@@ -121,6 +121,7 @@
     D_ARRAYCREATEFROMSTRINGSWFUNC                 DYNDTWAIN_API::DTWAIN_ArrayCreateFromStringsW = nullptr;
     D_ARRAYDESTROYFUNC                            DYNDTWAIN_API::DTWAIN_ArrayDestroy = nullptr;
     D_ARRAYDESTROYFRAMESFUNC                      DYNDTWAIN_API::DTWAIN_ArrayDestroyFrames = nullptr;
+    D_ARRAYDUMPTOLOGFUNC                          DYNDTWAIN_API::DTWAIN_ArrayDumpToLog = nullptr;
     D_ARRAYFINDFUNC                               DYNDTWAIN_API::DTWAIN_ArrayFind = nullptr;
     D_ARRAYFINDANSISTRINGFUNC                     DYNDTWAIN_API::DTWAIN_ArrayFindANSIString = nullptr;
     D_ARRAYFINDFLOATFUNC                          DYNDTWAIN_API::DTWAIN_ArrayFindFloat = nullptr;
@@ -323,6 +324,7 @@
     D_ENUMNOISEFILTERSFUNC                        DYNDTWAIN_API::DTWAIN_EnumNoiseFilters = nullptr;
     D_ENUMNOISEFILTERSEXFUNC                      DYNDTWAIN_API::DTWAIN_EnumNoiseFiltersEx = nullptr;
     D_ENUMOCRINTERFACESFUNC                       DYNDTWAIN_API::DTWAIN_EnumOCRInterfaces = nullptr;
+    D_ENUMOCRINTERFACESEXFUNC                     DYNDTWAIN_API::DTWAIN_EnumOCRInterfacesEx = nullptr;
     D_ENUMOCRSUPPORTEDCAPSFUNC                    DYNDTWAIN_API::DTWAIN_EnumOCRSupportedCaps = nullptr;
     D_ENUMORIENTATIONSFUNC                        DYNDTWAIN_API::DTWAIN_EnumOrientations = nullptr;
     D_ENUMORIENTATIONSEXFUNC                      DYNDTWAIN_API::DTWAIN_EnumOrientationsEx = nullptr;
@@ -1310,6 +1312,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_ArrayCreateFromStringsW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayDestroy, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayDestroyFrames, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ArrayDumpToLog, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayFind, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayFindANSIString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayFindFloat, hModule);
@@ -1512,6 +1515,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_EnumNoiseFilters, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumNoiseFiltersEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumOCRInterfaces, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_EnumOCRInterfacesEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumOCRSupportedCaps, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumOrientations, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumOrientationsEx, hModule);

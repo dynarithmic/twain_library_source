@@ -291,12 +291,12 @@ DTWAIN_CAPGETDEFAULT = 3
 DTWAIN_CAPSET = 6
 DTWAIN_CAPRESET = 7
 DTWAIN_CAPRESETALL = 8
-DTWAIN_CAPSETCONSTRAINT = 9
 DTWAIN_CAPSETAVAILABLE = 8
 DTWAIN_CAPSETCURRENT = 16
 DTWAIN_CAPGETHELP = 9
 DTWAIN_CAPGETLABEL = 10
 DTWAIN_CAPGETLABELENUM = 11
+DTWAIN_CAPSETCONSTRAINT = 12
 DTWAIN_AREASET = DTWAIN_CAPSET
 DTWAIN_AREARESET = DTWAIN_CAPRESET
 DTWAIN_AREACURRENT = DTWAIN_CAPGETCURRENT
@@ -1822,6 +1822,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayCreateFromReals.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayDestroy.restype = ct.c_long
      theDLL.DTWAIN_ArrayDestroyFrames.restype = ct.c_long
+     theDLL.DTWAIN_ArrayDumpToLog.restype = ct.c_long
      theDLL.DTWAIN_ArrayFind.restype = ct.c_long
      theDLL.DTWAIN_ArrayFindANSIString.restype = ct.c_long
      theDLL.DTWAIN_ArrayFindFloat.restype = ct.c_long
@@ -2024,6 +2025,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumNoiseFilters.restype = ct.c_long
      theDLL.DTWAIN_EnumNoiseFiltersEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumOCRInterfaces.restype = ct.c_long
+     theDLL.DTWAIN_EnumOCRInterfacesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumOCRSupportedCaps.restype = ct.c_long
      theDLL.DTWAIN_EnumOrientations.restype = ct.c_long
      theDLL.DTWAIN_EnumOrientationsEx.restype = ct.c_void_p
@@ -2940,6 +2942,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayCreateFromReals.argtypes = [ct.POINTER(ct.c_double), ct.c_long]
      theDLL.DTWAIN_ArrayDestroy.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ArrayDestroyFrames.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_ArrayDumpToLog.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ArrayFind.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_ArrayFindANSIString.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_ArrayFindFloat.argtypes = [ct.c_void_p, ct.c_double, ct.c_double]
@@ -4028,6 +4031,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayCreateFromReals.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayDestroy.restype = ct.c_long
      theDLL.DTWAIN_ArrayDestroyFrames.restype = ct.c_long
+     theDLL.DTWAIN_ArrayDumpToLog.restype = ct.c_long
      theDLL.DTWAIN_ArrayFind.restype = ct.c_long
      theDLL.DTWAIN_ArrayFindANSIString.restype = ct.c_long
      theDLL.DTWAIN_ArrayFindFloat.restype = ct.c_long
@@ -4230,6 +4234,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumNoiseFilters.restype = ct.c_long
      theDLL.DTWAIN_EnumNoiseFiltersEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumOCRInterfaces.restype = ct.c_long
+     theDLL.DTWAIN_EnumOCRInterfacesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumOCRSupportedCaps.restype = ct.c_long
      theDLL.DTWAIN_EnumOrientations.restype = ct.c_long
      theDLL.DTWAIN_EnumOrientationsEx.restype = ct.c_void_p
@@ -5146,6 +5151,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayCreateFromReals.argtypes = [ct.POINTER(ct.c_double), ct.c_long]
      theDLL.DTWAIN_ArrayDestroy.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ArrayDestroyFrames.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_ArrayDumpToLog.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ArrayFind.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_ArrayFindANSIString.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_ArrayFindFloat.argtypes = [ct.c_void_p, ct.c_double, ct.c_double]

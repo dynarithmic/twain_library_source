@@ -144,6 +144,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
+        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
         LONG DTWAIN_ArrayFindANSIString(DTWAIN_ARRAY pArray, LPCSTR pString);
         LONG DTWAIN_ArrayFindFloat(DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, DTWAIN_FLOAT Tolerance);
@@ -346,6 +347,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumNoiseFilters(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumNoiseFiltersEx(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRInterfaces);
+        DTWAIN_ARRAY DTWAIN_EnumOCRInterfacesEx();
         DTWAIN_BOOL DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LPDTWAIN_ARRAY SupportedCaps);
         DTWAIN_BOOL DTWAIN_EnumOrientations(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumOrientationsEx(DTWAIN_SOURCE Source);
@@ -1317,6 +1319,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
+        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
         LONG DTWAIN_ArrayFindANSIString(DTWAIN_ARRAY pArray, LPCSTR pString);
         LONG DTWAIN_ArrayFindFloat(DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, DTWAIN_FLOAT Tolerance);
@@ -1519,6 +1522,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumNoiseFilters(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumNoiseFiltersEx(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRInterfaces);
+        DTWAIN_ARRAY DTWAIN_EnumOCRInterfacesEx();
         DTWAIN_BOOL DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LPDTWAIN_ARRAY SupportedCaps);
         DTWAIN_BOOL DTWAIN_EnumOrientations(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumOrientationsEx(DTWAIN_SOURCE Source);
@@ -2490,6 +2494,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
+        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
         LONG DTWAIN_ArrayFindANSIString(DTWAIN_ARRAY pArray, LPCSTR pString);
         LONG DTWAIN_ArrayFindFloat(DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, DTWAIN_FLOAT Tolerance);
@@ -2692,6 +2697,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumNoiseFilters(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumNoiseFiltersEx(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRInterfaces);
+        DTWAIN_ARRAY DTWAIN_EnumOCRInterfacesEx();
         DTWAIN_BOOL DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LPDTWAIN_ARRAY SupportedCaps);
         DTWAIN_BOOL DTWAIN_EnumOrientations(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumOrientationsEx(DTWAIN_SOURCE Source);
@@ -3663,6 +3669,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
+        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
         LONG DTWAIN_ArrayFindANSIString(DTWAIN_ARRAY pArray, LPCSTR pString);
         LONG DTWAIN_ArrayFindFloat(DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, DTWAIN_FLOAT Tolerance);
@@ -3865,6 +3872,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumNoiseFilters(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumNoiseFiltersEx(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRInterfaces);
+        DTWAIN_ARRAY DTWAIN_EnumOCRInterfacesEx();
         DTWAIN_BOOL DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LPDTWAIN_ARRAY SupportedCaps);
         DTWAIN_BOOL DTWAIN_EnumOrientations(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumOrientationsEx(DTWAIN_SOURCE Source);

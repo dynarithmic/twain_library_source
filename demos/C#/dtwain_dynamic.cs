@@ -396,12 +396,12 @@
         public const int DTWAIN_CAPSET = 6;
         public const int DTWAIN_CAPRESET = 7;
         public const int DTWAIN_CAPRESETALL = 8;
-        public const int DTWAIN_CAPSETCONSTRAINT = 9;
         public const int DTWAIN_CAPSETAVAILABLE = 8;
         public const int DTWAIN_CAPSETCURRENT = 16;
         public const int DTWAIN_CAPGETHELP = 9;
         public const int DTWAIN_CAPGETLABEL = 10;
         public const int DTWAIN_CAPGETLABELENUM = 11;
+        public const int DTWAIN_CAPSETCONSTRAINT = 12;
         public const int DTWAIN_AREASET = DTWAIN_CAPSET;
         public const int DTWAIN_AREARESET = DTWAIN_CAPRESET;
         public const int DTWAIN_AREACURRENT = DTWAIN_CAPGETCURRENT;
@@ -1947,6 +1947,7 @@
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromRealsDelegate(ref DTWAIN_FLOAT pCArray, int nSize);
         public delegate int DTWAIN_ArrayDestroyDelegate(DTWAIN_ARRAY pArray);
         public delegate int DTWAIN_ArrayDestroyFramesDelegate(DTWAIN_ARRAY FrameArray);
+        public delegate int DTWAIN_ArrayDumpToLogDelegate(DTWAIN_ARRAY pArray);
         public delegate int DTWAIN_ArrayFindDelegate(DTWAIN_ARRAY pArray, System.IntPtr pVariant);
         public delegate int DTWAIN_ArrayFindANSIStringDelegate(DTWAIN_ARRAY pArray, string pString);
         public delegate int DTWAIN_ArrayFindFloatDelegate(DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, DTWAIN_FLOAT Tolerance);
@@ -2122,6 +2123,7 @@
         public delegate int DTWAIN_EnumNoiseFiltersDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
         public delegate DTWAIN_ARRAY DTWAIN_EnumNoiseFiltersExDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_EnumOCRInterfacesDelegate(ref DTWAIN_ARRAY OCRInterfaces);
+        public delegate DTWAIN_ARRAY DTWAIN_EnumOCRInterfacesExDelegate();
         public delegate int DTWAIN_EnumOCRSupportedCapsDelegate(DTWAIN_OCRENGINE Engine, ref DTWAIN_ARRAY SupportedCaps);
         public delegate int DTWAIN_EnumOrientationsDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
         public delegate DTWAIN_ARRAY DTWAIN_EnumOrientationsExDelegate(DTWAIN_SOURCE Source);
@@ -2930,6 +2932,9 @@
         [DTWAINNativeFunction("DTWAIN_ArrayDestroyFrames")]
         private readonly DTWAIN_ArrayDestroyFramesDelegate  _DTWAIN_ArrayDestroyFrames;
 
+        [DTWAINNativeFunction("DTWAIN_ArrayDumpToLog")]
+        private readonly DTWAIN_ArrayDumpToLogDelegate  _DTWAIN_ArrayDumpToLog;
+
         [DTWAINNativeFunction("DTWAIN_ArrayFind")]
         private readonly DTWAIN_ArrayFindDelegate  _DTWAIN_ArrayFind;
 
@@ -3454,6 +3459,9 @@
 
         [DTWAINNativeFunction("DTWAIN_EnumOCRInterfaces")]
         private readonly DTWAIN_EnumOCRInterfacesDelegate  _DTWAIN_EnumOCRInterfaces;
+
+        [DTWAINNativeFunction("DTWAIN_EnumOCRInterfacesEx")]
+        private readonly DTWAIN_EnumOCRInterfacesExDelegate  _DTWAIN_EnumOCRInterfacesEx;
 
         [DTWAINNativeFunction("DTWAIN_EnumOCRSupportedCaps")]
         private readonly DTWAIN_EnumOCRSupportedCapsDelegate  _DTWAIN_EnumOCRSupportedCaps;
@@ -5536,6 +5544,9 @@
         public  int DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray)
         => _DTWAIN_ArrayDestroyFrames(FrameArray);
 
+        public  int DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray)
+        => _DTWAIN_ArrayDumpToLog(pArray);
+
         public  int DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, System.IntPtr pVariant)
         => _DTWAIN_ArrayFind(pArray, pVariant);
 
@@ -6060,6 +6071,9 @@
 
         public  int DTWAIN_EnumOCRInterfaces(ref DTWAIN_ARRAY OCRInterfaces)
         => _DTWAIN_EnumOCRInterfaces(ref OCRInterfaces);
+
+        public  DTWAIN_ARRAY DTWAIN_EnumOCRInterfacesEx()
+        => _DTWAIN_EnumOCRInterfacesEx();
 
         public  int DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, ref DTWAIN_ARRAY SupportedCaps)
         => _DTWAIN_EnumOCRSupportedCaps(Engine, ref SupportedCaps);

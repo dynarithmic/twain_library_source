@@ -114,6 +114,7 @@ type DtwainarraycreatefromlongsFunc = unsafe extern "C" fn(*mut i32,i32) -> *mut
 type DtwainarraycreatefromrealsFunc = unsafe extern "C" fn(i32) -> *mut c_void;
 type DtwainarraydestroyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainarraydestroyframesFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainarraydumptologFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainarrayfindFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
 type DtwainarrayfindansistringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
 type DtwainarrayfindfloatFunc = unsafe extern "C" fn(*mut c_void,f64,f64) -> i32;
@@ -316,6 +317,7 @@ type DtwainenummaxbuffersexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut 
 type DtwainenumnoisefiltersFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumnoisefiltersexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type DtwainenumocrinterfacesFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
+type DtwainenumocrinterfacesexFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwainenumocrsupportedcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumorientationsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumorientationsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
@@ -1232,6 +1234,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_ArrayCreateFromRealsFunc: Symbol<'a, DtwainarraycreatefromrealsFunc>,
     DTWAIN_ArrayDestroyFunc: Symbol<'a, DtwainarraydestroyFunc>,
     DTWAIN_ArrayDestroyFramesFunc: Symbol<'a, DtwainarraydestroyframesFunc>,
+    DTWAIN_ArrayDumpToLogFunc: Symbol<'a, DtwainarraydumptologFunc>,
     DTWAIN_ArrayFindFunc: Symbol<'a, DtwainarrayfindFunc>,
     DTWAIN_ArrayFindANSIStringFunc: Symbol<'a, DtwainarrayfindansistringFunc>,
     DTWAIN_ArrayFindFloatFunc: Symbol<'a, DtwainarrayfindfloatFunc>,
@@ -1434,6 +1437,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_EnumNoiseFiltersFunc: Symbol<'a, DtwainenumnoisefiltersFunc>,
     DTWAIN_EnumNoiseFiltersExFunc: Symbol<'a, DtwainenumnoisefiltersexFunc>,
     DTWAIN_EnumOCRInterfacesFunc: Symbol<'a, DtwainenumocrinterfacesFunc>,
+    DTWAIN_EnumOCRInterfacesExFunc: Symbol<'a, DtwainenumocrinterfacesexFunc>,
     DTWAIN_EnumOCRSupportedCapsFunc: Symbol<'a, DtwainenumocrsupportedcapsFunc>,
     DTWAIN_EnumOrientationsFunc: Symbol<'a, DtwainenumorientationsFunc>,
     DTWAIN_EnumOrientationsExFunc: Symbol<'a, DtwainenumorientationsexFunc>,
@@ -2516,12 +2520,12 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_CAPSET: i32 = 6;
     pub const DTWAIN_CAPRESET: i32 = 7;
     pub const DTWAIN_CAPRESETALL: i32 = 8;
-    pub const DTWAIN_CAPSETCONSTRAINT: i32 = 9;
     pub const DTWAIN_CAPSETAVAILABLE: i32 = 8;
     pub const DTWAIN_CAPSETCURRENT: i32 = 16;
     pub const DTWAIN_CAPGETHELP: i32 = 9;
     pub const DTWAIN_CAPGETLABEL: i32 = 10;
     pub const DTWAIN_CAPGETLABELENUM: i32 = 11;
+    pub const DTWAIN_CAPSETCONSTRAINT: i32 = 12;
     pub const DTWAIN_AREASET: i32 = DTwainAPI::DTWAIN_CAPSET;
     pub const DTWAIN_AREARESET: i32 = DTwainAPI::DTWAIN_CAPRESET;
     pub const DTWAIN_AREACURRENT: i32 = DTwainAPI::DTWAIN_CAPGETCURRENT;
@@ -3990,6 +3994,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_ArrayCreateFromReals: Symbol<DtwainarraycreatefromrealsFunc> = unsafe { library.get(b"DTWAIN_ArrayCreateFromReals")? };
         let DTWAIN_ArrayDestroy: Symbol<DtwainarraydestroyFunc> = unsafe { library.get(b"DTWAIN_ArrayDestroy")? };
         let DTWAIN_ArrayDestroyFrames: Symbol<DtwainarraydestroyframesFunc> = unsafe { library.get(b"DTWAIN_ArrayDestroyFrames")? };
+        let DTWAIN_ArrayDumpToLog: Symbol<DtwainarraydumptologFunc> = unsafe { library.get(b"DTWAIN_ArrayDumpToLog")? };
         let DTWAIN_ArrayFind: Symbol<DtwainarrayfindFunc> = unsafe { library.get(b"DTWAIN_ArrayFind")? };
         let DTWAIN_ArrayFindANSIString: Symbol<DtwainarrayfindansistringFunc> = unsafe { library.get(b"DTWAIN_ArrayFindANSIString")? };
         let DTWAIN_ArrayFindFloat: Symbol<DtwainarrayfindfloatFunc> = unsafe { library.get(b"DTWAIN_ArrayFindFloat")? };
@@ -4192,6 +4197,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_EnumNoiseFilters: Symbol<DtwainenumnoisefiltersFunc> = unsafe { library.get(b"DTWAIN_EnumNoiseFilters")? };
         let DTWAIN_EnumNoiseFiltersEx: Symbol<DtwainenumnoisefiltersexFunc> = unsafe { library.get(b"DTWAIN_EnumNoiseFiltersEx")? };
         let DTWAIN_EnumOCRInterfaces: Symbol<DtwainenumocrinterfacesFunc> = unsafe { library.get(b"DTWAIN_EnumOCRInterfaces")? };
+        let DTWAIN_EnumOCRInterfacesEx: Symbol<DtwainenumocrinterfacesexFunc> = unsafe { library.get(b"DTWAIN_EnumOCRInterfacesEx")? };
         let DTWAIN_EnumOCRSupportedCaps: Symbol<DtwainenumocrsupportedcapsFunc> = unsafe { library.get(b"DTWAIN_EnumOCRSupportedCaps")? };
         let DTWAIN_EnumOrientations: Symbol<DtwainenumorientationsFunc> = unsafe { library.get(b"DTWAIN_EnumOrientations")? };
         let DTWAIN_EnumOrientationsEx: Symbol<DtwainenumorientationsexFunc> = unsafe { library.get(b"DTWAIN_EnumOrientationsEx")? };
@@ -5107,6 +5113,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_ArrayCreateFromRealsFunc: DTWAIN_ArrayCreateFromReals,
             DTWAIN_ArrayDestroyFunc: DTWAIN_ArrayDestroy,
             DTWAIN_ArrayDestroyFramesFunc: DTWAIN_ArrayDestroyFrames,
+            DTWAIN_ArrayDumpToLogFunc: DTWAIN_ArrayDumpToLog,
             DTWAIN_ArrayFindFunc: DTWAIN_ArrayFind,
             DTWAIN_ArrayFindANSIStringFunc: DTWAIN_ArrayFindANSIString,
             DTWAIN_ArrayFindFloatFunc: DTWAIN_ArrayFindFloat,
@@ -5309,6 +5316,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_EnumNoiseFiltersFunc: DTWAIN_EnumNoiseFilters,
             DTWAIN_EnumNoiseFiltersExFunc: DTWAIN_EnumNoiseFiltersEx,
             DTWAIN_EnumOCRInterfacesFunc: DTWAIN_EnumOCRInterfaces,
+            DTWAIN_EnumOCRInterfacesExFunc: DTWAIN_EnumOCRInterfacesEx,
             DTWAIN_EnumOCRSupportedCapsFunc: DTWAIN_EnumOCRSupportedCaps,
             DTWAIN_EnumOrientationsFunc: DTWAIN_EnumOrientations,
             DTWAIN_EnumOrientationsExFunc: DTWAIN_EnumOrientationsEx,
@@ -6428,6 +6436,10 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayDestroyFramesFunc)(FrameArray);  }
     }
 
+    pub fn DTWAIN_ArrayDumpToLog(&self, pArray: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_ArrayDumpToLogFunc)(pArray);  }
+    }
+
     pub fn DTWAIN_ArrayFind(&self, pArray: *mut c_void, pVariant: *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_ArrayFindFunc)(pArray, pVariant);  }
     }
@@ -7234,6 +7246,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_EnumOCRInterfaces(&self, OCRInterfaces: *mut *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_EnumOCRInterfacesFunc)(OCRInterfaces);  }
+    }
+
+    pub fn DTWAIN_EnumOCRInterfacesEx(&self) -> *mut c_void {
+        unsafe { return (self.DTWAIN_EnumOCRInterfacesExFunc)();  }
     }
 
     pub fn DTWAIN_EnumOCRSupportedCaps(&self, Engine: *mut c_void, SupportedCaps: *mut *mut c_void) -> i32 {

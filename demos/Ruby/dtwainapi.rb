@@ -202,6 +202,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_ArrayCreateFromReals
    attr_reader :DTWAIN_ArrayDestroy
    attr_reader :DTWAIN_ArrayDestroyFrames
+   attr_reader :DTWAIN_ArrayDumpToLog
    attr_reader :DTWAIN_ArrayFind
    attr_reader :DTWAIN_ArrayFindANSIString
    attr_reader :DTWAIN_ArrayFindFloat
@@ -404,6 +405,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_EnumNoiseFilters
    attr_reader :DTWAIN_EnumNoiseFiltersEx
    attr_reader :DTWAIN_EnumOCRInterfaces
+   attr_reader :DTWAIN_EnumOCRInterfacesEx
    attr_reader :DTWAIN_EnumOCRSupportedCaps
    attr_reader :DTWAIN_EnumOrientations
    attr_reader :DTWAIN_EnumOrientationsEx
@@ -1483,12 +1485,12 @@ class DTWAINAPI
    DTWAIN_CAPSET = 6
    DTWAIN_CAPRESET = 7
    DTWAIN_CAPRESETALL = 8
-   DTWAIN_CAPSETCONSTRAINT = 9
    DTWAIN_CAPSETAVAILABLE = 8
    DTWAIN_CAPSETCURRENT = 16
    DTWAIN_CAPGETHELP = 9
    DTWAIN_CAPGETLABEL = 10
    DTWAIN_CAPGETLABELENUM = 11
+   DTWAIN_CAPSETCONSTRAINT = 12
    DTWAIN_AREASET = DTWAIN_CAPSET
    DTWAIN_AREARESET = DTWAIN_CAPRESET
    DTWAIN_AREACURRENT = DTWAIN_CAPGETCURRENT
@@ -2996,6 +2998,7 @@ class DTWAINAPI
        @DTWAIN_ArrayCreateFromReals = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateFromReals'],[Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayDestroy = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayDestroy'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayDestroyFrames = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayDestroyFrames'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_ArrayDumpToLog = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayDumpToLog'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayFind = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayFind'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_ArrayFindANSIString = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayFindANSIString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_ArrayFindFloat = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayFindFloat'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE],Fiddle::TYPE_LONG)
@@ -3198,6 +3201,7 @@ class DTWAINAPI
        @DTWAIN_EnumNoiseFilters = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumNoiseFilters'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumNoiseFiltersEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumNoiseFiltersEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumOCRInterfaces = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumOCRInterfaces'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_EnumOCRInterfacesEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumOCRInterfacesEx'],[],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumOCRSupportedCaps = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumOCRSupportedCaps'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumOrientations = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumOrientations'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumOrientationsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumOrientationsEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
