@@ -2830,6 +2830,9 @@ module TwainAPI =
     type DTWAIN_GetCapOperationsDelegate = delegate of DTWAIN_SOURCE * LONG * int byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetCapOperationsExDelegate = delegate of DTWAIN_SOURCE * LONG -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetCapValuesDelegate = delegate of DTWAIN_SOURCE * LONG * LONG * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -2915,6 +2918,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetDuplexTypeDelegate = delegate of DTWAIN_SOURCE * int byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetDuplexTypeExDelegate = delegate of DTWAIN_SOURCE -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetErrorBufferDelegate = delegate of DTWAIN_ARRAY byref -> DTWAIN_BOOL
@@ -4568,6 +4574,7 @@ module TwainAPI =
     let private GetCapDataType = lazy (DynamicDll.Bind "DTWAIN_GetCapDataType" : DTWAIN_GetCapDataTypeDelegate)
     let private GetCapFromName = lazy (DynamicDll.Bind "DTWAIN_GetCapFromName" : DTWAIN_GetCapFromNameDelegate)
     let private GetCapOperations = lazy (DynamicDll.Bind "DTWAIN_GetCapOperations" : DTWAIN_GetCapOperationsDelegate)
+    let private GetCapOperationsEx = lazy (DynamicDll.Bind "DTWAIN_GetCapOperationsEx" : DTWAIN_GetCapOperationsExDelegate)
     let private GetCapValues = lazy (DynamicDll.Bind "DTWAIN_GetCapValues" : DTWAIN_GetCapValuesDelegate)
     let private GetCapValuesEx = lazy (DynamicDll.Bind "DTWAIN_GetCapValuesEx" : DTWAIN_GetCapValuesExDelegate)
     let private GetCapValuesEx2 = lazy (DynamicDll.Bind "DTWAIN_GetCapValuesEx2" : DTWAIN_GetCapValuesEx2Delegate)
@@ -4597,6 +4604,7 @@ module TwainAPI =
     let private GetDoubleFeedDetectLength = lazy (DynamicDll.Bind "DTWAIN_GetDoubleFeedDetectLength" : DTWAIN_GetDoubleFeedDetectLengthDelegate)
     let private GetDoubleFeedDetectValues = lazy (DynamicDll.Bind "DTWAIN_GetDoubleFeedDetectValues" : DTWAIN_GetDoubleFeedDetectValuesDelegate)
     let private GetDuplexType = lazy (DynamicDll.Bind "DTWAIN_GetDuplexType" : DTWAIN_GetDuplexTypeDelegate)
+    let private GetDuplexTypeEx = lazy (DynamicDll.Bind "DTWAIN_GetDuplexTypeEx" : DTWAIN_GetDuplexTypeExDelegate)
     let private GetErrorBuffer = lazy (DynamicDll.Bind "DTWAIN_GetErrorBuffer" : DTWAIN_GetErrorBufferDelegate)
     let private GetErrorBufferThreshold = lazy (DynamicDll.Bind "DTWAIN_GetErrorBufferThreshold" : DTWAIN_GetErrorBufferThresholdDelegate)
     let private GetErrorCallback = lazy (DynamicDll.Bind "DTWAIN_GetErrorCallback" : DTWAIN_GetErrorCallbackDelegate)
@@ -6367,6 +6375,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCapOperations.Value.Invoke(source, lcapability, &lpops)
 
+    let DTWAIN_GetCapOperationsEx (source: DTWAIN_SOURCE) (lcapability: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetCapOperationsEx.Value.Invoke(source, lcapability)
+
     let DTWAIN_GetCapValues (source: DTWAIN_SOURCE) (lcap: LONG) (lgettype: LONG) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCapValues.Value.Invoke(source, lcap, lgettype, &parray)
@@ -6482,6 +6494,10 @@ module TwainAPI =
     let DTWAIN_GetDuplexType (source: DTWAIN_SOURCE) (lpduptype: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDuplexType.Value.Invoke(source, &lpduptype)
+
+    let DTWAIN_GetDuplexTypeEx (source: DTWAIN_SOURCE) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetDuplexTypeEx.Value.Invoke(source)
 
     let DTWAIN_GetErrorBuffer (arraybuffer: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

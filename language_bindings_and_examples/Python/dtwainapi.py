@@ -2158,6 +2158,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetCapFromNameA.restype = ct.c_long
      theDLL.DTWAIN_GetCapFromNameW.restype = ct.c_long
      theDLL.DTWAIN_GetCapOperations.restype = ct.c_long
+     theDLL.DTWAIN_GetCapOperationsEx.restype = ct.c_long
      theDLL.DTWAIN_GetCapValues.restype = ct.c_long
      theDLL.DTWAIN_GetCapValuesEx.restype = ct.c_long
      theDLL.DTWAIN_GetCapValuesEx2.restype = ct.c_long
@@ -2203,6 +2204,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetDoubleFeedDetectLength.restype = ct.c_long
      theDLL.DTWAIN_GetDoubleFeedDetectValues.restype = ct.c_long
      theDLL.DTWAIN_GetDuplexType.restype = ct.c_long
+     theDLL.DTWAIN_GetDuplexTypeEx.restype = ct.c_long
      theDLL.DTWAIN_GetErrorBuffer.restype = ct.c_long
      theDLL.DTWAIN_GetErrorBufferThreshold.restype = ct.c_long
      theDLL.DTWAIN_GetErrorCallback.restype = theDLL.SETERRORPROC_TYPE
@@ -3266,6 +3268,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetCapFromNameA.argtypes = [ct.c_char_p]
      theDLL.DTWAIN_GetCapFromNameW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_GetCapOperations.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetCapOperationsEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_GetCapValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetCapValuesEx.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetCapValuesEx2.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.POINTER(ct.c_void_p)]
@@ -3308,6 +3311,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetDoubleFeedDetectLength.argtypes = [ct.c_void_p, ct.POINTER(ct.c_double), ct.c_long]
      theDLL.DTWAIN_GetDoubleFeedDetectValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetDuplexType.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetDuplexTypeEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetErrorBuffer.argtypes = [ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetErrorString.argtypes = [ct.c_long, ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetErrorStringA.argtypes = [ct.c_long, ct.c_char_p, ct.c_long]
@@ -4367,6 +4371,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetCapFromNameA.restype = ct.c_long
      theDLL.DTWAIN_GetCapFromNameW.restype = ct.c_long
      theDLL.DTWAIN_GetCapOperations.restype = ct.c_long
+     theDLL.DTWAIN_GetCapOperationsEx.restype = ct.c_long
      theDLL.DTWAIN_GetCapValues.restype = ct.c_long
      theDLL.DTWAIN_GetCapValuesEx.restype = ct.c_long
      theDLL.DTWAIN_GetCapValuesEx2.restype = ct.c_long
@@ -4412,6 +4417,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetDoubleFeedDetectLength.restype = ct.c_long
      theDLL.DTWAIN_GetDoubleFeedDetectValues.restype = ct.c_long
      theDLL.DTWAIN_GetDuplexType.restype = ct.c_long
+     theDLL.DTWAIN_GetDuplexTypeEx.restype = ct.c_long
      theDLL.DTWAIN_GetErrorBuffer.restype = ct.c_long
      theDLL.DTWAIN_GetErrorBufferThreshold.restype = ct.c_long
      theDLL.DTWAIN_GetErrorCallback.restype = theDLL.SETERRORPROC_TYPE
@@ -5475,6 +5481,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetCapFromNameA.argtypes = [ct.c_char_p]
      theDLL.DTWAIN_GetCapFromNameW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_GetCapOperations.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetCapOperationsEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_GetCapValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetCapValuesEx.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetCapValuesEx2.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.POINTER(ct.c_void_p)]
@@ -5517,6 +5524,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetDoubleFeedDetectLength.argtypes = [ct.c_void_p, ct.POINTER(ct.c_double), ct.c_long]
      theDLL.DTWAIN_GetDoubleFeedDetectValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetDuplexType.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetDuplexTypeEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetErrorBuffer.argtypes = [ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetErrorString.argtypes = [ct.c_long, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetErrorStringA.argtypes = [ct.c_long, ct.c_char_p, ct.c_long]

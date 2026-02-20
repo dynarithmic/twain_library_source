@@ -2803,6 +2803,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, int lCapability, ref int lpOps);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, int lCapability);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetCapValues(DTWAIN_SOURCE Source, int lCap, int lGetType, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
@@ -2909,6 +2912,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, ref int lpDupType);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_GetDuplexTypeEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetErrorBuffer(ref DTWAIN_ARRAY ArrayBuffer);

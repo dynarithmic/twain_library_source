@@ -2893,6 +2893,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetCapOperationsDelegate(Source As System.IntPtr, lCapability As Integer, ByRef lpOps As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetCapOperationsExDelegate(Source As System.IntPtr, lCapability As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetCapValuesDelegate(Source As System.IntPtr, lCap As Integer, lGetType As Integer, ByRef pArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -2978,6 +2981,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetDuplexTypeDelegate(Source As System.IntPtr, ByRef lpDupType As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetDuplexTypeExDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetErrorBufferDelegate(ByRef ArrayBuffer As System.IntPtr) As Integer
@@ -5624,6 +5630,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetCapOperations(Source, lCapability, lpOps)
         End Function
         
+        Public Function DTWAIN_GetCapOperationsEx(Source As System.IntPtr, lCapability As Integer) As Integer
+        Return api.DTWAIN_GetCapOperationsEx(Source, lCapability)
+        End Function
+        
         Public Function DTWAIN_GetCapValues(Source As System.IntPtr, lCap As Integer, lGetType As Integer, ByRef pArray As System.IntPtr) As Integer
         Return api.DTWAIN_GetCapValues(Source, lCap, lGetType, pArray)
         End Function
@@ -5738,6 +5748,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_GetDuplexType(Source As System.IntPtr, ByRef lpDupType As Integer) As Integer
         Return api.DTWAIN_GetDuplexType(Source, lpDupType)
+        End Function
+        
+        Public Function DTWAIN_GetDuplexTypeEx(Source As System.IntPtr) As Integer
+        Return api.DTWAIN_GetDuplexTypeEx(Source)
         End Function
         
         Public Function DTWAIN_GetErrorBuffer(ByRef ArrayBuffer As System.IntPtr) As Integer
@@ -7851,6 +7865,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetCapDataType As DTWAIN_GetCapDataTypeDelegate
             Public DTWAIN_GetCapFromName As DTWAIN_GetCapFromNameDelegate
             Public DTWAIN_GetCapOperations As DTWAIN_GetCapOperationsDelegate
+            Public DTWAIN_GetCapOperationsEx As DTWAIN_GetCapOperationsExDelegate
             Public DTWAIN_GetCapValues As DTWAIN_GetCapValuesDelegate
             Public DTWAIN_GetCapValuesEx As DTWAIN_GetCapValuesExDelegate
             Public DTWAIN_GetCapValuesEx2 As DTWAIN_GetCapValuesEx2Delegate
@@ -7880,6 +7895,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetDoubleFeedDetectLength As DTWAIN_GetDoubleFeedDetectLengthDelegate
             Public DTWAIN_GetDoubleFeedDetectValues As DTWAIN_GetDoubleFeedDetectValuesDelegate
             Public DTWAIN_GetDuplexType As DTWAIN_GetDuplexTypeDelegate
+            Public DTWAIN_GetDuplexTypeEx As DTWAIN_GetDuplexTypeExDelegate
             Public DTWAIN_GetErrorBuffer As DTWAIN_GetErrorBufferDelegate
             Public DTWAIN_GetErrorBufferThreshold As DTWAIN_GetErrorBufferThresholdDelegate
             Public DTWAIN_GetErrorCallback As DTWAIN_GetErrorCallbackDelegate

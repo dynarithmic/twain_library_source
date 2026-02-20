@@ -2237,6 +2237,7 @@ function DTWAIN_GetCapFromName(szName:LPCTSTR) : LONG; external 'dtwain64.dll'  
 function DTWAIN_GetCapFromNameA(szName:LPCSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCapFromNameA';
 function DTWAIN_GetCapFromNameW(szName:LPCWSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCapFromNameW';
 function DTWAIN_GetCapOperations(Source:DTWAIN_SOURCE; lCapability:LONG; lpOps:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetCapOperations';
+function DTWAIN_GetCapOperationsEx(Source:DTWAIN_SOURCE; lCapability:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCapOperationsEx';
 function DTWAIN_GetCapValues(Source:DTWAIN_SOURCE; lCap:LONG; lGetType:LONG; pArray:LPDTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetCapValues';
 function DTWAIN_GetCapValuesEx(Source:DTWAIN_SOURCE; lCap:LONG; lGetType:LONG; lContainerType:LONG; pArray:LPDTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetCapValuesEx';
 function DTWAIN_GetCapValuesEx2(Source:DTWAIN_SOURCE; lCap:LONG; lGetType:LONG; lContainerType:LONG; nDataType:LONG; pArray:LPDTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetCapValuesEx2';
@@ -2282,6 +2283,7 @@ function DTWAIN_GetDeviceTimeDateW(Source:DTWAIN_SOURCE; szTimeDate:LPWSTR) : BO
 function DTWAIN_GetDoubleFeedDetectLength(Source:DTWAIN_SOURCE; Value:LPDTWAIN_FLOAT; bCurrent:BOOL) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetDoubleFeedDetectLength';
 function DTWAIN_GetDoubleFeedDetectValues(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetDoubleFeedDetectValues';
 function DTWAIN_GetDuplexType(Source:DTWAIN_SOURCE; lpDupType:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetDuplexType';
+function DTWAIN_GetDuplexTypeEx(Source:DTWAIN_SOURCE) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetDuplexTypeEx';
 function DTWAIN_GetErrorBuffer(ArrayBuffer:LPDTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetErrorBuffer';
 function DTWAIN_GetErrorBufferThreshold : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetErrorBufferThreshold';
 function DTWAIN_GetErrorCallback : DTwainErrorProc; external 'dtwain64.dll'  name 'DTWAIN_GetErrorCallback';

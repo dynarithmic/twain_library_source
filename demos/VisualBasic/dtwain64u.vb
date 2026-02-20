@@ -2067,6 +2067,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetCapDataType Lib "dtwain64u.dll" (Source As System.IntPtr, nCap As Integer) As Integer
     Public Declare Unicode Function DTWAIN_GetCapFromName Lib "dtwain64u.dll" (szName As String) As Integer
     Public Declare Function DTWAIN_GetCapOperations Lib "dtwain64u.dll" (Source As System.IntPtr, lCapability As Integer, ByRef lpOps As Integer) As Integer
+    Public Declare Function DTWAIN_GetCapOperationsEx Lib "dtwain64u.dll" (Source As System.IntPtr, lCapability As Integer) As Integer
     Public Declare Function DTWAIN_GetCapValues Lib "dtwain64u.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetCapValuesEx Lib "dtwain64u.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer, lContainerType As Integer, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetCapValuesEx2 Lib "dtwain64u.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer, lContainerType As Integer, nDataType As Integer, ByRef pArray As System.IntPtr) As Integer
@@ -2096,6 +2097,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetDoubleFeedDetectLength Lib "dtwain64u.dll" (Source As System.IntPtr, ByRef Value As System.Double, bCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetDoubleFeedDetectValues Lib "dtwain64u.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetDuplexType Lib "dtwain64u.dll" (Source As System.IntPtr, ByRef lpDupType As Integer) As Integer
+    Public Declare Function DTWAIN_GetDuplexTypeEx Lib "dtwain64u.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetErrorBuffer Lib "dtwain64u.dll" (ByRef ArrayBuffer As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetErrorBufferThreshold Lib "dtwain64u.dll" () As Integer
     Public Declare Function DTWAIN_GetErrorCallback Lib "dtwain64u.dll" () As DTwainErrorProc

@@ -450,6 +450,7 @@ type DtwaingetcapfromnameFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingetcapfromnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
 type DtwaingetcapfromnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingetcapoperationsFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
+type DtwaingetcapoperationsexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwaingetcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut *mut c_void) -> i32;
 type DtwaingetcapvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,*mut *mut c_void) -> i32;
 type Dtwaingetcapvaluesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut *mut c_void) -> i32;
@@ -495,6 +496,7 @@ type DtwaingetdevicetimedatewFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -
 type DtwaingetdoublefeeddetectlengthFunc = unsafe extern "C" fn(*mut c_void,*mut f64,i32) -> i32;
 type DtwaingetdoublefeeddetectvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwaingetduplextypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetduplextypeexFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingeterrorbufferFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
 type DtwaingeterrorbufferthresholdFunc = unsafe extern "C" fn() -> i32;
 type DtwaingeterrorcallbackFunc = unsafe extern "C" fn() -> DTWAIN_ERROR_PROC;
@@ -1570,6 +1572,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetCapFromNameAFunc: Symbol<'a, DtwaingetcapfromnameaFunc>,
     DTWAIN_GetCapFromNameWFunc: Symbol<'a, DtwaingetcapfromnamewFunc>,
     DTWAIN_GetCapOperationsFunc: Symbol<'a, DtwaingetcapoperationsFunc>,
+    DTWAIN_GetCapOperationsExFunc: Symbol<'a, DtwaingetcapoperationsexFunc>,
     DTWAIN_GetCapValuesFunc: Symbol<'a, DtwaingetcapvaluesFunc>,
     DTWAIN_GetCapValuesExFunc: Symbol<'a, DtwaingetcapvaluesexFunc>,
     DTWAIN_GetCapValuesEx2Func: Symbol<'a, Dtwaingetcapvaluesex2Func>,
@@ -1615,6 +1618,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetDoubleFeedDetectLengthFunc: Symbol<'a, DtwaingetdoublefeeddetectlengthFunc>,
     DTWAIN_GetDoubleFeedDetectValuesFunc: Symbol<'a, DtwaingetdoublefeeddetectvaluesFunc>,
     DTWAIN_GetDuplexTypeFunc: Symbol<'a, DtwaingetduplextypeFunc>,
+    DTWAIN_GetDuplexTypeExFunc: Symbol<'a, DtwaingetduplextypeexFunc>,
     DTWAIN_GetErrorBufferFunc: Symbol<'a, DtwaingeterrorbufferFunc>,
     DTWAIN_GetErrorBufferThresholdFunc: Symbol<'a, DtwaingeterrorbufferthresholdFunc>,
     DTWAIN_GetErrorCallbackFunc: Symbol<'a, DtwaingeterrorcallbackFunc>,
@@ -4330,6 +4334,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetCapFromNameA: Symbol<DtwaingetcapfromnameaFunc> = unsafe { library.get(b"DTWAIN_GetCapFromNameA")? };
         let DTWAIN_GetCapFromNameW: Symbol<DtwaingetcapfromnamewFunc> = unsafe { library.get(b"DTWAIN_GetCapFromNameW")? };
         let DTWAIN_GetCapOperations: Symbol<DtwaingetcapoperationsFunc> = unsafe { library.get(b"DTWAIN_GetCapOperations")? };
+        let DTWAIN_GetCapOperationsEx: Symbol<DtwaingetcapoperationsexFunc> = unsafe { library.get(b"DTWAIN_GetCapOperationsEx")? };
         let DTWAIN_GetCapValues: Symbol<DtwaingetcapvaluesFunc> = unsafe { library.get(b"DTWAIN_GetCapValues")? };
         let DTWAIN_GetCapValuesEx: Symbol<DtwaingetcapvaluesexFunc> = unsafe { library.get(b"DTWAIN_GetCapValuesEx")? };
         let DTWAIN_GetCapValuesEx2: Symbol<Dtwaingetcapvaluesex2Func> = unsafe { library.get(b"DTWAIN_GetCapValuesEx2")? };
@@ -4375,6 +4380,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetDoubleFeedDetectLength: Symbol<DtwaingetdoublefeeddetectlengthFunc> = unsafe { library.get(b"DTWAIN_GetDoubleFeedDetectLength")? };
         let DTWAIN_GetDoubleFeedDetectValues: Symbol<DtwaingetdoublefeeddetectvaluesFunc> = unsafe { library.get(b"DTWAIN_GetDoubleFeedDetectValues")? };
         let DTWAIN_GetDuplexType: Symbol<DtwaingetduplextypeFunc> = unsafe { library.get(b"DTWAIN_GetDuplexType")? };
+        let DTWAIN_GetDuplexTypeEx: Symbol<DtwaingetduplextypeexFunc> = unsafe { library.get(b"DTWAIN_GetDuplexTypeEx")? };
         let DTWAIN_GetErrorBuffer: Symbol<DtwaingeterrorbufferFunc> = unsafe { library.get(b"DTWAIN_GetErrorBuffer")? };
         let DTWAIN_GetErrorBufferThreshold: Symbol<DtwaingeterrorbufferthresholdFunc> = unsafe { library.get(b"DTWAIN_GetErrorBufferThreshold")? };
         let DTWAIN_GetErrorCallback: Symbol<DtwaingeterrorcallbackFunc> = unsafe { library.get(b"DTWAIN_GetErrorCallback")? };
@@ -5449,6 +5455,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetCapFromNameAFunc: DTWAIN_GetCapFromNameA,
             DTWAIN_GetCapFromNameWFunc: DTWAIN_GetCapFromNameW,
             DTWAIN_GetCapOperationsFunc: DTWAIN_GetCapOperations,
+            DTWAIN_GetCapOperationsExFunc: DTWAIN_GetCapOperationsEx,
             DTWAIN_GetCapValuesFunc: DTWAIN_GetCapValues,
             DTWAIN_GetCapValuesExFunc: DTWAIN_GetCapValuesEx,
             DTWAIN_GetCapValuesEx2Func: DTWAIN_GetCapValuesEx2,
@@ -5494,6 +5501,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetDoubleFeedDetectLengthFunc: DTWAIN_GetDoubleFeedDetectLength,
             DTWAIN_GetDoubleFeedDetectValuesFunc: DTWAIN_GetDoubleFeedDetectValues,
             DTWAIN_GetDuplexTypeFunc: DTWAIN_GetDuplexType,
+            DTWAIN_GetDuplexTypeExFunc: DTWAIN_GetDuplexTypeEx,
             DTWAIN_GetErrorBufferFunc: DTWAIN_GetErrorBuffer,
             DTWAIN_GetErrorBufferThresholdFunc: DTWAIN_GetErrorBufferThreshold,
             DTWAIN_GetErrorCallbackFunc: DTWAIN_GetErrorCallback,
@@ -7780,6 +7788,10 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetCapOperationsFunc)(Source, lCapability, lpOps);  }
     }
 
+    pub fn DTWAIN_GetCapOperationsEx(&self, Source: *mut c_void, lCapability: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetCapOperationsExFunc)(Source, lCapability);  }
+    }
+
     pub fn DTWAIN_GetCapValues(&self, Source: *mut c_void, lCap: i32, lGetType: i32, pArray: *mut *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_GetCapValuesFunc)(Source, lCap, lGetType, pArray);  }
     }
@@ -7958,6 +7970,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetDuplexType(&self, Source: *mut c_void, lpDupType: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_GetDuplexTypeFunc)(Source, lpDupType);  }
+    }
+
+    pub fn DTWAIN_GetDuplexTypeEx(&self, Source: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_GetDuplexTypeExFunc)(Source);  }
     }
 
     pub fn DTWAIN_GetErrorBuffer(&self, ArrayBuffer: *mut *mut c_void) -> i32 {

@@ -2236,6 +2236,7 @@
         public delegate int DTWAIN_GetCapDataTypeDelegate(DTWAIN_SOURCE Source, int nCap);
         public delegate int DTWAIN_GetCapFromNameDelegate([MarshalAs(UnmanagedType.LPTStr)] string szName);
         public delegate int DTWAIN_GetCapOperationsDelegate(DTWAIN_SOURCE Source, int lCapability, ref int lpOps);
+        public delegate int DTWAIN_GetCapOperationsExDelegate(DTWAIN_SOURCE Source, int lCapability);
         public delegate int DTWAIN_GetCapValuesDelegate(DTWAIN_SOURCE Source, int lCap, int lGetType, ref DTWAIN_ARRAY pArray);
         public delegate int DTWAIN_GetCapValuesExDelegate(DTWAIN_SOURCE Source, int lCap, int lGetType, int lContainerType, ref DTWAIN_ARRAY pArray);
         public delegate int DTWAIN_GetCapValuesEx2Delegate(DTWAIN_SOURCE Source, int lCap, int lGetType, int lContainerType, int nDataType, ref DTWAIN_ARRAY pArray);
@@ -2272,6 +2273,7 @@
         public delegate int DTWAIN_GetDoubleFeedDetectLengthDelegate(DTWAIN_SOURCE Source, ref DTWAIN_FLOAT Value, int bCurrent);
         public delegate int DTWAIN_GetDoubleFeedDetectValuesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
         public delegate int DTWAIN_GetDuplexTypeDelegate(DTWAIN_SOURCE Source, ref int lpDupType);
+        public delegate int DTWAIN_GetDuplexTypeExDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetErrorBufferDelegate(ref DTWAIN_ARRAY ArrayBuffer);
         public delegate int DTWAIN_GetErrorBufferThresholdDelegate();
         public delegate DTwainErrorProc DTWAIN_GetErrorCallbackDelegate();
@@ -3799,6 +3801,9 @@
         [DTWAINNativeFunction("DTWAIN_GetCapOperations")]
         private readonly DTWAIN_GetCapOperationsDelegate  _DTWAIN_GetCapOperations;
 
+        [DTWAINNativeFunction("DTWAIN_GetCapOperationsEx")]
+        private readonly DTWAIN_GetCapOperationsExDelegate  _DTWAIN_GetCapOperationsEx;
+
         [DTWAINNativeFunction("DTWAIN_GetCapValues")]
         private readonly DTWAIN_GetCapValuesDelegate  _DTWAIN_GetCapValues;
 
@@ -3906,6 +3911,9 @@
 
         [DTWAINNativeFunction("DTWAIN_GetDuplexType")]
         private readonly DTWAIN_GetDuplexTypeDelegate  _DTWAIN_GetDuplexType;
+
+        [DTWAINNativeFunction("DTWAIN_GetDuplexTypeEx")]
+        private readonly DTWAIN_GetDuplexTypeExDelegate  _DTWAIN_GetDuplexTypeEx;
 
         [DTWAINNativeFunction("DTWAIN_GetErrorBuffer")]
         private readonly DTWAIN_GetErrorBufferDelegate  _DTWAIN_GetErrorBuffer;
@@ -6411,6 +6419,9 @@
         public  int DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, int lCapability, ref int lpOps)
         => _DTWAIN_GetCapOperations(Source, lCapability, ref lpOps);
 
+        public  int DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, int lCapability)
+        => _DTWAIN_GetCapOperationsEx(Source, lCapability);
+
         public  int DTWAIN_GetCapValues(DTWAIN_SOURCE Source, int lCap, int lGetType, ref DTWAIN_ARRAY pArray)
         => _DTWAIN_GetCapValues(Source, lCap, lGetType, ref pArray);
 
@@ -6518,6 +6529,9 @@
 
         public  int DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, ref int lpDupType)
         => _DTWAIN_GetDuplexType(Source, ref lpDupType);
+
+        public  int DTWAIN_GetDuplexTypeEx(DTWAIN_SOURCE Source)
+        => _DTWAIN_GetDuplexTypeEx(Source);
 
         public  int DTWAIN_GetErrorBuffer(ref DTWAIN_ARRAY ArrayBuffer)
         => _DTWAIN_GetErrorBuffer(ref ArrayBuffer);

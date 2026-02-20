@@ -457,6 +457,7 @@
     D_GETCAPFROMNAMEAFUNC                         DYNDTWAIN_API::DTWAIN_GetCapFromNameA = nullptr;
     D_GETCAPFROMNAMEWFUNC                         DYNDTWAIN_API::DTWAIN_GetCapFromNameW = nullptr;
     D_GETCAPOPERATIONSFUNC                        DYNDTWAIN_API::DTWAIN_GetCapOperations = nullptr;
+    D_GETCAPOPERATIONSEXFUNC                      DYNDTWAIN_API::DTWAIN_GetCapOperationsEx = nullptr;
     D_GETCAPVALUESFUNC                            DYNDTWAIN_API::DTWAIN_GetCapValues = nullptr;
     D_GETCAPVALUESEXFUNC                          DYNDTWAIN_API::DTWAIN_GetCapValuesEx = nullptr;
     D_GETCAPVALUESEX2FUNC                         DYNDTWAIN_API::DTWAIN_GetCapValuesEx2 = nullptr;
@@ -502,6 +503,7 @@
     D_GETDOUBLEFEEDDETECTLENGTHFUNC               DYNDTWAIN_API::DTWAIN_GetDoubleFeedDetectLength = nullptr;
     D_GETDOUBLEFEEDDETECTVALUESFUNC               DYNDTWAIN_API::DTWAIN_GetDoubleFeedDetectValues = nullptr;
     D_GETDUPLEXTYPEFUNC                           DYNDTWAIN_API::DTWAIN_GetDuplexType = nullptr;
+    D_GETDUPLEXTYPEEXFUNC                         DYNDTWAIN_API::DTWAIN_GetDuplexTypeEx = nullptr;
     D_GETERRORBUFFERFUNC                          DYNDTWAIN_API::DTWAIN_GetErrorBuffer = nullptr;
     D_GETERRORBUFFERTHRESHOLDFUNC                 DYNDTWAIN_API::DTWAIN_GetErrorBufferThreshold = nullptr;
     D_GETERRORCALLBACKFUNC                        DYNDTWAIN_API::DTWAIN_GetErrorCallback = nullptr;
@@ -1648,6 +1650,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetCapFromNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapFromNameW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapOperations, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCapOperationsEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapValues, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapValuesEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapValuesEx2, hModule);
@@ -1693,6 +1696,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetDoubleFeedDetectLength, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetDoubleFeedDetectValues, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetDuplexType, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetDuplexTypeEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetErrorBuffer, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetErrorBufferThreshold, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetErrorCallback, hModule);

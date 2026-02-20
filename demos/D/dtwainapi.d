@@ -2311,6 +2311,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LPCSTR) DTWAIN_GetCapFromNameA;
     extern(Windows) LONG function(LPCWSTR) DTWAIN_GetCapFromNameW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LPLONG) DTWAIN_GetCapOperations;
+    extern(Windows) LONG function(DTWAIN_SOURCE, LONG) DTWAIN_GetCapOperationsEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG, LPDTWAIN_ARRAY) DTWAIN_GetCapValues;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG, LONG, LPDTWAIN_ARRAY) DTWAIN_GetCapValuesEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG, LONG, LONG, LPDTWAIN_ARRAY) DTWAIN_GetCapValuesEx2;
@@ -2356,6 +2357,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_FLOAT, DTWAIN_BOOL) DTWAIN_GetDoubleFeedDetectLength;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_GetDoubleFeedDetectValues;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetDuplexType;
+    extern(Windows) LONG function(DTWAIN_SOURCE) DTWAIN_GetDuplexTypeEx;
     extern(Windows) DTWAIN_BOOL function(LPDTWAIN_ARRAY) DTWAIN_GetErrorBuffer;
     extern(Windows) LONG function() DTWAIN_GetErrorBufferThreshold;
     extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetErrorString;
@@ -3430,6 +3432,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetCapFromNameA, "DTWAIN_GetCapFromNameA");
         bindFunction(cast(void**)&DTWAIN_GetCapFromNameW, "DTWAIN_GetCapFromNameW");
         bindFunction(cast(void**)&DTWAIN_GetCapOperations, "DTWAIN_GetCapOperations");
+        bindFunction(cast(void**)&DTWAIN_GetCapOperationsEx, "DTWAIN_GetCapOperationsEx");
         bindFunction(cast(void**)&DTWAIN_GetCapValues, "DTWAIN_GetCapValues");
         bindFunction(cast(void**)&DTWAIN_GetCapValuesEx, "DTWAIN_GetCapValuesEx");
         bindFunction(cast(void**)&DTWAIN_GetCapValuesEx2, "DTWAIN_GetCapValuesEx2");
@@ -3475,6 +3478,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetDoubleFeedDetectLength, "DTWAIN_GetDoubleFeedDetectLength");
         bindFunction(cast(void**)&DTWAIN_GetDoubleFeedDetectValues, "DTWAIN_GetDoubleFeedDetectValues");
         bindFunction(cast(void**)&DTWAIN_GetDuplexType, "DTWAIN_GetDuplexType");
+        bindFunction(cast(void**)&DTWAIN_GetDuplexTypeEx, "DTWAIN_GetDuplexTypeEx");
         bindFunction(cast(void**)&DTWAIN_GetErrorBuffer, "DTWAIN_GetErrorBuffer");
         bindFunction(cast(void**)&DTWAIN_GetErrorBufferThreshold, "DTWAIN_GetErrorBufferThreshold");
         bindFunction(cast(void**)&DTWAIN_GetErrorString, "DTWAIN_GetErrorString");

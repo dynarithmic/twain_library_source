@@ -480,6 +480,7 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetCapFromNameW(LPCWSTR szName);
         DTWAIN_BOOL DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps);
+        LONG DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_GetCapValues(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetCapValuesEx(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetCapValuesEx2(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LONG nDataType, LPDTWAIN_ARRAY pArray);
@@ -524,6 +525,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetDoubleFeedDetectLength(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Value, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetDoubleFeedDetectValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDupType);
+        LONG DTWAIN_GetDuplexTypeEx(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer);
         LONG DTWAIN_GetErrorBufferThreshold();
         DTWAIN_ERROR_PROC DTWAIN_GetErrorCallback();
@@ -1655,6 +1657,7 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetCapFromNameW(LPCWSTR szName);
         DTWAIN_BOOL DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps);
+        LONG DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_GetCapValues(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetCapValuesEx(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetCapValuesEx2(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LONG nDataType, LPDTWAIN_ARRAY pArray);
@@ -1699,6 +1702,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetDoubleFeedDetectLength(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Value, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetDoubleFeedDetectValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDupType);
+        LONG DTWAIN_GetDuplexTypeEx(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer);
         LONG DTWAIN_GetErrorBufferThreshold();
         DTWAIN_ERROR_PROC DTWAIN_GetErrorCallback();
@@ -2830,6 +2834,7 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetCapFromNameW(LPCWSTR szName);
         DTWAIN_BOOL DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps);
+        LONG DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_GetCapValues(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetCapValuesEx(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetCapValuesEx2(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LONG nDataType, LPDTWAIN_ARRAY pArray);
@@ -2874,6 +2879,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetDoubleFeedDetectLength(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Value, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetDoubleFeedDetectValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDupType);
+        LONG DTWAIN_GetDuplexTypeEx(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer);
         LONG DTWAIN_GetErrorBufferThreshold();
         DTWAIN_ERROR_PROC DTWAIN_GetErrorCallback();
@@ -4005,6 +4011,7 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetCapFromNameW(LPCWSTR szName);
         DTWAIN_BOOL DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps);
+        LONG DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_GetCapValues(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetCapValuesEx(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetCapValuesEx2(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LONG nDataType, LPDTWAIN_ARRAY pArray);
@@ -4049,6 +4056,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetDoubleFeedDetectLength(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Value, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetDoubleFeedDetectValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDupType);
+        LONG DTWAIN_GetDuplexTypeEx(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer);
         LONG DTWAIN_GetErrorBufferThreshold();
         DTWAIN_ERROR_PROC DTWAIN_GetErrorCallback();

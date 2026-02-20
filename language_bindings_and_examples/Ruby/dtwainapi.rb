@@ -538,6 +538,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetCapFromNameA
    attr_reader :DTWAIN_GetCapFromNameW
    attr_reader :DTWAIN_GetCapOperations
+   attr_reader :DTWAIN_GetCapOperationsEx
    attr_reader :DTWAIN_GetCapValues
    attr_reader :DTWAIN_GetCapValuesEx
    attr_reader :DTWAIN_GetCapValuesEx2
@@ -583,6 +584,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetDoubleFeedDetectLength
    attr_reader :DTWAIN_GetDoubleFeedDetectValues
    attr_reader :DTWAIN_GetDuplexType
+   attr_reader :DTWAIN_GetDuplexTypeEx
    attr_reader :DTWAIN_GetErrorBuffer
    attr_reader :DTWAIN_GetErrorBufferThreshold
    attr_reader :DTWAIN_GetErrorCallback
@@ -3334,6 +3336,7 @@ class DTWAINAPI
        @DTWAIN_GetCapFromNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapFromNameA'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetCapFromNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapFromNameW'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetCapOperations = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapOperations'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_GetCapOperationsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapOperationsEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetCapValues = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetCapValuesEx = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapValuesEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetCapValuesEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapValuesEx2'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
@@ -3379,6 +3382,7 @@ class DTWAINAPI
        @DTWAIN_GetDoubleFeedDetectLength = Fiddle::Function::new(dtwain_dll['DTWAIN_GetDoubleFeedDetectLength'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_GetDoubleFeedDetectValues = Fiddle::Function::new(dtwain_dll['DTWAIN_GetDoubleFeedDetectValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetDuplexType = Fiddle::Function::new(dtwain_dll['DTWAIN_GetDuplexType'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_GetDuplexTypeEx = Fiddle::Function::new(dtwain_dll['DTWAIN_GetDuplexTypeEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetErrorBuffer = Fiddle::Function::new(dtwain_dll['DTWAIN_GetErrorBuffer'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetErrorBufferThreshold = Fiddle::Function::new(dtwain_dll['DTWAIN_GetErrorBufferThreshold'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetErrorCallback = Fiddle::Function::new(dtwain_dll['DTWAIN_GetErrorCallback'],[],Fiddle::TYPE_VOIDP)
