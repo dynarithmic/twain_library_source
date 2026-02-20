@@ -217,9 +217,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumPixelTypes(DTWAIN_SOURCE Source, LPDTWAIN_AR
 }
 
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, LONG PixelType, LPDTWAIN_ARRAY Array)
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumBitDepthsEx2(DTWAIN_SOURCE Source, LONG PixelType)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, Array))
+    LOG_FUNC_ENTRY_PARAMS((Source, PixelType))
     auto [pHandle, pSource] = VerifyHandles(Source);
     if (pSource->IsPixelTypeSupported(PixelType) )
     {
@@ -230,11 +230,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, LONG Pixel
         const CTL_ITwainSource::CachedPixelTypeMap& theMap = pSource->GetPixelTypeMap();
         auto& pBitDepths = theMap.find(PixelType)->second;
         std::copy(pBitDepths.begin(), pBitDepths.end(), std::back_inserter(vIn));
-		MoveArray(pHandle, Array, &arr);
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(arr)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK_LOG_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPixelTypeSupported(DTWAIN_SOURCE Source, LONG PixelType)

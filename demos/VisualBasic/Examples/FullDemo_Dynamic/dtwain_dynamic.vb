@@ -496,12 +496,12 @@ Namespace Dynarithmic
         Public Const DTWAIN_CAPSET As Integer = 6
         Public Const DTWAIN_CAPRESET As Integer = 7
         Public Const DTWAIN_CAPRESETALL As Integer = 8
-        Public Const DTWAIN_CAPSETCONSTRAINT As Integer = 9
         Public Const DTWAIN_CAPSETAVAILABLE As Integer = 8
         Public Const DTWAIN_CAPSETCURRENT As Integer = 16
         Public Const DTWAIN_CAPGETHELP As Integer = 9
         Public Const DTWAIN_CAPGETLABEL As Integer = 10
         Public Const DTWAIN_CAPGETLABELENUM As Integer = 11
+        Public Const DTWAIN_CAPSETCONSTRAINT As Integer = 12
         Public Const DTWAIN_AREASET As Integer = DTWAIN_CAPSET
         Public Const DTWAIN_AREARESET As Integer = DTWAIN_CAPRESET
         Public Const DTWAIN_AREACURRENT As Integer = DTWAIN_CAPGETCURRENT
@@ -1340,6 +1340,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_DLG_HIGHLIGHTFIRST As Integer = 8192
         Public Const DTWAIN_DLG_SAVELASTSCREENPOS As Integer = 16384
         Public Const DTWAIN_DLG_CENTER_CURRENT_MONITOR As Integer = 32768
+        Public Const DTWAIN_DLG_CONSOLEASPARENT As Integer = 65536
         Public Const DTWAIN_RES_ENGLISH As Integer = 0
         Public Const DTWAIN_RES_FRENCH As Integer = 1
         Public Const DTWAIN_RES_SPANISH As Integer = 2
@@ -2061,6 +2062,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_ArrayDestroyFramesDelegate(FrameArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayDumpToLogDelegate(pArray As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayFindDelegate(pArray As System.IntPtr, pVariant As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
@@ -2445,7 +2449,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_EnumBitDepthsDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_EnumBitDepthsExDelegate(Source As System.IntPtr, PixelType As Integer, ByRef pArray As System.IntPtr) As Integer
+        Private Delegate Function DTWAIN_EnumBitDepthsExDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumBitDepthsEx2Delegate(Source As System.IntPtr, PixelType As Integer) As System.IntPtr
@@ -2466,13 +2470,10 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_EnumCamerasDelegate(Source As System.IntPtr, ByRef Cameras As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_EnumCamerasExDelegate(Source As System.IntPtr, nWhichCamera As Integer, ByRef Cameras As System.IntPtr) As Integer
+        Private Delegate Function DTWAIN_EnumCamerasExDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_EnumCamerasEx2Delegate(Source As System.IntPtr) As System.IntPtr
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_EnumCamerasEx3Delegate(Source As System.IntPtr, nWhichCamera As Integer) As System.IntPtr
+        Private Delegate Function DTWAIN_EnumCamerasEx2Delegate(Source As System.IntPtr, nWhichCamera As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumCompressionTypesDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
@@ -2493,7 +2494,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_EnumCustomCapsDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_EnumCustomCapsEx2Delegate(Source As System.IntPtr) As System.IntPtr
+        Private Delegate Function DTWAIN_EnumCustomCapsExDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumDoubleFeedDetectLengthsDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr, bExpandIfRange As Integer) As Integer
@@ -2517,7 +2518,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_EnumExtendedCapsDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_EnumExtendedCapsExDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
+        Private Delegate Function DTWAIN_EnumExtendedCapsExDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumExtendedCapsEx2Delegate(Source As System.IntPtr) As System.IntPtr
@@ -2575,6 +2576,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumOCRInterfacesDelegate(ByRef OCRInterfaces As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_EnumOCRInterfacesExDelegate() As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumOCRSupportedCapsDelegate(Engine As System.IntPtr, ByRef SupportedCaps As System.IntPtr) As Integer
@@ -2676,7 +2680,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_EnumSupportedCapsDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_EnumSupportedCapsExDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
+        Private Delegate Function DTWAIN_EnumSupportedCapsExDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumSupportedCapsEx2Delegate(Source As System.IntPtr) As System.IntPtr
@@ -2889,6 +2893,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetCapOperationsDelegate(Source As System.IntPtr, lCapability As Integer, ByRef lpOps As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetCapOperationsExDelegate(Source As System.IntPtr, lCapability As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetCapValuesDelegate(Source As System.IntPtr, lCap As Integer, lGetType As Integer, ByRef pArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -2974,6 +2981,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetDuplexTypeDelegate(Source As System.IntPtr, ByRef lpDupType As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetDuplexTypeExDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetErrorBufferDelegate(ByRef ArrayBuffer As System.IntPtr) As Integer
@@ -4512,6 +4522,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_ArrayDestroyFrames(FrameArray)
         End Function
         
+        Public Function DTWAIN_ArrayDumpToLog(pArray As System.IntPtr) As Integer
+        Return api.DTWAIN_ArrayDumpToLog(pArray)
+        End Function
+        
         Public Function DTWAIN_ArrayFind(pArray As System.IntPtr, pVariant As System.IntPtr) As Integer
         Return api.DTWAIN_ArrayFind(pArray, pVariant)
         End Function
@@ -5024,8 +5038,8 @@ Namespace Dynarithmic
         Return api.DTWAIN_EnumBitDepths(Source, pArray)
         End Function
         
-        Public Function DTWAIN_EnumBitDepthsEx(Source As System.IntPtr, PixelType As Integer, ByRef pArray As System.IntPtr) As Integer
-        Return api.DTWAIN_EnumBitDepthsEx(Source, PixelType, pArray)
+        Public Function DTWAIN_EnumBitDepthsEx(Source As System.IntPtr) As System.IntPtr
+        Return api.DTWAIN_EnumBitDepthsEx(Source)
         End Function
         
         Public Function DTWAIN_EnumBitDepthsEx2(Source As System.IntPtr, PixelType As Integer) As System.IntPtr
@@ -5052,16 +5066,12 @@ Namespace Dynarithmic
         Return api.DTWAIN_EnumCameras(Source, Cameras)
         End Function
         
-        Public Function DTWAIN_EnumCamerasEx(Source As System.IntPtr, nWhichCamera As Integer, ByRef Cameras As System.IntPtr) As Integer
-        Return api.DTWAIN_EnumCamerasEx(Source, nWhichCamera, Cameras)
+        Public Function DTWAIN_EnumCamerasEx(Source As System.IntPtr) As System.IntPtr
+        Return api.DTWAIN_EnumCamerasEx(Source)
         End Function
         
-        Public Function DTWAIN_EnumCamerasEx2(Source As System.IntPtr) As System.IntPtr
-        Return api.DTWAIN_EnumCamerasEx2(Source)
-        End Function
-        
-        Public Function DTWAIN_EnumCamerasEx3(Source As System.IntPtr, nWhichCamera As Integer) As System.IntPtr
-        Return api.DTWAIN_EnumCamerasEx3(Source, nWhichCamera)
+        Public Function DTWAIN_EnumCamerasEx2(Source As System.IntPtr, nWhichCamera As Integer) As System.IntPtr
+        Return api.DTWAIN_EnumCamerasEx2(Source, nWhichCamera)
         End Function
         
         Public Function DTWAIN_EnumCompressionTypes(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
@@ -5088,8 +5098,8 @@ Namespace Dynarithmic
         Return api.DTWAIN_EnumCustomCaps(Source, pArray)
         End Function
         
-        Public Function DTWAIN_EnumCustomCapsEx2(Source As System.IntPtr) As System.IntPtr
-        Return api.DTWAIN_EnumCustomCapsEx2(Source)
+        Public Function DTWAIN_EnumCustomCapsEx(Source As System.IntPtr) As System.IntPtr
+        Return api.DTWAIN_EnumCustomCapsEx(Source)
         End Function
         
         Public Function DTWAIN_EnumDoubleFeedDetectLengths(Source As System.IntPtr, ByRef pArray As System.IntPtr, bExpandIfRange As Integer) As Integer
@@ -5120,8 +5130,8 @@ Namespace Dynarithmic
         Return api.DTWAIN_EnumExtendedCaps(Source, pArray)
         End Function
         
-        Public Function DTWAIN_EnumExtendedCapsEx(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
-        Return api.DTWAIN_EnumExtendedCapsEx(Source, pArray)
+        Public Function DTWAIN_EnumExtendedCapsEx(Source As System.IntPtr) As System.IntPtr
+        Return api.DTWAIN_EnumExtendedCapsEx(Source)
         End Function
         
         Public Function DTWAIN_EnumExtendedCapsEx2(Source As System.IntPtr) As System.IntPtr
@@ -5198,6 +5208,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_EnumOCRInterfaces(ByRef OCRInterfaces As System.IntPtr) As Integer
         Return api.DTWAIN_EnumOCRInterfaces(OCRInterfaces)
+        End Function
+        
+        Public Function DTWAIN_EnumOCRInterfacesEx() As System.IntPtr
+        Return api.DTWAIN_EnumOCRInterfacesEx()
         End Function
         
         Public Function DTWAIN_EnumOCRSupportedCaps(Engine As System.IntPtr, ByRef SupportedCaps As System.IntPtr) As Integer
@@ -5332,8 +5346,8 @@ Namespace Dynarithmic
         Return api.DTWAIN_EnumSupportedCaps(Source, pArray)
         End Function
         
-        Public Function DTWAIN_EnumSupportedCapsEx(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
-        Return api.DTWAIN_EnumSupportedCapsEx(Source, pArray)
+        Public Function DTWAIN_EnumSupportedCapsEx(Source As System.IntPtr) As System.IntPtr
+        Return api.DTWAIN_EnumSupportedCapsEx(Source)
         End Function
         
         Public Function DTWAIN_EnumSupportedCapsEx2(Source As System.IntPtr) As System.IntPtr
@@ -5616,6 +5630,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetCapOperations(Source, lCapability, lpOps)
         End Function
         
+        Public Function DTWAIN_GetCapOperationsEx(Source As System.IntPtr, lCapability As Integer) As Integer
+        Return api.DTWAIN_GetCapOperationsEx(Source, lCapability)
+        End Function
+        
         Public Function DTWAIN_GetCapValues(Source As System.IntPtr, lCap As Integer, lGetType As Integer, ByRef pArray As System.IntPtr) As Integer
         Return api.DTWAIN_GetCapValues(Source, lCap, lGetType, pArray)
         End Function
@@ -5730,6 +5748,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_GetDuplexType(Source As System.IntPtr, ByRef lpDupType As Integer) As Integer
         Return api.DTWAIN_GetDuplexType(Source, lpDupType)
+        End Function
+        
+        Public Function DTWAIN_GetDuplexTypeEx(Source As System.IntPtr) As Integer
+        Return api.DTWAIN_GetDuplexTypeEx(Source)
         End Function
         
         Public Function DTWAIN_GetErrorBuffer(ByRef ArrayBuffer As System.IntPtr) As Integer
@@ -7566,6 +7588,7 @@ Namespace Dynarithmic
             Public DTWAIN_ArrayCreateFromReals As DTWAIN_ArrayCreateFromRealsDelegate
             Public DTWAIN_ArrayDestroy As DTWAIN_ArrayDestroyDelegate
             Public DTWAIN_ArrayDestroyFrames As DTWAIN_ArrayDestroyFramesDelegate
+            Public DTWAIN_ArrayDumpToLog As DTWAIN_ArrayDumpToLogDelegate
             Public DTWAIN_ArrayFind As DTWAIN_ArrayFindDelegate
             Public DTWAIN_ArrayFindANSIString As DTWAIN_ArrayFindANSIStringDelegate
             Public DTWAIN_ArrayFindFloat As DTWAIN_ArrayFindFloatDelegate
@@ -7703,14 +7726,13 @@ Namespace Dynarithmic
             Public DTWAIN_EnumCameras As DTWAIN_EnumCamerasDelegate
             Public DTWAIN_EnumCamerasEx As DTWAIN_EnumCamerasExDelegate
             Public DTWAIN_EnumCamerasEx2 As DTWAIN_EnumCamerasEx2Delegate
-            Public DTWAIN_EnumCamerasEx3 As DTWAIN_EnumCamerasEx3Delegate
             Public DTWAIN_EnumCompressionTypes As DTWAIN_EnumCompressionTypesDelegate
             Public DTWAIN_EnumCompressionTypesEx As DTWAIN_EnumCompressionTypesExDelegate
             Public DTWAIN_EnumCompressionTypesEx2 As DTWAIN_EnumCompressionTypesEx2Delegate
             Public DTWAIN_EnumContrastValues As DTWAIN_EnumContrastValuesDelegate
             Public DTWAIN_EnumContrastValuesEx As DTWAIN_EnumContrastValuesExDelegate
             Public DTWAIN_EnumCustomCaps As DTWAIN_EnumCustomCapsDelegate
-            Public DTWAIN_EnumCustomCapsEx2 As DTWAIN_EnumCustomCapsEx2Delegate
+            Public DTWAIN_EnumCustomCapsEx As DTWAIN_EnumCustomCapsExDelegate
             Public DTWAIN_EnumDoubleFeedDetectLengths As DTWAIN_EnumDoubleFeedDetectLengthsDelegate
             Public DTWAIN_EnumDoubleFeedDetectLengthsEx As DTWAIN_EnumDoubleFeedDetectLengthsExDelegate
             Public DTWAIN_EnumDoubleFeedDetectValues As DTWAIN_EnumDoubleFeedDetectValuesDelegate
@@ -7738,6 +7760,7 @@ Namespace Dynarithmic
             Public DTWAIN_EnumNoiseFilters As DTWAIN_EnumNoiseFiltersDelegate
             Public DTWAIN_EnumNoiseFiltersEx As DTWAIN_EnumNoiseFiltersExDelegate
             Public DTWAIN_EnumOCRInterfaces As DTWAIN_EnumOCRInterfacesDelegate
+            Public DTWAIN_EnumOCRInterfacesEx As DTWAIN_EnumOCRInterfacesExDelegate
             Public DTWAIN_EnumOCRSupportedCaps As DTWAIN_EnumOCRSupportedCapsDelegate
             Public DTWAIN_EnumOrientations As DTWAIN_EnumOrientationsDelegate
             Public DTWAIN_EnumOrientationsEx As DTWAIN_EnumOrientationsExDelegate
@@ -7842,6 +7865,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetCapDataType As DTWAIN_GetCapDataTypeDelegate
             Public DTWAIN_GetCapFromName As DTWAIN_GetCapFromNameDelegate
             Public DTWAIN_GetCapOperations As DTWAIN_GetCapOperationsDelegate
+            Public DTWAIN_GetCapOperationsEx As DTWAIN_GetCapOperationsExDelegate
             Public DTWAIN_GetCapValues As DTWAIN_GetCapValuesDelegate
             Public DTWAIN_GetCapValuesEx As DTWAIN_GetCapValuesExDelegate
             Public DTWAIN_GetCapValuesEx2 As DTWAIN_GetCapValuesEx2Delegate
@@ -7871,6 +7895,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetDoubleFeedDetectLength As DTWAIN_GetDoubleFeedDetectLengthDelegate
             Public DTWAIN_GetDoubleFeedDetectValues As DTWAIN_GetDoubleFeedDetectValuesDelegate
             Public DTWAIN_GetDuplexType As DTWAIN_GetDuplexTypeDelegate
+            Public DTWAIN_GetDuplexTypeEx As DTWAIN_GetDuplexTypeExDelegate
             Public DTWAIN_GetErrorBuffer As DTWAIN_GetErrorBufferDelegate
             Public DTWAIN_GetErrorBufferThreshold As DTWAIN_GetErrorBufferThresholdDelegate
             Public DTWAIN_GetErrorCallback As DTWAIN_GetErrorCallbackDelegate

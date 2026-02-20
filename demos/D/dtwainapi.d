@@ -498,12 +498,12 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_CAPSET = 6;
     public static const int DTWAIN_CAPRESET = 7;
     public static const int DTWAIN_CAPRESETALL = 8;
-    public static const int DTWAIN_CAPSETCONSTRAINT = 9;
     public static const int DTWAIN_CAPSETAVAILABLE = 8;
     public static const int DTWAIN_CAPSETCURRENT = 16;
     public static const int DTWAIN_CAPGETHELP = 9;
     public static const int DTWAIN_CAPGETLABEL = 10;
     public static const int DTWAIN_CAPGETLABELENUM = 11;
+    public static const int DTWAIN_CAPSETCONSTRAINT = 12;
     public static const int DTWAIN_AREASET = DTWAIN_CAPSET;
     public static const int DTWAIN_AREARESET = DTWAIN_CAPRESET;
     public static const int DTWAIN_AREACURRENT = DTWAIN_CAPGETCURRENT;
@@ -1342,6 +1342,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_DLG_HIGHLIGHTFIRST = 8192;
     public static const int DTWAIN_DLG_SAVELASTSCREENPOS = 16384;
     public static const int DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768;
+    public static const int DTWAIN_DLG_CONSOLEASPARENT = 65536;
     public static const int DTWAIN_RES_ENGLISH = 0;
     public static const int DTWAIN_RES_FRENCH = 1;
     public static const int DTWAIN_RES_SPANISH = 2;
@@ -1976,6 +1977,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_ARRAY function(LPCWSTR*, LONG) DTWAIN_ArrayCreateFromStringsW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY) DTWAIN_ArrayDestroy;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY) DTWAIN_ArrayDestroyFrames;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY) DTWAIN_ArrayDumpToLog;
     extern(Windows) LONG function(DTWAIN_ARRAY, LPVOID) DTWAIN_ArrayFind;
     extern(Windows) LONG function(DTWAIN_ARRAY, LPCSTR) DTWAIN_ArrayFindANSIString;
     extern(Windows) LONG function(DTWAIN_ARRAY, DTWAIN_FLOAT, DTWAIN_FLOAT) DTWAIN_ArrayFindFloat;
@@ -2135,23 +2137,22 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumAutomaticSenseMedium;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumAutomaticSenseMediumEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumBitDepths;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LPDTWAIN_ARRAY) DTWAIN_EnumBitDepthsEx;
+    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumBitDepthsEx;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG) DTWAIN_EnumBitDepthsEx2;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumBottomCameras;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumBottomCamerasEx;
     extern(Windows) LONG function(DTWAIN_SOURCE, LPDTWAIN_ARRAY, DTWAIN_BOOL) DTWAIN_EnumBrightnessValues;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnumBrightnessValuesEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumCameras;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LPDTWAIN_ARRAY) DTWAIN_EnumCamerasEx;
-    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumCamerasEx2;
-    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG) DTWAIN_EnumCamerasEx3;
+    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumCamerasEx;
+    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG) DTWAIN_EnumCamerasEx2;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumCompressionTypes;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumCompressionTypesEx;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG, DTWAIN_BOOL) DTWAIN_EnumCompressionTypesEx2;
     extern(Windows) LONG function(DTWAIN_SOURCE, LPDTWAIN_ARRAY, DTWAIN_BOOL) DTWAIN_EnumContrastValues;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnumContrastValuesEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumCustomCaps;
-    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumCustomCapsEx2;
+    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumCustomCapsEx;
     extern(Windows) LONG function(DTWAIN_SOURCE, LPDTWAIN_ARRAY, DTWAIN_BOOL) DTWAIN_EnumDoubleFeedDetectLengths;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnumDoubleFeedDetectLengthsEx;
     extern(Windows) LONG function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumDoubleFeedDetectValues;
@@ -2159,7 +2160,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumExtImageInfoTypes;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumExtImageInfoTypesEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumExtendedCaps;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumExtendedCapsEx;
+    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumExtendedCapsEx;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumExtendedCapsEx2;
     extern(Windows) DTWAIN_BOOL function(LONG, LPDTWAIN_ARRAY) DTWAIN_EnumFileTypeBitsPerPixel;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumFileXferFormats;
@@ -2179,6 +2180,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumNoiseFilters;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumNoiseFiltersEx;
     extern(Windows) DTWAIN_BOOL function(LPDTWAIN_ARRAY) DTWAIN_EnumOCRInterfaces;
+    extern(Windows) DTWAIN_ARRAY function() DTWAIN_EnumOCRInterfacesEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_OCRENGINE, LPDTWAIN_ARRAY) DTWAIN_EnumOCRSupportedCaps;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumOrientations;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumOrientationsEx;
@@ -2214,7 +2216,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(LPDTWAIN_ARRAY) DTWAIN_EnumSources;
     extern(Windows) DTWAIN_ARRAY function() DTWAIN_EnumSourcesEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumSupportedCaps;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumSupportedCapsEx;
+    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumSupportedCapsEx;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumSupportedCapsEx2;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumSupportedExtImageInfo;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumSupportedExtImageInfoEx;
@@ -2309,6 +2311,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LPCSTR) DTWAIN_GetCapFromNameA;
     extern(Windows) LONG function(LPCWSTR) DTWAIN_GetCapFromNameW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LPLONG) DTWAIN_GetCapOperations;
+    extern(Windows) LONG function(DTWAIN_SOURCE, LONG) DTWAIN_GetCapOperationsEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG, LPDTWAIN_ARRAY) DTWAIN_GetCapValues;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG, LONG, LPDTWAIN_ARRAY) DTWAIN_GetCapValuesEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG, LONG, LONG, LPDTWAIN_ARRAY) DTWAIN_GetCapValuesEx2;
@@ -2354,6 +2357,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_FLOAT, DTWAIN_BOOL) DTWAIN_GetDoubleFeedDetectLength;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_GetDoubleFeedDetectValues;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetDuplexType;
+    extern(Windows) LONG function(DTWAIN_SOURCE) DTWAIN_GetDuplexTypeEx;
     extern(Windows) DTWAIN_BOOL function(LPDTWAIN_ARRAY) DTWAIN_GetErrorBuffer;
     extern(Windows) LONG function() DTWAIN_GetErrorBufferThreshold;
     extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetErrorString;
@@ -3094,6 +3098,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_ArrayCreateFromStringsW, "DTWAIN_ArrayCreateFromStringsW");
         bindFunction(cast(void**)&DTWAIN_ArrayDestroy, "DTWAIN_ArrayDestroy");
         bindFunction(cast(void**)&DTWAIN_ArrayDestroyFrames, "DTWAIN_ArrayDestroyFrames");
+        bindFunction(cast(void**)&DTWAIN_ArrayDumpToLog, "DTWAIN_ArrayDumpToLog");
         bindFunction(cast(void**)&DTWAIN_ArrayFind, "DTWAIN_ArrayFind");
         bindFunction(cast(void**)&DTWAIN_ArrayFindANSIString, "DTWAIN_ArrayFindANSIString");
         bindFunction(cast(void**)&DTWAIN_ArrayFindFloat, "DTWAIN_ArrayFindFloat");
@@ -3262,14 +3267,13 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_EnumCameras, "DTWAIN_EnumCameras");
         bindFunction(cast(void**)&DTWAIN_EnumCamerasEx, "DTWAIN_EnumCamerasEx");
         bindFunction(cast(void**)&DTWAIN_EnumCamerasEx2, "DTWAIN_EnumCamerasEx2");
-        bindFunction(cast(void**)&DTWAIN_EnumCamerasEx3, "DTWAIN_EnumCamerasEx3");
         bindFunction(cast(void**)&DTWAIN_EnumCompressionTypes, "DTWAIN_EnumCompressionTypes");
         bindFunction(cast(void**)&DTWAIN_EnumCompressionTypesEx, "DTWAIN_EnumCompressionTypesEx");
         bindFunction(cast(void**)&DTWAIN_EnumCompressionTypesEx2, "DTWAIN_EnumCompressionTypesEx2");
         bindFunction(cast(void**)&DTWAIN_EnumContrastValues, "DTWAIN_EnumContrastValues");
         bindFunction(cast(void**)&DTWAIN_EnumContrastValuesEx, "DTWAIN_EnumContrastValuesEx");
         bindFunction(cast(void**)&DTWAIN_EnumCustomCaps, "DTWAIN_EnumCustomCaps");
-        bindFunction(cast(void**)&DTWAIN_EnumCustomCapsEx2, "DTWAIN_EnumCustomCapsEx2");
+        bindFunction(cast(void**)&DTWAIN_EnumCustomCapsEx, "DTWAIN_EnumCustomCapsEx");
         bindFunction(cast(void**)&DTWAIN_EnumDoubleFeedDetectLengths, "DTWAIN_EnumDoubleFeedDetectLengths");
         bindFunction(cast(void**)&DTWAIN_EnumDoubleFeedDetectLengthsEx, "DTWAIN_EnumDoubleFeedDetectLengthsEx");
         bindFunction(cast(void**)&DTWAIN_EnumDoubleFeedDetectValues, "DTWAIN_EnumDoubleFeedDetectValues");
@@ -3297,6 +3301,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_EnumNoiseFilters, "DTWAIN_EnumNoiseFilters");
         bindFunction(cast(void**)&DTWAIN_EnumNoiseFiltersEx, "DTWAIN_EnumNoiseFiltersEx");
         bindFunction(cast(void**)&DTWAIN_EnumOCRInterfaces, "DTWAIN_EnumOCRInterfaces");
+        bindFunction(cast(void**)&DTWAIN_EnumOCRInterfacesEx, "DTWAIN_EnumOCRInterfacesEx");
         bindFunction(cast(void**)&DTWAIN_EnumOCRSupportedCaps, "DTWAIN_EnumOCRSupportedCaps");
         bindFunction(cast(void**)&DTWAIN_EnumOrientations, "DTWAIN_EnumOrientations");
         bindFunction(cast(void**)&DTWAIN_EnumOrientationsEx, "DTWAIN_EnumOrientationsEx");
@@ -3427,6 +3432,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetCapFromNameA, "DTWAIN_GetCapFromNameA");
         bindFunction(cast(void**)&DTWAIN_GetCapFromNameW, "DTWAIN_GetCapFromNameW");
         bindFunction(cast(void**)&DTWAIN_GetCapOperations, "DTWAIN_GetCapOperations");
+        bindFunction(cast(void**)&DTWAIN_GetCapOperationsEx, "DTWAIN_GetCapOperationsEx");
         bindFunction(cast(void**)&DTWAIN_GetCapValues, "DTWAIN_GetCapValues");
         bindFunction(cast(void**)&DTWAIN_GetCapValuesEx, "DTWAIN_GetCapValuesEx");
         bindFunction(cast(void**)&DTWAIN_GetCapValuesEx2, "DTWAIN_GetCapValuesEx2");
@@ -3472,6 +3478,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetDoubleFeedDetectLength, "DTWAIN_GetDoubleFeedDetectLength");
         bindFunction(cast(void**)&DTWAIN_GetDoubleFeedDetectValues, "DTWAIN_GetDoubleFeedDetectValues");
         bindFunction(cast(void**)&DTWAIN_GetDuplexType, "DTWAIN_GetDuplexType");
+        bindFunction(cast(void**)&DTWAIN_GetDuplexTypeEx, "DTWAIN_GetDuplexTypeEx");
         bindFunction(cast(void**)&DTWAIN_GetErrorBuffer, "DTWAIN_GetErrorBuffer");
         bindFunction(cast(void**)&DTWAIN_GetErrorBufferThreshold, "DTWAIN_GetErrorBufferThreshold");
         bindFunction(cast(void**)&DTWAIN_GetErrorString, "DTWAIN_GetErrorString");

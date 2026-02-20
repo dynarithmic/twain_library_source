@@ -121,6 +121,7 @@
     D_ARRAYCREATEFROMSTRINGSWFUNC                 DYNDTWAIN_API::DTWAIN_ArrayCreateFromStringsW = nullptr;
     D_ARRAYDESTROYFUNC                            DYNDTWAIN_API::DTWAIN_ArrayDestroy = nullptr;
     D_ARRAYDESTROYFRAMESFUNC                      DYNDTWAIN_API::DTWAIN_ArrayDestroyFrames = nullptr;
+    D_ARRAYDUMPTOLOGFUNC                          DYNDTWAIN_API::DTWAIN_ArrayDumpToLog = nullptr;
     D_ARRAYFINDFUNC                               DYNDTWAIN_API::DTWAIN_ArrayFind = nullptr;
     D_ARRAYFINDANSISTRINGFUNC                     DYNDTWAIN_API::DTWAIN_ArrayFindANSIString = nullptr;
     D_ARRAYFINDFLOATFUNC                          DYNDTWAIN_API::DTWAIN_ArrayFindFloat = nullptr;
@@ -289,14 +290,13 @@
     D_ENUMCAMERASFUNC                             DYNDTWAIN_API::DTWAIN_EnumCameras = nullptr;
     D_ENUMCAMERASEXFUNC                           DYNDTWAIN_API::DTWAIN_EnumCamerasEx = nullptr;
     D_ENUMCAMERASEX2FUNC                          DYNDTWAIN_API::DTWAIN_EnumCamerasEx2 = nullptr;
-    D_ENUMCAMERASEX3FUNC                          DYNDTWAIN_API::DTWAIN_EnumCamerasEx3 = nullptr;
     D_ENUMCOMPRESSIONTYPESFUNC                    DYNDTWAIN_API::DTWAIN_EnumCompressionTypes = nullptr;
     D_ENUMCOMPRESSIONTYPESEXFUNC                  DYNDTWAIN_API::DTWAIN_EnumCompressionTypesEx = nullptr;
     D_ENUMCOMPRESSIONTYPESEX2FUNC                 DYNDTWAIN_API::DTWAIN_EnumCompressionTypesEx2 = nullptr;
     D_ENUMCONTRASTVALUESFUNC                      DYNDTWAIN_API::DTWAIN_EnumContrastValues = nullptr;
     D_ENUMCONTRASTVALUESEXFUNC                    DYNDTWAIN_API::DTWAIN_EnumContrastValuesEx = nullptr;
     D_ENUMCUSTOMCAPSFUNC                          DYNDTWAIN_API::DTWAIN_EnumCustomCaps = nullptr;
-    D_ENUMCUSTOMCAPSEX2FUNC                       DYNDTWAIN_API::DTWAIN_EnumCustomCapsEx2 = nullptr;
+    D_ENUMCUSTOMCAPSEXFUNC                        DYNDTWAIN_API::DTWAIN_EnumCustomCapsEx = nullptr;
     D_ENUMDOUBLEFEEDDETECTLENGTHSFUNC             DYNDTWAIN_API::DTWAIN_EnumDoubleFeedDetectLengths = nullptr;
     D_ENUMDOUBLEFEEDDETECTLENGTHSEXFUNC           DYNDTWAIN_API::DTWAIN_EnumDoubleFeedDetectLengthsEx = nullptr;
     D_ENUMDOUBLEFEEDDETECTVALUESFUNC              DYNDTWAIN_API::DTWAIN_EnumDoubleFeedDetectValues = nullptr;
@@ -324,6 +324,7 @@
     D_ENUMNOISEFILTERSFUNC                        DYNDTWAIN_API::DTWAIN_EnumNoiseFilters = nullptr;
     D_ENUMNOISEFILTERSEXFUNC                      DYNDTWAIN_API::DTWAIN_EnumNoiseFiltersEx = nullptr;
     D_ENUMOCRINTERFACESFUNC                       DYNDTWAIN_API::DTWAIN_EnumOCRInterfaces = nullptr;
+    D_ENUMOCRINTERFACESEXFUNC                     DYNDTWAIN_API::DTWAIN_EnumOCRInterfacesEx = nullptr;
     D_ENUMOCRSUPPORTEDCAPSFUNC                    DYNDTWAIN_API::DTWAIN_EnumOCRSupportedCaps = nullptr;
     D_ENUMORIENTATIONSFUNC                        DYNDTWAIN_API::DTWAIN_EnumOrientations = nullptr;
     D_ENUMORIENTATIONSEXFUNC                      DYNDTWAIN_API::DTWAIN_EnumOrientationsEx = nullptr;
@@ -456,6 +457,7 @@
     D_GETCAPFROMNAMEAFUNC                         DYNDTWAIN_API::DTWAIN_GetCapFromNameA = nullptr;
     D_GETCAPFROMNAMEWFUNC                         DYNDTWAIN_API::DTWAIN_GetCapFromNameW = nullptr;
     D_GETCAPOPERATIONSFUNC                        DYNDTWAIN_API::DTWAIN_GetCapOperations = nullptr;
+    D_GETCAPOPERATIONSEXFUNC                      DYNDTWAIN_API::DTWAIN_GetCapOperationsEx = nullptr;
     D_GETCAPVALUESFUNC                            DYNDTWAIN_API::DTWAIN_GetCapValues = nullptr;
     D_GETCAPVALUESEXFUNC                          DYNDTWAIN_API::DTWAIN_GetCapValuesEx = nullptr;
     D_GETCAPVALUESEX2FUNC                         DYNDTWAIN_API::DTWAIN_GetCapValuesEx2 = nullptr;
@@ -501,6 +503,7 @@
     D_GETDOUBLEFEEDDETECTLENGTHFUNC               DYNDTWAIN_API::DTWAIN_GetDoubleFeedDetectLength = nullptr;
     D_GETDOUBLEFEEDDETECTVALUESFUNC               DYNDTWAIN_API::DTWAIN_GetDoubleFeedDetectValues = nullptr;
     D_GETDUPLEXTYPEFUNC                           DYNDTWAIN_API::DTWAIN_GetDuplexType = nullptr;
+    D_GETDUPLEXTYPEEXFUNC                         DYNDTWAIN_API::DTWAIN_GetDuplexTypeEx = nullptr;
     D_GETERRORBUFFERFUNC                          DYNDTWAIN_API::DTWAIN_GetErrorBuffer = nullptr;
     D_GETERRORBUFFERTHRESHOLDFUNC                 DYNDTWAIN_API::DTWAIN_GetErrorBufferThreshold = nullptr;
     D_GETERRORCALLBACKFUNC                        DYNDTWAIN_API::DTWAIN_GetErrorCallback = nullptr;
@@ -1311,6 +1314,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_ArrayCreateFromStringsW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayDestroy, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayDestroyFrames, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ArrayDumpToLog, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayFind, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayFindANSIString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayFindFloat, hModule);
@@ -1479,14 +1483,13 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_EnumCameras, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCamerasEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCamerasEx2, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_EnumCamerasEx3, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCompressionTypes, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCompressionTypesEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCompressionTypesEx2, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumContrastValues, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumContrastValuesEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCustomCaps, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_EnumCustomCapsEx2, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_EnumCustomCapsEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumDoubleFeedDetectLengths, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumDoubleFeedDetectLengthsEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumDoubleFeedDetectValues, hModule);
@@ -1514,6 +1517,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_EnumNoiseFilters, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumNoiseFiltersEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumOCRInterfaces, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_EnumOCRInterfacesEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumOCRSupportedCaps, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumOrientations, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumOrientationsEx, hModule);
@@ -1646,6 +1650,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetCapFromNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapFromNameW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapOperations, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCapOperationsEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapValues, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapValuesEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapValuesEx2, hModule);
@@ -1691,6 +1696,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetDoubleFeedDetectLength, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetDoubleFeedDetectValues, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetDuplexType, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetDuplexTypeEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetErrorBuffer, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetErrorBufferThreshold, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetErrorCallback, hModule);

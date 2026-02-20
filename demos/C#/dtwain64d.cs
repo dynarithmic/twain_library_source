@@ -378,12 +378,12 @@ namespace Dynarithmic
         public const int DTWAIN_CAPSET = 6;
         public const int DTWAIN_CAPRESET = 7;
         public const int DTWAIN_CAPRESETALL = 8;
-        public const int DTWAIN_CAPSETCONSTRAINT = 9;
         public const int DTWAIN_CAPSETAVAILABLE = 8;
         public const int DTWAIN_CAPSETCURRENT = 16;
         public const int DTWAIN_CAPGETHELP = 9;
         public const int DTWAIN_CAPGETLABEL = 10;
         public const int DTWAIN_CAPGETLABELENUM = 11;
+        public const int DTWAIN_CAPSETCONSTRAINT = 12;
         public const int DTWAIN_AREASET = DTWAIN_CAPSET;
         public const int DTWAIN_AREARESET = DTWAIN_CAPRESET;
         public const int DTWAIN_AREACURRENT = DTWAIN_CAPGETCURRENT;
@@ -1222,6 +1222,7 @@ namespace Dynarithmic
         public const int DTWAIN_DLG_HIGHLIGHTFIRST = 8192;
         public const int DTWAIN_DLG_SAVELASTSCREENPOS = 16384;
         public const int DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768;
+        public const int DTWAIN_DLG_CONSOLEASPARENT = 65536;
         public const int DTWAIN_RES_ENGLISH = 0;
         public const int DTWAIN_RES_FRENCH = 1;
         public const int DTWAIN_RES_SPANISH = 2;
@@ -1935,6 +1936,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, System.IntPtr pVariant);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
@@ -2331,7 +2335,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnumBitDepths(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern int DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, int PixelType, ref DTWAIN_ARRAY pArray);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_ARRAY DTWAIN_EnumBitDepthsEx2(DTWAIN_SOURCE Source, int PixelType);
@@ -2352,13 +2356,10 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnumCameras(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY Cameras);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern int DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source, int nWhichCamera, ref DTWAIN_ARRAY Cameras);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source);
-
-        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern DTWAIN_ARRAY DTWAIN_EnumCamerasEx3(DTWAIN_SOURCE Source, int nWhichCamera);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, int nWhichCamera);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
@@ -2379,7 +2380,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern DTWAIN_ARRAY DTWAIN_EnumCustomCapsEx2(DTWAIN_SOURCE Source);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumCustomCapsEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_EnumDoubleFeedDetectLengths(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray, int bExpandIfRange);
@@ -2403,7 +2404,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern int DTWAIN_EnumExtendedCapsEx(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumExtendedCapsEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_ARRAY DTWAIN_EnumExtendedCapsEx2(DTWAIN_SOURCE Source);
@@ -2461,6 +2462,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_EnumOCRInterfaces(ref DTWAIN_ARRAY OCRInterfaces);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern DTWAIN_ARRAY DTWAIN_EnumOCRInterfacesEx();
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, ref DTWAIN_ARRAY SupportedCaps);
@@ -2562,7 +2566,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern int DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx2(DTWAIN_SOURCE Source);
@@ -2799,6 +2803,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, int lCapability, ref int lpOps);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, int lCapability);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetCapValues(DTWAIN_SOURCE Source, int lCap, int lGetType, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
@@ -2905,6 +2912,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, ref int lpDupType);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_GetDuplexTypeEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetErrorBuffer(ref DTWAIN_ARRAY ArrayBuffer);

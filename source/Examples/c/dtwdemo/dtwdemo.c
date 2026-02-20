@@ -1328,8 +1328,16 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             HWND hWndEdit = GetDlgItem(hDlg, IDC_edCopyright);
             DTWAIN_GetShortVersionStringA(szBuf, 100);
             SendMessageA(hDlg, WM_SETTEXT, 0, (LPARAM)szBuf);
-            DTWAIN_GetVersionCopyrightA(szBuf, 1000);
-            SendMessageA(hWndEdit, WM_SETTEXT, 0, (LPARAM)szBuf);
+            DTWAIN_GetVersionInfoA(szBuf, 1000);
+			/* Edit controls need \r\n and not \n new lines. */
+			HANDLE h = DTWAIN_ConvertToAPIStringA(szBuf);
+			if (h)
+			{
+				LPCSTR pData = GlobalLock(h);
+				SetWindowTextA(hWndEdit, pData);
+				GlobalUnlock(h);
+				GlobalFree(h);
+			}
             return TRUE;
         }
 

@@ -325,12 +325,12 @@ Class DTWAINAPI
     Public Const DTWAIN_CAPSET As Integer = 6
     Public Const DTWAIN_CAPRESET As Integer = 7
     Public Const DTWAIN_CAPRESETALL As Integer = 8
-    Public Const DTWAIN_CAPSETCONSTRAINT As Integer = 9
     Public Const DTWAIN_CAPSETAVAILABLE As Integer = 8
     Public Const DTWAIN_CAPSETCURRENT As Integer = 16
     Public Const DTWAIN_CAPGETHELP As Integer = 9
     Public Const DTWAIN_CAPGETLABEL As Integer = 10
     Public Const DTWAIN_CAPGETLABELENUM As Integer = 11
+    Public Const DTWAIN_CAPSETCONSTRAINT As Integer = 12
     Public Const DTWAIN_AREASET As Integer = DTWAIN_CAPSET
     Public Const DTWAIN_AREARESET As Integer = DTWAIN_CAPRESET
     Public Const DTWAIN_AREACURRENT As Integer = DTWAIN_CAPGETCURRENT
@@ -1169,6 +1169,7 @@ Class DTWAINAPI
     Public Const DTWAIN_DLG_HIGHLIGHTFIRST As Integer = 8192
     Public Const DTWAIN_DLG_SAVELASTSCREENPOS As Integer = 16384
     Public Const DTWAIN_DLG_CENTER_CURRENT_MONITOR As Integer = 32768
+    Public Const DTWAIN_DLG_CONSOLEASPARENT As Integer = 65536
     Public Const DTWAIN_RES_ENGLISH As Integer = 0
     Public Const DTWAIN_RES_FRENCH As Integer = 1
     Public Const DTWAIN_RES_SPANISH As Integer = 2
@@ -1788,6 +1789,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_ArrayCreateFromReals Lib "dtwain64.dll" (ByRef pCArray As System.Double, nSize As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayDestroy Lib "dtwain64.dll" (pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayDestroyFrames Lib "dtwain64.dll" (FrameArray As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_ArrayDumpToLog Lib "dtwain64.dll" (pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayFind Lib "dtwain64.dll" (pArray As System.IntPtr, pVariant As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_ArrayFindANSIString Lib "dtwain64.dll" (pArray As System.IntPtr, pString As String) As Integer
     Public Declare Function DTWAIN_ArrayFindFloat Lib "dtwain64.dll" (pArray As System.IntPtr, Val As System.Double, Tolerance As System.Double) As Integer
@@ -1916,23 +1918,22 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_EnumAutomaticSenseMedium Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumAutomaticSenseMediumEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumBitDepths Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_EnumBitDepthsEx Lib "dtwain64.dll" (Source As System.IntPtr, PixelType As Integer, ByRef pArray As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_EnumBitDepthsEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumBitDepthsEx2 Lib "dtwain64.dll" (Source As System.IntPtr, PixelType As Integer) As System.IntPtr
     Public Declare Function DTWAIN_EnumBottomCameras Lib "dtwain64.dll" (Source As System.IntPtr, ByRef Cameras As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumBottomCamerasEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumBrightnessValues Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr, bExpandIfRange As Integer) As Integer
     Public Declare Function DTWAIN_EnumBrightnessValuesEx Lib "dtwain64.dll" (Source As System.IntPtr, bExpandIfRange As Integer) As System.IntPtr
     Public Declare Function DTWAIN_EnumCameras Lib "dtwain64.dll" (Source As System.IntPtr, ByRef Cameras As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_EnumCamerasEx Lib "dtwain64.dll" (Source As System.IntPtr, nWhichCamera As Integer, ByRef Cameras As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_EnumCamerasEx2 Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
-    Public Declare Function DTWAIN_EnumCamerasEx3 Lib "dtwain64.dll" (Source As System.IntPtr, nWhichCamera As Integer) As System.IntPtr
+    Public Declare Function DTWAIN_EnumCamerasEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
+    Public Declare Function DTWAIN_EnumCamerasEx2 Lib "dtwain64.dll" (Source As System.IntPtr, nWhichCamera As Integer) As System.IntPtr
     Public Declare Function DTWAIN_EnumCompressionTypes Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumCompressionTypesEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumCompressionTypesEx2 Lib "dtwain64.dll" (Source As System.IntPtr, lFileType As Integer, bUseBufferedMode As Integer) As System.IntPtr
     Public Declare Function DTWAIN_EnumContrastValues Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr, bExpandIfRange As Integer) As Integer
     Public Declare Function DTWAIN_EnumContrastValuesEx Lib "dtwain64.dll" (Source As System.IntPtr, bExpandIfRange As Integer) As System.IntPtr
     Public Declare Function DTWAIN_EnumCustomCaps Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_EnumCustomCapsEx2 Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
+    Public Declare Function DTWAIN_EnumCustomCapsEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumDoubleFeedDetectLengths Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr, bExpandIfRange As Integer) As Integer
     Public Declare Function DTWAIN_EnumDoubleFeedDetectLengthsEx Lib "dtwain64.dll" (Source As System.IntPtr, bExpandIfRange As Integer) As System.IntPtr
     Public Declare Function DTWAIN_EnumDoubleFeedDetectValues Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
@@ -1940,7 +1941,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_EnumExtImageInfoTypes Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumExtImageInfoTypesEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumExtendedCaps Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_EnumExtendedCapsEx Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_EnumExtendedCapsEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumExtendedCapsEx2 Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumFileTypeBitsPerPixel Lib "dtwain64.dll" (FileType As Integer, ByRef Array As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumFileXferFormats Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
@@ -1960,6 +1961,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_EnumNoiseFilters Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumNoiseFiltersEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumOCRInterfaces Lib "dtwain64.dll" (ByRef OCRInterfaces As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_EnumOCRInterfacesEx Lib "dtwain64.dll" () As System.IntPtr
     Public Declare Function DTWAIN_EnumOCRSupportedCaps Lib "dtwain64.dll" (Engine As System.IntPtr, ByRef SupportedCaps As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumOrientations Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumOrientationsEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
@@ -1993,7 +1995,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_EnumSources Lib "dtwain64.dll" (ByRef lpArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumSourcesEx Lib "dtwain64.dll" () As System.IntPtr
     Public Declare Function DTWAIN_EnumSupportedCaps Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_EnumSupportedCapsEx Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_EnumSupportedCapsEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumSupportedCapsEx2 Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumSupportedExtImageInfo Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumSupportedExtImageInfoEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
@@ -2064,6 +2066,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetCapDataType Lib "dtwain64.dll" (Source As System.IntPtr, nCap As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetCapFromName Lib "dtwain64.dll" (szName As String) As Integer
     Public Declare Function DTWAIN_GetCapOperations Lib "dtwain64.dll" (Source As System.IntPtr, lCapability As Integer, ByRef lpOps As Integer) As Integer
+    Public Declare Function DTWAIN_GetCapOperationsEx Lib "dtwain64.dll" (Source As System.IntPtr, lCapability As Integer) As Integer
     Public Declare Function DTWAIN_GetCapValues Lib "dtwain64.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetCapValuesEx Lib "dtwain64.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer, lContainerType As Integer, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetCapValuesEx2 Lib "dtwain64.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer, lContainerType As Integer, nDataType As Integer, ByRef pArray As System.IntPtr) As Integer
@@ -2093,6 +2096,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetDoubleFeedDetectLength Lib "dtwain64.dll" (Source As System.IntPtr, ByRef Value As System.Double, bCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetDoubleFeedDetectValues Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetDuplexType Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lpDupType As Integer) As Integer
+    Public Declare Function DTWAIN_GetDuplexTypeEx Lib "dtwain64.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetErrorBuffer Lib "dtwain64.dll" (ByRef ArrayBuffer As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetErrorBufferThreshold Lib "dtwain64.dll" () As Integer
     Public Declare Function DTWAIN_GetErrorCallback Lib "dtwain64.dll" () As DTwainErrorProc

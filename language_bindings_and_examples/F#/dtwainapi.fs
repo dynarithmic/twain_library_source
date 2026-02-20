@@ -381,12 +381,12 @@ module TwainAPI =
     let public DTWAIN_CAPSET = 6
     let public DTWAIN_CAPRESET = 7
     let public DTWAIN_CAPRESETALL = 8
-    let public DTWAIN_CAPSETCONSTRAINT = 9
     let public DTWAIN_CAPSETAVAILABLE = 8
     let public DTWAIN_CAPSETCURRENT = 16
     let public DTWAIN_CAPGETHELP = 9
     let public DTWAIN_CAPGETLABEL = 10
     let public DTWAIN_CAPGETLABELENUM = 11
+    let public DTWAIN_CAPSETCONSTRAINT = 12
     let public DTWAIN_AREASET = DTWAIN_CAPSET
     let public DTWAIN_AREARESET = DTWAIN_CAPRESET
     let public DTWAIN_AREACURRENT = DTWAIN_CAPGETCURRENT
@@ -1225,6 +1225,7 @@ module TwainAPI =
     let public DTWAIN_DLG_HIGHLIGHTFIRST = 8192
     let public DTWAIN_DLG_SAVELASTSCREENPOS = 16384
     let public DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768
+    let public DTWAIN_DLG_CONSOLEASPARENT = 65536
     let public DTWAIN_RES_ENGLISH = 0
     let public DTWAIN_RES_FRENCH = 1
     let public DTWAIN_RES_SPANISH = 2
@@ -1998,6 +1999,9 @@ module TwainAPI =
     type DTWAIN_ArrayDestroyFramesDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayDumpToLogDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayFindDelegate = delegate of DTWAIN_ARRAY * LPVOID -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)>]
@@ -2382,7 +2386,7 @@ module TwainAPI =
     type DTWAIN_EnumBitDepthsDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_EnumBitDepthsExDelegate = delegate of DTWAIN_SOURCE * LONG * DTWAIN_ARRAY byref -> DTWAIN_BOOL
+    type DTWAIN_EnumBitDepthsExDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumBitDepthsEx2Delegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_ARRAY
@@ -2403,13 +2407,10 @@ module TwainAPI =
     type DTWAIN_EnumCamerasDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_EnumCamerasExDelegate = delegate of DTWAIN_SOURCE * LONG * DTWAIN_ARRAY byref -> DTWAIN_BOOL
+    type DTWAIN_EnumCamerasExDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_EnumCamerasEx2Delegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_EnumCamerasEx3Delegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_ARRAY
+    type DTWAIN_EnumCamerasEx2Delegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumCompressionTypesDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
@@ -2430,7 +2431,7 @@ module TwainAPI =
     type DTWAIN_EnumCustomCapsDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_EnumCustomCapsEx2Delegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
+    type DTWAIN_EnumCustomCapsExDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumDoubleFeedDetectLengthsDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref * DTWAIN_BOOL -> LONG
@@ -2454,7 +2455,7 @@ module TwainAPI =
     type DTWAIN_EnumExtendedCapsDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_EnumExtendedCapsExDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
+    type DTWAIN_EnumExtendedCapsExDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumExtendedCapsEx2Delegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
@@ -2512,6 +2513,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumOCRInterfacesDelegate = delegate of DTWAIN_ARRAY byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_EnumOCRInterfacesExDelegate = delegate of unit -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumOCRSupportedCapsDelegate = delegate of DTWAIN_OCRENGINE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
@@ -2613,7 +2617,7 @@ module TwainAPI =
     type DTWAIN_EnumSupportedCapsDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_EnumSupportedCapsExDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
+    type DTWAIN_EnumSupportedCapsExDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumSupportedCapsEx2Delegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
@@ -2826,6 +2830,9 @@ module TwainAPI =
     type DTWAIN_GetCapOperationsDelegate = delegate of DTWAIN_SOURCE * LONG * int byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetCapOperationsExDelegate = delegate of DTWAIN_SOURCE * LONG -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetCapValuesDelegate = delegate of DTWAIN_SOURCE * LONG * LONG * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -2911,6 +2918,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetDuplexTypeDelegate = delegate of DTWAIN_SOURCE * int byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetDuplexTypeExDelegate = delegate of DTWAIN_SOURCE -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetErrorBufferDelegate = delegate of DTWAIN_ARRAY byref -> DTWAIN_BOOL
@@ -4287,6 +4297,7 @@ module TwainAPI =
     let private ArrayCreateFromReals = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromReals" : DTWAIN_ArrayCreateFromRealsDelegate)
     let private ArrayDestroy = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroy" : DTWAIN_ArrayDestroyDelegate)
     let private ArrayDestroyFrames = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroyFrames" : DTWAIN_ArrayDestroyFramesDelegate)
+    let private ArrayDumpToLog = lazy (DynamicDll.Bind "DTWAIN_ArrayDumpToLog" : DTWAIN_ArrayDumpToLogDelegate)
     let private ArrayFind = lazy (DynamicDll.Bind "DTWAIN_ArrayFind" : DTWAIN_ArrayFindDelegate)
     let private ArrayFindANSIString = lazy (DynamicDll.Bind "DTWAIN_ArrayFindANSIString" : DTWAIN_ArrayFindANSIStringDelegate)
     let private ArrayFindFloat = lazy (DynamicDll.Bind "DTWAIN_ArrayFindFloat" : DTWAIN_ArrayFindFloatDelegate)
@@ -4424,14 +4435,13 @@ module TwainAPI =
     let private EnumCameras = lazy (DynamicDll.Bind "DTWAIN_EnumCameras" : DTWAIN_EnumCamerasDelegate)
     let private EnumCamerasEx = lazy (DynamicDll.Bind "DTWAIN_EnumCamerasEx" : DTWAIN_EnumCamerasExDelegate)
     let private EnumCamerasEx2 = lazy (DynamicDll.Bind "DTWAIN_EnumCamerasEx2" : DTWAIN_EnumCamerasEx2Delegate)
-    let private EnumCamerasEx3 = lazy (DynamicDll.Bind "DTWAIN_EnumCamerasEx3" : DTWAIN_EnumCamerasEx3Delegate)
     let private EnumCompressionTypes = lazy (DynamicDll.Bind "DTWAIN_EnumCompressionTypes" : DTWAIN_EnumCompressionTypesDelegate)
     let private EnumCompressionTypesEx = lazy (DynamicDll.Bind "DTWAIN_EnumCompressionTypesEx" : DTWAIN_EnumCompressionTypesExDelegate)
     let private EnumCompressionTypesEx2 = lazy (DynamicDll.Bind "DTWAIN_EnumCompressionTypesEx2" : DTWAIN_EnumCompressionTypesEx2Delegate)
     let private EnumContrastValues = lazy (DynamicDll.Bind "DTWAIN_EnumContrastValues" : DTWAIN_EnumContrastValuesDelegate)
     let private EnumContrastValuesEx = lazy (DynamicDll.Bind "DTWAIN_EnumContrastValuesEx" : DTWAIN_EnumContrastValuesExDelegate)
     let private EnumCustomCaps = lazy (DynamicDll.Bind "DTWAIN_EnumCustomCaps" : DTWAIN_EnumCustomCapsDelegate)
-    let private EnumCustomCapsEx2 = lazy (DynamicDll.Bind "DTWAIN_EnumCustomCapsEx2" : DTWAIN_EnumCustomCapsEx2Delegate)
+    let private EnumCustomCapsEx = lazy (DynamicDll.Bind "DTWAIN_EnumCustomCapsEx" : DTWAIN_EnumCustomCapsExDelegate)
     let private EnumDoubleFeedDetectLengths = lazy (DynamicDll.Bind "DTWAIN_EnumDoubleFeedDetectLengths" : DTWAIN_EnumDoubleFeedDetectLengthsDelegate)
     let private EnumDoubleFeedDetectLengthsEx = lazy (DynamicDll.Bind "DTWAIN_EnumDoubleFeedDetectLengthsEx" : DTWAIN_EnumDoubleFeedDetectLengthsExDelegate)
     let private EnumDoubleFeedDetectValues = lazy (DynamicDll.Bind "DTWAIN_EnumDoubleFeedDetectValues" : DTWAIN_EnumDoubleFeedDetectValuesDelegate)
@@ -4459,6 +4469,7 @@ module TwainAPI =
     let private EnumNoiseFilters = lazy (DynamicDll.Bind "DTWAIN_EnumNoiseFilters" : DTWAIN_EnumNoiseFiltersDelegate)
     let private EnumNoiseFiltersEx = lazy (DynamicDll.Bind "DTWAIN_EnumNoiseFiltersEx" : DTWAIN_EnumNoiseFiltersExDelegate)
     let private EnumOCRInterfaces = lazy (DynamicDll.Bind "DTWAIN_EnumOCRInterfaces" : DTWAIN_EnumOCRInterfacesDelegate)
+    let private EnumOCRInterfacesEx = lazy (DynamicDll.Bind "DTWAIN_EnumOCRInterfacesEx" : DTWAIN_EnumOCRInterfacesExDelegate)
     let private EnumOCRSupportedCaps = lazy (DynamicDll.Bind "DTWAIN_EnumOCRSupportedCaps" : DTWAIN_EnumOCRSupportedCapsDelegate)
     let private EnumOrientations = lazy (DynamicDll.Bind "DTWAIN_EnumOrientations" : DTWAIN_EnumOrientationsDelegate)
     let private EnumOrientationsEx = lazy (DynamicDll.Bind "DTWAIN_EnumOrientationsEx" : DTWAIN_EnumOrientationsExDelegate)
@@ -4563,6 +4574,7 @@ module TwainAPI =
     let private GetCapDataType = lazy (DynamicDll.Bind "DTWAIN_GetCapDataType" : DTWAIN_GetCapDataTypeDelegate)
     let private GetCapFromName = lazy (DynamicDll.Bind "DTWAIN_GetCapFromName" : DTWAIN_GetCapFromNameDelegate)
     let private GetCapOperations = lazy (DynamicDll.Bind "DTWAIN_GetCapOperations" : DTWAIN_GetCapOperationsDelegate)
+    let private GetCapOperationsEx = lazy (DynamicDll.Bind "DTWAIN_GetCapOperationsEx" : DTWAIN_GetCapOperationsExDelegate)
     let private GetCapValues = lazy (DynamicDll.Bind "DTWAIN_GetCapValues" : DTWAIN_GetCapValuesDelegate)
     let private GetCapValuesEx = lazy (DynamicDll.Bind "DTWAIN_GetCapValuesEx" : DTWAIN_GetCapValuesExDelegate)
     let private GetCapValuesEx2 = lazy (DynamicDll.Bind "DTWAIN_GetCapValuesEx2" : DTWAIN_GetCapValuesEx2Delegate)
@@ -4592,6 +4604,7 @@ module TwainAPI =
     let private GetDoubleFeedDetectLength = lazy (DynamicDll.Bind "DTWAIN_GetDoubleFeedDetectLength" : DTWAIN_GetDoubleFeedDetectLengthDelegate)
     let private GetDoubleFeedDetectValues = lazy (DynamicDll.Bind "DTWAIN_GetDoubleFeedDetectValues" : DTWAIN_GetDoubleFeedDetectValuesDelegate)
     let private GetDuplexType = lazy (DynamicDll.Bind "DTWAIN_GetDuplexType" : DTWAIN_GetDuplexTypeDelegate)
+    let private GetDuplexTypeEx = lazy (DynamicDll.Bind "DTWAIN_GetDuplexTypeEx" : DTWAIN_GetDuplexTypeExDelegate)
     let private GetErrorBuffer = lazy (DynamicDll.Bind "DTWAIN_GetErrorBuffer" : DTWAIN_GetErrorBufferDelegate)
     let private GetErrorBufferThreshold = lazy (DynamicDll.Bind "DTWAIN_GetErrorBufferThreshold" : DTWAIN_GetErrorBufferThresholdDelegate)
     let private GetErrorCallback = lazy (DynamicDll.Bind "DTWAIN_GetErrorCallback" : DTWAIN_GetErrorCallbackDelegate)
@@ -5254,6 +5267,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayDestroyFrames.Value.Invoke(framearray)
 
+    let DTWAIN_ArrayDumpToLog (parray: DTWAIN_ARRAY) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayDumpToLog.Value.Invoke(parray)
+
     let DTWAIN_ArrayFind (parray: DTWAIN_ARRAY) (pvariant: LPVOID) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayFind.Value.Invoke(parray, pvariant)
@@ -5766,9 +5783,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumBitDepths.Value.Invoke(source, &parray)
 
-    let DTWAIN_EnumBitDepthsEx (source: DTWAIN_SOURCE) (pixeltype: LONG) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
+    let DTWAIN_EnumBitDepthsEx (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        EnumBitDepthsEx.Value.Invoke(source, pixeltype, &parray)
+        EnumBitDepthsEx.Value.Invoke(source)
 
     let DTWAIN_EnumBitDepthsEx2 (source: DTWAIN_SOURCE) (pixeltype: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -5794,17 +5811,13 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumCameras.Value.Invoke(source, &cameras)
 
-    let DTWAIN_EnumCamerasEx (source: DTWAIN_SOURCE) (nwhichcamera: LONG) (cameras: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
+    let DTWAIN_EnumCamerasEx (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        EnumCamerasEx.Value.Invoke(source, nwhichcamera, &cameras)
+        EnumCamerasEx.Value.Invoke(source)
 
-    let DTWAIN_EnumCamerasEx2 (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
+    let DTWAIN_EnumCamerasEx2 (source: DTWAIN_SOURCE) (nwhichcamera: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        EnumCamerasEx2.Value.Invoke(source)
-
-    let DTWAIN_EnumCamerasEx3 (source: DTWAIN_SOURCE) (nwhichcamera: LONG) : DTWAIN_ARRAY =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        EnumCamerasEx3.Value.Invoke(source, nwhichcamera)
+        EnumCamerasEx2.Value.Invoke(source, nwhichcamera)
 
     let DTWAIN_EnumCompressionTypes (source: DTWAIN_SOURCE) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -5830,9 +5843,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumCustomCaps.Value.Invoke(source, &parray)
 
-    let DTWAIN_EnumCustomCapsEx2 (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
+    let DTWAIN_EnumCustomCapsEx (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        EnumCustomCapsEx2.Value.Invoke(source)
+        EnumCustomCapsEx.Value.Invoke(source)
 
     let DTWAIN_EnumDoubleFeedDetectLengths (source: DTWAIN_SOURCE) (parray: DTWAIN_ARRAY byref) (bexpandifrange: DTWAIN_BOOL) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -5862,9 +5875,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumExtendedCaps.Value.Invoke(source, &parray)
 
-    let DTWAIN_EnumExtendedCapsEx (source: DTWAIN_SOURCE) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
+    let DTWAIN_EnumExtendedCapsEx (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        EnumExtendedCapsEx.Value.Invoke(source, &parray)
+        EnumExtendedCapsEx.Value.Invoke(source)
 
     let DTWAIN_EnumExtendedCapsEx2 (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -5941,6 +5954,10 @@ module TwainAPI =
     let DTWAIN_EnumOCRInterfaces (ocrinterfaces: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumOCRInterfaces.Value.Invoke(&ocrinterfaces)
+
+    let DTWAIN_EnumOCRInterfacesEx() : DTWAIN_ARRAY =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        EnumOCRInterfacesEx.Value.Invoke()
 
     let DTWAIN_EnumOCRSupportedCaps (engine: DTWAIN_OCRENGINE) (supportedcaps: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -6074,9 +6091,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumSupportedCaps.Value.Invoke(source, &parray)
 
-    let DTWAIN_EnumSupportedCapsEx (source: DTWAIN_SOURCE) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
+    let DTWAIN_EnumSupportedCapsEx (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        EnumSupportedCapsEx.Value.Invoke(source, &parray)
+        EnumSupportedCapsEx.Value.Invoke(source)
 
     let DTWAIN_EnumSupportedCapsEx2 (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -6358,6 +6375,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCapOperations.Value.Invoke(source, lcapability, &lpops)
 
+    let DTWAIN_GetCapOperationsEx (source: DTWAIN_SOURCE) (lcapability: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetCapOperationsEx.Value.Invoke(source, lcapability)
+
     let DTWAIN_GetCapValues (source: DTWAIN_SOURCE) (lcap: LONG) (lgettype: LONG) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCapValues.Value.Invoke(source, lcap, lgettype, &parray)
@@ -6473,6 +6494,10 @@ module TwainAPI =
     let DTWAIN_GetDuplexType (source: DTWAIN_SOURCE) (lpduptype: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDuplexType.Value.Invoke(source, &lpduptype)
+
+    let DTWAIN_GetDuplexTypeEx (source: DTWAIN_SOURCE) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetDuplexTypeEx.Value.Invoke(source)
 
     let DTWAIN_GetErrorBuffer (arraybuffer: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

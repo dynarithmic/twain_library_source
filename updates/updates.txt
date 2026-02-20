@@ -9,6 +9,8 @@ DTWAIN Version changes
   images, and for bit depths greater than 1, the SVG will consist of embedded base-64 
   encoded PNG data.
 
+- Fix various issues with DTWAIN_SetCapValues() using the MSG_SETCONSTRAINT set type.
+
 - Do not produce extraneous TWAIN messages from log files if DTWAIN_LOG_ISTWAINMSG option 
   is turned off.  This change reduces the size of log files by a very large margin.
 
