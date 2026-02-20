@@ -1842,15 +1842,21 @@ void CTL_TwainAppMgr::GetExtendedCapabilities(const CTL_ITwainSource *pSource, C
 UINT CTL_TwainAppMgr::GetCapOps(CTL_ITwainSource *pSource, int nCap, bool bCanQuery)
 {
     UINT nOps = 0;
+    // First try to get the support directly from TWAIN using MSG_QUERYSUPPORT
     if ( bCanQuery )
         nOps = GetCapabilityOperations(pSource, nCap).GetSupport();
 
-    // Cannot query the support if nOps is 0
+    // Cannot query the support if nOps is 0.  If nOps is 0,
+    // this is because the Source doesn't support MSG_QUERYSUPPORT.
     if ( nOps == 0 )
     {
-        // Fall back to the table of hard-coded container types
+        // Fall back to the table of hard-coded container types for
+        // standard TWAIN caps (TWAIN 2.4)
         const CTL_CapStruct cStruct = GetGeneralCapInfo(nCap);
-        // Build the bit string from the cap info
+
+        // Build the bit string from the cap info.  Note that custom caps
+        // will be all 0, as DTWAIN has no idea what is supported for particular
+        // custom caps.
         if (cStruct.m_nGetContainer)
             nOps |= TWQC_GET;
         if (cStruct.m_nGetCurrentContainer)
@@ -2011,11 +2017,6 @@ CTL_CapStruct CTL_TwainAppMgr::GetGeneralCapInfo(LONG Cap)
     {
         bFoundCap = true;
         cStruct = (*it).second;
-    }
-
-    if ( !bFoundCap )
-    {
-        cStruct = generalInfo[static_cast<short>(Cap)];
     }
     return cStruct;
 }
