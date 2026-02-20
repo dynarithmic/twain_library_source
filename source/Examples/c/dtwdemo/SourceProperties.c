@@ -117,7 +117,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 LONG numChars = DTWAIN_GetSourceDetailsA(szBufName, NULL, 0, 2, TRUE);
                 if (numChars > 0)
                 {
-					BYTE* szData = NULL;
+                    BYTE* szData = NULL;
                     szData = malloc(numChars + 1);
                     if (szData)
                     {
@@ -178,17 +178,17 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 case IDC_btnShowUIIOnly:
                 {
                     HWND hWndShowUIOnly = GetDlgItem(hDlg, IDC_btnShowUIIOnly);
-					HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
+                    HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
                     EnableWindow(hWndShowUIOnly, FALSE);
                     DTWAIN_ShowUIOnly(g_CurrentSource);
                     EnableWindow(hWndShowUIOnly, TRUE);
                     RefreshCustomDSData(hWndDSData);
                 }
-				break;
+                break;
                 case IDC_btnRefreshShowUIOnly:
                 {
-					HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
-					RefreshCustomDSData(hWndDSData);
+                    HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
+                    RefreshCustomDSData(hWndDSData);
                 }
                 break;
             }
@@ -247,32 +247,32 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
                 {
                     if (nNotification == CBN_SELCHANGE)
                     {
-						HWND hWndTestSet = GetDlgItem(hDlg, IDC_btnTestSet);
-						EnableWindow(hWndTestSet, TRUE);
-						TCHAR szGetType[100];
-						/* This is the MSG_RESET */
-						LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETCURSEL, 0, 0);
-						SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
-						capOpts = SetTestSelection2(hDlg, szGetType, curCapValue);
-						if (nCurSel == 1)
-						{
-							EnableSetCapWindows(hDlg, FALSE);
-							break;
-						}
-						else
-							EnableSetCapWindows(hDlg, TRUE);
+                        HWND hWndTestSet = GetDlgItem(hDlg, IDC_btnTestSet);
+                        EnableWindow(hWndTestSet, TRUE);
+                        TCHAR szGetType[100];
+                        /* This is the MSG_RESET */
+                        LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETCURSEL, 0, 0);
+                        SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
+                        capOpts = SetTestSelection2(hDlg, szGetType, curCapValue);
+                        if (nCurSel == 1)
+                        {
+                            EnableSetCapWindows(hDlg, FALSE);
+                            break;
+                        }
+                        else
+                            EnableSetCapWindows(hDlg, TRUE);
 
-						/* Now test for MSG_SETCONSTRAINT */
-						if (nCurSel == 2)
-						{
-							if (!(capOpts & DTWAIN_CO_SETCONSTRAINT))
-							{
-								// Disable controls for constraint, including test button
-								EnableSetCapWindows(hDlg, FALSE);
+                        /* Now test for MSG_SETCONSTRAINT */
+                        if (nCurSel == 2)
+                        {
+                            if (!(capOpts & DTWAIN_CO_SETCONSTRAINT))
+                            {
+                                // Disable controls for constraint, including test button
+                                EnableSetCapWindows(hDlg, FALSE);
                                 EnableWindow(hWndTestSet, FALSE);
-							}
-						}
-					}
+                            }
+                        }
+                    }
                 }
                 break;
 
