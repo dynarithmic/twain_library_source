@@ -30,7 +30,7 @@ static char g_szInput[32767];
 static LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 static void EnableSetCapWindows(HWND hWnd, int bEnable);
 static void SetTestSelection(HWND hWnd, TCHAR* getType, int capValue);
-static void SetTestSelection2(HWND hWnd, TCHAR* setType, int capValue);
+static LONG SetTestSelection2(HWND hWnd, TCHAR* setType, int capValue);
 static void TestGetCap(HWND hWnd, LONG capValue);
 static void TestSetCap(HWND hWnd, LONG capValue);
 static LONG InitTestControls(HWND hWnd, const char* szName);
@@ -207,6 +207,7 @@ void DisplayTestCapDlg(HWND parent, const char* szCapName)
 LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static LONG curCapValue;
+    LONG capOpts = 0;
     switch (message)
     {
         case WM_INITDIALOG:
@@ -252,7 +253,7 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 						/* This is the MSG_RESET */
 						LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETCURSEL, 0, 0);
 						SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
-						SetTestSelection2(hDlg, szGetType, curCapValue);
+						capOpts = SetTestSelection2(hDlg, szGetType, curCapValue);
 						if (nCurSel == 1)
 						{
 							EnableSetCapWindows(hDlg, FALSE);
@@ -264,11 +265,9 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 						/* Now test for MSG_SETCONSTRAINT */
 						if (nCurSel == 2)
 						{
-							LONG opts;
-							DTWAIN_GetCapOperations(g_CurrentSource, curCapValue, &opts);
-							if (!(opts & DTWAIN_CO_SETCONSTRAINT))
+							if (!(capOpts & DTWAIN_CO_SETCONSTRAINT))
 							{
-								// Disable controls for constraint, including t
+								// Disable controls for constraint, including test button
 								EnableSetCapWindows(hDlg, FALSE);
                                 EnableWindow(hWndTestSet, FALSE);
 							}
@@ -422,7 +421,7 @@ void SetTestSelection(HWND hWnd, TCHAR* getType, int capValue)
         SendMessage(hWndDataTypes, CB_SETCURSEL, nPos, 0);
 }
 
-void SetTestSelection2(HWND hWnd, TCHAR* setType, int capValue)
+LONG SetTestSelection2(HWND hWnd, TCHAR* setType, int capValue)
 {
     HWND hWndSetTypes = GetDlgItem(hWnd, IDC_cmbSetTypes);
     HWND hWndContainerTypesSet = GetDlgItem(hWnd, IDC_cmbContainerSet);
@@ -483,9 +482,9 @@ void SetTestSelection2(HWND hWnd, TCHAR* setType, int capValue)
             int i = 0;
             for (i = 0; i < numWindows; ++i)
                 EnableWindow(allWindows[i], FALSE);
-            return;
         }
     }
+    return capOpts;
 }
 
 void TestGetCap(HWND hWnd, LONG capValue)
