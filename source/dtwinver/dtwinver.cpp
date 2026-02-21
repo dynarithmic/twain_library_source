@@ -509,8 +509,28 @@ History: PJN / 24-02-1997 A number of updates including support for NT 3.1,
          PJN / 07-04-2024 1. Provided a new IsWindows11Version24H2 method.
          PJN / 07-11-2024 1. Provided a new IsWindowsServer2025ActiveDevelopmentBranch method.
                           2. Provided a new IsWindowsServerVersion24H2 method.
+         PJN / 27-06-2025 1. Provided a new IsWindows11Version25H2 method.
+                          2. Updated copyright details.
+         PJN / 08-11-2025 1. Provided a new IsWindows11Version26H1 method.
+                          2. Renamed a number of methods for naming consistency reasons.
+                          3. Added support for the following product types: PRODUCT_DATACENTER_WS_SERVER_CORE_AZURE_EDITION
+                          4. Provided a new IsHyperVNotIncluded method.
+                          5. Provided a new IsEssentialBusinessServerManagement method.
+                          6. Provided a new IsEssentialBusinessServerAdditional method.
+                          7. Provided a new IsEssentialBusinessServerAdditionalSvc method.
+                          8. Provided a new IsProfessionalForStudent method.
+                          9. Renamed "IsPPIPro" method to "IsWindows10Team".
+                          10. Renamed "IsWindows365" method to "IsWindows11SE".
+                          11. Updated the logic to handle the PRODUCT_PROFESSIONAL_PLUS product type.
+                          12. Renamed "IsWNC" method to "IsWindowsCPC".
+                          13. Renamed "IsXBoxDurangoHostOS" method to "IsXBoxOneHostOS".
+                          14. Renamed "IsXBoxScarlettHostOS" method to "IsXBoxSeriesXSHostOS".
+         PJN / 22-11-2025 1. Updated the code to return BuildLab and BuildLabEx strings
+                          2. Updated the code to support detecting ReactOS version details.
+         PJN / 28-01-2026 1. Provided a new IsWindows11Version26H2 method.
+                          2. Updated copyright details.
 
-Copyright (c) 1997 - 2024 by PJ Naughter (Web: www.naughter.com, Email: pjna@naughter.com)
+Copyright (c) 1997 - 2026 by PJ Naughter (Web: www.naughter.com, Email: pjna@naughter.com)
 
 All rights reserved.
 
@@ -668,7 +688,6 @@ to maintain a single distribution point for the source code.
 #endif //#ifndef VER_SUITE_WH_SERVER
 
 
-//Flags returned from GetProductInfo
 #ifndef PRODUCT_ULTIMATE
 #define PRODUCT_ULTIMATE 0x00000001
 #endif //#ifndef PRODUCT_ULTIMATE
@@ -1401,6 +1420,9 @@ to maintain a single distribution point for the source code.
 #define PRODUCT_DATACENTER_SERVER_CORE_AZURE_EDITION 0x00000198
 #endif //#ifndef PRODUCT_DATACENTER_SERVER_CORE_AZURE_EDITION
 
+#ifndef PRODUCT_DATACENTER_WS_SERVER_CORE_AZURE_EDITION
+#define PRODUCT_DATACENTER_WS_SERVER_CORE_AZURE_EDITION 0x00000199
+#endif //#define PRODUCT_DATACENTER_WS_SERVER_CORE_AZURE_EDITION 0x00000199
 #ifndef PRODUCT_UNLICENSED
 #define PRODUCT_UNLICENSED 0xABCDABCD
 #endif //#ifndef PRODUCT_UNLICENSED
@@ -1676,7 +1698,7 @@ _Success_(return != FALSE) BOOL COSVersion::GetProcessorType(_Inout_ LPOS_VERSIO
   {
     bSuccess = TRUE;
 
-    lpfnGetNativeSystemInfo pGetNativeSystemInfo = (lpfnGetNativeSystemInfo) GetProcAddress(hKernel32, "GetNativeSystemInfo"); //NOLINT(modernize-use-auto)
+    lpfnGetNativeSystemInfo pGetNativeSystemInfo = (lpfnGetNativeSystemInfo) GetProcAddress(hKernel32, "GetNativeSystemInfo"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
     if (pGetNativeSystemInfo)
     {
       pGetNativeSystemInfo(&UnderlyingSI);
@@ -1961,7 +1983,7 @@ _Success_(return != FALSE) BOOL COSVersion::GetVersion(_Inout_ LPOS_VERSION_INFO
       //Get the Product Suites installed
       GetProductSuiteDetailsFromRegistry(lpVersionInformation);
 
-      //Determine if we are using the "Standard" version of the server  
+      //Determine if we are using the "Standard" version of the server
       if ((lpVersionInformation->OSType != Workstation) && ((osviex.wSuiteMask & COSVERSION_SUITE_ENTERPRISE) == 0) &&
           ((osviex.wSuiteMask & COSVERSION_SUITE_DATACENTER) == 0) && ((osviex.wSuiteMask & COSVERSION_SUITE_WEBEDITION) == 0))
         lpVersionInformation->dwSuiteMask2 |= COSVERSION_SUITE2_STANDARD;
@@ -2280,7 +2302,17 @@ BOOL COSVersion::GetInfoBySpawingWriteVer(COSVersion::LPOS_VERSION_INFO lpVersio
                                           lpVersionInformation->ulDeviceFamily = atoi(pszToken);
                                           pszToken = strtok(NULL, pszSeparators);
                                           if (pszToken)
+                                          {
                                             lpVersionInformation->ulDeviceForm = atoi(pszToken);
+                                            pszToken = strtok(NULL, pszSeparators);
+                                            if (pszToken)
+                                            {
+                                              strcpy(lpVersionInformation->szBuildLab, pszToken);
+                                              pszToken = strtok(NULL, pszSeparators);
+                                              if (pszToken)
+                                                strcpy(lpVersionInformation->szBuildLabEx, pszToken);
+                                            }
+                                          }
                                         }
                                       }
                                     }
@@ -2449,10 +2481,11 @@ void COSVersion::GetXPSP1aDetailsFromRegistry(_Inout_ LPOS_VERSION_INFO lpVersio
       sTemp[0] = _T('\0');
       DWORD dwBufLen = 1024 * sizeof(TCHAR);
 
+      DWORD dwType = 0;
 #if !defined(COSVERSION_WIN16)
-      if (::RegQueryValueEx(hKey, _T("SubVersionNumber"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+      if ((::RegQueryValueEx(hKey, _T("SubVersionNumber"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ)) //NOLINT(modernize-use-nullptr)
 #else
-      if (RegQueryValueEx(hKey, _T("SubVersionNumber"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS)
+      if ((RegQueryValueEx(hKey, _T("SubVersionNumber"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ))
 #endif //#if !defined(COSVERSION_WIN16)
       {
         if (_tcsicmp(sTemp, _T("a")) == 0)
@@ -2470,6 +2503,94 @@ void COSVersion::GetXPSP1aDetailsFromRegistry(_Inout_ LPOS_VERSION_INFO lpVersio
 #endif //#if !defined(COSVERSION_CE)
 }
 
+void COSVersion::GetBuildLabDetails(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
+{
+#if !defined(COSVERSION_CE)
+  HKEY hKey = NULL; //NOLINT(modernize-use-nullptr)
+#if !defined(COSVERSION_WIN16)
+  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"), 0, KEY_QUERY_VALUE | KEY_WOW64_64KEY, &hKey) == ERROR_SUCCESS)
+#else
+  if (RegOpenKey(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"), &hKey) == ERROR_SUCCESS)
+#endif //#if !defined(COSVERSION_WIN16)
+  {
+    TCHAR sTemp[1024]; //NOLINT(modernize-avoid-c-arrays)
+    sTemp[0] = _T('\0');
+    DWORD dwBufLen = 1024 * sizeof(TCHAR);
+    DWORD dwType = 0;
+#if !defined(COSVERSION_WIN16)
+    if ((::RegQueryValueEx(hKey, _T("BuildLab"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ)) //NOLINT(modernize-use-nullptr)
+#else
+    if ((RegQueryValueEx(hKey, _T("BuildLab"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ))
+#endif //#if !defined(COSVERSION_WIN16)
+    {
+#if defined(_tcscpy_s)
+      _tcscpy_s(lpVersionInformation->szBuildLab, sizeof(lpVersionInformation->szBuildLab) / sizeof(TCHAR), sTemp);
+#else
+      _tcscpy(lpVersionInformation->szBuildLab, sTemp);
+#endif //#if defined(_tcscpy_s)
+    }
+    sTemp[0] = _T('\0');
+    dwBufLen = 1024 * sizeof(TCHAR);
+    dwType = 0;
+#if !defined(COSVERSION_WIN16)
+    if ((::RegQueryValueEx(hKey, _T("BuildLabEx"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ)) //NOLINT(modernize-use-nullptr)
+#else
+    if ((RegQueryValueEx(hKey, _T("BuildLabEx"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ))
+#endif //#if !defined(COSVERSION_WIN16)
+    {
+#if defined(_tcscpy_s)
+      _tcscpy_s(lpVersionInformation->szBuildLabEx, sizeof(lpVersionInformation->szBuildLab) / sizeof(TCHAR), sTemp);
+#else
+      _tcscpy(lpVersionInformation->szBuildLabEx, sTemp);
+#endif //#if defined(_tcscpy_s)
+    }
+    //Check to see if we are running on ReactOS
+    sTemp[0] = _T('\0');
+    dwBufLen = 1024 * sizeof(TCHAR);
+    dwType = 0;
+#if !defined(COSVERSION_WIN16)
+    if ((::RegQueryValueEx(hKey, _T("ProductName"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ)) //NOLINT(modernize-use-nullptr)
+#else
+    if ((RegQueryValueEx(hKey, _T("ProductName"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ))
+#endif //#if !defined(COSVERSION_WIN16)
+    {
+      if (_tcsstr(sTemp, _T("ReactOS")) != NULL) //NOLINT(modernize-use-nullptr)
+      {
+        lpVersionInformation->UnderlyingPlatform = ReactOS;
+        //There is no concept of Service Pack on ReactOS, so reset these values
+        _tcscpy(lpVersionInformation->szUnderlyingCSDVersion, _T(""));
+        lpVersionInformation->wUnderlyingServicePackMajor = 0;
+        lpVersionInformation->wUnderlyingServicePackMinor = 0;
+        //Parse the lpVersionInformation->szBuildLab variable to extract the ReactOS build numbers
+        lpVersionInformation->dwUnderlyingMajorVersion = 0;
+        lpVersionInformation->dwUnderlyingMinorVersion = 0;
+        lpVersionInformation->dwUnderlyingBuildNumber = 0;
+        LPCTSTR pszSeparator = _tcsstr(lpVersionInformation->szBuildLab, _T("-"));
+        if (pszSeparator)
+        {
+          int nVersionMajor = 0;
+          int nVersionMinor = 0;
+          int nVersionPatchLevel = 0;
+#if defined(_stscanf_s)
+#pragma warning(suppress: 26481)
+          if (_stscanf_s(pszSeparator + 1, _T("%d.%d.%d"), &nVersionMajor, &nVersionMinor, &nVersionPatchLevel) == 3)
+#else
+#pragma warning(suppress: 26481)
+          if (_stscanf(pszSeparator + 1, _T("%d.%d.%d"), &nVersionMajor, &nVersionMinor, &nVersionPatchLevel) == 3)
+#endif //#if defined(_stscanf_s)
+          {
+            lpVersionInformation->dwUnderlyingMajorVersion = nVersionMajor;
+            lpVersionInformation->dwUnderlyingMinorVersion = nVersionMinor;
+            lpVersionInformation->dwUnderlyingBuildNumber = nVersionPatchLevel;
+          }
+        }
+      }
+    }
+    //Don't forget to close the registry key we were using
+    RegCloseKey(hKey);
+  }
+#endif //#if !defined(COSVERSION_CE)
+}
 void COSVersion::GetUBRFromRegistry(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
 {
 #if !defined(COSVERSION_CE)
@@ -2483,12 +2604,15 @@ void COSVersion::GetUBRFromRegistry(_Inout_ LPOS_VERSION_INFO lpVersionInformati
   if (RegOpenKey(HKEY_LOCAL_MACHINE, _T("Software\\Microsoft\\Windows NT\\CurrentVersion"), &hKey) == ERROR_SUCCESS)
 #endif //#if (defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64))
   {
-    DWORD dwBufLen = sizeof(lpVersionInformation->dwUBR);
+    DWORD dwType = 0;
+    DWORD dwUBR = 0;
+    DWORD dwBufLen = sizeof(dwUBR);
 #if !defined(COSVERSION_WIN16)
-    ::RegQueryValueEx(hKey, _T("UBR"), NULL, NULL, (LPBYTE)&lpVersionInformation->dwUBR, &dwBufLen); //NOLINT(modernize-use-nullptr)
+    if ((::RegQueryValueEx(hKey, _T("UBR"), NULL, &dwType, (LPBYTE)&dwUBR, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_DWORD)) //NOLINT(modernize-use-nullptr)
 #else
-    RegQueryValueEx(hKey, _T("UBR"), NULL, NULL, (LPBYTE)&lpVersionInformation->dwUBR, &dwBufLen);
+    if ((RegQueryValueEx(hKey, _T("UBR"), NULL, &dwType, (LPBYTE)&dwUBR, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_DWORD))
 #endif //#if !defined(COSVERSION_WIN16)
+      lpVersionInformation->dwUBR = dwUBR;
 
     //Don't forget to close the registry key we were using
     RegCloseKey(hKey);
@@ -2511,11 +2635,11 @@ void COSVersion::GetSemiAnnualFromRegistry(_Inout_ LPOS_VERSION_INFO lpVersionIn
     TCHAR sTemp[1024]; //NOLINT(modernize-avoid-c-arrays)
     sTemp[0] = _T('\0');
     DWORD dwBufLen = 1024 * sizeof(TCHAR);
-
+    DWORD dwType = 0;
 #if !defined(COSVERSION_WIN16)
-    if (::RegQueryValueEx(hKey, _T("EditionID"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+    if ((::RegQueryValueEx(hKey, _T("EditionID"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ)) //NOLINT(modernize-use-nullptr)
 #else
-    if (RegQueryValueEx(hKey, _T("EditionID"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS)
+    if ((RegQueryValueEx(hKey, _T("EditionID"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ))
 #endif //#if !defined(COSVERSION_WIN16)
     {
       if (_tcsstr(sTemp, _T("ACor")) != NULL) //NOLINT(modernize-use-nullptr)
@@ -2558,11 +2682,11 @@ COSVersion::OS_TYPE COSVersion::GetNTOSTypeFromRegistry(_In_ HKEY hKeyProductOpt
   TCHAR sTemp[1024]; //NOLINT(modernize-avoid-c-arrays)
   sTemp[0] = _T('\0');
   DWORD dwBufLen = 1024 * sizeof(TCHAR);
-
+  DWORD dwType = 0;
 #if (defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64))
-  if (::RegQueryValueEx(hKeyProductOptions, _T("ProductType"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+  if ((::RegQueryValueEx(hKeyProductOptions, _T("ProductType"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ)) //NOLINT(modernize-use-nullptr)
 #else
-  if (RegQueryValueEx(hKeyProductOptions, _T("ProductType"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS)
+  if ((RegQueryValueEx(hKeyProductOptions, _T("ProductType"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ))
 #endif //#if (defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64))
   {
     if (_tcsicmp(sTemp, _T("LANMANNT")) == 0)
@@ -2591,11 +2715,11 @@ void COSVersion::GetNTOSTypeFromRegistry(_Inout_ LPOS_VERSION_INFO lpVersionInfo
     TCHAR sTemp[1024]; //NOLINT(modernize-avoid-c-arrays)
     sTemp[0] = _T('\0');
     DWORD dwBufLen = 1024 * sizeof(TCHAR);
-
+    DWORD dwType = 0;
 #if (defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64))
-    if (::RegQueryValueEx(hKey, _T("ProductType"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+    if ((::RegQueryValueEx(hKey, _T("ProductType"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ)) //NOLINT(modernize-use-nullptr)
 #else
-    if (RegQueryValueEx(hKey, _T("ProductType"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS)
+    if ((RegQueryValueEx(hKey, _T("ProductType"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ))
 #endif //#if (defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64))
     {
       if (bOnlyUpdateDCDetails)
@@ -2646,11 +2770,11 @@ void COSVersion::GetBingEditionIDFromRegistry(_Inout_ LPOS_VERSION_INFO lpVersio
     TCHAR sTemp[1024]; //NOLINT(modernize-avoid-c-arrays)
     sTemp[0] = _T('\0');
     DWORD dwBufLen = 1024 * sizeof(TCHAR);
-
+    DWORD dwType = 0;
 #if (defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64))
-    if (::RegQueryValueEx(hKey, _T("EditionID"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+    if ((::RegQueryValueEx(hKey, _T("EditionID"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ)) //NOLINT(modernize-use-nullptr)
 #else
-    if (RegQueryValueEx(hKey, _T("EditionID"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS)
+    if ((RegQueryValueEx(hKey, _T("EditionID"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ))
 #endif //#if (defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64))
     {
     #if defined(_tcsupr_s)
@@ -2681,9 +2805,9 @@ void COSVersion::GetProductSuiteDetailsFromRegistry(_Inout_ LPOS_VERSION_INFO lp
     DWORD dwType = 0;
     DWORD dwSize = 0;
 #if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64)
-    if (::RegQueryValueEx(hKey, _T("ProductSuite"), NULL, &dwType, NULL, &dwSize) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+    if ((::RegQueryValueEx(hKey, _T("ProductSuite"), NULL, &dwType, NULL, &dwSize) == ERROR_SUCCESS)) //NOLINT(modernize-use-nullptr)
 #else
-    if (RegQueryValueEx(hKey, _T("ProductSuite"), NULL, &dwType, NULL, &dwSize) == ERROR_SUCCESS)
+    if ((RegQueryValueEx(hKey, _T("ProductSuite"), NULL, &dwType, NULL, &dwSize) == ERROR_SUCCESS))
 #endif //#if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64)
     {
       //Allocate buffer.
@@ -2691,9 +2815,9 @@ void COSVersion::GetProductSuiteDetailsFromRegistry(_Inout_ LPOS_VERSION_INFO lp
 
       //Retrieve array of product suite strings.
 #if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64)
-      if (::RegQueryValueEx(hKey, _T("ProductSuite"), NULL, &dwType, (LPBYTE) lpszProductSuites, &dwSize) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+      if ((::RegQueryValueEx(hKey, _T("ProductSuite"), NULL, &dwType, (LPBYTE)lpszProductSuites, &dwSize) == ERROR_SUCCESS) && (dwType == REG_MULTI_SZ))  //NOLINT(modernize-use-nullptr)
 #else
-      if (RegQueryValueEx(hKey, _T("ProductSuite"), NULL, &dwType, (LPBYTE) lpszProductSuites, &dwSize) == ERROR_SUCCESS)
+      if ((RegQueryValueEx(hKey, _T("ProductSuite"), NULL, &dwType, (LPBYTE)lpszProductSuites, &dwSize) == ERROR_SUCCESS) && (dwType == REG_MULTI_SZ))
 #endif //#if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64)
       {
         //Search for suite name in array of strings.
@@ -2750,9 +2874,9 @@ void COSVersion::GetTerminalServicesRemoteAdminModeDetailsFromRegistry(_Inout_ L
     DWORD dwType = 0;
     DWORD dwSize = sizeof(DWORD);
 #if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64)
-    if (::RegQueryValueEx(hKey, _T("TSAppCompat"), NULL, &dwType, (LPBYTE) &dwTSAppCompat, &dwSize) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+    if ((::RegQueryValueEx(hKey, _T("TSAppCompat"), NULL, &dwType, (LPBYTE)&dwTSAppCompat, &dwSize) == ERROR_SUCCESS) && (dwType == REG_DWORD)) //NOLINT(modernize-use-nullptr)
 #else
-    if (RegQueryValueEx(hKey, _T("TSAppCompat"), NULL, &dwType, (LPBYTE) &dwTSAppCompat, &dwSize) == ERROR_SUCCESS)
+    if ((RegQueryValueEx(hKey, _T("TSAppCompat"), NULL, &dwType, (LPBYTE)&dwTSAppCompat, &dwSize) == ERROR_SUCCESS) && (dwType == REG_DWORD))
 #endif //#if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64) 
     {
       if (dwTSAppCompat == 0)
@@ -2781,9 +2905,9 @@ void COSVersion::GetMediaCenterDetails(_Inout_ LPOS_VERSION_INFO lpVersionInform
       DWORD dwType = 0;
       DWORD dwSize = sizeof(DWORD);
 #if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64)
-      if (::RegQueryValueEx(hKey, _T("Installed"), NULL, &dwType, (LPBYTE) &dwMCE, &dwSize) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+      if ((::RegQueryValueEx(hKey, _T("Installed"), NULL, &dwType, (LPBYTE) &dwMCE, &dwSize) == ERROR_SUCCESS) && (dwType == REG_DWORD)) //NOLINT(modernize-use-nullptr)
 #else
-      if (RegQueryValueEx(hKey, _T("Installed"), NULL, &dwType, (LPBYTE) &dwMCE, &dwSize) == ERROR_SUCCESS)
+      if ((RegQueryValueEx(hKey, _T("Installed"), NULL, &dwType, (LPBYTE) &dwMCE, &dwSize) == ERROR_SUCCESS) && (dwType == REG_DWORD))
 #endif //#if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64) 
       {
         if (dwMCE)
@@ -2805,9 +2929,9 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
   if (hKernel32 != NULL) //NOLINT(modernize-use-nullptr)
   {
 #if defined(COSVERSION_CE)
-    lpfnGetProductInfo pGetProductInfo = (lpfnGetProductInfo) GetProcAddress(hKernel32, L"GetProductInfo"); //NOLINT(modernize-use-auto)
+    lpfnGetProductInfo pGetProductInfo = (lpfnGetProductInfo) GetProcAddress(hKernel32, L"GetProductInfo"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #else
-    lpfnGetProductInfo pGetProductInfo = (lpfnGetProductInfo) GetProcAddress(hKernel32, "GetProductInfo"); //NOLINT(modernize-use-auto)
+    lpfnGetProductInfo pGetProductInfo = (lpfnGetProductInfo) GetProcAddress(hKernel32, "GetProductInfo"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #endif //#if defined(COSVERSION_CE)
     if (pGetProductInfo)
       pGetProductInfo(lpVersionInformation->dwUnderlyingMajorVersion, lpVersionInformation->dwUnderlyingMinorVersion, lpVersionInformation->wUnderlyingServicePackMajor, 
@@ -2931,11 +3055,13 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     {
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_SERVER_CORE;
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_DATACENTER;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_HYPERV_NOT_INCLUDED;
       break;
     }
     case PRODUCT_DATACENTER_SERVER_V:
     {
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_DATACENTER;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_HYPERV_NOT_INCLUDED;
       break;
     }
     case PRODUCT_DATACENTER_SERVER:
@@ -2962,6 +3088,7 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     {
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_SERVER_CORE;
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_ENTERPRISE;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_HYPERV_NOT_INCLUDED;
       break;
     }
     case PRODUCT_ENTERPRISE_SERVER:
@@ -2973,6 +3100,7 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     case PRODUCT_ENTERPRISE_SERVER_V:
     {
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_ENTERPRISE;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_HYPERV_NOT_INCLUDED;
       break;
     }
     case PRODUCT_ENTERPRISE_SERVER_IA64:
@@ -2994,6 +3122,7 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     {
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_SERVER_CORE;
       lpVersionInformation->dwSuiteMask2 |= COSVERSION_SUITE2_STANDARD;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_HYPERV_NOT_INCLUDED;
       break;
     }
     case PRODUCT_STANDARD_SERVER:
@@ -3012,6 +3141,7 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     case PRODUCT_STANDARD_SERVER_V:
     {
       lpVersionInformation->dwSuiteMask2 |= COSVERSION_SUITE2_STANDARD;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_HYPERV_NOT_INCLUDED;
       break;
     }
     case PRODUCT_HYPERV:
@@ -3059,20 +3189,17 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     }
     case PRODUCT_ESSENTIALBUSINESS_SERVER_MGMTSVC:
     {
-      //Note really sure what "PRODUCT_ESSENTIALBUSINESS_SERVER_MGMTSVC", we just treat it as PRODUCT_ESSENTIALBUSINESS_SERVER_MGMT
-      lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_ESSENTIAL_BUSINESS_SERVER_MANAGEMENT;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_ESSENTIALBUSINESS_SERVER_MGMTSVC;
       break;
     }
     case PRODUCT_ESSENTIALBUSINESS_SERVER_ADDL:
     {
-      //Note really sure what "PRODUCT_ESSENTIALBUSINESS_SERVER_ADDL", we just treat it as COSVERSION_SUITE_ESSENTIAL_BUSINESS_SERVER_MESSAGING. It probably refers to the cancelled EBS R2 release
-      lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_ESSENTIAL_BUSINESS_SERVER_MESSAGING;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_ESSENTIALBUSINESS_SERVER_ADDL;
       break;
     }
     case PRODUCT_ESSENTIALBUSINESS_SERVER_ADDLSVC:
     {
-      //Note really sure what "PRODUCT_ESSENTIALBUSINESS_SERVER_ADDLSVC", we just treat it as COSVERSION_SUITE_ESSENTIAL_BUSINESS_SERVER_MESSAGING. It probably refers to the cancelled EBS R2 release
-      lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_ESSENTIAL_BUSINESS_SERVER_MESSAGING;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_ESSENTIALBUSINESS_SERVER_ADDLSVC;
       break;
     }
     case PRODUCT_MEDIUMBUSINESS_SERVER_MANAGEMENT:
@@ -3093,6 +3220,7 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     case PRODUCT_CLUSTER_SERVER_V:
     {
       lpVersionInformation->dwSuiteMask2 |= COSVERSION_SUITE2_CLUSTER_SERVER;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_HYPERV_NOT_INCLUDED;
       break;
     }
     case PRODUCT_CLUSTER_SERVER:
@@ -3233,6 +3361,7 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     case PRODUCT_SERVER_FOR_SMALLBUSINESS_V:
     {
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_SMALLBUSINESS;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_HYPERV_NOT_INCLUDED;
       break;
     }
     case PRODUCT_SERVER_FOUNDATION:
@@ -3303,12 +3432,6 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     #endif //#if !defined(COSVERSION_CE) 
       break;
     }
-    case PRODUCT_PROFESSIONAL_PLUS: //This was a SKU available during the Windows 8 Consumer Preview
-    {
-      //We just map to the "Windows 8 Pro" SKU
-      lpVersionInformation->dwSuiteMask2 |= COSVERSION_SUITE2_PROFESSIONAL;
-      break;
-    }
     case PRODUCT_THINPC:
     {
       lpVersionInformation->dwSuiteMask2 |= COSVERSION_SUITE2_THINPC;
@@ -3367,6 +3490,7 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
       lpVersionInformation->dwSuiteMask2 |= COSVERSION_SUITE2_CORE;
       break;
     }
+    case PRODUCT_PROFESSIONAL_PLUS: //deliberate fallthrough //This was an early SKU name for ProfessionalWMC
     case PRODUCT_PROFESSIONAL_WMC:
     {
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_MEDIACENTER;
@@ -3594,16 +3718,16 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     }
     case PRODUCT_DATACENTER_A_SERVER_CORE:
     {
-      //Note really sure what the "_A_" bit represents
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_DATACENTER;
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_SERVER_CORE;
+      lpVersionInformation->bSemiAnnual = TRUE;
       break;
     }
     case PRODUCT_STANDARD_A_SERVER_CORE:
     {
-      //Note really sure what the "_A_" bit represents
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_SERVER_CORE;
       lpVersionInformation->dwSuiteMask2 |= COSVERSION_SUITE2_STANDARD;
+      lpVersionInformation->bSemiAnnual = TRUE;
       break;
     }
     case PRODUCT_DATACENTER_WS_SERVER_CORE:
@@ -3825,6 +3949,14 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
       lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_DATACENTER_SERVER_CORE_AZURE_EDITION;
       break;
     }
+    case PRODUCT_DATACENTER_WS_SERVER_CORE_AZURE_EDITION:
+    {
+      lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_DATACENTER;
+      lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_SERVER_CORE;
+      lpVersionInformation->dwSuiteMask3 |= COSVERSION_SUITE3_AZURE;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_DATACENTER_WS_SERVER_CORE_AZURE_EDITION;
+      break;
+    }
     case PRODUCT_AZURE_SERVER_CLOUDHOST:
     {
       lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_AZURE_SERVER_CLOUDHOST;
@@ -3837,13 +3969,13 @@ void COSVersion::GetProductInfo(_Inout_ LPOS_VERSION_INFO lpVersionInformation)
     }
     case PRODUCT_CLOUDEDITIONN:
     {
-      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_WINDOWS365;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_SE;
       lpVersionInformation->dwSuiteMask |= COSVERSION_SUITE_N;
       break;
     }
     case PRODUCT_CLOUDEDITION:
     {
-      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_WINDOWS365;
+      lpVersionInformation->dwSuiteMask4 |= COSVERSION_SUITE4_SE;
       break;
     }
     case PRODUCT_IOTENTERPRISESK:
@@ -3922,9 +4054,9 @@ void COSVersion::GetTabletPCDetails(_Inout_ LPOS_VERSION_INFO lpVersionInformati
       DWORD dwType = 0;
       DWORD dwSize = sizeof(DWORD);
 #if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64)
-      if (::RegQueryValueEx(hKey, _T("Installed"), NULL, &dwType, (LPBYTE)&dwMCE, &dwSize) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+      if ((::RegQueryValueEx(hKey, _T("Installed"), NULL, &dwType, (LPBYTE)&dwMCE, &dwSize) == ERROR_SUCCESS) && (dwType == REG_DWORD)) //NOLINT(modernize-use-nullptr)
 #else
-      if (RegQueryValueEx(hKey, _T("Installed"), NULL, &dwType, (LPBYTE)&dwMCE, &dwSize) == ERROR_SUCCESS)
+      if ((RegQueryValueEx(hKey, _T("Installed"), NULL, &dwType, (LPBYTE)&dwMCE, &dwSize) == ERROR_SUCCESS) && (dwType == REG_DWORD))
 #endif //#if defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64)
       {
         if (dwMCE)
@@ -3964,11 +4096,11 @@ void COSVersion::GetNTHALDetailsFromRegistry(_Inout_ LPOS_VERSION_INFO lpVersion
     TCHAR sTemp[1024]; //NOLINT(modernize-avoid-c-arrays)
     sTemp[0] = _T('\0');
     DWORD dwBufLen = 1024 * sizeof(TCHAR);
-
+    DWORD dwType = 0;
 #if (defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64))
-    if (::RegQueryValueEx(hKey, _T("CurrentType"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+    if ((::RegQueryValueEx(hKey, _T("CurrentType"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ)) //NOLINT(modernize-use-nullptr)
 #else
-    if (RegQueryValueEx(hKey, _T("CurrentType"), NULL, NULL, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS)
+    if ((RegQueryValueEx(hKey, _T("CurrentType"), NULL, &dwType, (LPBYTE)sTemp, &dwBufLen) == ERROR_SUCCESS) && (dwType == REG_SZ))
 #endif //#if (defined(COSVERSION_WIN32) || defined(COSVERSION_WIN64))
     {
       if (_tcsicmp(sTemp, _T("Uniprocessor Free")) == 0)
@@ -4000,7 +4132,7 @@ DWORD COSVersion::GetNTCurrentBuildFromRegistry(_In_ HKEY hKeyCurrentVersion)
   memset(byData, 0, sizeof(byData));
   DWORD dwType = 0;
   DWORD dwSize = sizeof(byData);
-  if (::RegQueryValueEx(hKeyCurrentVersion, _T("CurrentBuildNumber"), NULL, &dwType, byData, &dwSize) == ERROR_SUCCESS) //NOLINT(modernize-use-nullptr)
+  if ((::RegQueryValueEx(hKeyCurrentVersion, _T("CurrentBuildNumber"), NULL, &dwType, byData, &dwSize) == ERROR_SUCCESS) && (dwType == REG_SZ)) //NOLINT(modernize-use-nullptr)
     dwCurrentBuild = _ttoi((TCHAR*) byData);
 
   return dwCurrentBuild;
@@ -4035,9 +4167,9 @@ _Success_(return != FALSE) BOOL COSVersion::GetNTRTLVersion(_Inout_ LPOS_VERSION
 
   //Get the function pointer to the native mode API "RtlGetVersion"
 #if defined(COSVERSION_CE)
-  lpfnRtlGetVersion lpRtlGetVersion = (lpfnRtlGetVersion) GetProcAddress(hNTDLL, L"RtlGetVersion"); //NOLINT(modernize-use-auto)
+  lpfnRtlGetVersion lpRtlGetVersion = (lpfnRtlGetVersion) GetProcAddress(hNTDLL, L"RtlGetVersion"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #else
-  lpfnRtlGetVersion lpRtlGetVersion = (lpfnRtlGetVersion) GetProcAddress(hNTDLL, "RtlGetVersion"); //NOLINT(modernize-use-auto)
+  lpfnRtlGetVersion lpRtlGetVersion = (lpfnRtlGetVersion) GetProcAddress(hNTDLL, "RtlGetVersion"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #endif //#if defined(COSVERSION_CE)
   if (lpRtlGetVersion == NULL) //NOLINT(modernize-use-nullptr)
     return FALSE;
@@ -4088,9 +4220,9 @@ _Success_(return != FALSE) BOOL COSVersion::GetDeviceFamilyInfo(_Inout_ LPOS_VER
 
   //Get the function pointer to the native mode API "RtlGetDeviceFamilyInfo"
 #if defined(COSVERSION_CE)
-  lpfnRtlGetDeviceFamilyInfo lpRtlGetDeviceFamilyInfo = (lpfnRtlGetDeviceFamilyInfo)GetProcAddress(hNTDLL, L"RtlGetDeviceFamilyInfoEnum"); //NOLINT(modernize-use-auto)
+  lpfnRtlGetDeviceFamilyInfo lpRtlGetDeviceFamilyInfo = (lpfnRtlGetDeviceFamilyInfo)GetProcAddress(hNTDLL, L"RtlGetDeviceFamilyInfoEnum"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #else
-  lpfnRtlGetDeviceFamilyInfo lpRtlGetDeviceFamilyInfo = (lpfnRtlGetDeviceFamilyInfo)GetProcAddress(hNTDLL, "RtlGetDeviceFamilyInfoEnum"); //NOLINT(modernize-use-auto)
+  lpfnRtlGetDeviceFamilyInfo lpRtlGetDeviceFamilyInfo = (lpfnRtlGetDeviceFamilyInfo)GetProcAddress(hNTDLL, "RtlGetDeviceFamilyInfoEnum"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #endif //#if defined(COSVERSION_CE)
   if (lpRtlGetDeviceFamilyInfo == NULL) //NOLINT(modernize-use-nullptr)
     return FALSE;
@@ -4201,6 +4333,8 @@ void COSVersion::_GetVersion(_In_ DWORD dwMajorVersion, _In_ DWORD dwMinorVersio
   lpVersionInformation->wUnderlyingServicePackMajor = lpVersionInformation->wEmulatedServicePackMajor;
   lpVersionInformation->wUnderlyingServicePackMinor = lpVersionInformation->wEmulatedServicePackMinor;
 
+  //Get the Semi-Annual details
+  GetSemiAnnualFromRegistry(lpVersionInformation);
   //Get the product info details
   GetProductInfo(lpVersionInformation);
 
@@ -4216,8 +4350,6 @@ void COSVersion::_GetVersion(_In_ DWORD dwMajorVersion, _In_ DWORD dwMinorVersio
   //Get the UBR details
   GetUBRFromRegistry(lpVersionInformation);
 
-  //Get the Semi-Annual details
-  GetSemiAnnualFromRegistry(lpVersionInformation);
 
   //Handle the special case of the Platform Id being Win32s
   if (dwPlatformId == VER_PLATFORM_WIN32s)
@@ -4239,6 +4371,8 @@ void COSVersion::_GetVersion(_In_ DWORD dwMajorVersion, _In_ DWORD dwMinorVersio
 
   //Call "RtlGetDeviceFamilyInfo" to get device family details
   GetDeviceFamilyInfo(lpVersionInformation);
+  //Get the BuildLab/BuildLabEx details
+  GetBuildLabDetails(lpVersionInformation);
 
   //Also check if Windows 8.1 / Windows 2012 R2 Update is installed (Details at http://technet.microsoft.com/en-us/library/dn645472.aspx)
   const BOOL bIsWindows8Point1OrWindowsServer2012R2 = IsWindows8Point1OrWindowsServer2012R2(lpVersionInformation, TRUE);
@@ -4877,6 +5011,20 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindows11ActiveDevelopmentBranch(_
   else
     return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwEmulatedBuildNumber > 26200);
 }
+_Success_(return != FALSE) BOOL COSVersion::IsWindows11Version26H1(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+{
+  if (bCheckUnderlying)
+    return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwUnderlyingBuildNumber >= 28000);
+  else
+    return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwEmulatedBuildNumber >= 28000);
+}
+_Success_(return != FALSE) BOOL COSVersion::IsWindows11Version26H2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+{
+  if (bCheckUnderlying)
+    return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwUnderlyingBuildNumber > 26200) && (lpVersionInformation->dwUnderlyingBuildNumber <= 26300);
+  else
+    return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwEmulatedBuildNumber > 26200) && (lpVersionInformation->dwEmulatedBuildNumber <= 26300);
+}
 
 _Success_(return != FALSE) BOOL COSVersion::IsWindows8Point1(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
@@ -5069,7 +5217,7 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindowsXPProfessional(_In_ LPCOS_V
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == Workstation) && !IsWindowsXPPersonal(lpVersionInformation, bCheckUnderlying);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWebWindowsServer2003(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003Web(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_WEBEDITION) != 0) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_R2_EDITION) == 0);
 }
@@ -5079,27 +5227,27 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003(_In_ LPCOS_VERSI
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == Server) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_R2_EDITION) == 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsEnterpriseWindowsServer2003(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003Enterprise(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2003(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_ENTERPRISE) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWindowsServer2003(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003Datacenter(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_DATACENTER) != 0) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_R2_EDITION) == 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDomainControllerWindowsServer2003(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003DomainController(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == DomainController) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_R2_EDITION) == 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsStandardWindowsServer2003(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003Standard(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STANDARD) != 0) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_R2_EDITION) == 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWebWindowsServer2003R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003R2Web(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_WEBEDITION) != 0) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_R2_EDITION) != 0);
 }
@@ -5109,22 +5257,22 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003R2(_In_ LPCOS_VER
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == Server) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_R2_EDITION) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsEnterpriseWindowsServer2003R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003R2Enterprise(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2003R2(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_ENTERPRISE) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsStandardWindowsServer2003R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003R2Standard(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STANDARD) != 0) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_R2_EDITION) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWindowsServer2003R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003R2Datacenter(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_DATACENTER) != 0) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_R2_EDITION) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDomainControllerWindowsServer2003R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2003R2DomainController(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsXPOrWindowsServer2003(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == DomainController) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_R2_EDITION) != 0);
 }
@@ -5134,32 +5282,32 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008(_In_ LPCOS_VERSI
   return IsWindowsVistaOrWindowsServer2008(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == Server); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWebWindowsServer2008(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008Web(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsVistaOrWindowsServer2008(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_WEBEDITION) != 0); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsEnterpriseWindowsServer2008(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008Enterprise(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2008(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_ENTERPRISE) != 0); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsStandardWindowsServer2008(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008Standard(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsVistaOrWindowsServer2008(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STANDARD) != 0); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWindowsServer2008(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008Datacenter(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsVistaOrWindowsServer2008(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_DATACENTER) != 0); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDomainControllerWindowsServer2008(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008DomainController(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsVistaOrWindowsServer2008(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == DomainController); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWebWindowsServer2008R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008R2Web(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows7OrWindowsServer2008R2(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_WEBEDITION) != 0); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
@@ -5169,27 +5317,27 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008R2(_In_ LPCOS_VER
   return IsWindows7OrWindowsServer2008R2(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == Server); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsEnterpriseWindowsServer2008R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008R2Enterprise(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2008R2(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_ENTERPRISE) != 0); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsStandardWindowsServer2008R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008R2Standard(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows7OrWindowsServer2008R2(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STANDARD) != 0); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWindowsServer2008R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008R2Datacenter(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows7OrWindowsServer2008R2(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_DATACENTER) != 0); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDomainControllerWindowsServer2008R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2008R2DomainController(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows7OrWindowsServer2008R2(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == DomainController); //Note there is no need to check the COSVERSION_SUITE_R2EDITION flag here
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWebWindowsServer2012(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012Web(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows8OrWindowsServer2012(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_WEBEDITION) != 0);
 }
@@ -5199,27 +5347,27 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012(_In_ LPCOS_VERSI
   return IsWindows8OrWindowsServer2012(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == Server);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsEnterpriseWindowsServer2012(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012Enterprise(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2012(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_ENTERPRISE) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsStandardWindowsServer2012(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012Standard(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows8OrWindowsServer2012(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STANDARD) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWindowsServer2012(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012Datacenter(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows8OrWindowsServer2012(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_DATACENTER) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDomainControllerWindowsServer2012(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012DomainController(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows8OrWindowsServer2012(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == DomainController);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWebWindowsServer2012R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012R2Web(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows8Point1OrWindowsServer2012R2(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_WEBEDITION) != 0);
 }
@@ -5234,27 +5382,27 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012R2Update(_In_ LPC
   return IsWindowsServer2012R2(lpVersionInformation, bCheckUnderlying) && IsWindows8Point1Or2012R2Update(lpVersionInformation);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsEnterpriseWindowsServer2012R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012R2Enterprise(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2012R2(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_ENTERPRISE) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsStandardWindowsServer2012R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012R2Standard(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows8Point1OrWindowsServer2012R2(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STANDARD) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWindowsServer2012R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012R2Datacenter(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows8Point1OrWindowsServer2012R2(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_DATACENTER) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDomainControllerWindowsServer2012R2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2012R2DomainController(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows8Point1OrWindowsServer2012R2(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == DomainController);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWebWindowsServer2016(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2016Web(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows10OrWindowsServer2016(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_WEBEDITION) != 0);
 }
@@ -5280,97 +5428,97 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindowsServerVersion1803(_In_ LPCO
     return IsWindowsServer2016(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwEmulatedBuildNumber > 16299) && (lpVersionInformation->dwEmulatedBuildNumber < 17600) && lpVersionInformation->bSemiAnnual;
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsEnterpriseWindowsServer2016(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2016Enterprise(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2016(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_ENTERPRISE) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsStandardWindowsServer2016(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2016Standard(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows10OrWindowsServer2016(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STANDARD) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWindowsServer2016(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2016Datacenter(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows10OrWindowsServer2016(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_DATACENTER) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDomainControllerWindowsServer2016(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2016DomainController(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindows10OrWindowsServer2016(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == DomainController);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWebWindowsServer2019(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2019Web(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2019(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_WEBEDITION) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsEnterpriseWindowsServer2019(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2019Enterprise(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2019(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_ENTERPRISE) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsStandardWindowsServer2019(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2019Standard(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2019(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STANDARD) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWindowsServer2019(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2019Datacenter(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2019(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_DATACENTER) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDomainControllerWindowsServer2019(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2019DomainController(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2019(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == DomainController);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWebWindowsServer2022(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2022Web(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2022(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_WEBEDITION) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsEnterpriseWindowsServer2022(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2022Enterprise(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2022(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_ENTERPRISE) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsStandardWindowsServer2022(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2022Standard(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2022(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STANDARD) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWindowsServer2022(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2022Datacenter(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2022(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_DATACENTER) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDomainControllerWindowsServer2022(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2022DomainController(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2022(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == DomainController);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWebWindowsServer2025(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2025Web(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2025(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_WEBEDITION) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsStandardWindowsServer2025(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2025Standard(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2025(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STANDARD) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsEnterpriseWindowsServer2025(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2025Enterprise(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2025(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_ENTERPRISE) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWindowsServer2025(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2025Datacenter(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2025(lpVersionInformation, bCheckUnderlying) && ((lpVersionInformation->dwSuiteMask & COSVERSION_SUITE_DATACENTER) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsDomainControllerWindowsServer2025(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2025DomainController(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   return IsWindowsServer2025(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->OSType == DomainController);
 }
@@ -5660,7 +5808,7 @@ _Success_(return != FALSE) BOOL COSVersion::IsARM64Server(_In_ LPCOS_VERSION_INF
   return ((lpVersionInformation->dwSuiteMask3 & COSVERSION_SUITE3_ARM64_SERVER) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsPPIPro(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+_Success_(return != FALSE) BOOL COSVersion::IsWindows10Team(_In_ LPCOS_VERSION_INFO lpVersionInformation)
 {
   return ((lpVersionInformation->dwSuiteMask3 & COSVERSION_SUITE3_PPI_PRO) != 0);
 }
@@ -5779,7 +5927,7 @@ _Success_(return != FALSE) BOOL COSVersion::IsIoTEnterpriseEvaluation(_In_ LPCOS
          ((lpVersionInformation->dwSuiteMask3 & COSVERSION_SUITE3_IOTENTERPRISE) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWNC(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsCPC(_In_ LPCOS_VERSION_INFO lpVersionInformation)
 {
   return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_WNC) != 0);
 }
@@ -5824,12 +5972,12 @@ _Success_(return != FALSE) BOOL COSVersion::IsXBoxEraOS(_In_ LPCOS_VERSION_INFO 
   return ((lpVersionInformation->dwSuiteMask3 & COSVERSION_SUITE3_XBOX_ERAOS) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsXBoxDurangoHostOS(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+_Success_(return != FALSE) BOOL COSVersion::IsXBoxOneHostOS(_In_ LPCOS_VERSION_INFO lpVersionInformation)
 {
   return ((lpVersionInformation->dwSuiteMask3 & COSVERSION_SUITE3_XBOX_DURANGOHOSTOS) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsXBoxScarlettHostOS(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+_Success_(return != FALSE) BOOL COSVersion::IsXBoxSeriesXSHostOS(_In_ LPCOS_VERSION_INFO lpVersionInformation)
 {
   return ((lpVersionInformation->dwSuiteMask3 & COSVERSION_SUITE3_XBOX_SCARLETTHOSTOS) != 0);
 }
@@ -5854,6 +6002,10 @@ _Success_(return != FALSE) BOOL COSVersion::IsDatacenterServerCoreAzureEdition(_
   return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_DATACENTER_SERVER_CORE_AZURE_EDITION) != 0);
 }
 
+_Success_(return != FALSE) BOOL COSVersion::IsDatacenterWSServerCoreAzureEdition(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+{
+  return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_DATACENTER_WS_SERVER_CORE_AZURE_EDITION) != 0);
+}
 _Success_(return != FALSE) BOOL COSVersion::IsAzureServerCloudHost(_In_ LPCOS_VERSION_INFO lpVersionInformation)
 {
   return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_AZURE_SERVER_CLOUDHOST) != 0);
@@ -5864,9 +6016,9 @@ _Success_(return != FALSE) BOOL COSVersion::IsAzureServerCloudMOS(_In_ LPCOS_VER
   return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_AZURE_SERVER_CLOUDMOS) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsWindows365(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+_Success_(return != FALSE) BOOL COSVersion::IsWindows11SE(_In_ LPCOS_VERSION_INFO lpVersionInformation)
 {
-  return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_WINDOWS365) != 0);
+  return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_SE) != 0);
 }
 
 _Success_(return != FALSE) BOOL COSVersion::IsUnlicensed(_In_ LPCOS_VERSION_INFO lpVersionInformation)
@@ -5882,6 +6034,27 @@ _Success_(return != FALSE) BOOL COSVersion::IsServerForSBSolutions(_In_ LPCOS_VE
 _Success_(return != FALSE) BOOL COSVersion::IsServerSolutions(_In_ LPCOS_VERSION_INFO lpVersionInformation)
 {
   return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_SERVER_SOLUTIONS) != 0);
+}
+_Success_(return != FALSE) BOOL COSVersion::IsHyperVNotIncluded(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+{
+  return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_HYPERV_NOT_INCLUDED) != 0);
+}
+_Success_(return != FALSE) BOOL COSVersion::IsEssentialBusinessServerManagementSvc(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+{
+  return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_ESSENTIALBUSINESS_SERVER_MGMTSVC) != 0);
+}
+_Success_(return != FALSE) BOOL COSVersion::IsEssentialBusinessServerAdditional(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+{
+  return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_ESSENTIALBUSINESS_SERVER_ADDL) != 0);
+}
+_Success_(return != FALSE) BOOL COSVersion::IsEssentialBusinessServerAdditionalSvc(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+{
+  return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_ESSENTIALBUSINESS_SERVER_ADDLSVC) != 0);
+}
+_Success_(return != FALSE) BOOL COSVersion::IsProfessionalForStudent(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+{
+  return ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_PROFESSIONAL) != 0) &&
+          ((lpVersionInformation->dwSuiteMask2 & COSVERSION_SUITE2_STUDENT) != 0);
 }
 
 _Success_(return != FALSE) BOOL COSVersion::Is64Bit(_In_ LPCOS_VERSION_INFO /*lpVersionInformation*/, _In_ BOOL bCheckUnderlying)
@@ -5952,9 +6125,9 @@ _Success_(return != FALSE) BOOL COSVersion::GetVersion(_Out_ DWORD& dwVersion)
 
   //Get the function pointer to "GetVersion"
 #if defined(COSVERSION_CE)
-  lpfnGetVersion lpGetVersion = (lpfnGetVersion)GetProcAddress(hKernel32, L"GetVersion"); //NOLINT(modernize-use-auto)
+  lpfnGetVersion lpGetVersion = (lpfnGetVersion)GetProcAddress(hKernel32, L"GetVersion"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #else
-  lpfnGetVersion lpGetVersion = (lpfnGetVersion)GetProcAddress(hKernel32, "GetVersion"); //NOLINT(modernize-use-auto)
+  lpfnGetVersion lpGetVersion = (lpfnGetVersion)GetProcAddress(hKernel32, "GetVersion"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #endif //#if defined(COSVERSION_CE)
   if (lpGetVersion == NULL) //NOLINT(modernize-use-nullptr)
     return FALSE;
@@ -5993,12 +6166,12 @@ _Success_(return != FALSE) BOOL COSVersion::GetVersionEx(_Inout_ LPOSVERSIONINFO
   //Get the function pointer to "GetVersionEx"
 #if defined(_UNICODE)
 #if defined(COSVERSION_CE)
-  lpfnGetVersionEx lpGetVersionEx = (lpfnGetVersionEx)GetProcAddress(hKernel32, L"GetVersionExW"); //NOLINT(modernize-use-auto)
+  lpfnGetVersionEx lpGetVersionEx = (lpfnGetVersionEx)GetProcAddress(hKernel32, L"GetVersionExW"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #else
-  lpfnGetVersionEx lpGetVersionEx = (lpfnGetVersionEx)GetProcAddress(hKernel32, "GetVersionExW"); //NOLINT(modernize-use-auto)
+  lpfnGetVersionEx lpGetVersionEx = (lpfnGetVersionEx)GetProcAddress(hKernel32, "GetVersionExW"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #endif //#if defined(COSVERSION_CE)
 #else
-  lpfnGetVersionEx lpGetVersionEx = (lpfnGetVersionEx)GetProcAddress(hKernel32, "GetVersionExA"); //NOLINT(modernize-use-auto)
+  lpfnGetVersionEx lpGetVersionEx = (lpfnGetVersionEx)GetProcAddress(hKernel32, "GetVersionExA"); //NOLINT(modernize-use-auto, clang-diagnostic-cast-function-type-mismatch)
 #endif //#if defined(_UNICODE)
 
   if (lpGetVersionEx)
