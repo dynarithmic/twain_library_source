@@ -294,12 +294,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
             if ( !bUseLastScreenPos )
             {
                 if (pS->CS.nOptions & DTWAIN_DLG_CENTER_CURRENT_MONITOR)
-                {
-                    HWND hWndParent = pS->CS.hWndParent;
-                    if (pS->CS.nOptions & DTWAIN_DLG_CONSOLEASPARENT)
-                        hWndParent = GetEffectiveConsoleWindow();
-					CenterWindowOnCurrentMonitor(hWndParent ? hWndParent : hWnd);
-                }
+                    CenterWindowSmart(hWnd, pS->CS.nOptions);
                 else
                 if (pS->CS.nOptions & DTWAIN_DLG_CENTER_SCREEN)
                     CenterWindow(hWnd, nullptr);
