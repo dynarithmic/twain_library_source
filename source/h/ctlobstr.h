@@ -646,9 +646,142 @@ namespace dynarithmic
             return str;
         }
 
+        private:
+		template <typename CharT>
+		class is_any_of_pred
+		{
+		    public:
+			    using string_type = std::basic_string<CharT>;
+
+			    explicit is_any_of_pred(string_type chars)
+				    : chars_(std::move(chars)) {
+			    }
+
+			    bool operator()(CharT ch) const
+			    {
+				    return chars_.find(ch) != string_type::npos;
+			    }
+
+		    private:
+			    string_type chars_;
+		};
+
+		template <typename CharT>
+		static auto is_any_of(const CharT* chars)
+		{
+			return is_any_of_pred<CharT>(std::basic_string<CharT>(chars));
+		}
+
+		template <typename StringType, typename Pred>
+		static StringType& ltrim_if(StringType& str, Pred pred)
+		{
+			auto it2 = std::find_if_not(str.begin(), str.end(), pred);
+			str.erase(str.begin(), it2);
+			return str;
+		}
+
+		template <typename StringType, typename Pred>
+        static StringType& rtrim_if(StringType& str, Pred pred)
+		{
+			auto it1 = std::find_if_not(str.rbegin(), str.rend(), pred);
+			str.erase(it1.base(), str.end());
+			return str;
+		}
+
+		template <typename StringType, typename Pred>
+        static StringType ltrim_copy_if(StringType str, Pred pred)
+		{
+			return ltrim_if(str, pred);
+		}
+
+		template <typename StringType, typename Pred>
+        static StringType rtrim_copy(StringType str, Pred pred)
+		{
+			return ltrim_if(str, pred);
+		}
+
+		template <typename StringType, typename Pred>
+        static StringType trim_copy_if(StringType str, Pred pred)
+		{
+			return ltrim_if(rtrim_if(str, pred), pred);
+		}
+
+		template <typename StringType, typename Pred>
+        static StringType& trim_if(StringType& str, Pred pred)
+		{
+			return ltrim_if(rtrim_if(str, pred), pred);
+		}
+
+		template <typename StringType>
+        static StringType& ltrim(StringType& str)
+		{
+			if constexpr (std::is_same_v <StringType, std::wstring>)
+			{
+				return ltrim_if(str, [](unsigned char ch) { return !iswspace(ch); });
+			}
+			else
+			{
+				return ltrim_if(str, [](unsigned char ch) { return !isspace(ch); });
+			}
+			return str;
+		}
+
+		template <typename String>
+        static StringType& rtrim(StringType& str)
+		{
+			if constexpr (std::is_same_v <StringType, std::wstring>)
+			{
+				return rtrim_if(str, [](unsigned char ch) { return !iswspace(ch); });
+			}
+			else
+			{
+				return rtrim_if(str, [](unsigned char ch) { return !isspace(ch); });
+			}
+			return str;
+		}
+
+		template <typename StringType>
+        static StringType ltrim_copy(StringType str)
+		{
+			if constexpr (std::is_same_v <StringType, std::wstring>)
+			{
+				return ltrim_if(str, [](unsigned char ch) { return !iswspace(ch); });
+			}
+			else
+			{
+				return ltrim_if(str, [](unsigned char ch) { return !isspace(ch); });
+			}
+			return str;
+		}
+
+		template <typename StringType>
+        static StringType rtrim_copy(StringType str)
+		{
+			if constexpr (std::is_same_v <StringType, std::wstring>)
+			{
+				return rtrim_if(str, [](unsigned char ch) { return !iswspace(ch); });
+			}
+			else
+			{
+				return rtrim_if(str, [](unsigned char ch) { return !isspace(ch); });
+			}
+			return str;
+		}
+
+		static StringType trim_copy(StringType str)
+		{
+			return ltrim_copy(rtrim_copy(str));
+		}
+
+		static StringType& trim(StringType& str)
+		{
+			return ltrim_copy(rtrim_copy(str));
+		}
+
+        public:
         static StringType&  TrimRight(StringType& str, const CharType *lpszTrimStr)
         {
-            boost::trim_right_if(str, boost::is_any_of(lpszTrimStr));
+            rtrim_if(str, is_any_of(lpszTrimStr));
             return str;
         }
 
@@ -661,7 +794,7 @@ namespace dynarithmic
 
         static StringType& TrimLeft(StringType& str, const CharType * lpszTrimStr)
         {
-            boost::trim_left_if(str, boost::is_any_of(lpszTrimStr));
+            ltrim_if(str, is_any_of(lpszTrimStr));
             return str;
         }
 
