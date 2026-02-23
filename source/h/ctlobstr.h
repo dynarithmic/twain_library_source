@@ -712,60 +712,42 @@ namespace dynarithmic
 			return ltrim_if(rtrim_if(str, pred), pred);
 		}
 
-		template <typename StringType>
-        static StringType& ltrim(StringType& str)
-		{
+        template <typename StringType, typename TrimmerFn>
+        static decltype(auto) string_trimmer(StringType&& str, TrimmerFn fn)
+        {
 			if constexpr (std::is_same_v <StringType, std::wstring>)
 			{
-				return ltrim_if(str, [](unsigned char ch) { return !iswspace(ch); });
+				return fn(str, [](unsigned char ch) { return !iswspace(ch); });
 			}
 			else
 			{
-				return ltrim_if(str, [](unsigned char ch) { return !isspace(ch); });
+				return fn(str, [](unsigned char ch) { return !isspace(ch); });
 			}
-			return str;
+			return std::forward<T>(str);
+        }
+
+		template <typename StringType>
+		static decltype(auto) ltrim(StringType&& str)
+		{
+            return string_trimmer(str, &ltrim_if);
 		}
 
-		template <typename String>
-        static StringType& rtrim(StringType& str)
+		template <typename StringType>
+		static decltype(auto) rtrim(StringType&& str)
 		{
-			if constexpr (std::is_same_v <StringType, std::wstring>)
-			{
-				return rtrim_if(str, [](unsigned char ch) { return !iswspace(ch); });
-			}
-			else
-			{
-				return rtrim_if(str, [](unsigned char ch) { return !isspace(ch); });
-			}
-			return str;
+            return string_trimmer(str, &rtrim_if);
 		}
 
 		template <typename StringType>
         static StringType ltrim_copy(StringType str)
 		{
-			if constexpr (std::is_same_v <StringType, std::wstring>)
-			{
-				return ltrim_if(str, [](unsigned char ch) { return !iswspace(ch); });
-			}
-			else
-			{
-				return ltrim_if(str, [](unsigned char ch) { return !isspace(ch); });
-			}
-			return str;
+            return ltrim(str);
 		}
 
 		template <typename StringType>
         static StringType rtrim_copy(StringType str)
 		{
-			if constexpr (std::is_same_v <StringType, std::wstring>)
-			{
-				return rtrim_if(str, [](unsigned char ch) { return !iswspace(ch); });
-			}
-			else
-			{
-				return rtrim_if(str, [](unsigned char ch) { return !isspace(ch); });
-			}
-			return str;
+            return rtrim(str);
 		}
 
 		static StringType trim_copy(StringType str)
@@ -781,42 +763,32 @@ namespace dynarithmic
         public:
         static StringType&  TrimRight(StringType& str, const CharType *lpszTrimStr)
         {
-            rtrim_if(str, is_any_of(lpszTrimStr));
-            return str;
+            return rtrim_if(str, is_any_of(lpszTrimStr));
         }
 
         static StringType& TrimRight(StringType &str, CharType ch= StringTraits::GetSpace() )
         {
-            CharType sz[2] = {};
-            sz[0]=ch; sz[1] = 0;
-            return TrimRight(str, sz);
+            return rtrim_if(str, [&](auto c) { return c == ch; });
         }
 
         static StringType& TrimLeft(StringType& str, const CharType * lpszTrimStr)
         {
-            ltrim_if(str, is_any_of(lpszTrimStr));
-            return str;
+            return ltrim_if(str, is_any_of(lpszTrimStr));
         }
 
         static StringType& TrimLeft(StringType& str, CharType ch= StringTraits::GetSpace() )
         {
-            CharType sz[2] = {};
-            sz[0]=ch; sz[1] = 0;
-            return TrimLeft(str, sz);
+            return ltrim_if(str, [&](auto c) { return c == ch; });
         }
 
         static StringType& TrimAll(StringType& str, CharType ch = StringTraits::GetSpace())
         {
-            TrimRight( str, ch );
-            TrimLeft( str, ch );
-            return str;
+            return trim_if(str, [&](auto c) { return c == ch; });
         }
 
         static StringType& TrimAll(StringType& str, const CharType *lpszTrimStr)
         {
-            TrimRight( str, lpszTrimStr );
-            TrimLeft( str, lpszTrimStr );
-            return str;
+            return trim_if(str, is_any_of(lpszTrimStr));
         }
 
         template <typename Container>
