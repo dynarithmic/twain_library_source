@@ -761,32 +761,17 @@ namespace dynarithmic
 		}
 
         public:
-        static StringType&  TrimRight(StringType& str, const CharType *lpszTrimStr)
+        static StringType& TrimRight(StringType& str, const CharType *lpszTrimStr = StringTraits::GetSpaceString())
         {
             return rtrim_if(str, is_any_of(lpszTrimStr));
         }
 
-        static StringType& TrimRight(StringType &str, CharType ch= StringTraits::GetSpace() )
-        {
-            return rtrim_if(str, [&](auto c) { return c == ch; });
-        }
-
-        static StringType& TrimLeft(StringType& str, const CharType * lpszTrimStr)
+        static StringType& TrimLeft(StringType& str, const CharType* lpszTrimStr = StringTraits::GetSpaceString())
         {
             return ltrim_if(str, is_any_of(lpszTrimStr));
         }
 
-        static StringType& TrimLeft(StringType& str, CharType ch= StringTraits::GetSpace() )
-        {
-            return ltrim_if(str, [&](auto c) { return c == ch; });
-        }
-
-        static StringType& TrimAll(StringType& str, CharType ch = StringTraits::GetSpace())
-        {
-            return trim_if(str, [&](auto c) { return c == ch; });
-        }
-
-        static StringType& TrimAll(StringType& str, const CharType *lpszTrimStr)
+        static StringType& TrimAll(StringType& str, const CharType *lpszTrimStr = StringTraits::GetSpaceString())
         {
             return trim_if(str, is_any_of(lpszTrimStr));
         }
