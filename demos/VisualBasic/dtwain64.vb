@@ -459,6 +459,7 @@ Class DTWAINAPI
     Public Const DTWAIN_TN_TRANSFERTILEDONE As Integer = 1301
     Public Const DTWAIN_TN_FILECOMPRESSTYPEMISMATCH As Integer = 1302
     Public Const DTWAIN_TN_SOURCEDETAILS As Integer = 1304
+    Public Const DTWAIN_TN_QUERYACQUIREPAGES As Integer = 1305
     Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
     Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
     Public Const DTWAIN_MODAL As Integer = 0
