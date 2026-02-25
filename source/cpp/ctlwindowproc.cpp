@@ -343,6 +343,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
           case DTWAIN_TN_FEEDERNOTENABLED:
           case DTWAIN_TN_FEEDERNOTSUPPORTED:
           case DTWAIN_TN_PREACQUIRESTART:
+		  case DTWAIN_TN_QUERYACQUIREPAGES:
           {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) )
@@ -499,19 +500,12 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                             {
 
                             }
-                            // Close the source
-                            CTL_TwainAppMgr::CloseSource(pSession, pSource);
-
                             if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) )
                                 bPassMsg = true;
                             DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
                                 static_cast<DTWAIN_HANDLE>(pHandle),
                                 static_cast<DTWAIN_SOURCE>(pSource),
                                 wParam, 0);
-
-                            // Check if source should be reopened after acquisition
-                            if (pSource->IsReopenAfterAcquire())
-                                CTL_TwainAppMgr::OpenSource(pSession, pSource);
                         }
                     }
                     pHandle->EraseAcquireNum( pSource->GetAcquireNum() );

@@ -142,6 +142,6 @@ TW_UINT16 CTL_ImageMemFileXferTriplet::Execute()
 
     // Delete the buffer if compression used and we have saved to a file
     ImageMemoryHandler::GlobalFreePr(m_ImageMemXferBuffer.Memory.TheMem);
-    AbortTransfer(false);
+    AbortTransfer({ false, false });
     return rc;
 }

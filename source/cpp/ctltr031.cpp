@@ -371,7 +371,19 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             m_hDataHandle = CurDib->GetHandle();
 
                             // Callback function for access to change DIB
-                            ProcessUserUpdatingDIB(nCurImage);
+                            HANDLE oldHandle = m_hDataHandle;
+                            auto hDib = ProcessUserUpdatingDIB(nCurImage);
+                            if (m_hDataHandle != oldHandle)
+                            {
+                                // Lock the new data.  
+                                auto pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(hDib));
+                                m_nCurDibSize = static_cast<TW_UINT32>(ImageMemoryHandler::GlobalSize(hDib));
+
+                                m_ptrDib = reinterpret_cast<unsigned char*>(pDibInfo);
+                                m_ptrOrig = m_ptrDib;
+                                CurDib->SetHandle(m_hDataHandle);
+                                (*pArray)[nCurImage] = CurDib;
+                            }
 
                             // Change bpp if necessary
                             if (bProcessDibEx)
@@ -552,7 +564,20 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
         bForceClose = false;
     else
         bForceClose = true;
-    AbortTransfer(bForceClose, errfile);
+
+	// Determine if feeder should feed pages
+	if (rc == TWRC_XFERDONE)
+	{
+		auto nFeedNext = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYACQUIREPAGES, reinterpret_cast<LPARAM>(pSource));
+
+		if (nFeedNext == 0)
+		{
+			StopAcquisitions(errfile);
+			return rc;
+		}
+	}
+
+    AbortTransfer({ bForceClose, false }, errfile);
     return rc;
 }
 
