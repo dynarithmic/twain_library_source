@@ -646,44 +646,134 @@ namespace dynarithmic
             return str;
         }
 
-        static StringType&  TrimRight(StringType& str, const CharType *lpszTrimStr)
+        private:
+		template <typename CharT>
+		class is_any_of_pred
+		{
+		    public:
+			    using string_type = std::basic_string<CharT>;
+
+			    explicit is_any_of_pred(string_type chars)
+				    : chars_(std::move(chars)) {
+			    }
+
+			    bool operator()(CharT ch) const
+			    {
+				    return chars_.find(ch) != string_type::npos;
+			    }
+
+		    private:
+			    string_type chars_;
+		};
+
+		template <typename CharT>
+		static auto is_any_of(const CharT* chars)
+		{
+			return is_any_of_pred<CharT>(std::basic_string<CharT>(chars));
+		}
+
+		template <typename StringType, typename Pred>
+		static StringType& ltrim_if(StringType& str, Pred pred)
+		{
+			auto it2 = std::find_if_not(str.begin(), str.end(), pred);
+			str.erase(str.begin(), it2);
+			return str;
+		}
+
+		template <typename StringType, typename Pred>
+        static StringType& rtrim_if(StringType& str, Pred pred)
+		{
+			auto it1 = std::find_if_not(str.rbegin(), str.rend(), pred);
+			str.erase(it1.base(), str.end());
+			return str;
+		}
+
+		template <typename StringType, typename Pred>
+        static StringType ltrim_copy_if(StringType str, Pred pred)
+		{
+			return ltrim_if(str, pred);
+		}
+
+		template <typename StringType, typename Pred>
+        static StringType rtrim_copy(StringType str, Pred pred)
+		{
+			return ltrim_if(str, pred);
+		}
+
+		template <typename StringType, typename Pred>
+        static StringType trim_copy_if(StringType str, Pred pred)
+		{
+			return ltrim_if(rtrim_if(str, pred), pred);
+		}
+
+		template <typename StringType, typename Pred>
+        static StringType& trim_if(StringType& str, Pred pred)
+		{
+			return ltrim_if(rtrim_if(str, pred), pred);
+		}
+
+        template <typename StringType, typename TrimmerFn>
+        static decltype(auto) string_trimmer(StringType&& str, TrimmerFn fn)
         {
-            boost::trim_right_if(str, boost::is_any_of(lpszTrimStr));
-            return str;
+			if constexpr (std::is_same_v <StringType, std::wstring>)
+			{
+				return fn(str, [](unsigned char ch) { return !iswspace(ch); });
+			}
+			else
+			{
+				return fn(str, [](unsigned char ch) { return !isspace(ch); });
+			}
+			return std::forward<StringType>(str);
         }
 
-        static StringType& TrimRight(StringType &str, CharType ch= StringTraits::GetSpace() )
+		template <typename StringType>
+		static decltype(auto) ltrim(StringType&& str)
+		{
+            return string_trimmer(str, &ltrim_if);
+		}
+
+		template <typename StringType>
+		static decltype(auto) rtrim(StringType&& str)
+		{
+            return string_trimmer(str, &rtrim_if);
+		}
+
+		template <typename StringType>
+        static StringType ltrim_copy(StringType str)
+		{
+            return ltrim(str);
+		}
+
+		template <typename StringType>
+        static StringType rtrim_copy(StringType str)
+		{
+            return rtrim(str);
+		}
+
+		static StringType trim_copy(StringType str)
+		{
+			return ltrim_copy(rtrim_copy(str));
+		}
+
+		static StringType& trim(StringType& str)
+		{
+			return ltrim_copy(rtrim_copy(str));
+		}
+
+        public:
+        static StringType& TrimRight(StringType& str, const CharType *lpszTrimStr = StringTraits::GetSpaceString())
         {
-            CharType sz[2] = {};
-            sz[0]=ch; sz[1] = 0;
-            return TrimRight(str, sz);
+            return rtrim_if(str, is_any_of(lpszTrimStr));
         }
 
-        static StringType& TrimLeft(StringType& str, const CharType * lpszTrimStr)
+        static StringType& TrimLeft(StringType& str, const CharType* lpszTrimStr = StringTraits::GetSpaceString())
         {
-            boost::trim_left_if(str, boost::is_any_of(lpszTrimStr));
-            return str;
+            return ltrim_if(str, is_any_of(lpszTrimStr));
         }
 
-        static StringType& TrimLeft(StringType& str, CharType ch= StringTraits::GetSpace() )
+        static StringType& TrimAll(StringType& str, const CharType *lpszTrimStr = StringTraits::GetSpaceString())
         {
-            CharType sz[2] = {};
-            sz[0]=ch; sz[1] = 0;
-            return TrimLeft(str, sz);
-        }
-
-        static StringType& TrimAll(StringType& str, CharType ch = StringTraits::GetSpace())
-        {
-            TrimRight( str, ch );
-            TrimLeft( str, ch );
-            return str;
-        }
-
-        static StringType& TrimAll(StringType& str, const CharType *lpszTrimStr)
-        {
-            TrimRight( str, lpszTrimStr );
-            TrimLeft( str, lpszTrimStr );
-            return str;
+            return trim_if(str, is_any_of(lpszTrimStr));
         }
 
         template <typename Container>

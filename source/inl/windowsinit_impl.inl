@@ -67,39 +67,46 @@ bool dynarithmic::CenterWindow(HWND hWnd, HWND hParent)
     return true;
 }
 
-void dynarithmic::CenterWindowOnCurrentMonitor(HWND hWnd)
+static HMONITOR GetPreferredMonitor(HWND hDialog, int options)
 {
-	// Get window rect
-	RECT rcWindow;
-	GetWindowRect(hWnd, &rcWindow);
+    if (options & DTWAIN_DLG_CONSOLEASPARENT)
+    {
+        HWND hConsole = GetConsoleWindow();
+        if (hConsole)
+        {
+            return MonitorFromWindow(hConsole,MONITOR_DEFAULTTONEAREST);
+        }
+    }
 
-	int windowWidth = rcWindow.right - rcWindow.left;
-	int windowHeight = rcWindow.bottom - rcWindow.top;
+	return MonitorFromWindow(hDialog,MONITOR_DEFAULTTONEAREST);
+}
 
-	// Get the monitor containing the window
-	HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+static void CenterWindowOnMonitor(HWND hWnd, HMONITOR hMonitor)
+{
+    MONITORINFO mi = { sizeof(mi) };
+    GetMonitorInfo(hMonitor, &mi);
 
-	MONITORINFO mi;
-	mi.cbSize = sizeof(mi);
-	GetMonitorInfo(hMonitor, &mi);
+    RECT rcWork = mi.rcWork;
 
-	// Use work area (excludes taskbar)
-	RECT rcWork = mi.rcWork;
+    RECT rcWindow;
+    GetWindowRect(hWnd, &rcWindow);
 
-	int x = rcWork.left +
-		((rcWork.right - rcWork.left) - windowWidth) / 2;
+    int windowWidth = rcWindow.right - rcWindow.left;
+    int windowHeight = rcWindow.bottom - rcWindow.top;
 
-	int y = rcWork.top +
-		((rcWork.bottom - rcWork.top) - windowHeight) / 2;
+    int x = rcWork.left +
+        ((rcWork.right - rcWork.left) - windowWidth) / 2;
 
-	SetWindowPos(
-		hWnd,
-		NULL,
-		x,
-		y,
-		0,
-		0,
-		SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+    int y = rcWork.top +
+        ((rcWork.bottom - rcWork.top) - windowHeight) / 2;
+
+    SetWindowPos(hWnd,NULL,x,y,0,0,SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+};
+
+void dynarithmic::CenterWindowSmart(HWND hWnd, int options)
+{
+	HMONITOR hMonitor = GetPreferredMonitor(hWnd, options);
+	CenterWindowOnMonitor(hWnd, hMonitor);
 }
 
 ////////// Function to subclass the window ////////////////////////

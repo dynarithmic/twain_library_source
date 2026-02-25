@@ -2,16 +2,21 @@ DTWAIN Version changes
 
 5.8.1
 
-- Add SVG and SVGZ file formats to DTWAIN_AcquireFile() and DTWAIN_AcquireFileEx().
+- Added SVG and SVGZ file formats to DTWAIN_AcquireFile() and DTWAIN_AcquireFileEx().
   The constants are DTWAIN_SVG and DTWAIN_SVGZ for SVG and SVGZ types, respectively.
   
   The SVG that is produced will be vectorized for black=and-white, 1 bit-per-pixel
   images, and for bit depths greater than 1, the SVG will consist of embedded base-64 
   encoded PNG data.
 
+- Added DTWAIN_TN_QUERYACQUIREPAGES notification to allow an application to stop acquiring
+  pages during the acquisition process.  Returning a value of 0 from this notification 
+  will stop the acquisition of pages.  Note that this does not guarantee that the
+  physical device (if using a document feeder) will stop feeding pages.
+
 - Fix various issues with DTWAIN_SetCapValues() using the MSG_SETCONSTRAINT set type.
 
-- Do not produce extraneous TWAIN messages from log files if DTWAIN_LOG_ISTWAINMSG option 
+- Eliminate extraneous TWAIN messages from log files if DTWAIN_LOG_ISTWAINMSG option 
   is turned off.  This change reduces the size of log files by a very large margin.
 
 - Determine at runtime if the client application requires GetMessage() processing instead
@@ -25,6 +30,7 @@ DTWAIN Version changes
   a null terminated ASCII string that represents the Product Name of the Source that is being processed.
   The notification is sent for each Source that is being processed during the calls to 
   DTWAIN_GetSourceDetails() or DTWAIN_GetSessionDetails().  
+
 
 
 5.8.0

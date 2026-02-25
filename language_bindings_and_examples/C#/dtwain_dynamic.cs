@@ -530,6 +530,7 @@
         public const int DTWAIN_TN_TRANSFERTILEDONE = 1301;
         public const int DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
         public const int DTWAIN_TN_SOURCEDETAILS = 1304;
+        public const int DTWAIN_TN_QUERYACQUIREPAGES = 1305;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;

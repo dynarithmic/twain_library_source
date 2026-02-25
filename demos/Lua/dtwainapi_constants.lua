@@ -387,6 +387,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_TN_TRANSFERTILEDONE = 1301
    dtwain_constants.DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302
    dtwain_constants.DTWAIN_TN_SOURCEDETAILS = 1304
+   dtwain_constants.DTWAIN_TN_QUERYACQUIREPAGES = 1305
    dtwain_constants.DTWAIN_PDFOCR_CLEANTEXT1 = 1
    dtwain_constants.DTWAIN_PDFOCR_CLEANTEXT2 = 2
    dtwain_constants.DTWAIN_MODAL = 0

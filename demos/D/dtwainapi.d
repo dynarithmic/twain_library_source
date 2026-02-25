@@ -632,6 +632,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_TN_TRANSFERTILEDONE = 1301;
     public static const int DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
     public static const int DTWAIN_TN_SOURCEDETAILS = 1304;
+    public static const int DTWAIN_TN_QUERYACQUIREPAGES = 1305;
     public static const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
     public static const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
     public static const int DTWAIN_MODAL = 0;
