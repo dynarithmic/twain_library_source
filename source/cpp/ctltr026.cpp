@@ -93,7 +93,6 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
     m_bJobControlPageRecorded = false;
     int errfile = 0;
-    int nFeedNext = 1;
     switch (rc)
     {
         case TWRC_XFERDONE:
@@ -514,12 +513,12 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
     else
         bForceClose = true;
 
-    // Determine if feeder should feed pages
+    // Determine if acquisitions should be stopped by the client program
     if (rc == TWRC_XFERDONE)
     {
-        nFeedNext = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_QUERYACQUIREPAGES,reinterpret_cast<LPARAM>(pSource));
+        int keepAcquiringPages = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_QUERYACQUIREPAGES,reinterpret_cast<LPARAM>(pSource));
 
-        if (nFeedNext == 0)
+        if (keepAcquiringPages == 0)
         {
             StopAcquisitions(errfile);
             return rc;

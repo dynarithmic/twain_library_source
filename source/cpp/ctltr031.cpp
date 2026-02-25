@@ -565,12 +565,13 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     else
         bForceClose = true;
 
-	// Determine if feeder should feed pages
+	// Determine if user requests that acquisitions should be stopped
 	if (rc == TWRC_XFERDONE)
 	{
-		auto nFeedNext = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYACQUIREPAGES, reinterpret_cast<LPARAM>(pSource));
+		auto keepAcquiringPages = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYACQUIREPAGES, 
+                                                                        reinterpret_cast<LPARAM>(pSource));
 
-		if (nFeedNext == 0)
+		if (keepAcquiringPages == 0)
 		{
 			StopAcquisitions(errfile);
 			return rc;

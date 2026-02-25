@@ -360,8 +360,8 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
                                     static_cast<DTWAIN_SOURCE>(pSource),
                                      wParam, lParam );
-            }
-            break;
+          }
+          break;
 
             case DTWAIN_TN_PAGECANCELLED:
             {
@@ -465,7 +465,6 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
 
             case DTWAIN_AcquireSourceClosed:
             {
-                auto pSession = pHandle->m_pTwainSession;
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if ( pSource && pSource->IsOpened() )
                 {
