@@ -723,7 +723,7 @@ namespace dynarithmic
 			{
 				return fn(str, [](unsigned char ch) { return !isspace(ch); });
 			}
-			return std::forward<T>(str);
+			return std::forward<StringType>(str);
         }
 
 		template <typename StringType>
