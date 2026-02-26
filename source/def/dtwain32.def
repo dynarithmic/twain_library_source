@@ -1141,4 +1141,7 @@ DTWAIN_EnumOCRInterfacesEx                        @31170
 DTWAIN_ArrayDumpToLog                             @31171
 DTWAIN_GetCapOperationsEx                         @31172
 DTWAIN_GetDuplexTypeEx                            @31173
-
+DTWAIN_GetJobControlEx                            @31174
+DTWAIN_GetLightPathEx                             @31175
+DTWAIN_GetSourceUnitEx                            @31176
+DTWAIN_GetOrientationEx                           @31177
