@@ -186,7 +186,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source)
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto pTheSource = pSource;
 
-    // This will only work in STATE 7 or the source!
+	DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
+		                                         DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, { "ICAP_EXTIMAGEINFO" });
+
+    // This will only work in STATE 7 of the source!
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING; }, 
                                         DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
 
