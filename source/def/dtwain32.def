@@ -1147,3 +1147,7 @@ DTWAIN_GetSourceUnitEx                            @31176
 DTWAIN_GetOrientationEx                           @31177
 DTWAIN_GetRotationEx                              @31178
 DTWAIN_GetResolutionEx                            @31179
+DTWAIN_GetBitDepthEx                              @31180
+DTWAIN_GetBrightnessEx                            @31181
+DTWAIN_GetContrastEx                              @31182
+DTWAIN_GetCompressionTypeEx                       @31183

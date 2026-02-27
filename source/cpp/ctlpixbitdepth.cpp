@@ -169,6 +169,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, LONG BitDepth,
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
+LONG DLLENTRY_DEF DTWAIN_GetBitDepthEx(DTWAIN_SOURCE Source, DTWAIN_BOOL bCurrent)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, bCurrent))
+    LONG val = {};
+    auto bRet = DTWAIN_GetBitDepth(Source, &val, bCurrent);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? val : -1);
+    CATCH_BLOCK(-1)
+}
+
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDepth, DTWAIN_BOOL bCurrent)
 {
