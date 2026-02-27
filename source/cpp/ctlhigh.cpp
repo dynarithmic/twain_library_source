@@ -429,6 +429,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE_I(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_A(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_voidptr, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_RETURNVAL_I(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, ErrorVal, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_RETURNVAL_D(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_double, ErrorVal, GetCurrentCapValues)
 
 #define EXPORT_GET_CAP_VALUE_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value)\
@@ -629,6 +630,7 @@ EXPORT_GET_CAP_VALUE_A(DTWAIN_GetPrinterStrings, CAP_PRINTERSTRING)
 EXPORT_GET_VALUE_OPT_MAXLENGTH_S(DTWAIN_GetPrinterSuffixString, CAP_PRINTERSUFFIX)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetOverscan, ICAP_OVERSCAN)
 EXPORT_GET_CAP_VALUE_D(DTWAIN_GetRotation, ICAP_ROTATION)
+EXPORT_GET_CAP_VALUE_RETURNVAL_D(DTWAIN_GetRotationEx, ICAP_ROTATION, std::numeric_limits<DTWAIN_FLOAT>::min())
 EXPORT_GET_CAP_VALUE_D(DTWAIN_GetShadow, ICAP_SHADOW)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetSourceUnit, ICAP_UNITS)
 EXPORT_GET_CAP_VALUE_RETURNVAL_I(DTWAIN_GetSourceUnitEx, ICAP_UNITS, -1)
@@ -836,6 +838,15 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetDeviceCapByString(DTWAIN_SOURCE Source, LPTST
     return retVal;
 }
 
+DTWAIN_FLOAT DLLENTRY_DEF DTWAIN_GetResolutionEx(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_FLOAT value = {};
+    auto bRet = DTWAIN_GetResolution(Source, &value);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? value : std::numeric_limits<DTWAIN_FLOAT>::min())
+	CATCH_BLOCK(std::numeric_limits<DTWAIN_FLOAT>::min())
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Resolution)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Resolution))
@@ -846,8 +857,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLO
     else
     if (pSource->IsCapInSupportedList(ICAP_XNATIVERESOLUTION))
          lCap = ICAP_XNATIVERESOLUTION;
-    else
-        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&]{ return lCap == 0;  }, DTWAIN_ERR_CAP_NO_SUPPORT, FALSE, FUNC_MACRO);
     const DTWAIN_BOOL bRet = GetDoubleCap( pSource, lCap, Resolution);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(FALSE)

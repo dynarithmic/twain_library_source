@@ -1145,3 +1145,5 @@ DTWAIN_GetJobControlEx                            @31174
 DTWAIN_GetLightPathEx                             @31175
 DTWAIN_GetSourceUnitEx                            @31176
 DTWAIN_GetOrientationEx                           @31177
+DTWAIN_GetRotationEx                              @31178
+DTWAIN_GetResolutionEx                            @31179
