@@ -430,6 +430,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE_A(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_voidptr, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_RETURNVAL_I(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, ErrorVal, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_RETURNVAL_D(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_double, ErrorVal, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_RETURNVAL_A(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_voidptr, ErrorVal, GetCurrentCapValues)
 
 #define EXPORT_GET_CAP_VALUE_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value)\
@@ -626,9 +627,13 @@ EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPatchSearchMode, ICAP_PATCHCODESEAR
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPatchTimeOut, ICAP_PATCHCODETIMEOUT)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetPixelFlavor, ICAP_PIXELFLAVOR)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPrinter, CAP_PRINTER)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetPrinterEx, DTWAIN_GetPrinter, CAP_PRINTER, -1)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetPrinterStartNumber, CAP_PRINTERINDEX)
+EXPORT_GET_CAP_VALUE_RETURNVAL_I(DTWAIN_GetPrinterStartNumberEx, ICAP_UNITS, -1)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPrinterStringMode, CAP_PRINTERMODE)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetPrinterStringModeEx, DTWAIN_GetPrinterStringMode, CAP_PRINTERMODE, -1)
 EXPORT_GET_CAP_VALUE_A(DTWAIN_GetPrinterStrings, CAP_PRINTERSTRING)
+EXPORT_GET_CAP_VALUE_RETURNVAL_A(DTWAIN_GetPrinterStringsEx, CAP_PRINTERSTRING, nullptr)
 EXPORT_GET_VALUE_OPT_MAXLENGTH_S(DTWAIN_GetPrinterSuffixString, CAP_PRINTERSUFFIX)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetOverscan, ICAP_OVERSCAN)
 EXPORT_GET_CAP_VALUE_D(DTWAIN_GetRotation, ICAP_ROTATION)
@@ -856,12 +861,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLO
     LOG_FUNC_ENTRY_PARAMS((Source, Resolution))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     LONG lCap = 0;
+    const char* pCapName = "ICAP_XRESOLUTION";
     if ( pSource->IsCapInSupportedList(ICAP_XRESOLUTION))
         lCap = ICAP_XRESOLUTION;
     else
-    if (pSource->IsCapInSupportedList(ICAP_XNATIVERESOLUTION))
-         lCap = ICAP_XNATIVERESOLUTION;
-	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&]{ return lCap == 0;  }, DTWAIN_ERR_CAP_NO_SUPPORT, FALSE, FUNC_MACRO);
+    {
+        pCapName = "ICAP_XNATIVERESOLUTION";
+        if (pSource->IsCapInSupportedList(ICAP_XNATIVERESOLUTION))
+            lCap = ICAP_XNATIVERESOLUTION;
+    }
+	DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return lCap == 0; }, DTWAIN_ERR_CAP_NO_SUPPORT,
+		                                         false, FUNC_MACRO, false, { pCapName });
     const DTWAIN_BOOL bRet = GetDoubleCap( pSource, lCap, Resolution);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(FALSE)
@@ -942,6 +952,12 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
             }
         }
         MoveArray(pHandle, pArray, &arrayToUse);
+    }
+    else
+    {
+        // Error occurred
+		DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return true; }, pHandle->m_lLastError, 
+                                                     0, FUNC_MACRO, false, { CTL_TwainAppMgr::GetCapNameFromCap(lCap) });
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
     CATCH_BLOCK_LOG_PARAMS(0) //DTWAIN_FAILURE1)

@@ -247,9 +247,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
 
     // Check for cap support
     bool isSupported = pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCapability));
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return isSupported == false; },
-                                      DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
-
+    DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return isSupported == false; },
+                                                 DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, 
+                                                { CTL_TwainAppMgr::GetCapNameFromCap(lCapability) });
     // Get the capability operations
     *lpOps = GetCapOperationsInternal(pHandle, pSource, lCapability);
 

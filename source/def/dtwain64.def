@@ -1151,3 +1151,7 @@ DTWAIN_GetBitDepthEx                              @31180
 DTWAIN_GetBrightnessEx                            @31181
 DTWAIN_GetContrastEx                              @31182
 DTWAIN_GetCompressionTypeEx                       @31183
+DTWAIN_GetPrinterEx                               @31184
+DTWAIN_GetPrinterStartNumberEx                    @31185
+DTWAIN_GetPrinterStringModeEx                     @31186
+DTWAIN_GetPrinterStringsEx                        @31187
