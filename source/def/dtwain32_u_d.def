@@ -1176,3 +1176,8 @@ DTWAIN_GetBarcodePriorities                       @31205
 DTWAIN_EnumBarcodePriorities                      @31206
 DTWAIN_EnumBarcodeCodes                           @31207
 DTWAIN_EnumBarcodeCodesEx                         @31208
+DTWAIN_EnumBarcodeMaxPrioritiesEx                 @31209
+DTWAIN_EnumBarcodeMaxRetriesEx                    @31210
+DTWAIN_EnumBarcodePrioritiesEx                    @31211
+DTWAIN_EnumBarcodeSearchModesEx                   @31212
+DTWAIN_EnumBarcodeTimeOutValuesEx                 @31213
