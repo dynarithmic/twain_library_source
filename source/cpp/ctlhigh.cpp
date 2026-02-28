@@ -353,6 +353,26 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
        CATCH_BLOCK(false) \
     }
 
+#define EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CapDataType, errorRetValue, CapFn) \
+    CapDataType::value_type DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source)\
+    {\
+       LOG_FUNC_ENTRY_PARAMS((Source)) \
+       CapDataType::value_type value = {}; \
+       auto bRet = GetCapability<CapDataType>(Source, Cap, &value, CapFn); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet?value : errorRetValue); \
+       CATCH_BLOCK(errorRetValue) \
+    }
+
+#define EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN(FuncName, FuncNameToCall, Cap, CapDataType, ErrorValue) \
+    CapDataType::value_type DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, DTWAIN_BOOL bCurrent)\
+    {\
+       LOG_FUNC_ENTRY_PARAMS((Source, bCurrent)) \
+       CapDataType::value_type value = {};    \
+       auto bRet = FuncNameToCall(Source, &value, bCurrent);\
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet?value : ErrorValue);\
+       CATCH_BLOCK(ErrorValue) \
+    }
+
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CapDataType) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType::value_type* value, DTWAIN_BOOL bCurrent)\
     {\
@@ -408,6 +428,10 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE_D(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_double, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_I(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_A(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_voidptr, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_RETURNVAL_I(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, ErrorVal, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_RETURNVAL_D(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_double, ErrorVal, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_RETURNVAL_A(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_voidptr, ErrorVal, GetCurrentCapValues)
+
 #define EXPORT_GET_CAP_VALUE_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value)\
     {\
@@ -436,6 +460,8 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CTL_ArrayFactory::tagged_array_long)
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT_D(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CTL_ArrayFactory::tagged_array_double)
+#define EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(FuncName, FuncNameToCall, Cap, ErrorValue) EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN(FuncName, FuncNameToCall, Cap, CTL_ArrayFactory::tagged_array_long, ErrorValue)
+
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value, DTWAIN_LONG GetType)\
     {\
@@ -572,6 +598,8 @@ EXPORT_GET_CAP_VALUE_I(DTWAIN_GetBatteryPercent, CAP_BATTERYPERCENTAGE)
 EXPORT_GET_CAP_VALUE_D(DTWAIN_GetBrightness, ICAP_BRIGHTNESS)
 EXPORT_GET_CAP_VALUE_S(DTWAIN_GetCaption, CAP_CAPTION, 255)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetCompressionType, ICAP_COMPRESSION)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetCompressionTypeEx, DTWAIN_GetCompressionType, ICAP_COMPRESSION, -1)
+
 EXPORT_GET_CAP_VALUE_D(DTWAIN_GetContrast, ICAP_CONTRAST)
 EXPORT_GET_CAP_VALUE_S(DTWAIN_GetDeviceTimeDate, CAP_DEVICETIMEDATE, 32)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_D(DTWAIN_GetDoubleFeedDetectLength, CAP_DOUBLEFEEDDETECTIONLENGTH)
@@ -581,12 +609,15 @@ EXPORT_GET_CAP_VALUE_I(DTWAIN_GetFeederOrder, CAP_FEEDERORDER)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_S(DTWAIN_GetHalftone, ICAP_HALFTONES, 128)
 EXPORT_GET_CAP_VALUE_D(DTWAIN_GetHighlight, ICAP_HIGHLIGHT)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetJobControl, CAP_JOBCONTROL)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetJobControlEx, DTWAIN_GetJobControl, CAP_JOBCONTROL, -1)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetLightPath, ICAP_LIGHTPATH)
+EXPORT_GET_CAP_VALUE_RETURNVAL_I(DTWAIN_GetLightPathEx, ICAP_LIGHTPATH, -1)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetLightSource, ICAP_LIGHTSOURCE)
 EXPORT_GET_CAP_VALUE_A(DTWAIN_GetLightSources, ICAP_LIGHTSOURCE)
 EXPORT_ENUM_CURRENTCAP_VALUES_NOEXPAND_EX(DTWAIN_GetLightSourcesEx, ICAP_LIGHTSOURCE)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetNoiseFilter,  ICAP_NOISEFILTER)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetOrientation, ICAP_ORIENTATION)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetOrientationEx, DTWAIN_GetOrientation, ICAP_ORIENTATION, -1)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetMaxBuffers, CAP_MAXBATCHBUFFERS)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPaperSize, ICAP_SUPPORTEDSIZES)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPatchMaxPriorities, ICAP_PATCHCODEMAXSEARCHPRIORITIES)
@@ -596,14 +627,22 @@ EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPatchSearchMode, ICAP_PATCHCODESEAR
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPatchTimeOut, ICAP_PATCHCODETIMEOUT)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetPixelFlavor, ICAP_PIXELFLAVOR)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPrinter, CAP_PRINTER)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetPrinterEx, DTWAIN_GetPrinter, CAP_PRINTER, -1)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetPrinterStartNumber, CAP_PRINTERINDEX)
+EXPORT_GET_CAP_VALUE_RETURNVAL_I(DTWAIN_GetPrinterStartNumberEx, ICAP_UNITS, -1)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPrinterStringMode, CAP_PRINTERMODE)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetPrinterStringModeEx, DTWAIN_GetPrinterStringMode, CAP_PRINTERMODE, -1)
 EXPORT_GET_CAP_VALUE_A(DTWAIN_GetPrinterStrings, CAP_PRINTERSTRING)
+EXPORT_GET_CAP_VALUE_RETURNVAL_A(DTWAIN_GetPrinterStringsEx, CAP_PRINTERSTRING, nullptr)
 EXPORT_GET_VALUE_OPT_MAXLENGTH_S(DTWAIN_GetPrinterSuffixString, CAP_PRINTERSUFFIX)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetOverscan, ICAP_OVERSCAN)
 EXPORT_GET_CAP_VALUE_D(DTWAIN_GetRotation, ICAP_ROTATION)
+EXPORT_GET_CAP_VALUE_RETURNVAL_D(DTWAIN_GetRotationEx, ICAP_ROTATION, std::numeric_limits<DTWAIN_FLOAT>::min())
+EXPORT_GET_CAP_VALUE_RETURNVAL_D(DTWAIN_GetBrightnessEx, ICAP_BRIGHTNESS, std::numeric_limits<DTWAIN_FLOAT>::min())
+EXPORT_GET_CAP_VALUE_RETURNVAL_D(DTWAIN_GetContrastEx, ICAP_CONTRAST, std::numeric_limits<DTWAIN_FLOAT>::min())
 EXPORT_GET_CAP_VALUE_D(DTWAIN_GetShadow, ICAP_SHADOW)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetSourceUnit, ICAP_UNITS)
+EXPORT_GET_CAP_VALUE_RETURNVAL_I(DTWAIN_GetSourceUnitEx, ICAP_UNITS, -1)
 
 EXPORT_GET_CAP_VALUE_D(DTWAIN_GetThreshold, ICAP_THRESHOLD)
 EXPORT_GET_CAP_VALUE_S(DTWAIN_GetTimeDate, CAP_TIMEDATE, 32)
@@ -808,18 +847,31 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetDeviceCapByString(DTWAIN_SOURCE Source, LPTST
     return retVal;
 }
 
+DTWAIN_FLOAT DLLENTRY_DEF DTWAIN_GetResolutionEx(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_FLOAT value = {};
+    auto bRet = DTWAIN_GetResolution(Source, &value);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? value : std::numeric_limits<DTWAIN_FLOAT>::min())
+	CATCH_BLOCK(std::numeric_limits<DTWAIN_FLOAT>::min())
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Resolution)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Resolution))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     LONG lCap = 0;
+    const char* pCapName = "ICAP_XRESOLUTION";
     if ( pSource->IsCapInSupportedList(ICAP_XRESOLUTION))
         lCap = ICAP_XRESOLUTION;
     else
-    if (pSource->IsCapInSupportedList(ICAP_XNATIVERESOLUTION))
-         lCap = ICAP_XNATIVERESOLUTION;
-    else
-        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+    {
+        pCapName = "ICAP_XNATIVERESOLUTION";
+        if (pSource->IsCapInSupportedList(ICAP_XNATIVERESOLUTION))
+            lCap = ICAP_XNATIVERESOLUTION;
+    }
+	DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return lCap == 0; }, DTWAIN_ERR_CAP_NO_SUPPORT,
+		                                         false, FUNC_MACRO, false, { pCapName });
     const DTWAIN_BOOL bRet = GetDoubleCap( pSource, lCap, Resolution);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(FALSE)
@@ -900,6 +952,12 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
             }
         }
         MoveArray(pHandle, pArray, &arrayToUse);
+    }
+    else
+    {
+        // Error occurred
+		DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return true; }, pHandle->m_lLastError, 
+                                                     0, FUNC_MACRO, false, { CTL_TwainAppMgr::GetCapNameFromCap(lCap) });
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
     CATCH_BLOCK_LOG_PARAMS(0) //DTWAIN_FAILURE1)

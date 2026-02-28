@@ -1141,3 +1141,17 @@ DTWAIN_EnumOCRInterfacesEx                        @31170
 DTWAIN_ArrayDumpToLog                             @31171
 DTWAIN_GetCapOperationsEx                         @31172
 DTWAIN_GetDuplexTypeEx                            @31173
+DTWAIN_GetJobControlEx                            @31174
+DTWAIN_GetLightPathEx                             @31175
+DTWAIN_GetSourceUnitEx                            @31176
+DTWAIN_GetOrientationEx                           @31177
+DTWAIN_GetRotationEx                              @31178
+DTWAIN_GetResolutionEx                            @31179
+DTWAIN_GetBitDepthEx                              @31180
+DTWAIN_GetBrightnessEx                            @31181
+DTWAIN_GetContrastEx                              @31182
+DTWAIN_GetCompressionTypeEx                       @31183
+DTWAIN_GetPrinterEx                               @31184
+DTWAIN_GetPrinterStartNumberEx                    @31185
+DTWAIN_GetPrinterStringModeEx                     @31186
+DTWAIN_GetPrinterStringsEx                        @31187

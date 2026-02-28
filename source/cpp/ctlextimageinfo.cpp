@@ -51,9 +51,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, 
     if (bArrayExists)
         pHandle->m_ArrayFactory->clear(*Array);
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pS->IsExtendedImageInfoSupported(); },
-                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
-    if (!pS->IsSupportedExtImageInfoCap())
+    DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return !pS->IsExtendedImageInfoSupported(); },
+                                                DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, { "ICAP_EXTIMAGEINFO" });
+    if (!pS->IsSupportedExtImageInfoCap()) 
     {
         // This is done for TWAIN 1.x sources or 2.x sources that do not have the ICAP_SUPPORTEDEXTIMAGEINFO
         // capability (but do have the ICAP_EXTIMAGEINFO available).
@@ -109,8 +109,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
 
     CTL_ITwainSource* pS = pSource;
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pS->IsExtendedImageInfoSupported(); },
-                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return !pS->IsExtendedImageInfoSupported(); },
+                                                 DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, { "ICAP_EXTIMAGEINFO" });
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pS->GetState() != SOURCE_STATE_TRANSFERRING; }, 
                                         DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
@@ -186,7 +186,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source)
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto pTheSource = pSource;
 
-    // This will only work in STATE 7 or the source!
+	DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
+		                                         DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, { "ICAP_EXTIMAGEINFO" });
+
+    // This will only work in STATE 7 of the source!
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING; }, 
                                         DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
 
@@ -234,8 +237,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source,
 
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     CTL_ITwainSource* pTheSource = pSource;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
-                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
+                                         		 DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, { "ICAP_EXTIMAGEINFO" });
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING; }, 
                                         DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
     const TW_INFO Info = pTheSource->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
@@ -293,8 +296,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
     CTL_ITwainSource* pTheSource = pSource;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
-                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
+		                                         DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, { "ICAP_EXTIMAGEINFO" });
 
     // Must be in State 7 for this function to be called
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING; },
@@ -315,8 +318,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeExtImageInfo(DTWAIN_SOURCE Source)
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     CTL_ITwainSource* pTheSource = pSource;
     
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
-        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
+		                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, { "ICAP_EXTIMAGEINFO" });
 
     pTheSource->DestroyExtImageInfo();
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
