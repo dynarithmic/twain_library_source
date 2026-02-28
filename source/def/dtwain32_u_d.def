@@ -1175,3 +1175,4 @@ DTWAIN_SetBarcodePriorities                       @31204
 DTWAIN_GetBarcodePriorities                       @31205
 DTWAIN_EnumBarcodePriorities                      @31206
 DTWAIN_EnumBarcodeCodes                           @31207
+DTWAIN_EnumBarcodeCodesEx                         @31208
