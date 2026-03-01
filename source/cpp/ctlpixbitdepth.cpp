@@ -169,6 +169,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, LONG BitDepth,
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
+LONG DLLENTRY_DEF DTWAIN_GetBitDepthEx(DTWAIN_SOURCE Source, DTWAIN_BOOL bCurrent)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, bCurrent))
+    LONG val = {};
+    auto bRet = DTWAIN_GetBitDepth(Source, &val, bCurrent);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? val : -1);
+    CATCH_BLOCK(-1)
+}
+
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDepth, DTWAIN_BOOL bCurrent)
 {
@@ -183,7 +192,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDept
     const DTWAIN_BOOL bRet = GetCapValuesEx2_Internal(pSource, ICAP_BITDEPTH, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
     if ( bRet && Array )
     {
-        DTWAINArrayLowLevelPtr_RAII(pHandle, &Array);
+        DTWAINArrayLowLevelPtr_RAII raii(pHandle, &Array);
         const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         if ( !vIn.empty() )
             *BitDepth = vIn[0];
@@ -217,9 +226,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumPixelTypes(DTWAIN_SOURCE Source, LPDTWAIN_AR
 }
 
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, LONG PixelType, LPDTWAIN_ARRAY Array)
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumBitDepthsEx2(DTWAIN_SOURCE Source, LONG PixelType)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, Array))
+    LOG_FUNC_ENTRY_PARAMS((Source, PixelType))
     auto [pHandle, pSource] = VerifyHandles(Source);
     if (pSource->IsPixelTypeSupported(PixelType) )
     {
@@ -230,11 +239,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, LONG Pixel
         const CTL_ITwainSource::CachedPixelTypeMap& theMap = pSource->GetPixelTypeMap();
         auto& pBitDepths = theMap.find(PixelType)->second;
         std::copy(pBitDepths.begin(), pBitDepths.end(), std::back_inserter(vIn));
-		MoveArray(pHandle, Array, &arr);
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(arr)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK_LOG_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPixelTypeSupported(DTWAIN_SOURCE Source, LONG PixelType)

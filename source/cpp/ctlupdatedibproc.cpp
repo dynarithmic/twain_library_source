@@ -37,10 +37,17 @@ DTWAIN_DIBUPDATE_PROC DLLENTRY_DEF DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DeleteDIB(HANDLE Dib)
 {
     LOG_FUNC_ENTRY_PARAMS((Dib))
-    BOOL bOk = ImageMemoryHandler::GlobalUnlock(Dib);
-    if ( !bOk )
-        LOG_FUNC_EXIT_NONAME_PARAMS(0)
-    ImageMemoryHandler::GlobalFree(Dib);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
+	if (!Dib)
+		LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+	UINT flags = GlobalFlags(Dib);
+	if (flags == GMEM_INVALID_HANDLE)
+		LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+	UINT lockCount = flags & GMEM_LOCKCOUNT;
+	for (UINT i = 0; i < lockCount; ++i)
+        ImageMemoryHandler::GlobalUnlock(Dib);
+    auto ret = ImageMemoryHandler::GlobalFree(Dib);
+    if ( ret != NULL )
+		dynarithmic::LogWin32Error(ImageMemoryHandler::GetLastError());
+	LOG_FUNC_EXIT_NONAME_PARAMS(ret == NULL?TRUE:FALSE)
     CATCH_BLOCK(FALSE)
 }

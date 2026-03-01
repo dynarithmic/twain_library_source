@@ -827,7 +827,7 @@ namespace dynarithmic
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing = DTWAIN_VERIFY_DLLHANDLE | DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR);
     bool CenterWindow(HWND hwnd, HWND hwndParent);
-    void CenterWindowOnCurrentMonitor(HWND hwnd);
+    void CenterWindowSmart(HWND hwnd, int options);
 
     LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap);
     LONG GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCapType);
@@ -871,7 +871,7 @@ namespace dynarithmic
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize);
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize);
     std::string GetErrorString_Internal(int nError);
-    void DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap);
+    void DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFlags = false);
     std::string LogWin32Error(DWORD lastError);
     void LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
     void UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle);

@@ -22,6 +22,7 @@
 #define CTLTR026_H
 
 #include "ctltr024.h"
+#include "ctltr027.h"
 namespace dynarithmic
 {
     class CTL_ImageIOHandler;
@@ -45,11 +46,16 @@ namespace dynarithmic
             int             GetAcquireFailAction() const { return m_nFailAction; }
             void            SetAcquireFailAction(int nAction) { m_nFailAction = nAction; }
             static void     ResolveImageResolution(CTL_ITwainSource *pSource,  DTWAINImageInfoEx* ImageInfo);
-            bool            ResetTransfer(TW_UINT16 Msg = MSG_RESET);
-
+			std::pair<bool, CTL_ImagePendingTriplet> ResetTransfer(TW_UINT16 Msg = MSG_RESET);
 
         protected:
-            std::pair<bool, bool> AbortTransfer(bool bForceClose = false, int error = 0);
+            struct AbortTraits
+            {
+                bool m_bForceClose = false;
+                bool m_bStopFeeder = false;
+            };
+
+            std::pair<bool, bool> AbortTransfer(AbortTraits bForceClose = {false, false}, int error = 0);
             std::string     GetPageFileName(const std::string& strBase, int nCurImage ) const;
             bool            IsPendingXfersDone() const { return m_bPendingXfersDone; }
             void            SetPendingXfersDone(bool bSet) { m_bPendingXfersDone = bSet; }
@@ -57,8 +63,9 @@ namespace dynarithmic
             void            SetLastPendingInfoCode(TW_UINT16 code) { m_lastPendingXferCode = code; }
             TW_UINT16       GetLastPendingInfoCode() const { return m_lastPendingXferCode; }
             bool            CancelAcquisition();
+            TW_UINT16       GetPendingCount();
             bool            FailAcquisition();
-
+            void            StopAcquisitions(int errfile);
             bool            StopFeeder();
             bool            IsJobControlPending(TW_PENDINGXFERS *pPending) const;
             static bool     CopyDibToClipboard(CTL_ITwainSession *pSession, HANDLE hDib);
@@ -98,6 +105,7 @@ namespace dynarithmic
             bool ResampleAcquiredDib();
             bool EndTwainUI() const { return m_bEndTwainUI; }
             void SetEndTwainUI(bool bSet = true) { m_bEndTwainUI = bSet; }
+            HANDLE ProcessUserUpdatingDIB(size_t nLastDib);
 
         protected:
             HANDLE          m_hDataHandle;

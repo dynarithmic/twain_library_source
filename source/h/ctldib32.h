@@ -423,6 +423,18 @@ namespace dynarithmic
             }
     };
 
+    class CTL_SVGIOHandler : public CTL_ImageIOHandler
+    {
+        public:
+            CTL_SVGIOHandler() : CTL_ImageIOHandler()
+            {}
+            CTL_SVGIOHandler(CTL_TwainDib *pDib, bool isSVGZ) : CTL_ImageIOHandler(pDib), m_isSVGZ(isSVGZ)
+            {}
+            bool IsFormatSVGZ() const { return m_isSVGZ; }
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+        private:
+			bool m_isSVGZ = false;
+    };
     #endif  // NOIMAGE_SUPPORT
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -529,6 +541,8 @@ namespace dynarithmic
                    WEBPFormat = DTWAIN_WEBP,
                    PBMFormat = DTWAIN_PBM,
                    JpegXRFormat = DTWAIN_JPEGXR,
+                   SVGFormat = DTWAIN_SVG,
+                   SVGZFormat = DTWAIN_SVGZ,
                    RawFormat=9999};
 
             // Setting/Getting

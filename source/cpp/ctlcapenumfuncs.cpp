@@ -31,7 +31,7 @@
 using namespace dynarithmic;
 
 /////////////////////////////////////////////////////////////////////////
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx2(DTWAIN_SOURCE Source)
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     DTWAIN_ARRAY pArray = nullptr;
@@ -40,6 +40,23 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx2(DTWAIN_SOURCE Source)
     CATCH_BLOCK(nullptr)
 }
 
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumExtendedCapsEx(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_ARRAY pArray = nullptr;
+    DTWAIN_EnumExtendedCaps(Source, &pArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
+    CATCH_BLOCK(nullptr)
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_ARRAY pArray = nullptr;
+    DTWAIN_EnumSupportedCaps(Source, &pArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
+    CATCH_BLOCK(nullptr)
+}
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
@@ -201,22 +218,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_AR
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-static LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* pSource, LONG lCapability)
+static LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapability)
 {
-    LONG nOps = 0;
     CTL_CapInfo* CapInfo = GetCapInfo(pHandle, pSource, static_cast<TW_UINT16>(lCapability));
     if (!CapInfo)
         return 0;
-    nOps = std::get<CAPINFO_IDX_SUPPORTEDOPS>(*CapInfo);
-    if (nOps == 0)
-    {
-        // Try and get the operations now from TWAIN
-        nOps = CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true);
-        if (nOps != 0)
-            // Replace 0 with what TWAIN found out about the supported operations
-            std::get<CAPINFO_IDX_SUPPORTEDOPS>(*CapInfo) = nOps;
-    }
-    return nOps;
+    // Try and get the operations now from TWAIN
+    return CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true);
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
+    LONG val = 0;
+    DTWAIN_GetCapOperations(Source, lCapability, &val);
+	LOG_FUNC_EXIT_NONAME_PARAMS(val)
+	CATCH_BLOCK(0)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG  lpOps)
@@ -230,9 +247,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
 
     // Check for cap support
     bool isSupported = pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCapability));
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return isSupported == false; },
-                                      DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
-
+    DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return isSupported == false; },
+                                                 DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, 
+                                                { CTL_TwainAppMgr::GetCapNameFromCap(lCapability) });
     // Get the capability operations
     *lpOps = GetCapOperationsInternal(pHandle, pSource, lCapability);
 

@@ -72,7 +72,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     {
         SourceAcquireOptions opts;
         opts.setIsUIIOnly(true);
-        dynarithmic::StartModalMessageLoop(pSource, opts);
+        auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
+		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, false, FUNC_MACRO);
     }
 
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -84,15 +85,3 @@ void dynarithmic::LLSetupUIOnly(CTL_ITwainSource* pSource)
     // show the interface -- this is where we may get a message right away in the loop
     CTL_TwainAppMgr::ShowUserInterface(pSource, false, true);
 }
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, BOOL bSet)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, bSet))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-
-    // return the file name that would be acquired
-    pSource->SetForceScanOnNoUI(bSet ? true : false);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-

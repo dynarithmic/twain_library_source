@@ -29,6 +29,24 @@
 using namespace dynarithmic;
 using namespace boost::logic;
 
+static HWND GetEffectiveConsoleWindow()
+{
+	// 1) Already attached?
+	HWND hwnd = GetConsoleWindow();
+	if (hwnd)
+		return hwnd;
+
+	// 2) Try attaching to parent console
+	if (AttachConsole(ATTACH_PARENT_PROCESS))
+	{
+		hwnd = GetConsoleWindow();
+		if (hwnd)
+			return hwnd;
+	}
+    return NULL;
+}
+
+
 CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& opts)
 {
     #ifndef _WIN32
@@ -275,14 +293,19 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
             }
             if ( !bUseLastScreenPos )
             {
-				if (pS->CS.nOptions & DTWAIN_DLG_CENTER_CURRENT_MONITOR)
-					CenterWindowOnCurrentMonitor(hWnd);
+                if (pS->CS.nOptions & DTWAIN_DLG_CENTER_CURRENT_MONITOR)
+                    CenterWindowSmart(hWnd, pS->CS.nOptions);
                 else
                 if (pS->CS.nOptions & DTWAIN_DLG_CENTER_SCREEN)
                     CenterWindow(hWnd, nullptr);
                 else
                 if (pS->CS.nOptions & DTWAIN_DLG_CENTER)
-                    CenterWindow(hWnd, GetParent(hWnd));
+                {
+					HWND hWndParent = pS->CS.hWndParent;
+					if (pS->CS.nOptions & DTWAIN_DLG_CONSOLEASPARENT)
+						hWndParent = GetEffectiveConsoleWindow();
+                    CenterWindow(hWnd, hWndParent ? hWndParent : GetParent(hWnd));
+                }
                 else
                     SetWindowPos(hWnd, nullptr, pS->CS.xpos, pS->CS.ypos, 0, 0, SWP_NOSIZE);
             }

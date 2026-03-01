@@ -1241,86 +1241,6 @@ LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableExW(LPWSTR szDirectories, LONG nLength)
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetTwainCountryNameA(LONG nameID, LPSTR ret)
-{
-	#ifdef _UNICODE
-		std::wstring arg(1024, 0);
-        const DTWAIN_BOOL retVal = DTWAIN_GetTwainCountryName(nameID, &arg[0]);
-		return null_terminator_copier(get_view(arg), ret, retVal);
-	#else
-		return DTWAIN_GetTwainCountryName(nameID, ret);
-	#endif
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetTwainCountryNameW(LONG nameID, LPWSTR ret)
-{
-#ifdef _UNICODE
-	return DTWAIN_GetTwainCountryName(nameID, ret);
-#else
-	std::string arg(1024, 0);
-	DTWAIN_BOOL retVal = DTWAIN_GetTwainCountryName(nameID, &arg[0]);
-	return null_terminator_copier(get_view(arg), ret, retVal);
-#endif
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetTwainCountryValueA(LPCSTR country)
-{
-#ifdef _UNICODE
-	return DTWAIN_GetTwainCountryValue(StringConversion::Convert_AnsiPtr_To_Native(country).c_str());
-#else
-	return DTWAIN_GetTwainCountryValue(country);
-#endif
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetTwainCountryValueW(LPCWSTR country)
-{
-#ifdef _UNICODE
-	return DTWAIN_GetTwainCountryValue(country);
-#else
-	return DTWAIN_GetTwainCountryValue(StringConversion::Convert_WidePtr_To_Native(country).c_str());
-#endif
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetTwainLanguageNameA(LONG nameID, LPSTR ret)
-{
-#ifdef _UNICODE
-	std::wstring arg(1024, 0);
-    const DTWAIN_BOOL retVal = DTWAIN_GetTwainLanguageName(nameID, &arg[0]);
-	return null_terminator_copier(get_view(arg), ret, retVal);
-#else
-	return DTWAIN_GetTwainLanguageName(nameID, ret);
-#endif
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetTwainLanguageNameW(LONG nameID, LPWSTR ret)
-{
-#ifdef _UNICODE
-	return DTWAIN_GetTwainLanguageName(nameID, ret);
-#else
-	std::string arg(1024, 0);
-	DTWAIN_BOOL retVal = DTWAIN_GetTwainLanguageName(nameID, &arg[0]);
-	return null_terminator_copier(get_view(arg), ret, retVal);
-#endif
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetTwainLanguageValueA(LPCSTR lang)
-{
-#ifdef _UNICODE
-	return DTWAIN_GetTwainLanguageValue(StringConversion::Convert_AnsiPtr_To_Native(lang).c_str());
-#else
-	return DTWAIN_GetTwainLanguageValue(lang);
-#endif
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetTwainLanguageValueW(LPCWSTR lang)
-{
-#ifdef _UNICODE
-	return DTWAIN_GetTwainLanguageValue(lang);
-#else
-	return DTWAIN_GetTwainLanguageValue(StringConversion::Convert_WidePtr_To_Native(lang).c_str());
-#endif
-}
-
 LONG DLLENTRY_DEF DTWAIN_GetVersionInfoW(LPWSTR lpszVer, LONG nLength)
 {
 #ifdef _UNICODE
@@ -1406,29 +1326,6 @@ LONG DLLENTRY_DEF DTWAIN_GetShortVersionStringA(LPSTR lpszVer, LONG nLength)
 	return null_terminator_copier(get_view(args), lpszVer, retVal);
 #else
 	return DTWAIN_GetShortVersionString(lpszVer, nLength);
-#endif
-}
-
-
-LONG DLLENTRY_DEF DTWAIN_GetTwainStringNameW(LONG category, LONG TwainID, LPWSTR lpszBuffer, LONG nLength)
-{
-#ifdef _UNICODE
-    return DTWAIN_GetTwainStringName(category, TwainID, lpszBuffer, nLength);
-#else
-    std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetTwainStringName(category, TwainID, (nLength > 0 && lpszBuffer)? &args[0] : nullptr, static_cast<LONG>(args.size()));
-    return null_terminator_copier(get_view(args), lpszBuffer, retVal);
-#endif
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetTwainStringNameA(LONG category, LONG TwainID, LPSTR lpszBuffer, LONG nLength)
-{
-#ifdef _UNICODE
-    std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetTwainStringName(category, TwainID, (nLength > 0 && lpszBuffer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
-    return null_terminator_copier(get_view(args), lpszBuffer, retVal);
-#else
-    return DTWAIN_GetTwainStringName(category, TwainID, lpszBuffer, nLength);
 #endif
 }
 

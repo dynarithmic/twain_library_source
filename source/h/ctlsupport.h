@@ -95,7 +95,7 @@ namespace dynarithmic
                     {
                         LONG nSize = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array2));
                         if (nSize > 0)
-                            DTWAIN_RangeGetNearestValue(Source, SupportVal, SupportVal, DTWAIN_ROUNDNEAREST);
+                            DTWAIN_RangeGetNearestValue(Array2, SupportVal, SupportVal, DTWAIN_ROUNDNEAREST);
                     }
                 }
             }

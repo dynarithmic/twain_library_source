@@ -185,29 +185,3 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAI
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
-
-static bool SetBitDepth(CTL_ITwainSource *p, LONG BitDepth);
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceAcquireBitDepth(DTWAIN_SOURCE Source, LONG BitDepth)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, BitDepth))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const DTWAIN_BOOL bRet = SetBitDepth(pSource, BitDepth);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-static bool SetBitDepth(CTL_ITwainSource *pTheSource, LONG BitDepth)
-{
-    if (BitDepth == 1 ||
-        BitDepth == 4 ||
-        BitDepth == 8 ||
-        BitDepth == 24)
-    {
-        pTheSource->SetForcedImageBpp(BitDepth);
-        return true;
-    }
-    else
-        pTheSource->SetForcedImageBpp(0);
-    return true;
-}

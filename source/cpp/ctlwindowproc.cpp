@@ -220,6 +220,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_INVALID_TWAINDSM2_BITMAP:
             case DTWAIN_TN_IMAGE_RESAMPLE_FAILURE:
             case DTWAIN_TN_FILECOMPRESSTYPEMISMATCH:
+            case DTWAIN_TN_SOURCEDETAILS:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
@@ -342,6 +343,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
           case DTWAIN_TN_FEEDERNOTENABLED:
           case DTWAIN_TN_FEEDERNOTSUPPORTED:
           case DTWAIN_TN_PREACQUIRESTART:
+		  case DTWAIN_TN_QUERYACQUIREPAGES:
           {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) )
@@ -358,8 +360,8 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
                                     static_cast<DTWAIN_SOURCE>(pSource),
                                      wParam, lParam );
-            }
-            break;
+          }
+          break;
 
             case DTWAIN_TN_PAGECANCELLED:
             {
@@ -463,7 +465,6 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
 
             case DTWAIN_AcquireSourceClosed:
             {
-                auto pSession = pHandle->m_pTwainSession;
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if ( pSource && pSource->IsOpened() )
                 {
@@ -498,19 +499,12 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                             {
 
                             }
-                            // Close the source
-                            CTL_TwainAppMgr::CloseSource(pSession, pSource);
-
                             if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) )
                                 bPassMsg = true;
                             DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
                                 static_cast<DTWAIN_HANDLE>(pHandle),
                                 static_cast<DTWAIN_SOURCE>(pSource),
                                 wParam, 0);
-
-                            // Check if source should be reopened after acquisition
-                            if (pSource->IsReopenAfterAcquire())
-                                CTL_TwainAppMgr::OpenSource(pSession, pSource);
                         }
                     }
                     pHandle->EraseAcquireNum( pSource->GetAcquireNum() );

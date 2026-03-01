@@ -105,6 +105,7 @@ class CTL_ErrorStructDecoder {
         static std::string DecodeTWAINReturnCode(TW_UINT16 retCode);
         static std::string DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, std::string_view defMessage);
         static std::string DecodeTWAINReturnCodeCC(TW_UINT16 retCode);
+        static std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem);
         void StartMessageDecoder(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
         const std::string& GetDecodedString() const { return m_pString; }
     protected:

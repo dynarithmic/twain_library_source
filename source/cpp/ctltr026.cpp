@@ -93,7 +93,6 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
     m_bJobControlPageRecorded = false;
     int errfile = 0;
-
     switch (rc)
     {
         case TWRC_XFERDONE:
@@ -104,7 +103,6 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
                                                   DTWAIN_TN_TRANSFERDONE,
                                                   reinterpret_cast<LPARAM>(pSource));
-
             if (m_nTransferType == DAT_IMAGENATIVEXFER)
             {
                 // We need to clone the DIB if we're doing a native XFER on a DSM2 Data Source
@@ -132,7 +130,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                         // Stop the acquisition
                         pSource->SetShutdownAcquire(true);
                         FailAcquisition();
-                        AbortTransfer(true, errfile);
+                        AbortTransfer({ true, false }, errfile);
                         return TWRC_FAILURE;
                     }
 
@@ -263,7 +261,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 {
                     bPageDiscarded = true;
                     // Set the error code
-					CTL_TwainAppMgr::SetAndLogError(DTWAIN_ERR_BAD_DIB_PAGE, "", false);
+                    CTL_TwainAppMgr::SetAndLogError(DTWAIN_ERR_BAD_DIB_PAGE, "", false);
                     break;
                 }
 
@@ -295,25 +293,8 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     break;  // The page is discarded
                 }
 
-                auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
-
                 // Callback function for access to change DIB
-                if (sessionHandle->m_pDibUpdateProc != nullptr && GetDAT() != DAT_AUDIONATIVEXFER)
-                {
-                    HANDLE hRetDib =
-                        (sessionHandle->m_pDibUpdateProc)
-                        (pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
-                    if (hRetDib && hRetDib != m_hDataHandle)
-                    {
-                        // Application changed DIB.  So make this the current dib
-                        #ifdef _WIN32
-                        GlobalFree(m_hDataHandle);
-                        #endif
-                        m_hDataHandle = hRetDib;
-                        pSource->SetDibHandle(m_hDataHandle, nLastDib);
-                        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_APPUPDATEDDIB, reinterpret_cast<LPARAM>(pSource));
-                    }
-                }
+                ProcessUserUpdatingDIB(nLastDib);
 
                 // Change bpp if necessary
                 if (bProcessDibEx && GetDAT() != DAT_AUDIONATIVEXFER)
@@ -496,7 +477,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
         {
             m_hDataHandle = nullptr;
             FailAcquisition();
-            AbortTransfer(false, errfile);
+            AbortTransfer({ false, false }, errfile);
             return rc;
         }
         case TWRC_SUCCESS:
@@ -531,9 +512,51 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
         bForceClose = false;
     else
         bForceClose = true;
-    AbortTransfer(bForceClose, errfile);
-    return rc;
 
+    // Determine if acquisitions should be stopped by the client program
+    if (rc == TWRC_XFERDONE)
+    {
+        int keepAcquiringPages = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_QUERYACQUIREPAGES,reinterpret_cast<LPARAM>(pSource));
+
+        if (keepAcquiringPages == 0)
+        {
+            StopAcquisitions(errfile);
+            return rc;
+        }
+    }
+
+    AbortTransfer({ bForceClose, false }, errfile);
+    return rc;
+}
+
+void CTL_ImageXferTriplet::StopAcquisitions(int errfile)
+{
+    // Clean up since the acquisitions are stopped
+    // End the transfer
+    auto pending = ResetTransfer(MSG_ENDXFER);
+    GetLocalPendingXferInfo() = *(pending.second.GetPendingXferBuffer());
+    SetPendingXfersDone(true);
+    int pendingCount = pending.second.GetPendingXferBuffer()->Count;
+
+    // Do final cleanup of multipage image files, job control, etc.
+    AbortTransfer({ false, true }, errfile);
+
+    // Now stop the feeder, if possible
+    if (pendingCount != 0)
+    {
+		ResetTransfer(MSG_STOPFEEDER);
+		ResetTransfer(MSG_RESET);
+	}
+	// Set the scan pending to false
+	m_bScanPending = false;
+}
+
+TW_UINT16 CTL_ImageXferTriplet::GetPendingCount() 
+{
+    TW_PENDINGXFERS pPending = {};
+    TW_UINT16 rc = {};
+    rc = GetImagePendingInfo(&pPending);
+    return pPending.Count;
 }
 
 bool CTL_ImageXferTriplet::CancelAcquisition()
@@ -646,7 +669,7 @@ TW_UINT16 CTL_ImageXferTriplet::GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UIN
 
 
 
-std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int errFile)
+std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(AbortTraits abortTraits, int errFile)
 {
     if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
         LogWriterUtils::WriteLogInfoIndentedA("Potentially aborting transfer..");
@@ -699,7 +722,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                 if ( pSource->GetMaxAcquireCount() == pSource->GetPendingImageNum() + 1 )
                     nContinue = 0;
                 else
-                if ( !bForceClose )
+                if ( !abortTraits.m_bForceClose )
                 {
                     // Send message to User App
                     nContinue = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
@@ -708,7 +731,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                     if ( !nContinue)
                         bUserCancelled = true;
                 }
-                if ( !nContinue || bForceClose )
+                if ( !nContinue || (abortTraits.m_bForceClose & !abortTraits.m_bStopFeeder))
                 {
                     ResetTransfer(MSG_RESET);
                     // Check if canceled by user
@@ -718,11 +741,8 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                                                               reinterpret_cast<LPARAM>(pSource));
                 }
                 else
-                // Check if the user wants to just stop the feeder
+                if ( !abortTraits.m_bStopFeeder )
                 {
-                    if ( nContinue == 2 )// Stop the feeder
-                        StopFeeder();
-                    // Remain in state 6, even if user wanted to stop the feeder
                     m_bScanPending = true;
 
                     if ( bEndOfJobDetected )
@@ -741,18 +761,20 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                 }
             }
 
-            if ( ptrPending->Count == 0 || !nContinue || bForceClose || bEndOfJobDetected || bProcessSinglePage)
+            if ( ptrPending->Count == 0 || !nContinue || abortTraits.m_bForceClose || bEndOfJobDetected || bProcessSinglePage ||
+                abortTraits.m_bStopFeeder)
             {
                 struct UIShutDown
                 {
                     CTL_ITwainSession* pSession;
                     CTL_ITwainSource* pSource;
                     bool bShutdown;
-                    UIShutDown(CTL_ITwainSession* pSes, CTL_ITwainSource* pSrc, bool bClose)
-                        : pSession(pSes), pSource(pSrc), bShutdown(bClose) {}
+                    bool bFeederStopped;
+                    UIShutDown(CTL_ITwainSession* pSes, CTL_ITwainSource* pSrc, bool bClose, bool feederStopped)
+                        : pSession(pSes), pSource(pSrc), bShutdown(bClose), bFeederStopped(feederStopped) {}
                     ~UIShutDown()
                     {
-                        if (bShutdown)
+                        if (bShutdown && !bFeederStopped )
                             CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
                     }
                 };
@@ -765,11 +787,12 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                 // If there are no more images pending for single page image types, and
                 // the device is not showing the user-interface, and there are no pages in 
                 // the feeder, shut the UI down.
-                UIShutDown uiCloser(pSession, pSource, !keepProcessingSinglePage && !pSource->IsUIOpenOnAcquire());
+                UIShutDown uiCloser(pSession, pSource, !keepProcessingSinglePage && !pSource->IsUIOpenOnAcquire(),
+                                    abortTraits.m_bStopFeeder);
 
                 if ( pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative)
                 {
-                    if ( !bForceClose )
+                    if ( !abortTraits.m_bForceClose )
                     {
                         // Check if we've acquired any pages successfully
                         if ( pSource->GetPendingImageNum() + 1 - pSource->GetBlankPageCount() > 0)
@@ -942,10 +965,10 @@ int CTL_ImageXferTriplet::GetTransferType() const
 
 bool CTL_ImageXferTriplet::StopFeeder()
 {
-    return ResetTransfer(MSG_STOPFEEDER);
+    return ResetTransfer(MSG_STOPFEEDER).second.GetPendingXferBuffer()->Count;
 }
 
-bool CTL_ImageXferTriplet::ResetTransfer(TW_UINT16 Msg/*=MSG_RESET*/)
+std::pair<bool, CTL_ImagePendingTriplet> CTL_ImageXferTriplet::ResetTransfer(TW_UINT16 Msg/*=MSG_RESET*/)
 {
     CTL_ITwainSession* pSession = GetSessionPtr();
     CTL_ImagePendingTriplet Pending(pSession, GetSourcePtr(), Msg);
@@ -967,17 +990,17 @@ bool CTL_ImageXferTriplet::ResetTransfer(TW_UINT16 Msg/*=MSG_RESET*/)
                 case MSG_STOPFEEDER:
                     LogWriterUtils::WriteLogInfoIndentedA("stopping feeder...");
             }
-            return true;
+            return { true, Pending };
 
         case TWRC_FAILURE:
         {
             LogWriterUtils::WriteLogInfoIndentedA("Reset Transfer failed...");
             auto ccode = CTL_TwainAppMgr::GetLastConditionCodeError();
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, ccode);
-            return false;
+            return { false, Pending };
         }
     }
-    return false;
+    return { false, Pending };
 }
 
 // Always called for the last bitmap scanned for File Transfer using the prompt
@@ -1575,6 +1598,30 @@ void CTL_ImageXferTriplet::SetBufferedTransfer(bool bSet)
 bool CTL_ImageXferTriplet::IsBufferedTransfer() const
 {
     return m_IsBuffered;
+}
+
+HANDLE CTL_ImageXferTriplet::ProcessUserUpdatingDIB(size_t nLastDib)
+{
+    CTL_ITwainSession* pSession = GetSessionPtr();
+    CTL_ITwainSource* pSource = GetSourcePtr();
+    auto sessionHandle = pSource->GetDTWAINHandle();
+
+    if (sessionHandle->m_pDibUpdateProc != nullptr && GetDAT() != DAT_AUDIONATIVEXFER)
+    {
+        HANDLE hRetDib = (sessionHandle->m_pDibUpdateProc)(pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
+        if (hRetDib && hRetDib != m_hDataHandle)
+        {
+            // Application changed DIB.  So make this the current dib
+            #ifdef _WIN32
+            ImageMemoryHandler::GlobalFree(m_hDataHandle);
+            #endif
+            m_hDataHandle = hRetDib;
+            pSource->SetDibHandle(m_hDataHandle, nLastDib);
+            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_APPUPDATEDDIB, reinterpret_cast<LPARAM>(pSource));
+            return m_hDataHandle;
+        }
+    }
+    return m_hDataHandle;
 }
 
 bool IsState7InfoNeeded(CTL_ITwainSource *pSource)

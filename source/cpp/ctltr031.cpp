@@ -368,22 +368,21 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             }
 
                             CurDib->FlipBitMap(m_nPixelType == TWPT_RGB?1:0);
-                            auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
+                            m_hDataHandle = CurDib->GetHandle();
 
                             // Callback function for access to change DIB
-                            if ( sessionHandle->m_pDibUpdateProc != nullptr)
+                            HANDLE oldHandle = m_hDataHandle;
+                            auto hDib = ProcessUserUpdatingDIB(nCurImage);
+                            if (m_hDataHandle != oldHandle)
                             {
-                                const HANDLE hRetDib =
-                                    (sessionHandle->m_pDibUpdateProc)
-                                            (pSource, static_cast<int>(nCurImage), m_hDataHandle);
-                                if ( hRetDib && hRetDib != m_hDataHandle)
-                                {
-                                    // Application changed DIB.  So make this the current dib
-                                    ImageMemoryHandler::GlobalFree( m_hDataHandle );
-                                    m_hDataHandle = hRetDib;
-                                    pSource->SetDibHandle( m_hDataHandle, nLastDib );
-                                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_APPUPDATEDDIB, reinterpret_cast<LPARAM>(pSource));
-                                }
+                                // Lock the new data.  
+                                auto pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(hDib));
+                                m_nCurDibSize = static_cast<TW_UINT32>(ImageMemoryHandler::GlobalSize(hDib));
+
+                                m_ptrDib = reinterpret_cast<unsigned char*>(pDibInfo);
+                                m_ptrOrig = m_ptrDib;
+                                CurDib->SetHandle(m_hDataHandle);
+                                (*pArray)[nCurImage] = CurDib;
                             }
 
                             // Change bpp if necessary
@@ -565,7 +564,21 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
         bForceClose = false;
     else
         bForceClose = true;
-    AbortTransfer(bForceClose, errfile);
+
+	// Determine if user requests that acquisitions should be stopped
+	if (rc == TWRC_XFERDONE)
+	{
+		auto keepAcquiringPages = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYACQUIREPAGES, 
+                                                                        reinterpret_cast<LPARAM>(pSource));
+
+		if (keepAcquiringPages == 0)
+		{
+			StopAcquisitions(errfile);
+			return rc;
+		}
+	}
+
+    AbortTransfer({ bForceClose, false }, errfile);
     return rc;
 }
 
