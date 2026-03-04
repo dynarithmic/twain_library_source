@@ -531,6 +531,9 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
 void CTL_ImageXferTriplet::StopAcquisitions(int errfile)
 {
+    auto pSession = GetSessionPtr();
+    auto pSource = GetSourcePtr();
+	CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_ACQUIREPAGESSTOPPING, reinterpret_cast<LPARAM>(pSource));
     // Clean up since the acquisitions are stopped
     // End the transfer
     auto pending = ResetTransfer(MSG_ENDXFER);
@@ -549,6 +552,7 @@ void CTL_ImageXferTriplet::StopAcquisitions(int errfile)
 	}
 	// Set the scan pending to false
 	m_bScanPending = false;
+	CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_ACQUIREPAGESSTOPPED, reinterpret_cast<LPARAM>(pSource));
 }
 
 TW_UINT16 CTL_ImageXferTriplet::GetPendingCount() 

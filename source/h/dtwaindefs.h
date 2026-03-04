@@ -542,6 +542,8 @@
 
 /* Sent to determine if feeder should continue feeding pages */
 #define DTWAIN_TN_QUERYACQUIREPAGES             1305
+#define DTWAIN_TN_ACQUIREPAGESSTOPPING          1306
+#define DTWAIN_TN_ACQUIREPAGESSTOPPED           1307
 
 /* PDF OCR clean text flags */
 #define DTWAIN_PDFOCR_CLEANTEXT1            1
