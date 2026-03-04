@@ -726,25 +726,26 @@ namespace dynarithmic
 			return std::forward<StringType>(str);
         }
 
-		template <typename StringType>
 		static decltype(auto) ltrim(StringType&& str)
 		{
             return string_trimmer(str, &ltrim_if);
 		}
 
-		template <typename StringType>
 		static decltype(auto) rtrim(StringType&& str)
 		{
             return string_trimmer(str, &rtrim_if);
 		}
 
-		template <typename StringType>
+		static decltype(auto) trim(StringType&& str)
+		{
+			return ltrim_copy(rtrim_copy(str));
+		}
+
         static StringType ltrim_copy(StringType str)
 		{
             return ltrim(str);
 		}
 
-		template <typename StringType>
         static StringType rtrim_copy(StringType str)
 		{
             return rtrim(str);
@@ -755,10 +756,6 @@ namespace dynarithmic
 			return ltrim_copy(rtrim_copy(str));
 		}
 
-		static StringType& trim(StringType& str)
-		{
-			return ltrim_copy(rtrim_copy(str));
-		}
 
         public:
         static StringType& TrimRight(StringType& str, const CharType *lpszTrimStr = StringTraits::GetSpaceString())
