@@ -534,6 +534,7 @@ namespace dynarithmic
         std::string              s_AppTitle;
         std::pair<int32_t, int32_t> s_SavedSelectSourcePos;
         CTL_TEXTELEMENTPTRLIST   s_PDFTextElementList;
+        int64_t                  s_logFileSaveThreshold = -1LL;
         CTL_StaticDataStruct();
     };
 
@@ -624,6 +625,7 @@ namespace dynarithmic
         static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
         static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
         static auto& GetPDFTextElementList() { return s_StaticData.s_PDFTextElementList; }
+        static auto& GetLogFileSaveThreshold() { return s_StaticData.s_logFileSaveThreshold; }
     };
 
     struct CTL_LoggerCallbackInfo

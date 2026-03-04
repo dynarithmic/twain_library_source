@@ -1181,4 +1181,4 @@ DTWAIN_EnumBarcodeMaxRetriesEx                    @31210
 DTWAIN_EnumBarcodePrioritiesEx                    @31211
 DTWAIN_EnumBarcodeSearchModesEx                   @31212
 DTWAIN_EnumBarcodeTimeOutValuesEx                 @31213
-
+DTWAIN_SetLogSaveThreshold                        @31214

@@ -242,6 +242,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainMsg(MSG *pMsg)
 LONG DLLENTRY_DEF DTWAIN_GetLastError()
 {
     LOG_FUNC_ENTRY_PARAMS(())
+
+    // Test stuff
+    std::string sTest = "VueScan TWAIN";
+
+    auto sNew = StringWrapperA::TrimAll(sTest);
+
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if ( !pHandle )
     {
@@ -1080,6 +1086,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(!logFailed)
     CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLogSaveThreshold(LONG64 lineCount)
+{
+	LOG_FUNC_ENTRY_PARAMS((lineCount))
+	auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    if (lineCount <= 0)
+        lineCount = -1LL;
+    CTL_StaticData::GetLogFileSaveThreshold() = lineCount;
+    CTL_StaticData::GetLogger().SetLogSaveThreshold(lineCount);
+	LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+	CATCH_BLOCK(false)
 }
 
 bool dynarithmic::UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle)
