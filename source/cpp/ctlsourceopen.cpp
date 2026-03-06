@@ -36,6 +36,7 @@ static void TestAndCachePixelTypes(CTL_ITwainSource *p);
 static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 static void DetermineIfGetMessage(CTL_ITwainSource* p);
 static void DetermineIfPaperDetectable(CTL_ITwainSource* p);
+static void DetermineSheetcountDefs(CTL_ITwainSource* p);
 static std::pair<bool, int> PerformPixelTypeCompliancyTest(CTL_ITwainSource * p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
@@ -109,6 +110,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 
     // See if the source uses GetMessage processing for the TWAIN message loop
     DetermineIfGetMessage(pSource);
+
+    // See if the source will interpret CAP_SHEETCOUNT as Images or actual sheets of paper
+    DetermineSheetcountDefs(pSource);
 
     // Cache the pixel types and bit depths
     TestAndCachePixelTypes(pSource);
@@ -289,6 +293,28 @@ void DetermineIfPaperDetectable(CTL_ITwainSource* p)
         }
         ++iterSearch;
     }
+}
+
+void DetermineSheetcountDefs(CTL_ITwainSource* p)
+{
+	using wildcards::match;
+	auto& sheetcount_map = CTL_TwainAppMgr::GetSourceSheetcountMap();
+	std::string sourceName = p->GetProductNameA();
+
+	// Search map for a matching name
+	auto iterSearch = sheetcount_map.begin();
+	while (iterSearch != sheetcount_map.end())
+	{
+		bool matches = match(sourceName, iterSearch->first);
+		if (matches)
+		{
+            bool usesSheets = (iterSearch->second == "SHEETS");
+            p->SetUseSheetCountAsSheets(usesSheets);
+			return;
+		}
+		++iterSearch;
+	}
+    p->SetUseSheetCountAsSheets(true);
 }
 
 void DetermineIfGetMessage(CTL_ITwainSource* pSource)

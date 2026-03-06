@@ -483,6 +483,7 @@ namespace dynarithmic
                INI_SELECTSOURCEPOS_KEY,
                INI_SAVESELECTSOURCEPOS_KEY,
                INI_TWAINLOOPGETMSG_KEY,
+               INI_SHEETCOUNT_KEY,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;

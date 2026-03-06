@@ -493,6 +493,8 @@ namespace dynarithmic
         boost::logic::tribool IsAudioTransferSupported() const { return m_tbIsAudioTransferSupported; }
         boost::logic::tribool IsUIControllable() const { return m_tbUIControllable; }
         boost::logic::tribool IsFeederSensitive() const { return m_tbIsFeederSensitive; }
+        boost::logic::tribool IsUseSheetCountAsSheets() const { return m_tbUseSheetCountAsSheets; }
+		void         SetUseSheetCountAsSheets(bool bSet) noexcept { m_tbUseSheetCountAsSheets = bSet; }
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
         void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
         void         SetFeederSupported(bool bSet) { m_tbIsFeederSupported = bSet; }
@@ -517,6 +519,7 @@ namespace dynarithmic
         int         GetFeederWaitTime() const noexcept { return m_nFeederWaitTime; }
         int         GetFeederWaitTimeOption() const noexcept { return m_nFeederWaitTimeOption; }
         void        SetFeederWaitTimeOption(int option) noexcept { m_nFeederWaitTimeOption = option; }
+
         // Only public member
         void *      m_pUserPtr;
 
@@ -652,6 +655,7 @@ namespace dynarithmic
         boost::logic::tribool m_tbIsAudioTransferSupported;
         boost::logic::tribool m_tbUIControllable;
         boost::logic::tribool m_tbIsFeederSensitive;
+        boost::logic::tribool m_tbUseSheetCountAsSheets;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;
 

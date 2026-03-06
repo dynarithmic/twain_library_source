@@ -96,6 +96,7 @@ static void LoadFlatbedOnlyOverrides();
 static void LoadTwainLoopOverrides();
 static void LoadPaperDetectionOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
+static void LoadSheetcountProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
 static void LoadSelectSourcePosition();
@@ -880,6 +881,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 
                 // Load check feeder on open status
                 LoadOnSourceOpenProperties(pHandle);
+
+                // Load the CAP_SHEETCOUNT behavior
+                LoadSheetcountProperties(pHandle);
 
                 // Load image file related options
                 LoadImageFileOptions(pHandle);
@@ -2480,6 +2484,33 @@ void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle)
     // Check if the default opened source name is saved to the INI file when a source is opened
 	iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data();
 	pHandle->m_OnSourceOpenProperties.m_bSaveDefaultToINI = iniInterface->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCE_SAVEDEFAULT).data(), false);
+}
+
+// This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [SheetCount]
+// section.  This section determines whether the TWAIN driver supports
+// CAP_SHEETCOUNT correctly (interprets the CAP_SHEETCOUNT as the number
+// of sheets of paper, not the number of images)
+void LoadSheetcountProperties(CTL_TwainDLLHandle* pHandle)
+{
+	auto& sheetcount_map = CTL_TwainAppMgr::GetSourceSheetcountMap();
+	sheetcount_map.clear();
+
+	// Get the section name
+	auto* customProfile = CTL_StaticData::GetINIInterface();
+	if (!customProfile)
+		return;
+	CSimpleIniA::TNamesDepend keys;
+	auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SHEETCOUNT_KEY).data();
+	customProfile->GetAllKeys(iniKey, keys);
+	auto iter = keys.begin();
+	while (iter != keys.end())
+	{
+		CSimpleIniA::TNamesDepend vals;
+		customProfile->GetAllValues(iniKey, iter->pItem, vals);
+        if ( !vals.empty() )
+            sheetcount_map.push_back({ iter->pItem,vals.front().pItem });
+		++iter;
+	}
 }
 
 void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)

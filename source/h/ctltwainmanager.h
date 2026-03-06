@@ -57,6 +57,7 @@ namespace dynarithmic
     using SourceToXferReadyList = std::vector<std::pair<std::string, uint32_t>>;
     using SourceFlatbedOnlyList = std::unordered_set<std::string>;
     using SourceGetMessageList = std::unordered_set<std::string>;
+    using SourceSheetcountMap = std::vector<std::pair<std::string, std::string>>;
     using SourcePaperDetectableMap = std::map<std::string, bool>;
 
     class CTL_TwainAppMgr;
@@ -143,7 +144,7 @@ namespace dynarithmic
 
             // Gets the transfer count for a selected source
             static int GetTransferCount( const CTL_ITwainSource *pSource );
-            static int SetTransferCount( const CTL_ITwainSource *pSource, int nCount );
+            static int SetTransferCount( CTL_ITwainSource *pSource, int nCount );
 
             // Get capabilities for selected source
             static void GetCapabilities(const CTL_ITwainSource *pSource,CTL_TwainCapArray& rArray);
@@ -263,6 +264,7 @@ namespace dynarithmic
             static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_SourceFlatbedOnlyList; }
             static SourceGetMessageList& GetSourceGetMessageList() { return s_SourceGetMessageList; }
             static SourcePaperDetectableMap& GetSourcePaperDetectionMap() { return s_SourcePaperDetectableMap; }
+            static SourceSheetcountMap& GetSourceSheetcountMap() { return s_SourceSheetcountList; }
             const CTL_TwainTriplet* GetCurrentTriplet() const { return m_pCurrentTriplet;}
 
         private:
@@ -470,6 +472,7 @@ namespace dynarithmic
             static SourceFlatbedOnlyList s_SourceFlatbedOnlyList;
             static SourceGetMessageList s_SourceGetMessageList;
             static SourcePaperDetectableMap s_SourcePaperDetectableMap;
+            static SourceSheetcountMap      s_SourceSheetcountList;
     };
 
     #define DTWAIN_ERROR_CONDITION(Err, RetVal, mustReport) {               \
