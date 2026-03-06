@@ -318,7 +318,21 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN;},
                                         DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
 
-    // adjust the container types for GETHELP, GETLABEL, and GETLABELENUM
+    bool useLogging = CTL_StaticData::GetLogFilterFlags() ? true : false;
+
+    // make sure we have DTWAIN compatible container, 
+    // in case the programmer passed-in the TWAIN equivalent container
+    auto oldContainerType = lContainerType;
+    lContainerType = GetDTWAINContainerFromTWAINContainer(lContainerType);
+    if (oldContainerType != lContainerType && useLogging)
+    {
+        auto newName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DTWAIN_CONT, lContainerType).second;
+        auto oldName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWON, oldContainerType).second;
+        std::ostringstream strm;
+        strm << "Changing container type for GET... operation from " << oldName << " to " << newName;
+        LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+    }
+
     switch (lGetType)
     {
         case DTWAIN_CAPGETHELP:
@@ -413,7 +427,7 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
     if ( lGetType == MSG_GET )
 	    SetCapabilityInfo<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(pHandle, pSource, lContainerType, lCap);
 
-    MoveArray(pHandle, pArray, &ThisArray); 
+    dynarithmic::MoveArray(pHandle, pArray, &ThisArray); 
     dynarithmic::DumpArrayContents(*pArray, lCap);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -441,6 +455,21 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
 
     if ( !CTL_CapabilityTriplet::IsCapOperationReset(lSetType) )
     {
+		bool useLogging = CTL_StaticData::GetLogFilterFlags() ? true : false;
+
+		// make sure we have DTWAIN compatible container, 
+		// in case the programmer passed-in the TWAIN equivalent container
+		auto oldContainerType = lContainerType;
+		lContainerType = GetDTWAINContainerFromTWAINContainer(lContainerType);
+		if (oldContainerType != lContainerType && useLogging)
+		{
+			auto newName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DTWAIN_CONT, lContainerType).second;
+			auto oldName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWON, oldContainerType).second;
+			std::ostringstream strm;
+			strm << "Changing container type for SET... operation from " << oldName << " to " << newName;
+			LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+		}
+
 		// Test to see if array is valid and non-empty (must have at least one value for MSG_SET operations)
         bool isValid = pHandle->m_ArrayFactory->is_valid(pArray);
         bool isEmpty = false;

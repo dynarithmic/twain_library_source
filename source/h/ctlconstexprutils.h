@@ -565,6 +565,48 @@ namespace dynarithmic
     {
         return  (value + (upto - 1)) / upto * upto;
     }
+
+	static constexpr int GetDTWAINContainerFromTWAINContainer(int containerType) noexcept
+	{
+        switch (containerType)
+        {
+            case TWON_ONEVALUE:
+            case DTWAIN_CONTONEVALUE:
+                return DTWAIN_CONTONEVALUE;
+
+            case TWON_RANGE:
+            case DTWAIN_CONTRANGE:
+                return DTWAIN_CONTRANGE;
+
+			case TWON_ARRAY:
+			case DTWAIN_CONTARRAY:
+				return DTWAIN_CONTARRAY;
+
+			case TWON_ENUMERATION:
+			case DTWAIN_CONTENUMERATION:
+				return DTWAIN_CONTENUMERATION;
+        }
+        return containerType;
+	}
+
+	static constexpr int GetTWAINContainerFromDTWAINContainer(int containerType) noexcept
+	{
+		switch (containerType)
+		{
+		    case DTWAIN_CONTONEVALUE:
+                return TWON_ONEVALUE;
+
+		    case DTWAIN_CONTRANGE:
+                return TWON_RANGE;
+
+		    case DTWAIN_CONTARRAY:
+                return TWON_ARRAY;
+
+		    case DTWAIN_CONTENUMERATION:
+			    return TWON_ENUMERATION;
+		}
+		return containerType;
+	}
 };
 
 #endif
