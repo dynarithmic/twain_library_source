@@ -42,7 +42,7 @@ DTWAIN Version changes
 
   Previously, these functions only accepted the DTWAIN container names, for example,
   DTWAIN_CONTONEVALUE instead of TWON_ONEVALUE.  Now these functions will accept the 
-  DTWAIN container constant name of the TWAIN container constant name.
+  DTWAIN container constant name or the TWAIN container constant name.
 
 
 - Added sending DTWAIN_TN_ACQUIREPAGESTOPPING and DTWAIN_TN_ACQUIREPAGESTOPPED notifications
