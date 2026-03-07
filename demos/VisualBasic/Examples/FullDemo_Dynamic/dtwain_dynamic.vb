@@ -631,6 +631,8 @@ Namespace Dynarithmic
         Public Const DTWAIN_TN_FILECOMPRESSTYPEMISMATCH As Integer = 1302
         Public Const DTWAIN_TN_SOURCEDETAILS As Integer = 1304
         Public Const DTWAIN_TN_QUERYACQUIREPAGES As Integer = 1305
+        Public Const DTWAIN_TN_ACQUIREPAGESSTOPPING As Integer = 1306
+        Public Const DTWAIN_TN_ACQUIREPAGESSTOPPED As Integer = 1307
         Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
         Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
         Public Const DTWAIN_MODAL As Integer = 0
@@ -1893,6 +1895,8 @@ Namespace Dynarithmic
         Public Const DTWAIN_CONSTANT_CAPCODE_MAP As Integer = 80
         Public Const DTWAIN_CONSTANT_ACAP As Integer = 81
         Public Const DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC As Integer = 82
+        Public Const DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT As Integer = 83
+        Public Const DTWAIN_CONSTANT_ERROR_NAMES As Integer = 84
         Public Const DTWAIN_USERRES_START As Integer = 20000
         Public Const DTWAIN_USERRES_MAXSIZE As Integer = 8192
         Public Const DTWAIN_APIHANDLEOK As Integer = 1
@@ -4170,6 +4174,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetLightSourcesDelegate(Source As System.IntPtr, LightSources As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_SetLogSaveThresholdDelegate(lineCount As System.Int64) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetLoggerCallbackDelegate(logProc As DTwainLoggerProc, UserData As System.Int64) As Integer
@@ -7455,6 +7462,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetLightSources(Source, LightSources)
         End Function
         
+        Public Function DTWAIN_SetLogSaveThreshold(lineCount As System.Int64) As Integer
+        Return api.DTWAIN_SetLogSaveThreshold(lineCount)
+        End Function
+        
         Public Function DTWAIN_SetLoggerCallback(logProc As DTwainLoggerProc, UserData As System.Int64) As Integer
         Return api.DTWAIN_SetLoggerCallback(logProc, UserData)
         End Function
@@ -8572,6 +8583,7 @@ Namespace Dynarithmic
             Public DTWAIN_SetLightPathEx As DTWAIN_SetLightPathExDelegate
             Public DTWAIN_SetLightSource As DTWAIN_SetLightSourceDelegate
             Public DTWAIN_SetLightSources As DTWAIN_SetLightSourcesDelegate
+            Public DTWAIN_SetLogSaveThreshold As DTWAIN_SetLogSaveThresholdDelegate
             Public DTWAIN_SetLoggerCallback As DTWAIN_SetLoggerCallbackDelegate
             Public DTWAIN_SetManualDuplexMode As DTWAIN_SetManualDuplexModeDelegate
             Public DTWAIN_SetMaxAcquisitions As DTWAIN_SetMaxAcquisitionsDelegate

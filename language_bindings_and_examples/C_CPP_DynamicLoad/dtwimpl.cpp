@@ -1065,6 +1065,7 @@
     D_SETLIGHTPATHEXFUNC                          DYNDTWAIN_API::DTWAIN_SetLightPathEx = nullptr;
     D_SETLIGHTSOURCEFUNC                          DYNDTWAIN_API::DTWAIN_SetLightSource = nullptr;
     D_SETLIGHTSOURCESFUNC                         DYNDTWAIN_API::DTWAIN_SetLightSources = nullptr;
+    D_SETLOGSAVETHRESHOLDFUNC                     DYNDTWAIN_API::DTWAIN_SetLogSaveThreshold = nullptr;
     D_SETLOGGERCALLBACKFUNC                       DYNDTWAIN_API::DTWAIN_SetLoggerCallback = nullptr;
     D_SETLOGGERCALLBACKAFUNC                      DYNDTWAIN_API::DTWAIN_SetLoggerCallbackA = nullptr;
     D_SETLOGGERCALLBACKWFUNC                      DYNDTWAIN_API::DTWAIN_SetLoggerCallbackW = nullptr;
@@ -2298,6 +2299,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SetLightPathEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetLightSource, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetLightSources, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_SetLogSaveThreshold, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetLoggerCallback, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetLoggerCallbackA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetLoggerCallbackW, hModule);

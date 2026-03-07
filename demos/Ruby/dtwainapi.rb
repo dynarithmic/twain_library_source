@@ -1144,6 +1144,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_SetLightPathEx
    attr_reader :DTWAIN_SetLightSource
    attr_reader :DTWAIN_SetLightSources
+   attr_reader :DTWAIN_SetLogSaveThreshold
    attr_reader :DTWAIN_SetLoggerCallback
    attr_reader :DTWAIN_SetLoggerCallbackA
    attr_reader :DTWAIN_SetLoggerCallbackW
@@ -1662,6 +1663,8 @@ class DTWAINAPI
    DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302
    DTWAIN_TN_SOURCEDETAILS = 1304
    DTWAIN_TN_QUERYACQUIREPAGES = 1305
+   DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306
+   DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
    DTWAIN_PDFOCR_CLEANTEXT1 = 1
    DTWAIN_PDFOCR_CLEANTEXT2 = 2
    DTWAIN_MODAL = 0
@@ -2924,6 +2927,8 @@ class DTWAINAPI
    DTWAIN_CONSTANT_CAPCODE_MAP = 80
    DTWAIN_CONSTANT_ACAP = 81
    DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC = 82
+   DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT = 83
+   DTWAIN_CONSTANT_ERROR_NAMES = 84
    DTWAIN_USERRES_START = 20000
    DTWAIN_USERRES_MAXSIZE = 8192
    DTWAIN_APIHANDLEOK = 1
@@ -3983,6 +3988,7 @@ class DTWAINAPI
        @DTWAIN_SetLightPathEx = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLightPathEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SetLightSource = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLightSource'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetLightSources = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLightSources'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_SetLogSaveThreshold = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLogSaveThreshold'],[Fiddle::TYPE_LONG_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetLoggerCallback = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLoggerCallback'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetLoggerCallbackA = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLoggerCallbackA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetLoggerCallbackW = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLoggerCallbackW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG_LONG],Fiddle::TYPE_INT)

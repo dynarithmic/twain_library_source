@@ -1083,6 +1083,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetLightPathEx(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightPaths);
         DTWAIN_BOOL DTWAIN_SetLightSource(DTWAIN_SOURCE Source, LONG LightSource);
         DTWAIN_BOOL DTWAIN_SetLightSources(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightSources);
+        DTWAIN_BOOL DTWAIN_SetLogSaveThreshold(LONG64 lineCount);
         DTWAIN_BOOL DTWAIN_SetLoggerCallback(DTWAIN_LOGGER_PROC logProc, DTWAIN_LONG64 UserData);
         DTWAIN_BOOL DTWAIN_SetLoggerCallbackA(DTWAIN_LOGGER_PROCA logProc, DTWAIN_LONG64 UserData);
         DTWAIN_BOOL DTWAIN_SetLoggerCallbackW(DTWAIN_LOGGER_PROCW logProc, DTWAIN_LONG64 UserData);
@@ -2300,6 +2301,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetLightPathEx(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightPaths);
         DTWAIN_BOOL DTWAIN_SetLightSource(DTWAIN_SOURCE Source, LONG LightSource);
         DTWAIN_BOOL DTWAIN_SetLightSources(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightSources);
+        DTWAIN_BOOL DTWAIN_SetLogSaveThreshold(LONG64 lineCount);
         DTWAIN_BOOL DTWAIN_SetLoggerCallback(DTWAIN_LOGGER_PROC logProc, DTWAIN_LONG64 UserData);
         DTWAIN_BOOL DTWAIN_SetLoggerCallbackA(DTWAIN_LOGGER_PROCA logProc, DTWAIN_LONG64 UserData);
         DTWAIN_BOOL DTWAIN_SetLoggerCallbackW(DTWAIN_LOGGER_PROCW logProc, DTWAIN_LONG64 UserData);
@@ -3517,6 +3519,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetLightPathEx(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightPaths);
         DTWAIN_BOOL DTWAIN_SetLightSource(DTWAIN_SOURCE Source, LONG LightSource);
         DTWAIN_BOOL DTWAIN_SetLightSources(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightSources);
+        DTWAIN_BOOL DTWAIN_SetLogSaveThreshold(LONG64 lineCount);
         DTWAIN_BOOL DTWAIN_SetLoggerCallback(DTWAIN_LOGGER_PROC logProc, DTWAIN_LONG64 UserData);
         DTWAIN_BOOL DTWAIN_SetLoggerCallbackA(DTWAIN_LOGGER_PROCA logProc, DTWAIN_LONG64 UserData);
         DTWAIN_BOOL DTWAIN_SetLoggerCallbackW(DTWAIN_LOGGER_PROCW logProc, DTWAIN_LONG64 UserData);
@@ -4734,6 +4737,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetLightPathEx(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightPaths);
         DTWAIN_BOOL DTWAIN_SetLightSource(DTWAIN_SOURCE Source, LONG LightSource);
         DTWAIN_BOOL DTWAIN_SetLightSources(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightSources);
+        DTWAIN_BOOL DTWAIN_SetLogSaveThreshold(LONG64 lineCount);
         DTWAIN_BOOL DTWAIN_SetLoggerCallback(DTWAIN_LOGGER_PROC logProc, DTWAIN_LONG64 UserData);
         DTWAIN_BOOL DTWAIN_SetLoggerCallbackA(DTWAIN_LOGGER_PROCA logProc, DTWAIN_LONG64 UserData);
         DTWAIN_BOOL DTWAIN_SetLoggerCallbackW(DTWAIN_LOGGER_PROCW logProc, DTWAIN_LONG64 UserData);

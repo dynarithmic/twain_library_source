@@ -1056,6 +1056,7 @@ type DtwainsetlightpathFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainsetlightpathexFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
 type DtwainsetlightsourceFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainsetlightsourcesFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainsetlogsavethresholdFunc = unsafe extern "C" fn(i64) -> i32;
 type DtwainsetloggercallbackFunc = unsafe extern "C" fn(DTWAIN_LOGGER_PROC,i64) -> i32;
 type DtwainsetloggercallbackaFunc = unsafe extern "C" fn(DTWAIN_LOGGER_PROCA,i64) -> i32;
 type DtwainsetloggercallbackwFunc = unsafe extern "C" fn(DTWAIN_LOGGER_PROCW,i64) -> i32;
@@ -2218,6 +2219,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_SetLightPathExFunc: Symbol<'a, DtwainsetlightpathexFunc>,
     DTWAIN_SetLightSourceFunc: Symbol<'a, DtwainsetlightsourceFunc>,
     DTWAIN_SetLightSourcesFunc: Symbol<'a, DtwainsetlightsourcesFunc>,
+    DTWAIN_SetLogSaveThresholdFunc: Symbol<'a, DtwainsetlogsavethresholdFunc>,
     DTWAIN_SetLoggerCallbackFunc: Symbol<'a, DtwainsetloggercallbackFunc>,
     DTWAIN_SetLoggerCallbackAFunc: Symbol<'a, DtwainsetloggercallbackaFunc>,
     DTWAIN_SetLoggerCallbackWFunc: Symbol<'a, DtwainsetloggercallbackwFunc>,
@@ -2739,6 +2741,8 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_TN_FILECOMPRESSTYPEMISMATCH: i32 = 1302;
     pub const DTWAIN_TN_SOURCEDETAILS: i32 = 1304;
     pub const DTWAIN_TN_QUERYACQUIREPAGES: i32 = 1305;
+    pub const DTWAIN_TN_ACQUIREPAGESSTOPPING: i32 = 1306;
+    pub const DTWAIN_TN_ACQUIREPAGESSTOPPED: i32 = 1307;
     pub const DTWAIN_PDFOCR_CLEANTEXT1: i32 = 1;
     pub const DTWAIN_PDFOCR_CLEANTEXT2: i32 = 2;
     pub const DTWAIN_MODAL: i32 = 0;
@@ -4001,6 +4005,8 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_CONSTANT_CAPCODE_MAP: i32 = 80;
     pub const DTWAIN_CONSTANT_ACAP: i32 = 81;
     pub const DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC: i32 = 82;
+    pub const DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT: i32 = 83;
+    pub const DTWAIN_CONSTANT_ERROR_NAMES: i32 = 84;
     pub const DTWAIN_USERRES_START: i32 = 20000;
     pub const DTWAIN_USERRES_MAXSIZE: i32 = 8192;
     pub const DTWAIN_APIHANDLEOK: i32 = 1;
@@ -5021,6 +5027,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_SetLightPathEx: Symbol<DtwainsetlightpathexFunc> = unsafe { library.get(b"DTWAIN_SetLightPathEx")? };
         let DTWAIN_SetLightSource: Symbol<DtwainsetlightsourceFunc> = unsafe { library.get(b"DTWAIN_SetLightSource")? };
         let DTWAIN_SetLightSources: Symbol<DtwainsetlightsourcesFunc> = unsafe { library.get(b"DTWAIN_SetLightSources")? };
+        let DTWAIN_SetLogSaveThreshold: Symbol<DtwainsetlogsavethresholdFunc> = unsafe { library.get(b"DTWAIN_SetLogSaveThreshold")? };
         let DTWAIN_SetLoggerCallback: Symbol<DtwainsetloggercallbackFunc> = unsafe { library.get(b"DTWAIN_SetLoggerCallback")? };
         let DTWAIN_SetLoggerCallbackA: Symbol<DtwainsetloggercallbackaFunc> = unsafe { library.get(b"DTWAIN_SetLoggerCallbackA")? };
         let DTWAIN_SetLoggerCallbackW: Symbol<DtwainsetloggercallbackwFunc> = unsafe { library.get(b"DTWAIN_SetLoggerCallbackW")? };
@@ -6182,6 +6189,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_SetLightPathExFunc: DTWAIN_SetLightPathEx,
             DTWAIN_SetLightSourceFunc: DTWAIN_SetLightSource,
             DTWAIN_SetLightSourcesFunc: DTWAIN_SetLightSources,
+            DTWAIN_SetLogSaveThresholdFunc: DTWAIN_SetLogSaveThreshold,
             DTWAIN_SetLoggerCallbackFunc: DTWAIN_SetLoggerCallback,
             DTWAIN_SetLoggerCallbackAFunc: DTWAIN_SetLoggerCallbackA,
             DTWAIN_SetLoggerCallbackWFunc: DTWAIN_SetLoggerCallbackW,
@@ -10371,6 +10379,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_SetLightSources(&self, Source: *mut c_void, LightSources: *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_SetLightSourcesFunc)(Source, LightSources);  }
+    }
+
+    pub fn DTWAIN_SetLogSaveThreshold(&self, lineCount: i64) -> i32 {
+        unsafe { return (self.DTWAIN_SetLogSaveThresholdFunc)(lineCount);  }
     }
 
     pub fn DTWAIN_SetLoggerCallback(&self, logProc: DTWAIN_LOGGER_PROC, UserData: i64) -> i32 {

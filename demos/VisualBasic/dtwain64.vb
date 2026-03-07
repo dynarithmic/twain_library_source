@@ -460,6 +460,8 @@ Class DTWAINAPI
     Public Const DTWAIN_TN_FILECOMPRESSTYPEMISMATCH As Integer = 1302
     Public Const DTWAIN_TN_SOURCEDETAILS As Integer = 1304
     Public Const DTWAIN_TN_QUERYACQUIREPAGES As Integer = 1305
+    Public Const DTWAIN_TN_ACQUIREPAGESSTOPPING As Integer = 1306
+    Public Const DTWAIN_TN_ACQUIREPAGESSTOPPED As Integer = 1307
     Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
     Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
     Public Const DTWAIN_MODAL As Integer = 0
@@ -1722,6 +1724,8 @@ Class DTWAINAPI
     Public Const DTWAIN_CONSTANT_CAPCODE_MAP As Integer = 80
     Public Const DTWAIN_CONSTANT_ACAP As Integer = 81
     Public Const DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC As Integer = 82
+    Public Const DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT As Integer = 83
+    Public Const DTWAIN_CONSTANT_ERROR_NAMES As Integer = 84
     Public Const DTWAIN_USERRES_START As Integer = 20000
     Public Const DTWAIN_USERRES_MAXSIZE As Integer = 8192
     Public Const DTWAIN_APIHANDLEOK As Integer = 1
@@ -2493,6 +2497,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_SetLightPathEx Lib "dtwain64.dll" (Source As System.IntPtr, LightPaths As System.IntPtr) As Integer
     Public Declare Function DTWAIN_SetLightSource Lib "dtwain64.dll" (Source As System.IntPtr, LightSource As Integer) As Integer
     Public Declare Function DTWAIN_SetLightSources Lib "dtwain64.dll" (Source As System.IntPtr, LightSources As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_SetLogSaveThreshold Lib "dtwain64.dll" (lineCount As System.Int64) As Integer
     Public Declare Function DTWAIN_SetLoggerCallback Lib "dtwain64.dll" (logProc As DTwainLoggerProc, UserData As System.Int64) As Integer
     Public Declare Function DTWAIN_SetManualDuplexMode Lib "dtwain64.dll" (Source As System.IntPtr, Flags As Integer, bSet As Integer) As Integer
     Public Declare Function DTWAIN_SetMaxAcquisitions Lib "dtwain64.dll" (Source As System.IntPtr, MaxAcquires As Integer) As Integer

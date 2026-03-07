@@ -513,6 +513,8 @@ namespace Dynarithmic
         public const int DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
         public const int DTWAIN_TN_SOURCEDETAILS = 1304;
         public const int DTWAIN_TN_QUERYACQUIREPAGES = 1305;
+        public const int DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
+        public const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
@@ -1775,6 +1777,8 @@ namespace Dynarithmic
         public const int DTWAIN_CONSTANT_CAPCODE_MAP = 80;
         public const int DTWAIN_CONSTANT_ACAP = 81;
         public const int DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC = 82;
+        public const int DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT = 83;
+        public const int DTWAIN_CONSTANT_ERROR_NAMES = 84;
         public const int DTWAIN_USERRES_START = 20000;
         public const int DTWAIN_USERRES_MAXSIZE = 8192;
         public const int DTWAIN_APIHANDLEOK = 1;
@@ -4251,6 +4255,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_SetLightSources(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightSources);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_SetLogSaveThreshold(LONG64 lineCount);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_SetLoggerCallback(DTwainLoggerProc logProc, long UserData);

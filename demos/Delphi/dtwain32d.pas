@@ -556,6 +556,8 @@ const
   DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
   DTWAIN_TN_SOURCEDETAILS = 1304;
   DTWAIN_TN_QUERYACQUIREPAGES = 1305;
+  DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
+  DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
   DTWAIN_PDFOCR_CLEANTEXT1 = 1;
   DTWAIN_PDFOCR_CLEANTEXT2 = 2;
   DTWAIN_MODAL = 0;
@@ -1818,6 +1820,8 @@ const
   DTWAIN_CONSTANT_CAPCODE_MAP = 80;
   DTWAIN_CONSTANT_ACAP = 81;
   DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC = 82;
+  DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT = 83;
+  DTWAIN_CONSTANT_ERROR_NAMES = 84;
   DTWAIN_USERRES_START = 20000;
   DTWAIN_USERRES_MAXSIZE = 8192;
   DTWAIN_APIHANDLEOK = 1;
@@ -2846,6 +2850,7 @@ function DTWAIN_SetLightPath(Source:DTWAIN_SOURCE; LightPath:LONG) : BOOL; stdca
 function DTWAIN_SetLightPathEx(Source:DTWAIN_SOURCE; LightPaths:DTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_SetLightPathEx';
 function DTWAIN_SetLightSource(Source:DTWAIN_SOURCE; LightSource:LONG) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_SetLightSource';
 function DTWAIN_SetLightSources(Source:DTWAIN_SOURCE; LightSources:DTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_SetLightSources';
+function DTWAIN_SetLogSaveThreshold(lineCount:Int64) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_SetLogSaveThreshold';
 function DTWAIN_SetLoggerCallback(logProc:DTwainLoggerProc; UserData:Int64) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_SetLoggerCallback';
 function DTWAIN_SetLoggerCallbackA(logProc:DTwainLoggerProcA; UserData:Int64) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_SetLoggerCallbackA';
 function DTWAIN_SetLoggerCallbackW(logProc:DTwainLoggerProcW; UserData:Int64) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_SetLoggerCallbackW';
