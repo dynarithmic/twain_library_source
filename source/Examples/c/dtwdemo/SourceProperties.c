@@ -81,6 +81,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
         wsprintf(szBuf, _T("%d.%d"), nMajor, nMinor);
         SetWindowText(hWndVersion, szBuf);
 
+        CheckDlgButton(hDlg, IDC_chkResetCapsOnClose, BST_CHECKED);
         DTWAIN_EnumSupportedCaps(g_CurrentSource, &CapArray);
         nCapCount = DTWAIN_ArrayGetCount(CapArray);
         for (nIndex = 0; nIndex < nCapCount; nIndex++)
@@ -148,7 +149,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
     {
         int nControl = LOWORD(wParam);
         int nNotification = HIWORD(wParam);
-
+		HWND hCheckBox = GetDlgItem(hDlg, IDC_chkResetCapsOnClose);
         switch (nControl)
         {
             /* Quit the dialog */
@@ -159,8 +160,10 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 MessageBoxA(NULL, "You must close the Source user interface before leaving this dialog", "Information", MB_ICONSTOP);
                 return FALSE;
             }
-            /* User may have done a lot of capability testing,
-            so make sure we reset all the caps to default when we return */
+            /* User may have done a lot of capability testing, 
+            so make sure we reset all the caps to default when we return if requested */
+            LRESULT checkState = SendMessage(hCheckBox, BM_GETCHECK, 0, 0);
+            if (checkState == BST_CHECKED)
             DTWAIN_SetAllCapsToDefault(g_CurrentSource);
             EndDialog(hDlg, 1);
             break;
