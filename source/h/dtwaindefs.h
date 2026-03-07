@@ -1061,9 +1061,10 @@
 #define DTWAIN_ERR_OPERATION_NOTSUPPORTED  (-2504)
 #define DTWAIN_ERR_INVALID_PDFTEXTELEMENT  (-2505)
 #define DTWAIN_ERR_SETCAP_FAILED           (-2506)
+#define DTWAIN_ERR_CAP_INVALIDSTATE        (-2507)
 
-#define DTWAIN_ERR_LAST                    (DTWAIN_ERR_USER_START + 1)
 #define DTWAIN_ERR_USER_START              (-80000)  
+#define DTWAIN_ERR_LAST                    (DTWAIN_ERR_USER_START + 1)
 
 /* Device event constants (these values are pow(2, value), where value
    is the TWAIN 1.8 value)*/

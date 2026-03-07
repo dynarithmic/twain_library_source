@@ -607,6 +607,31 @@ namespace dynarithmic
 		}
 		return containerType;
 	}
+
+	static constexpr bool IsValidContainerType(TW_UINT16 containerType, bool testDTWAINType = true)
+	{
+		switch (containerType)
+		{
+            case TWON_ONEVALUE:
+            case TWON_RANGE:
+            case TWON_ARRAY:
+            case TWON_ENUMERATION:
+                return true;
+		}
+        if (testDTWAINType)
+        {
+            switch (containerType)
+            {
+                case DTWAIN_CONTONEVALUE:
+                case DTWAIN_CONTRANGE:
+                case DTWAIN_CONTARRAY:
+                case DTWAIN_CONTENUMERATION:
+                case DTWAIN_CONTDEFAULT:
+                    return true;
+            }
+        }
+        return false;
+	}
 };
 
 #endif
