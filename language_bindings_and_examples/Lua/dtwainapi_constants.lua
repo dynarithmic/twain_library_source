@@ -869,6 +869,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_ERR_OPERATION_NOTSUPPORTED = (-2504)
    dtwain_constants.DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505)
    dtwain_constants.DTWAIN_ERR_SETCAP_FAILED = (-2506)
+   dtwain_constants.DTWAIN_ERR_CAP_INVALIDSTATE = (-2507)
    dtwain_constants.DTWAIN_DE_CHKAUTOCAPTURE = 1
    dtwain_constants.DTWAIN_DE_CHKBATTERY = 2
    dtwain_constants.DTWAIN_DE_CHKDEVICEONLINE = 4
