@@ -296,6 +296,7 @@ type DtwainenumbrightnessvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) ->
 type DtwainenumcamerasFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumcamerasexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type Dtwainenumcamerasex2Func = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumcaplabelsFunc = unsafe extern "C" fn(i32) -> *mut c_void;
 type DtwainenumcompressiontypesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumcompressiontypesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type Dtwainenumcompressiontypesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
@@ -469,6 +470,12 @@ type DtwaingetcapdatatypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwaingetcapfromnameFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingetcapfromnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
 type DtwaingetcapfromnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingetcaphelpFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetcaphelpaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type DtwaingetcaphelpwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetcaplabelFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetcaplabelaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type DtwaingetcaplabelwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
 type DtwaingetcapoperationsFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
 type DtwaingetcapoperationsexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwaingetcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut *mut c_void) -> i32;
@@ -1459,6 +1466,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_EnumCamerasFunc: Symbol<'a, DtwainenumcamerasFunc>,
     DTWAIN_EnumCamerasExFunc: Symbol<'a, DtwainenumcamerasexFunc>,
     DTWAIN_EnumCamerasEx2Func: Symbol<'a, Dtwainenumcamerasex2Func>,
+    DTWAIN_EnumCapLabelsFunc: Symbol<'a, DtwainenumcaplabelsFunc>,
     DTWAIN_EnumCompressionTypesFunc: Symbol<'a, DtwainenumcompressiontypesFunc>,
     DTWAIN_EnumCompressionTypesExFunc: Symbol<'a, DtwainenumcompressiontypesexFunc>,
     DTWAIN_EnumCompressionTypesEx2Func: Symbol<'a, Dtwainenumcompressiontypesex2Func>,
@@ -1632,6 +1640,12 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetCapFromNameFunc: Symbol<'a, DtwaingetcapfromnameFunc>,
     DTWAIN_GetCapFromNameAFunc: Symbol<'a, DtwaingetcapfromnameaFunc>,
     DTWAIN_GetCapFromNameWFunc: Symbol<'a, DtwaingetcapfromnamewFunc>,
+    DTWAIN_GetCapHelpFunc: Symbol<'a, DtwaingetcaphelpFunc>,
+    DTWAIN_GetCapHelpAFunc: Symbol<'a, DtwaingetcaphelpaFunc>,
+    DTWAIN_GetCapHelpWFunc: Symbol<'a, DtwaingetcaphelpwFunc>,
+    DTWAIN_GetCapLabelFunc: Symbol<'a, DtwaingetcaplabelFunc>,
+    DTWAIN_GetCapLabelAFunc: Symbol<'a, DtwaingetcaplabelaFunc>,
+    DTWAIN_GetCapLabelWFunc: Symbol<'a, DtwaingetcaplabelwFunc>,
     DTWAIN_GetCapOperationsFunc: Symbol<'a, DtwaingetcapoperationsFunc>,
     DTWAIN_GetCapOperationsExFunc: Symbol<'a, DtwaingetcapoperationsexFunc>,
     DTWAIN_GetCapValuesFunc: Symbol<'a, DtwaingetcapvaluesFunc>,
@@ -3224,6 +3238,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_ERR_INVALID_PDFTEXTELEMENT: i32 = -2505;
     pub const DTWAIN_ERR_SETCAP_FAILED: i32 = -2506;
     pub const DTWAIN_ERR_CAP_INVALIDSTATE: i32 = -2507;
+    pub const DTWAIN_ERR_GETCAP_FAILED: i32 = -2508;
     pub const DTWAIN_DE_CHKAUTOCAPTURE: i32 = 1;
     pub const DTWAIN_DE_CHKBATTERY: i32 = 2;
     pub const DTWAIN_DE_CHKDEVICEONLINE: i32 = 4;
@@ -4268,6 +4283,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_EnumCameras: Symbol<DtwainenumcamerasFunc> = unsafe { library.get(b"DTWAIN_EnumCameras")? };
         let DTWAIN_EnumCamerasEx: Symbol<DtwainenumcamerasexFunc> = unsafe { library.get(b"DTWAIN_EnumCamerasEx")? };
         let DTWAIN_EnumCamerasEx2: Symbol<Dtwainenumcamerasex2Func> = unsafe { library.get(b"DTWAIN_EnumCamerasEx2")? };
+        let DTWAIN_EnumCapLabels: Symbol<DtwainenumcaplabelsFunc> = unsafe { library.get(b"DTWAIN_EnumCapLabels")? };
         let DTWAIN_EnumCompressionTypes: Symbol<DtwainenumcompressiontypesFunc> = unsafe { library.get(b"DTWAIN_EnumCompressionTypes")? };
         let DTWAIN_EnumCompressionTypesEx: Symbol<DtwainenumcompressiontypesexFunc> = unsafe { library.get(b"DTWAIN_EnumCompressionTypesEx")? };
         let DTWAIN_EnumCompressionTypesEx2: Symbol<Dtwainenumcompressiontypesex2Func> = unsafe { library.get(b"DTWAIN_EnumCompressionTypesEx2")? };
@@ -4441,6 +4457,12 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetCapFromName: Symbol<DtwaingetcapfromnameFunc> = unsafe { library.get(b"DTWAIN_GetCapFromName")? };
         let DTWAIN_GetCapFromNameA: Symbol<DtwaingetcapfromnameaFunc> = unsafe { library.get(b"DTWAIN_GetCapFromNameA")? };
         let DTWAIN_GetCapFromNameW: Symbol<DtwaingetcapfromnamewFunc> = unsafe { library.get(b"DTWAIN_GetCapFromNameW")? };
+        let DTWAIN_GetCapHelp: Symbol<DtwaingetcaphelpFunc> = unsafe { library.get(b"DTWAIN_GetCapHelp")? };
+        let DTWAIN_GetCapHelpA: Symbol<DtwaingetcaphelpaFunc> = unsafe { library.get(b"DTWAIN_GetCapHelpA")? };
+        let DTWAIN_GetCapHelpW: Symbol<DtwaingetcaphelpwFunc> = unsafe { library.get(b"DTWAIN_GetCapHelpW")? };
+        let DTWAIN_GetCapLabel: Symbol<DtwaingetcaplabelFunc> = unsafe { library.get(b"DTWAIN_GetCapLabel")? };
+        let DTWAIN_GetCapLabelA: Symbol<DtwaingetcaplabelaFunc> = unsafe { library.get(b"DTWAIN_GetCapLabelA")? };
+        let DTWAIN_GetCapLabelW: Symbol<DtwaingetcaplabelwFunc> = unsafe { library.get(b"DTWAIN_GetCapLabelW")? };
         let DTWAIN_GetCapOperations: Symbol<DtwaingetcapoperationsFunc> = unsafe { library.get(b"DTWAIN_GetCapOperations")? };
         let DTWAIN_GetCapOperationsEx: Symbol<DtwaingetcapoperationsexFunc> = unsafe { library.get(b"DTWAIN_GetCapOperationsEx")? };
         let DTWAIN_GetCapValues: Symbol<DtwaingetcapvaluesFunc> = unsafe { library.get(b"DTWAIN_GetCapValues")? };
@@ -5430,6 +5452,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_EnumCamerasFunc: DTWAIN_EnumCameras,
             DTWAIN_EnumCamerasExFunc: DTWAIN_EnumCamerasEx,
             DTWAIN_EnumCamerasEx2Func: DTWAIN_EnumCamerasEx2,
+            DTWAIN_EnumCapLabelsFunc: DTWAIN_EnumCapLabels,
             DTWAIN_EnumCompressionTypesFunc: DTWAIN_EnumCompressionTypes,
             DTWAIN_EnumCompressionTypesExFunc: DTWAIN_EnumCompressionTypesEx,
             DTWAIN_EnumCompressionTypesEx2Func: DTWAIN_EnumCompressionTypesEx2,
@@ -5603,6 +5626,12 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetCapFromNameFunc: DTWAIN_GetCapFromName,
             DTWAIN_GetCapFromNameAFunc: DTWAIN_GetCapFromNameA,
             DTWAIN_GetCapFromNameWFunc: DTWAIN_GetCapFromNameW,
+            DTWAIN_GetCapHelpFunc: DTWAIN_GetCapHelp,
+            DTWAIN_GetCapHelpAFunc: DTWAIN_GetCapHelpA,
+            DTWAIN_GetCapHelpWFunc: DTWAIN_GetCapHelpW,
+            DTWAIN_GetCapLabelFunc: DTWAIN_GetCapLabel,
+            DTWAIN_GetCapLabelAFunc: DTWAIN_GetCapLabelA,
+            DTWAIN_GetCapLabelWFunc: DTWAIN_GetCapLabelW,
             DTWAIN_GetCapOperationsFunc: DTWAIN_GetCapOperations,
             DTWAIN_GetCapOperationsExFunc: DTWAIN_GetCapOperationsEx,
             DTWAIN_GetCapValuesFunc: DTWAIN_GetCapValues,
@@ -7342,6 +7371,10 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_EnumCamerasEx2Func)(Source, nWhichCamera);  }
     }
 
+    pub fn DTWAIN_EnumCapLabels(&self, lCapability: i32) -> *mut c_void {
+        unsafe { return (self.DTWAIN_EnumCapLabelsFunc)(lCapability);  }
+    }
+
     pub fn DTWAIN_EnumCompressionTypes(&self, Source: *mut c_void, pArray: *mut *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_EnumCompressionTypesFunc)(Source, pArray);  }
     }
@@ -8032,6 +8065,30 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetCapFromNameW(&self, szName: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_GetCapFromNameWFunc)(szName);  }
+    }
+
+    pub fn DTWAIN_GetCapHelp(&self, lCapability: i32, lpszOut: *mut u16, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetCapHelpFunc)(lCapability, lpszOut, nSize);  }
+    }
+
+    pub fn DTWAIN_GetCapHelpA(&self, lCapability: i32, lpszOut: *mut c_char, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetCapHelpAFunc)(lCapability, lpszOut, nSize);  }
+    }
+
+    pub fn DTWAIN_GetCapHelpW(&self, lCapability: i32, lpszOut: *mut u16, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetCapHelpWFunc)(lCapability, lpszOut, nSize);  }
+    }
+
+    pub fn DTWAIN_GetCapLabel(&self, lCapability: i32, lpszOut: *mut u16, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetCapLabelFunc)(lCapability, lpszOut, nSize);  }
+    }
+
+    pub fn DTWAIN_GetCapLabelA(&self, lCapability: i32, lpszOut: *mut c_char, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetCapLabelAFunc)(lCapability, lpszOut, nSize);  }
+    }
+
+    pub fn DTWAIN_GetCapLabelW(&self, lCapability: i32, lpszOut: *mut u16, nnSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetCapLabelWFunc)(lCapability, lpszOut, nnSize);  }
     }
 
     pub fn DTWAIN_GetCapOperations(&self, Source: *mut c_void, lCapability: i32, lpOps: *mut i32) -> i32 {

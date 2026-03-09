@@ -296,6 +296,7 @@ typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ENUMBRIGHTNESSVALUESEXFUNC)              
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_ENUMCAMERASFUNC)                          (DTWAIN_SOURCE, LPDTWAIN_ARRAY);
 typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ENUMCAMERASEXFUNC)                       (DTWAIN_SOURCE);
 typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ENUMCAMERASEX2FUNC)                      (DTWAIN_SOURCE, LONG);
+typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ENUMCAPLABELSFUNC)                       (LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_ENUMCOMPRESSIONTYPESFUNC)                 (DTWAIN_SOURCE, LPDTWAIN_ARRAY);
 typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ENUMCOMPRESSIONTYPESEXFUNC)              (DTWAIN_SOURCE);
 typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ENUMCOMPRESSIONTYPESEX2FUNC)             (DTWAIN_SOURCE, LONG, DTWAIN_BOOL);
@@ -469,6 +470,12 @@ typedef LONG (DLLENTRY_DEF * D_GETCAPDATATYPEFUNC)                              
 typedef LONG (DLLENTRY_DEF * D_GETCAPFROMNAMEFUNC)                              (LPCTSTR);
 typedef LONG (DLLENTRY_DEF * D_GETCAPFROMNAMEAFUNC)                             (LPCSTR);
 typedef LONG (DLLENTRY_DEF * D_GETCAPFROMNAMEWFUNC)                             (LPCWSTR);
+typedef LONG (DLLENTRY_DEF * D_GETCAPHELPFUNC)                                  (LONG, LPTSTR, LONG);
+typedef LONG (DLLENTRY_DEF * D_GETCAPHELPAFUNC)                                 (LONG, LPSTR, LONG);
+typedef LONG (DLLENTRY_DEF * D_GETCAPHELPWFUNC)                                 (LONG, LPWSTR, LONG);
+typedef LONG (DLLENTRY_DEF * D_GETCAPLABELFUNC)                                 (LONG, LPTSTR, LONG);
+typedef LONG (DLLENTRY_DEF * D_GETCAPLABELAFUNC)                                (LONG, LPSTR, LONG);
+typedef LONG (DLLENTRY_DEF * D_GETCAPLABELWFUNC)                                (LONG, LPWSTR, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETCAPOPERATIONSFUNC)                     (DTWAIN_SOURCE, LONG, LPLONG);
 typedef LONG (DLLENTRY_DEF * D_GETCAPOPERATIONSEXFUNC)                          (DTWAIN_SOURCE, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETCAPVALUESFUNC)                         (DTWAIN_SOURCE, LONG, LONG, LPDTWAIN_ARRAY);
@@ -1480,6 +1487,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_ENUMCAMERASFUNC                                DTWAIN_EnumCameras;
     STATIC D_ENUMCAMERASEXFUNC                              DTWAIN_EnumCamerasEx;
     STATIC D_ENUMCAMERASEX2FUNC                             DTWAIN_EnumCamerasEx2;
+    STATIC D_ENUMCAPLABELSFUNC                              DTWAIN_EnumCapLabels;
     STATIC D_ENUMCOMPRESSIONTYPESFUNC                       DTWAIN_EnumCompressionTypes;
     STATIC D_ENUMCOMPRESSIONTYPESEXFUNC                     DTWAIN_EnumCompressionTypesEx;
     STATIC D_ENUMCOMPRESSIONTYPESEX2FUNC                    DTWAIN_EnumCompressionTypesEx2;
@@ -1653,6 +1661,12 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_GETCAPFROMNAMEFUNC                             DTWAIN_GetCapFromName;
     STATIC D_GETCAPFROMNAMEAFUNC                            DTWAIN_GetCapFromNameA;
     STATIC D_GETCAPFROMNAMEWFUNC                            DTWAIN_GetCapFromNameW;
+    STATIC D_GETCAPHELPFUNC                                 DTWAIN_GetCapHelp;
+    STATIC D_GETCAPHELPAFUNC                                DTWAIN_GetCapHelpA;
+    STATIC D_GETCAPHELPWFUNC                                DTWAIN_GetCapHelpW;
+    STATIC D_GETCAPLABELFUNC                                DTWAIN_GetCapLabel;
+    STATIC D_GETCAPLABELAFUNC                               DTWAIN_GetCapLabelA;
+    STATIC D_GETCAPLABELWFUNC                               DTWAIN_GetCapLabelW;
     STATIC D_GETCAPOPERATIONSFUNC                           DTWAIN_GetCapOperations;
     STATIC D_GETCAPOPERATIONSEXFUNC                         DTWAIN_GetCapOperationsEx;
     STATIC D_GETCAPVALUESFUNC                               DTWAIN_GetCapValues;

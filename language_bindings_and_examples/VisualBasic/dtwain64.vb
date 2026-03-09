@@ -943,6 +943,7 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_INVALID_PDFTEXTELEMENT As Integer = (-2505)
     Public Const DTWAIN_ERR_SETCAP_FAILED As Integer = (-2506)
     Public Const DTWAIN_ERR_CAP_INVALIDSTATE As Integer = (-2507)
+    Public Const DTWAIN_ERR_GETCAP_FAILED As Integer = (-2508)
     Public Const DTWAIN_DE_CHKAUTOCAPTURE As Integer = 1
     Public Const DTWAIN_DE_CHKBATTERY As Integer = 2
     Public Const DTWAIN_DE_CHKDEVICEONLINE As Integer = 4
@@ -1946,6 +1947,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_EnumCameras Lib "dtwain64.dll" (Source As System.IntPtr, ByRef Cameras As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumCamerasEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumCamerasEx2 Lib "dtwain64.dll" (Source As System.IntPtr, nWhichCamera As Integer) As System.IntPtr
+    Public Declare Function DTWAIN_EnumCapLabels Lib "dtwain64.dll" (lCapability As Integer) As System.IntPtr
     Public Declare Function DTWAIN_EnumCompressionTypes Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumCompressionTypesEx Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumCompressionTypesEx2 Lib "dtwain64.dll" (Source As System.IntPtr, lFileType As Integer, bUseBufferedMode As Integer) As System.IntPtr
@@ -2091,6 +2093,8 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetCapContainerEx2 Lib "dtwain64.dll" (nCap As Integer, bSetContainer As Integer) As System.IntPtr
     Public Declare Function DTWAIN_GetCapDataType Lib "dtwain64.dll" (Source As System.IntPtr, nCap As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetCapFromName Lib "dtwain64.dll" (szName As String) As Integer
+    Public Declare Ansi Function DTWAIN_GetCapHelp Lib "dtwain64.dll" (lCapability As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
+    Public Declare Ansi Function DTWAIN_GetCapLabel Lib "dtwain64.dll" (lCapability As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
     Public Declare Function DTWAIN_GetCapOperations Lib "dtwain64.dll" (Source As System.IntPtr, lCapability As Integer, ByRef lpOps As Integer) As Integer
     Public Declare Function DTWAIN_GetCapOperationsEx Lib "dtwain64.dll" (Source As System.IntPtr, lCapability As Integer) As Integer
     Public Declare Function DTWAIN_GetCapValues Lib "dtwain64.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer, ByRef pArray As System.IntPtr) As Integer

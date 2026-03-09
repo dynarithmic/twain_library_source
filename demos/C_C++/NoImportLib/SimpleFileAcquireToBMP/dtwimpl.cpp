@@ -303,6 +303,7 @@
     D_ENUMCAMERASFUNC                             DYNDTWAIN_API::DTWAIN_EnumCameras = nullptr;
     D_ENUMCAMERASEXFUNC                           DYNDTWAIN_API::DTWAIN_EnumCamerasEx = nullptr;
     D_ENUMCAMERASEX2FUNC                          DYNDTWAIN_API::DTWAIN_EnumCamerasEx2 = nullptr;
+    D_ENUMCAPLABELSFUNC                           DYNDTWAIN_API::DTWAIN_EnumCapLabels = nullptr;
     D_ENUMCOMPRESSIONTYPESFUNC                    DYNDTWAIN_API::DTWAIN_EnumCompressionTypes = nullptr;
     D_ENUMCOMPRESSIONTYPESEXFUNC                  DYNDTWAIN_API::DTWAIN_EnumCompressionTypesEx = nullptr;
     D_ENUMCOMPRESSIONTYPESEX2FUNC                 DYNDTWAIN_API::DTWAIN_EnumCompressionTypesEx2 = nullptr;
@@ -476,6 +477,12 @@
     D_GETCAPFROMNAMEFUNC                          DYNDTWAIN_API::DTWAIN_GetCapFromName = nullptr;
     D_GETCAPFROMNAMEAFUNC                         DYNDTWAIN_API::DTWAIN_GetCapFromNameA = nullptr;
     D_GETCAPFROMNAMEWFUNC                         DYNDTWAIN_API::DTWAIN_GetCapFromNameW = nullptr;
+    D_GETCAPHELPFUNC                              DYNDTWAIN_API::DTWAIN_GetCapHelp = nullptr;
+    D_GETCAPHELPAFUNC                             DYNDTWAIN_API::DTWAIN_GetCapHelpA = nullptr;
+    D_GETCAPHELPWFUNC                             DYNDTWAIN_API::DTWAIN_GetCapHelpW = nullptr;
+    D_GETCAPLABELFUNC                             DYNDTWAIN_API::DTWAIN_GetCapLabel = nullptr;
+    D_GETCAPLABELAFUNC                            DYNDTWAIN_API::DTWAIN_GetCapLabelA = nullptr;
+    D_GETCAPLABELWFUNC                            DYNDTWAIN_API::DTWAIN_GetCapLabelW = nullptr;
     D_GETCAPOPERATIONSFUNC                        DYNDTWAIN_API::DTWAIN_GetCapOperations = nullptr;
     D_GETCAPOPERATIONSEXFUNC                      DYNDTWAIN_API::DTWAIN_GetCapOperationsEx = nullptr;
     D_GETCAPVALUESFUNC                            DYNDTWAIN_API::DTWAIN_GetCapValues = nullptr;
@@ -1537,6 +1544,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_EnumCameras, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCamerasEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCamerasEx2, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_EnumCapLabels, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCompressionTypes, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCompressionTypesEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumCompressionTypesEx2, hModule);
@@ -1710,6 +1718,12 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetCapFromName, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapFromNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapFromNameW, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCapHelp, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCapHelpA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCapHelpW, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCapLabel, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCapLabelA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCapLabelW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapOperations, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapOperationsEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCapValues, hModule);

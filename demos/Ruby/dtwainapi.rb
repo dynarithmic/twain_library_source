@@ -384,6 +384,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_EnumCameras
    attr_reader :DTWAIN_EnumCamerasEx
    attr_reader :DTWAIN_EnumCamerasEx2
+   attr_reader :DTWAIN_EnumCapLabels
    attr_reader :DTWAIN_EnumCompressionTypes
    attr_reader :DTWAIN_EnumCompressionTypesEx
    attr_reader :DTWAIN_EnumCompressionTypesEx2
@@ -557,6 +558,12 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetCapFromName
    attr_reader :DTWAIN_GetCapFromNameA
    attr_reader :DTWAIN_GetCapFromNameW
+   attr_reader :DTWAIN_GetCapHelp
+   attr_reader :DTWAIN_GetCapHelpA
+   attr_reader :DTWAIN_GetCapHelpW
+   attr_reader :DTWAIN_GetCapLabel
+   attr_reader :DTWAIN_GetCapLabelA
+   attr_reader :DTWAIN_GetCapLabelW
    attr_reader :DTWAIN_GetCapOperations
    attr_reader :DTWAIN_GetCapOperationsEx
    attr_reader :DTWAIN_GetCapValues
@@ -2146,6 +2153,7 @@ class DTWAINAPI
    DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505)
    DTWAIN_ERR_SETCAP_FAILED = (-2506)
    DTWAIN_ERR_CAP_INVALIDSTATE = (-2507)
+   DTWAIN_ERR_GETCAP_FAILED = (-2508)
    DTWAIN_DE_CHKAUTOCAPTURE = 1
    DTWAIN_DE_CHKBATTERY = 2
    DTWAIN_DE_CHKDEVICEONLINE = 4
@@ -3229,6 +3237,7 @@ class DTWAINAPI
        @DTWAIN_EnumCameras = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCameras'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumCamerasEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCamerasEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumCamerasEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCamerasEx2'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
+       @DTWAIN_EnumCapLabels = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCapLabels'],[Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumCompressionTypes = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCompressionTypes'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumCompressionTypesEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCompressionTypesEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumCompressionTypesEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCompressionTypesEx2'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_VOIDP)
@@ -3402,6 +3411,12 @@ class DTWAINAPI
        @DTWAIN_GetCapFromName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapFromName'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetCapFromNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapFromNameA'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetCapFromNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapFromNameW'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
+       @DTWAIN_GetCapHelp = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapHelp'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetCapHelpA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapHelpA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetCapHelpW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapHelpW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetCapLabel = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapLabel'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetCapLabelA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapLabelA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetCapLabelW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapLabelW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetCapOperations = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapOperations'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetCapOperationsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapOperationsEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetCapValues = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCapValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)

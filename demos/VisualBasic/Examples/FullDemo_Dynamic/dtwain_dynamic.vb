@@ -1114,6 +1114,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_ERR_INVALID_PDFTEXTELEMENT As Integer = (-2505)
         Public Const DTWAIN_ERR_SETCAP_FAILED As Integer = (-2506)
         Public Const DTWAIN_ERR_CAP_INVALIDSTATE As Integer = (-2507)
+        Public Const DTWAIN_ERR_GETCAP_FAILED As Integer = (-2508)
         Public Const DTWAIN_DE_CHKAUTOCAPTURE As Integer = 1
         Public Const DTWAIN_DE_CHKBATTERY As Integer = 2
         Public Const DTWAIN_DE_CHKDEVICEONLINE As Integer = 4
@@ -2521,6 +2522,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_EnumCamerasEx2Delegate(Source As System.IntPtr, nWhichCamera As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_EnumCapLabelsDelegate(lCapability As Integer) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumCompressionTypesDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -2954,6 +2958,12 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetCapFromNameDelegate(szName As String) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Private Delegate Function DTWAIN_GetCapHelpDelegate(lCapability As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Private Delegate Function DTWAIN_GetCapLabelDelegate(lCapability As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetCapOperationsDelegate(Source As System.IntPtr, lCapability As Integer, ByRef lpOps As Integer) As Integer
@@ -5255,6 +5265,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_EnumCamerasEx2(Source, nWhichCamera)
         End Function
         
+        Public Function DTWAIN_EnumCapLabels(lCapability As Integer) As System.IntPtr
+        Return api.DTWAIN_EnumCapLabels(lCapability)
+        End Function
+        
         Public Function DTWAIN_EnumCompressionTypes(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
         Return api.DTWAIN_EnumCompressionTypes(Source, pArray)
         End Function
@@ -5833,6 +5847,14 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_GetCapFromName(szName As String) As Integer
         Return api.DTWAIN_GetCapFromName(szName)
+        End Function
+        
+        Public Function DTWAIN_GetCapHelp(lCapability As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
+        Return api.DTWAIN_GetCapHelp(lCapability, lpszOut, nSize)
+        End Function
+        
+        Public Function DTWAIN_GetCapLabel(lCapability As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
+        Return api.DTWAIN_GetCapLabel(lCapability, lpszOut, nSize)
         End Function
         
         Public Function DTWAIN_GetCapOperations(Source As System.IntPtr, lCapability As Integer, ByRef lpOps As Integer) As Integer
@@ -8032,6 +8054,7 @@ Namespace Dynarithmic
             Public DTWAIN_EnumCameras As DTWAIN_EnumCamerasDelegate
             Public DTWAIN_EnumCamerasEx As DTWAIN_EnumCamerasExDelegate
             Public DTWAIN_EnumCamerasEx2 As DTWAIN_EnumCamerasEx2Delegate
+            Public DTWAIN_EnumCapLabels As DTWAIN_EnumCapLabelsDelegate
             Public DTWAIN_EnumCompressionTypes As DTWAIN_EnumCompressionTypesDelegate
             Public DTWAIN_EnumCompressionTypesEx As DTWAIN_EnumCompressionTypesExDelegate
             Public DTWAIN_EnumCompressionTypesEx2 As DTWAIN_EnumCompressionTypesEx2Delegate
@@ -8177,6 +8200,8 @@ Namespace Dynarithmic
             Public DTWAIN_GetCapContainerEx2 As DTWAIN_GetCapContainerEx2Delegate
             Public DTWAIN_GetCapDataType As DTWAIN_GetCapDataTypeDelegate
             Public DTWAIN_GetCapFromName As DTWAIN_GetCapFromNameDelegate
+            Public DTWAIN_GetCapHelp As DTWAIN_GetCapHelpDelegate
+            Public DTWAIN_GetCapLabel As DTWAIN_GetCapLabelDelegate
             Public DTWAIN_GetCapOperations As DTWAIN_GetCapOperationsDelegate
             Public DTWAIN_GetCapOperationsEx As DTWAIN_GetCapOperationsExDelegate
             Public DTWAIN_GetCapValues As DTWAIN_GetCapValuesDelegate

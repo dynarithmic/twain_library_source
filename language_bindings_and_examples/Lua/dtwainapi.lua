@@ -326,6 +326,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras);
         DTWAIN_ARRAY DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, LONG nWhichCamera);
+        DTWAIN_ARRAY DTWAIN_EnumCapLabels(LONG lCapability);
         DTWAIN_BOOL DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, LONG lFileType, DTWAIN_BOOL bUseBufferedMode);
@@ -499,6 +500,12 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetCapFromName(DTWAIN_CCHARPTRTYPE szName);
         LONG DTWAIN_GetCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetCapFromNameW(LPCWSTR szName);
+        LONG DTWAIN_GetCapHelp(LONG lCapability, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapHelpA(LONG lCapability, LPSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapHelpW(LONG lCapability, LPWSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabel(LONG lCapability, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabelA(LONG lCapability, LPSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabelW(LONG lCapability, LPWSTR lpszOut, LONG nnSize);
         DTWAIN_BOOL DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps);
         LONG DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_GetCapValues(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray);
@@ -1544,6 +1551,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras);
         DTWAIN_ARRAY DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, LONG nWhichCamera);
+        DTWAIN_ARRAY DTWAIN_EnumCapLabels(LONG lCapability);
         DTWAIN_BOOL DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, LONG lFileType, DTWAIN_BOOL bUseBufferedMode);
@@ -1717,6 +1725,12 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetCapFromName(DTWAIN_CCHARPTRTYPE szName);
         LONG DTWAIN_GetCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetCapFromNameW(LPCWSTR szName);
+        LONG DTWAIN_GetCapHelp(LONG lCapability, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapHelpA(LONG lCapability, LPSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapHelpW(LONG lCapability, LPWSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabel(LONG lCapability, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabelA(LONG lCapability, LPSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabelW(LONG lCapability, LPWSTR lpszOut, LONG nnSize);
         DTWAIN_BOOL DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps);
         LONG DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_GetCapValues(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray);
@@ -2762,6 +2776,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras);
         DTWAIN_ARRAY DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, LONG nWhichCamera);
+        DTWAIN_ARRAY DTWAIN_EnumCapLabels(LONG lCapability);
         DTWAIN_BOOL DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, LONG lFileType, DTWAIN_BOOL bUseBufferedMode);
@@ -2935,6 +2950,12 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetCapFromName(DTWAIN_CCHARPTRTYPE szName);
         LONG DTWAIN_GetCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetCapFromNameW(LPCWSTR szName);
+        LONG DTWAIN_GetCapHelp(LONG lCapability, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapHelpA(LONG lCapability, LPSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapHelpW(LONG lCapability, LPWSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabel(LONG lCapability, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabelA(LONG lCapability, LPSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabelW(LONG lCapability, LPWSTR lpszOut, LONG nnSize);
         DTWAIN_BOOL DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps);
         LONG DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_GetCapValues(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray);
@@ -3980,6 +4001,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras);
         DTWAIN_ARRAY DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, LONG nWhichCamera);
+        DTWAIN_ARRAY DTWAIN_EnumCapLabels(LONG lCapability);
         DTWAIN_BOOL DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, LONG lFileType, DTWAIN_BOOL bUseBufferedMode);
@@ -4153,6 +4175,12 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetCapFromName(DTWAIN_CCHARPTRTYPE szName);
         LONG DTWAIN_GetCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetCapFromNameW(LPCWSTR szName);
+        LONG DTWAIN_GetCapHelp(LONG lCapability, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapHelpA(LONG lCapability, LPSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapHelpW(LONG lCapability, LPWSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabel(LONG lCapability, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabelA(LONG lCapability, LPSTR lpszOut, LONG nSize);
+        LONG DTWAIN_GetCapLabelW(LONG lCapability, LPWSTR lpszOut, LONG nnSize);
         DTWAIN_BOOL DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps);
         LONG DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_GetCapValues(DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray);

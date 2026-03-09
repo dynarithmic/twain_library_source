@@ -999,6 +999,7 @@ module TwainAPI =
     let public DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505)
     let public DTWAIN_ERR_SETCAP_FAILED = (-2506)
     let public DTWAIN_ERR_CAP_INVALIDSTATE = (-2507)
+    let public DTWAIN_ERR_GETCAP_FAILED = (-2508)
     let public DTWAIN_DE_CHKAUTOCAPTURE = 1
     let public DTWAIN_DE_CHKBATTERY = 2
     let public DTWAIN_DE_CHKDEVICEONLINE = 4
@@ -2458,6 +2459,9 @@ module TwainAPI =
     type DTWAIN_EnumCamerasEx2Delegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_EnumCapLabelsDelegate = delegate of LONG -> DTWAIN_ARRAY
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumCompressionTypesDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -2891,6 +2895,12 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetCapFromNameDelegate = delegate of string -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetCapHelpDelegate = delegate of LONG * System.Text.StringBuilder * LONG -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetCapLabelDelegate = delegate of LONG * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetCapOperationsDelegate = delegate of DTWAIN_SOURCE * LONG * int byref -> DTWAIN_BOOL
@@ -4577,6 +4587,7 @@ module TwainAPI =
     let private EnumCameras = lazy (DynamicDll.Bind "DTWAIN_EnumCameras" : DTWAIN_EnumCamerasDelegate)
     let private EnumCamerasEx = lazy (DynamicDll.Bind "DTWAIN_EnumCamerasEx" : DTWAIN_EnumCamerasExDelegate)
     let private EnumCamerasEx2 = lazy (DynamicDll.Bind "DTWAIN_EnumCamerasEx2" : DTWAIN_EnumCamerasEx2Delegate)
+    let private EnumCapLabels = lazy (DynamicDll.Bind "DTWAIN_EnumCapLabels" : DTWAIN_EnumCapLabelsDelegate)
     let private EnumCompressionTypes = lazy (DynamicDll.Bind "DTWAIN_EnumCompressionTypes" : DTWAIN_EnumCompressionTypesDelegate)
     let private EnumCompressionTypesEx = lazy (DynamicDll.Bind "DTWAIN_EnumCompressionTypesEx" : DTWAIN_EnumCompressionTypesExDelegate)
     let private EnumCompressionTypesEx2 = lazy (DynamicDll.Bind "DTWAIN_EnumCompressionTypesEx2" : DTWAIN_EnumCompressionTypesEx2Delegate)
@@ -4722,6 +4733,8 @@ module TwainAPI =
     let private GetCapContainerEx2 = lazy (DynamicDll.Bind "DTWAIN_GetCapContainerEx2" : DTWAIN_GetCapContainerEx2Delegate)
     let private GetCapDataType = lazy (DynamicDll.Bind "DTWAIN_GetCapDataType" : DTWAIN_GetCapDataTypeDelegate)
     let private GetCapFromName = lazy (DynamicDll.Bind "DTWAIN_GetCapFromName" : DTWAIN_GetCapFromNameDelegate)
+    let private GetCapHelp = lazy (DynamicDll.Bind "DTWAIN_GetCapHelp" : DTWAIN_GetCapHelpDelegate)
+    let private GetCapLabel = lazy (DynamicDll.Bind "DTWAIN_GetCapLabel" : DTWAIN_GetCapLabelDelegate)
     let private GetCapOperations = lazy (DynamicDll.Bind "DTWAIN_GetCapOperations" : DTWAIN_GetCapOperationsDelegate)
     let private GetCapOperationsEx = lazy (DynamicDll.Bind "DTWAIN_GetCapOperationsEx" : DTWAIN_GetCapOperationsExDelegate)
     let private GetCapValues = lazy (DynamicDll.Bind "DTWAIN_GetCapValues" : DTWAIN_GetCapValuesDelegate)
@@ -6041,6 +6054,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumCamerasEx2.Value.Invoke(source, nwhichcamera)
 
+    let DTWAIN_EnumCapLabels (lcapability: LONG) : DTWAIN_ARRAY =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        EnumCapLabels.Value.Invoke(lcapability)
+
     let DTWAIN_EnumCompressionTypes (source: DTWAIN_SOURCE) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumCompressionTypes.Value.Invoke(source, &parray)
@@ -6620,6 +6637,14 @@ module TwainAPI =
     let DTWAIN_GetCapFromName (szname: string) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCapFromName.Value.Invoke(szname)
+
+    let DTWAIN_GetCapHelp (lcapability: LONG) (lpszout: System.Text.StringBuilder) (nsize: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetCapHelp.Value.Invoke(lcapability, lpszout, nsize)
+
+    let DTWAIN_GetCapLabel (lcapability: LONG) (lpszout: System.Text.StringBuilder) (nsize: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetCapLabel.Value.Invoke(lcapability, lpszout, nsize)
 
     let DTWAIN_GetCapOperations (source: DTWAIN_SOURCE) (lcapability: LONG) (lpops: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

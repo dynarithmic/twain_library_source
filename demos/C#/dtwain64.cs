@@ -996,6 +996,7 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505);
         public const int DTWAIN_ERR_SETCAP_FAILED = (-2506);
         public const int DTWAIN_ERR_CAP_INVALIDSTATE = (-2507);
+        public const int DTWAIN_ERR_GETCAP_FAILED = (-2508);
         public const int DTWAIN_DE_CHKAUTOCAPTURE = 1;
         public const int DTWAIN_DE_CHKBATTERY = 2;
         public const int DTWAIN_DE_CHKDEVICEONLINE = 4;
@@ -2407,6 +2408,9 @@ namespace Dynarithmic
         public static extern DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, int nWhichCamera);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern DTWAIN_ARRAY DTWAIN_EnumCapLabels(int lCapability);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
@@ -2864,6 +2868,18 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
         public static extern int DTWAIN_GetCapFromName([MarshalAs(UnmanagedType.LPStr)] string szName);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_GetCapHelp(int lCapability, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder lpszOut, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_GetCapHelp(int lCapability, System.IntPtr lpszOut, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_GetCapLabel(int lCapability, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder lpszOut, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_GetCapLabel(int lCapability, System.IntPtr lpszOut, int nSize);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, int lCapability, ref int lpOps);

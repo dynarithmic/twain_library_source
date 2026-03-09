@@ -1039,6 +1039,7 @@ const
   DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505);
   DTWAIN_ERR_SETCAP_FAILED = (-2506);
   DTWAIN_ERR_CAP_INVALIDSTATE = (-2507);
+  DTWAIN_ERR_GETCAP_FAILED = (-2508);
   DTWAIN_DE_CHKAUTOCAPTURE = 1;
   DTWAIN_DE_CHKBATTERY = 2;
   DTWAIN_DE_CHKDEVICEONLINE = 4;
@@ -2089,6 +2090,7 @@ function DTWAIN_EnumBrightnessValuesEx(Source:DTWAIN_SOURCE; bExpandIfRange:BOOL
 function DTWAIN_EnumCameras(Source:DTWAIN_SOURCE; Cameras:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCameras';
 function DTWAIN_EnumCamerasEx(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCamerasEx';
 function DTWAIN_EnumCamerasEx2(Source:DTWAIN_SOURCE; nWhichCamera:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCamerasEx2';
+function DTWAIN_EnumCapLabels(lCapability:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCapLabels';
 function DTWAIN_EnumCompressionTypes(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCompressionTypes';
 function DTWAIN_EnumCompressionTypesEx(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCompressionTypesEx';
 function DTWAIN_EnumCompressionTypesEx2(Source:DTWAIN_SOURCE; lFileType:LONG; bUseBufferedMode:BOOL) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCompressionTypesEx2';
@@ -2262,6 +2264,12 @@ function DTWAIN_GetCapDataType(Source:DTWAIN_SOURCE; nCap:LONG) : LONG; stdcall;
 function DTWAIN_GetCapFromName(szName:LPCTSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapFromName';
 function DTWAIN_GetCapFromNameA(szName:LPCSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapFromNameA';
 function DTWAIN_GetCapFromNameW(szName:LPCWSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapFromNameW';
+function DTWAIN_GetCapHelp(lCapability:LONG; lpszOut:LPTSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapHelp';
+function DTWAIN_GetCapHelpA(lCapability:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapHelpA';
+function DTWAIN_GetCapHelpW(lCapability:LONG; lpszOut:LPWSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapHelpW';
+function DTWAIN_GetCapLabel(lCapability:LONG; lpszOut:LPTSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapLabel';
+function DTWAIN_GetCapLabelA(lCapability:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapLabelA';
+function DTWAIN_GetCapLabelW(lCapability:LONG; lpszOut:LPWSTR; nnSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapLabelW';
 function DTWAIN_GetCapOperations(Source:DTWAIN_SOURCE; lCapability:LONG; lpOps:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapOperations';
 function DTWAIN_GetCapOperationsEx(Source:DTWAIN_SOURCE; lCapability:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapOperationsEx';
 function DTWAIN_GetCapValues(Source:DTWAIN_SOURCE; lCap:LONG; lGetType:LONG; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapValues';

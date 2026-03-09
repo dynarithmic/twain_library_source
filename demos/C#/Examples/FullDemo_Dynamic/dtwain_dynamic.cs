@@ -1014,6 +1014,7 @@
         public const int DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505);
         public const int DTWAIN_ERR_SETCAP_FAILED = (-2506);
         public const int DTWAIN_ERR_CAP_INVALIDSTATE = (-2507);
+        public const int DTWAIN_ERR_GETCAP_FAILED = (-2508);
         public const int DTWAIN_DE_CHKAUTOCAPTURE = 1;
         public const int DTWAIN_DE_CHKBATTERY = 2;
         public const int DTWAIN_DE_CHKDEVICEONLINE = 4;
@@ -2108,6 +2109,7 @@
         public delegate int DTWAIN_EnumCamerasDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY Cameras);
         public delegate DTWAIN_ARRAY DTWAIN_EnumCamerasExDelegate(DTWAIN_SOURCE Source);
         public delegate DTWAIN_ARRAY DTWAIN_EnumCamerasEx2Delegate(DTWAIN_SOURCE Source, int nWhichCamera);
+        public delegate DTWAIN_ARRAY DTWAIN_EnumCapLabelsDelegate(int lCapability);
         public delegate int DTWAIN_EnumCompressionTypesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
         public delegate DTWAIN_ARRAY DTWAIN_EnumCompressionTypesExDelegate(DTWAIN_SOURCE Source);
         public delegate DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx2Delegate(DTWAIN_SOURCE Source, int lFileType, int bUseBufferedMode);
@@ -2261,6 +2263,10 @@
         public delegate DTWAIN_ARRAY DTWAIN_GetCapContainerEx2Delegate(int nCap, int bSetContainer);
         public delegate int DTWAIN_GetCapDataTypeDelegate(DTWAIN_SOURCE Source, int nCap);
         public delegate int DTWAIN_GetCapFromNameDelegate([MarshalAs(UnmanagedType.LPTStr)] string szName);
+        public delegate int DTWAIN_GetCapHelpDelegate(int lCapability, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize);
+        public delegate int DTWAIN_GetCapHelpDelegate_overload(int lCapability, System.IntPtr lpszOut, int nSize);
+        public delegate int DTWAIN_GetCapLabelDelegate(int lCapability, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize);
+        public delegate int DTWAIN_GetCapLabelDelegate_overload(int lCapability, System.IntPtr lpszOut, int nSize);
         public delegate int DTWAIN_GetCapOperationsDelegate(DTWAIN_SOURCE Source, int lCapability, ref int lpOps);
         public delegate int DTWAIN_GetCapOperationsExDelegate(DTWAIN_SOURCE Source, int lCapability);
         public delegate int DTWAIN_GetCapValuesDelegate(DTWAIN_SOURCE Source, int lCap, int lGetType, ref DTWAIN_ARRAY pArray);
@@ -3446,6 +3452,9 @@
         [DTWAINNativeFunction("DTWAIN_EnumCamerasEx2")]
         private readonly DTWAIN_EnumCamerasEx2Delegate  _DTWAIN_EnumCamerasEx2;
 
+        [DTWAINNativeFunction("DTWAIN_EnumCapLabels")]
+        private readonly DTWAIN_EnumCapLabelsDelegate  _DTWAIN_EnumCapLabels;
+
         [DTWAINNativeFunction("DTWAIN_EnumCompressionTypes")]
         private readonly DTWAIN_EnumCompressionTypesDelegate  _DTWAIN_EnumCompressionTypes;
 
@@ -3904,6 +3913,18 @@
 
         [DTWAINNativeFunction("DTWAIN_GetCapFromName")]
         private readonly DTWAIN_GetCapFromNameDelegate  _DTWAIN_GetCapFromName;
+
+        [DTWAINNativeFunction("DTWAIN_GetCapHelp")]
+        private readonly DTWAIN_GetCapHelpDelegate  _DTWAIN_GetCapHelp;
+
+        [DTWAINNativeFunction("DTWAIN_GetCapHelp")]
+        private readonly DTWAIN_GetCapHelpDelegate_overload _DTWAIN_GetCapHelp_overload; 
+
+        [DTWAINNativeFunction("DTWAIN_GetCapLabel")]
+        private readonly DTWAIN_GetCapLabelDelegate  _DTWAIN_GetCapLabel;
+
+        [DTWAINNativeFunction("DTWAIN_GetCapLabel")]
+        private readonly DTWAIN_GetCapLabelDelegate_overload _DTWAIN_GetCapLabel_overload; 
 
         [DTWAINNativeFunction("DTWAIN_GetCapOperations")]
         private readonly DTWAIN_GetCapOperationsDelegate  _DTWAIN_GetCapOperations;
@@ -6187,6 +6208,9 @@
         public  DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, int nWhichCamera)
         => _DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
 
+        public  DTWAIN_ARRAY DTWAIN_EnumCapLabels(int lCapability)
+        => _DTWAIN_EnumCapLabels(lCapability);
+
         public  int DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray)
         => _DTWAIN_EnumCompressionTypes(Source, ref pArray);
 
@@ -6645,6 +6669,18 @@
 
         public  int DTWAIN_GetCapFromName([MarshalAs(UnmanagedType.LPTStr)] string szName)
         => _DTWAIN_GetCapFromName(szName);
+
+        public  int DTWAIN_GetCapHelp(int lCapability, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize)
+        => _DTWAIN_GetCapHelp(lCapability, lpszOut, nSize);
+
+        public  int DTWAIN_GetCapHelp (int lCapability, System.IntPtr lpszOut, int nSize)
+        => _DTWAIN_GetCapHelp_overload(lCapability, lpszOut, nSize);
+
+        public  int DTWAIN_GetCapLabel(int lCapability, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize)
+        => _DTWAIN_GetCapLabel(lCapability, lpszOut, nSize);
+
+        public  int DTWAIN_GetCapLabel (int lCapability, System.IntPtr lpszOut, int nSize)
+        => _DTWAIN_GetCapLabel_overload(lCapability, lpszOut, nSize);
 
         public  int DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, int lCapability, ref int lpOps)
         => _DTWAIN_GetCapOperations(Source, lCapability, ref lpOps);
