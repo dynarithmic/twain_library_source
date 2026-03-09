@@ -64,6 +64,9 @@ namespace dynarithmic
             template <typename T>
             bool GenericEnumCapValues(void* pCapData)
             {
+                if (!pCapData)
+                    return false;
+
                 size_t nNumItems = 1;
 
                 // dereference to a pointer to the Twain container

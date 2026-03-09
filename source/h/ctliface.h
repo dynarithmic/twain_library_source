@@ -782,6 +782,7 @@ namespace dynarithmic
             CTL_StringType                  m_TwainDSMUserDirectory;
             CTL_StringType                  m_strSessionDetails;
             CTL_StringType                  m_strSourceDetails;
+            const CTL_ITwainSession* GetTwainSession() const { return m_pTwainSession; }
     };
 
     template <typename T>

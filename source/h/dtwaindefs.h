@@ -1062,6 +1062,7 @@
 #define DTWAIN_ERR_INVALID_PDFTEXTELEMENT  (-2505)
 #define DTWAIN_ERR_SETCAP_FAILED           (-2506)
 #define DTWAIN_ERR_CAP_INVALIDSTATE        (-2507)
+#define DTWAIN_ERR_GETCAP_FAILED           (-2508)
 
 #define DTWAIN_ERR_USER_START              (-80000)  
 #define DTWAIN_ERR_LAST                    (DTWAIN_ERR_USER_START + 1)

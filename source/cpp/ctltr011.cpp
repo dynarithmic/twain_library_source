@@ -111,6 +111,9 @@ void CTL_CapabilityGetTriplet::Decode(void * p)
         case MSG_GET:
         case MSG_GETCURRENT:
         case MSG_GETDEFAULT:
+        case MSG_GETLABEL:
+        case MSG_GETLABELENUM:
+        case MSG_GETHELP:
         case MSG_QUERYSUPPORT:
             EnumCapValues(p);
             return ;

@@ -1931,6 +1931,18 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
     return QT;
 }
 
+CTL_CapabilityLabelTriplet CTL_TwainAppMgr::GetCapabilityLabel(int nCap)
+{
+	const auto pSession = static_cast<CTL_ITwainSession*>(GetDTWAINHandle_Internal());
+
+	if (!IsValidTwainSession(pSession))
+		return { nullptr, 0 };
+
+	CTL_CapabilityLabelTriplet LabelTrip(pSession, static_cast<TW_UINT16>(nCap));
+	LabelTrip.Execute();
+	return LabelTrip;
+}
+
 ////////////////// End Capabilities that should be supported /////////////////
 
 /////////////// Capabilities that do not have to be supported ////////////////

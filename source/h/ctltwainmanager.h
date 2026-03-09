@@ -37,6 +37,7 @@
 #include "ctltr014.h"
 #include "ctltr015.h"
 #include "ctltr035.h"
+#include "ctltr045.h"
 #include <boost/dll/shared_library.hpp>
 namespace dynarithmic
 {
@@ -157,6 +158,8 @@ namespace dynarithmic
 
             static CTL_CapabilityQueryTriplet GetCapabilityOperations(const CTL_ITwainSource *pSource, // Uses the MSG_QUERYSUPPORT triplet
                                                                       int nCap);
+
+			static CTL_CapabilityLabelTriplet GetCapabilityLabel(int nCap); // Uses the MSG_GETLABEL triplet
 
             static CTL_IntArray EnumTransferMechanisms( const CTL_ITwainSource *pSource );
             static std::vector<TW_UINT32> EnumSupportedDATS(const CTL_ITwainSource* pSource);

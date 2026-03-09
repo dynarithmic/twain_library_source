@@ -1182,3 +1182,10 @@ DTWAIN_EnumBarcodePrioritiesEx                    @31211
 DTWAIN_EnumBarcodeSearchModesEx                   @31212
 DTWAIN_EnumBarcodeTimeOutValuesEx                 @31213
 DTWAIN_SetLogSaveThreshold                        @31214  
+DTWAIN_GetCapLabel                                @31215
+DTWAIN_GetCapLabelA                               @31216
+DTWAIN_GetCapLabelW                               @31217
+DTWAIN_GetCapHelp                                 @31218
+DTWAIN_GetCapHelpA                                @31219
+DTWAIN_GetCapHelpW                                @31220
+DTWAIN_EnumCapLabels                              @31221 

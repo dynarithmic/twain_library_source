@@ -74,7 +74,7 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
 
     if ( rc != TWRC_SUCCESS )
     {
-        m_bSupported = FALSE;
+        m_bSupported = false;
         return rc;
     }
 

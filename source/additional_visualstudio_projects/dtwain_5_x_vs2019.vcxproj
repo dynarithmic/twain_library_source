@@ -1835,6 +1835,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctltr042.h" />
     <ClInclude Include="h\ctltr043.h" />
     <ClInclude Include="h\ctltr044.h" />
+    <ClInclude Include="h\ctltr045.h" />
     <ClInclude Include="h\ctltripletbase.h" />
     <ClInclude Include="h\ctltwaincompliancy.h" />
     <ClInclude Include="h\ctltwainidentity.h" />

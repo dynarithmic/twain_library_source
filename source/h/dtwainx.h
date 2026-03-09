@@ -1064,6 +1064,9 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayGetCapValuesEx2(DTWAIN_SOURCE Source, LONG
 /* Set the log file save threshold when logging to a file using DTWAIN_SetTwainLog */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLogSaveThreshold(LONG64 lineCount);
 
+/* Support MSG_GETLABELENUM */
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCapLabels(LONG lCapability);
+
 #include "dtwstrfn.h"
 
 #ifdef __cplusplus

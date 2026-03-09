@@ -1104,6 +1104,9 @@
     <ClInclude Include="miniz\miniz_zip.h">
       <Filter>miniz</Filter>
     </ClInclude>
+    <ClInclude Include="h\ctltr045.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">
