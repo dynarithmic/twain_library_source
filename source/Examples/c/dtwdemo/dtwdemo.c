@@ -322,7 +322,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    int wmId, wmEvent;
+    UINT wmId, wmEvent;
     TCHAR szHello[MAX_LOADSTRING];
     LoadString(hInst, IDS_HELLO, szHello, MAX_LOADSTRING);
 
@@ -344,7 +344,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             /* See if the acquisition is to a file using source mode */
             if (wmId >= nFirstAcquireSourceID && wmId <= nLastAcquireSourceID)
             {
-                for (int i = 0; i < numSourceModeTypes; ++i)
+                for (UINT i = 0; i < numSourceModeTypes; ++i)
                 {
                     if (g_allSourceModeTypes[i].resourceId == wmId)
                     {
@@ -1578,7 +1578,7 @@ void DisableFileXFerSubItems()
 	HMENU mainMenu = GetMenu(g_hWnd);
 	HMENU hSubMenu = GetSubMenu(mainMenu, 1);
 	HMENU hSubMenu2 = GetSubMenu(hSubMenu, 3);
-    int i;
+    UINT i;
 	for (i = nFirstAcquireSourceID; i <= nLastAcquireSourceID; ++i)
 		EnableMenuItem(hSubMenu2, i, MF_BYCOMMAND | MF_GRAYED);
 }
@@ -1611,7 +1611,7 @@ void EnableBarcodeAndFileXferItems(DTWAIN_SOURCE source)
         // Now enable the subitems of the file xfer support
         arrFileTypes = DTWAIN_EnumFileXferFormatsEx(source);
         nCount = DTWAIN_ArrayGetCount(arrFileTypes);
-        for (i = 0; i < nCount; ++i)
+        for (i = 0; i < (UINT)nCount; ++i)
         {
             UINT nFound = 0;
             UINT curId = 0;
