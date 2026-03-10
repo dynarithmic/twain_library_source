@@ -157,6 +157,7 @@ CTL_StaticDataStruct::CTL_StaticDataStruct() :
                 {INI_SAVESELECTSOURCEPOS_KEY,    "saveselectsourcepos"},
                 {INI_TWAINLOOPGETMSG_KEY,        "TwainLoopGetMsg"},
                 {INI_SHEETCOUNT_KEY,             "SheetCount"},
+				{INI_TESTGET_ITEM,               "Testget"},
              } }, s_SavedSelectSourcePos{ std::numeric_limits<int32_t>::max(), std::numeric_limits<int32_t>::max() } {}
 
 std::pair<bool, std::string> CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)

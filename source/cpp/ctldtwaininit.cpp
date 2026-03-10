@@ -100,7 +100,7 @@ static void LoadSheetcountProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
 static void LoadSelectSourcePosition();
-
+static void LoadGetMessageTestOverride();
 
 #ifdef _WIN32
 static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM w, LPARAM lparam);
@@ -875,6 +875,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 
                 // Load whether paper detection is supported
                 LoadPaperDetectionOverrides();
+
+                // Load whether there will be an explicit test for GetMessage()
+                LoadGetMessageTestOverride();
 
                 // Load flatbed only list of devices
                 LoadFlatbedOnlyOverrides();
@@ -2443,6 +2446,15 @@ void LoadTwainLoopOverrides()
         getmsgloop_list.insert(iter->pItem);
         ++iter;
     }
+}
+
+void LoadGetMessageTestOverride()
+{
+	auto* customProfile = CTL_StaticData::GetINIInterface();
+	if (!customProfile)
+		return;
+    auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TWAINLOOPPEEK_KEY).data();
+    CTL_StaticData::IsTestForGetMessage() = customProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TESTGET_ITEM).data(), true);
 }
 
 // This loads the sources that will override DTWAIN_IsFeederSensitive() with 

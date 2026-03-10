@@ -34,6 +34,9 @@ std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
 
 static bool DTWAIN_ShouldUseGetMessage()
 {
+    if (!CTL_StaticData::IsTestForGetMessage())
+        return false;
+
 	MSG msg;
 
     // 1) If no window belongs to this thread, likely script host
@@ -280,7 +283,7 @@ int TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, b
     // has explicitly stated to use GetMessage() by either calling 
     // DTWAIN_EnablePeekMessageLoop() to FALSE, or the DTWAIN32/64.INI
     // has the Source listed as one that must use GetMessage(), then we use GetMessage().
-    auto isGetMessageRequired = DTWAIN_ShouldUseGetMessage() || !pSource->IsUsePeekMessage();
+	auto isGetMessageRequired = !pSource->IsUsePeekMessage() || DTWAIN_ShouldUseGetMessage();
     if (isGetMessageRequired)
         pSource->SetUsePeekMessage(false);
 

@@ -484,6 +484,7 @@ namespace dynarithmic
                INI_SAVESELECTSOURCEPOS_KEY,
                INI_TWAINLOOPGETMSG_KEY,
                INI_SHEETCOUNT_KEY,
+               INI_TESTGET_ITEM,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
@@ -536,6 +537,7 @@ namespace dynarithmic
         std::pair<int32_t, int32_t> s_SavedSelectSourcePos;
         CTL_TEXTELEMENTPTRLIST   s_PDFTextElementList;
         int64_t                  s_logFileSaveThreshold = -1LL;
+        bool                     s_bTestGetMessage = true;
         CTL_StaticDataStruct();
     };
 
@@ -627,6 +629,7 @@ namespace dynarithmic
         static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
         static auto& GetPDFTextElementList() { return s_StaticData.s_PDFTextElementList; }
         static auto& GetLogFileSaveThreshold() { return s_StaticData.s_logFileSaveThreshold; }
+        static bool& IsTestForGetMessage() { return s_StaticData.s_bTestGetMessage; }
     };
 
     struct CTL_LoggerCallbackInfo
