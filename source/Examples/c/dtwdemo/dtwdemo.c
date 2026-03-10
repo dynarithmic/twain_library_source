@@ -368,7 +368,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    int wmId, wmEvent;
+    UINT wmId, wmEvent;
     TCHAR szHello[MAX_LOADSTRING];
     LoadString(hInst, IDS_HELLO, szHello, MAX_LOADSTRING);
 
@@ -388,9 +388,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             wmEvent = HIWORD(wParam);
 
             /* See if the acquisition is to a file using source mode */
+            UINT i;
             if (wmId >= nFirstAcquireSourceID && wmId <= nLastAcquireSourceID)
             {
-                for (int i = 0; i < numSourceModeTypes; ++i)
+                for (i = 0; i < numSourceModeTypes; ++i)
                 {
                     if (g_allSourceModeTypes[i].resourceId == wmId)
                     {
@@ -404,7 +405,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			/* See if the acquisition is to a file */
 			if (wmId >= nFirstAcquireFileID && wmId <= nLastAcquireFileID)
 			{
-				for (int i = 0; i < numDTWAINFileTypes; ++i)
+				for (i = 0; i < numDTWAINFileTypes; ++i)
 				{
 					if (g_allDTWAINFileTypes[i].resourceId == wmId)
 					{
@@ -1679,7 +1680,7 @@ void EnableBarcodeAndFileXferItems(DTWAIN_SOURCE source)
     {
         DTWAIN_ARRAY arrFileTypes = NULL;
         LONG nCount = 0;
-        UINT i = 0;
+        LONG i = 0;
         LONG fileType;
 
         // Enable the "main" menu item
