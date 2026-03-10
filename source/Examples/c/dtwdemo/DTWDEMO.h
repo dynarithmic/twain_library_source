@@ -35,6 +35,24 @@
 #define IDM_SHOW_PREVIEW                    309
 #define IDM_SHOW_BARCODEINFO                310
 
+#define IDM_ACQUIREFILESOURCE_WINDOWSBMP    400
+#define IDM_ACQUIREFILESOURCE_JPEG          401
+#define IDM_ACQUIREFILESOURCE_TIFF          402
+#define IDM_ACQUIREFILESOURCE_TIFFMULTIPAGE 403
+#define IDM_ACQUIREFILESOURCE_PNG           404
+#define IDM_ACQUIREFILESOURCE_PDF           405
+#define IDM_ACQUIREFILESOURCE_PDFA          406
+#define IDM_ACQUIREFILESOURCE_PDFA2         407
+#define IDM_ACQUIREFILESOURCE_PDFRASTER     408
+#define IDM_ACQUIREFILESOURCE_FLASHPIX      409
+#define IDM_ACQUIREFILESOURCE_EXIF          410
+#define IDM_ACQUIREFILESOURCE_SPIFF         411
+#define IDM_ACQUIREFILESOURCE_XBM           412
+#define IDM_ACQUIREFILESOURCE_PICT          413
+#define IDM_ACQUIREFILESOURCE_JP2           414
+#define IDM_ACQUIREFILESOURCE_JPX           415
+#define IDM_ACQUIREFILESOURCE_DEJAVU        416
+
 
 #define IDD_dlgEnterSourceName              1000
 #define IDC_edSourceName                    1001
@@ -79,6 +97,7 @@
 #define IDC_edLangName                      7012
 #define IDC_edBarCodes                      7013
 #define IDD_dlgBarCodes                     7014
+#define IDD_dlgEnterFileName                7015
 
 #define IDD_dlgTestCap                      8000
 #define IDC_cmbGetTypes                     8001
@@ -104,6 +123,7 @@
 #define IDC_btnShowUIIOnly                  8021
 #define IDC_btnRefreshShowUIOnly            8022
 #define IDC_chkResetCapsOnClose             8023
+#define IDC_edSaveFileName                  8024
 
 #define ID_LANGUAGE_ENGLISH             32771
 #define ID_LANGUAGE_FRENCH              32772

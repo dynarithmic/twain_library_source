@@ -31,21 +31,37 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "E&xit Demo",                  IDM_EXIT
     END
-
     POPUP "&Acquire Test"
     BEGIN
         MENUITEM "Acquire Native...",           IDM_ACQUIRE_NATIVE
         MENUITEM "Acquire Buffered...",         IDM_ACQUIRE_BUFFERED
         MENUITEM "Acquire File ...",            IDM_ACQUIRE_FILE_DTWAIN
-        MENUITEM "Acquire File (Source Mode)...", IDM_ACQUIRE_FILE_SOURCE
+        POPUP "Acquire File (Source Mode)..."
+        BEGIN
+            MENUITEM "Windows BMP",                 IDM_ACQUIREFILESOURCE_WINDOWSBMP
+            MENUITEM "JPEG (JFIF)",                 IDM_ACQUIREFILESOURCE_JPEG
+            MENUITEM "TIFF",                        IDM_ACQUIREFILESOURCE_TIFF
+            MENUITEM "TIFF (Multipage)",            IDM_ACQUIREFILESOURCE_TIFFMULTIPAGE
+            MENUITEM "PNG",                         IDM_ACQUIREFILESOURCE_PNG
+            MENUITEM "PDF",                         IDM_ACQUIREFILESOURCE_PDF
+            MENUITEM "PDF/A",                       IDM_ACQUIREFILESOURCE_PDFA
+            MENUITEM "PDF/A2",                      IDM_ACQUIREFILESOURCE_PDFA2
+            MENUITEM "PDFRASTER",                   IDM_ACQUIREFILESOURCE_PDFRASTER
+            MENUITEM "FlashPix (FPX)",              IDM_ACQUIREFILESOURCE_FLASHPIX
+            MENUITEM "EXIF",                        IDM_ACQUIREFILESOURCE_EXIF
+            MENUITEM "SPIFF",                       IDM_ACQUIREFILESOURCE_SPIFF
+            MENUITEM "XBM",                         IDM_ACQUIREFILESOURCE_XBM
+            MENUITEM "Macintosh PICT",              IDM_ACQUIREFILESOURCE_PICT
+            MENUITEM "JP2 (JPEG ISO/IEC 15444-1)",  IDM_ACQUIREFILESOURCE_JP2
+            MENUITEM "JPX (JPEG ISO/IEC 15444-2)",  IDM_ACQUIREFILESOURCE_JPX
+            MENUITEM "DEJAVU",                      IDM_ACQUIREFILESOURCE_DEJAVU
+        END
         MENUITEM SEPARATOR
         MENUITEM "Show Preview",                IDM_SHOW_PREVIEW
         MENUITEM "Use Source UI",               IDM_USE_SOURCE_UI
         MENUITEM "Discard Blank Pages...",      IDM_DISCARD_BLANKS
         MENUITEM "Show Barcode Information",    IDM_SHOW_BARCODEINFO
     END
-
-
     POPUP "&TWAIN Logging"
     BEGIN
         MENUITEM "Logging Options...",          IDM_LOGGING_OPTIONS
@@ -58,8 +74,8 @@ BEGIN
         MENUITEM "German",                      ID_LANGUAGE_GERMAN
         MENUITEM "Greek",                       ID_LANGUAGE_GREEK
         MENUITEM "Italian",                     ID_LANGUAGE_ITALIAN
-        MENUITEM "Japanese"                     ID_LANGUAGE_JAPANESE
-        MENUITEM "Korean"                       ID_LANGUAGE_KOREAN
+        MENUITEM "Japanese",                    ID_LANGUAGE_JAPANESE
+        MENUITEM "Korean",                      ID_LANGUAGE_KOREAN
         MENUITEM "Portuguese",                  ID_LANGUAGE_PORTUGUESE
         MENUITEM "Romanian",                    ID_LANGUAGE_ROMANIAN
         MENUITEM "Russian",                     ID_LANGUAGE_RUSSIAN
@@ -68,7 +84,6 @@ BEGIN
         MENUITEM "Spanish",                     ID_LANGUAGE_SPANISH
         MENUITEM "Custom Language...",          ID_LANGUAGE_CUSTOMLANGUAGE
     END
-
     POPUP "&Help"
     BEGIN
         MENUITEM "&About ...",                  IDM_ABOUT
@@ -263,6 +278,17 @@ BEGIN
     LTEXT           "Results:",IDC_staticResults,228,186,27,8
     LTEXT           "Input: (One data item per line):",IDC_staticInput,24,186,102,8
     LTEXT           "",IDC_staticTestGetResults,215,55,49,8
+END
+
+IDD_dlgEnterFileName DIALOGEX 0, 0, 271, 61
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Save File"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    EDITTEXT        IDC_edSaveFileName,51,7,199,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,82,35,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,136,35,50,14
+    LTEXT           "File Name:",IDC_STATIC,8,9,34,8
 END
 
 /////////////////////////////////////////////////////////////////////////////
