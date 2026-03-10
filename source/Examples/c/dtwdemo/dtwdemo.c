@@ -402,7 +402,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
 
                 case IDM_ACQUIRE_FILE_SOURCE:
-                    AcquireFile(TRUE);
+                    AcquireFile(TRUE, 0);
                 break;
 
                 case IDM_USE_SOURCE_UI:
