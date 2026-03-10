@@ -60,7 +60,8 @@ void LoadLanguage(int message);
 void LoadLanguageStrings(LPCTSTR szLang);
 void DisplayCustomLangDlg();
 INT_PTR DisplayGetFileNameDlg();
-void DisableFileXFerSubItems();
+void EnableFileXFerSubItems(BOOL bEnable, BOOL bDTWAINMode, BOOL bSourceMode);
+HANDLE CALLBACK MyUpdateDibProc(DTWAIN_SOURCE Source, LONG whichHandle, HANDLE hDib);
 
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -78,7 +79,6 @@ LRESULT CALLBACK EnterSourceNameProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 LRESULT CALLBACK DisplayCustomSelectProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayBarCodeInfoProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayAcquireSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK DisplayFileTypesProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayLoggingProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK EnterFileNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
@@ -103,7 +103,7 @@ typedef struct
 {
     UINT resourceId;
     int  dtwainType;
-} AllSourceModeTypes;
+} AllFileTypes;
 
 AllTypes g_allTypes[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
                             {_T("BMP File (RLE)"), DTWAIN_BMP_RLE, _T("test.bmp")},
@@ -170,7 +170,7 @@ AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("engli
                                  {ID_LANGUAGE_KOREAN                , _T("korean")}
                                 };
 
-AllSourceModeTypes g_allSourceModeTypes[] = { {IDM_ACQUIREFILESOURCE_WINDOWSBMP, DTWAIN_FF_BMP},
+AllFileTypes g_allSourceModeTypes[] = { {IDM_ACQUIREFILESOURCE_WINDOWSBMP, DTWAIN_FF_BMP},
                                               {IDM_ACQUIREFILESOURCE_JPEG, DTWAIN_FF_JFIF},
                                               {IDM_ACQUIREFILESOURCE_TIFF, DTWAIN_FF_TIFF },
                                               {IDM_ACQUIREFILESOURCE_TIFFMULTIPAGE, DTWAIN_FF_TIFFMULTI},
@@ -188,9 +188,55 @@ AllSourceModeTypes g_allSourceModeTypes[] = { {IDM_ACQUIREFILESOURCE_WINDOWSBMP,
                                               {IDM_ACQUIREFILESOURCE_JPX, DTWAIN_FF_JPX},
                                               {IDM_ACQUIREFILESOURCE_DEJAVU, DTWAIN_FF_DEJAVU} };
 
+AllFileTypes g_allDTWAINFileTypes[] = 
+{
+        { IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION  ,  DTWAIN_BIGTIFFNONEMULTI },
+        { IDM_ACQUIREFILE_BIGTIFF_GROUP3         ,  DTWAIN_BIGTIFFG3MULTI },
+        { IDM_ACQUIREFILE_BIGTIFF_GROUP4         ,  DTWAIN_BIGTIFFG4MULTI },
+        { IDM_ACQUIREFILE_BIGTIFF_FLATE          ,  DTWAIN_BIGTIFFDEFLATEMULTI },
+        { IDM_ACQUIREFILE_BIGTIFF_JPEG           ,  DTWAIN_BIGTIFFJPEGMULTI },
+        { IDM_ACQUIREFILE_BIGTIFF_LZW            ,  DTWAIN_BIGTIFFLZWMULTI },
+        { IDM_ACQUIREFILE_BIGTIFF_PACKBITS       ,  DTWAIN_BIGTIFFPACKBITS },
+        { IDM_ACQUIREFILE_BMP                    ,  DTWAIN_BMP },
+        { IDM_ACQUIREFILE_BMPRLE                 ,  DTWAIN_BMP_RLE },
+        { IDM_ACQUIREFILE_DCX                    ,  DTWAIN_DCX },
+        { IDM_ACQUIREFILE_ENHANCEDMETAFILE       ,  DTWAIN_EMF },
+        { IDM_ACQUIREFILE_GIF                    ,  DTWAIN_GIF },
+        { IDM_ACQUIREFILE_ICO                    ,  DTWAIN_ICO_RESIZED },
+        { IDM_ACQUIREFILE_ICOVISTA               ,  DTWAIN_ICO_VISTA },
+        { IDM_ACQUIREFILE_JPEG                   ,  DTWAIN_JPEG },
+        { IDM_ACQUIREFILE_JPEG2000               ,  DTWAIN_JPEG2000 },
+        { IDM_ACQUIREFILE_JPEGXR                 ,  DTWAIN_JPEGXR },
+        { IDM_ACQUIREFILE_PAINTSHOP              ,  DTWAIN_PSD },
+        { IDM_ACQUIREFILE_PCX                    ,  DTWAIN_PCX },
+        { IDM_ACQUIREFILE_PDF                    ,  DTWAIN_PDFMULTI },
+        { IDM_ACQUIREFILE_PNG                    ,  DTWAIN_PNG },
+        { IDM_ACQUIREFILE_POSTSCRIPTLEVEL1       ,  DTWAIN_POSTSCRIPT1MULTI },
+        { IDM_ACQUIREFILE_POSTSCRIPTLEVEL2       ,  DTWAIN_POSTSCRIPT2MULTI },
+        { IDM_ACQUIREFILE_SVG                    ,  DTWAIN_SVG },
+        { IDM_ACQUIREFILE_SVGZ                   ,  DTWAIN_SVGZ },
+        { IDM_ACQUIREFILE_TGA                    ,  DTWAIN_TGA },
+        { IDM_ACQUIREFILE_TGARLE                 ,  DTWAIN_TGA_RLE },
+        { IDM_ACQUIREFILE_TEXT                   ,  DTWAIN_TEXTMULTI },
+        { IDM_ACQUIREFILE_TIFF_NOCOMPRESSION     ,  DTWAIN_TIFFNONEMULTI },
+        { IDM_ACQUIREFILE_TIFF_GROUP3            ,  DTWAIN_TIFFG3MULTI },
+        { IDM_ACQUIREFILE_TIFF_GROUP4            ,  DTWAIN_TIFFG4MULTI },
+        { IDM_ACQUIREFILE_TIFF_FLATE             ,  DTWAIN_TIFFDEFLATEMULTI },
+        { IDM_ACQUIREFILE_TIFF_JPEG              ,  DTWAIN_TIFFJPEGMULTI },
+        { IDM_ACQUIREFILE_TIFF_LZW               ,  DTWAIN_TIFFLZWMULTI },
+        { IDM_ACQUIREFILE_TIFF_PACKBITS          ,  DTWAIN_TIFFPACKBITSMULTI },
+        { IDM_ACQUIREFILE_WEBP                   ,  DTWAIN_WEBP },
+        { IDM_ACQUIREFILE_WINDOWSMETAFILE        ,  DTWAIN_WMF },
+        { IDM_ACQUIREFILE_WIRELESSBITMAP         ,  DTWAIN_WBMP_RESIZED },
+};
+
 const UINT nFirstAcquireSourceID = IDM_ACQUIREFILESOURCE_WINDOWSBMP;
 const UINT nLastAcquireSourceID = IDM_ACQUIREFILESOURCE_DEJAVU;
 const UINT numSourceModeTypes = sizeof(g_allSourceModeTypes) / sizeof(g_allSourceModeTypes[0]);
+
+const UINT nFirstAcquireFileID = IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION;
+const UINT nLastAcquireFileID = IDM_ACQUIREFILE_WIRELESSBITMAP;
+const UINT numDTWAINFileTypes = sizeof(g_allDTWAINFileTypes) / sizeof(g_allDTWAINFileTypes[0]);
 
 UINT g_AllMenuItems[] = { IDM_SELECT_SOURCE,
                           IDM_SELECT_SOURCE_BY_NAME,
@@ -308,7 +354,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    g_hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
-   DisableFileXFerSubItems();
+   EnableFileXFerSubItems(FALSE, TRUE, TRUE);
    if (!g_hWnd)
    {
       return FALSE;
@@ -322,7 +368,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    UINT wmId, wmEvent;
+    int wmId, wmEvent;
     TCHAR szHello[MAX_LOADSTRING];
     LoadString(hInst, IDS_HELLO, szHello, MAX_LOADSTRING);
 
@@ -331,7 +377,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_CREATE:
             g_Menu = GetMenu(hWnd);
             EnableSourceItems(FALSE);
-            DisableFileXFerSubItems();
+            EnableFileXFerSubItems(FALSE, TRUE, TRUE);
             CheckMenuItem(g_Menu, IDM_USE_SOURCE_UI, MF_BYCOMMAND | MF_CHECKED);
             CheckMenuItem(g_Menu, IDM_SHOW_PREVIEW, MF_BYCOMMAND | MF_CHECKED);
             CheckMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_CHECKED);
@@ -344,7 +390,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             /* See if the acquisition is to a file using source mode */
             if (wmId >= nFirstAcquireSourceID && wmId <= nLastAcquireSourceID)
             {
-                for (UINT i = 0; i < numSourceModeTypes; ++i)
+                for (int i = 0; i < numSourceModeTypes; ++i)
                 {
                     if (g_allSourceModeTypes[i].resourceId == wmId)
                     {
@@ -354,6 +400,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
                 return 0;
             }
+
+			/* See if the acquisition is to a file */
+			if (wmId >= nFirstAcquireFileID && wmId <= nLastAcquireFileID)
+			{
+				for (int i = 0; i < numDTWAINFileTypes; ++i)
+				{
+					if (g_allDTWAINFileTypes[i].resourceId == wmId)
+					{
+						AcquireFile(FALSE, g_allDTWAINFileTypes[i].dtwainType);
+						break;
+					}
+				}
+				return 0;
+			}
+
 
             /* Parse the menu selections : */
             switch (wmId)
@@ -379,7 +440,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         DTWAIN_CloseSource(g_CurrentSource);
                         g_CurrentSource = NULL;
                         EnableSourceItems(FALSE);
-						DisableFileXFerSubItems();
+                        EnableFileXFerSubItems(FALSE, TRUE, TRUE);
                         SetCaptionToSourceName();
                     }
                 break;
@@ -681,49 +742,40 @@ void AcquireBuffered()
     GenericAcquire(1);
 }
 
-void AcquireFile(BOOL bUseSource, LONG sourceModeType)
+void AcquireFile(BOOL bUseSource, LONG fileType)
 {
     LONG ErrStatus;
     LONG FileFlags = DTWAIN_USELONGNAME;
-    LONG FileType;
     BOOL bAcquireOK = TRUE;
     DTWAIN_ARRAY AFileNames = 0;
     BOOL UseUI;
     TCHAR szError[256];
+	INT_PTR retValue;
 
-    if ( bUseSource )
+    if (bUseSource)
     {
-        INT_PTR retValue;
-		MessageBox(g_hWnd, _T("Note: Image preview is not available when acquiring files using Source Mode"), _T("Image Preview not available"), MB_ICONSTOP);
+        MessageBox(g_hWnd, _T("Note: Image preview is not available when acquiring files using Source Mode"), _T("Image Preview not available"), MB_ICONSTOP);
         FileFlags |= DTWAIN_USESOURCEMODE;
-        FileType = sourceModeType;
-        retValue = DisplayGetFileNameDlg();
-        if (g_FileName[0] == 0 && retValue != IDCANCEL)
-        {
-			MessageBox(g_hWnd, _T("Cannot enter a blank image file name"), _T("Error"), MB_ICONSTOP);
-            return;
-        }
-        if (retValue == IDCANCEL)
-            return;
     }
     else
-    {
-        /* User wants to use DTWAIN File Mode instead of Source mode */
-        /* All Sources can use this mode */
-        INT_PTR nDlgFileType = DialogBox(g_hInstance, (LPCTSTR)IDD_dlgFileType, g_hWnd, (DLGPROC)DisplayFileTypesProc);
-        if (nDlgFileType == 0)
-            return;
-        FileFlags |= DTWAIN_USENATIVE;
-        FileType = g_FileType;
+		FileFlags |= DTWAIN_USENATIVE;
 
-        /* This is just one of many options that can be set
-          for DTWAIN / PDF support */
-        if ( g_FileType == DTWAIN_PDFMULTI )
-            DTWAIN_SetPDFPageSize(g_CurrentSource, DTWAIN_FS_USLETTER, 0, 0);
+    retValue = DisplayGetFileNameDlg();
+    if (g_FileName[0] == 0 && retValue != IDCANCEL)
+    {
+		MessageBox(g_hWnd, _T("Cannot enter a blank image file name"), _T("Error"), MB_ICONSTOP);
+        return;
     }
+    if (retValue == IDCANCEL)
+        return;
+    /* This is just one of many options that can be set
+        for DTWAIN / PDF support */
+
+    if ( fileType == DTWAIN_PDFMULTI )
+        DTWAIN_SetPDFPageSize(g_CurrentSource, DTWAIN_FS_USLETTER, 0, 0);
 
     /* Check if TEXT type is acquired */
-    if ( FileType == DTWAIN_TEXTMULTI )
+    if ( fileType == DTWAIN_TEXTMULTI )
     {
         /* Initialize the OCR engine if it's available */
         if (!DTWAIN_InitOCRInterface() )
@@ -758,7 +810,7 @@ void AcquireFile(BOOL bUseSource, LONG sourceModeType)
     EnableSourceItems(FALSE);
     bAcquireOK = DTWAIN_AcquireFileEx(g_CurrentSource,
                                   AFileNames,
-                                  FileType,
+                                  fileType,
                                   FileFlags | DTWAIN_CREATE_DIRECTORY,
                                   DTWAIN_PT_DEFAULT, /* Use default */
                                   DTWAIN_ACQUIREALL, /* Get all pages */
@@ -1572,16 +1624,38 @@ void EnableAllMenuItems(BOOL bEnable)
     EnableBarcodeAndFileXferItems(g_CurrentSource);
 }
 
+void EnableFileXFerSubItems(BOOL bEnable, BOOL bDTWAINMode, BOOL bSourceMode)
+{
+    // First, disable all the menu items here
+    HMENU mainMenu = GetMenu(g_hWnd);
+    HMENU hSubMenu = GetSubMenu(mainMenu, 1);
+    if (bEnable)
+    {
+        if ( bDTWAINMode)
+            EnableMenuItem(hSubMenu, 2, MF_BYPOSITION | MF_ENABLED);
+        if ( bSourceMode)
+            EnableMenuItem(hSubMenu, 3, MF_BYPOSITION | MF_ENABLED);
+    }
+    else
+    {
+		if (bDTWAINMode)
+			EnableMenuItem(hSubMenu, 2, MF_BYPOSITION | MF_GRAYED);
+		if (bSourceMode)
+			EnableMenuItem(hSubMenu, 3, MF_BYPOSITION | MF_GRAYED);
+    }
+}
+
 void DisableFileXFerSubItems()
 {
 	// First, disable all the menu items here
 	HMENU mainMenu = GetMenu(g_hWnd);
 	HMENU hSubMenu = GetSubMenu(mainMenu, 1);
 	HMENU hSubMenu2 = GetSubMenu(hSubMenu, 3);
-    UINT i;
+	UINT i;
 	for (i = nFirstAcquireSourceID; i <= nLastAcquireSourceID; ++i)
 		EnableMenuItem(hSubMenu2, i, MF_BYCOMMAND | MF_GRAYED);
 }
+
 
 void EnableBarcodeAndFileXferItems(DTWAIN_SOURCE source)
 {
@@ -1592,6 +1666,11 @@ void EnableBarcodeAndFileXferItems(DTWAIN_SOURCE source)
         EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_GRAYED);
     else
         EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_ENABLED);
+
+	EnableFileXFerSubItems(TRUE, TRUE, TRUE);
+
+	// Now enable the Source mode file xfers by querying the Source as to 
+	// what is available
     if (!DTWAIN_IsFileXferSupported(source, DTWAIN_ANYSUPPORT))
     {
         EnableMenuItem(hSubMenu, 3, MF_BYCOMMAND | MF_GRAYED);
@@ -1603,15 +1682,16 @@ void EnableBarcodeAndFileXferItems(DTWAIN_SOURCE source)
         UINT i = 0;
         LONG fileType;
 
-		EnableMenuItem(g_Menu, 3, MF_BYCOMMAND | MF_ENABLED);
+        // Enable the "main" menu item
+		EnableFileXFerSubItems(TRUE, FALSE, TRUE);
 
-		// First, disable all the menu items here
+		// First, disable all the submenu items here
         DisableFileXFerSubItems();
 
         // Now enable the subitems of the file xfer support
         arrFileTypes = DTWAIN_EnumFileXferFormatsEx(source);
         nCount = DTWAIN_ArrayGetCount(arrFileTypes);
-        for (i = 0; i < (UINT)nCount; ++i)
+        for (i = 0; i < nCount; ++i)
         {
             UINT nFound = 0;
             UINT curId = 0;

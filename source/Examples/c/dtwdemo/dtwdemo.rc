@@ -35,7 +35,53 @@ BEGIN
     BEGIN
         MENUITEM "Acquire Native...",           IDM_ACQUIRE_NATIVE
         MENUITEM "Acquire Buffered...",         IDM_ACQUIRE_BUFFERED
-        MENUITEM "Acquire File ...",            IDM_ACQUIRE_FILE_DTWAIN
+        POPUP "Acquire File ..."
+        BEGIN
+            POPUP "BigTIFF"
+            BEGIN
+                MENUITEM "No compression",              IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION
+                MENUITEM "Group 3",                     IDM_ACQUIREFILE_BIGTIFF_GROUP3
+                MENUITEM "Group 4",                     IDM_ACQUIREFILE_BIGTIFF_GROUP4
+                MENUITEM "Flate",                       IDM_ACQUIREFILE_BIGTIFF_FLATE
+                MENUITEM "JPEG",                        IDM_ACQUIREFILE_BIGTIFF_JPEG
+                MENUITEM "LZW",                         IDM_ACQUIREFILE_BIGTIFF_LZW
+                MENUITEM "Packbits",                    IDM_ACQUIREFILE_BIGTIFF_PACKBITS
+            END
+            MENUITEM "BMP",                         IDM_ACQUIREFILE_BMP
+            MENUITEM "BMP-RLE",                     IDM_ACQUIREFILE_BMPRLE
+            MENUITEM "DCX",                         IDM_ACQUIREFILE_DCX
+            MENUITEM "Enhanced Meta File (EMF)",    IDM_ACQUIREFILE_ENHANCEDMETAFILE
+            MENUITEM "GIF",                         IDM_ACQUIREFILE_GIF
+            MENUITEM "ICO",                         IDM_ACQUIREFILE_ICO
+            MENUITEM "ICO-Vista",                   IDM_ACQUIREFILE_ICOVISTA
+            MENUITEM "JPEG",                        IDM_ACQUIREFILE_JPEG
+            MENUITEM "JPEG-2000",                   IDM_ACQUIREFILE_JPEG2000
+            MENUITEM "JPEG-XR",                     IDM_ACQUIREFILE_JPEGXR
+            MENUITEM "Paintshop (PSD)",             IDM_ACQUIREFILE_PAINTSHOP
+            MENUITEM "PCX",                         IDM_ACQUIREFILE_PCX
+            MENUITEM "PDF",                         IDM_ACQUIREFILE_PDF
+            MENUITEM "PNG",                         IDM_ACQUIREFILE_PNG
+            MENUITEM "PostScript (Level 1)",        IDM_ACQUIREFILE_POSTSCRIPTLEVEL1
+            MENUITEM "PostScript (Level 2)",        IDM_ACQUIREFILE_POSTSCRIPTLEVEL2
+            MENUITEM "SVG",                         IDM_ACQUIREFILE_SVG
+            MENUITEM "SVGZ",                        IDM_ACQUIREFILE_SVGZ
+            MENUITEM "Targa (TGA)",                 IDM_ACQUIREFILE_TGA
+            MENUITEM "Targa-RLE",                   IDM_ACQUIREFILE_TGARLE
+            MENUITEM "Text (OCR)",                  IDM_ACQUIREFILE_TEXT
+            POPUP "TIFF"
+            BEGIN
+                MENUITEM "No compression",              IDM_ACQUIREFILE_TIFF_NOCOMPRESSION
+                MENUITEM "Group 3",                     IDM_ACQUIREFILE_TIFF_GROUP3
+                MENUITEM "Group 4",                     IDM_ACQUIREFILE_TIFF_GROUP4
+                MENUITEM "Flate",                       IDM_ACQUIREFILE_TIFF_FLATE
+                MENUITEM "JPEG",                        IDM_ACQUIREFILE_TIFF_JPEG
+                MENUITEM "LZW",                         IDM_ACQUIREFILE_TIFF_LZW
+                MENUITEM "Packbits",                    IDM_ACQUIREFILE_TIFF_PACKBITS
+            END
+            MENUITEM "WEBP",                        IDM_ACQUIREFILE_WEBP
+            MENUITEM "Windows Meta File (WMF)",     IDM_ACQUIREFILE_WINDOWSMETAFILE
+            MENUITEM "Wireless Bitmap (WBMP)",      IDM_ACQUIREFILE_WIRELESSBITMAP
+        END
         POPUP "Acquire File (Source Mode)..."
         BEGIN
             MENUITEM "Windows BMP",                 IDM_ACQUIREFILESOURCE_WINDOWSBMP
