@@ -2136,9 +2136,9 @@ UINT CTL_TwainAppMgr::GetContainerTypesFromCap( TW_UINT16 Cap, bool nType )
     return cStruct.m_nSetContainer;
 }
 
-CTL_ErrorStruct CTL_TwainAppMgr::GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG)
+CTL_TWAINDecoderStruct CTL_TwainAppMgr::GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG)
 {
-    CTL_ErrorStruct eStruct;
+    CTL_TWAINDecoderStruct eStruct;
     auto& errorInfoMap = CTL_StaticData::GetGeneralErrorInfoMap();
     const auto it = errorInfoMap.find(std::make_tuple(nDG, nDAT, nMSG));
     if ( it != errorInfoMap.end() )
@@ -2456,7 +2456,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 
     TW_UINT16 retcode = TWRC_SUCCESS;
 
-    CTL_ErrorStruct e;
+    CTL_TWAINDecoderStruct e;
     std::string s;
 
     pTW_IDENTITY pOrigin = pTriplet.GetOriginID();

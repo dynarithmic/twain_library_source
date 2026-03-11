@@ -268,7 +268,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_DECODE_BITMAP)
                 {
                     std::string sOut = "\nOriginal bitmap from device: \n";
-                    sOut += "{" + CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle) + "}";
+                    sOut += "{" + CTL_TWAINTypeDecoder::DecodeBitmap(m_hDataHandle) + "}";
                     LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
                 }
 
@@ -1536,7 +1536,7 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
             if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
                 std::string sOut = msg[i];
-                sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
+                sOut += CTL_TWAINTypeDecoder::DecodeBitmap(m_hDataHandle);
                 LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
             }
             return true;

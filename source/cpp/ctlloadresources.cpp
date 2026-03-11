@@ -148,7 +148,7 @@ namespace dynarithmic
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = true;
-        CTL_ErrorStruct ErrorStruct;
+        CTL_TWAINDecoderStruct ErrorStruct;
         TW_UINT32 dg;
         TW_UINT16 dat, msg;
         int structtype, retcode, successcode;
@@ -841,12 +841,12 @@ namespace dynarithmic
             return m_strCapName;
     }
     ////////////////////////////////////////////////////////////////////
-    bool CTL_ErrorStruct::IsFailureMatch(TW_UINT16 cc) const
+    bool CTL_TWAINDecoderStruct::IsFailureMatch(TW_UINT16 cc) const
     {
         return 1L << cc & m_nTWCCErrorCodes?true:false;
     }
 
-    bool CTL_ErrorStruct::IsSuccessMatch(TW_UINT16 rc) const
+    bool CTL_TWAINDecoderStruct::IsSuccessMatch(TW_UINT16 rc) const
     {
         if (rc == TWRC_SUCCESS)
             return true;

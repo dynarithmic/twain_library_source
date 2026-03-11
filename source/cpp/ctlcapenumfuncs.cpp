@@ -264,6 +264,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
     // Get the capability operations
     *lpOps = GetCapOperationsInternal(pHandle, pSource, lCapability);
 
+    // Log the cap operations if logging is turned on
+    if (CTL_StaticData::GetLogFilterFlags())
+    {
+        LogWriterUtils::WriteLogInfoIndentedA("Supported operations for capability " + CTL_TwainAppMgr::GetCapNameFromCap(lCapability) + ": ");
+		LogWriterUtils::WriteLogInfoIndentedA(CTL_TWAINTypeDecoder::DecodeCapOperations(*lpOps));
+    }
+
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOps))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)

@@ -2153,7 +2153,8 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantEx(LONG lConstantType, LONG lTw
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable)
 {
     LOG_FUNC_ENTRY_PARAMS((bEnable))
-    CTL_StaticData::IsTestForGetMessage() = (bEnable ? true : false);
+    auto& bTest = CTL_StaticData::IsTestForGetMessage();
+    bTest = (bEnable ? true : false);
     LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
     CATCH_BLOCK(0)
 }

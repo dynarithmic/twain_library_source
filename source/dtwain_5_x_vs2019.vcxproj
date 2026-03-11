@@ -1392,7 +1392,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include=".\dtwinver\Dtwinver.cpp" />
     <ClCompile Include=".\dtwinver\Getwinver.cpp" />
     <ClCompile Include=".\cpp\ctlflog.cpp" />
-    <ClCompile Include=".\cpp\errstruc.cpp" />
     <ClCompile Include=".\cpp\logmsg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">false</ExcludedFromBuild>
     </ClCompile>
@@ -1479,6 +1478,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\ctltripletbase.cpp" />
     <ClCompile Include="cpp\ctltsstub.cpp" />
     <ClCompile Include="cpp\ctltwaincompliancy.cpp" />
+    <ClCompile Include="cpp\ctltwaindecoder.cpp" />
     <ClCompile Include="cpp\ctltwainfilesystem.cpp" />
     <ClCompile Include="cpp\ctltwainmanager.cpp" />
     <ClCompile Include="cpp\ctltwainsession.cpp" />
@@ -1838,6 +1838,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctltr045.h" />
     <ClInclude Include="h\ctltripletbase.h" />
     <ClInclude Include="h\ctltwaincompliancy.h" />
+    <ClInclude Include="h\ctltwaindecoder.h" />
     <ClInclude Include="h\ctltwainidentity.h" />
     <ClInclude Include="h\ctltwainmanager.h" />
     <ClInclude Include="h\ctltwainmsgloop.h" />
@@ -1857,7 +1858,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\dtwain_standard_defs.h" />
     <ClInclude Include="h\dtwain_version.h" />
     <ClInclude Include="h\dtwtype.h" />
-    <ClInclude Include="h\errstruc.h" />
     <ClInclude Include="h\extendedimageinfo.h" />
     <ClInclude Include="h\imagefun\dtwpdf\crc32_aux.h" />
     <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />

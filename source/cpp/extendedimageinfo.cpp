@@ -1248,7 +1248,7 @@ std::pair<bool, int> dynarithmic::GetExtImageInfoDataInternal(DTWAIN_SOURCE Sour
 		// Log the current information
 		if (CTL_StaticData::GetLogFilterFlags())
 		{
-			std::string sTWInfo = CTL_ErrorStructDecoder::DecodeTW_INFO(&Info, nullptr);
+			std::string sTWInfo = CTL_TWAINTypeDecoder::DecodeTW_INFO(&Info, nullptr);
 			sTWInfo = "TW_Info: " + sTWInfo;
 			LogWriterUtils::WriteLogInfoIndentedA(sTWInfo);
 		}
