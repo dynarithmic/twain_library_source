@@ -339,6 +339,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_EnableBarcodeDetection
    attr_reader :DTWAIN_EnableDuplex
    attr_reader :DTWAIN_EnableFeeder
+   attr_reader :DTWAIN_EnableGetMessageLoopDetection
    attr_reader :DTWAIN_EnableIndicator
    attr_reader :DTWAIN_EnableJobFileHandling
    attr_reader :DTWAIN_EnableLamp
@@ -884,6 +885,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_IsFeederSupported
    attr_reader :DTWAIN_IsFileSystemSupported
    attr_reader :DTWAIN_IsFileXferSupported
+   attr_reader :DTWAIN_IsGetMessageLoopDetectionOn
    attr_reader :DTWAIN_IsIAFieldALastPageSupported
    attr_reader :DTWAIN_IsIAFieldALevelSupported
    attr_reader :DTWAIN_IsIAFieldAPrintFormatSupported
@@ -3192,6 +3194,7 @@ class DTWAINAPI
        @DTWAIN_EnableBarcodeDetection = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableBarcodeDetection'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_EnableDuplex = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableDuplex'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_EnableFeeder = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableFeeder'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
+       @DTWAIN_EnableGetMessageLoopDetection = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableGetMessageLoopDetection'],[Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_EnableIndicator = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableIndicator'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_EnableJobFileHandling = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableJobFileHandling'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_EnableLamp = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableLamp'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
@@ -3737,6 +3740,7 @@ class DTWAINAPI
        @DTWAIN_IsFeederSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsFeederSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsFileSystemSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsFileSystemSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsFileXferSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsFileXferSupported'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
+       @DTWAIN_IsGetMessageLoopDetectionOn = Fiddle::Function::new(dtwain_dll['DTWAIN_IsGetMessageLoopDetectionOn'],[],Fiddle::TYPE_INT)
        @DTWAIN_IsIAFieldALastPageSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsIAFieldALastPageSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsIAFieldALevelSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsIAFieldALevelSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsIAFieldAPrintFormatSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsIAFieldAPrintFormatSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)

@@ -281,6 +281,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnableBarcodeDetection(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
+        DTWAIN_BOOL DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableIndicator(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableJobFileHandling(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
         DTWAIN_BOOL DTWAIN_EnableLamp(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
@@ -823,6 +824,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileXferSupported(DTWAIN_SOURCE Source, LONG lFileType);
+        DTWAIN_BOOL DTWAIN_IsGetMessageLoopDetectionOn();
         DTWAIN_BOOL DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALevelSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldAPrintFormatSupported(DTWAIN_SOURCE Source);
@@ -1506,6 +1508,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnableBarcodeDetection(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
+        DTWAIN_BOOL DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableIndicator(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableJobFileHandling(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
         DTWAIN_BOOL DTWAIN_EnableLamp(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
@@ -2048,6 +2051,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileXferSupported(DTWAIN_SOURCE Source, LONG lFileType);
+        DTWAIN_BOOL DTWAIN_IsGetMessageLoopDetectionOn();
         DTWAIN_BOOL DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALevelSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldAPrintFormatSupported(DTWAIN_SOURCE Source);
@@ -2731,6 +2735,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnableBarcodeDetection(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
+        DTWAIN_BOOL DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableIndicator(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableJobFileHandling(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
         DTWAIN_BOOL DTWAIN_EnableLamp(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
@@ -3273,6 +3278,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileXferSupported(DTWAIN_SOURCE Source, LONG lFileType);
+        DTWAIN_BOOL DTWAIN_IsGetMessageLoopDetectionOn();
         DTWAIN_BOOL DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALevelSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldAPrintFormatSupported(DTWAIN_SOURCE Source);
@@ -3956,6 +3962,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnableBarcodeDetection(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
+        DTWAIN_BOOL DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableIndicator(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableJobFileHandling(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
         DTWAIN_BOOL DTWAIN_EnableLamp(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
@@ -4498,6 +4505,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileXferSupported(DTWAIN_SOURCE Source, LONG lFileType);
+        DTWAIN_BOOL DTWAIN_IsGetMessageLoopDetectionOn();
         DTWAIN_BOOL DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALevelSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldAPrintFormatSupported(DTWAIN_SOURCE Source);

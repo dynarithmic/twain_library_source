@@ -258,6 +258,7 @@
     D_ENABLEBARCODEDETECTIONFUNC                  DYNDTWAIN_API::DTWAIN_EnableBarcodeDetection = nullptr;
     D_ENABLEDUPLEXFUNC                            DYNDTWAIN_API::DTWAIN_EnableDuplex = nullptr;
     D_ENABLEFEEDERFUNC                            DYNDTWAIN_API::DTWAIN_EnableFeeder = nullptr;
+    D_ENABLEGETMESSAGELOOPDETECTIONFUNC           DYNDTWAIN_API::DTWAIN_EnableGetMessageLoopDetection = nullptr;
     D_ENABLEINDICATORFUNC                         DYNDTWAIN_API::DTWAIN_EnableIndicator = nullptr;
     D_ENABLEJOBFILEHANDLINGFUNC                   DYNDTWAIN_API::DTWAIN_EnableJobFileHandling = nullptr;
     D_ENABLELAMPFUNC                              DYNDTWAIN_API::DTWAIN_EnableLamp = nullptr;
@@ -804,6 +805,7 @@
     D_ISFEEDERSUPPORTEDFUNC                       DYNDTWAIN_API::DTWAIN_IsFeederSupported = nullptr;
     D_ISFILESYSTEMSUPPORTEDFUNC                   DYNDTWAIN_API::DTWAIN_IsFileSystemSupported = nullptr;
     D_ISFILEXFERSUPPORTEDFUNC                     DYNDTWAIN_API::DTWAIN_IsFileXferSupported = nullptr;
+    D_ISGETMESSAGELOOPDETECTIONONFUNC             DYNDTWAIN_API::DTWAIN_IsGetMessageLoopDetectionOn = nullptr;
     D_ISIAFIELDALASTPAGESUPPORTEDFUNC             DYNDTWAIN_API::DTWAIN_IsIAFieldALastPageSupported = nullptr;
     D_ISIAFIELDALEVELSUPPORTEDFUNC                DYNDTWAIN_API::DTWAIN_IsIAFieldALevelSupported = nullptr;
     D_ISIAFIELDAPRINTFORMATSUPPORTEDFUNC          DYNDTWAIN_API::DTWAIN_IsIAFieldAPrintFormatSupported = nullptr;
@@ -1499,6 +1501,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_EnableBarcodeDetection, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnableDuplex, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnableFeeder, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_EnableGetMessageLoopDetection, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnableIndicator, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnableJobFileHandling, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnableLamp, hModule);
@@ -2045,6 +2048,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_IsFeederSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsFileSystemSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsFileXferSupported, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_IsGetMessageLoopDetectionOn, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsIAFieldALastPageSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsIAFieldALevelSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsIAFieldAPrintFormatSupported, hModule);

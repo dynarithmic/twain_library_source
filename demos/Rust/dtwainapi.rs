@@ -251,6 +251,7 @@ type DtwainenableautomaticsensemediumFunc = unsafe extern "C" fn(*mut c_void,i32
 type DtwainenablebarcodedetectionFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainenableduplexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainenablefeederFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenablegetmessageloopdetectionFunc = unsafe extern "C" fn(i32) -> i32;
 type DtwainenableindicatorFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainenablejobfilehandlingFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainenablelampFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
@@ -796,6 +797,7 @@ type DtwainisfeedersensitiveFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainisfeedersupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainisfilesystemsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainisfilexfersupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainisgetmessageloopdetectiononFunc = unsafe extern "C" fn() -> i32;
 type DtwainisiafieldalastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainisiafieldalevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainisiafieldaprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
@@ -1421,6 +1423,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_EnableBarcodeDetectionFunc: Symbol<'a, DtwainenablebarcodedetectionFunc>,
     DTWAIN_EnableDuplexFunc: Symbol<'a, DtwainenableduplexFunc>,
     DTWAIN_EnableFeederFunc: Symbol<'a, DtwainenablefeederFunc>,
+    DTWAIN_EnableGetMessageLoopDetectionFunc: Symbol<'a, DtwainenablegetmessageloopdetectionFunc>,
     DTWAIN_EnableIndicatorFunc: Symbol<'a, DtwainenableindicatorFunc>,
     DTWAIN_EnableJobFileHandlingFunc: Symbol<'a, DtwainenablejobfilehandlingFunc>,
     DTWAIN_EnableLampFunc: Symbol<'a, DtwainenablelampFunc>,
@@ -1966,6 +1969,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_IsFeederSupportedFunc: Symbol<'a, DtwainisfeedersupportedFunc>,
     DTWAIN_IsFileSystemSupportedFunc: Symbol<'a, DtwainisfilesystemsupportedFunc>,
     DTWAIN_IsFileXferSupportedFunc: Symbol<'a, DtwainisfilexfersupportedFunc>,
+    DTWAIN_IsGetMessageLoopDetectionOnFunc: Symbol<'a, DtwainisgetmessageloopdetectiononFunc>,
     DTWAIN_IsIAFieldALastPageSupportedFunc: Symbol<'a, DtwainisiafieldalastpagesupportedFunc>,
     DTWAIN_IsIAFieldALevelSupportedFunc: Symbol<'a, DtwainisiafieldalevelsupportedFunc>,
     DTWAIN_IsIAFieldAPrintFormatSupportedFunc: Symbol<'a, DtwainisiafieldaprintformatsupportedFunc>,
@@ -4238,6 +4242,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_EnableBarcodeDetection: Symbol<DtwainenablebarcodedetectionFunc> = unsafe { library.get(b"DTWAIN_EnableBarcodeDetection")? };
         let DTWAIN_EnableDuplex: Symbol<DtwainenableduplexFunc> = unsafe { library.get(b"DTWAIN_EnableDuplex")? };
         let DTWAIN_EnableFeeder: Symbol<DtwainenablefeederFunc> = unsafe { library.get(b"DTWAIN_EnableFeeder")? };
+        let DTWAIN_EnableGetMessageLoopDetection: Symbol<DtwainenablegetmessageloopdetectionFunc> = unsafe { library.get(b"DTWAIN_EnableGetMessageLoopDetection")? };
         let DTWAIN_EnableIndicator: Symbol<DtwainenableindicatorFunc> = unsafe { library.get(b"DTWAIN_EnableIndicator")? };
         let DTWAIN_EnableJobFileHandling: Symbol<DtwainenablejobfilehandlingFunc> = unsafe { library.get(b"DTWAIN_EnableJobFileHandling")? };
         let DTWAIN_EnableLamp: Symbol<DtwainenablelampFunc> = unsafe { library.get(b"DTWAIN_EnableLamp")? };
@@ -4783,6 +4788,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_IsFeederSupported: Symbol<DtwainisfeedersupportedFunc> = unsafe { library.get(b"DTWAIN_IsFeederSupported")? };
         let DTWAIN_IsFileSystemSupported: Symbol<DtwainisfilesystemsupportedFunc> = unsafe { library.get(b"DTWAIN_IsFileSystemSupported")? };
         let DTWAIN_IsFileXferSupported: Symbol<DtwainisfilexfersupportedFunc> = unsafe { library.get(b"DTWAIN_IsFileXferSupported")? };
+        let DTWAIN_IsGetMessageLoopDetectionOn: Symbol<DtwainisgetmessageloopdetectiononFunc> = unsafe { library.get(b"DTWAIN_IsGetMessageLoopDetectionOn")? };
         let DTWAIN_IsIAFieldALastPageSupported: Symbol<DtwainisiafieldalastpagesupportedFunc> = unsafe { library.get(b"DTWAIN_IsIAFieldALastPageSupported")? };
         let DTWAIN_IsIAFieldALevelSupported: Symbol<DtwainisiafieldalevelsupportedFunc> = unsafe { library.get(b"DTWAIN_IsIAFieldALevelSupported")? };
         let DTWAIN_IsIAFieldAPrintFormatSupported: Symbol<DtwainisiafieldaprintformatsupportedFunc> = unsafe { library.get(b"DTWAIN_IsIAFieldAPrintFormatSupported")? };
@@ -5407,6 +5413,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_EnableBarcodeDetectionFunc: DTWAIN_EnableBarcodeDetection,
             DTWAIN_EnableDuplexFunc: DTWAIN_EnableDuplex,
             DTWAIN_EnableFeederFunc: DTWAIN_EnableFeeder,
+            DTWAIN_EnableGetMessageLoopDetectionFunc: DTWAIN_EnableGetMessageLoopDetection,
             DTWAIN_EnableIndicatorFunc: DTWAIN_EnableIndicator,
             DTWAIN_EnableJobFileHandlingFunc: DTWAIN_EnableJobFileHandling,
             DTWAIN_EnableLampFunc: DTWAIN_EnableLamp,
@@ -5952,6 +5959,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_IsFeederSupportedFunc: DTWAIN_IsFeederSupported,
             DTWAIN_IsFileSystemSupportedFunc: DTWAIN_IsFileSystemSupported,
             DTWAIN_IsFileXferSupportedFunc: DTWAIN_IsFileXferSupported,
+            DTWAIN_IsGetMessageLoopDetectionOnFunc: DTWAIN_IsGetMessageLoopDetectionOn,
             DTWAIN_IsIAFieldALastPageSupportedFunc: DTWAIN_IsIAFieldALastPageSupported,
             DTWAIN_IsIAFieldALevelSupportedFunc: DTWAIN_IsIAFieldALevelSupported,
             DTWAIN_IsIAFieldAPrintFormatSupportedFunc: DTWAIN_IsIAFieldAPrintFormatSupported,
@@ -7189,6 +7197,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_EnableFeeder(&self, Source: *mut c_void, bSet: i32) -> i32 {
         unsafe { return (self.DTWAIN_EnableFeederFunc)(Source, bSet);  }
+    }
+
+    pub fn DTWAIN_EnableGetMessageLoopDetection(&self, bEnable: i32) -> i32 {
+        unsafe { return (self.DTWAIN_EnableGetMessageLoopDetectionFunc)(bEnable);  }
     }
 
     pub fn DTWAIN_EnableIndicator(&self, Source: *mut c_void, bEnable: i32) -> i32 {
@@ -9369,6 +9381,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_IsFileXferSupported(&self, Source: *mut c_void, lFileType: i32) -> i32 {
         unsafe { return (self.DTWAIN_IsFileXferSupportedFunc)(Source, lFileType);  }
+    }
+
+    pub fn DTWAIN_IsGetMessageLoopDetectionOn(&self) -> i32 {
+        unsafe { return (self.DTWAIN_IsGetMessageLoopDetectionOnFunc)();  }
     }
 
     pub fn DTWAIN_IsIAFieldALastPageSupported(&self, Source: *mut c_void) -> i32 {
