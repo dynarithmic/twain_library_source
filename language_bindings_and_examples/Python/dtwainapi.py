@@ -1966,6 +1966,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnableBarcodeDetection.restype = ct.c_long
      theDLL.DTWAIN_EnableDuplex.restype = ct.c_long
      theDLL.DTWAIN_EnableFeeder.restype = ct.c_long
+     theDLL.DTWAIN_EnableGetMessageLoopDetection.restype = ct.c_long
      theDLL.DTWAIN_EnableIndicator.restype = ct.c_long
      theDLL.DTWAIN_EnableJobFileHandling.restype = ct.c_long
      theDLL.DTWAIN_EnableLamp.restype = ct.c_long
@@ -2511,6 +2512,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_IsFeederSupported.restype = ct.c_long
      theDLL.DTWAIN_IsFileSystemSupported.restype = ct.c_long
      theDLL.DTWAIN_IsFileXferSupported.restype = ct.c_long
+     theDLL.DTWAIN_IsGetMessageLoopDetectionOn.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldALastPageSupported.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldALevelSupported.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldAPrintFormatSupported.restype = ct.c_long
@@ -3132,6 +3134,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnableBarcodeDetection.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableDuplex.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableFeeder.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_EnableGetMessageLoopDetection.argtypes = [ct.c_long]
      theDLL.DTWAIN_EnableIndicator.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableJobFileHandling.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableLamp.argtypes = [ct.c_void_p, ct.c_long]
@@ -4275,6 +4278,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnableBarcodeDetection.restype = ct.c_long
      theDLL.DTWAIN_EnableDuplex.restype = ct.c_long
      theDLL.DTWAIN_EnableFeeder.restype = ct.c_long
+     theDLL.DTWAIN_EnableGetMessageLoopDetection.restype = ct.c_long
      theDLL.DTWAIN_EnableIndicator.restype = ct.c_long
      theDLL.DTWAIN_EnableJobFileHandling.restype = ct.c_long
      theDLL.DTWAIN_EnableLamp.restype = ct.c_long
@@ -4820,6 +4824,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_IsFeederSupported.restype = ct.c_long
      theDLL.DTWAIN_IsFileSystemSupported.restype = ct.c_long
      theDLL.DTWAIN_IsFileXferSupported.restype = ct.c_long
+     theDLL.DTWAIN_IsGetMessageLoopDetectionOn.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldALastPageSupported.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldALevelSupported.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldAPrintFormatSupported.restype = ct.c_long
@@ -5441,6 +5446,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnableBarcodeDetection.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableDuplex.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableFeeder.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_EnableGetMessageLoopDetection.argtypes = [ct.c_long]
      theDLL.DTWAIN_EnableIndicator.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableJobFileHandling.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableLamp.argtypes = [ct.c_void_p, ct.c_long]

@@ -2273,6 +2273,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, int bSet);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_EnableGetMessageLoopDetection(int bEnable);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_EnableIndicator(DTWAIN_SOURCE Source, int bEnable);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
@@ -3663,6 +3666,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_IsFileXferSupported(DTWAIN_SOURCE Source, int lFileType);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_IsGetMessageLoopDetectionOn();
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
