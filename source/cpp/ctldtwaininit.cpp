@@ -2150,6 +2150,21 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantEx(LONG lConstantType, LONG lTw
     CATCH_BLOCK(0)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable)
+{
+    LOG_FUNC_ENTRY_PARAMS((bEnable))
+    CTL_StaticData::IsTestForGetMessage() = (bEnable ? true : false);
+    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+    CATCH_BLOCK(0)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopDetectionOn(VOID_PROTOTYPE)
+{
+    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_EXIT_NONAME_PARAMS(CTL_StaticData::IsTestForGetMessage()?TRUE:FALSE)
+    CATCH_BLOCK(0)
+}
+
 LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(LPTSTR lpszBuffer, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszBuffer, nMaxLen))

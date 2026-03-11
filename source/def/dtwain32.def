@@ -1189,3 +1189,6 @@ DTWAIN_GetCapHelp                                 @31218
 DTWAIN_GetCapHelpA                                @31219
 DTWAIN_GetCapHelpW                                @31220
 DTWAIN_EnumCapLabels                              @31221 
+DTWAIN_EnableGetMessageLoopDetection              @31222
+DTWAIN_IsGetMessageLoopDetectionOn                @31223 
+
