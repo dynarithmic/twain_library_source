@@ -44,6 +44,13 @@ DTWAIN Version changes
   DTWAIN_CONTONEVALUE instead of TWON_ONEVALUE.  Now these functions will accept the 
   DTWAIN container constant name or the TWAIN container constant name.
 
+- Added function DTWAIN_EnableGetMessageLoopDetection() that will turn on or off
+  the auto-detection by DTWAIN to determine if the user-environment will successfully
+  acquire images using the Windows API GetMessage() instead of the default PeekMessage().  
+
+  By default, the auto detection is on, with the fallback being to use PeekMessage().
+  However,  it has been discovered that the auto-detection should always be turned off for 
+  environments such as the Java Virtual Machine (JVM).
 
 - Added sending DTWAIN_TN_ACQUIREPAGESTOPPING and DTWAIN_TN_ACQUIREPAGESTOPPED notifications
   to the application after the application returns 0 from the DTWAIN_TN_QUERYACQUIREPAGES 
