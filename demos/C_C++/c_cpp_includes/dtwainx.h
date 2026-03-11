@@ -1067,6 +1067,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLogSaveThreshold(LONG64 lineCount);
 /* Support MSG_GETLABELENUM */
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCapLabels(LONG lCapability);
 
+/* Turn off the GetMessage() testing when determining the TWAIN loop type */
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable);
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopDetectionOn(VOID_PROTOTYPE);
+
 #include "dtwstrfn.h"
 
 #ifdef __cplusplus
