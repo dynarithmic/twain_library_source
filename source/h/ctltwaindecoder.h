@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef ERRSTRUC_H
-#define ERRSTRUC_H
+#ifndef CTLTWAINDECODER_H
+#define CTLTWAINDECODER_H
 
 #include <tuple>
 #include <unordered_map>
@@ -95,9 +95,9 @@ namespace dynarithmic
                             ERRSTRUCT_TW_METRICS
    };
 
-class CTL_ErrorStructDecoder {
+class CTL_TWAINTypeDecoder {
     public:
-        CTL_ErrorStructDecoder() = default;
+        CTL_TWAINTypeDecoder() = default;
         void StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest, TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF Data,
                           ErrorStructTypes sType);
         static std::string DecodeBitmap(HANDLE hBitmap);
@@ -108,16 +108,17 @@ class CTL_ErrorStructDecoder {
         static std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem);
         void StartMessageDecoder(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
         const std::string& GetDecodedString() const { return m_pString; }
+        static std::string DecodeCapOperations(LONG capOps);
     protected:
         std::string m_pString;
 };
 
 // Define the cap info structure used
-class CTL_ErrorStruct
+class CTL_TWAINDecoderStruct
 {
     public:
         typedef std::tuple<TW_UINT32, TW_UINT16, TW_UINT16> key_type;
-        CTL_ErrorStruct() :
+        CTL_TWAINDecoderStruct() :
             m_nStructType(0),
             m_nTWCCErrorCodes(0),
             m_nTWRCCodes(0),
@@ -127,7 +128,7 @@ class CTL_ErrorStruct
             m_Key({}, {}, {}) {
         }
 
-        CTL_ErrorStruct(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMsg) :
+        CTL_TWAINDecoderStruct(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMsg) :
                 m_nStructType(0),
                 m_nTWCCErrorCodes(0),
                 m_nTWRCCodes(0),
@@ -169,25 +170,25 @@ class CTL_ErrorStruct
 
         static std::string GetTWAINDSMError(TW_UINT16 retcode)
         {
-            return CTL_ErrorStructDecoder::DecodeTWAINReturnCode(retcode);
+            return CTL_TWAINTypeDecoder::DecodeTWAINReturnCode(retcode);
         }
 
         static std::string GetTWAINDSMErrorCC(TW_UINT16 retcode)
         {
-            return CTL_ErrorStructDecoder::DecodeTWAINReturnCodeCC(retcode);
+            return CTL_TWAINTypeDecoder::DecodeTWAINReturnCodeCC(retcode);
         }
 
     private:
-        friend class CTL_ErrorStructDecoder;
+        friend class CTL_TWAINTypeDecoder;
         UINT       m_nStructType;
         LONG       m_nTWCCErrorCodes;
         LONG       m_nTWRCCodes;
-        CTL_ErrorStructDecoder m_Decoder;
+        CTL_TWAINTypeDecoder m_Decoder;
         pTW_IDENTITY m_pOrigin, m_pDest;
         TW_MEMREF  m_pData;
         key_type m_Key;
 };
-typedef std::unordered_map<CTL_ErrorStruct::key_type, CTL_ErrorStruct, boost::hash<CTL_ErrorStruct::key_type>> CTL_GeneralErrorInfo;
+typedef std::unordered_map<CTL_TWAINDecoderStruct::key_type, CTL_TWAINDecoderStruct, boost::hash<CTL_TWAINDecoderStruct::key_type>> CTL_GeneralErrorInfo;
 }
 #endif
 
