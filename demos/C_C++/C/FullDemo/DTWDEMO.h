@@ -34,6 +34,7 @@
 #define IDM_DISCARD_BLANKS                  308
 #define IDM_SHOW_PREVIEW                    309
 #define IDM_SHOW_BARCODEINFO                310
+#define IDM_ACQUIRETEST_USEGETMESSAGE       311
 
 #define IDM_ACQUIREFILESOURCE_WINDOWSBMP    400
 #define IDM_ACQUIREFILESOURCE_JPEG          401

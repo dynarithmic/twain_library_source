@@ -107,6 +107,8 @@ BEGIN
         MENUITEM "Use Source UI",               IDM_USE_SOURCE_UI
         MENUITEM "Discard Blank Pages...",      IDM_DISCARD_BLANKS
         MENUITEM "Show Barcode Information",    IDM_SHOW_BARCODEINFO
+        MENUITEM SEPARATOR
+        MENUITEM "Use GetMessage TWAIN Loop",   IDM_ACQUIRETEST_USEGETMESSAGE
     END
     POPUP "&TWAIN Logging"
     BEGIN

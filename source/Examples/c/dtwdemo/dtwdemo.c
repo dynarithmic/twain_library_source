@@ -43,7 +43,7 @@ void SelectTheSource(int nWhich);
 void EnableSourceItems(BOOL bEnable);
 void EnableSelectSourceItems(BOOL bEnable);
 void EnableAllMenuItems(BOOL bEnable);
-void EnableBarcodeAndFileXferItems(DTWAIN_SOURCE source);
+void EnableBarcodeMenuItem(DTWAIN_SOURCE source);
 DTWAIN_SOURCE DisplayGetNameDlg();
 DTWAIN_SOURCE DisplayCustomDlg();
 void DisplaySourceProps();
@@ -60,8 +60,7 @@ void LoadLanguage(int message);
 void LoadLanguageStrings(LPCTSTR szLang);
 void DisplayCustomLangDlg();
 INT_PTR DisplayGetFileNameDlg();
-void EnableFileXFerSubItems(BOOL bEnable, BOOL bDTWAINMode, BOOL bSourceMode);
-HANDLE CALLBACK MyUpdateDibProc(DTWAIN_SOURCE Source, LONG whichHandle, HANDLE hDib);
+void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable);
 
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -119,8 +118,8 @@ AllTypes g_allTypes[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
                             {_T("Postscript Level 2 File"), DTWAIN_POSTSCRIPT2MULTI, _T("test.ps")},
                             {_T("PNG File"), DTWAIN_PNG, _T("test.png")},
                             {_T("Adobe Paintshop (PSD) File"), DTWAIN_PSD, _T("test.psd")},
-							{_T("SVG File"), DTWAIN_SVG, _T("test.svg")},
-							{_T("SVGZ File"), DTWAIN_SVGZ, _T("test.svgz")},
+                            {_T("SVG File"), DTWAIN_SVG, _T("test.svg")},
+                            {_T("SVGZ File"), DTWAIN_SVGZ, _T("test.svgz")},
                             {_T("Text File"), DTWAIN_TEXTMULTI, _T("test.txt")},
                             {_T("TIFF (No compression)"), DTWAIN_TIFFNONEMULTI, _T("test.tif")},
                             {_T("TIFF (CCITT Group 3)"), DTWAIN_TIFFG3MULTI, _T("test.tif")},
@@ -304,7 +303,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     g_PDFTextElement = DTWAIN_CreatePDFTextElement();
 
     /* Position, font height, font color, and display pages for the PDF text element */
-	DTWAIN_SetPDFTextElementFloat(g_PDFTextElement, 25, 0, DTWAIN_PDFTEXTELEMENT_FONTHEIGHT);
+    DTWAIN_SetPDFTextElementFloat(g_PDFTextElement, 25, 0, DTWAIN_PDFTEXTELEMENT_FONTHEIGHT);
     DTWAIN_SetPDFTextElementLong(g_PDFTextElement, 100, 100, DTWAIN_PDFTEXTELEMENT_POSITION);
     DTWAIN_SetPDFTextElementLong(g_PDFTextElement, DTWAIN_MakeRGB(127, 127, 127), 0, DTWAIN_PDFTEXTELEMENT_COLOR);
     DTWAIN_SetPDFTextElementLong(g_PDFTextElement, DTWAIN_PDFTEXT_ALLPAGES, 0, DTWAIN_PDFTEXTELEMENT_DISPLAYFLAGS);
@@ -354,7 +353,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    g_hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
-   EnableFileXFerSubItems(FALSE, TRUE, TRUE);
+   EnableFileXFerMenuItems(NULL, FALSE);
    if (!g_hWnd)
    {
       return FALSE;
@@ -377,7 +376,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_CREATE:
             g_Menu = GetMenu(hWnd);
             EnableSourceItems(FALSE);
-            EnableFileXFerSubItems(FALSE, TRUE, TRUE);
+            EnableFileXFerMenuItems(NULL, FALSE);
             CheckMenuItem(g_Menu, IDM_USE_SOURCE_UI, MF_BYCOMMAND | MF_CHECKED);
             CheckMenuItem(g_Menu, IDM_SHOW_PREVIEW, MF_BYCOMMAND | MF_CHECKED);
             CheckMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_CHECKED);
@@ -402,19 +401,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 return 0;
             }
 
-			/* See if the acquisition is to a file */
-			if (wmId >= nFirstAcquireFileID && wmId <= nLastAcquireFileID)
-			{
-				for (i = 0; i < numDTWAINFileTypes; ++i)
-				{
-					if (g_allDTWAINFileTypes[i].resourceId == wmId)
-					{
-						AcquireFile(FALSE, g_allDTWAINFileTypes[i].dtwainType);
-						break;
-					}
-				}
-				return 0;
-			}
+            /* See if the acquisition is to a file */
+            if (wmId >= nFirstAcquireFileID && wmId <= nLastAcquireFileID)
+            {
+                for (i = 0; i < numDTWAINFileTypes; ++i)
+                {
+                    if (g_allDTWAINFileTypes[i].resourceId == wmId)
+                    {
+                        AcquireFile(FALSE, g_allDTWAINFileTypes[i].dtwainType);
+                        break;
+                    }
+                }
+                return 0;
+            }
 
 
             /* Parse the menu selections : */
@@ -441,7 +440,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         DTWAIN_CloseSource(g_CurrentSource);
                         g_CurrentSource = NULL;
                         EnableSourceItems(FALSE);
-                        EnableFileXFerSubItems(FALSE, TRUE, TRUE);
+                        EnableFileXFerMenuItems(NULL, FALSE);
                         SetCaptionToSourceName();
                     }
                 break;
@@ -465,6 +464,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 case IDM_ACQUIRE_FILE_SOURCE:
                     AcquireFile(TRUE, 0);
+                break;
+
+                case IDM_ACQUIRETEST_USEGETMESSAGE:
+                    ToggleCheckedItem(IDM_ACQUIRETEST_USEGETMESSAGE);
+                    if (g_CurrentSource)
+                    {
+                        BOOL useGetMessage = GetToggleMenuState(IDM_ACQUIRETEST_USEGETMESSAGE);
+                        DTWAIN_EnablePeekMessageLoop(g_CurrentSource, !useGetMessage);
+                    }
                 break;
 
                 case IDM_USE_SOURCE_UI:
@@ -623,15 +631,19 @@ void SelectTheSource(int nWhich)
 
             // We want to make sure that when we acquire to a PDF file, we will "stamp"
             // each PDF page with the text that g_PDFTextElement will have (see TwainCallbackProc)
-			DTWAIN_AddPDFTextElement(tempSource, g_PDFTextElement);
+            DTWAIN_AddPDFTextElement(tempSource, g_PDFTextElement);
 
             // Enable all of the items in the menu, depending on what the source supports
-            EnableBarcodeAndFileXferItems(tempSource);
+            EnableBarcodeMenuItem(tempSource);
+            EnableFileXFerMenuItems(tempSource, TRUE);
             EnableSourceItems(TRUE);
 
             g_CurrentSource = tempSource;
             SetCaptionToSourceName();
             DTWAIN_EnableFeeder(tempSource, TRUE);
+
+            // Enable or disable the PeekMessage() TWAIN loop processing
+            DTWAIN_EnablePeekMessageLoop(tempSource, !GetToggleMenuState(IDM_ACQUIRETEST_USEGETMESSAGE));
         }
         else
             MessageBox(g_hWnd, _T("Error Opening Source"), _T("TWAIN Error"), MB_ICONSTOP);
@@ -718,7 +730,7 @@ void GenericAcquire(LONG nWhichOne)
             DTWAIN_GetErrorStringA(lastError, szError, 1023);
             MessageBoxA(NULL, szError, "TWAIN Error", MB_ICONSTOP);
         }
-		DTWAIN_DestroyAcquisitionArray(g_AcquireArray, FALSE);
+        DTWAIN_DestroyAcquisitionArray(g_AcquireArray, FALSE);
         return;
     }
 
@@ -751,7 +763,7 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     DTWAIN_ARRAY AFileNames = 0;
     BOOL UseUI;
     TCHAR szError[256];
-	INT_PTR retValue;
+    INT_PTR retValue;
 
     if (bUseSource)
     {
@@ -759,12 +771,12 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
         FileFlags |= DTWAIN_USESOURCEMODE;
     }
     else
-		FileFlags |= DTWAIN_USENATIVE;
+        FileFlags |= DTWAIN_USENATIVE;
 
     retValue = DisplayGetFileNameDlg();
     if (g_FileName[0] == 0 && retValue != IDCANCEL)
     {
-		MessageBox(g_hWnd, _T("Cannot enter a blank image file name"), _T("Error"), MB_ICONSTOP);
+        MessageBox(g_hWnd, _T("Cannot enter a blank image file name"), _T("Error"), MB_ICONSTOP);
         return;
     }
     if (retValue == IDCANCEL)
@@ -857,7 +869,7 @@ DTWAIN_SOURCE DisplayGetNameDlg()
 
 INT_PTR DisplayGetFileNameDlg()
 {
-	return DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterFileName, g_hWnd, (DLGPROC)EnterFileNameProc);
+    return DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterFileName, g_hWnd, (DLGPROC)EnterFileNameProc);
 }
 
 void DisplayCustomLangDlg()
@@ -1462,15 +1474,15 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             DTWAIN_GetShortVersionStringA(szBuf, 100);
             SendMessageA(hDlg, WM_SETTEXT, 0, (LPARAM)szBuf);
             DTWAIN_GetVersionInfoA(szBuf, 1000);
-			/* Edit controls need \r\n and not \n new lines. */
-			HANDLE h = DTWAIN_ConvertToAPIStringA(szBuf);
-			if (h)
-			{
-				LPCSTR pData = GlobalLock(h);
-				SetWindowTextA(hWndEdit, pData);
-				GlobalUnlock(h);
-				GlobalFree(h);
-			}
+            /* Edit controls need \r\n and not \n new lines. */
+            HANDLE h = DTWAIN_ConvertToAPIStringA(szBuf);
+            if (h)
+            {
+                LPCSTR pData = GlobalLock(h);
+                SetWindowTextA(hWndEdit, pData);
+                GlobalUnlock(h);
+                GlobalFree(h);
+            }
             return TRUE;
         }
 
@@ -1566,7 +1578,7 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
                 DTWAIN_SetPDFTextElementString(g_PDFTextElement, text, DTWAIN_PDFTEXTELEMENT_TEXT);
 
                 /* Increment the page count*/
-				++pdf_page_count;
+                ++pdf_page_count;
             }
             return 1;
         }
@@ -1622,90 +1634,84 @@ void EnableAllMenuItems(BOOL bEnable)
     EnableMenuItem(g_Menu, IDC_DTWDEMO, nOptions);
     for (i = 0; i < numItems; ++i)
         EnableMenuItem(g_Menu, g_AllMenuItems[i], nOptions);
-    EnableBarcodeAndFileXferItems(g_CurrentSource);
-}
-
-void EnableFileXFerSubItems(BOOL bEnable, BOOL bDTWAINMode, BOOL bSourceMode)
-{
-    // First, disable all the menu items here
-    HMENU mainMenu = GetMenu(g_hWnd);
-    HMENU hSubMenu = GetSubMenu(mainMenu, 1);
-    if (bEnable)
-    {
-        if ( bDTWAINMode)
-            EnableMenuItem(hSubMenu, 2, MF_BYPOSITION | MF_ENABLED);
-        if ( bSourceMode)
-            EnableMenuItem(hSubMenu, 3, MF_BYPOSITION | MF_ENABLED);
-    }
-    else
-    {
-		if (bDTWAINMode)
-			EnableMenuItem(hSubMenu, 2, MF_BYPOSITION | MF_GRAYED);
-		if (bSourceMode)
-			EnableMenuItem(hSubMenu, 3, MF_BYPOSITION | MF_GRAYED);
-    }
+    EnableBarcodeMenuItem(g_CurrentSource);
+    EnableFileXFerMenuItems(g_CurrentSource, bEnable);
 }
 
 void DisableFileXFerSubItems()
 {
-	// First, disable all the menu items here
-	HMENU mainMenu = GetMenu(g_hWnd);
-	HMENU hSubMenu = GetSubMenu(mainMenu, 1);
-	HMENU hSubMenu2 = GetSubMenu(hSubMenu, 3);
-	UINT i;
-	for (i = nFirstAcquireSourceID; i <= nLastAcquireSourceID; ++i)
-		EnableMenuItem(hSubMenu2, i, MF_BYCOMMAND | MF_GRAYED);
+    // First, disable all the menu items here
+    HMENU mainMenu = GetMenu(g_hWnd);
+    HMENU hSubMenu = GetSubMenu(mainMenu, 1);
+    HMENU hSubMenu2 = GetSubMenu(hSubMenu, 3);
+    UINT i;
+    for (i = nFirstAcquireSourceID; i <= nLastAcquireSourceID; ++i)
+        EnableMenuItem(hSubMenu2, i, MF_BYCOMMAND | MF_GRAYED);
 }
 
+void EnableBarcodeMenuItem(DTWAIN_SOURCE source)
+{
+	EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_GRAYED);
+	if (DTWAIN_IsExtImageInfoSupported(source))
+    {
+        if (DTWAIN_IsBarcodeSupported(source, DTWAIN_ANYSUPPORT))
+            EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_ENABLED);
+    }
+}
 
-void EnableBarcodeAndFileXferItems(DTWAIN_SOURCE source)
+void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable)
 {
 	HMENU mainMenu = GetMenu(g_hWnd);
 	HMENU hSubMenu = GetSubMenu(mainMenu, 1);
 	HMENU hSubMenu2 = GetSubMenu(hSubMenu, 3);
-    if (!DTWAIN_IsExtImageInfoSupported(source))
-        EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_GRAYED);
-    else
-        EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_ENABLED);
 
-	EnableFileXFerSubItems(TRUE, TRUE, TRUE);
+	if (bEnable)
+	{
+		EnableMenuItem(hSubMenu, 2, MF_BYPOSITION | MF_ENABLED);
+		EnableMenuItem(hSubMenu, 3, MF_BYPOSITION | MF_ENABLED);
+	}
+	else
+	{
+		EnableMenuItem(hSubMenu, 2, MF_BYPOSITION | MF_GRAYED);
+		EnableMenuItem(hSubMenu, 3, MF_BYPOSITION | MF_GRAYED);
+	}
 
-	// Now enable the Source mode file xfers by querying the Source as to 
-	// what is available
-    if (!DTWAIN_IsFileXferSupported(source, DTWAIN_ANYSUPPORT))
+    if (source && bEnable)
     {
-        EnableMenuItem(hSubMenu, 3, MF_BYCOMMAND | MF_GRAYED);
-    }
-    else
-    {
-        DTWAIN_ARRAY arrFileTypes = NULL;
-        LONG nCount = 0;
-        LONG i = 0;
-        LONG fileType;
-
-        // Enable the "main" menu item
-		EnableFileXFerSubItems(TRUE, FALSE, TRUE);
-
-		// First, disable all the submenu items here
-        DisableFileXFerSubItems();
-
-        // Now enable the subitems of the file xfer support
-        arrFileTypes = DTWAIN_EnumFileXferFormatsEx(source);
-        nCount = DTWAIN_ArrayGetCount(arrFileTypes);
-        for (i = 0; i < nCount; ++i)
+        // Now enable the Source mode file xfers by querying the Source as to 
+        // what is available
+        if (!DTWAIN_IsFileXferSupported(source, DTWAIN_ANYSUPPORT))
         {
-            UINT nFound = 0;
-            UINT curId = 0;
-            DTWAIN_ArrayGetAtLong(arrFileTypes, i, &fileType);
-            for (nFound = nFirstAcquireSourceID; nFound <= nLastAcquireSourceID; ++nFound, ++curId)
+            EnableMenuItem(hSubMenu, 3, MF_BYCOMMAND | MF_GRAYED);
+        }
+        else
+        {
+            DTWAIN_ARRAY arrFileTypes = NULL;
+            LONG nCount = 0;
+            LONG i = 0;
+            LONG fileType;
+
+            // First, disable all the submenu items here
+            DisableFileXFerSubItems();
+
+            // Now enable the subitems of the file xfer support
+            arrFileTypes = DTWAIN_EnumFileXferFormatsEx(source);
+            nCount = DTWAIN_ArrayGetCount(arrFileTypes);
+            for (i = 0; i < nCount; ++i)
             {
-                if (g_allSourceModeTypes[curId].dtwainType == fileType)
+                UINT nFound = 0;
+                UINT curId = 0;
+                DTWAIN_ArrayGetAtLong(arrFileTypes, i, &fileType);
+                for (nFound = nFirstAcquireSourceID; nFound <= nLastAcquireSourceID; ++nFound, ++curId)
                 {
-					EnableMenuItem(hSubMenu2, curId, MF_BYPOSITION | MF_ENABLED);
-                    break;
+                    if (g_allSourceModeTypes[curId].dtwainType == fileType)
+                    {
+                        EnableMenuItem(hSubMenu2, curId, MF_BYPOSITION | MF_ENABLED);
+                        break;
+                    }
                 }
             }
+            DTWAIN_ArrayDestroy(arrFileTypes);
         }
-        DTWAIN_ArrayDestroy(arrFileTypes);
     }
 }
