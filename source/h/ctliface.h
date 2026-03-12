@@ -66,7 +66,7 @@ struct dtwain_library_loader : library_loader_impl
 #include "ctltmpl4.h"
 #include "ctltwainsession.h"
 #include "dtwain_resource_constants.h"
-#include "errstruc.h"
+#include "ctltwaindecoder.h"
 #include "logmsg.h"
 #include "winconst.h"
 #include <map>

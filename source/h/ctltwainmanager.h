@@ -30,7 +30,7 @@
 #include "ctltwainsession.h"
 #include "ctlenum.h"
 #include "capstruc.h"
-#include "errstruc.h"
+#include "ctltwaindecoder.h"
 #include "ctltripletbase.h"
 #include "ctltr011.h"
 #include "ctltr012.h"
@@ -442,7 +442,7 @@ namespace dynarithmic
                    }
             };
 
-            static CTL_ErrorStruct GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG);
+            static CTL_TWAINDecoderStruct GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG);
 
             void DestroySession(const CTL_ITwainSession* pSession);
             void DestroyAllTwainSessions();
