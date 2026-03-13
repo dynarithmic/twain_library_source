@@ -897,6 +897,9 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainTimeout(VOID_PROTOTYPE);
 /* User-defined callback to change DIB */
 DTWAIN_DIBUPDATE_PROC DLLENTRY_DEF DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc);
 
+/* Function used for DTWAIN_TN_QUERYUPDATEDIBx notifications */
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UpdateCurrentDIB(DTWAIN_SOURCE Source, HANDLE hNewDib);
+
 /* Use PeekMessage() or GetMessage() TWAIN loop */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePeekMessageLoop(DTWAIN_SOURCE Source, BOOL bSet);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPeekMessageLoopEnabled(DTWAIN_SOURCE Source);

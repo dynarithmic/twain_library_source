@@ -357,8 +357,14 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                         // This may be a compressed image instead of a DIB.  Don't flip if this is an image
                         if ( m_nCompression == TWCP_NONE )
                         {
-                            // Here we can do a check for blank page.  The code has not been tested
-                            // To be done...
+							m_hDataHandle = CurDib->GetHandle();
+							HANDLE oldHandle = m_hDataHandle;
+
+							// See if the user wants to change the original DIB now
+							CurDib->SetHandle(ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBORIG));
+							m_hDataHandle = CurDib->GetHandle();
+
+                            // Here we can do a check for blank page.  
                             if ( ProcessBlankPage(pSession, pSource, CurDib, false, DTWAIN_TN_BLANKPAGEDETECTED1,
                                                   DTWAIN_TN_BLANKPAGEDISCARDED1, DTWAIN_BP_AUTODISCARD_IMMEDIATE) == 0 )
                             {
@@ -371,9 +377,9 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             m_hDataHandle = CurDib->GetHandle();
 
                             // Callback function for access to change DIB
-                            HANDLE oldHandle = m_hDataHandle;
-                            auto hDib = ProcessUserUpdatingDIB(nCurImage);
-                            if (m_hDataHandle != oldHandle)
+                            auto hDib = ProcessUserUpdatingDIB(nCurImage, 0);
+
+                            if (hDib != m_hDataHandle)
                             {
                                 // Lock the new data.  
                                 auto pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(hDib));
@@ -390,7 +396,16 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             {
                                 if (ModifyAcquiredDib())
                                     m_ptrOrig = nullptr;
+								oldHandle = m_hDataHandle;
+								ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBRESAMPLED);
                             }
+
+							auto pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(m_hDataHandle));
+							m_nCurDibSize = static_cast<TW_UINT32>(ImageMemoryHandler::GlobalSize(m_hDataHandle));
+							m_ptrDib = reinterpret_cast<unsigned char*>(pDibInfo);
+							m_ptrOrig = m_ptrDib;
+							CurDib->SetHandle(m_hDataHandle);
+							(*pArray)[nCurImage] = CurDib;
 
                             if ( CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSEDDIBFINAL, reinterpret_cast<LPARAM>(pSource)) == 0 )
                             {
