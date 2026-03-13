@@ -397,6 +397,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromCap(DTWAIN_SOURCE Source, LONG l
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCapType, lSize))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
+    if (pHandle)
+        pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     auto retValue = CreateArrayFromCap(pHandle, pSource, lCapType, lSize);
 	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retValue.second; }, retValue.first, nullptr, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(retValue.second)

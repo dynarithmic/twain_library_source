@@ -66,7 +66,7 @@ struct dtwain_library_loader : library_loader_impl
 #include "ctltmpl4.h"
 #include "ctltwainsession.h"
 #include "dtwain_resource_constants.h"
-#include "errstruc.h"
+#include "ctltwaindecoder.h"
 #include "logmsg.h"
 #include "winconst.h"
 #include <map>
@@ -483,6 +483,8 @@ namespace dynarithmic
                INI_SELECTSOURCEPOS_KEY,
                INI_SAVESELECTSOURCEPOS_KEY,
                INI_TWAINLOOPGETMSG_KEY,
+               INI_SHEETCOUNT_KEY,
+               INI_TESTGET_ITEM,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
@@ -534,6 +536,8 @@ namespace dynarithmic
         std::string              s_AppTitle;
         std::pair<int32_t, int32_t> s_SavedSelectSourcePos;
         CTL_TEXTELEMENTPTRLIST   s_PDFTextElementList;
+        int64_t                  s_logFileSaveThreshold = -1LL;
+        bool                     s_bTestGetMessage = true;
         CTL_StaticDataStruct();
     };
 
@@ -624,6 +628,8 @@ namespace dynarithmic
         static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
         static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
         static auto& GetPDFTextElementList() { return s_StaticData.s_PDFTextElementList; }
+        static auto& GetLogFileSaveThreshold() { return s_StaticData.s_logFileSaveThreshold; }
+        static bool& IsTestForGetMessage() { return s_StaticData.s_bTestGetMessage; }
     };
 
     struct CTL_LoggerCallbackInfo
@@ -779,6 +785,7 @@ namespace dynarithmic
             CTL_StringType                  m_TwainDSMUserDirectory;
             CTL_StringType                  m_strSessionDetails;
             CTL_StringType                  m_strSourceDetails;
+            const CTL_ITwainSession* GetTwainSession() const { return m_pTwainSession; }
     };
 
     template <typename T>

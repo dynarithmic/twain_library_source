@@ -110,6 +110,8 @@ namespace dynarithmic
         else
             m_ostr.open(filename);
         m_bFileCreated = m_ostr?true:false;
+        if (m_bFileCreated)
+            m_fileName = filename;
     }
 
     File_Logger::~File_Logger()
@@ -124,8 +126,43 @@ namespace dynarithmic
         }
     }
 
-    void File_Logger::trace(std::string_view msg)
+    void File_Logger::checkAutoCount()
     {
+        if (m_autoSaveThreshold > 0 && m_currentLineCount > 0)
+        {
+            if ((m_currentLineCount % m_autoSaveThreshold) == 0)
+            {
+                // Save the current log file and reopen it for appending
+                if (m_ostr.is_open())
+                    m_ostr.close();
+
+				if (m_ostr.fail()) 
+                {
+                    std::ostringstream strm;
+                    strm << "Error closing log file " << m_fileName;
+                    OutputDebugStringA(strm.str().c_str());
+				}
+                else
+                    m_ostr.open(m_fileName, std::ios::app);
+            }
+        }
+    }
+
+	void File_Logger::setAutoSaveThreshold(int64_t count)
+	{
+
+		m_autoSaveThreshold = count < 0 ? -1LL : count;
+		m_currentLineCount = 0;
+	}
+
+	void File_Logger::trace(std::string_view msg)
+    {
+        // Bump up the line count
+        ++m_currentLineCount;
+
+        // Check if the log file is to be saved and then reopened
+        checkAutoCount();
+
         if (m_ostr)
             generic_outstream(m_ostr, getTime() + getThreadID() + msg.data());
     }
@@ -191,6 +228,18 @@ void CLogSystem::GetModuleName(HINSTANCE hInst)
     #endif
 }
 
+bool CLogSystem::SetLogSaveThreshold(int64_t lineCount)
+{
+    auto iter = app_logger_map.find(FILE_LOGGING);
+    if (iter != app_logger_map.end())
+    {
+        auto pFileLogger = static_cast<File_Logger*>(iter->second.get());
+        pFileLogger->setAutoSaveThreshold(lineCount);
+        return true;
+    }
+    return false;
+}
+
 bool CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, const LoggingTraits& lTraits)
 {
     bool loggerSet = false;
@@ -211,9 +260,10 @@ bool CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
             case FILE_LOGGING:
             {
                 auto filelogging = std::make_shared<File_Logger>(StringConversion::Convert_NativePtr_To_Ansi(pOutputFilename).c_str(), lTraits);
-                if (filelogging->IsFileCreated())
+                if (filelogging->isFileCreated())
                 {
                     app_logger_map[FILE_LOGGING] = filelogging;
+                    filelogging->setAutoSaveThreshold(CTL_StaticData::GetLogFileSaveThreshold());
                     loggerSet = true;
                 }
                 else

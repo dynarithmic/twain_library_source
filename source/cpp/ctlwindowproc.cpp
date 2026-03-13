@@ -696,7 +696,7 @@ void dynarithmic::LogDTWAINMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 {
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_NOTIFICATIONS)
     {
-        CTL_ErrorStruct e;
+        CTL_TWAINDecoderStruct e;
         std::string s;
         if ( bToCallback )
             s = "To callback: ";

@@ -542,6 +542,8 @@
 
 /* Sent to determine if feeder should continue feeding pages */
 #define DTWAIN_TN_QUERYACQUIREPAGES             1305
+#define DTWAIN_TN_ACQUIREPAGESSTOPPING          1306
+#define DTWAIN_TN_ACQUIREPAGESSTOPPED           1307
 
 /* PDF OCR clean text flags */
 #define DTWAIN_PDFOCR_CLEANTEXT1            1
@@ -1059,9 +1061,11 @@
 #define DTWAIN_ERR_OPERATION_NOTSUPPORTED  (-2504)
 #define DTWAIN_ERR_INVALID_PDFTEXTELEMENT  (-2505)
 #define DTWAIN_ERR_SETCAP_FAILED           (-2506)
+#define DTWAIN_ERR_CAP_INVALIDSTATE        (-2507)
+#define DTWAIN_ERR_GETCAP_FAILED           (-2508)
 
-#define DTWAIN_ERR_LAST                    (DTWAIN_ERR_USER_START + 1)
 #define DTWAIN_ERR_USER_START              (-80000)  
+#define DTWAIN_ERR_LAST                    (DTWAIN_ERR_USER_START + 1)
 
 /* Device event constants (these values are pow(2, value), where value
    is the TWAIN 1.8 value)*/
@@ -1669,7 +1673,9 @@ DTWAIN DLL are not displayed */
 #define DTWAIN_CONSTANT_CAPCODE_MAP 80
 #define DTWAIN_CONSTANT_ACAP        81
 #define DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC 82
-#define DTWAIN_CONSTANT_LAST     (DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC + 1) 
+#define DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT 83
+#define DTWAIN_CONSTANT_ERROR_NAMES     84
+#define DTWAIN_CONSTANT_LAST     (DTWAIN_CONSTANT_ERROR_NAMES + 1) 
 
 /* This ID is the start of user-defined custom resources */
 #define DTWAIN_USERRES_START     20000

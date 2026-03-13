@@ -633,6 +633,8 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
     public static const int DTWAIN_TN_SOURCEDETAILS = 1304;
     public static const int DTWAIN_TN_QUERYACQUIREPAGES = 1305;
+    public static const int DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
+    public static const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
     public static const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
     public static const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
     public static const int DTWAIN_MODAL = 0;
@@ -1113,6 +1115,8 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ERR_OPERATION_NOTSUPPORTED = (-2504);
     public static const int DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505);
     public static const int DTWAIN_ERR_SETCAP_FAILED = (-2506);
+    public static const int DTWAIN_ERR_CAP_INVALIDSTATE = (-2507);
+    public static const int DTWAIN_ERR_GETCAP_FAILED = (-2508);
     public static const int DTWAIN_DE_CHKAUTOCAPTURE = 1;
     public static const int DTWAIN_DE_CHKBATTERY = 2;
     public static const int DTWAIN_DE_CHKDEVICEONLINE = 4;
@@ -1895,6 +1899,8 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_CONSTANT_CAPCODE_MAP = 80;
     public static const int DTWAIN_CONSTANT_ACAP = 81;
     public static const int DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC = 82;
+    public static const int DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT = 83;
+    public static const int DTWAIN_CONSTANT_ERROR_NAMES = 84;
     public static const int DTWAIN_USERRES_START = 20000;
     public static const int DTWAIN_USERRES_MAXSIZE = 8192;
     public static const int DTWAIN_APIHANDLEOK = 1;
@@ -2115,6 +2121,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableBarcodeDetection;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableDuplex;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableFeeder;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_BOOL) DTWAIN_EnableGetMessageLoopDetection;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableIndicator;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableJobFileHandling;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableLamp;
@@ -2160,6 +2167,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumCameras;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumCamerasEx;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG) DTWAIN_EnumCamerasEx2;
+    extern(Windows) DTWAIN_ARRAY function(LONG) DTWAIN_EnumCapLabels;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumCompressionTypes;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumCompressionTypesEx;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG, DTWAIN_BOOL) DTWAIN_EnumCompressionTypesEx2;
@@ -2331,6 +2339,12 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(DTWAIN_CCHARPTRTYPE) DTWAIN_GetCapFromName;
     extern(Windows) LONG function(LPCSTR) DTWAIN_GetCapFromNameA;
     extern(Windows) LONG function(LPCWSTR) DTWAIN_GetCapFromNameW;
+    extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetCapHelp;
+    extern(Windows) LONG function(LONG, LPSTR, LONG) DTWAIN_GetCapHelpA;
+    extern(Windows) LONG function(LONG, LPWSTR, LONG) DTWAIN_GetCapHelpW;
+    extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetCapLabel;
+    extern(Windows) LONG function(LONG, LPSTR, LONG) DTWAIN_GetCapLabelA;
+    extern(Windows) LONG function(LONG, LPWSTR, LONG) DTWAIN_GetCapLabelW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LPLONG) DTWAIN_GetCapOperations;
     extern(Windows) LONG function(DTWAIN_SOURCE, LONG) DTWAIN_GetCapOperationsEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG, LPDTWAIN_ARRAY) DTWAIN_GetCapValues;
@@ -2647,6 +2661,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsFeederSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsFileSystemSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_IsFileXferSupported;
+    extern(Windows) DTWAIN_BOOL function() DTWAIN_IsGetMessageLoopDetectionOn;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIAFieldALastPageSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIAFieldALevelSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIAFieldAPrintFormatSupported;
@@ -2911,6 +2926,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_ARRAY) DTWAIN_SetLightPathEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetLightSource;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_ARRAY) DTWAIN_SetLightSources;
+    extern(Windows) DTWAIN_BOOL function(LONG64) DTWAIN_SetLogSaveThreshold;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, DTWAIN_BOOL) DTWAIN_SetManualDuplexMode;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetMaxAcquisitions;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetMaxBuffers;
@@ -3276,6 +3292,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_EnableBarcodeDetection, "DTWAIN_EnableBarcodeDetection");
         bindFunction(cast(void**)&DTWAIN_EnableDuplex, "DTWAIN_EnableDuplex");
         bindFunction(cast(void**)&DTWAIN_EnableFeeder, "DTWAIN_EnableFeeder");
+        bindFunction(cast(void**)&DTWAIN_EnableGetMessageLoopDetection, "DTWAIN_EnableGetMessageLoopDetection");
         bindFunction(cast(void**)&DTWAIN_EnableIndicator, "DTWAIN_EnableIndicator");
         bindFunction(cast(void**)&DTWAIN_EnableJobFileHandling, "DTWAIN_EnableJobFileHandling");
         bindFunction(cast(void**)&DTWAIN_EnableLamp, "DTWAIN_EnableLamp");
@@ -3321,6 +3338,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_EnumCameras, "DTWAIN_EnumCameras");
         bindFunction(cast(void**)&DTWAIN_EnumCamerasEx, "DTWAIN_EnumCamerasEx");
         bindFunction(cast(void**)&DTWAIN_EnumCamerasEx2, "DTWAIN_EnumCamerasEx2");
+        bindFunction(cast(void**)&DTWAIN_EnumCapLabels, "DTWAIN_EnumCapLabels");
         bindFunction(cast(void**)&DTWAIN_EnumCompressionTypes, "DTWAIN_EnumCompressionTypes");
         bindFunction(cast(void**)&DTWAIN_EnumCompressionTypesEx, "DTWAIN_EnumCompressionTypesEx");
         bindFunction(cast(void**)&DTWAIN_EnumCompressionTypesEx2, "DTWAIN_EnumCompressionTypesEx2");
@@ -3492,6 +3510,12 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetCapFromName, "DTWAIN_GetCapFromName");
         bindFunction(cast(void**)&DTWAIN_GetCapFromNameA, "DTWAIN_GetCapFromNameA");
         bindFunction(cast(void**)&DTWAIN_GetCapFromNameW, "DTWAIN_GetCapFromNameW");
+        bindFunction(cast(void**)&DTWAIN_GetCapHelp, "DTWAIN_GetCapHelp");
+        bindFunction(cast(void**)&DTWAIN_GetCapHelpA, "DTWAIN_GetCapHelpA");
+        bindFunction(cast(void**)&DTWAIN_GetCapHelpW, "DTWAIN_GetCapHelpW");
+        bindFunction(cast(void**)&DTWAIN_GetCapLabel, "DTWAIN_GetCapLabel");
+        bindFunction(cast(void**)&DTWAIN_GetCapLabelA, "DTWAIN_GetCapLabelA");
+        bindFunction(cast(void**)&DTWAIN_GetCapLabelW, "DTWAIN_GetCapLabelW");
         bindFunction(cast(void**)&DTWAIN_GetCapOperations, "DTWAIN_GetCapOperations");
         bindFunction(cast(void**)&DTWAIN_GetCapOperationsEx, "DTWAIN_GetCapOperationsEx");
         bindFunction(cast(void**)&DTWAIN_GetCapValues, "DTWAIN_GetCapValues");
@@ -3808,6 +3832,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_IsFeederSupported, "DTWAIN_IsFeederSupported");
         bindFunction(cast(void**)&DTWAIN_IsFileSystemSupported, "DTWAIN_IsFileSystemSupported");
         bindFunction(cast(void**)&DTWAIN_IsFileXferSupported, "DTWAIN_IsFileXferSupported");
+        bindFunction(cast(void**)&DTWAIN_IsGetMessageLoopDetectionOn, "DTWAIN_IsGetMessageLoopDetectionOn");
         bindFunction(cast(void**)&DTWAIN_IsIAFieldALastPageSupported, "DTWAIN_IsIAFieldALastPageSupported");
         bindFunction(cast(void**)&DTWAIN_IsIAFieldALevelSupported, "DTWAIN_IsIAFieldALevelSupported");
         bindFunction(cast(void**)&DTWAIN_IsIAFieldAPrintFormatSupported, "DTWAIN_IsIAFieldAPrintFormatSupported");
@@ -4072,6 +4097,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_SetLightPathEx, "DTWAIN_SetLightPathEx");
         bindFunction(cast(void**)&DTWAIN_SetLightSource, "DTWAIN_SetLightSource");
         bindFunction(cast(void**)&DTWAIN_SetLightSources, "DTWAIN_SetLightSources");
+        bindFunction(cast(void**)&DTWAIN_SetLogSaveThreshold, "DTWAIN_SetLogSaveThreshold");
         bindFunction(cast(void**)&DTWAIN_SetManualDuplexMode, "DTWAIN_SetManualDuplexMode");
         bindFunction(cast(void**)&DTWAIN_SetMaxAcquisitions, "DTWAIN_SetMaxAcquisitions");
         bindFunction(cast(void**)&DTWAIN_SetMaxBuffers, "DTWAIN_SetMaxBuffers");

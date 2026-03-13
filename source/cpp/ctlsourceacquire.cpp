@@ -555,8 +555,9 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                                       DTWAIN_ERR_SOURCE_ACQUIRING, -1, FUNC_MACRO);
     // Negotiate transfer
 
-    // We may have to reset the max number of pages double the amount if 
-    // SetTransferCount() detects that the scanner is running a duplex scan
+    // Set the transfer count.  In addition, we may have to reset the max number of 
+    // pages double the amount if SetTransferCount() detects that the scanner is 
+    // running a duplex scan
     opts.setMaxPages(CTL_TwainAppMgr::SetTransferCount(pSource, opts.getMaxPages()));
 
     pSource->SetSpecialTransferMode(opts.getTransferMode());

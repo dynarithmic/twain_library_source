@@ -23,13 +23,13 @@
 #include <array>
 #include "ctliface.h"
 #include "ctltwainmanager.h"
-#include "errstruc.h"
+#include "ctltwaindecoder.h"
 #include "twainfix32.h"
 
 using namespace dynarithmic;
 
 static std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix);
-static std::string DecodeData(CTL_ErrorStructDecoder *pDecoder, TW_MEMREF pData, ErrorStructTypes sType);
+static std::string DecodeData(CTL_TWAINTypeDecoder *pDecoder, TW_MEMREF pData, ErrorStructTypes sType);
 static std::string DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCSTR pMem);
 static std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem);
 static std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups);
@@ -92,7 +92,7 @@ static constexpr std::array<std::pair<uint32_t, const char*>, 6> mapSupportedGro
     ADD_ERRORCODE_TO_MAP2(0, DF_DS2)
 } };
 
-void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
+void CTL_TWAINTypeDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
                                                  WPARAM wParam, LPARAM lParam)
 {
     StringStreamA sBuffer;
@@ -111,7 +111,7 @@ void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
     m_pString = sBuffer.str();
 }
 
-void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest,
+void CTL_TWAINTypeDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest,
                                          TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF Data,
                                          ErrorStructTypes sType)
 {
@@ -161,7 +161,7 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
     m_pString += pDestStr + pMemRefStr;
 }
 
-std::string CTL_ErrorStructDecoder::DecodeBitmap(HANDLE hBitmap)
+std::string CTL_TWAINTypeDecoder::DecodeBitmap(HANDLE hBitmap)
 {
     StringStreamA sBuffer;
     if ( !hBitmap )
@@ -183,7 +183,7 @@ std::string CTL_ErrorStructDecoder::DecodeBitmap(HANDLE hBitmap)
     return sBuffer.str();
 }
 
-std::string CTL_ErrorStructDecoder::DecodePDFTextElement(PDFTextElement *pEl)
+std::string CTL_TWAINTypeDecoder::DecodePDFTextElement(PDFTextElement *pEl)
 {
     StringStreamA sBuffer;
     if ( !pEl )
@@ -209,19 +209,19 @@ std::string CTL_ErrorStructDecoder::DecodePDFTextElement(PDFTextElement *pEl)
 }
 
 
-std::string CTL_ErrorStructDecoder::DecodeTWAINReturnCode(TW_UINT16 retCode)
+std::string CTL_TWAINTypeDecoder::DecodeTWAINReturnCode(TW_UINT16 retCode)
 {
     return DecodeTWAINCode(retCode, IDS_TWRC_ERRORSTART,
                            dynarithmic::GetErrorString_Internal(DTWAIN_ERR_UNKNOWN_TWAIN_RC));
 }
 
-std::string CTL_ErrorStructDecoder::DecodeTWAINReturnCodeCC(TW_UINT16 retCode)
+std::string CTL_TWAINTypeDecoder::DecodeTWAINReturnCodeCC(TW_UINT16 retCode)
 {
     return DecodeTWAINCode(retCode, IDS_TWCC_ERRORSTART,
                            dynarithmic::GetErrorString_Internal(DTWAIN_ERR_UNKNOWN_TWAIN_CC));
 }
 
-std::string CTL_ErrorStructDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, std::string_view defMessage)
+std::string CTL_TWAINTypeDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, std::string_view defMessage)
 {
     const TW_UINT16 actualCode = retCode + errStart;
     const auto it = dynarithmic::generic_array_finder_if(mapTwainDSMReturnCodes, [&](const auto& pr) { return pr.first == actualCode; });
@@ -230,7 +230,7 @@ std::string CTL_ErrorStructDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16
     return defMessage.data();
 }
 
-std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorStructTypes sType)
+std::string DecodeData(CTL_TWAINTypeDecoder* pDecoder, TW_MEMREF pData, ErrorStructTypes sType)
 {
     StringStreamA sBuffer;
     std::string sTemp;
@@ -821,7 +821,7 @@ std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem)
     return sTemp;
 }
 
-std::string CTL_ErrorStructDecoder::DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem)
+std::string CTL_TWAINTypeDecoder::DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem)
 {
     StringStreamA sBuffer;
     sBuffer << "{InfoId=" << CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, pInfo->InfoID).second 
@@ -839,4 +839,23 @@ std::string CTL_ErrorStructDecoder::DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem)
         sTemp = sTemp2 + sTemp;
     }
     return sTemp;
+}
+
+std::string CTL_TWAINTypeDecoder::DecodeCapOperations(LONG nOps)
+{
+    std::string sReturn;
+
+    static constexpr std::array<std::string_view, 6> sAllOps =
+        { "TWQC_GET", "TWQC_GETCURRENT", "TWQC_GETDEFAULT", "TWQC_SET", "TWQC_RESET", "TWQC_SETCONSTRAINT" };
+
+    static constexpr std::array<TW_UINT16, 6> nAllOps = 
+        { TWQC_GET, TWQC_GETCURRENT, TWQC_GETDEFAULT, TWQC_SET, TWQC_RESET, TWQC_SETCONSTRAINT };
+
+    std::vector<std::string> vOps;
+    for (size_t i = 0; i < nAllOps.size(); ++i)
+    {
+        if (nOps & nAllOps[i])
+            vOps.push_back(sAllOps[i].data());
+    }
+    return StringWrapperA::Join(vOps, " | ");
 }

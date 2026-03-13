@@ -48,7 +48,7 @@ namespace dynarithmic
 
             case SUCCESS_RESAMPLING:
                 LogWriterUtils::WriteLogInfoIndentedA("Resampling bitmap data for image type " + m_ImageType + " success...");
-                std::string sOut = CTL_ErrorStructDecoder::DecodeBitmap(dataHandle);
+                std::string sOut = CTL_TWAINTypeDecoder::DecodeBitmap(dataHandle);
                 LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
             break;
         }

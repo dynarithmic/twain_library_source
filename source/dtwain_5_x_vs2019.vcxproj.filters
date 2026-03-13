@@ -310,9 +310,6 @@
     <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwtiff2ps.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\errstruc.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipImage.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -631,6 +628,9 @@
     <ClCompile Include="miniz\miniz_zip.c">
       <Filter>miniz</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\ctltwaindecoder.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -891,9 +891,6 @@
     <ClInclude Include=".\h\errorcheck.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\errstruc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="cpp\pdflib32\flateencode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1103,6 +1100,12 @@
     </ClInclude>
     <ClInclude Include="miniz\miniz_zip.h">
       <Filter>miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltr045.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltwaindecoder.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

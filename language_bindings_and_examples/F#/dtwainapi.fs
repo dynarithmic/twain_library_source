@@ -516,6 +516,8 @@ module TwainAPI =
     let public DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302
     let public DTWAIN_TN_SOURCEDETAILS = 1304
     let public DTWAIN_TN_QUERYACQUIREPAGES = 1305
+    let public DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306
+    let public DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
     let public DTWAIN_PDFOCR_CLEANTEXT1 = 1
     let public DTWAIN_PDFOCR_CLEANTEXT2 = 2
     let public DTWAIN_MODAL = 0
@@ -996,6 +998,8 @@ module TwainAPI =
     let public DTWAIN_ERR_OPERATION_NOTSUPPORTED = (-2504)
     let public DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505)
     let public DTWAIN_ERR_SETCAP_FAILED = (-2506)
+    let public DTWAIN_ERR_CAP_INVALIDSTATE = (-2507)
+    let public DTWAIN_ERR_GETCAP_FAILED = (-2508)
     let public DTWAIN_DE_CHKAUTOCAPTURE = 1
     let public DTWAIN_DE_CHKBATTERY = 2
     let public DTWAIN_DE_CHKDEVICEONLINE = 4
@@ -1778,6 +1782,8 @@ module TwainAPI =
     let public DTWAIN_CONSTANT_CAPCODE_MAP = 80
     let public DTWAIN_CONSTANT_ACAP = 81
     let public DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC = 82
+    let public DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT = 83
+    let public DTWAIN_CONSTANT_ERROR_NAMES = 84
     let public DTWAIN_USERRES_START = 20000
     let public DTWAIN_USERRES_MAXSIZE = 8192
     let public DTWAIN_APIHANDLEOK = 1
@@ -2318,6 +2324,9 @@ module TwainAPI =
     type DTWAIN_EnableFeederDelegate = delegate of DTWAIN_SOURCE * DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_EnableGetMessageLoopDetectionDelegate = delegate of DTWAIN_BOOL -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnableIndicatorDelegate = delegate of DTWAIN_SOURCE * DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -2451,6 +2460,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumCamerasEx2Delegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_ARRAY
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_EnumCapLabelsDelegate = delegate of LONG -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumCompressionTypesDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
@@ -2886,6 +2898,12 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetCapFromNameDelegate = delegate of string -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetCapHelpDelegate = delegate of LONG * System.Text.StringBuilder * LONG -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetCapLabelDelegate = delegate of LONG * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetCapOperationsDelegate = delegate of DTWAIN_SOURCE * LONG * int byref -> DTWAIN_BOOL
@@ -3521,6 +3539,9 @@ module TwainAPI =
     type DTWAIN_IsFileXferSupportedDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_IsGetMessageLoopDetectionOnDelegate = delegate of unit -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_IsIAFieldALastPageSupportedDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4103,6 +4124,9 @@ module TwainAPI =
     type DTWAIN_SetLightSourcesDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_SetLogSaveThresholdDelegate = delegate of LONG64 -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SetManualDuplexModeDelegate = delegate of DTWAIN_SOURCE * LONG * DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4524,6 +4548,7 @@ module TwainAPI =
     let private EnableBarcodeDetection = lazy (DynamicDll.Bind "DTWAIN_EnableBarcodeDetection" : DTWAIN_EnableBarcodeDetectionDelegate)
     let private EnableDuplex = lazy (DynamicDll.Bind "DTWAIN_EnableDuplex" : DTWAIN_EnableDuplexDelegate)
     let private EnableFeeder = lazy (DynamicDll.Bind "DTWAIN_EnableFeeder" : DTWAIN_EnableFeederDelegate)
+    let private EnableGetMessageLoopDetection = lazy (DynamicDll.Bind "DTWAIN_EnableGetMessageLoopDetection" : DTWAIN_EnableGetMessageLoopDetectionDelegate)
     let private EnableIndicator = lazy (DynamicDll.Bind "DTWAIN_EnableIndicator" : DTWAIN_EnableIndicatorDelegate)
     let private EnableJobFileHandling = lazy (DynamicDll.Bind "DTWAIN_EnableJobFileHandling" : DTWAIN_EnableJobFileHandlingDelegate)
     let private EnableLamp = lazy (DynamicDll.Bind "DTWAIN_EnableLamp" : DTWAIN_EnableLampDelegate)
@@ -4569,6 +4594,7 @@ module TwainAPI =
     let private EnumCameras = lazy (DynamicDll.Bind "DTWAIN_EnumCameras" : DTWAIN_EnumCamerasDelegate)
     let private EnumCamerasEx = lazy (DynamicDll.Bind "DTWAIN_EnumCamerasEx" : DTWAIN_EnumCamerasExDelegate)
     let private EnumCamerasEx2 = lazy (DynamicDll.Bind "DTWAIN_EnumCamerasEx2" : DTWAIN_EnumCamerasEx2Delegate)
+    let private EnumCapLabels = lazy (DynamicDll.Bind "DTWAIN_EnumCapLabels" : DTWAIN_EnumCapLabelsDelegate)
     let private EnumCompressionTypes = lazy (DynamicDll.Bind "DTWAIN_EnumCompressionTypes" : DTWAIN_EnumCompressionTypesDelegate)
     let private EnumCompressionTypesEx = lazy (DynamicDll.Bind "DTWAIN_EnumCompressionTypesEx" : DTWAIN_EnumCompressionTypesExDelegate)
     let private EnumCompressionTypesEx2 = lazy (DynamicDll.Bind "DTWAIN_EnumCompressionTypesEx2" : DTWAIN_EnumCompressionTypesEx2Delegate)
@@ -4714,6 +4740,8 @@ module TwainAPI =
     let private GetCapContainerEx2 = lazy (DynamicDll.Bind "DTWAIN_GetCapContainerEx2" : DTWAIN_GetCapContainerEx2Delegate)
     let private GetCapDataType = lazy (DynamicDll.Bind "DTWAIN_GetCapDataType" : DTWAIN_GetCapDataTypeDelegate)
     let private GetCapFromName = lazy (DynamicDll.Bind "DTWAIN_GetCapFromName" : DTWAIN_GetCapFromNameDelegate)
+    let private GetCapHelp = lazy (DynamicDll.Bind "DTWAIN_GetCapHelp" : DTWAIN_GetCapHelpDelegate)
+    let private GetCapLabel = lazy (DynamicDll.Bind "DTWAIN_GetCapLabel" : DTWAIN_GetCapLabelDelegate)
     let private GetCapOperations = lazy (DynamicDll.Bind "DTWAIN_GetCapOperations" : DTWAIN_GetCapOperationsDelegate)
     let private GetCapOperationsEx = lazy (DynamicDll.Bind "DTWAIN_GetCapOperationsEx" : DTWAIN_GetCapOperationsExDelegate)
     let private GetCapValues = lazy (DynamicDll.Bind "DTWAIN_GetCapValues" : DTWAIN_GetCapValuesDelegate)
@@ -4925,6 +4953,7 @@ module TwainAPI =
     let private IsFeederSupported = lazy (DynamicDll.Bind "DTWAIN_IsFeederSupported" : DTWAIN_IsFeederSupportedDelegate)
     let private IsFileSystemSupported = lazy (DynamicDll.Bind "DTWAIN_IsFileSystemSupported" : DTWAIN_IsFileSystemSupportedDelegate)
     let private IsFileXferSupported = lazy (DynamicDll.Bind "DTWAIN_IsFileXferSupported" : DTWAIN_IsFileXferSupportedDelegate)
+    let private IsGetMessageLoopDetectionOn = lazy (DynamicDll.Bind "DTWAIN_IsGetMessageLoopDetectionOn" : DTWAIN_IsGetMessageLoopDetectionOnDelegate)
     let private IsIAFieldALastPageSupported = lazy (DynamicDll.Bind "DTWAIN_IsIAFieldALastPageSupported" : DTWAIN_IsIAFieldALastPageSupportedDelegate)
     let private IsIAFieldALevelSupported = lazy (DynamicDll.Bind "DTWAIN_IsIAFieldALevelSupported" : DTWAIN_IsIAFieldALevelSupportedDelegate)
     let private IsIAFieldAPrintFormatSupported = lazy (DynamicDll.Bind "DTWAIN_IsIAFieldAPrintFormatSupported" : DTWAIN_IsIAFieldAPrintFormatSupportedDelegate)
@@ -5119,6 +5148,7 @@ module TwainAPI =
     let private SetLightPathEx = lazy (DynamicDll.Bind "DTWAIN_SetLightPathEx" : DTWAIN_SetLightPathExDelegate)
     let private SetLightSource = lazy (DynamicDll.Bind "DTWAIN_SetLightSource" : DTWAIN_SetLightSourceDelegate)
     let private SetLightSources = lazy (DynamicDll.Bind "DTWAIN_SetLightSources" : DTWAIN_SetLightSourcesDelegate)
+    let private SetLogSaveThreshold = lazy (DynamicDll.Bind "DTWAIN_SetLogSaveThreshold" : DTWAIN_SetLogSaveThresholdDelegate)
     let private SetManualDuplexMode = lazy (DynamicDll.Bind "DTWAIN_SetManualDuplexMode" : DTWAIN_SetManualDuplexModeDelegate)
     let private SetMaxAcquisitions = lazy (DynamicDll.Bind "DTWAIN_SetMaxAcquisitions" : DTWAIN_SetMaxAcquisitionsDelegate)
     let private SetMaxBuffers = lazy (DynamicDll.Bind "DTWAIN_SetMaxBuffers" : DTWAIN_SetMaxBuffersDelegate)
@@ -5852,6 +5882,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnableFeeder.Value.Invoke(source, bset)
 
+    let DTWAIN_EnableGetMessageLoopDetection (benable: DTWAIN_BOOL) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        EnableGetMessageLoopDetection.Value.Invoke(benable)
+
     let DTWAIN_EnableIndicator (source: DTWAIN_SOURCE) (benable: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnableIndicator.Value.Invoke(source, benable)
@@ -6031,6 +6065,10 @@ module TwainAPI =
     let DTWAIN_EnumCamerasEx2 (source: DTWAIN_SOURCE) (nwhichcamera: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumCamerasEx2.Value.Invoke(source, nwhichcamera)
+
+    let DTWAIN_EnumCapLabels (lcapability: LONG) : DTWAIN_ARRAY =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        EnumCapLabels.Value.Invoke(lcapability)
 
     let DTWAIN_EnumCompressionTypes (source: DTWAIN_SOURCE) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -6611,6 +6649,14 @@ module TwainAPI =
     let DTWAIN_GetCapFromName (szname: string) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCapFromName.Value.Invoke(szname)
+
+    let DTWAIN_GetCapHelp (lcapability: LONG) (lpszout: System.Text.StringBuilder) (nsize: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetCapHelp.Value.Invoke(lcapability, lpszout, nsize)
+
+    let DTWAIN_GetCapLabel (lcapability: LONG) (lpszout: System.Text.StringBuilder) (nsize: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetCapLabel.Value.Invoke(lcapability, lpszout, nsize)
 
     let DTWAIN_GetCapOperations (source: DTWAIN_SOURCE) (lcapability: LONG) (lpops: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -7456,6 +7502,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         IsFileXferSupported.Value.Invoke(source, lfiletype)
 
+    let DTWAIN_IsGetMessageLoopDetectionOn() : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        IsGetMessageLoopDetectionOn.Value.Invoke()
+
     let DTWAIN_IsIAFieldALastPageSupported (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         IsIAFieldALastPageSupported.Value.Invoke(source)
@@ -8231,6 +8281,10 @@ module TwainAPI =
     let DTWAIN_SetLightSources (source: DTWAIN_SOURCE) (lightsources: DTWAIN_ARRAY) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SetLightSources.Value.Invoke(source, lightsources)
+
+    let DTWAIN_SetLogSaveThreshold (linecount: LONG64) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        SetLogSaveThreshold.Value.Invoke(linecount)
 
     let DTWAIN_SetManualDuplexMode (source: DTWAIN_SOURCE) (flags: LONG) (bset: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

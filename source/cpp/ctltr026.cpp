@@ -268,7 +268,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_DECODE_BITMAP)
                 {
                     std::string sOut = "\nOriginal bitmap from device: \n";
-                    sOut += "{" + CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle) + "}";
+                    sOut += "{" + CTL_TWAINTypeDecoder::DecodeBitmap(m_hDataHandle) + "}";
                     LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
                 }
 
@@ -531,6 +531,9 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
 void CTL_ImageXferTriplet::StopAcquisitions(int errfile)
 {
+    auto pSession = GetSessionPtr();
+    auto pSource = GetSourcePtr();
+	CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_ACQUIREPAGESSTOPPING, reinterpret_cast<LPARAM>(pSource));
     // Clean up since the acquisitions are stopped
     // End the transfer
     auto pending = ResetTransfer(MSG_ENDXFER);
@@ -549,6 +552,7 @@ void CTL_ImageXferTriplet::StopAcquisitions(int errfile)
 	}
 	// Set the scan pending to false
 	m_bScanPending = false;
+	CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_ACQUIREPAGESSTOPPED, reinterpret_cast<LPARAM>(pSource));
 }
 
 TW_UINT16 CTL_ImageXferTriplet::GetPendingCount() 
@@ -1532,7 +1536,7 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
             if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
                 std::string sOut = msg[i];
-                sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
+                sOut += CTL_TWAINTypeDecoder::DecodeBitmap(m_hDataHandle);
                 LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
             }
             return true;

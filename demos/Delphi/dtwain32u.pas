@@ -556,6 +556,8 @@ const
   DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
   DTWAIN_TN_SOURCEDETAILS = 1304;
   DTWAIN_TN_QUERYACQUIREPAGES = 1305;
+  DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
+  DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
   DTWAIN_PDFOCR_CLEANTEXT1 = 1;
   DTWAIN_PDFOCR_CLEANTEXT2 = 2;
   DTWAIN_MODAL = 0;
@@ -1036,6 +1038,8 @@ const
   DTWAIN_ERR_OPERATION_NOTSUPPORTED = (-2504);
   DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505);
   DTWAIN_ERR_SETCAP_FAILED = (-2506);
+  DTWAIN_ERR_CAP_INVALIDSTATE = (-2507);
+  DTWAIN_ERR_GETCAP_FAILED = (-2508);
   DTWAIN_DE_CHKAUTOCAPTURE = 1;
   DTWAIN_DE_CHKBATTERY = 2;
   DTWAIN_DE_CHKDEVICEONLINE = 4;
@@ -1818,6 +1822,8 @@ const
   DTWAIN_CONSTANT_CAPCODE_MAP = 80;
   DTWAIN_CONSTANT_ACAP = 81;
   DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC = 82;
+  DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT = 83;
+  DTWAIN_CONSTANT_ERROR_NAMES = 84;
   DTWAIN_USERRES_START = 20000;
   DTWAIN_USERRES_MAXSIZE = 8192;
   DTWAIN_APIHANDLEOK = 1;
@@ -2039,6 +2045,7 @@ function DTWAIN_EnableAutomaticSenseMedium(Source:DTWAIN_SOURCE; bSet:BOOL) : BO
 function DTWAIN_EnableBarcodeDetection(Source:DTWAIN_SOURCE; bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnableBarcodeDetection';
 function DTWAIN_EnableDuplex(Source:DTWAIN_SOURCE; bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnableDuplex';
 function DTWAIN_EnableFeeder(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnableFeeder';
+function DTWAIN_EnableGetMessageLoopDetection(bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnableGetMessageLoopDetection';
 function DTWAIN_EnableIndicator(Source:DTWAIN_SOURCE; bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnableIndicator';
 function DTWAIN_EnableJobFileHandling(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnableJobFileHandling';
 function DTWAIN_EnableLamp(Source:DTWAIN_SOURCE; bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnableLamp';
@@ -2084,6 +2091,7 @@ function DTWAIN_EnumBrightnessValuesEx(Source:DTWAIN_SOURCE; bExpandIfRange:BOOL
 function DTWAIN_EnumCameras(Source:DTWAIN_SOURCE; Cameras:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCameras';
 function DTWAIN_EnumCamerasEx(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCamerasEx';
 function DTWAIN_EnumCamerasEx2(Source:DTWAIN_SOURCE; nWhichCamera:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCamerasEx2';
+function DTWAIN_EnumCapLabels(lCapability:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCapLabels';
 function DTWAIN_EnumCompressionTypes(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCompressionTypes';
 function DTWAIN_EnumCompressionTypesEx(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCompressionTypesEx';
 function DTWAIN_EnumCompressionTypesEx2(Source:DTWAIN_SOURCE; lFileType:LONG; bUseBufferedMode:BOOL) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumCompressionTypesEx2';
@@ -2257,6 +2265,12 @@ function DTWAIN_GetCapDataType(Source:DTWAIN_SOURCE; nCap:LONG) : LONG; stdcall;
 function DTWAIN_GetCapFromName(szName:LPCTSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapFromName';
 function DTWAIN_GetCapFromNameA(szName:LPCSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapFromNameA';
 function DTWAIN_GetCapFromNameW(szName:LPCWSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapFromNameW';
+function DTWAIN_GetCapHelp(lCapability:LONG; lpszOut:LPTSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapHelp';
+function DTWAIN_GetCapHelpA(lCapability:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapHelpA';
+function DTWAIN_GetCapHelpW(lCapability:LONG; lpszOut:LPWSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapHelpW';
+function DTWAIN_GetCapLabel(lCapability:LONG; lpszOut:LPTSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapLabel';
+function DTWAIN_GetCapLabelA(lCapability:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapLabelA';
+function DTWAIN_GetCapLabelW(lCapability:LONG; lpszOut:LPWSTR; nnSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapLabelW';
 function DTWAIN_GetCapOperations(Source:DTWAIN_SOURCE; lCapability:LONG; lpOps:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapOperations';
 function DTWAIN_GetCapOperationsEx(Source:DTWAIN_SOURCE; lCapability:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapOperationsEx';
 function DTWAIN_GetCapValues(Source:DTWAIN_SOURCE; lCap:LONG; lGetType:LONG; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCapValues';
@@ -2578,6 +2592,7 @@ function DTWAIN_IsFeederSensitive(Source:DTWAIN_SOURCE) : BOOL; stdcall;  extern
 function DTWAIN_IsFeederSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsFeederSupported';
 function DTWAIN_IsFileSystemSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsFileSystemSupported';
 function DTWAIN_IsFileXferSupported(Source:DTWAIN_SOURCE; lFileType:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsFileXferSupported';
+function DTWAIN_IsGetMessageLoopDetectionOn : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsGetMessageLoopDetectionOn';
 function DTWAIN_IsIAFieldALastPageSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsIAFieldALastPageSupported';
 function DTWAIN_IsIAFieldALevelSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsIAFieldALevelSupported';
 function DTWAIN_IsIAFieldAPrintFormatSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsIAFieldAPrintFormatSupported';
@@ -2846,6 +2861,7 @@ function DTWAIN_SetLightPath(Source:DTWAIN_SOURCE; LightPath:LONG) : BOOL; stdca
 function DTWAIN_SetLightPathEx(Source:DTWAIN_SOURCE; LightPaths:DTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetLightPathEx';
 function DTWAIN_SetLightSource(Source:DTWAIN_SOURCE; LightSource:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetLightSource';
 function DTWAIN_SetLightSources(Source:DTWAIN_SOURCE; LightSources:DTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetLightSources';
+function DTWAIN_SetLogSaveThreshold(lineCount:Int64) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetLogSaveThreshold';
 function DTWAIN_SetLoggerCallback(logProc:DTwainLoggerProc; UserData:Int64) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetLoggerCallback';
 function DTWAIN_SetLoggerCallbackA(logProc:DTwainLoggerProcA; UserData:Int64) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetLoggerCallbackA';
 function DTWAIN_SetLoggerCallbackW(logProc:DTwainLoggerProcW; UserData:Int64) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetLoggerCallbackW';

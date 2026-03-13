@@ -23,6 +23,7 @@
 #include "errorcheck.h"
 #include "ctltmpl5.h"
 #include "ctllogcalls.h"
+#include "ctlarray.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -227,6 +228,16 @@ static LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSour
     return CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true);
 }
 
+template <TW_UINT16 msgType>
+static CTL_StringType GetCapLabelHelpInternal(CTL_TwainDLLHandle* pHandle, LONG lCapability)
+{
+    CTL_CapabilityLabelHelpTriplet<msgType> LabelHelpTrip(pHandle->m_pTwainSession, static_cast<TW_UINT16>(lCapability));
+    auto rc = LabelHelpTrip.Execute();
+    if (rc == TWRC_SUCCESS)
+        return StringConversion::Convert_Ansi_To_Native(LabelHelpTrip.GetString());
+    return {};
+}
+
 LONG DLLENTRY_DEF DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
@@ -236,7 +247,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapabili
 	CATCH_BLOCK(0)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG  lpOps)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCapability, lpOps))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
@@ -253,9 +264,54 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
     // Get the capability operations
     *lpOps = GetCapOperationsInternal(pHandle, pSource, lCapability);
 
+    // Log the cap operations if logging is turned on
+    if (CTL_StaticData::GetLogFilterFlags())
+    {
+        LogWriterUtils::WriteLogInfoIndentedA("Supported operations for capability " + CTL_TwainAppMgr::GetCapNameFromCap(lCapability) + ": ");
+		LogWriterUtils::WriteLogInfoIndentedA(CTL_TWAINTypeDecoder::DecodeCapOperations(*lpOps));
+    }
+
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOps))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetCapLabel(LONG lCapability, LPTSTR lpszLabel, LONG nMaxLen)
+{
+    LOG_FUNC_ENTRY_PARAMS((lCapability, lpszLabel, nMaxLen))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+
+    // Get the cap label (if this is supported)
+    CTL_StringType label = GetCapLabelHelpInternal<MSG_GETLABEL>(pHandle, lCapability);
+    auto maxChars = StringWrapper::CopyInfoToCString(label, lpszLabel, nMaxLen);
+	LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszLabel))
+    LOG_FUNC_EXIT_NONAME_PARAMS(maxChars)
+    CATCH_BLOCK(0)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetCapHelp(LONG lCapability, LPTSTR lpszHelp, LONG nMaxLen)
+{
+    LOG_FUNC_ENTRY_PARAMS((lCapability, lpszHelp, nMaxLen))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    // Get the cap help (if this is supported)
+    CTL_StringType label = GetCapLabelHelpInternal<MSG_GETHELP>(pHandle, lCapability);
+    auto maxChars = StringWrapper::CopyInfoToCString(label, lpszHelp, nMaxLen);
+	LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszHelp))
+    LOG_FUNC_EXIT_NONAME_PARAMS(maxChars)
+    CATCH_BLOCK(0)
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCapLabels(LONG lCapability)
+{
+	LOG_FUNC_ENTRY_PARAMS((lCapability))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    CTL_CapabilityLabelEnumTriplet Trip(pHandle->m_pTwainSession, static_cast<TW_UINT16>(lCapability));
+    DTWAIN_ARRAY arrayRet = {};
+    auto rc = Trip.Execute();
+    if (rc == TWRC_SUCCESS)
+        arrayRet = dynarithmic::CreateArrayFromContainer<std::vector<std::string>>(pHandle, Trip.GetStrings());
+	LOG_FUNC_EXIT_NONAME_PARAMS(arrayRet)
+	CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)

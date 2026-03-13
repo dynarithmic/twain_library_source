@@ -531,6 +531,8 @@
         public const int DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
         public const int DTWAIN_TN_SOURCEDETAILS = 1304;
         public const int DTWAIN_TN_QUERYACQUIREPAGES = 1305;
+        public const int DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
+        public const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
@@ -1011,6 +1013,8 @@
         public const int DTWAIN_ERR_OPERATION_NOTSUPPORTED = (-2504);
         public const int DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505);
         public const int DTWAIN_ERR_SETCAP_FAILED = (-2506);
+        public const int DTWAIN_ERR_CAP_INVALIDSTATE = (-2507);
+        public const int DTWAIN_ERR_GETCAP_FAILED = (-2508);
         public const int DTWAIN_DE_CHKAUTOCAPTURE = 1;
         public const int DTWAIN_DE_CHKBATTERY = 2;
         public const int DTWAIN_DE_CHKDEVICEONLINE = 4;
@@ -1793,6 +1797,8 @@
         public const int DTWAIN_CONSTANT_CAPCODE_MAP = 80;
         public const int DTWAIN_CONSTANT_ACAP = 81;
         public const int DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC = 82;
+        public const int DTWAIN_CONSTANT_DTWAINCONT_TWAINCONT = 83;
+        public const int DTWAIN_CONSTANT_ERROR_NAMES = 84;
         public const int DTWAIN_USERRES_START = 20000;
         public const int DTWAIN_USERRES_MAXSIZE = 8192;
         public const int DTWAIN_APIHANDLEOK = 1;
@@ -2058,6 +2064,7 @@
         public delegate int DTWAIN_EnableBarcodeDetectionDelegate(DTWAIN_SOURCE Source, int bEnable);
         public delegate int DTWAIN_EnableDuplexDelegate(DTWAIN_SOURCE Source, int bEnable);
         public delegate int DTWAIN_EnableFeederDelegate(DTWAIN_SOURCE Source, int bSet);
+        public delegate int DTWAIN_EnableGetMessageLoopDetectionDelegate(int bEnable);
         public delegate int DTWAIN_EnableIndicatorDelegate(DTWAIN_SOURCE Source, int bEnable);
         public delegate int DTWAIN_EnableJobFileHandlingDelegate(DTWAIN_SOURCE Source, int bSet);
         public delegate int DTWAIN_EnableLampDelegate(DTWAIN_SOURCE Source, int bEnable);
@@ -2103,6 +2110,7 @@
         public delegate int DTWAIN_EnumCamerasDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY Cameras);
         public delegate DTWAIN_ARRAY DTWAIN_EnumCamerasExDelegate(DTWAIN_SOURCE Source);
         public delegate DTWAIN_ARRAY DTWAIN_EnumCamerasEx2Delegate(DTWAIN_SOURCE Source, int nWhichCamera);
+        public delegate DTWAIN_ARRAY DTWAIN_EnumCapLabelsDelegate(int lCapability);
         public delegate int DTWAIN_EnumCompressionTypesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
         public delegate DTWAIN_ARRAY DTWAIN_EnumCompressionTypesExDelegate(DTWAIN_SOURCE Source);
         public delegate DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx2Delegate(DTWAIN_SOURCE Source, int lFileType, int bUseBufferedMode);
@@ -2256,6 +2264,10 @@
         public delegate DTWAIN_ARRAY DTWAIN_GetCapContainerEx2Delegate(int nCap, int bSetContainer);
         public delegate int DTWAIN_GetCapDataTypeDelegate(DTWAIN_SOURCE Source, int nCap);
         public delegate int DTWAIN_GetCapFromNameDelegate([MarshalAs(UnmanagedType.LPTStr)] string szName);
+        public delegate int DTWAIN_GetCapHelpDelegate(int lCapability, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize);
+        public delegate int DTWAIN_GetCapHelpDelegate_overload(int lCapability, System.IntPtr lpszOut, int nSize);
+        public delegate int DTWAIN_GetCapLabelDelegate(int lCapability, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize);
+        public delegate int DTWAIN_GetCapLabelDelegate_overload(int lCapability, System.IntPtr lpszOut, int nSize);
         public delegate int DTWAIN_GetCapOperationsDelegate(DTWAIN_SOURCE Source, int lCapability, ref int lpOps);
         public delegate int DTWAIN_GetCapOperationsExDelegate(DTWAIN_SOURCE Source, int lCapability);
         public delegate int DTWAIN_GetCapValuesDelegate(DTWAIN_SOURCE Source, int lCap, int lGetType, ref DTWAIN_ARRAY pArray);
@@ -2517,6 +2529,7 @@
         public delegate int DTWAIN_IsFeederSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsFileSystemSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsFileXferSupportedDelegate(DTWAIN_SOURCE Source, int lFileType);
+        public delegate int DTWAIN_IsGetMessageLoopDetectionOnDelegate();
         public delegate int DTWAIN_IsIAFieldALastPageSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsIAFieldALevelSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsIAFieldAPrintFormatSupportedDelegate(DTWAIN_SOURCE Source);
@@ -2720,6 +2733,7 @@
         public delegate int DTWAIN_SetLightPathExDelegate(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightPaths);
         public delegate int DTWAIN_SetLightSourceDelegate(DTWAIN_SOURCE Source, int LightSource);
         public delegate int DTWAIN_SetLightSourcesDelegate(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightSources);
+        public delegate int DTWAIN_SetLogSaveThresholdDelegate(LONG64 lineCount);
         public delegate int DTWAIN_SetLoggerCallbackDelegate(DTwainLoggerProc logProc, long UserData);
         public delegate int DTWAIN_SetManualDuplexModeDelegate(DTWAIN_SOURCE Source, int Flags, int bSet);
         public delegate int DTWAIN_SetMaxAcquisitionsDelegate(DTWAIN_SOURCE Source, int MaxAcquires);
@@ -3305,6 +3319,9 @@
         [DTWAINNativeFunction("DTWAIN_EnableFeeder")]
         private readonly DTWAIN_EnableFeederDelegate  _DTWAIN_EnableFeeder;
 
+        [DTWAINNativeFunction("DTWAIN_EnableGetMessageLoopDetection")]
+        private readonly DTWAIN_EnableGetMessageLoopDetectionDelegate  _DTWAIN_EnableGetMessageLoopDetection;
+
         [DTWAINNativeFunction("DTWAIN_EnableIndicator")]
         private readonly DTWAIN_EnableIndicatorDelegate  _DTWAIN_EnableIndicator;
 
@@ -3439,6 +3456,9 @@
 
         [DTWAINNativeFunction("DTWAIN_EnumCamerasEx2")]
         private readonly DTWAIN_EnumCamerasEx2Delegate  _DTWAIN_EnumCamerasEx2;
+
+        [DTWAINNativeFunction("DTWAIN_EnumCapLabels")]
+        private readonly DTWAIN_EnumCapLabelsDelegate  _DTWAIN_EnumCapLabels;
 
         [DTWAINNativeFunction("DTWAIN_EnumCompressionTypes")]
         private readonly DTWAIN_EnumCompressionTypesDelegate  _DTWAIN_EnumCompressionTypes;
@@ -3898,6 +3918,18 @@
 
         [DTWAINNativeFunction("DTWAIN_GetCapFromName")]
         private readonly DTWAIN_GetCapFromNameDelegate  _DTWAIN_GetCapFromName;
+
+        [DTWAINNativeFunction("DTWAIN_GetCapHelp")]
+        private readonly DTWAIN_GetCapHelpDelegate  _DTWAIN_GetCapHelp;
+
+        [DTWAINNativeFunction("DTWAIN_GetCapHelp")]
+        private readonly DTWAIN_GetCapHelpDelegate_overload _DTWAIN_GetCapHelp_overload; 
+
+        [DTWAINNativeFunction("DTWAIN_GetCapLabel")]
+        private readonly DTWAIN_GetCapLabelDelegate  _DTWAIN_GetCapLabel;
+
+        [DTWAINNativeFunction("DTWAIN_GetCapLabel")]
+        private readonly DTWAIN_GetCapLabelDelegate_overload _DTWAIN_GetCapLabel_overload; 
 
         [DTWAINNativeFunction("DTWAIN_GetCapOperations")]
         private readonly DTWAIN_GetCapOperationsDelegate  _DTWAIN_GetCapOperations;
@@ -4682,6 +4714,9 @@
         [DTWAINNativeFunction("DTWAIN_IsFileXferSupported")]
         private readonly DTWAIN_IsFileXferSupportedDelegate  _DTWAIN_IsFileXferSupported;
 
+        [DTWAINNativeFunction("DTWAIN_IsGetMessageLoopDetectionOn")]
+        private readonly DTWAIN_IsGetMessageLoopDetectionOnDelegate  _DTWAIN_IsGetMessageLoopDetectionOn;
+
         [DTWAINNativeFunction("DTWAIN_IsIAFieldALastPageSupported")]
         private readonly DTWAIN_IsIAFieldALastPageSupportedDelegate  _DTWAIN_IsIAFieldALastPageSupported;
 
@@ -5290,6 +5325,9 @@
 
         [DTWAINNativeFunction("DTWAIN_SetLightSources")]
         private readonly DTWAIN_SetLightSourcesDelegate  _DTWAIN_SetLightSources;
+
+        [DTWAINNativeFunction("DTWAIN_SetLogSaveThreshold")]
+        private readonly DTWAIN_SetLogSaveThresholdDelegate  _DTWAIN_SetLogSaveThreshold;
 
         [DTWAINNativeFunction("DTWAIN_SetLoggerCallback")]
         private readonly DTWAIN_SetLoggerCallbackDelegate  _DTWAIN_SetLoggerCallback;
@@ -6043,6 +6081,9 @@
         public  int DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, int bSet)
         => _DTWAIN_EnableFeeder(Source, bSet);
 
+        public  int DTWAIN_EnableGetMessageLoopDetection(int bEnable)
+        => _DTWAIN_EnableGetMessageLoopDetection(bEnable);
+
         public  int DTWAIN_EnableIndicator(DTWAIN_SOURCE Source, int bEnable)
         => _DTWAIN_EnableIndicator(Source, bEnable);
 
@@ -6177,6 +6218,9 @@
 
         public  DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, int nWhichCamera)
         => _DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
+
+        public  DTWAIN_ARRAY DTWAIN_EnumCapLabels(int lCapability)
+        => _DTWAIN_EnumCapLabels(lCapability);
 
         public  int DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray)
         => _DTWAIN_EnumCompressionTypes(Source, ref pArray);
@@ -6636,6 +6680,18 @@
 
         public  int DTWAIN_GetCapFromName([MarshalAs(UnmanagedType.LPTStr)] string szName)
         => _DTWAIN_GetCapFromName(szName);
+
+        public  int DTWAIN_GetCapHelp(int lCapability, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize)
+        => _DTWAIN_GetCapHelp(lCapability, lpszOut, nSize);
+
+        public  int DTWAIN_GetCapHelp (int lCapability, System.IntPtr lpszOut, int nSize)
+        => _DTWAIN_GetCapHelp_overload(lCapability, lpszOut, nSize);
+
+        public  int DTWAIN_GetCapLabel(int lCapability, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize)
+        => _DTWAIN_GetCapLabel(lCapability, lpszOut, nSize);
+
+        public  int DTWAIN_GetCapLabel (int lCapability, System.IntPtr lpszOut, int nSize)
+        => _DTWAIN_GetCapLabel_overload(lCapability, lpszOut, nSize);
 
         public  int DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, int lCapability, ref int lpOps)
         => _DTWAIN_GetCapOperations(Source, lCapability, ref lpOps);
@@ -7420,6 +7476,9 @@
         public  int DTWAIN_IsFileXferSupported(DTWAIN_SOURCE Source, int lFileType)
         => _DTWAIN_IsFileXferSupported(Source, lFileType);
 
+        public  int DTWAIN_IsGetMessageLoopDetectionOn()
+        => _DTWAIN_IsGetMessageLoopDetectionOn();
+
         public  int DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source)
         => _DTWAIN_IsIAFieldALastPageSupported(Source);
 
@@ -8028,6 +8087,9 @@
 
         public  int DTWAIN_SetLightSources(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightSources)
         => _DTWAIN_SetLightSources(Source, LightSources);
+
+        public  int DTWAIN_SetLogSaveThreshold(LONG64 lineCount)
+        => _DTWAIN_SetLogSaveThreshold(lineCount);
 
         public  int DTWAIN_SetLoggerCallback(DTwainLoggerProc logProc, long UserData)
         => _DTWAIN_SetLoggerCallback(logProc, UserData);

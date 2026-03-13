@@ -118,9 +118,10 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(const char *pFuncName, int nW
 		char buffer[1024] = {};
 		CTL_TwainAppMgr::GetErrorString(-pHandle->m_lLastError, buffer, 1023);
         std::ostringstream strm;
+        auto errorName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_ERROR_NAMES, pHandle->m_lLastError).second;
         strm << " -- " 
              << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_LASTERROR) 
-             << " (" << std::to_string(pHandle->m_lLastError) << ") " 
+             << " (" << errorName  << ") " 
              << "(" << buffer << ")";
         s += strm.str();
     }

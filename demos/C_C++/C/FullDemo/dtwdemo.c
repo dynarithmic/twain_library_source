@@ -349,12 +349,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
                 case IDM_ACQUIRE_FILE_DTWAIN:
                     EnableAllMenuItems(FALSE);
-                    AcquireFile(FALSE);
+                    AcquireFile(FALSE, 0);
                     EnableAllMenuItems(TRUE);
                 break;
 
                 case IDM_ACQUIRE_FILE_SOURCE:
-                    AcquireFile(TRUE);
+                    AcquireFile(TRUE, 0);
+                break;
+
+                case IDM_ACQUIRETEST_USEGETMESSAGE:
+                    ToggleCheckedItem(IDM_ACQUIRETEST_USEGETMESSAGE);
+                    if (g_CurrentSource)
+                    {
+                        BOOL useGetMessage = GetToggleMenuState(IDM_ACQUIRETEST_USEGETMESSAGE);
+                        DTWAIN_EnablePeekMessageLoop(g_CurrentSource, !useGetMessage);
+                    }
                 break;
 
                 case IDM_USE_SOURCE_UI:
@@ -508,20 +517,24 @@ void SelectTheSource(int nWhich)
     {
         if ( DTWAIN_OpenSource(tempSource) )
         {
-            // Enable bar code detection
-            DTWAIN_EnableBarcodeDetection(tempSource, 1);
+            // Enable the barcode detection (only valid if source supports barcode detection)
+            DTWAIN_EnableBarcodeDetection(tempSource, TRUE);
 
             // We want to make sure that when we acquire to a PDF file, we will "stamp"
             // each PDF page with the text that g_PDFTextElement will have (see TwainCallbackProc)
-			DTWAIN_AddPDFTextElement(tempSource, g_PDFTextElement);
+            DTWAIN_AddPDFTextElement(tempSource, g_PDFTextElement);
 
             // Enable all of the items in the menu, depending on what the source supports
-            EnableBarcodeAndFileXferItems(tempSource);
+            EnableBarcodeMenuItem(tempSource);
+            EnableFileXFerMenuItems(tempSource, TRUE);
             EnableSourceItems(TRUE);
 
             g_CurrentSource = tempSource;
             SetCaptionToSourceName();
             DTWAIN_EnableFeeder(tempSource, TRUE);
+
+            // Enable or disable the PeekMessage() TWAIN loop processing
+            DTWAIN_EnablePeekMessageLoop(tempSource, !GetToggleMenuState(IDM_ACQUIRETEST_USEGETMESSAGE));
         }
         else
             MessageBox(g_hWnd, _T("Error Opening Source"), _T("TWAIN Error"), MB_ICONSTOP);
@@ -608,7 +621,7 @@ void GenericAcquire(LONG nWhichOne)
             DTWAIN_GetErrorStringA(lastError, szError, 1023);
             MessageBoxA(NULL, szError, "TWAIN Error", MB_ICONSTOP);
         }
-		DTWAIN_DestroyAcquisitionArray(g_AcquireArray, FALSE);
+        DTWAIN_DestroyAcquisitionArray(g_AcquireArray, FALSE);
         return;
     }
 
@@ -633,61 +646,40 @@ void AcquireBuffered()
     GenericAcquire(1);
 }
 
-void AcquireFile(BOOL bUseSource)
+void AcquireFile(BOOL bUseSource, LONG fileType)
 {
     LONG ErrStatus;
     LONG FileFlags = DTWAIN_USELONGNAME;
-    LONG FileType;
     BOOL bAcquireOK = TRUE;
     DTWAIN_ARRAY AFileNames = 0;
     BOOL UseUI;
     TCHAR szError[256];
+    INT_PTR retValue;
 
-    if ( bUseSource )
+    if (bUseSource)
     {
-        /* User wants to use the internal Source
-           mode transfer.  Not all Sources
-           have the ability to do this */
-        if ( !DTWAIN_IsFileXferSupported(g_CurrentSource, DTWAIN_ANYSUPPORT) )
-        {
-            MessageBox(g_hWnd, _T("Sorry.  The selected driver does not support file transfers"), _T("Information"), MB_OK);
-            return;
-        }
-
-        if ( !DTWAIN_IsFileXferSupported(g_CurrentSource, DTWAIN_FF_BMP) )
-        {
-            MessageBox(g_hWnd,_T("Sorry.  This demonstration program only supports BMP file transfers.\n")
-                              _T("However, the selected driver does support other file formats.\n")
-                              _T("The DTWAIN library can obtain these supported types with the appropriate\n")
-                              _T("call to DTWAIN_AcquireFile or DTWAIN_AcquireFileEx."), _T("Information"), MB_OK);
-            return;
-        }
-
+        MessageBox(g_hWnd, _T("Note: Image preview is not available when acquiring files using Source Mode"), _T("Image Preview not available"), MB_ICONSTOP);
         FileFlags |= DTWAIN_USESOURCEMODE;
-        FileType = DTWAIN_FF_BMP;
-        _tcscpy(g_FileName, _T(".\\IMAGE.TMP"));
-        MessageBox(g_hWnd, _T("The name of the image file that will be saved is IMAGE.TMP\n")
-                          _T("The format of the file will be the one chosen from your ")
-                          _T("device user interface"), _T("Information"), MB_OK);
     }
     else
-    {
-        /* User wants to use DTWAIN File Mode instead of Source mode */
-        /* All Sources can use this mode */
-        INT_PTR nDlgFileType = DialogBox(g_hInstance, (LPCTSTR)IDD_dlgFileType, g_hWnd, (DLGPROC)DisplayFileTypesProc);
-        if (nDlgFileType == 0)
-            return;
         FileFlags |= DTWAIN_USENATIVE;
-        FileType = g_FileType;
 
-        /* This is just one of many options that can be set
-          for DTWAIN / PDF support */
-        if ( g_FileType == DTWAIN_PDFMULTI )
-            DTWAIN_SetPDFPageSize(g_CurrentSource, DTWAIN_FS_USLETTER, 0, 0);
+    retValue = DisplayGetFileNameDlg();
+    if (g_FileName[0] == 0 && retValue != IDCANCEL)
+    {
+        MessageBox(g_hWnd, _T("Cannot enter a blank image file name"), _T("Error"), MB_ICONSTOP);
+        return;
     }
+    if (retValue == IDCANCEL)
+        return;
+    /* This is just one of many options that can be set
+        for DTWAIN / PDF support */
+
+    if ( fileType == DTWAIN_PDFMULTI )
+        DTWAIN_SetPDFPageSize(g_CurrentSource, DTWAIN_FS_USLETTER, 0, 0);
 
     /* Check if TEXT type is acquired */
-    if ( FileType == DTWAIN_TEXTMULTI )
+    if ( fileType == DTWAIN_TEXTMULTI )
     {
         /* Initialize the OCR engine if it's available */
         if (!DTWAIN_InitOCRInterface() )
@@ -722,7 +714,7 @@ void AcquireFile(BOOL bUseSource)
     EnableSourceItems(FALSE);
     bAcquireOK = DTWAIN_AcquireFileEx(g_CurrentSource,
                                   AFileNames,
-                                  FileType,
+                                  fileType,
                                   FileFlags | DTWAIN_CREATE_DIRECTORY,
                                   DTWAIN_PT_DEFAULT, /* Use default */
                                   DTWAIN_ACQUIREALL, /* Get all pages */
@@ -764,6 +756,11 @@ DTWAIN_SOURCE DisplayGetNameDlg()
     g_NamedSource = NULL;
     DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterSourceName, g_hWnd, (DLGPROC)EnterSourceNameProc);
     return g_NamedSource;
+}
+
+INT_PTR DisplayGetFileNameDlg()
+{
+    return DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterFileName, g_hWnd, (DLGPROC)EnterFileNameProc);
 }
 
 void DisplayCustomLangDlg()
@@ -920,6 +917,43 @@ LRESULT CALLBACK EnterSourceNameProc(HWND hDlg, UINT message, WPARAM wParam, LPA
                     {
                         MessageBox(g_hWnd, _T("Could not select Source"), _T("Error"), MB_ICONSTOP);
                     }
+                }
+                break;
+
+                case IDCANCEL:
+                    EndDialog(hDlg, LOWORD(wParam));
+                    return TRUE;
+                break;
+            }
+        }
+        break;
+    }
+    return FALSE;
+}
+
+/* Dialog box to display source name to open */
+LRESULT CALLBACK EnterFileNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+        case WM_INITDIALOG:
+        {
+            return TRUE;
+        }
+
+        case WM_COMMAND:
+        {
+            int nControl = LOWORD(wParam);
+            int nNotification = HIWORD(wParam);
+
+            switch( nControl )
+            {
+                /* Quit the dialog */
+                case IDOK:
+                {
+                    HWND hWndEdit = GetDlgItem(hDlg, IDC_edSaveFileName);
+                    GetWindowText(hWndEdit, g_FileName, 255);
+                    EndDialog(hDlg, LOWORD(wParam));
                 }
                 break;
 
@@ -1185,7 +1219,6 @@ LRESULT CALLBACK DisplayCustomSelectProc(HWND hDlg, UINT message, WPARAM wParam,
     return FALSE;
 }
 
-
 LRESULT CALLBACK DisplayAcquireSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HWND hWndFeeder;
@@ -1332,15 +1365,15 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             DTWAIN_GetShortVersionStringA(szBuf, 100);
             SendMessageA(hDlg, WM_SETTEXT, 0, (LPARAM)szBuf);
             DTWAIN_GetVersionInfoA(szBuf, 1000);
-			/* Edit controls need \r\n and not \n new lines. */
-			HANDLE h = DTWAIN_ConvertToAPIStringA(szBuf);
-			if (h)
-			{
-				LPCSTR pData = GlobalLock(h);
-				SetWindowTextA(hWndEdit, pData);
-				GlobalUnlock(h);
-				GlobalFree(h);
-			}
+            /* Edit controls need \r\n and not \n new lines. */
+            HANDLE h = DTWAIN_ConvertToAPIStringA(szBuf);
+            if (h)
+            {
+                LPCSTR pData = GlobalLock(h);
+                SetWindowTextA(hWndEdit, pData);
+                GlobalUnlock(h);
+                GlobalFree(h);
+            }
             return TRUE;
         }
 
@@ -1436,7 +1469,7 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
                 DTWAIN_SetPDFTextElementString(g_PDFTextElement, text, DTWAIN_PDFTEXTELEMENT_TEXT);
 
                 /* Increment the page count*/
-				++pdf_page_count;
+                ++pdf_page_count;
             }
             return 1;
         }
@@ -1492,15 +1525,84 @@ void EnableAllMenuItems(BOOL bEnable)
     EnableMenuItem(g_Menu, IDC_DTWDEMO, nOptions);
     for (i = 0; i < numItems; ++i)
         EnableMenuItem(g_Menu, g_AllMenuItems[i], nOptions);
-    EnableBarcodeAndFileXferItems(g_CurrentSource);
+    EnableBarcodeMenuItem(g_CurrentSource);
+    EnableFileXFerMenuItems(g_CurrentSource, bEnable);
 }
 
-void EnableBarcodeAndFileXferItems(DTWAIN_SOURCE source)
+void DisableFileXFerSubItems()
 {
-    if (!DTWAIN_IsExtImageInfoSupported(source))
-        EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_GRAYED);
-    else
-        EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_ENABLED);
-    if (!DTWAIN_IsFileXferSupported(source, DTWAIN_ANYSUPPORT))
-        EnableMenuItem(g_Menu, IDM_ACQUIRE_FILE_SOURCE, MF_BYCOMMAND | MF_GRAYED);
+    // First, disable all the menu items here
+    HMENU mainMenu = GetMenu(g_hWnd);
+    HMENU hSubMenu = GetSubMenu(mainMenu, 1);
+    HMENU hSubMenu2 = GetSubMenu(hSubMenu, 3);
+    UINT i;
+    for (i = nFirstAcquireSourceID; i <= nLastAcquireSourceID; ++i)
+        EnableMenuItem(hSubMenu2, i, MF_BYCOMMAND | MF_GRAYED);
+}
+
+void EnableBarcodeMenuItem(DTWAIN_SOURCE source)
+{
+	EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_GRAYED);
+	if (DTWAIN_IsExtImageInfoSupported(source))
+    {
+        if (DTWAIN_IsBarcodeSupported(source, DTWAIN_ANYSUPPORT))
+            EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_ENABLED);
+    }
+}
+
+void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable)
+{
+	HMENU mainMenu = GetMenu(g_hWnd);
+	HMENU hSubMenu = GetSubMenu(mainMenu, 1);
+	HMENU hSubMenu2 = GetSubMenu(hSubMenu, 3);
+
+	if (bEnable)
+	{
+		EnableMenuItem(hSubMenu, 2, MF_BYPOSITION | MF_ENABLED);
+		EnableMenuItem(hSubMenu, 3, MF_BYPOSITION | MF_ENABLED);
+	}
+	else
+	{
+		EnableMenuItem(hSubMenu, 2, MF_BYPOSITION | MF_GRAYED);
+		EnableMenuItem(hSubMenu, 3, MF_BYPOSITION | MF_GRAYED);
+	}
+
+    if (source && bEnable)
+    {
+        // Now enable the Source mode file xfers by querying the Source as to 
+        // what is available
+        if (!DTWAIN_IsFileXferSupported(source, DTWAIN_ANYSUPPORT))
+        {
+            EnableMenuItem(hSubMenu, 3, MF_BYCOMMAND | MF_GRAYED);
+        }
+        else
+        {
+            DTWAIN_ARRAY arrFileTypes = NULL;
+            LONG nCount = 0;
+            LONG i = 0;
+            LONG fileType;
+
+            // First, disable all the submenu items here
+            DisableFileXFerSubItems();
+
+            // Now enable the subitems of the file xfer support
+            arrFileTypes = DTWAIN_EnumFileXferFormatsEx(source);
+            nCount = DTWAIN_ArrayGetCount(arrFileTypes);
+            for (i = 0; i < nCount; ++i)
+            {
+                UINT nFound = 0;
+                UINT curId = 0;
+                DTWAIN_ArrayGetAtLong(arrFileTypes, i, &fileType);
+                for (nFound = nFirstAcquireSourceID; nFound <= nLastAcquireSourceID; ++nFound, ++curId)
+                {
+                    if (g_allSourceModeTypes[curId].dtwainType == fileType)
+                    {
+                        EnableMenuItem(hSubMenu2, curId, MF_BYPOSITION | MF_ENABLED);
+                        break;
+                    }
+                }
+            }
+            DTWAIN_ArrayDestroy(arrFileTypes);
+        }
+    }
 }
