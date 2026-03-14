@@ -405,7 +405,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 							m_ptrDib = reinterpret_cast<unsigned char*>(pDibInfo);
 							m_ptrOrig = m_ptrDib;
 							CurDib->SetHandle(m_hDataHandle);
-							(*pArray)[nCurImage] = CurDib;
+							(*pArray)[nLastDib] = CurDib;
 
                             if ( CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSEDDIBFINAL, reinterpret_cast<LPARAM>(pSource)) == 0 )
                             {
