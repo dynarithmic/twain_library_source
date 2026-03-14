@@ -61,6 +61,39 @@ DTWAIN Version changes
   has either returned to the Source user-interface, or if no user-interface is used,
   is returning back to the application).
 
+- Added sending DTWAIN_TN_QUERYUPDATEDIBORIG and DTWAIN_TN_QUERYUPDATEDIBRESAMPLED
+  notifications after the image is retrieved from the TWAIN device (DTWAIN_TN_QUERYUPDATEDIBORIG)
+  and after the image has been potentially modified by DTWAIN (DTWAIN_TN_QUERYUPDATEDIBRESAMPLED).
+  
+  These notifications are used for: 
+
+      a) DTWAIN_AcquireNative(Ex), 
+      b) DTWAIN_AcquireBuffered(Ex) using no compression and no user-defined buffer,
+      c) DTWAIN_AcquireFile(Ex) with the DTWAIN_USESOURCEMODE flag not set.
+
+  These notifications give the application the option of adjusting the current acquired image.  
+  To do this the application should call DTWAIN_GetCurrentAcquiredImage() to get the DIB 
+  (Device Independent Bitmap) handle, 
+  and replace the current acquired image by calling DTWAIN_UpdateCurrentAcquiredImage() with 
+  the new DIB.  Note that the bitmaps must be in DIB format, as this is the image type that the 
+  device will use.
+
+  The return value for these notifications should be 1, since DTWAIN on return will only check if the
+  DIB has been updated, and not specifically the return value.
+
+  The DTWAIN_SetUpdateDibProc function that sets up a function that allows changing the DIB will
+  still exist, but it is highly recommended to use the new notifications, as they allow 
+  changing the DIB both when the image is retrieved directly from the device, and after the 
+  image has been resampled.
+
+- Added DTWAIN_RotateDIB function that rotates a Device Independent Bitmap by n degrees:  
+
+  HANDLE DWAIN_RotateDIB(HANDLE originalDib, DTWAIN_FLOAT degrees);
+ 
+  The return value will be a copy of the original DIB, but with the image rotated.  The original
+  DIB is not modified.  This function can be used for the notifications mentioned above 
+  (DTWAIN_TN_QUERYUPDATEDIBORIG and  DTWAIN_TN_QUERYUPDATEDIBRESAMPLED).
+  
 - Fixed possible NULL being returned when calling DTWAIN_ArrayCreateFromCap() on a 
   custom capability.
 
