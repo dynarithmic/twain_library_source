@@ -169,69 +169,66 @@ AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("engli
                                  {ID_LANGUAGE_KOREAN                , _T("korean")}
                                 };
 
-AllFileTypes g_allSourceModeTypes[] = { {IDM_ACQUIREFILESOURCE_WINDOWSBMP, DTWAIN_FF_BMP},
-                                              {IDM_ACQUIREFILESOURCE_JPEG, DTWAIN_FF_JFIF},
-                                              {IDM_ACQUIREFILESOURCE_TIFF, DTWAIN_FF_TIFF },
-                                              {IDM_ACQUIREFILESOURCE_TIFFMULTIPAGE, DTWAIN_FF_TIFFMULTI},
-                                              {IDM_ACQUIREFILESOURCE_PNG, DTWAIN_FF_PNG},
-                                              {IDM_ACQUIREFILESOURCE_PDF, DTWAIN_FF_PDF},
-                                              {IDM_ACQUIREFILESOURCE_PDFA, DTWAIN_FF_PDFA},
-                                              {IDM_ACQUIREFILESOURCE_PDFA2, DTWAIN_FF_PDFA2},
-                                              {IDM_ACQUIREFILESOURCE_PDFRASTER, DTWAIN_FF_PDFRASTER},
-                                              {IDM_ACQUIREFILESOURCE_FLASHPIX, DTWAIN_FF_FPX},
-                                              {IDM_ACQUIREFILESOURCE_EXIF, DTWAIN_FF_EXIF},
-                                              {IDM_ACQUIREFILESOURCE_SPIFF, DTWAIN_FF_SPIFF},
-                                              {IDM_ACQUIREFILESOURCE_XBM, DTWAIN_FF_XBM},
-                                              {IDM_ACQUIREFILESOURCE_PICT, DTWAIN_FF_PICT},
-                                              {IDM_ACQUIREFILESOURCE_JP2, DTWAIN_FF_JP2},
-                                              {IDM_ACQUIREFILESOURCE_JPX, DTWAIN_FF_JPX},
-                                              {IDM_ACQUIREFILESOURCE_DEJAVU, DTWAIN_FF_DEJAVU} };
-
-AllFileTypes g_allDTWAINFileTypes[] = 
-{
-        { IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION  ,  DTWAIN_BIGTIFFNONEMULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_GROUP3         ,  DTWAIN_BIGTIFFG3MULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_GROUP4         ,  DTWAIN_BIGTIFFG4MULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_FLATE          ,  DTWAIN_BIGTIFFDEFLATEMULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_JPEG           ,  DTWAIN_BIGTIFFJPEGMULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_LZW            ,  DTWAIN_BIGTIFFLZWMULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_PACKBITS       ,  DTWAIN_BIGTIFFPACKBITS },
-        { IDM_ACQUIREFILE_BMP                    ,  DTWAIN_BMP },
-        { IDM_ACQUIREFILE_BMPRLE                 ,  DTWAIN_BMP_RLE },
-        { IDM_ACQUIREFILE_DCX                    ,  DTWAIN_DCX },
-        { IDM_ACQUIREFILE_ENHANCEDMETAFILE       ,  DTWAIN_EMF },
-        { IDM_ACQUIREFILE_GIF                    ,  DTWAIN_GIF },
-        { IDM_ACQUIREFILE_ICO                    ,  DTWAIN_ICO_RESIZED },
-        { IDM_ACQUIREFILE_ICOVISTA               ,  DTWAIN_ICO_VISTA },
-        { IDM_ACQUIREFILE_JPEG                   ,  DTWAIN_JPEG },
-        { IDM_ACQUIREFILE_JPEG2000               ,  DTWAIN_JPEG2000 },
-        { IDM_ACQUIREFILE_JPEGXR                 ,  DTWAIN_JPEGXR },
-        { IDM_ACQUIREFILE_PAINTSHOP              ,  DTWAIN_PSD },
-        { IDM_ACQUIREFILE_PCX                    ,  DTWAIN_PCX },
-        { IDM_ACQUIREFILE_PDF                    ,  DTWAIN_PDFMULTI },
-        { IDM_ACQUIREFILE_PNG                    ,  DTWAIN_PNG },
-        { IDM_ACQUIREFILE_POSTSCRIPTLEVEL1       ,  DTWAIN_POSTSCRIPT1MULTI },
-        { IDM_ACQUIREFILE_POSTSCRIPTLEVEL2       ,  DTWAIN_POSTSCRIPT2MULTI },
-        { IDM_ACQUIREFILE_SVG                    ,  DTWAIN_SVG },
-        { IDM_ACQUIREFILE_SVGZ                   ,  DTWAIN_SVGZ },
-        { IDM_ACQUIREFILE_TGA                    ,  DTWAIN_TGA },
-        { IDM_ACQUIREFILE_TGARLE                 ,  DTWAIN_TGA_RLE },
-        { IDM_ACQUIREFILE_TEXT                   ,  DTWAIN_TEXTMULTI },
-        { IDM_ACQUIREFILE_TIFF_NOCOMPRESSION     ,  DTWAIN_TIFFNONEMULTI },
-        { IDM_ACQUIREFILE_TIFF_GROUP3            ,  DTWAIN_TIFFG3MULTI },
-        { IDM_ACQUIREFILE_TIFF_GROUP4            ,  DTWAIN_TIFFG4MULTI },
-        { IDM_ACQUIREFILE_TIFF_FLATE             ,  DTWAIN_TIFFDEFLATEMULTI },
-        { IDM_ACQUIREFILE_TIFF_JPEG              ,  DTWAIN_TIFFJPEGMULTI },
-        { IDM_ACQUIREFILE_TIFF_LZW               ,  DTWAIN_TIFFLZWMULTI },
-        { IDM_ACQUIREFILE_TIFF_PACKBITS          ,  DTWAIN_TIFFPACKBITSMULTI },
-        { IDM_ACQUIREFILE_WEBP                   ,  DTWAIN_WEBP },
-        { IDM_ACQUIREFILE_WINDOWSMETAFILE        ,  DTWAIN_WMF },
-        { IDM_ACQUIREFILE_WIRELESSBITMAP         ,  DTWAIN_WBMP_RESIZED },
-};
+AllFileTypes g_allDTWAINFileTypes[] = {
+        {IDM_ACQUIREFILESOURCE_WINDOWSBMP, DTWAIN_FF_BMP},
+        {IDM_ACQUIREFILESOURCE_JPEG, DTWAIN_FF_JFIF},
+        {IDM_ACQUIREFILESOURCE_TIFF, DTWAIN_FF_TIFF },
+        {IDM_ACQUIREFILESOURCE_TIFFMULTIPAGE, DTWAIN_FF_TIFFMULTI},
+        {IDM_ACQUIREFILESOURCE_PNG, DTWAIN_FF_PNG},
+        {IDM_ACQUIREFILESOURCE_PDF, DTWAIN_FF_PDF},
+        {IDM_ACQUIREFILESOURCE_PDFA, DTWAIN_FF_PDFA},
+        {IDM_ACQUIREFILESOURCE_PDFA2, DTWAIN_FF_PDFA2},
+        {IDM_ACQUIREFILESOURCE_PDFRASTER, DTWAIN_FF_PDFRASTER},
+        {IDM_ACQUIREFILESOURCE_FLASHPIX, DTWAIN_FF_FPX},
+        {IDM_ACQUIREFILESOURCE_EXIF, DTWAIN_FF_EXIF},
+        {IDM_ACQUIREFILESOURCE_SPIFF, DTWAIN_FF_SPIFF},
+        {IDM_ACQUIREFILESOURCE_XBM, DTWAIN_FF_XBM},
+        {IDM_ACQUIREFILESOURCE_PICT, DTWAIN_FF_PICT},
+        {IDM_ACQUIREFILESOURCE_JP2, DTWAIN_FF_JP2},
+        {IDM_ACQUIREFILESOURCE_JPX, DTWAIN_FF_JPX},
+        {IDM_ACQUIREFILESOURCE_DEJAVU, DTWAIN_FF_DEJAVU},
+        {IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION  ,  DTWAIN_BIGTIFFNONEMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_GROUP3         ,  DTWAIN_BIGTIFFG3MULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_GROUP4         ,  DTWAIN_BIGTIFFG4MULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_FLATE          ,  DTWAIN_BIGTIFFDEFLATEMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_JPEG           ,  DTWAIN_BIGTIFFJPEGMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_LZW            ,  DTWAIN_BIGTIFFLZWMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_PACKBITS       ,  DTWAIN_BIGTIFFPACKBITS },
+        {IDM_ACQUIREFILE_BMP                    ,  DTWAIN_BMP },
+        {IDM_ACQUIREFILE_BMPRLE                 ,  DTWAIN_BMP_RLE },
+        {IDM_ACQUIREFILE_DCX                    ,  DTWAIN_DCX },
+        {IDM_ACQUIREFILE_ENHANCEDMETAFILE       ,  DTWAIN_EMF },
+        {IDM_ACQUIREFILE_GIF                    ,  DTWAIN_GIF },
+        {IDM_ACQUIREFILE_ICO                    ,  DTWAIN_ICO_RESIZED },
+        {IDM_ACQUIREFILE_ICOVISTA               ,  DTWAIN_ICO_VISTA },
+        {IDM_ACQUIREFILE_JPEG                   ,  DTWAIN_JPEG },
+        {IDM_ACQUIREFILE_JPEG2000               ,  DTWAIN_JPEG2000 },
+        {IDM_ACQUIREFILE_JPEGXR                 ,  DTWAIN_JPEGXR },
+        {IDM_ACQUIREFILE_PAINTSHOP              ,  DTWAIN_PSD },
+        {IDM_ACQUIREFILE_PCX                    ,  DTWAIN_PCX },
+        {IDM_ACQUIREFILE_PDF                    ,  DTWAIN_PDFMULTI },
+        {IDM_ACQUIREFILE_PNG                    ,  DTWAIN_PNG },
+        {IDM_ACQUIREFILE_POSTSCRIPTLEVEL1       ,  DTWAIN_POSTSCRIPT1MULTI },
+        {IDM_ACQUIREFILE_POSTSCRIPTLEVEL2       ,  DTWAIN_POSTSCRIPT2MULTI },
+        {IDM_ACQUIREFILE_SVG                    ,  DTWAIN_SVG },
+        {IDM_ACQUIREFILE_SVGZ                   ,  DTWAIN_SVGZ },
+        {IDM_ACQUIREFILE_TGA                    ,  DTWAIN_TGA },
+        {IDM_ACQUIREFILE_TGARLE                 ,  DTWAIN_TGA_RLE },
+        {IDM_ACQUIREFILE_TEXT                   ,  DTWAIN_TEXTMULTI },
+        {IDM_ACQUIREFILE_TIFF_NOCOMPRESSION     ,  DTWAIN_TIFFNONEMULTI },
+        {IDM_ACQUIREFILE_TIFF_GROUP3            ,  DTWAIN_TIFFG3MULTI },
+        {IDM_ACQUIREFILE_TIFF_GROUP4            ,  DTWAIN_TIFFG4MULTI },
+        {IDM_ACQUIREFILE_TIFF_FLATE             ,  DTWAIN_TIFFDEFLATEMULTI },
+        {IDM_ACQUIREFILE_TIFF_JPEG              ,  DTWAIN_TIFFJPEGMULTI },
+        {IDM_ACQUIREFILE_TIFF_LZW               ,  DTWAIN_TIFFLZWMULTI },
+        {IDM_ACQUIREFILE_TIFF_PACKBITS          ,  DTWAIN_TIFFPACKBITSMULTI },
+        {IDM_ACQUIREFILE_WEBP                   ,  DTWAIN_WEBP },
+        {IDM_ACQUIREFILE_WINDOWSMETAFILE        ,  DTWAIN_WMF },
+        {IDM_ACQUIREFILE_WIRELESSBITMAP         ,  DTWAIN_WBMP_RESIZED },
+    };
 
 const UINT nFirstAcquireSourceID = IDM_ACQUIREFILESOURCE_WINDOWSBMP;
 const UINT nLastAcquireSourceID = IDM_ACQUIREFILESOURCE_DEJAVU;
-const UINT numSourceModeTypes = sizeof(g_allSourceModeTypes) / sizeof(g_allSourceModeTypes[0]);
 
 const UINT nFirstAcquireFileID = IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION;
 const UINT nLastAcquireFileID = IDM_ACQUIREFILE_WIRELESSBITMAP;
@@ -388,33 +385,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             /* See if the acquisition is to a file using source mode */
             UINT i;
-            if (wmId >= nFirstAcquireSourceID && wmId <= nLastAcquireSourceID)
-            {
-                for (i = 0; i < numSourceModeTypes; ++i)
-                {
-                    if (g_allSourceModeTypes[i].resourceId == wmId)
-                    {
-                        AcquireFile(TRUE, g_allSourceModeTypes[i].dtwainType);
-                        break;
-                    }
-                }
-                return 0;
-            }
-
-            /* See if the acquisition is to a file */
-            if (wmId >= nFirstAcquireFileID && wmId <= nLastAcquireFileID)
+            if (wmId >= nFirstAcquireSourceID && wmId <= nLastAcquireFileID)
             {
                 for (i = 0; i < numDTWAINFileTypes; ++i)
                 {
                     if (g_allDTWAINFileTypes[i].resourceId == wmId)
                     {
-                        AcquireFile(FALSE, g_allDTWAINFileTypes[i].dtwainType);
+                        g_FileType = g_allDTWAINFileTypes[i].dtwainType;
+                        AcquireFile(g_allDTWAINFileTypes[i].resourceId < nFirstAcquireFileID, g_allDTWAINFileTypes[i].dtwainType);
                         break;
                     }
                 }
                 return 0;
             }
-
 
             /* Parse the menu selections : */
             switch (wmId)
@@ -1403,7 +1386,7 @@ LRESULT CALLBACK DisplayFileTypesProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 case IDOK:
                 {
                     /* Get the current selection */
-                        SendMessage( hWndEdit, WM_GETTEXT, 256, (LPARAM)g_FileName);
+                    SendMessage( hWndEdit, WM_GETTEXT, 256, (LPARAM)g_FileName);
 
                     if ( g_FileName[0] == 0 || IsAllSpace(g_FileName))
                     {
@@ -1549,10 +1532,12 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
                 DisplayBarCodeInfo();
         }
         break;
+
         /* See if we want to keep the DIB */
         case DTWAIN_TN_QUERYPAGEDISCARD:
         {
             LRESULT retVal;
+
             /* First let's see if menu option is checked */
             BOOL showPreview = GetToggleMenuState(IDM_SHOW_PREVIEW);
             if (!showPreview)
@@ -1618,6 +1603,9 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
                     return FALSE;
                 bPageOK = TRUE;
             }
+
+        case DTWAIN_TN_QUERYUPDATEDIBORIG:
+            return 1;
     }
     return 1;
 }
@@ -1636,6 +1624,7 @@ void EnableAllMenuItems(BOOL bEnable)
         EnableMenuItem(g_Menu, g_AllMenuItems[i], nOptions);
     EnableBarcodeMenuItem(g_CurrentSource);
     EnableFileXFerMenuItems(g_CurrentSource, bEnable);
+    EnableMenuItem(g_Menu, IDM_ACQUIRETEST_USEGETMESSAGE, nOptions);
 }
 
 void DisableFileXFerSubItems()
@@ -1704,7 +1693,7 @@ void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable)
                 DTWAIN_ArrayGetAtLong(arrFileTypes, i, &fileType);
                 for (nFound = nFirstAcquireSourceID; nFound <= nLastAcquireSourceID; ++nFound, ++curId)
                 {
-                    if (g_allSourceModeTypes[curId].dtwainType == fileType)
+                    if (g_allDTWAINFileTypes[curId].dtwainType == fileType)
                     {
                         EnableMenuItem(hSubMenu2, curId, MF_BYPOSITION | MF_ENABLED);
                         break;
