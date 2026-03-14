@@ -50,6 +50,22 @@ DTWAIN Version changes
   However,  it has been discovered that the auto-detection should always be turned off for 
   environments such as the Java Virtual Machine (JVM).
 
+- The DTWDEMO32 and DTWDEMO64 demo programs now contains a method of setting most capability 
+  values before acquiring images.  This allows testing of the device's capabilities during
+  the acquisition (for example, auto-deskew, auto-rotate, possibly custom caps, etc.).  
+  The capabilities must be able to be fully negotiated in state 4 (TWAIN Source is open), and not need
+  to be negotiated during states 5, 6, or 7 (this is when the TWAIN Source is showing the user-interface
+  and/or in the process of acquiring images).  
+
+  This new option is available through the main menu once a TWAIN Source has been selected:
+
+  "Source Selection Test -> Source Properties.." 
+
+  and the lower left "Capability Info" box will contain a check box item "Reset Caps On Exit".  
+  If you have set capability values through the "Test Capability" functionality, you must uncheck 
+  the "Reset Caps On Exit" check box, so as to maintain the newly set capability values when the 
+  Source Properties dialog is closed.
+
 - Added sending DTWAIN_TN_ACQUIREPAGESTOPPING and DTWAIN_TN_ACQUIREPAGESTOPPED notifications
   to the application after the application returns 0 from the DTWAIN_TN_QUERYACQUIREPAGES 
   notification.  
