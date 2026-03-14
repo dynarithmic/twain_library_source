@@ -73,10 +73,9 @@ DTWAIN Version changes
 
   These notifications give the application the option of adjusting the current acquired image.  
   To do this the application should call DTWAIN_GetCurrentAcquiredImage() to get the DIB 
-  (Device Independent Bitmap) handle, 
-  and replace the current acquired image by calling DTWAIN_UpdateCurrentAcquiredImage() with 
-  the new DIB.  Note that the bitmaps must be in DIB format, as this is the image type that the 
-  device will use.
+  (Device Independent Bitmap) handle,  and replace the current acquired image by calling 
+  DTWAIN_UpdateCurrentAcquiredImage() with the new DIB.  Note that the bitmaps must be in 
+  DIB format, as this is the image type that the device will use.
 
   The return value for these notifications should be 1, since DTWAIN on return will only check if the
   DIB has been updated, and not specifically the return value.
