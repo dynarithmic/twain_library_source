@@ -52,7 +52,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DeleteDIB(HANDLE Dib)
     CATCH_BLOCK(FALSE)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UpdateCurrentDIB(DTWAIN_SOURCE Source, HANDLE hNewDib)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib)
 {
 	LOG_FUNC_ENTRY_PARAMS((Source, hNewDib))
 	auto [pHandle, pSource] = VerifyHandles(Source);
