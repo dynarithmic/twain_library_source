@@ -518,6 +518,8 @@ module TwainAPI =
     let public DTWAIN_TN_QUERYACQUIREPAGES = 1305
     let public DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306
     let public DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
+    let public DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
+    let public DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
     let public DTWAIN_PDFOCR_CLEANTEXT1 = 1
     let public DTWAIN_PDFOCR_CLEANTEXT2 = 2
     let public DTWAIN_MODAL = 0
@@ -4391,6 +4393,9 @@ module TwainAPI =
     type DTWAIN_UnlockMemoryExDelegate = delegate of HANDLE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_UpdateCurrentDIBDelegate = delegate of DTWAIN_SOURCE * HANDLE -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_UseMultipleThreadsDelegate = delegate of DTWAIN_BOOL -> DTWAIN_BOOL
     let private AcquireAudioFile = lazy (DynamicDll.Bind "DTWAIN_AcquireAudioFile" : DTWAIN_AcquireAudioFileDelegate)
     let private AcquireAudioNative = lazy (DynamicDll.Bind "DTWAIN_AcquireAudioNative" : DTWAIN_AcquireAudioNativeDelegate)
@@ -5237,6 +5242,7 @@ module TwainAPI =
     let private TestGetCap = lazy (DynamicDll.Bind "DTWAIN_TestGetCap" : DTWAIN_TestGetCapDelegate)
     let private UnlockMemory = lazy (DynamicDll.Bind "DTWAIN_UnlockMemory" : DTWAIN_UnlockMemoryDelegate)
     let private UnlockMemoryEx = lazy (DynamicDll.Bind "DTWAIN_UnlockMemoryEx" : DTWAIN_UnlockMemoryExDelegate)
+    let private UpdateCurrentDIB = lazy (DynamicDll.Bind "DTWAIN_UpdateCurrentDIB" : DTWAIN_UpdateCurrentDIBDelegate)
     let private UseMultipleThreads = lazy (DynamicDll.Bind "DTWAIN_UseMultipleThreads" : DTWAIN_UseMultipleThreadsDelegate)
     /// Loads the DTWAIN DLL and performs post-load business logic
     let Load (dllPath: string) =
@@ -8637,6 +8643,10 @@ module TwainAPI =
     let DTWAIN_UnlockMemoryEx (h: HANDLE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         UnlockMemoryEx.Value.Invoke(h)
+
+    let DTWAIN_UpdateCurrentDIB (source: DTWAIN_SOURCE) (hnewdib: HANDLE) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        UpdateCurrentDIB.Value.Invoke(source, hnewdib)
 
     let DTWAIN_UseMultipleThreads (bset: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

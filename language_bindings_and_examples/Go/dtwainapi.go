@@ -470,6 +470,8 @@ const (
     DTWAIN_TN_QUERYACQUIREPAGES = 1305
     DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306
     DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
+    DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
+    DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
     DTWAIN_PDFOCR_CLEANTEXT1 = 1
     DTWAIN_PDFOCR_CLEANTEXT2 = 2
     DTWAIN_MODAL = 0
@@ -1760,7 +1762,7 @@ func Load_DTWAINDLL(path string) (*DTWAIN_DLL, error) {
         return nil, err
     }
 
-    var arr [1167] string
+    var arr [1168] string
     arr[0] = "DTWAIN_AcquireAudioFile"
     arr[1] = "DTWAIN_AcquireAudioFileA"
     arr[2] = "DTWAIN_AcquireAudioFileW"
@@ -2927,7 +2929,8 @@ func Load_DTWAINDLL(path string) (*DTWAIN_DLL, error) {
     arr[1163] = "DTWAIN_TestGetCap"
     arr[1164] = "DTWAIN_UnlockMemory"
     arr[1165] = "DTWAIN_UnlockMemoryEx"
-    arr[1166] = "DTWAIN_UseMultipleThreads"
+    arr[1166] = "DTWAIN_UpdateCurrentDIB"
+    arr[1167] = "DTWAIN_UseMultipleThreads"
     for _, name := range arr {
         addr, err := syscall.GetProcAddress(d.Handle, name)
         if err != nil {
@@ -10109,6 +10112,12 @@ func (d *DTWAIN_DLL) DTWAIN_UnlockMemory(h HANDLE) int32 {
 func (d *DTWAIN_DLL) DTWAIN_UnlockMemoryEx(h HANDLE) int32 {
     theProc := d.procs["DTWAIN_UnlockMemoryEx"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(h))
+    return int32(v1)
+}
+
+func (d *DTWAIN_DLL) DTWAIN_UpdateCurrentDIB(Source DTWAIN_SOURCE, hNewDib HANDLE) int32 {
+    theProc := d.procs["DTWAIN_UpdateCurrentDIB"]
+    v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(hNewDib))
     return int32(v1)
 }
 

@@ -1226,6 +1226,7 @@
     D_TESTGETCAPFUNC                              DYNDTWAIN_API::DTWAIN_TestGetCap = nullptr;
     D_UNLOCKMEMORYFUNC                            DYNDTWAIN_API::DTWAIN_UnlockMemory = nullptr;
     D_UNLOCKMEMORYEXFUNC                          DYNDTWAIN_API::DTWAIN_UnlockMemoryEx = nullptr;
+    D_UPDATECURRENTDIBFUNC                        DYNDTWAIN_API::DTWAIN_UpdateCurrentDIB = nullptr;
     D_USEMULTIPLETHREADSFUNC                      DYNDTWAIN_API::DTWAIN_UseMultipleThreads = nullptr;
 #endif
 
@@ -2469,6 +2470,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_TestGetCap, hModule);
           LOADFUNCTIONIMPL(DTWAIN_UnlockMemory, hModule);
           LOADFUNCTIONIMPL(DTWAIN_UnlockMemoryEx, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_UpdateCurrentDIB, hModule);
           LOADFUNCTIONIMPL(DTWAIN_UseMultipleThreads, hModule);
     }
     return 1;

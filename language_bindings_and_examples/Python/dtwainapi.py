@@ -428,6 +428,8 @@ DTWAIN_TN_SOURCEDETAILS = 1304
 DTWAIN_TN_QUERYACQUIREPAGES = 1305
 DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306
 DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
+DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
+DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
 DTWAIN_PDFOCR_CLEANTEXT1 = 1
 DTWAIN_PDFOCR_CLEANTEXT2 = 2
 DTWAIN_MODAL = 0
@@ -2931,6 +2933,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
      theDLL.DTWAIN_UnlockMemory.restype = ct.c_long
      theDLL.DTWAIN_UnlockMemoryEx.restype = ct.c_long
+     theDLL.DTWAIN_UpdateCurrentDIB.restype = ct.c_long
      theDLL.DTWAIN_UseMultipleThreads.restype = ct.c_long
 
      #set up the argument types
@@ -4057,6 +4060,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_UnlockMemoryEx.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_UpdateCurrentDIB.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_UseMultipleThreads.argtypes = [ct.c_long]
 
 def setup_ansi(theDLL):
@@ -5243,6 +5247,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
      theDLL.DTWAIN_UnlockMemory.restype = ct.c_long
      theDLL.DTWAIN_UnlockMemoryEx.restype = ct.c_long
+     theDLL.DTWAIN_UpdateCurrentDIB.restype = ct.c_long
      theDLL.DTWAIN_UseMultipleThreads.restype = ct.c_long
 
      #set up the argument types
@@ -6369,4 +6374,5 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_UnlockMemoryEx.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_UpdateCurrentDIB.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_UseMultipleThreads.argtypes = [ct.c_long]

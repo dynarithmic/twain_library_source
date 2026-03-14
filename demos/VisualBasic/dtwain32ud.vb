@@ -462,6 +462,8 @@ Class DTWAINAPI
     Public Const DTWAIN_TN_QUERYACQUIREPAGES As Integer = 1305
     Public Const DTWAIN_TN_ACQUIREPAGESSTOPPING As Integer = 1306
     Public Const DTWAIN_TN_ACQUIREPAGESSTOPPED As Integer = 1307
+    Public Const DTWAIN_TN_QUERYUPDATEDIBORIG As Integer = 1308
+    Public Const DTWAIN_TN_QUERYUPDATEDIBRESAMPLED As Integer = 1309
     Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
     Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
     Public Const DTWAIN_MODAL As Integer = 0
@@ -2596,6 +2598,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_TestGetCap Lib "dtwain32ud.dll" (Source As System.IntPtr, lCapability As Integer) As System.IntPtr
     Public Declare Function DTWAIN_UnlockMemory Lib "dtwain32ud.dll" (h As System.IntPtr) As Integer
     Public Declare Function DTWAIN_UnlockMemoryEx Lib "dtwain32ud.dll" (h As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_UpdateCurrentDIB Lib "dtwain32ud.dll" (Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
     Public Declare Function DTWAIN_UseMultipleThreads Lib "dtwain32ud.dll" (bSet As Integer) As Integer
 
 End Class

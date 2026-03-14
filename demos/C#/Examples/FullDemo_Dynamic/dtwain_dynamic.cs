@@ -533,6 +533,8 @@
         public const int DTWAIN_TN_QUERYACQUIREPAGES = 1305;
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
+        public const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
+        public const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
@@ -2824,6 +2826,7 @@
         public delegate DTWAIN_ARRAY DTWAIN_TestGetCapDelegate(DTWAIN_SOURCE Source, int lCapability);
         public delegate int DTWAIN_UnlockMemoryDelegate(HANDLE h);
         public delegate int DTWAIN_UnlockMemoryExDelegate(HANDLE h);
+        public delegate int DTWAIN_UpdateCurrentDIBDelegate(DTWAIN_SOURCE Source, HANDLE hNewDib);
         public delegate int DTWAIN_UseMultipleThreadsDelegate(int bSet);
 
         public TwainAPI(string dllPath)
@@ -5599,6 +5602,9 @@
         [DTWAINNativeFunction("DTWAIN_UnlockMemoryEx")]
         private readonly DTWAIN_UnlockMemoryExDelegate  _DTWAIN_UnlockMemoryEx;
 
+        [DTWAINNativeFunction("DTWAIN_UpdateCurrentDIB")]
+        private readonly DTWAIN_UpdateCurrentDIBDelegate  _DTWAIN_UpdateCurrentDIB;
+
         [DTWAINNativeFunction("DTWAIN_UseMultipleThreads")]
         private readonly DTWAIN_UseMultipleThreadsDelegate  _DTWAIN_UseMultipleThreads;
         public  int DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string lpszFile, int lFileFlags, int lMaxClips, int bShowUI, int bCloseSource, ref int pStatus)
@@ -8360,6 +8366,9 @@
 
         public  int DTWAIN_UnlockMemoryEx(HANDLE h)
         => _DTWAIN_UnlockMemoryEx(h);
+
+        public  int DTWAIN_UpdateCurrentDIB(DTWAIN_SOURCE Source, HANDLE hNewDib)
+        => _DTWAIN_UpdateCurrentDIB(Source, hNewDib);
 
         public  int DTWAIN_UseMultipleThreads(int bSet)
         => _DTWAIN_UseMultipleThreads(bSet);

@@ -1304,6 +1304,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_TestGetCap
    attr_reader :DTWAIN_UnlockMemory
    attr_reader :DTWAIN_UnlockMemoryEx
+   attr_reader :DTWAIN_UpdateCurrentDIB
    attr_reader :DTWAIN_UseMultipleThreads
    DTWAIN_FF_TIFF = 0
    DTWAIN_FF_PICT = 1
@@ -1674,6 +1675,8 @@ class DTWAINAPI
    DTWAIN_TN_QUERYACQUIREPAGES = 1305
    DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306
    DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
+   DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
+   DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
    DTWAIN_PDFOCR_CLEANTEXT1 = 1
    DTWAIN_PDFOCR_CLEANTEXT2 = 2
    DTWAIN_MODAL = 0
@@ -4159,6 +4162,7 @@ class DTWAINAPI
        @DTWAIN_TestGetCap = Fiddle::Function::new(dtwain_dll['DTWAIN_TestGetCap'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_UnlockMemory = Fiddle::Function::new(dtwain_dll['DTWAIN_UnlockMemory'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_UnlockMemoryEx = Fiddle::Function::new(dtwain_dll['DTWAIN_UnlockMemoryEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_UpdateCurrentDIB = Fiddle::Function::new(dtwain_dll['DTWAIN_UpdateCurrentDIB'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_UseMultipleThreads = Fiddle::Function::new(dtwain_dll['DTWAIN_UseMultipleThreads'],[Fiddle::TYPE_INT],Fiddle::TYPE_INT)
     end
 end

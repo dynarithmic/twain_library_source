@@ -633,6 +633,8 @@ Namespace Dynarithmic
         Public Const DTWAIN_TN_QUERYACQUIREPAGES As Integer = 1305
         Public Const DTWAIN_TN_ACQUIREPAGESSTOPPING As Integer = 1306
         Public Const DTWAIN_TN_ACQUIREPAGESSTOPPED As Integer = 1307
+        Public Const DTWAIN_TN_QUERYUPDATEDIBORIG As Integer = 1308
+        Public Const DTWAIN_TN_QUERYUPDATEDIBRESAMPLED As Integer = 1309
         Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
         Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
         Public Const DTWAIN_MODAL As Integer = 0
@@ -4466,6 +4468,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_UnlockMemoryExDelegate(h As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_UpdateCurrentDIBDelegate(Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_UseMultipleThreadsDelegate(bSet As Integer) As Integer
         Public Function DTWAIN_AcquireAudioFile(Source As System.IntPtr, lpszFile As String, lFileFlags As Integer, lMaxClips As Integer, bShowUI As Integer, bCloseSource As Integer, ByRef pStatus As Integer) As Integer
         Return api.DTWAIN_AcquireAudioFile(Source, lpszFile, lFileFlags, lMaxClips, bShowUI, bCloseSource, pStatus)
@@ -7863,6 +7868,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_UnlockMemoryEx(h)
         End Function
         
+        Public Function DTWAIN_UpdateCurrentDIB(Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
+        Return api.DTWAIN_UpdateCurrentDIB(Source, hNewDib)
+        End Function
+        
         Public Function DTWAIN_UseMultipleThreads(bSet As Integer) As Integer
         Return api.DTWAIN_UseMultipleThreads(bSet)
         End Function
@@ -8716,6 +8725,7 @@ Namespace Dynarithmic
             Public DTWAIN_TestGetCap As DTWAIN_TestGetCapDelegate
             Public DTWAIN_UnlockMemory As DTWAIN_UnlockMemoryDelegate
             Public DTWAIN_UnlockMemoryEx As DTWAIN_UnlockMemoryExDelegate
+            Public DTWAIN_UpdateCurrentDIB As DTWAIN_UpdateCurrentDIBDelegate
             Public DTWAIN_UseMultipleThreads As DTWAIN_UseMultipleThreadsDelegate
         End Class
     End Class

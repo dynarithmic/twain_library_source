@@ -516,6 +516,8 @@ namespace Dynarithmic
         public const int DTWAIN_TN_QUERYACQUIREPAGES = 1305;
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
+        public const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
+        public const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
@@ -4552,6 +4554,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_UnlockMemoryEx(HANDLE h);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_UpdateCurrentDIB(DTWAIN_SOURCE Source, HANDLE hNewDib);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_UseMultipleThreads(int bSet);

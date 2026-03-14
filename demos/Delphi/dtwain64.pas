@@ -558,6 +558,8 @@ const
   DTWAIN_TN_QUERYACQUIREPAGES = 1305;
   DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
   DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
+  DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
+  DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
   DTWAIN_PDFOCR_CLEANTEXT1 = 1;
   DTWAIN_PDFOCR_CLEANTEXT2 = 2;
   DTWAIN_MODAL = 0;
@@ -3013,6 +3015,7 @@ function DTWAIN_SysInitializeNoBlocking : DTWAIN_HANDLE; external 'dtwain64.dll'
 function DTWAIN_TestGetCap(Source:DTWAIN_SOURCE; lCapability:LONG) : DTWAIN_ARRAY; external 'dtwain64.dll'  name 'DTWAIN_TestGetCap';
 function DTWAIN_UnlockMemory(h:NativeInt) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_UnlockMemory';
 function DTWAIN_UnlockMemoryEx(h:NativeInt) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_UnlockMemoryEx';
+function DTWAIN_UpdateCurrentDIB(Source:DTWAIN_SOURCE; hNewDib:NativeInt) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_UpdateCurrentDIB';
 function DTWAIN_UseMultipleThreads(bSet:BOOL) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_UseMultipleThreads';
 
 implementation
