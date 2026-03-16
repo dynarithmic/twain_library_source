@@ -61,6 +61,7 @@ void LoadLanguageStrings(LPCTSTR szLang);
 void DisplayCustomLangDlg();
 INT_PTR DisplayGetFileNameDlg();
 void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable);
+BOOL IsMenuItemEnabled(UINT resID);
 
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -566,6 +567,14 @@ BOOL GetToggleMenuState(UINT resID)
     if ( nState != -1 )
         return (nState & MF_CHECKED)?TRUE:FALSE;
     return TRUE;
+}
+
+BOOL IsMenuItemEnabled(UINT resID) 
+{
+	UINT nState = GetMenuState(g_Menu, resID, MF_BYCOMMAND);
+	if (nState != -1)
+		return (nState & (MF_DISABLED | MF_GRAYED)) ? FALSE: TRUE;
+	return FALSE;
 }
 
 void SelectTheSource(int nWhich)
@@ -1527,7 +1536,7 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
 
         case DTWAIN_TN_TRANSFERDONE:
         {
-            BOOL showBarCodes = GetToggleMenuState(IDM_SHOW_BARCODEINFO);
+            BOOL showBarCodes = GetToggleMenuState(IDM_SHOW_BARCODEINFO) && IsMenuItemEnabled(IDM_SHOW_BARCODEINFO);
             if (showBarCodes)
                 DisplayBarCodeInfo();
         }
