@@ -161,7 +161,7 @@ struct NestedAcquisitionDestroyer
     }
 };
 
-std::pair<bool, int> dynarithmic::DestroyAcquisitionArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, DTWAIN_BOOL bDestroyDibs)
+std::pair<bool, int> dynarithmic::DestroyAcquisitionArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, bool bDestroyDibs)
 {
     const auto& factory = pHandle->m_ArrayFactory;
 
@@ -174,7 +174,7 @@ std::pair<bool, int> dynarithmic::DestroyAcquisitionArray(CTL_TwainDLLHandle* pH
     DTWAINArrayLowLevel_RAII raiiMain(pHandle, aAcq);
 
     // get instance of acquisition destroy class
-    const NestedAcquisitionDestroyer acqDestroyer(pHandle, bDestroyDibs ? true : false);
+    const NestedAcquisitionDestroyer acqDestroyer(pHandle, bDestroyDibs);
 
     // underlying images array
     auto& vImagesArray = factory->underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(aAcq);
