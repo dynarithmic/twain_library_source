@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <io.h>
 #include "SourceProperties.h"
-
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -44,14 +43,14 @@ void SelectTheSource(int nWhich);
 void EnableSourceItems(BOOL bEnable);
 void EnableSelectSourceItems(BOOL bEnable);
 void EnableAllMenuItems(BOOL bEnable);
-void EnableBarcodeAndFileXferItems(DTWAIN_SOURCE source);
+void EnableBarcodeMenuItem(DTWAIN_SOURCE source);
 DTWAIN_SOURCE DisplayGetNameDlg();
 DTWAIN_SOURCE DisplayCustomDlg();
 void DisplaySourceProps();
 void SetCaptionToSourceName();
 void AcquireNative();
 void AcquireBuffered();
-void AcquireFile(BOOL bUseSource);
+void AcquireFile(BOOL bUseSource, LONG fileType);
 BOOL IsAllSpace(LPCTSTR p);
 void ToggleCheckedItem(UINT resId);
 BOOL GetToggleMenuState(UINT resID);
@@ -60,6 +59,8 @@ void DisplayLoggingOptions();
 void LoadLanguage(int message);
 void LoadLanguageStrings(LPCTSTR szLang);
 void DisplayCustomLangDlg();
+void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable);
+INT_PTR DisplayGetFileNameDlg();
 
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -77,10 +78,11 @@ LRESULT CALLBACK EnterSourceNameProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 LRESULT CALLBACK DisplayCustomSelectProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayBarCodeInfoProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayAcquireSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK DisplayFileTypesProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayLoggingProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK EnterFileNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR DisplayOneDibPage(HINSTANCE hInstance, HANDLE hDib, UINT resID, HWND wndHandle);
+
 
 // File types structure
 typedef struct
@@ -96,6 +98,12 @@ typedef struct
     LPCTSTR language;
 } AllLanguages;
 
+typedef struct
+{
+    UINT resourceId;
+    int  dtwainType;
+} AllFileTypes;
+
 AllTypes g_allTypes[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
                             {_T("BMP File (RLE)"), DTWAIN_BMP_RLE, _T("test.bmp")},
                             {_T("PCX File"),DTWAIN_PCX, _T("test.pcx")},
@@ -110,8 +118,8 @@ AllTypes g_allTypes[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
                             {_T("Postscript Level 2 File"), DTWAIN_POSTSCRIPT2MULTI, _T("test.ps")},
                             {_T("PNG File"), DTWAIN_PNG, _T("test.png")},
                             {_T("Adobe Paintshop (PSD) File"), DTWAIN_PSD, _T("test.psd")},
-							{_T("SVG File"), DTWAIN_SVG, _T("test.svg")},
-							{_T("SVGZ File"), DTWAIN_SVGZ, _T("test.svgz")},
+                            {_T("SVG File"), DTWAIN_SVG, _T("test.svg")},
+                            {_T("SVGZ File"), DTWAIN_SVGZ, _T("test.svgz")},
                             {_T("Text File"), DTWAIN_TEXTMULTI, _T("test.txt")},
                             {_T("TIFF (No compression)"), DTWAIN_TIFFNONEMULTI, _T("test.tif")},
                             {_T("TIFF (CCITT Group 3)"), DTWAIN_TIFFG3MULTI, _T("test.tif")},
@@ -161,6 +169,71 @@ AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("engli
                                  {ID_LANGUAGE_KOREAN                , _T("korean")}
                                 };
 
+AllFileTypes g_allDTWAINFileTypes[] = {
+        {IDM_ACQUIREFILESOURCE_WINDOWSBMP, DTWAIN_FF_BMP},
+        {IDM_ACQUIREFILESOURCE_JPEG, DTWAIN_FF_JFIF},
+        {IDM_ACQUIREFILESOURCE_TIFF, DTWAIN_FF_TIFF },
+        {IDM_ACQUIREFILESOURCE_TIFFMULTIPAGE, DTWAIN_FF_TIFFMULTI},
+        {IDM_ACQUIREFILESOURCE_PNG, DTWAIN_FF_PNG},
+        {IDM_ACQUIREFILESOURCE_PDF, DTWAIN_FF_PDF},
+        {IDM_ACQUIREFILESOURCE_PDFA, DTWAIN_FF_PDFA},
+        {IDM_ACQUIREFILESOURCE_PDFA2, DTWAIN_FF_PDFA2},
+        {IDM_ACQUIREFILESOURCE_PDFRASTER, DTWAIN_FF_PDFRASTER},
+        {IDM_ACQUIREFILESOURCE_FLASHPIX, DTWAIN_FF_FPX},
+        {IDM_ACQUIREFILESOURCE_EXIF, DTWAIN_FF_EXIF},
+        {IDM_ACQUIREFILESOURCE_SPIFF, DTWAIN_FF_SPIFF},
+        {IDM_ACQUIREFILESOURCE_XBM, DTWAIN_FF_XBM},
+        {IDM_ACQUIREFILESOURCE_PICT, DTWAIN_FF_PICT},
+        {IDM_ACQUIREFILESOURCE_JP2, DTWAIN_FF_JP2},
+        {IDM_ACQUIREFILESOURCE_JPX, DTWAIN_FF_JPX},
+        {IDM_ACQUIREFILESOURCE_DEJAVU, DTWAIN_FF_DEJAVU},
+        {IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION  ,  DTWAIN_BIGTIFFNONEMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_GROUP3         ,  DTWAIN_BIGTIFFG3MULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_GROUP4         ,  DTWAIN_BIGTIFFG4MULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_FLATE          ,  DTWAIN_BIGTIFFDEFLATEMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_JPEG           ,  DTWAIN_BIGTIFFJPEGMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_LZW            ,  DTWAIN_BIGTIFFLZWMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_PACKBITS       ,  DTWAIN_BIGTIFFPACKBITS },
+        {IDM_ACQUIREFILE_BMP                    ,  DTWAIN_BMP },
+        {IDM_ACQUIREFILE_BMPRLE                 ,  DTWAIN_BMP_RLE },
+        {IDM_ACQUIREFILE_DCX                    ,  DTWAIN_DCX },
+        {IDM_ACQUIREFILE_ENHANCEDMETAFILE       ,  DTWAIN_EMF },
+        {IDM_ACQUIREFILE_GIF                    ,  DTWAIN_GIF },
+        {IDM_ACQUIREFILE_ICO                    ,  DTWAIN_ICO_RESIZED },
+        {IDM_ACQUIREFILE_ICOVISTA               ,  DTWAIN_ICO_VISTA },
+        {IDM_ACQUIREFILE_JPEG                   ,  DTWAIN_JPEG },
+        {IDM_ACQUIREFILE_JPEG2000               ,  DTWAIN_JPEG2000 },
+        {IDM_ACQUIREFILE_JPEGXR                 ,  DTWAIN_JPEGXR },
+        {IDM_ACQUIREFILE_PAINTSHOP              ,  DTWAIN_PSD },
+        {IDM_ACQUIREFILE_PCX                    ,  DTWAIN_PCX },
+        {IDM_ACQUIREFILE_PDF                    ,  DTWAIN_PDFMULTI },
+        {IDM_ACQUIREFILE_PNG                    ,  DTWAIN_PNG },
+        {IDM_ACQUIREFILE_POSTSCRIPTLEVEL1       ,  DTWAIN_POSTSCRIPT1MULTI },
+        {IDM_ACQUIREFILE_POSTSCRIPTLEVEL2       ,  DTWAIN_POSTSCRIPT2MULTI },
+        {IDM_ACQUIREFILE_SVG                    ,  DTWAIN_SVG },
+        {IDM_ACQUIREFILE_SVGZ                   ,  DTWAIN_SVGZ },
+        {IDM_ACQUIREFILE_TGA                    ,  DTWAIN_TGA },
+        {IDM_ACQUIREFILE_TGARLE                 ,  DTWAIN_TGA_RLE },
+        {IDM_ACQUIREFILE_TEXT                   ,  DTWAIN_TEXTMULTI },
+        {IDM_ACQUIREFILE_TIFF_NOCOMPRESSION     ,  DTWAIN_TIFFNONEMULTI },
+        {IDM_ACQUIREFILE_TIFF_GROUP3            ,  DTWAIN_TIFFG3MULTI },
+        {IDM_ACQUIREFILE_TIFF_GROUP4            ,  DTWAIN_TIFFG4MULTI },
+        {IDM_ACQUIREFILE_TIFF_FLATE             ,  DTWAIN_TIFFDEFLATEMULTI },
+        {IDM_ACQUIREFILE_TIFF_JPEG              ,  DTWAIN_TIFFJPEGMULTI },
+        {IDM_ACQUIREFILE_TIFF_LZW               ,  DTWAIN_TIFFLZWMULTI },
+        {IDM_ACQUIREFILE_TIFF_PACKBITS          ,  DTWAIN_TIFFPACKBITSMULTI },
+        {IDM_ACQUIREFILE_WEBP                   ,  DTWAIN_WEBP },
+        {IDM_ACQUIREFILE_WINDOWSMETAFILE        ,  DTWAIN_WMF },
+        {IDM_ACQUIREFILE_WIRELESSBITMAP         ,  DTWAIN_WBMP_RESIZED },
+    };
+
+const UINT nFirstAcquireSourceID = IDM_ACQUIREFILESOURCE_WINDOWSBMP;
+const UINT nLastAcquireSourceID = IDM_ACQUIREFILESOURCE_DEJAVU;
+
+const UINT nFirstAcquireFileID = IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION;
+const UINT nLastAcquireFileID = IDM_ACQUIREFILE_WIRELESSBITMAP;
+const UINT numDTWAINFileTypes = sizeof(g_allDTWAINFileTypes) / sizeof(g_allDTWAINFileTypes[0]);
+
 UINT g_AllMenuItems[] = { IDM_SELECT_SOURCE,
                           IDM_SELECT_SOURCE_BY_NAME,
                           IDM_SELECT_DEFAULT_SOURCE,
@@ -178,6 +251,7 @@ UINT g_AllMenuItems[] = { IDM_SELECT_SOURCE,
                           IDM_SHOW_BARCODEINFO };
 
 TCHAR g_CustomLanguage[256];
+
 
 DTWAIN_PDFTEXTELEMENT g_PDFTextElement;
 
@@ -207,7 +281,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     hAccelTable = LoadAccelerators(hInstance, (LPCTSTR)IDC_DTWDEMO);
 
     /* Initialize DTWAIN.  Quit if error! */
-    if ( !DTWAIN_SysInitialize( )) 
+    if ( !DTWAIN_SysInitialize( ))
         return 0;
     DTWAIN_SetAppInfoA("1.0","Demo Program Menu", "Demo Program Family", "Demo Program Name");
 
@@ -226,7 +300,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     g_PDFTextElement = DTWAIN_CreatePDFTextElement();
 
     /* Position, font height, font color, and display pages for the PDF text element */
-	DTWAIN_SetPDFTextElementFloat(g_PDFTextElement, 25, 0, DTWAIN_PDFTEXTELEMENT_FONTHEIGHT);
+    DTWAIN_SetPDFTextElementFloat(g_PDFTextElement, 25, 0, DTWAIN_PDFTEXTELEMENT_FONTHEIGHT);
     DTWAIN_SetPDFTextElementLong(g_PDFTextElement, 100, 100, DTWAIN_PDFTEXTELEMENT_POSITION);
     DTWAIN_SetPDFTextElementLong(g_PDFTextElement, DTWAIN_MakeRGB(127, 127, 127), 0, DTWAIN_PDFTEXTELEMENT_COLOR);
     DTWAIN_SetPDFTextElementLong(g_PDFTextElement, DTWAIN_PDFTEXT_ALLPAGES, 0, DTWAIN_PDFTEXTELEMENT_DISPLAYFLAGS);
@@ -276,7 +350,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    g_hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
-
+   EnableFileXFerMenuItems(NULL, FALSE);
    if (!g_hWnd)
    {
       return FALSE;
@@ -290,16 +364,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    int wmId, wmEvent;
+    UINT wmId, wmEvent;
     TCHAR szHello[MAX_LOADSTRING];
     LoadString(hInst, IDS_HELLO, szHello, MAX_LOADSTRING);
 
     switch (message)
     {
-
         case WM_CREATE:
             g_Menu = GetMenu(hWnd);
             EnableSourceItems(FALSE);
+            EnableFileXFerMenuItems(NULL, FALSE);
             CheckMenuItem(g_Menu, IDM_USE_SOURCE_UI, MF_BYCOMMAND | MF_CHECKED);
             CheckMenuItem(g_Menu, IDM_SHOW_PREVIEW, MF_BYCOMMAND | MF_CHECKED);
             CheckMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_CHECKED);
@@ -308,7 +382,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_COMMAND:
             wmId    = LOWORD(wParam);
             wmEvent = HIWORD(wParam);
-            // Parse the menu selections:
+
+            /* See if the acquisition is to a file using source mode */
+            UINT i;
+            if (wmId >= nFirstAcquireSourceID && wmId <= nLastAcquireFileID)
+            {
+                for (i = 0; i < numDTWAINFileTypes; ++i)
+                {
+                    if (g_allDTWAINFileTypes[i].resourceId == wmId)
+                    {
+                        g_FileType = g_allDTWAINFileTypes[i].dtwainType;
+                        AcquireFile(g_allDTWAINFileTypes[i].resourceId < nFirstAcquireFileID, g_allDTWAINFileTypes[i].dtwainType);
+                        break;
+                    }
+                }
+                return 0;
+            }
+
+            /* Parse the menu selections : */
             switch (wmId)
             {
                 case IDM_ABOUT:
@@ -332,6 +423,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         DTWAIN_CloseSource(g_CurrentSource);
                         g_CurrentSource = NULL;
                         EnableSourceItems(FALSE);
+                        EnableFileXFerMenuItems(NULL, FALSE);
                         SetCaptionToSourceName();
                     }
                 break;
@@ -474,6 +566,14 @@ BOOL GetToggleMenuState(UINT resID)
     if ( nState != -1 )
         return (nState & MF_CHECKED)?TRUE:FALSE;
     return TRUE;
+}
+
+BOOL IsMenuItemEnabled(UINT resID) 
+{
+	UINT nState = GetMenuState(g_Menu, resID, MF_BYCOMMAND);
+	if (nState != -1)
+		return (nState & (MF_DISABLED | MF_GRAYED)) ? FALSE: TRUE;
+	return FALSE;
 }
 
 void SelectTheSource(int nWhich)
@@ -1294,7 +1394,7 @@ LRESULT CALLBACK DisplayFileTypesProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 case IDOK:
                 {
                     /* Get the current selection */
-                        SendMessage( hWndEdit, WM_GETTEXT, 256, (LPARAM)g_FileName);
+                    SendMessage( hWndEdit, WM_GETTEXT, 256, (LPARAM)g_FileName);
 
                     if ( g_FileName[0] == 0 || IsAllSpace(g_FileName))
                     {
@@ -1435,15 +1535,17 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
 
         case DTWAIN_TN_TRANSFERDONE:
         {
-            BOOL showBarCodes = GetToggleMenuState(IDM_SHOW_BARCODEINFO);
+            BOOL showBarCodes = GetToggleMenuState(IDM_SHOW_BARCODEINFO) && IsMenuItemEnabled(IDM_SHOW_BARCODEINFO);
             if (showBarCodes)
                 DisplayBarCodeInfo();
         }
         break;
+
         /* See if we want to keep the DIB */
         case DTWAIN_TN_QUERYPAGEDISCARD:
         {
             LRESULT retVal;
+
             /* First let's see if menu option is checked */
             BOOL showPreview = GetToggleMenuState(IDM_SHOW_PREVIEW);
             if (!showPreview)
@@ -1527,6 +1629,7 @@ void EnableAllMenuItems(BOOL bEnable)
         EnableMenuItem(g_Menu, g_AllMenuItems[i], nOptions);
     EnableBarcodeMenuItem(g_CurrentSource);
     EnableFileXFerMenuItems(g_CurrentSource, bEnable);
+    EnableMenuItem(g_Menu, IDM_ACQUIRETEST_USEGETMESSAGE, nOptions);
 }
 
 void DisableFileXFerSubItems()
@@ -1595,7 +1698,7 @@ void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable)
                 DTWAIN_ArrayGetAtLong(arrFileTypes, i, &fileType);
                 for (nFound = nFirstAcquireSourceID; nFound <= nLastAcquireSourceID; ++nFound, ++curId)
                 {
-                    if (g_allSourceModeTypes[curId].dtwainType == fileType)
+                    if (g_allDTWAINFileTypes[curId].dtwainType == fileType)
                     {
                         EnableMenuItem(hSubMenu2, curId, MF_BYPOSITION | MF_ENABLED);
                         break;
