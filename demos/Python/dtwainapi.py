@@ -2935,7 +2935,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
      theDLL.DTWAIN_UnlockMemory.restype = ct.c_long
      theDLL.DTWAIN_UnlockMemoryEx.restype = ct.c_long
-     theDLL.DTWAIN_UpdateCurrentDIB.restype = ct.c_long
+     theDLL.DTWAIN_UpdateCurrentAcquiredImage.restype = ct.c_long
      theDLL.DTWAIN_UseMultipleThreads.restype = ct.c_long
 
      #set up the argument types
@@ -4063,7 +4063,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_UnlockMemoryEx.argtypes = [ct.c_void_p]
-     theDLL.DTWAIN_UpdateCurrentDIB.argtypes = [ct.c_void_p, ct.c_void_p]
+     theDLL.DTWAIN_UpdateCurrentAcquiredImage.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_UseMultipleThreads.argtypes = [ct.c_long]
 
 def setup_ansi(theDLL):
@@ -5251,7 +5251,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
      theDLL.DTWAIN_UnlockMemory.restype = ct.c_long
      theDLL.DTWAIN_UnlockMemoryEx.restype = ct.c_long
-     theDLL.DTWAIN_UpdateCurrentDIB.restype = ct.c_long
+     theDLL.DTWAIN_UpdateCurrentAcquiredImage.restype = ct.c_long
      theDLL.DTWAIN_UseMultipleThreads.restype = ct.c_long
 
      #set up the argument types
@@ -6379,5 +6379,5 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_UnlockMemoryEx.argtypes = [ct.c_void_p]
-     theDLL.DTWAIN_UpdateCurrentDIB.argtypes = [ct.c_void_p, ct.c_void_p]
+     theDLL.DTWAIN_UpdateCurrentAcquiredImage.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_UseMultipleThreads.argtypes = [ct.c_long]

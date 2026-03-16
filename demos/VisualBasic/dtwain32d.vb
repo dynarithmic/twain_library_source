@@ -2599,7 +2599,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_TestGetCap Lib "dtwain32d.dll" (Source As System.IntPtr, lCapability As Integer) As System.IntPtr
     Public Declare Function DTWAIN_UnlockMemory Lib "dtwain32d.dll" (h As System.IntPtr) As Integer
     Public Declare Function DTWAIN_UnlockMemoryEx Lib "dtwain32d.dll" (h As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_UpdateCurrentDIB Lib "dtwain32d.dll" (Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_UpdateCurrentAcquiredImage Lib "dtwain32d.dll" (Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
     Public Declare Function DTWAIN_UseMultipleThreads Lib "dtwain32d.dll" (bSet As Integer) As Integer
 
 End Class

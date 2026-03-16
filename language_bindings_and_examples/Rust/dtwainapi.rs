@@ -1217,7 +1217,7 @@ type DtwainsysinitializenoblockingFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwaintestgetcapFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
 type DtwainunlockmemoryFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainunlockmemoryexFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainupdatecurrentdibFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainupdatecurrentacquiredimageFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
 type DtwainusemultiplethreadsFunc = unsafe extern "C" fn(i32) -> i32;
 pub struct DTwainAPI<'a>
 {
@@ -2391,7 +2391,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_TestGetCapFunc: Symbol<'a, DtwaintestgetcapFunc>,
     DTWAIN_UnlockMemoryFunc: Symbol<'a, DtwainunlockmemoryFunc>,
     DTWAIN_UnlockMemoryExFunc: Symbol<'a, DtwainunlockmemoryexFunc>,
-    DTWAIN_UpdateCurrentDIBFunc: Symbol<'a, DtwainupdatecurrentdibFunc>,
+    DTWAIN_UpdateCurrentAcquiredImageFunc: Symbol<'a, DtwainupdatecurrentacquiredimageFunc>,
     DTWAIN_UseMultipleThreadsFunc: Symbol<'a, DtwainusemultiplethreadsFunc>
 }
 impl<'a> DTwainAPI<'a>
@@ -5215,7 +5215,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_TestGetCap: Symbol<DtwaintestgetcapFunc> = unsafe { library.get(b"DTWAIN_TestGetCap")? };
         let DTWAIN_UnlockMemory: Symbol<DtwainunlockmemoryFunc> = unsafe { library.get(b"DTWAIN_UnlockMemory")? };
         let DTWAIN_UnlockMemoryEx: Symbol<DtwainunlockmemoryexFunc> = unsafe { library.get(b"DTWAIN_UnlockMemoryEx")? };
-        let DTWAIN_UpdateCurrentDIB: Symbol<DtwainupdatecurrentdibFunc> = unsafe { library.get(b"DTWAIN_UpdateCurrentDIB")? };
+        let DTWAIN_UpdateCurrentAcquiredImage: Symbol<DtwainupdatecurrentacquiredimageFunc> = unsafe { library.get(b"DTWAIN_UpdateCurrentAcquiredImage")? };
         let DTWAIN_UseMultipleThreads: Symbol<DtwainusemultiplethreadsFunc> = unsafe { library.get(b"DTWAIN_UseMultipleThreads")? };
         Ok(Self {
             DTWAIN_AcquireAudioFileFunc: DTWAIN_AcquireAudioFile,
@@ -6388,7 +6388,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_TestGetCapFunc: DTWAIN_TestGetCap,
             DTWAIN_UnlockMemoryFunc: DTWAIN_UnlockMemory,
             DTWAIN_UnlockMemoryExFunc: DTWAIN_UnlockMemoryEx,
-            DTWAIN_UpdateCurrentDIBFunc: DTWAIN_UpdateCurrentDIB,
+            DTWAIN_UpdateCurrentAcquiredImageFunc: DTWAIN_UpdateCurrentAcquiredImage,
             DTWAIN_UseMultipleThreadsFunc: DTWAIN_UseMultipleThreads
         })
 }
@@ -11074,8 +11074,8 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_UnlockMemoryExFunc)(h);  }
     }
 
-    pub fn DTWAIN_UpdateCurrentDIB(&self, Source: *mut c_void, hNewDib: *mut c_void) -> i32 {
-        unsafe { return (self.DTWAIN_UpdateCurrentDIBFunc)(Source, hNewDib);  }
+    pub fn DTWAIN_UpdateCurrentAcquiredImage(&self, Source: *mut c_void, hNewDib: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_UpdateCurrentAcquiredImageFunc)(Source, hNewDib);  }
     }
 
     pub fn DTWAIN_UseMultipleThreads(&self, bSet: i32) -> i32 {

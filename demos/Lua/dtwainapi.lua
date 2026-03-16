@@ -1244,7 +1244,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
-        DTWAIN_BOOL DTWAIN_UpdateCurrentDIB(DTWAIN_SOURCE Source, HANDLE hNewDib);
+        DTWAIN_BOOL DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib);
         DTWAIN_BOOL DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet);
   ]]
   return ffi.load(DLLToLoad)
@@ -2473,7 +2473,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
-        DTWAIN_BOOL DTWAIN_UpdateCurrentDIB(DTWAIN_SOURCE Source, HANDLE hNewDib);
+        DTWAIN_BOOL DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib);
         DTWAIN_BOOL DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet);
   ]]
   return ffi.load(DLLToLoad)
@@ -3702,7 +3702,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
-        DTWAIN_BOOL DTWAIN_UpdateCurrentDIB(DTWAIN_SOURCE Source, HANDLE hNewDib);
+        DTWAIN_BOOL DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib);
         DTWAIN_BOOL DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet);
   ]]
   return ffi.load(DLLToLoad)
@@ -4931,7 +4931,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
-        DTWAIN_BOOL DTWAIN_UpdateCurrentDIB(DTWAIN_SOURCE Source, HANDLE hNewDib);
+        DTWAIN_BOOL DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib);
         DTWAIN_BOOL DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet);
   ]]
   return ffi.load(DLLToLoad)

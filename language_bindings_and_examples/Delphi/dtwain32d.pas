@@ -3017,7 +3017,7 @@ function DTWAIN_SysInitializeNoBlocking : DTWAIN_HANDLE; stdcall;  external 'dtw
 function DTWAIN_TestGetCap(Source:DTWAIN_SOURCE; lCapability:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_TestGetCap';
 function DTWAIN_UnlockMemory(h:NativeInt) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_UnlockMemory';
 function DTWAIN_UnlockMemoryEx(h:NativeInt) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_UnlockMemoryEx';
-function DTWAIN_UpdateCurrentDIB(Source:DTWAIN_SOURCE; hNewDib:NativeInt) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_UpdateCurrentDIB';
+function DTWAIN_UpdateCurrentAcquiredImage(Source:DTWAIN_SOURCE; hNewDib:NativeInt) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_UpdateCurrentAcquiredImage';
 function DTWAIN_UseMultipleThreads(bSet:BOOL) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_UseMultipleThreads';
 
 implementation

@@ -1220,7 +1220,7 @@ typedef DTWAIN_HANDLE (DLLENTRY_DEF * D_SYSINITIALIZENOBLOCKINGFUNC)            
 typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_TESTGETCAPFUNC)                          (DTWAIN_SOURCE, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_UNLOCKMEMORYFUNC)                         (HANDLE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_UNLOCKMEMORYEXFUNC)                       (HANDLE);
-typedef DTWAIN_BOOL (DLLENTRY_DEF * D_UPDATECURRENTDIBFUNC)                     (DTWAIN_SOURCE, HANDLE);
+typedef DTWAIN_BOOL (DLLENTRY_DEF * D_UPDATECURRENTACQUIREDIMAGEFUNC)           (DTWAIN_SOURCE, HANDLE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   (DTWAIN_BOOL);
 
 #ifdef __cplusplus
@@ -2415,7 +2415,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_TESTGETCAPFUNC                                 DTWAIN_TestGetCap;
     STATIC D_UNLOCKMEMORYFUNC                               DTWAIN_UnlockMemory;
     STATIC D_UNLOCKMEMORYEXFUNC                             DTWAIN_UnlockMemoryEx;
-    STATIC D_UPDATECURRENTDIBFUNC                           DTWAIN_UpdateCurrentDIB;
+    STATIC D_UPDATECURRENTACQUIREDIMAGEFUNC                 DTWAIN_UpdateCurrentAcquiredImage;
     STATIC D_USEMULTIPLETHREADSFUNC                         DTWAIN_UseMultipleThreads;
 #ifdef __cplusplus
         static int InitDTWAINInterface(DYNDTWAIN_API*, HMODULE h);

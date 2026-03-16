@@ -2840,5 +2840,5 @@ my $DTWAIN_SysInitializeNoBlocking = new Win32::API($dtwain_dllName, 'DTWAIN_Sys
 my $DTWAIN_TestGetCap = new Win32::API($dtwain_dllName, 'DTWAIN_TestGetCap', 'Ni', 'N');
 my $DTWAIN_UnlockMemory = new Win32::API($dtwain_dllName, 'DTWAIN_UnlockMemory', 'P', 'I');
 my $DTWAIN_UnlockMemoryEx = new Win32::API($dtwain_dllName, 'DTWAIN_UnlockMemoryEx', 'P', 'I');
-my $DTWAIN_UpdateCurrentDIB = new Win32::API($dtwain_dllName, 'DTWAIN_UpdateCurrentDIB', 'NP', 'I');
+my $DTWAIN_UpdateCurrentAcquiredImage = new Win32::API($dtwain_dllName, 'DTWAIN_UpdateCurrentAcquiredImage', 'NP', 'I');
 my $DTWAIN_UseMultipleThreads = new Win32::API($dtwain_dllName, 'DTWAIN_UseMultipleThreads', 'I', 'I');

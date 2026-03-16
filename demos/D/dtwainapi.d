@@ -3078,7 +3078,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG) DTWAIN_TestGetCap;
     extern(Windows) DTWAIN_BOOL function(HANDLE) DTWAIN_UnlockMemory;
     extern(Windows) DTWAIN_BOOL function(HANDLE) DTWAIN_UnlockMemoryEx;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, HANDLE) DTWAIN_UpdateCurrentDIB;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, HANDLE) DTWAIN_UpdateCurrentAcquiredImage;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_BOOL) DTWAIN_UseMultipleThreads;
 
     /************ Constructor ************/
@@ -4251,7 +4251,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_TestGetCap, "DTWAIN_TestGetCap");
         bindFunction(cast(void**)&DTWAIN_UnlockMemory, "DTWAIN_UnlockMemory");
         bindFunction(cast(void**)&DTWAIN_UnlockMemoryEx, "DTWAIN_UnlockMemoryEx");
-        bindFunction(cast(void**)&DTWAIN_UpdateCurrentDIB, "DTWAIN_UpdateCurrentDIB");
+        bindFunction(cast(void**)&DTWAIN_UpdateCurrentAcquiredImage, "DTWAIN_UpdateCurrentAcquiredImage");
         bindFunction(cast(void**)&DTWAIN_UseMultipleThreads, "DTWAIN_UseMultipleThreads");
         bindFunction(cast(void**)&DTWAIN_GetCallback, "DTWAIN_GetCallback");
         bindFunction(cast(void**)&DTWAIN_GetCallback64, "DTWAIN_GetCallback64");

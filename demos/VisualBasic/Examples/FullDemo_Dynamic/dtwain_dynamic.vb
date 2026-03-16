@@ -4472,7 +4472,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_UnlockMemoryExDelegate(h As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_UpdateCurrentDIBDelegate(Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
+        Private Delegate Function DTWAIN_UpdateCurrentAcquiredImageDelegate(Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_UseMultipleThreadsDelegate(bSet As Integer) As Integer
@@ -7876,8 +7876,8 @@ Namespace Dynarithmic
         Return api.DTWAIN_UnlockMemoryEx(h)
         End Function
         
-        Public Function DTWAIN_UpdateCurrentDIB(Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
-        Return api.DTWAIN_UpdateCurrentDIB(Source, hNewDib)
+        Public Function DTWAIN_UpdateCurrentAcquiredImage(Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
+        Return api.DTWAIN_UpdateCurrentAcquiredImage(Source, hNewDib)
         End Function
         
         Public Function DTWAIN_UseMultipleThreads(bSet As Integer) As Integer
@@ -8734,7 +8734,7 @@ Namespace Dynarithmic
             Public DTWAIN_TestGetCap As DTWAIN_TestGetCapDelegate
             Public DTWAIN_UnlockMemory As DTWAIN_UnlockMemoryDelegate
             Public DTWAIN_UnlockMemoryEx As DTWAIN_UnlockMemoryExDelegate
-            Public DTWAIN_UpdateCurrentDIB As DTWAIN_UpdateCurrentDIBDelegate
+            Public DTWAIN_UpdateCurrentAcquiredImage As DTWAIN_UpdateCurrentAcquiredImageDelegate
             Public DTWAIN_UseMultipleThreads As DTWAIN_UseMultipleThreadsDelegate
         End Class
     End Class

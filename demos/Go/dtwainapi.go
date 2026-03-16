@@ -2931,7 +2931,7 @@ func Load_DTWAINDLL(path string) (*DTWAIN_DLL, error) {
     arr[1164] = "DTWAIN_TestGetCap"
     arr[1165] = "DTWAIN_UnlockMemory"
     arr[1166] = "DTWAIN_UnlockMemoryEx"
-    arr[1167] = "DTWAIN_UpdateCurrentDIB"
+    arr[1167] = "DTWAIN_UpdateCurrentAcquiredImage"
     arr[1168] = "DTWAIN_UseMultipleThreads"
     for _, name := range arr {
         addr, err := syscall.GetProcAddress(d.Handle, name)
@@ -10123,8 +10123,8 @@ func (d *DTWAIN_DLL) DTWAIN_UnlockMemoryEx(h HANDLE) int32 {
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_UpdateCurrentDIB(Source DTWAIN_SOURCE, hNewDib HANDLE) int32 {
-    theProc := d.procs["DTWAIN_UpdateCurrentDIB"]
+func (d *DTWAIN_DLL) DTWAIN_UpdateCurrentAcquiredImage(Source DTWAIN_SOURCE, hNewDib HANDLE) int32 {
+    theProc := d.procs["DTWAIN_UpdateCurrentAcquiredImage"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(hNewDib))
     return int32(v1)
 }

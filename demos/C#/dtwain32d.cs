@@ -4559,7 +4559,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_UnlockMemoryEx(HANDLE h);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_UpdateCurrentDIB(DTWAIN_SOURCE Source, HANDLE hNewDib);
+        public static extern int DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_UseMultipleThreads(int bSet);

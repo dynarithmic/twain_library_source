@@ -4397,7 +4397,7 @@ module TwainAPI =
     type DTWAIN_UnlockMemoryExDelegate = delegate of HANDLE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_UpdateCurrentDIBDelegate = delegate of DTWAIN_SOURCE * HANDLE -> DTWAIN_BOOL
+    type DTWAIN_UpdateCurrentAcquiredImageDelegate = delegate of DTWAIN_SOURCE * HANDLE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_UseMultipleThreadsDelegate = delegate of DTWAIN_BOOL -> DTWAIN_BOOL
@@ -5247,7 +5247,7 @@ module TwainAPI =
     let private TestGetCap = lazy (DynamicDll.Bind "DTWAIN_TestGetCap" : DTWAIN_TestGetCapDelegate)
     let private UnlockMemory = lazy (DynamicDll.Bind "DTWAIN_UnlockMemory" : DTWAIN_UnlockMemoryDelegate)
     let private UnlockMemoryEx = lazy (DynamicDll.Bind "DTWAIN_UnlockMemoryEx" : DTWAIN_UnlockMemoryExDelegate)
-    let private UpdateCurrentDIB = lazy (DynamicDll.Bind "DTWAIN_UpdateCurrentDIB" : DTWAIN_UpdateCurrentDIBDelegate)
+    let private UpdateCurrentAcquiredImage = lazy (DynamicDll.Bind "DTWAIN_UpdateCurrentAcquiredImage" : DTWAIN_UpdateCurrentAcquiredImageDelegate)
     let private UseMultipleThreads = lazy (DynamicDll.Bind "DTWAIN_UseMultipleThreads" : DTWAIN_UseMultipleThreadsDelegate)
     /// Loads the DTWAIN DLL and performs post-load business logic
     let Load (dllPath: string) =
@@ -8653,9 +8653,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         UnlockMemoryEx.Value.Invoke(h)
 
-    let DTWAIN_UpdateCurrentDIB (source: DTWAIN_SOURCE) (hnewdib: HANDLE) : DTWAIN_BOOL =
+    let DTWAIN_UpdateCurrentAcquiredImage (source: DTWAIN_SOURCE) (hnewdib: HANDLE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        UpdateCurrentDIB.Value.Invoke(source, hnewdib)
+        UpdateCurrentAcquiredImage.Value.Invoke(source, hnewdib)
 
     let DTWAIN_UseMultipleThreads (bset: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

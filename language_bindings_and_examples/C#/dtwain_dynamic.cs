@@ -2828,7 +2828,7 @@
         public delegate DTWAIN_ARRAY DTWAIN_TestGetCapDelegate(DTWAIN_SOURCE Source, int lCapability);
         public delegate int DTWAIN_UnlockMemoryDelegate(HANDLE h);
         public delegate int DTWAIN_UnlockMemoryExDelegate(HANDLE h);
-        public delegate int DTWAIN_UpdateCurrentDIBDelegate(DTWAIN_SOURCE Source, HANDLE hNewDib);
+        public delegate int DTWAIN_UpdateCurrentAcquiredImageDelegate(DTWAIN_SOURCE Source, HANDLE hNewDib);
         public delegate int DTWAIN_UseMultipleThreadsDelegate(int bSet);
 
         public TwainAPI(string dllPath)
@@ -5607,8 +5607,8 @@
         [DTWAINNativeFunction("DTWAIN_UnlockMemoryEx")]
         private readonly DTWAIN_UnlockMemoryExDelegate  _DTWAIN_UnlockMemoryEx;
 
-        [DTWAINNativeFunction("DTWAIN_UpdateCurrentDIB")]
-        private readonly DTWAIN_UpdateCurrentDIBDelegate  _DTWAIN_UpdateCurrentDIB;
+        [DTWAINNativeFunction("DTWAIN_UpdateCurrentAcquiredImage")]
+        private readonly DTWAIN_UpdateCurrentAcquiredImageDelegate  _DTWAIN_UpdateCurrentAcquiredImage;
 
         [DTWAINNativeFunction("DTWAIN_UseMultipleThreads")]
         private readonly DTWAIN_UseMultipleThreadsDelegate  _DTWAIN_UseMultipleThreads;
@@ -8375,8 +8375,8 @@
         public  int DTWAIN_UnlockMemoryEx(HANDLE h)
         => _DTWAIN_UnlockMemoryEx(h);
 
-        public  int DTWAIN_UpdateCurrentDIB(DTWAIN_SOURCE Source, HANDLE hNewDib)
-        => _DTWAIN_UpdateCurrentDIB(Source, hNewDib);
+        public  int DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib)
+        => _DTWAIN_UpdateCurrentAcquiredImage(Source, hNewDib);
 
         public  int DTWAIN_UseMultipleThreads(int bSet)
         => _DTWAIN_UseMultipleThreads(bSet);
