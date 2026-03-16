@@ -108,12 +108,36 @@ DTWAIN Version changes
   The return value will be a copy of the original DIB, but with the image rotated.  The original
   DIB is not modified.  This function can be used for the notifications mentioned above 
   (DTWAIN_TN_QUERYUPDATEDIBORIG and  DTWAIN_TN_QUERYUPDATEDIBRESAMPLED).
-  
+
+- Added DTWAIN_NODELETEDIBS file flag to DTWAIN_AcquireFile and DTWAIN_AcquireFileEx.
+  This file flag will allow all of the generated Device Independent Bitmaps to be retained
+  in memory instead of automatically being deleted when the image file is saved.  
+
+  To retrieve the bitmaps, the function DTWAIN_GetAcquisitionArray() should be used after 
+  calling DTWAIN_AcquireFile(Ex).  The return value is a DTWAIN_ARRAY of the acquisitions,
+  similar to the DTWAIN_ARRAY that is returned for DTWAIN_AcquireNativeEx().  
+
+  Example:
+     DTWAIN_SOURCE Source;
+     DTWAIN_AcquireFile(Source, "filename", DTWAIN_BMP, 
+                        DTWAIN_USENATIVE | DTWAIN_NODELETEDIBS, // Do not delete the DIBS
+                        ... other parameters
+                       );
+
+     DTWAIN_ARRAY dibs = DTWAIN_GetAcquisitionArray(Source);
+     // Get the first dib from the first acquisition attempted
+     HANDLE oneDib = DTWAIN_GetAcquiredImage(dibs, 0, 0);  
+     //...
+     // Destroy the acquisition array
+     DTWAIN_DestroyAcquisitionArray(dibs, TRUE);
+
 - Fixed possible NULL being returned when calling DTWAIN_ArrayCreateFromCap() on a 
   custom capability.
 
 - Fixed potential memory access violation when discarding images during buffered transfers.
   This can occur if the DTWAIN_TN_QUERYPAGEDISCARD user notification returns 0.
+
+- Fixed potential memory leak when removing images after DTWAIN_AcquireFile(Ex) is called.
 
 
 5.8.1
