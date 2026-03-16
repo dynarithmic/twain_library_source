@@ -980,7 +980,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
     else
     {
         // Error occurred
-		DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return true; }, pHandle->m_lLastError, 
+		DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return true; }, pHandle->m_lLastError, 
                                                      0, FUNC_MACRO, false, { CTL_TwainAppMgr::GetCapNameFromCap(lCap) });
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
