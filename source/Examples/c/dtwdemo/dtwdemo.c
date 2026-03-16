@@ -59,9 +59,8 @@ void DisplayLoggingOptions();
 void LoadLanguage(int message);
 void LoadLanguageStrings(LPCTSTR szLang);
 void DisplayCustomLangDlg();
-INT_PTR DisplayGetFileNameDlg();
 void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable);
-BOOL IsMenuItemEnabled(UINT resID);
+INT_PTR DisplayGetFileNameDlg();
 
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -1612,9 +1611,6 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
                     return FALSE;
                 bPageOK = TRUE;
             }
-
-        case DTWAIN_TN_QUERYUPDATEDIBORIG:
-            return 1;
     }
     return 1;
 }
