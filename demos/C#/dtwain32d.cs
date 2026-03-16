@@ -316,6 +316,7 @@ namespace Dynarithmic
         public const int DTWAIN_USESOURCEMODE = 128;
         public const int DTWAIN_USELIST = 256;
         public const int DTWAIN_CREATE_DIRECTORY = 512;
+        public const int DTWAIN_NODELETEDIBS = 1024;
         public const int DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY;
         public const int DTWAIN_ARRAYANY = 1;
         public const int DTWAIN_ArrayTypePTR = 1;
@@ -2774,6 +2775,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, int nWhichAcq);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetActiveDSMPath([MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);

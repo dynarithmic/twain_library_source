@@ -434,6 +434,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_USESOURCEMODE As Integer = 128
         Public Const DTWAIN_USELIST As Integer = 256
         Public Const DTWAIN_CREATE_DIRECTORY As Integer = 512
+        Public Const DTWAIN_NODELETEDIBS As Integer = 1024
         Public Const DTWAIN_CREATEDIRECTORY As Integer = DTWAIN_CREATE_DIRECTORY
         Public Const DTWAIN_ARRAYANY As Integer = 1
         Public Const DTWAIN_ArrayTypePTR As Integer = 1
@@ -2879,6 +2880,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetAcquiredImageArrayDelegate(aAcq As System.IntPtr, nWhichAcq As Integer) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetAcquisitionArrayDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetActiveDSMPathDelegate(<MarshalAs(UnmanagedType.LPTStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
@@ -5752,6 +5756,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetAcquiredImageArray(aAcq, nWhichAcq)
         End Function
         
+        Public Function DTWAIN_GetAcquisitionArray(Source As System.IntPtr) As System.IntPtr
+        Return api.DTWAIN_GetAcquisitionArray(Source)
+        End Function
+        
         Public Function DTWAIN_GetActiveDSMPath(<MarshalAs(UnmanagedType.LPTStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
         Return api.DTWAIN_GetActiveDSMPath(lpszBuffer, nMaxLen)
         End Function
@@ -8196,6 +8204,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetAcquireStripSizes As DTWAIN_GetAcquireStripSizesDelegate
             Public DTWAIN_GetAcquiredImage As DTWAIN_GetAcquiredImageDelegate
             Public DTWAIN_GetAcquiredImageArray As DTWAIN_GetAcquiredImageArrayDelegate
+            Public DTWAIN_GetAcquisitionArray As DTWAIN_GetAcquisitionArrayDelegate
             Public DTWAIN_GetActiveDSMPath As DTWAIN_GetActiveDSMPathDelegate
             Public DTWAIN_GetActiveDSMVersionInfo As DTWAIN_GetActiveDSMVersionInfoDelegate
             Public DTWAIN_GetAlarmVolume As DTWAIN_GetAlarmVolumeDelegate

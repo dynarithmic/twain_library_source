@@ -191,6 +191,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_USESOURCEMODE = 128
    dtwain_constants.DTWAIN_USELIST = 256
    dtwain_constants.DTWAIN_CREATE_DIRECTORY = 512
+   dtwain_constants.DTWAIN_NODELETEDIBS = 1024
    dtwain_constants.DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY
    dtwain_constants.DTWAIN_ARRAYANY = 1
    dtwain_constants.DTWAIN_ArrayTypePTR = 1

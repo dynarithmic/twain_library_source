@@ -431,6 +431,7 @@ type DtwaingetacquirestripdataFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*
 type DtwaingetacquirestripsizesFunc = unsafe extern "C" fn(*mut c_void,*mut u32,*mut u32,*mut u32) -> i32;
 type DtwaingetacquiredimageFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
 type DtwaingetacquiredimagearrayFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwaingetacquisitionarrayFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type DtwaingetactivedsmpathFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
 type DtwaingetactivedsmpathaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
 type DtwaingetactivedsmpathwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
@@ -1604,6 +1605,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetAcquireStripSizesFunc: Symbol<'a, DtwaingetacquirestripsizesFunc>,
     DTWAIN_GetAcquiredImageFunc: Symbol<'a, DtwaingetacquiredimageFunc>,
     DTWAIN_GetAcquiredImageArrayFunc: Symbol<'a, DtwaingetacquiredimagearrayFunc>,
+    DTWAIN_GetAcquisitionArrayFunc: Symbol<'a, DtwaingetacquisitionarrayFunc>,
     DTWAIN_GetActiveDSMPathFunc: Symbol<'a, DtwaingetactivedsmpathFunc>,
     DTWAIN_GetActiveDSMPathAFunc: Symbol<'a, DtwaingetactivedsmpathaFunc>,
     DTWAIN_GetActiveDSMPathWFunc: Symbol<'a, DtwaingetactivedsmpathwFunc>,
@@ -2564,6 +2566,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_USESOURCEMODE: i32 = 128;
     pub const DTWAIN_USELIST: i32 = 256;
     pub const DTWAIN_CREATE_DIRECTORY: i32 = 512;
+    pub const DTWAIN_NODELETEDIBS: i32 = 1024;
     pub const DTWAIN_CREATEDIRECTORY: i32 = DTwainAPI::DTWAIN_CREATE_DIRECTORY;
     pub const DTWAIN_ARRAYANY: i32 = 1;
     pub const DTWAIN_ArrayTypePTR: i32 = 1;
@@ -4426,6 +4429,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetAcquireStripSizes: Symbol<DtwaingetacquirestripsizesFunc> = unsafe { library.get(b"DTWAIN_GetAcquireStripSizes")? };
         let DTWAIN_GetAcquiredImage: Symbol<DtwaingetacquiredimageFunc> = unsafe { library.get(b"DTWAIN_GetAcquiredImage")? };
         let DTWAIN_GetAcquiredImageArray: Symbol<DtwaingetacquiredimagearrayFunc> = unsafe { library.get(b"DTWAIN_GetAcquiredImageArray")? };
+        let DTWAIN_GetAcquisitionArray: Symbol<DtwaingetacquisitionarrayFunc> = unsafe { library.get(b"DTWAIN_GetAcquisitionArray")? };
         let DTWAIN_GetActiveDSMPath: Symbol<DtwaingetactivedsmpathFunc> = unsafe { library.get(b"DTWAIN_GetActiveDSMPath")? };
         let DTWAIN_GetActiveDSMPathA: Symbol<DtwaingetactivedsmpathaFunc> = unsafe { library.get(b"DTWAIN_GetActiveDSMPathA")? };
         let DTWAIN_GetActiveDSMPathW: Symbol<DtwaingetactivedsmpathwFunc> = unsafe { library.get(b"DTWAIN_GetActiveDSMPathW")? };
@@ -5598,6 +5602,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetAcquireStripSizesFunc: DTWAIN_GetAcquireStripSizes,
             DTWAIN_GetAcquiredImageFunc: DTWAIN_GetAcquiredImage,
             DTWAIN_GetAcquiredImageArrayFunc: DTWAIN_GetAcquiredImageArray,
+            DTWAIN_GetAcquisitionArrayFunc: DTWAIN_GetAcquisitionArray,
             DTWAIN_GetActiveDSMPathFunc: DTWAIN_GetActiveDSMPath,
             DTWAIN_GetActiveDSMPathAFunc: DTWAIN_GetActiveDSMPathA,
             DTWAIN_GetActiveDSMPathWFunc: DTWAIN_GetActiveDSMPathW,
@@ -7923,6 +7928,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetAcquiredImageArray(&self, aAcq: *mut c_void, nWhichAcq: i32) -> *mut c_void {
         unsafe { return (self.DTWAIN_GetAcquiredImageArrayFunc)(aAcq, nWhichAcq);  }
+    }
+
+    pub fn DTWAIN_GetAcquisitionArray(&self, Source: *mut c_void) -> *mut c_void {
+        unsafe { return (self.DTWAIN_GetAcquisitionArrayFunc)(Source);  }
     }
 
     pub fn DTWAIN_GetActiveDSMPath(&self, lpszBuffer: *mut u16, nMaxLen: i32) -> i32 {

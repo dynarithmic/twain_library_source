@@ -438,6 +438,7 @@
     D_GETACQUIRESTRIPSIZESFUNC                    DYNDTWAIN_API::DTWAIN_GetAcquireStripSizes = nullptr;
     D_GETACQUIREDIMAGEFUNC                        DYNDTWAIN_API::DTWAIN_GetAcquiredImage = nullptr;
     D_GETACQUIREDIMAGEARRAYFUNC                   DYNDTWAIN_API::DTWAIN_GetAcquiredImageArray = nullptr;
+    D_GETACQUISITIONARRAYFUNC                     DYNDTWAIN_API::DTWAIN_GetAcquisitionArray = nullptr;
     D_GETACTIVEDSMPATHFUNC                        DYNDTWAIN_API::DTWAIN_GetActiveDSMPath = nullptr;
     D_GETACTIVEDSMPATHAFUNC                       DYNDTWAIN_API::DTWAIN_GetActiveDSMPathA = nullptr;
     D_GETACTIVEDSMPATHWFUNC                       DYNDTWAIN_API::DTWAIN_GetActiveDSMPathW = nullptr;
@@ -1682,6 +1683,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetAcquireStripSizes, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetAcquiredImage, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetAcquiredImageArray, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetAcquisitionArray, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetActiveDSMPath, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetActiveDSMPathA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetActiveDSMPathW, hModule);

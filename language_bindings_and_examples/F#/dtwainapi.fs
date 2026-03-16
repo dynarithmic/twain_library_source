@@ -319,6 +319,7 @@ module TwainAPI =
     let public DTWAIN_USESOURCEMODE = 128
     let public DTWAIN_USELIST = 256
     let public DTWAIN_CREATE_DIRECTORY = 512
+    let public DTWAIN_NODELETEDIBS = 1024
     let public DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY
     let public DTWAIN_ARRAYANY = 1
     let public DTWAIN_ArrayTypePTR = 1
@@ -2817,6 +2818,9 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetAcquiredImageArrayDelegate = delegate of DTWAIN_ARRAY * LONG -> DTWAIN_ARRAY
 
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetAcquisitionArrayDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
+
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetActiveDSMPathDelegate = delegate of System.Text.StringBuilder * LONG -> LONG
 
@@ -4717,6 +4721,7 @@ module TwainAPI =
     let private GetAcquireStripSizes = lazy (DynamicDll.Bind "DTWAIN_GetAcquireStripSizes" : DTWAIN_GetAcquireStripSizesDelegate)
     let private GetAcquiredImage = lazy (DynamicDll.Bind "DTWAIN_GetAcquiredImage" : DTWAIN_GetAcquiredImageDelegate)
     let private GetAcquiredImageArray = lazy (DynamicDll.Bind "DTWAIN_GetAcquiredImageArray" : DTWAIN_GetAcquiredImageArrayDelegate)
+    let private GetAcquisitionArray = lazy (DynamicDll.Bind "DTWAIN_GetAcquisitionArray" : DTWAIN_GetAcquisitionArrayDelegate)
     let private GetActiveDSMPath = lazy (DynamicDll.Bind "DTWAIN_GetActiveDSMPath" : DTWAIN_GetActiveDSMPathDelegate)
     let private GetActiveDSMVersionInfo = lazy (DynamicDll.Bind "DTWAIN_GetActiveDSMVersionInfo" : DTWAIN_GetActiveDSMVersionInfoDelegate)
     let private GetAlarmVolume = lazy (DynamicDll.Bind "DTWAIN_GetAlarmVolume" : DTWAIN_GetAlarmVolumeDelegate)
@@ -6543,6 +6548,10 @@ module TwainAPI =
     let DTWAIN_GetAcquiredImageArray (aacq: DTWAIN_ARRAY) (nwhichacq: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetAcquiredImageArray.Value.Invoke(aacq, nwhichacq)
+
+    let DTWAIN_GetAcquisitionArray (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetAcquisitionArray.Value.Invoke(source)
 
     let DTWAIN_GetActiveDSMPath (lpszbuffer: System.Text.StringBuilder) (nmaxlen: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

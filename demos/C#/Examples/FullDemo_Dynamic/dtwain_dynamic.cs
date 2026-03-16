@@ -334,6 +334,7 @@
         public const int DTWAIN_USESOURCEMODE = 128;
         public const int DTWAIN_USELIST = 256;
         public const int DTWAIN_CREATE_DIRECTORY = 512;
+        public const int DTWAIN_NODELETEDIBS = 1024;
         public const int DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY;
         public const int DTWAIN_ARRAYANY = 1;
         public const int DTWAIN_ArrayTypePTR = 1;
@@ -2233,6 +2234,7 @@
         public delegate int DTWAIN_GetAcquireStripSizesDelegate(DTWAIN_SOURCE Source, ref DWORD lpMin, ref DWORD lpMax, ref DWORD lpPreferred);
         public delegate HANDLE DTWAIN_GetAcquiredImageDelegate(DTWAIN_ARRAY aAcq, int nWhichAcq, int nWhichDib);
         public delegate DTWAIN_ARRAY DTWAIN_GetAcquiredImageArrayDelegate(DTWAIN_ARRAY aAcq, int nWhichAcq);
+        public delegate DTWAIN_ARRAY DTWAIN_GetAcquisitionArrayDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetActiveDSMPathDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetActiveDSMPathDelegate_overload(System.IntPtr lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetActiveDSMVersionInfoDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szDLLInfo, int nMaxLen);
@@ -3822,6 +3824,9 @@
 
         [DTWAINNativeFunction("DTWAIN_GetAcquiredImageArray")]
         private readonly DTWAIN_GetAcquiredImageArrayDelegate  _DTWAIN_GetAcquiredImageArray;
+
+        [DTWAINNativeFunction("DTWAIN_GetAcquisitionArray")]
+        private readonly DTWAIN_GetAcquisitionArrayDelegate  _DTWAIN_GetAcquisitionArray;
 
         [DTWAINNativeFunction("DTWAIN_GetActiveDSMPath")]
         private readonly DTWAIN_GetActiveDSMPathDelegate  _DTWAIN_GetActiveDSMPath;
@@ -6587,6 +6592,9 @@
 
         public  DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, int nWhichAcq)
         => _DTWAIN_GetAcquiredImageArray(aAcq, nWhichAcq);
+
+        public  DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source)
+        => _DTWAIN_GetAcquisitionArray(Source);
 
         public  int DTWAIN_GetActiveDSMPath([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen)
         => _DTWAIN_GetActiveDSMPath(lpszBuffer, nMaxLen);

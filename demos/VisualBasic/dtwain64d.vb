@@ -263,6 +263,7 @@ Class DTWAINAPI
     Public Const DTWAIN_USESOURCEMODE As Integer = 128
     Public Const DTWAIN_USELIST As Integer = 256
     Public Const DTWAIN_CREATE_DIRECTORY As Integer = 512
+    Public Const DTWAIN_NODELETEDIBS As Integer = 1024
     Public Const DTWAIN_CREATEDIRECTORY As Integer = DTWAIN_CREATE_DIRECTORY
     Public Const DTWAIN_ARRAYANY As Integer = 1
     Public Const DTWAIN_ArrayTypePTR As Integer = 1
@@ -2068,6 +2069,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetAcquireStripSizes Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef lpMin As UInteger, ByRef lpMax As UInteger, ByRef lpPreferred As UInteger) As Integer
     Public Declare Function DTWAIN_GetAcquiredImage Lib "dtwain64d.dll" (aAcq As System.IntPtr, nWhichAcq As Integer, nWhichDib As Integer) As System.IntPtr
     Public Declare Function DTWAIN_GetAcquiredImageArray Lib "dtwain64d.dll" (aAcq As System.IntPtr, nWhichAcq As Integer) As System.IntPtr
+    Public Declare Function DTWAIN_GetAcquisitionArray Lib "dtwain64d.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Ansi Function DTWAIN_GetActiveDSMPath Lib "dtwain64d.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetActiveDSMVersionInfo Lib "dtwain64d.dll" (<MarshalAs(UnmanagedType.LPStr)> szDLLInfo As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetAlarmVolume Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef lpVolume As Integer) As Integer

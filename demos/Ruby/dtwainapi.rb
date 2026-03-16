@@ -519,6 +519,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetAcquireStripSizes
    attr_reader :DTWAIN_GetAcquiredImage
    attr_reader :DTWAIN_GetAcquiredImageArray
+   attr_reader :DTWAIN_GetAcquisitionArray
    attr_reader :DTWAIN_GetActiveDSMPath
    attr_reader :DTWAIN_GetActiveDSMPathA
    attr_reader :DTWAIN_GetActiveDSMPathW
@@ -1476,6 +1477,7 @@ class DTWAINAPI
    DTWAIN_USESOURCEMODE = 128
    DTWAIN_USELIST = 256
    DTWAIN_CREATE_DIRECTORY = 512
+   DTWAIN_NODELETEDIBS = 1024
    DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY
    DTWAIN_ARRAYANY = 1
    DTWAIN_ArrayTypePTR = 1
@@ -3377,6 +3379,7 @@ class DTWAINAPI
        @DTWAIN_GetAcquireStripSizes = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAcquireStripSizes'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetAcquiredImage = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAcquiredImage'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_GetAcquiredImageArray = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAcquiredImageArray'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
+       @DTWAIN_GetAcquisitionArray = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAcquisitionArray'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_GetActiveDSMPath = Fiddle::Function::new(dtwain_dll['DTWAIN_GetActiveDSMPath'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetActiveDSMPathA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetActiveDSMPathA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetActiveDSMPathW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetActiveDSMPathW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)

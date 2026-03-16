@@ -229,6 +229,7 @@ DTWAIN_USELONGNAME = 64
 DTWAIN_USESOURCEMODE = 128
 DTWAIN_USELIST = 256
 DTWAIN_CREATE_DIRECTORY = 512
+DTWAIN_NODELETEDIBS = 1024
 DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY
 DTWAIN_ARRAYANY = 1
 DTWAIN_ArrayTypePTR = 1
@@ -2148,6 +2149,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetAcquireStripSizes.restype = ct.c_long
      theDLL.DTWAIN_GetAcquiredImage.restype = ct.c_void_p
      theDLL.DTWAIN_GetAcquiredImageArray.restype = ct.c_void_p
+     theDLL.DTWAIN_GetAcquisitionArray.restype = ct.c_void_p
      theDLL.DTWAIN_GetActiveDSMPath.restype = ct.c_long
      theDLL.DTWAIN_GetActiveDSMPathA.restype = ct.c_long
      theDLL.DTWAIN_GetActiveDSMPathW.restype = ct.c_long
@@ -3311,6 +3313,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetAcquireStripSizes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong)]
      theDLL.DTWAIN_GetAcquiredImage.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_GetAcquiredImageArray.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_GetAcquisitionArray.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetActiveDSMPath.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetActiveDSMPathA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetActiveDSMPathW.argtypes = [ct.c_wchar_p, ct.c_long]
@@ -4462,6 +4465,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetAcquireStripSizes.restype = ct.c_long
      theDLL.DTWAIN_GetAcquiredImage.restype = ct.c_void_p
      theDLL.DTWAIN_GetAcquiredImageArray.restype = ct.c_void_p
+     theDLL.DTWAIN_GetAcquisitionArray.restype = ct.c_void_p
      theDLL.DTWAIN_GetActiveDSMPath.restype = ct.c_long
      theDLL.DTWAIN_GetActiveDSMPathA.restype = ct.c_long
      theDLL.DTWAIN_GetActiveDSMPathW.restype = ct.c_long
@@ -5625,6 +5629,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetAcquireStripSizes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong)]
      theDLL.DTWAIN_GetAcquiredImage.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_GetAcquiredImageArray.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_GetAcquisitionArray.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetActiveDSMPath.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetActiveDSMPathA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetActiveDSMPathW.argtypes = [ct.c_wchar_p, ct.c_long]

@@ -359,6 +359,7 @@ const
   DTWAIN_USESOURCEMODE = 128;
   DTWAIN_USELIST = 256;
   DTWAIN_CREATE_DIRECTORY = 512;
+  DTWAIN_NODELETEDIBS = 1024;
   DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY;
   DTWAIN_ARRAYANY = 1;
   DTWAIN_ArrayTypePTR = 1;
@@ -2227,6 +2228,7 @@ function DTWAIN_GetAcquireStripData(Source:DTWAIN_SOURCE; lpCompression:LPLONG; 
 function DTWAIN_GetAcquireStripSizes(Source:DTWAIN_SOURCE; lpMin:LPDWORD; lpMax:LPDWORD; lpPreferred:LPDWORD) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetAcquireStripSizes';
 function DTWAIN_GetAcquiredImage(aAcq:DTWAIN_ARRAY; nWhichAcq:LONG; nWhichDib:LONG) : NativeInt; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetAcquiredImage';
 function DTWAIN_GetAcquiredImageArray(aAcq:DTWAIN_ARRAY; nWhichAcq:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetAcquiredImageArray';
+function DTWAIN_GetAcquisitionArray(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetAcquisitionArray';
 function DTWAIN_GetActiveDSMPath(lpszBuffer:LPTSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetActiveDSMPath';
 function DTWAIN_GetActiveDSMPathA(lpszBuffer:LPSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetActiveDSMPathA';
 function DTWAIN_GetActiveDSMPathW(lpszBuffer:LPWSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetActiveDSMPathW';

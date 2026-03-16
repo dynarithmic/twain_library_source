@@ -436,6 +436,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_USESOURCEMODE = 128;
     public static const int DTWAIN_USELIST = 256;
     public static const int DTWAIN_CREATE_DIRECTORY = 512;
+    public static const int DTWAIN_NODELETEDIBS = 1024;
     public static const int DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY;
     public static const int DTWAIN_ARRAYANY = 1;
     public static const int DTWAIN_ArrayTypePTR = 1;
@@ -2303,6 +2304,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDWORD, LPDWORD, LPDWORD) DTWAIN_GetAcquireStripSizes;
     extern(Windows) HANDLE function(DTWAIN_ARRAY, LONG, LONG) DTWAIN_GetAcquiredImage;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_ARRAY, LONG) DTWAIN_GetAcquiredImageArray;
+    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_GetAcquisitionArray;
     extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetActiveDSMPath;
     extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetActiveDSMPathA;
     extern(Windows) LONG function(LPWSTR, LONG) DTWAIN_GetActiveDSMPathW;
@@ -3475,6 +3477,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetAcquireStripSizes, "DTWAIN_GetAcquireStripSizes");
         bindFunction(cast(void**)&DTWAIN_GetAcquiredImage, "DTWAIN_GetAcquiredImage");
         bindFunction(cast(void**)&DTWAIN_GetAcquiredImageArray, "DTWAIN_GetAcquiredImageArray");
+        bindFunction(cast(void**)&DTWAIN_GetAcquisitionArray, "DTWAIN_GetAcquisitionArray");
         bindFunction(cast(void**)&DTWAIN_GetActiveDSMPath, "DTWAIN_GetActiveDSMPath");
         bindFunction(cast(void**)&DTWAIN_GetActiveDSMPathA, "DTWAIN_GetActiveDSMPathA");
         bindFunction(cast(void**)&DTWAIN_GetActiveDSMPathW, "DTWAIN_GetActiveDSMPathW");

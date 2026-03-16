@@ -461,6 +461,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetAcquireStripSizes(DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred);
         HANDLE DTWAIN_GetAcquiredImage(DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib);
         DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG nWhichAcq);
+        DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetActiveDSMPath(DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathW(LPWSTR lpszBuffer, LONG nMaxLen);
@@ -1689,6 +1690,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetAcquireStripSizes(DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred);
         HANDLE DTWAIN_GetAcquiredImage(DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib);
         DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG nWhichAcq);
+        DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetActiveDSMPath(DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathW(LPWSTR lpszBuffer, LONG nMaxLen);
@@ -2917,6 +2919,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetAcquireStripSizes(DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred);
         HANDLE DTWAIN_GetAcquiredImage(DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib);
         DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG nWhichAcq);
+        DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetActiveDSMPath(DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathW(LPWSTR lpszBuffer, LONG nMaxLen);
@@ -4145,6 +4148,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetAcquireStripSizes(DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred);
         HANDLE DTWAIN_GetAcquiredImage(DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib);
         DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG nWhichAcq);
+        DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetActiveDSMPath(DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathW(LPWSTR lpszBuffer, LONG nMaxLen);
