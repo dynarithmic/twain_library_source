@@ -148,6 +148,7 @@
 #define DTWAIN_USESOURCEMODE      128
 #define DTWAIN_USELIST            256
 #define DTWAIN_CREATE_DIRECTORY   512
+#define DTWAIN_NODELETEDIBS       1024
 
 
 /* DTWAIN_ARRAY types */

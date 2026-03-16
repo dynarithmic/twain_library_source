@@ -271,6 +271,7 @@ namespace dynarithmic
         TW_USERINTERFACE* GetTWUserInterface() { return &m_UserInterface; }
         void         AddDibsToAcquisition(DTWAIN_ARRAY aDibs) const;
         void         ResetAcquisitionAttempts(DTWAIN_ARRAY aNewAttempts);
+        void         SetAcquisitionAttempts(DTWAIN_ARRAY aNewAttempts) { m_aAcqAttempts = aNewAttempts; }
         DTWAIN_ARRAY   GetAcquisitionArray() const;
         CTL_DeviceEvent GetDeviceEvent() const { return m_DeviceEvent; }
         void         SetDeviceEvent(const CTL_DeviceEvent& DevEvent)

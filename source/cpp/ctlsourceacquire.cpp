@@ -264,6 +264,8 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     SourceCloserRAII sourceCloser(p, !bSourcePreOpened);
 
     const auto acqType = opts.getAcquireType();
+
+
     switch (acqType)
     {
         case ACQUIREAUDIONATIVE:
@@ -407,6 +409,8 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     pDLLHandle->m_bTransferDone = false;
     pDLLHandle->m_bSourceClosed = false;
     pDLLHandle->m_lLastError = 0;
+
+    pSource->SetUserAcquisitionArray(nullptr);
 
     if (pDLLHandle->m_lAcquireMode == DTWAIN_MODELESS)
     {

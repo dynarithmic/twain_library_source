@@ -3021,6 +3021,17 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG n
 	CATCH_BLOCK(nullptr)
 }
 
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto theArray = pSource->GetUserAcquisitionArray();
+    //use a copy
+    const DTWAIN_ARRAY aCopy = CreateArrayCopyFromFactory(pHandle, theArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(aCopy)
+	CATCH_BLOCK(nullptr)
+}
+
 template <typename T>
 static LONG ArrayStringLength_Internal(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray, LONG nWhichString)
 {

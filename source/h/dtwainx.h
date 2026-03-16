@@ -1074,6 +1074,10 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCapLabels(LONG lCapability);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopDetectionOn(VOID_PROTOTYPE);
 
+/* Get acquisition array produced when calling DTWAIN_AcquireFile(Ex) using a file
+   flag of DTWAIN_NODELETEDIBS */
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
+
 #include "dtwstrfn.h"
 
 #ifdef __cplusplus

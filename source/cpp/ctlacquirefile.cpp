@@ -25,6 +25,7 @@
 #include "sourceacquireopts.h"
 #include "ctlfileutils.h"
 #include "ctltwainmsgloop.h"
+#include "ctlsourcedibs.h"
 
 #include "cppfunc.h"
 #include "sourceselectopts.h"
@@ -289,8 +290,9 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
         auto vTest = FileListToVector<std::string>(opts);
     #endif
 
+    opts.setDiscardDibs(!(opts.getFileFlags() & DTWAIN_NODELETEDIBS));
     opts.setAcquireType(AcquireType);
-    opts.setDiscardDibs(true); // make sure we remove acquired dibs for file handling
+
     // set the auto create directory if indicated
     bool bCreateDir = opts.getFileFlags() & DTWAIN_CREATE_DIRECTORY;
     pSource->SetFileAutoCreateDirectory(bCreateDir);
@@ -349,15 +351,18 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
         bRetval = TRUE;
         if (pHandle->m_lAcquireMode == DTWAIN_MODAL)
         {
-            auto& factory = pHandle->m_ArrayFactory;
-            auto pVariant = aDibs;
-            const auto& vDibs = 
-                factory->underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(pVariant);
-            std::for_each(begin(vDibs), end(vDibs), [&](HANDLE dib) {factory->destroy(dib); });
-            pSource->ResetAcquisitionAttempts(nullptr);
-            if (factory->is_valid(pVariant))
-                factory->destroy(pVariant);
+            if (!(opts.getFileFlags() & DTWAIN_NODELETEDIBS))
+            {
+                dynarithmic::DestroyAcquisitionArray(pHandle, aDibs, TRUE);
+                pSource->ResetAcquisitionAttempts(nullptr);
+            }
+            else
+            {
+                pSource->SetUserAcquisitionArray(aDibs);
+                pSource->SetAcquisitionAttempts(nullptr);
+            }
         }
+		bRetval = TRUE;
     }
 
     if (pHandle->m_lAcquireMode == DTWAIN_MODAL)
