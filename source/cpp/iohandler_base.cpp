@@ -24,7 +24,7 @@
 
 using namespace dynarithmic;
 
-boost::container::flat_map<LONG, std::vector<int>> CTL_ImageIOHandler::s_supportedBitDepths;
+boost::container::flat_map<LONG, std::vector<uint16_t>> CTL_ImageIOHandler::s_supportedBitDepths;
 
 CTL_ImageIOHandler::CTL_ImageIOHandler() : bytesleft(0), nextbyte(0),
 bytebuffer{}, bittable{}, masktable{}, pMultiDibData(nullptr), m_nPage(0), m_bAllWritten(true), m_bOnePageWritten(false)
