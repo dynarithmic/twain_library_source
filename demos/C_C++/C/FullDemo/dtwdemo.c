@@ -54,7 +54,6 @@ void AcquireFile(BOOL bUseSource, LONG fileType);
 BOOL IsAllSpace(LPCTSTR p);
 void ToggleCheckedItem(UINT resId);
 BOOL GetToggleMenuState(UINT resID);
-BOOL IsTypeAvailable(LONG filetype);
 void DisplayLoggingOptions();
 void LoadLanguage(int message);
 void LoadLanguageStrings(LPCTSTR szLang);
@@ -1362,96 +1361,6 @@ LRESULT CALLBACK DisplayAcquireSettingsProc(HWND hDlg, UINT message, WPARAM wPar
     return FALSE;
 }
 
-
-LRESULT CALLBACK DisplayFileTypesProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    static HWND hWndCombo;
-    static HWND hWndEdit;
-    switch (message)
-    {
-        case WM_INITDIALOG:
-        {
-            int i;
-            int nTypes = sizeof(g_allTypes) / sizeof(g_allTypes[0]);
-            hWndCombo = GetDlgItem(hDlg, IDC_cmbFileType);
-            hWndEdit = GetDlgItem(hDlg, IDC_edFileName);
-            for (i = 0; i < nTypes; ++i )
-                SendMessage(hWndCombo, CB_ADDSTRING, 0, (LPARAM)g_allTypes[i].fType);
-            SendMessage(hWndCombo, CB_SETCURSEL, 0, 0);
-            SendMessage(hWndEdit, WM_SETTEXT, 0, (LPARAM)g_allTypes[0].defName);
-            return TRUE;
-        }
-        break;
-
-        case WM_COMMAND:
-        {
-            int nControl = LOWORD(wParam);
-            int nNotification = HIWORD(wParam);
-
-            switch( nControl )
-            {
-                /* Quit the dialog */
-                case IDOK:
-                {
-                    /* Get the current selection */
-                    SendMessage( hWndEdit, WM_GETTEXT, 256, (LPARAM)g_FileName);
-
-                    if ( g_FileName[0] == 0 || IsAllSpace(g_FileName))
-                    {
-                        MessageBox(hDlg, _T("A file name must be entered"), _T("Error"), MB_ICONSTOP);
-                    }
-                    else
-                    {
-                        g_FileType = g_allTypes[(int)SendMessage(hWndCombo, CB_GETCURSEL, 0, 0)].DTWAINType;
-                        if ( nDTwainType & DTWAIN_DEMODLL_VERSION ) 
-                        {
-                            if ( !IsTypeAvailable(g_FileType) )
-                            {
-                                MessageBox(hDlg, _T("Sorry.  This file type is not available in the demo version of DTWAIN"), _T("Error"), MB_ICONSTOP);
-                                return TRUE;
-                            }
-                        }
-                        EndDialog(hDlg, 1);
-                    }
-                }
-                break;
-                case IDCANCEL:
-                     g_FileType = g_allTypes[(int)SendMessage(hWndCombo, CB_GETCURSEL, 0, 0)].DTWAINType;
-                     EndDialog(hDlg, 0);
-                break;
-                case IDC_cmbFileType:
-                {
-                    if ( nNotification == CBN_SELCHANGE )
-                    {
-                        /* Set the default file name */
-                        LRESULT nCurSel = SendMessage( hWndCombo, CB_GETCURSEL, 0, 0);
-                        SendMessage(hWndEdit, WM_SETTEXT, 0, (LPARAM)g_allTypes[nCurSel].defName);
-                    }
-                }
-                break;
-            }
-        }
-        break;
-    }
-    return FALSE;
-}
-
-BOOL IsTypeAvailable(LONG lFileType)
-{
-    if ( nDTwainType & DTWAIN_DEMODLL_VERSION )
-    {
-       return ( lFileType == DTWAIN_BMP ||
-           lFileType == DTWAIN_PDF ||
-           lFileType == DTWAIN_PDFMULTI ||
-           lFileType == DTWAIN_TIFFNONE ||
-           lFileType == DTWAIN_TIFFNONEMULTI ||
-           lFileType == DTWAIN_TIFFG4 ||
-           lFileType == DTWAIN_TIFFG4MULTI ||
-           lFileType == DTWAIN_TEXT ||
-           lFileType == DTWAIN_TEXTMULTI );
-    }
-    return TRUE;
-}
 
 // Message handler for about box.
 LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
