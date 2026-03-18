@@ -2308,6 +2308,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrame(DTWAIN_ARRAY FrameArray, LONG nW
         if ( pbottom )
             *pbottom = Frame->Bottom();
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pleft, ptop, pright, pbottom))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(FALSE)
 }
@@ -2471,7 +2472,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAll(DTWAIN_FRAME Frame, LPDTWAIN_FLOAT L
         *Right = pPtr.Right();
     if ( Bottom )
         *Bottom = pPtr.Bottom();
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+	LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Left, Top, Right, Bottom))
+	LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -2489,7 +2491,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValue(DTWAIN_FRAME Frame, LONG nWhich, L
         auto& pPtr = vOne.front();
         *Value = pPtr.m_FrameComponent[nWhich];
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+	LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Value))
+	LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
