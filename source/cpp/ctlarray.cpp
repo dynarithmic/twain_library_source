@@ -1106,6 +1106,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LP
             *pTheData = factory->get_value(pArray, nWhere, pVariant);
         }
         break;
+        case CTL_ArrayFactory::arrayTag::Int16Type:
+        {
+            short pValue = {};
+            factory->get_value(pArray, nWhere, &pValue);
+			auto pTheData = static_cast<LONG*>(pVariant);
+            *pTheData = pValue;
+        }
+        break;
+		case CTL_ArrayFactory::arrayTag::UInt16Type:
+		{
+			unsigned short pValue = {};
+			factory->get_value(pArray, nWhere, &pValue);
+			auto pTheData = static_cast<ULONG*>(pVariant);
+			*pTheData = pValue;
+		}
+        break;
         default:
             factory->get_value(pArray, nWhere, pVariant);
     }

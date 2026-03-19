@@ -72,6 +72,8 @@ namespace dynarithmic
 
     CTL_ArrayFactory::CTL_ArrayFactory()
     {
+		m_vfnAddMap.insert({ arrayTag::Int16Type, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_int16>(tag, value, nSize); } });
+		m_vfnAddMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_uint16>(tag, value, nSize); } });
         m_vfnAddMap.insert({ arrayTag::LongType, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_long>(tag, value, nSize); } });
         m_vfnAddMap.insert({ arrayTag::Long64Type, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_long64>(tag, value, nSize); } });
         m_vfnAddMap.insert({ arrayTag::DoubleType, [&](arrayTag* tag, std::size_t nSize,void* value) { simple_pushback<tagged_array_double>(tag, value, nSize); } });
@@ -85,7 +87,9 @@ namespace dynarithmic
         m_vfnAddMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_twframe>(tag, value, nSize); } });
         m_vfnAddMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_fix32>(tag, value, nSize); } });
 
-        m_vfnGetMap.insert({ arrayTag::LongType, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_long>(tag, nWhere, value); } });
+        m_vfnGetMap.insert({ arrayTag::Int16Type, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_int16>(tag, nWhere, value); } });
+		m_vfnGetMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_uint16>(tag, nWhere, value); } });
+		m_vfnGetMap.insert({ arrayTag::LongType, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_long>(tag, nWhere, value); } });
         m_vfnGetMap.insert({ arrayTag::Long64Type, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_long64>(tag, nWhere, value); } });
         m_vfnGetMap.insert({ arrayTag::DoubleType, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_double>(tag, nWhere, value); } });
         m_vfnGetMap.insert({ arrayTag::StringType, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_string>(tag, nWhere, value); } });
@@ -98,6 +102,8 @@ namespace dynarithmic
         m_vfnGetMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_twframe>(tag, nWhere, value); } });
         m_vfnGetMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_fix32>(tag, nWhere, value); } });
 
+		m_vfnFindMap.insert({ arrayTag::Int16Type, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_int16>(tag, value, {}, simple_finder_t()); } });
+		m_vfnFindMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_uint16>(tag, value, {}, simple_finder_t()); } });
         m_vfnFindMap.insert({ arrayTag::LongType, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_long>(tag, value, {}, simple_finder_t()); } });
         m_vfnFindMap.insert({ arrayTag::Long64Type, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_long64>(tag, value, {}, simple_finder_t()); } });
         m_vfnFindMap.insert({ arrayTag::DoubleType, [&](arrayTag* tag, void* value, double val) { return simple_finder<tagged_array_double>(tag, value, {}, double_finder_t(val)); } });
@@ -111,7 +117,9 @@ namespace dynarithmic
         m_vfnFindMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_twframe>(tag, value, {}, frame_finder_t()); } });
         m_vfnFindMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_fix32>(tag, value, {}, simple_finder_t()); } });
 
-        m_vfnInserterMap.insert({ arrayTag::LongType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { simple_inserter<tagged_array_long>(tag, nWhere, nCount, value); } });
+        m_vfnInserterMap.insert({ arrayTag::Int16Type, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { simple_inserter<tagged_array_int16>(tag, nWhere, nCount, value); } });
+		m_vfnInserterMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { simple_inserter<tagged_array_uint16>(tag, nWhere, nCount, value); } });
+		m_vfnInserterMap.insert({ arrayTag::LongType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { simple_inserter<tagged_array_long>(tag, nWhere, nCount, value); } });
         m_vfnInserterMap.insert({ arrayTag::Long64Type, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { simple_inserter<tagged_array_long64>(tag, nWhere, nCount, value); } });
         m_vfnInserterMap.insert({ arrayTag::DoubleType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { simple_inserter<tagged_array_double>(tag, nWhere, nCount, value); } });
         m_vfnInserterMap.insert({ arrayTag::StringType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { string_inserter<tagged_array_string>(tag, nWhere, nCount, value); } });
@@ -124,7 +132,9 @@ namespace dynarithmic
         m_vfnInserterMap.insert({ arrayTag::VoidPtrType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { pointer_inserter<tagged_array_voidptr>(tag, nWhere, nCount, value); } });
         m_vfnInserterMap.insert({ arrayTag::ArrayOfArrayOfVoidPtrType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { pointer_inserter<tagged_array_tagged_array_voidptr>(tag, nWhere, nCount, value); } });
 
-        m_vfnCopierMap.insert({ arrayTag::LongType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_long>(tagDest, tagSrc); } });
+        m_vfnCopierMap.insert({ arrayTag::Int16Type, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_int16>(tagDest, tagSrc); } });
+		m_vfnCopierMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_uint16>(tagDest, tagSrc); } });
+		m_vfnCopierMap.insert({ arrayTag::LongType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_long>(tagDest, tagSrc); } });
         m_vfnCopierMap.insert({ arrayTag::Long64Type, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_long64>(tagDest, tagSrc); } });
         m_vfnCopierMap.insert({ arrayTag::DoubleType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_double>(tagDest, tagSrc); } });
         m_vfnCopierMap.insert({ arrayTag::StringType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_string>(tagDest, tagSrc); } });
@@ -137,6 +147,8 @@ namespace dynarithmic
         m_vfnCopierMap.insert({ arrayTag::VoidPtrType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_voidptr>(tagDest, tagSrc); } });
         m_vfnCopierMap.insert({ arrayTag::ArrayOfArrayOfVoidPtrType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_tagged_array_voidptr>(tagDest, tagSrc); } });
 
+		m_vfnRemoverMap.insert({ arrayTag::Int16Type, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_int16>(tag, nWhere, nCount); } });
+		m_vfnRemoverMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_uint16>(tag, nWhere, nCount); } });
         m_vfnRemoverMap.insert({ arrayTag::LongType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_long>(tag, nWhere, nCount); } });
         m_vfnRemoverMap.insert({ arrayTag::Long64Type, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_long64>(tag, nWhere, nCount); } });
         m_vfnRemoverMap.insert({ arrayTag::DoubleType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_double>(tag, nWhere, nCount); } });
@@ -150,7 +162,9 @@ namespace dynarithmic
         m_vfnRemoverMap.insert({ arrayTag::VoidPtrType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_voidptr>(tag, nWhere, nCount); } });
         m_vfnRemoverMap.insert({ arrayTag::ArrayOfArrayOfVoidPtrType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_tagged_array_voidptr>(tag, nWhere, nCount); } });
 
-        m_vfnClearerMap.insert({ arrayTag::LongType, [&](arrayTag* tag) { simple_clearer<tagged_array_long>(tag); } });
+        m_vfnClearerMap.insert({ arrayTag::Int16Type, [&](arrayTag* tag) { simple_clearer<tagged_array_int16>(tag); } });
+		m_vfnClearerMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tag) { simple_clearer<tagged_array_uint16>(tag); } });
+		m_vfnClearerMap.insert({ arrayTag::LongType, [&](arrayTag* tag) { simple_clearer<tagged_array_long>(tag); } });
         m_vfnClearerMap.insert({ arrayTag::Long64Type, [&](arrayTag* tag) { simple_clearer<tagged_array_long64>(tag); } });
         m_vfnClearerMap.insert({ arrayTag::DoubleType, [&](arrayTag* tag) { simple_clearer<tagged_array_double>(tag); } });
         m_vfnClearerMap.insert({ arrayTag::StringType, [&](arrayTag* tag) { simple_clearer<tagged_array_string>(tag); } });
@@ -163,6 +177,8 @@ namespace dynarithmic
         m_vfnClearerMap.insert({ arrayTag::VoidPtrType, [&](arrayTag* tag) { simple_clearer<tagged_array_voidptr>(tag); } });
         m_vfnClearerMap.insert({ arrayTag::ArrayOfArrayOfVoidPtrType, [&](arrayTag* tag) { simple_clearer<tagged_array_tagged_array_voidptr>(tag); } });
 
+		m_vfnResizerMap.insert({ arrayTag::Int16Type, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_int16>(tag, num); } });
+		m_vfnResizerMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_uint16>(tag, num); } });
         m_vfnResizerMap.insert({ arrayTag::LongType, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_long>(tag, num); } });
         m_vfnResizerMap.insert({ arrayTag::Long64Type, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_long64>(tag, num); } });
         m_vfnResizerMap.insert({ arrayTag::DoubleType, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_double>(tag, num); } });
@@ -176,6 +192,8 @@ namespace dynarithmic
         m_vfnResizerMap.insert({ arrayTag::VoidPtrType, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_voidptr>(tag, num); } });
         m_vfnResizerMap.insert({ arrayTag::ArrayOfArrayOfVoidPtrType, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_tagged_array_voidptr>(tag, num); } });
 
+		m_vfnCounterMap.insert({ arrayTag::Int16Type, [&](arrayTag* tag) { return simple_counter<tagged_array_int16>(tag); } });
+		m_vfnCounterMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tag) { return simple_counter<tagged_array_uint16>(tag); } });
         m_vfnCounterMap.insert({ arrayTag::LongType, [&](arrayTag* tag) { return simple_counter<tagged_array_long>(tag); } });
         m_vfnCounterMap.insert({ arrayTag::Long64Type, [&](arrayTag* tag) { return simple_counter<tagged_array_long64>(tag); } });
         m_vfnCounterMap.insert({ arrayTag::DoubleType, [&](arrayTag* tag) { return simple_counter<tagged_array_double>(tag); } });
@@ -189,6 +207,8 @@ namespace dynarithmic
         m_vfnCounterMap.insert({ arrayTag::VoidPtrType, [&](arrayTag* tag) { return simple_counter<tagged_array_voidptr>(tag); } });
         m_vfnCounterMap.insert({ arrayTag::ArrayOfArrayOfVoidPtrType, [&](arrayTag* tag) { return simple_counter<tagged_array_tagged_array_voidptr>(tag); } });
 
+		m_vfnSetterMap.insert({ arrayTag::Int16Type, [&](arrayTag* tag, size_t nWhere, void* value) { simple_setter<tagged_array_int16>(tag, nWhere, value); } });
+		m_vfnSetterMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tag, size_t nWhere, void* value) { simple_setter<tagged_array_uint16>(tag, nWhere, value); } });
         m_vfnSetterMap.insert({ arrayTag::LongType, [&](arrayTag* tag, size_t nWhere, void* value) { simple_setter<tagged_array_long>(tag, nWhere, value); } });
         m_vfnSetterMap.insert({ arrayTag::Long64Type, [&](arrayTag* tag, size_t nWhere, void* value) { simple_setter<tagged_array_long64>(tag, nWhere, value); } });
         m_vfnSetterMap.insert({ arrayTag::DoubleType, [&](arrayTag* tag, size_t nWhere, void* value) { simple_setter<tagged_array_double>(tag, nWhere, value); } });
@@ -202,6 +222,8 @@ namespace dynarithmic
         m_vfnSetterMap.insert({ arrayTag::VoidPtrType, [&](arrayTag* tag, size_t nWhere, void* value) { pointer_setter<tagged_array_voidptr>(tag, nWhere, value); } });
         m_vfnSetterMap.insert({ arrayTag::ArrayOfArrayOfVoidPtrType, [&](arrayTag* tag, size_t nWhere, void* value) { pointer_setter<tagged_array_tagged_array_voidptr>(tag, nWhere, value); } });
 
+		m_vfnGetBufferMap.insert({ arrayTag::Int16Type, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_int16>(tag, nWhere); } });
+		m_vfnGetBufferMap.insert({ arrayTag::UInt16Type, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_uint16>(tag, nWhere); } });
         m_vfnGetBufferMap.insert({ arrayTag::LongType, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_long>(tag, nWhere); } });
         m_vfnGetBufferMap.insert({ arrayTag::Long64Type, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_long64>(tag, nWhere); } });
         m_vfnGetBufferMap.insert({ arrayTag::DoubleType, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_double>(tag, nWhere); } });
@@ -236,6 +258,12 @@ namespace dynarithmic
             case CTL_ArrayIntType:
                 pNewArray = generic_array_creator<tagged_array_long>(arrayTag::LongType, nInitialSize);
                 break;
+			case CTL_ArrayShortIntType:
+				pNewArray = generic_array_creator<tagged_array_int16>(arrayTag::Int16Type, nInitialSize);
+				break;
+			case CTL_ArrayShortUIntType:
+				pNewArray = generic_array_creator<tagged_array_uint16>(arrayTag::UInt16Type, nInitialSize);
+				break;
             case CTL_ArrayInt64Type:
                 pNewArray = generic_array_creator<tagged_array_long64>(arrayTag::Long64Type, nInitialSize);
                 break;
