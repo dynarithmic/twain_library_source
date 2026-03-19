@@ -2594,6 +2594,8 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_ARRAYINT32: i32 = 130;
     pub const DTWAIN_ARRAYINT64: i32 = 140;
     pub const DTWAIN_ARRAYUINT64: i32 = 150;
+    pub const DTWAIN_ARRAYSHORTINT16: i32 = 160;
+    pub const DTWAIN_ARRAYSHORTUINT16: i32 = 170;
     pub const DTWAIN_RANGELONG: i32 = DTwainAPI::DTWAIN_ARRAYLONG;
     pub const DTWAIN_RANGEFLOAT: i32 = DTwainAPI::DTWAIN_ARRAYFLOAT;
     pub const DTWAIN_RANGEMIN: i32 = 0;

@@ -340,6 +340,8 @@ namespace Dynarithmic
         public const int DTWAIN_ARRAYINT32 = 130;
         public const int DTWAIN_ARRAYINT64 = 140;
         public const int DTWAIN_ARRAYUINT64 = 150;
+        public const int DTWAIN_ARRAYSHORTINT16 = 160;
+        public const int DTWAIN_ARRAYSHORTUINT16 = 170;
         public const int DTWAIN_RANGELONG = DTWAIN_ARRAYLONG;
         public const int DTWAIN_RANGEFLOAT = DTWAIN_ARRAYFLOAT;
         public const int DTWAIN_RANGEMIN = 0;

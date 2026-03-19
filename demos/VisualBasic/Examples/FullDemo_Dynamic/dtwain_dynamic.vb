@@ -458,6 +458,8 @@ Namespace Dynarithmic
         Public Const DTWAIN_ARRAYINT32 As Integer = 130
         Public Const DTWAIN_ARRAYINT64 As Integer = 140
         Public Const DTWAIN_ARRAYUINT64 As Integer = 150
+        Public Const DTWAIN_ARRAYSHORTINT16 As Integer = 160
+        Public Const DTWAIN_ARRAYSHORTUINT16 As Integer = 170
         Public Const DTWAIN_RANGELONG As Integer = DTWAIN_ARRAYLONG
         Public Const DTWAIN_RANGEFLOAT As Integer = DTWAIN_ARRAYFLOAT
         Public Const DTWAIN_RANGEMIN As Integer = 0
