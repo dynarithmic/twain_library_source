@@ -149,7 +149,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
     {
         int nControl = LOWORD(wParam);
         int nNotification = HIWORD(wParam);
-		HWND hCheckBox = GetDlgItem(hDlg, IDC_chkResetCapsOnClose);
+        HWND hCheckBox = GetDlgItem(hDlg, IDC_chkResetCapsOnClose);
         switch (nControl)
         {
             /* Quit the dialog */
@@ -164,7 +164,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             so make sure we reset all the caps to default when we return if requested */
             LRESULT checkState = SendMessage(hCheckBox, BM_GETCHECK, 0, 0);
             if (checkState == BST_CHECKED)
-            DTWAIN_SetAllCapsToDefault(g_CurrentSource);
+                DTWAIN_SetAllCapsToDefault(g_CurrentSource);
             EndDialog(hDlg, 1);
             break;
         case IDC_btnTestCap:
@@ -544,6 +544,10 @@ void TestGetCap(HWND hWnd, LONG capValue)
             bGotID = (nTranslationID != capValue);
         }
     }
+
+    /* Choose the data type */
+    LONG bestDataType = DTWAIN_GetCapDataType(g_CurrentSource, capValue);
+
     /* Call the capability function */
     DTWAIN_ARRAY values;
     LONG ret = DTWAIN_GetCapValuesEx2(g_CurrentSource, capValue, nGetType, nContainerType, nDataType, &values);
@@ -575,24 +579,24 @@ void TestGetCap(HWND hWnd, LONG capValue)
                     char szLo[100];
                     int hiWord = lVal >> 16;
                     int loWord = lVal & 0x0000FFFF;
-                    DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, hiWord, szHi, 100);
-                    DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, loWord, szLo, 100);
+                    DTWAIN_GetTwainNameFromConstantExA(DTWAIN_CONSTANT_DG, hiWord, szHi, 100);
+                    DTWAIN_GetTwainNameFromConstantExA(DTWAIN_CONSTANT_DAT, loWord, szLo, 100);
                     sprintf(szValues, "%s / %s", szHi, szLo);
                 }
                 else
-                    if (bIsCapNameSupported)
-                        DTWAIN_GetNameFromCapA(lVal, szValues, 256);
-                    else
-                        if (nDataType == TWTY_BOOL)
-                            sprintf(szValues, "%s", lVal == 1 ? "TRUE" : "FALSE");
-                        else
-                            if (bGotID)
-                                DTWAIN_GetTwainNameFromConstantA(nTranslationID, lVal, szValues, 256);
-                            else
-                                if (nContainerType == DTWAIN_CONTRANGE)
-                                    sprintf(szValues, "%s: %d", rangeName[i], lVal);
-                                else
-                                    sprintf(szValues, "%d", lVal);
+                if (bIsCapNameSupported)
+                    DTWAIN_GetNameFromCapA(lVal, szValues, 256);
+                else
+                if (nDataType == TWTY_BOOL)
+                    sprintf(szValues, "%s", lVal == 1 ? "TRUE" : "FALSE");
+                else
+                if (bGotID)
+                    DTWAIN_GetTwainNameFromConstantExA(nTranslationID, lVal, szValues, 256);
+                else
+                if (nContainerType == DTWAIN_CONTRANGE)
+                    sprintf(szValues, "%s: %d", rangeName[i], lVal);
+                else
+                    sprintf(szValues, "%d", lVal);
                 SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
             }
             break;
