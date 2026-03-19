@@ -1905,6 +1905,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_EnableBarcodeDetection Lib "dtwain32d.dll" (Source As System.IntPtr, bEnable As Integer) As Integer
     Public Declare Function DTWAIN_EnableDuplex Lib "dtwain32d.dll" (Source As System.IntPtr, bEnable As Integer) As Integer
     Public Declare Function DTWAIN_EnableFeeder Lib "dtwain32d.dll" (Source As System.IntPtr, bSet As Integer) As Integer
+    Public Declare Function DTWAIN_EnableGetMessageLoop Lib "dtwain32d.dll" (Source As System.IntPtr, bSet As Integer) As Integer
     Public Declare Function DTWAIN_EnableGetMessageLoopDetection Lib "dtwain32d.dll" (bEnable As Integer) As Integer
     Public Declare Function DTWAIN_EnableIndicator Lib "dtwain32d.dll" (Source As System.IntPtr, bEnable As Integer) As Integer
     Public Declare Function DTWAIN_EnableJobFileHandling Lib "dtwain32d.dll" (Source As System.IntPtr, bSet As Integer) As Integer
@@ -2310,6 +2311,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_IsFileSystemSupported Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_IsFileXferSupported Lib "dtwain32d.dll" (Source As System.IntPtr, lFileType As Integer) As Integer
     Public Declare Function DTWAIN_IsGetMessageLoopDetectionOn Lib "dtwain32d.dll" () As Integer
+    Public Declare Function DTWAIN_IsGetMessageLoopEnabled Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_IsIAFieldALastPageSupported Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_IsIAFieldALevelSupported Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_IsIAFieldAPrintFormatSupported Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer

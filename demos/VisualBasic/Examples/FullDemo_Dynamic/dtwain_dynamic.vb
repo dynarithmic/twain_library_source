@@ -2390,6 +2390,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_EnableFeederDelegate(Source As System.IntPtr, bSet As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_EnableGetMessageLoopDelegate(Source As System.IntPtr, bSet As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnableGetMessageLoopDetectionDelegate(bEnable As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -3603,6 +3606,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_IsGetMessageLoopDetectionOnDelegate() As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_IsGetMessageLoopEnabledDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_IsIAFieldALastPageSupportedDelegate(Source As System.IntPtr) As Integer
@@ -5098,6 +5104,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_EnableFeeder(Source As System.IntPtr, bSet As Integer) As Integer
         Return api.DTWAIN_EnableFeeder(Source, bSet)
+        End Function
+        
+        Public Function DTWAIN_EnableGetMessageLoop(Source As System.IntPtr, bSet As Integer) As Integer
+        Return api.DTWAIN_EnableGetMessageLoop(Source, bSet)
         End Function
         
         Public Function DTWAIN_EnableGetMessageLoopDetection(bEnable As Integer) As Integer
@@ -6720,6 +6730,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_IsGetMessageLoopDetectionOn()
         End Function
         
+        Public Function DTWAIN_IsGetMessageLoopEnabled(Source As System.IntPtr) As Integer
+        Return api.DTWAIN_IsGetMessageLoopEnabled(Source)
+        End Function
+        
         Public Function DTWAIN_IsIAFieldALastPageSupported(Source As System.IntPtr) As Integer
         Return api.DTWAIN_IsIAFieldALastPageSupported(Source)
         End Function
@@ -8040,6 +8054,7 @@ Namespace Dynarithmic
             Public DTWAIN_EnableBarcodeDetection As DTWAIN_EnableBarcodeDetectionDelegate
             Public DTWAIN_EnableDuplex As DTWAIN_EnableDuplexDelegate
             Public DTWAIN_EnableFeeder As DTWAIN_EnableFeederDelegate
+            Public DTWAIN_EnableGetMessageLoop As DTWAIN_EnableGetMessageLoopDelegate
             Public DTWAIN_EnableGetMessageLoopDetection As DTWAIN_EnableGetMessageLoopDetectionDelegate
             Public DTWAIN_EnableIndicator As DTWAIN_EnableIndicatorDelegate
             Public DTWAIN_EnableJobFileHandling As DTWAIN_EnableJobFileHandlingDelegate
@@ -8445,6 +8460,7 @@ Namespace Dynarithmic
             Public DTWAIN_IsFileSystemSupported As DTWAIN_IsFileSystemSupportedDelegate
             Public DTWAIN_IsFileXferSupported As DTWAIN_IsFileXferSupportedDelegate
             Public DTWAIN_IsGetMessageLoopDetectionOn As DTWAIN_IsGetMessageLoopDetectionOnDelegate
+            Public DTWAIN_IsGetMessageLoopEnabled As DTWAIN_IsGetMessageLoopEnabledDelegate
             Public DTWAIN_IsIAFieldALastPageSupported As DTWAIN_IsIAFieldALastPageSupportedDelegate
             Public DTWAIN_IsIAFieldALevelSupported As DTWAIN_IsIAFieldALevelSupportedDelegate
             Public DTWAIN_IsIAFieldAPrintFormatSupported As DTWAIN_IsIAFieldAPrintFormatSupportedDelegate

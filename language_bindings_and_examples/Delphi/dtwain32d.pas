@@ -2048,6 +2048,7 @@ function DTWAIN_EnableAutomaticSenseMedium(Source:DTWAIN_SOURCE; bSet:BOOL) : BO
 function DTWAIN_EnableBarcodeDetection(Source:DTWAIN_SOURCE; bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnableBarcodeDetection';
 function DTWAIN_EnableDuplex(Source:DTWAIN_SOURCE; bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnableDuplex';
 function DTWAIN_EnableFeeder(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnableFeeder';
+function DTWAIN_EnableGetMessageLoop(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnableGetMessageLoop';
 function DTWAIN_EnableGetMessageLoopDetection(bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnableGetMessageLoopDetection';
 function DTWAIN_EnableIndicator(Source:DTWAIN_SOURCE; bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnableIndicator';
 function DTWAIN_EnableJobFileHandling(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnableJobFileHandling';
@@ -2597,6 +2598,7 @@ function DTWAIN_IsFeederSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  extern
 function DTWAIN_IsFileSystemSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_IsFileSystemSupported';
 function DTWAIN_IsFileXferSupported(Source:DTWAIN_SOURCE; lFileType:LONG) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_IsFileXferSupported';
 function DTWAIN_IsGetMessageLoopDetectionOn : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_IsGetMessageLoopDetectionOn';
+function DTWAIN_IsGetMessageLoopEnabled(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_IsGetMessageLoopEnabled';
 function DTWAIN_IsIAFieldALastPageSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_IsIAFieldALastPageSupported';
 function DTWAIN_IsIAFieldALevelSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_IsIAFieldALevelSupported';
 function DTWAIN_IsIAFieldAPrintFormatSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_IsIAFieldAPrintFormatSupported';

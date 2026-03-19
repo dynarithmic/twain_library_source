@@ -2067,6 +2067,7 @@
         public delegate int DTWAIN_EnableBarcodeDetectionDelegate(DTWAIN_SOURCE Source, int bEnable);
         public delegate int DTWAIN_EnableDuplexDelegate(DTWAIN_SOURCE Source, int bEnable);
         public delegate int DTWAIN_EnableFeederDelegate(DTWAIN_SOURCE Source, int bSet);
+        public delegate int DTWAIN_EnableGetMessageLoopDelegate(DTWAIN_SOURCE Source, int bSet);
         public delegate int DTWAIN_EnableGetMessageLoopDetectionDelegate(int bEnable);
         public delegate int DTWAIN_EnableIndicatorDelegate(DTWAIN_SOURCE Source, int bEnable);
         public delegate int DTWAIN_EnableJobFileHandlingDelegate(DTWAIN_SOURCE Source, int bSet);
@@ -2534,6 +2535,7 @@
         public delegate int DTWAIN_IsFileSystemSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsFileXferSupportedDelegate(DTWAIN_SOURCE Source, int lFileType);
         public delegate int DTWAIN_IsGetMessageLoopDetectionOnDelegate();
+        public delegate int DTWAIN_IsGetMessageLoopEnabledDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsIAFieldALastPageSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsIAFieldALevelSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsIAFieldAPrintFormatSupportedDelegate(DTWAIN_SOURCE Source);
@@ -3323,6 +3325,9 @@
 
         [DTWAINNativeFunction("DTWAIN_EnableFeeder")]
         private readonly DTWAIN_EnableFeederDelegate  _DTWAIN_EnableFeeder;
+
+        [DTWAINNativeFunction("DTWAIN_EnableGetMessageLoop")]
+        private readonly DTWAIN_EnableGetMessageLoopDelegate  _DTWAIN_EnableGetMessageLoop;
 
         [DTWAINNativeFunction("DTWAIN_EnableGetMessageLoopDetection")]
         private readonly DTWAIN_EnableGetMessageLoopDetectionDelegate  _DTWAIN_EnableGetMessageLoopDetection;
@@ -4725,6 +4730,9 @@
         [DTWAINNativeFunction("DTWAIN_IsGetMessageLoopDetectionOn")]
         private readonly DTWAIN_IsGetMessageLoopDetectionOnDelegate  _DTWAIN_IsGetMessageLoopDetectionOn;
 
+        [DTWAINNativeFunction("DTWAIN_IsGetMessageLoopEnabled")]
+        private readonly DTWAIN_IsGetMessageLoopEnabledDelegate  _DTWAIN_IsGetMessageLoopEnabled;
+
         [DTWAINNativeFunction("DTWAIN_IsIAFieldALastPageSupported")]
         private readonly DTWAIN_IsIAFieldALastPageSupportedDelegate  _DTWAIN_IsIAFieldALastPageSupported;
 
@@ -6091,6 +6099,9 @@
 
         public  int DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, int bSet)
         => _DTWAIN_EnableFeeder(Source, bSet);
+
+        public  int DTWAIN_EnableGetMessageLoop(DTWAIN_SOURCE Source, int bSet)
+        => _DTWAIN_EnableGetMessageLoop(Source, bSet);
 
         public  int DTWAIN_EnableGetMessageLoopDetection(int bEnable)
         => _DTWAIN_EnableGetMessageLoopDetection(bEnable);
@@ -7492,6 +7503,9 @@
 
         public  int DTWAIN_IsGetMessageLoopDetectionOn()
         => _DTWAIN_IsGetMessageLoopDetectionOn();
+
+        public  int DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source)
+        => _DTWAIN_IsGetMessageLoopEnabled(Source);
 
         public  int DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source)
         => _DTWAIN_IsIAFieldALastPageSupported(Source);

@@ -2124,6 +2124,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableBarcodeDetection;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableDuplex;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableFeeder;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, BOOL) DTWAIN_EnableGetMessageLoop;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_BOOL) DTWAIN_EnableGetMessageLoopDetection;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableIndicator;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableJobFileHandling;
@@ -2666,6 +2667,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsFileSystemSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_IsFileXferSupported;
     extern(Windows) DTWAIN_BOOL function() DTWAIN_IsGetMessageLoopDetectionOn;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsGetMessageLoopEnabled;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIAFieldALastPageSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIAFieldALevelSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIAFieldAPrintFormatSupported;
@@ -3297,6 +3299,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_EnableBarcodeDetection, "DTWAIN_EnableBarcodeDetection");
         bindFunction(cast(void**)&DTWAIN_EnableDuplex, "DTWAIN_EnableDuplex");
         bindFunction(cast(void**)&DTWAIN_EnableFeeder, "DTWAIN_EnableFeeder");
+        bindFunction(cast(void**)&DTWAIN_EnableGetMessageLoop, "DTWAIN_EnableGetMessageLoop");
         bindFunction(cast(void**)&DTWAIN_EnableGetMessageLoopDetection, "DTWAIN_EnableGetMessageLoopDetection");
         bindFunction(cast(void**)&DTWAIN_EnableIndicator, "DTWAIN_EnableIndicator");
         bindFunction(cast(void**)&DTWAIN_EnableJobFileHandling, "DTWAIN_EnableJobFileHandling");
@@ -3839,6 +3842,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_IsFileSystemSupported, "DTWAIN_IsFileSystemSupported");
         bindFunction(cast(void**)&DTWAIN_IsFileXferSupported, "DTWAIN_IsFileXferSupported");
         bindFunction(cast(void**)&DTWAIN_IsGetMessageLoopDetectionOn, "DTWAIN_IsGetMessageLoopDetectionOn");
+        bindFunction(cast(void**)&DTWAIN_IsGetMessageLoopEnabled, "DTWAIN_IsGetMessageLoopEnabled");
         bindFunction(cast(void**)&DTWAIN_IsIAFieldALastPageSupported, "DTWAIN_IsIAFieldALastPageSupported");
         bindFunction(cast(void**)&DTWAIN_IsIAFieldALevelSupported, "DTWAIN_IsIAFieldALevelSupported");
         bindFunction(cast(void**)&DTWAIN_IsIAFieldAPrintFormatSupported, "DTWAIN_IsIAFieldAPrintFormatSupported");

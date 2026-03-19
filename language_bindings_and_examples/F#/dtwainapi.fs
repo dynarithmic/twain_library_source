@@ -2327,6 +2327,9 @@ module TwainAPI =
     type DTWAIN_EnableFeederDelegate = delegate of DTWAIN_SOURCE * DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_EnableGetMessageLoopDelegate = delegate of DTWAIN_SOURCE * BOOL -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnableGetMessageLoopDetectionDelegate = delegate of DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -3548,6 +3551,9 @@ module TwainAPI =
     type DTWAIN_IsGetMessageLoopDetectionOnDelegate = delegate of unit -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_IsGetMessageLoopEnabledDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_IsIAFieldALastPageSupportedDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4557,6 +4563,7 @@ module TwainAPI =
     let private EnableBarcodeDetection = lazy (DynamicDll.Bind "DTWAIN_EnableBarcodeDetection" : DTWAIN_EnableBarcodeDetectionDelegate)
     let private EnableDuplex = lazy (DynamicDll.Bind "DTWAIN_EnableDuplex" : DTWAIN_EnableDuplexDelegate)
     let private EnableFeeder = lazy (DynamicDll.Bind "DTWAIN_EnableFeeder" : DTWAIN_EnableFeederDelegate)
+    let private EnableGetMessageLoop = lazy (DynamicDll.Bind "DTWAIN_EnableGetMessageLoop" : DTWAIN_EnableGetMessageLoopDelegate)
     let private EnableGetMessageLoopDetection = lazy (DynamicDll.Bind "DTWAIN_EnableGetMessageLoopDetection" : DTWAIN_EnableGetMessageLoopDetectionDelegate)
     let private EnableIndicator = lazy (DynamicDll.Bind "DTWAIN_EnableIndicator" : DTWAIN_EnableIndicatorDelegate)
     let private EnableJobFileHandling = lazy (DynamicDll.Bind "DTWAIN_EnableJobFileHandling" : DTWAIN_EnableJobFileHandlingDelegate)
@@ -4964,6 +4971,7 @@ module TwainAPI =
     let private IsFileSystemSupported = lazy (DynamicDll.Bind "DTWAIN_IsFileSystemSupported" : DTWAIN_IsFileSystemSupportedDelegate)
     let private IsFileXferSupported = lazy (DynamicDll.Bind "DTWAIN_IsFileXferSupported" : DTWAIN_IsFileXferSupportedDelegate)
     let private IsGetMessageLoopDetectionOn = lazy (DynamicDll.Bind "DTWAIN_IsGetMessageLoopDetectionOn" : DTWAIN_IsGetMessageLoopDetectionOnDelegate)
+    let private IsGetMessageLoopEnabled = lazy (DynamicDll.Bind "DTWAIN_IsGetMessageLoopEnabled" : DTWAIN_IsGetMessageLoopEnabledDelegate)
     let private IsIAFieldALastPageSupported = lazy (DynamicDll.Bind "DTWAIN_IsIAFieldALastPageSupported" : DTWAIN_IsIAFieldALastPageSupportedDelegate)
     let private IsIAFieldALevelSupported = lazy (DynamicDll.Bind "DTWAIN_IsIAFieldALevelSupported" : DTWAIN_IsIAFieldALevelSupportedDelegate)
     let private IsIAFieldAPrintFormatSupported = lazy (DynamicDll.Bind "DTWAIN_IsIAFieldAPrintFormatSupported" : DTWAIN_IsIAFieldAPrintFormatSupportedDelegate)
@@ -5892,6 +5900,10 @@ module TwainAPI =
     let DTWAIN_EnableFeeder (source: DTWAIN_SOURCE) (bset: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnableFeeder.Value.Invoke(source, bset)
+
+    let DTWAIN_EnableGetMessageLoop (source: DTWAIN_SOURCE) (bset: BOOL) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        EnableGetMessageLoop.Value.Invoke(source, bset)
 
     let DTWAIN_EnableGetMessageLoopDetection (benable: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -7520,6 +7532,10 @@ module TwainAPI =
     let DTWAIN_IsGetMessageLoopDetectionOn() : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         IsGetMessageLoopDetectionOn.Value.Invoke()
+
+    let DTWAIN_IsGetMessageLoopEnabled (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        IsGetMessageLoopEnabled.Value.Invoke(source)
 
     let DTWAIN_IsIAFieldALastPageSupported (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
