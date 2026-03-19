@@ -903,6 +903,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source,
 /* Use PeekMessage() or GetMessage() TWAIN loop */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePeekMessageLoop(DTWAIN_SOURCE Source, BOOL bSet);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPeekMessageLoopEnabled(DTWAIN_SOURCE Source);
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableGetMessageLoop(DTWAIN_SOURCE Source, BOOL bSet);
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source);
 
 /* Error buffer access */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer);
