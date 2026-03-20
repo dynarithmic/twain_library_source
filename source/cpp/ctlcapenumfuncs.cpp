@@ -336,11 +336,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)
             if (pSource->IsCapNegotiableInState(cap, pSource->GetState()))
             {
                 // Note that some caps are read-only, so SetCapabilityValues will fail for those caps
-                bool bResetOk = SetCapabilityValues(pSource, cap, DTWAIN_CAPRESET, static_cast<UINT>(TwainContainer_ONEVALUE), 0, Array);
-                if (logFilterFlags && !bResetOk)
+                auto Ops = GetCapOperationsInternal(pHandle, pSource, cap);
+                if (Ops & TWQC_RESET)
                 {
-                    // Save the failed names if logging is on
-                    vFailed.push_back(CTL_TwainAppMgr::GetCapNameFromCap(cap));
+                    bool bResetOk = SetCapabilityValues(pSource, cap, DTWAIN_CAPRESET, static_cast<UINT>(TwainContainer_ONEVALUE), 0, Array);
+                    if (logFilterFlags && !bResetOk)
+                    {
+                        // Save the failed names if logging is on
+                        vFailed.push_back(CTL_TwainAppMgr::GetCapNameFromCap(cap));
+                    }
                 }
             }
         }
