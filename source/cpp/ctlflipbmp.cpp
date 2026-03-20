@@ -66,7 +66,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP
     CATCH_BLOCK(nullptr)
 }
 
-HANDLE DLLENTRY_DEF DTWAIN_RotateDIB( HANDLE hDib, DTWAIN_FLOAT angle )
+HANDLE DLLENTRY_DEF DTWAIN_RotateImage(HANDLE hDib, DTWAIN_FLOAT angle)
 {
     LOG_FUNC_ENTRY_PARAMS((hDib, angle))
     const auto retVal = CDibInterface::RotateDIB(hDib, static_cast<float>(angle));
@@ -74,10 +74,10 @@ HANDLE DLLENTRY_DEF DTWAIN_RotateDIB( HANDLE hDib, DTWAIN_FLOAT angle )
     CATCH_BLOCK(nullptr)
 }
 
-HANDLE DLLENTRY_DEF DTWAIN_RotateDIBString(HANDLE hDib, LPCTSTR angle)
+HANDLE DLLENTRY_DEF DTWAIN_RotateImageString(HANDLE hDib, LPCTSTR angle)
 {
     LOG_FUNC_ENTRY_PARAMS((hDib, angle))
-    auto retDIB = DTWAIN_RotateDIB(hDib, StringWrapper::ToDouble(angle));
+    auto retDIB = DTWAIN_RotateImage(hDib, StringWrapper::ToDouble(angle));
     LOG_FUNC_EXIT_NONAME_PARAMS(retDIB)
     CATCH_BLOCK(nullptr)
 }
