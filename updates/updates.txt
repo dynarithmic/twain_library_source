@@ -7,7 +7,7 @@ DTWAIN Version changes
   Clarified the usage of the "number of pages" argument to the DTWAIN_Acquire...()
   functions when the device is acquiring in duplex mode.  If the device is in 
   duplex mode, the number of pages will specify the number of sheets of paper to
-  process (front and back side). and not the number of total images.
+  process (front and back side), and not the number of total images.
 
   For example:
   DTWAIN_EnableDuplex(Source, TRUE);  // Enable the duplex unit
@@ -35,8 +35,8 @@ DTWAIN Version changes
   DTWAIN_Acquire...() function is called.
 
 - The DTWAIN_GetCapValuesEx...(), DTWAIN_SetCapValuesEx...(), DTWAIN_ArrayGetCapValuesEx...()
-  and DTWAIN_ArraySetCapValuesEx...() will now accept the TWAIN container constant names in
-  addition to the DTWAIN container names when specifying the container to use.
+  and DTWAIN_ArraySetCapValuesEx...() functions will now accept the TWAIN container constant 
+  names in addition to the DTWAIN container names when specifying the container to use.
 
   Previously, these functions only accepted the DTWAIN container names, for example,
   DTWAIN_CONTONEVALUE instead of TWON_ONEVALUE.  Now these functions will accept the 
@@ -47,7 +47,7 @@ DTWAIN Version changes
   acquire images using the Windows API GetMessage() instead of the default PeekMessage().  
 
   By default, the auto detection is on, with the fallback being to use PeekMessage().
-  However,  it has been discovered that the auto-detection should always be turned off for 
+  However, it has been discovered that the auto-detection should always be turned off for 
   environments such as the Java Virtual Machine (JVM).
 
 - The DTWDEMO32 and DTWDEMO64 demo programs now contains a method of setting most capability 
