@@ -450,6 +450,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_ARRAYLONG64 As Integer = 10
         Public Const DTWAIN_ARRAYANSISTRING As Integer = 11
         Public Const DTWAIN_ARRAYWIDESTRING As Integer = 12
+        Public Const DTWAIN_ARRAYULONG As Integer = 13
         Public Const DTWAIN_ARRAYTWFIX32 As Integer = 200
         Public Const DTWAIN_ArrayTypeINVALID As Integer = 0
         Public Const DTWAIN_ARRAYINT16 As Integer = 100

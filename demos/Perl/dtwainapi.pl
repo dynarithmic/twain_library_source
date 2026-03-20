@@ -205,6 +205,7 @@ use constant DTWAIN_ARRAYUNICODESTRING => 9;
 use constant DTWAIN_ARRAYLONG64 => 10;
 use constant DTWAIN_ARRAYANSISTRING => 11;
 use constant DTWAIN_ARRAYWIDESTRING => 12;
+use constant DTWAIN_ARRAYULONG => 13;
 use constant DTWAIN_ARRAYTWFIX32 => 200;
 use constant DTWAIN_ArrayTypeINVALID => 0;
 use constant DTWAIN_ARRAYINT16 => 100;

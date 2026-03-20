@@ -2586,6 +2586,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_ARRAYLONG64: i32 = 10;
     pub const DTWAIN_ARRAYANSISTRING: i32 = 11;
     pub const DTWAIN_ARRAYWIDESTRING: i32 = 12;
+    pub const DTWAIN_ARRAYULONG: i32 = 13;
     pub const DTWAIN_ARRAYTWFIX32: i32 = 200;
     pub const DTWAIN_ArrayTypeINVALID: i32 = 0;
     pub const DTWAIN_ARRAYINT16: i32 = 100;

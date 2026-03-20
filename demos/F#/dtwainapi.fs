@@ -335,6 +335,7 @@ module TwainAPI =
     let public DTWAIN_ARRAYLONG64 = 10
     let public DTWAIN_ARRAYANSISTRING = 11
     let public DTWAIN_ARRAYWIDESTRING = 12
+    let public DTWAIN_ARRAYULONG = 13
     let public DTWAIN_ARRAYTWFIX32 = 200
     let public DTWAIN_ArrayTypeINVALID = 0
     let public DTWAIN_ARRAYINT16 = 100

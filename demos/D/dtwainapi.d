@@ -452,6 +452,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ARRAYLONG64 = 10;
     public static const int DTWAIN_ARRAYANSISTRING = 11;
     public static const int DTWAIN_ARRAYWIDESTRING = 12;
+    public static const int DTWAIN_ARRAYULONG = 13;
     public static const int DTWAIN_ARRAYTWFIX32 = 200;
     public static const int DTWAIN_ArrayTypeINVALID = 0;
     public static const int DTWAIN_ARRAYINT16 = 100;

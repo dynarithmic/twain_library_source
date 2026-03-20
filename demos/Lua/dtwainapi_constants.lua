@@ -207,6 +207,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_ARRAYLONG64 = 10
    dtwain_constants.DTWAIN_ARRAYANSISTRING = 11
    dtwain_constants.DTWAIN_ARRAYWIDESTRING = 12
+   dtwain_constants.DTWAIN_ARRAYULONG = 13
    dtwain_constants.DTWAIN_ARRAYTWFIX32 = 200
    dtwain_constants.DTWAIN_ArrayTypeINVALID = 0
    dtwain_constants.DTWAIN_ARRAYINT16 = 100
