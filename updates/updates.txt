@@ -101,9 +101,9 @@ DTWAIN Version changes
   changing the DIB both when the image is retrieved directly from the device, and after the 
   image has been resampled.
 
-- Added DTWAIN_RotateDIB function that rotates a Device Independent Bitmap by n degrees:  
+- Added DTWAIN_RotateImage function that rotates a Device Independent Bitmap by n degrees:  
 
-  HANDLE DWAIN_RotateDIB(HANDLE originalDib, DTWAIN_FLOAT degrees);
+  HANDLE DWAIN_RotateImage(HANDLE originalDib, DTWAIN_FLOAT degrees);
  
   The return value will be a copy of the original DIB, but with the image rotated.  The original
   DIB is not modified.  This function can be used for the notifications mentioned above 
