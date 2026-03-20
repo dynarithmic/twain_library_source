@@ -173,6 +173,7 @@
    if compiling UNICODE applications */
 #define DTWAIN_ARRAYWIDESTRING      12
 #define DTWAIN_ARRAYTWFIX32         200
+#define DTWAIN_ARRAYULONG           13
 
 #define DTWAIN_ArrayTypeINVALID     0
 

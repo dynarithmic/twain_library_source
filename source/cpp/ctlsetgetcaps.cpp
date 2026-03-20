@@ -368,9 +368,9 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
     {
         retVal = PerformGetCap<LONG>(pSource, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayIntType);
 
-        // Convert the integer arrays if TwainType < 32-bits wide
         if (retVal.second)
         {
+			// Convert the integer arrays if TwainType < 32-bits wide
 			if (dynarithmic::IsTwain8BitIntegralType(static_cast<TW_UINT16>(nDataType)))
 				dynarithmic::ConvertArrayInPlace<LONG, TW_INT8>(pHandle, retVal.second);
             else
@@ -379,6 +379,12 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
             else
             if (dynarithmic::IsTwain16BitUIntegralType(static_cast<TW_UINT16>(nDataType)))
 				dynarithmic::ConvertArrayInPlace<LONG, TW_UINT16>(pHandle, retVal.second);
+            else
+            if (dynarithmic::IsTwain32BitIntegralType(static_cast<TW_UINT16>(nDataType)))
+				dynarithmic::ConvertArrayInPlace<LONG, TW_INT32>(pHandle, retVal.second);
+            else
+            if (dynarithmic::IsTwain32BitUIntegralType(static_cast<TW_UINT16>(nDataType)))
+				dynarithmic::ConvertArrayInPlace<uint32_t, TW_UINT32>(pHandle, retVal.second);
         }
     }
     else

@@ -106,33 +106,42 @@ static void genericDumper(DTWAIN_ARRAY Array)
     LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
 }
 
+template <typename IntType>
+static void CapDumper(DTWAIN_ARRAY Array)
+{
+	// Get the array contents as a vector
+	const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+	const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<IntType>(Array);
+
+	StringStreamA strm;
+	size_t n;
+	strm << "\n";
+
+	// if the cap is for supported caps, then output the strings.
+	// vector of names
+	std::vector<std::string> CapNames;
+
+	// get the vector of cap names given cap number
+	std::transform(vCaps.begin(), vCaps.end(), std::back_inserter(CapNames),
+		[](IntType n) {return CTL_TwainAppMgr::GetCapNameFromCap(n); });
+
+	// stream the cap information from the cap names
+	std::for_each(CapNames.begin(), CapNames.end(), oStreamer<std::string>(&strm, &n));
+	LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
+
+}
+
+static void DumpArrayULONG(DTWAIN_ARRAY Array)
+{
+    genericDumper<CTL_ArrayFactory::tagged_array_uint32>(Array);
+}
+
 static void DumpArrayLONG(DTWAIN_ARRAY Array, LONG lCap)
 {
     if ( lCap != CAP_SUPPORTEDCAPS )
         genericDumper<CTL_ArrayFactory::tagged_array_long>(Array);
-
     else
-    {
-        // Get the array contents as a vector
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
-
-        StringStreamA strm;
-        size_t n;
-        strm << "\n";
-
-        // if the cap is for supported caps, then output the strings.
-        // vector of names
-        std::vector<std::string> CapNames;
-
-        // get the vector of cap names given cap number
-        std::transform(vCaps.begin(), vCaps.end(), std::back_inserter(CapNames),
-                        [] (LONG n) {return CTL_TwainAppMgr::GetCapNameFromCap(n);});
-
-        // stream the cap information from the cap names
-        std::for_each(CapNames.begin(), CapNames.end(), oStreamer<std::string>(&strm, &n));
-        LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
-    }
+        CapDumper<LONG>(Array);
 }
 
 static void DumpArrayFLOAT(DTWAIN_ARRAY Array)
@@ -259,6 +268,10 @@ void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFl
         case DTWAIN_ARRAYLONG:
             DumpArrayLONG(Array, lCap);
             break;
+
+		case DTWAIN_ARRAYUINT32:
+			DumpArrayULONG(Array);
+			break;
 
         case DTWAIN_ARRAYFLOAT:
             DumpArrayFLOAT(Array);
