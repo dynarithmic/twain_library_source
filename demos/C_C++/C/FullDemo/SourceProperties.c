@@ -596,7 +596,10 @@ void TestGetCap(HWND hWnd, LONG capValue)
                 if (nContainerType == DTWAIN_CONTRANGE)
                     sprintf(szValues, "%s: %d", rangeName[i], lVal);
                 else
-                    sprintf(szValues, "%d", lVal);
+                if ( nDataType == TWTY_UINT32)
+                    sprintf(szValues, "%u", (TW_UINT32)lVal);
+                else
+				    sprintf(szValues, "%d", lVal);
                 SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
             }
             break;
