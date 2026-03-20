@@ -436,6 +436,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_USESOURCEMODE = 128;
     public static const int DTWAIN_USELIST = 256;
     public static const int DTWAIN_CREATE_DIRECTORY = 512;
+    public static const int DTWAIN_NODELETEDIBS = 1024;
     public static const int DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY;
     public static const int DTWAIN_ARRAYANY = 1;
     public static const int DTWAIN_ArrayTypePTR = 1;
@@ -451,6 +452,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ARRAYLONG64 = 10;
     public static const int DTWAIN_ARRAYANSISTRING = 11;
     public static const int DTWAIN_ARRAYWIDESTRING = 12;
+    public static const int DTWAIN_ARRAYULONG = 13;
     public static const int DTWAIN_ARRAYTWFIX32 = 200;
     public static const int DTWAIN_ArrayTypeINVALID = 0;
     public static const int DTWAIN_ARRAYINT16 = 100;
@@ -459,6 +461,8 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ARRAYINT32 = 130;
     public static const int DTWAIN_ARRAYINT64 = 140;
     public static const int DTWAIN_ARRAYUINT64 = 150;
+    public static const int DTWAIN_ARRAYSHORTINT16 = 160;
+    public static const int DTWAIN_ARRAYSHORTUINT16 = 170;
     public static const int DTWAIN_RANGELONG = DTWAIN_ARRAYLONG;
     public static const int DTWAIN_RANGEFLOAT = DTWAIN_ARRAYFLOAT;
     public static const int DTWAIN_RANGEMIN = 0;
@@ -635,6 +639,8 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_TN_QUERYACQUIREPAGES = 1305;
     public static const int DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
     public static const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
+    public static const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
+    public static const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
     public static const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
     public static const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
     public static const int DTWAIN_MODAL = 0;
@@ -2121,6 +2127,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableBarcodeDetection;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableDuplex;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableFeeder;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, BOOL) DTWAIN_EnableGetMessageLoop;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_BOOL) DTWAIN_EnableGetMessageLoopDetection;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableIndicator;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnableJobFileHandling;
@@ -2301,6 +2308,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDWORD, LPDWORD, LPDWORD) DTWAIN_GetAcquireStripSizes;
     extern(Windows) HANDLE function(DTWAIN_ARRAY, LONG, LONG) DTWAIN_GetAcquiredImage;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_ARRAY, LONG) DTWAIN_GetAcquiredImageArray;
+    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_GetAcquisitionArray;
     extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetActiveDSMPath;
     extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetActiveDSMPathA;
     extern(Windows) LONG function(LPWSTR, LONG) DTWAIN_GetActiveDSMPathW;
@@ -2662,6 +2670,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsFileSystemSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_IsFileXferSupported;
     extern(Windows) DTWAIN_BOOL function() DTWAIN_IsGetMessageLoopDetectionOn;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsGetMessageLoopEnabled;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIAFieldALastPageSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIAFieldALevelSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIAFieldAPrintFormatSupported;
@@ -3074,6 +3083,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG) DTWAIN_TestGetCap;
     extern(Windows) DTWAIN_BOOL function(HANDLE) DTWAIN_UnlockMemory;
     extern(Windows) DTWAIN_BOOL function(HANDLE) DTWAIN_UnlockMemoryEx;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, HANDLE) DTWAIN_UpdateCurrentAcquiredImage;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_BOOL) DTWAIN_UseMultipleThreads;
 
     /************ Constructor ************/
@@ -3292,6 +3302,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_EnableBarcodeDetection, "DTWAIN_EnableBarcodeDetection");
         bindFunction(cast(void**)&DTWAIN_EnableDuplex, "DTWAIN_EnableDuplex");
         bindFunction(cast(void**)&DTWAIN_EnableFeeder, "DTWAIN_EnableFeeder");
+        bindFunction(cast(void**)&DTWAIN_EnableGetMessageLoop, "DTWAIN_EnableGetMessageLoop");
         bindFunction(cast(void**)&DTWAIN_EnableGetMessageLoopDetection, "DTWAIN_EnableGetMessageLoopDetection");
         bindFunction(cast(void**)&DTWAIN_EnableIndicator, "DTWAIN_EnableIndicator");
         bindFunction(cast(void**)&DTWAIN_EnableJobFileHandling, "DTWAIN_EnableJobFileHandling");
@@ -3472,6 +3483,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetAcquireStripSizes, "DTWAIN_GetAcquireStripSizes");
         bindFunction(cast(void**)&DTWAIN_GetAcquiredImage, "DTWAIN_GetAcquiredImage");
         bindFunction(cast(void**)&DTWAIN_GetAcquiredImageArray, "DTWAIN_GetAcquiredImageArray");
+        bindFunction(cast(void**)&DTWAIN_GetAcquisitionArray, "DTWAIN_GetAcquisitionArray");
         bindFunction(cast(void**)&DTWAIN_GetActiveDSMPath, "DTWAIN_GetActiveDSMPath");
         bindFunction(cast(void**)&DTWAIN_GetActiveDSMPathA, "DTWAIN_GetActiveDSMPathA");
         bindFunction(cast(void**)&DTWAIN_GetActiveDSMPathW, "DTWAIN_GetActiveDSMPathW");
@@ -3833,6 +3845,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_IsFileSystemSupported, "DTWAIN_IsFileSystemSupported");
         bindFunction(cast(void**)&DTWAIN_IsFileXferSupported, "DTWAIN_IsFileXferSupported");
         bindFunction(cast(void**)&DTWAIN_IsGetMessageLoopDetectionOn, "DTWAIN_IsGetMessageLoopDetectionOn");
+        bindFunction(cast(void**)&DTWAIN_IsGetMessageLoopEnabled, "DTWAIN_IsGetMessageLoopEnabled");
         bindFunction(cast(void**)&DTWAIN_IsIAFieldALastPageSupported, "DTWAIN_IsIAFieldALastPageSupported");
         bindFunction(cast(void**)&DTWAIN_IsIAFieldALevelSupported, "DTWAIN_IsIAFieldALevelSupported");
         bindFunction(cast(void**)&DTWAIN_IsIAFieldAPrintFormatSupported, "DTWAIN_IsIAFieldAPrintFormatSupported");
@@ -4245,6 +4258,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_TestGetCap, "DTWAIN_TestGetCap");
         bindFunction(cast(void**)&DTWAIN_UnlockMemory, "DTWAIN_UnlockMemory");
         bindFunction(cast(void**)&DTWAIN_UnlockMemoryEx, "DTWAIN_UnlockMemoryEx");
+        bindFunction(cast(void**)&DTWAIN_UpdateCurrentAcquiredImage, "DTWAIN_UpdateCurrentAcquiredImage");
         bindFunction(cast(void**)&DTWAIN_UseMultipleThreads, "DTWAIN_UseMultipleThreads");
         bindFunction(cast(void**)&DTWAIN_GetCallback, "DTWAIN_GetCallback");
         bindFunction(cast(void**)&DTWAIN_GetCallback64, "DTWAIN_GetCallback64");

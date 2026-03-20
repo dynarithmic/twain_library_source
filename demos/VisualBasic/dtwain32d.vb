@@ -263,6 +263,7 @@ Class DTWAINAPI
     Public Const DTWAIN_USESOURCEMODE As Integer = 128
     Public Const DTWAIN_USELIST As Integer = 256
     Public Const DTWAIN_CREATE_DIRECTORY As Integer = 512
+    Public Const DTWAIN_NODELETEDIBS As Integer = 1024
     Public Const DTWAIN_CREATEDIRECTORY As Integer = DTWAIN_CREATE_DIRECTORY
     Public Const DTWAIN_ARRAYANY As Integer = 1
     Public Const DTWAIN_ArrayTypePTR As Integer = 1
@@ -278,6 +279,7 @@ Class DTWAINAPI
     Public Const DTWAIN_ARRAYLONG64 As Integer = 10
     Public Const DTWAIN_ARRAYANSISTRING As Integer = 11
     Public Const DTWAIN_ARRAYWIDESTRING As Integer = 12
+    Public Const DTWAIN_ARRAYULONG As Integer = 13
     Public Const DTWAIN_ARRAYTWFIX32 As Integer = 200
     Public Const DTWAIN_ArrayTypeINVALID As Integer = 0
     Public Const DTWAIN_ARRAYINT16 As Integer = 100
@@ -286,6 +288,8 @@ Class DTWAINAPI
     Public Const DTWAIN_ARRAYINT32 As Integer = 130
     Public Const DTWAIN_ARRAYINT64 As Integer = 140
     Public Const DTWAIN_ARRAYUINT64 As Integer = 150
+    Public Const DTWAIN_ARRAYSHORTINT16 As Integer = 160
+    Public Const DTWAIN_ARRAYSHORTUINT16 As Integer = 170
     Public Const DTWAIN_RANGELONG As Integer = DTWAIN_ARRAYLONG
     Public Const DTWAIN_RANGEFLOAT As Integer = DTWAIN_ARRAYFLOAT
     Public Const DTWAIN_RANGEMIN As Integer = 0
@@ -462,6 +466,8 @@ Class DTWAINAPI
     Public Const DTWAIN_TN_QUERYACQUIREPAGES As Integer = 1305
     Public Const DTWAIN_TN_ACQUIREPAGESSTOPPING As Integer = 1306
     Public Const DTWAIN_TN_ACQUIREPAGESSTOPPED As Integer = 1307
+    Public Const DTWAIN_TN_QUERYUPDATEDIBORIG As Integer = 1308
+    Public Const DTWAIN_TN_QUERYUPDATEDIBRESAMPLED As Integer = 1309
     Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
     Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
     Public Const DTWAIN_MODAL As Integer = 0
@@ -1902,6 +1908,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_EnableBarcodeDetection Lib "dtwain32d.dll" (Source As System.IntPtr, bEnable As Integer) As Integer
     Public Declare Function DTWAIN_EnableDuplex Lib "dtwain32d.dll" (Source As System.IntPtr, bEnable As Integer) As Integer
     Public Declare Function DTWAIN_EnableFeeder Lib "dtwain32d.dll" (Source As System.IntPtr, bSet As Integer) As Integer
+    Public Declare Function DTWAIN_EnableGetMessageLoop Lib "dtwain32d.dll" (Source As System.IntPtr, bSet As Integer) As Integer
     Public Declare Function DTWAIN_EnableGetMessageLoopDetection Lib "dtwain32d.dll" (bEnable As Integer) As Integer
     Public Declare Function DTWAIN_EnableIndicator Lib "dtwain32d.dll" (Source As System.IntPtr, bEnable As Integer) As Integer
     Public Declare Function DTWAIN_EnableJobFileHandling Lib "dtwain32d.dll" (Source As System.IntPtr, bSet As Integer) As Integer
@@ -2066,6 +2073,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetAcquireStripSizes Lib "dtwain32d.dll" (Source As System.IntPtr, ByRef lpMin As UInteger, ByRef lpMax As UInteger, ByRef lpPreferred As UInteger) As Integer
     Public Declare Function DTWAIN_GetAcquiredImage Lib "dtwain32d.dll" (aAcq As System.IntPtr, nWhichAcq As Integer, nWhichDib As Integer) As System.IntPtr
     Public Declare Function DTWAIN_GetAcquiredImageArray Lib "dtwain32d.dll" (aAcq As System.IntPtr, nWhichAcq As Integer) As System.IntPtr
+    Public Declare Function DTWAIN_GetAcquisitionArray Lib "dtwain32d.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Ansi Function DTWAIN_GetActiveDSMPath Lib "dtwain32d.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetActiveDSMVersionInfo Lib "dtwain32d.dll" (<MarshalAs(UnmanagedType.LPStr)> szDLLInfo As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetAlarmVolume Lib "dtwain32d.dll" (Source As System.IntPtr, ByRef lpVolume As Integer) As Integer
@@ -2306,6 +2314,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_IsFileSystemSupported Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_IsFileXferSupported Lib "dtwain32d.dll" (Source As System.IntPtr, lFileType As Integer) As Integer
     Public Declare Function DTWAIN_IsGetMessageLoopDetectionOn Lib "dtwain32d.dll" () As Integer
+    Public Declare Function DTWAIN_IsGetMessageLoopEnabled Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_IsIAFieldALastPageSupported Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_IsIAFieldALevelSupported Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_IsIAFieldAPrintFormatSupported Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
@@ -2595,6 +2604,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_TestGetCap Lib "dtwain32d.dll" (Source As System.IntPtr, lCapability As Integer) As System.IntPtr
     Public Declare Function DTWAIN_UnlockMemory Lib "dtwain32d.dll" (h As System.IntPtr) As Integer
     Public Declare Function DTWAIN_UnlockMemoryEx Lib "dtwain32d.dll" (h As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_UpdateCurrentAcquiredImage Lib "dtwain32d.dll" (Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
     Public Declare Function DTWAIN_UseMultipleThreads Lib "dtwain32d.dll" (bSet As Integer) As Integer
 
 End Class

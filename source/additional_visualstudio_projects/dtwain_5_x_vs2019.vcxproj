@@ -1303,6 +1303,7 @@ cd ..
 md demos\C_C++\libs\$(PlatformArchitecture)bit
 cd demos\C_C++\libs\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).lib .
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -1826,6 +1827,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctllogfunctioncall.h" />
     <ClInclude Include="h\ctlrandnumutils.h" />
     <ClInclude Include="h\ctlsetgetcaps.h" />
+    <ClInclude Include="h\ctlsourcedibs.h" />
     <ClInclude Include="h\ctlstringutils.h" />
     <ClInclude Include="h\ctlsupport.h" />
     <ClInclude Include="h\ctlthreadutils.h" />

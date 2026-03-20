@@ -281,6 +281,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnableBarcodeDetection(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
+        DTWAIN_BOOL DTWAIN_EnableGetMessageLoop(DTWAIN_SOURCE Source, BOOL bSet);
         DTWAIN_BOOL DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableIndicator(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableJobFileHandling(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
@@ -461,6 +462,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetAcquireStripSizes(DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred);
         HANDLE DTWAIN_GetAcquiredImage(DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib);
         DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG nWhichAcq);
+        DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetActiveDSMPath(DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathW(LPWSTR lpszBuffer, LONG nMaxLen);
@@ -825,6 +827,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileXferSupported(DTWAIN_SOURCE Source, LONG lFileType);
         DTWAIN_BOOL DTWAIN_IsGetMessageLoopDetectionOn();
+        DTWAIN_BOOL DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALevelSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldAPrintFormatSupported(DTWAIN_SOURCE Source);
@@ -1243,6 +1246,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
+        DTWAIN_BOOL DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib);
         DTWAIN_BOOL DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet);
   ]]
   return ffi.load(DLLToLoad)
@@ -1508,6 +1512,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnableBarcodeDetection(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
+        DTWAIN_BOOL DTWAIN_EnableGetMessageLoop(DTWAIN_SOURCE Source, BOOL bSet);
         DTWAIN_BOOL DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableIndicator(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableJobFileHandling(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
@@ -1688,6 +1693,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetAcquireStripSizes(DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred);
         HANDLE DTWAIN_GetAcquiredImage(DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib);
         DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG nWhichAcq);
+        DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetActiveDSMPath(DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathW(LPWSTR lpszBuffer, LONG nMaxLen);
@@ -2052,6 +2058,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileXferSupported(DTWAIN_SOURCE Source, LONG lFileType);
         DTWAIN_BOOL DTWAIN_IsGetMessageLoopDetectionOn();
+        DTWAIN_BOOL DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALevelSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldAPrintFormatSupported(DTWAIN_SOURCE Source);
@@ -2470,6 +2477,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
+        DTWAIN_BOOL DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib);
         DTWAIN_BOOL DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet);
   ]]
   return ffi.load(DLLToLoad)
@@ -2735,6 +2743,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnableBarcodeDetection(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
+        DTWAIN_BOOL DTWAIN_EnableGetMessageLoop(DTWAIN_SOURCE Source, BOOL bSet);
         DTWAIN_BOOL DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableIndicator(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableJobFileHandling(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
@@ -2915,6 +2924,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetAcquireStripSizes(DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred);
         HANDLE DTWAIN_GetAcquiredImage(DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib);
         DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG nWhichAcq);
+        DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetActiveDSMPath(DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathW(LPWSTR lpszBuffer, LONG nMaxLen);
@@ -3279,6 +3289,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileXferSupported(DTWAIN_SOURCE Source, LONG lFileType);
         DTWAIN_BOOL DTWAIN_IsGetMessageLoopDetectionOn();
+        DTWAIN_BOOL DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALevelSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldAPrintFormatSupported(DTWAIN_SOURCE Source);
@@ -3697,6 +3708,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
+        DTWAIN_BOOL DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib);
         DTWAIN_BOOL DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet);
   ]]
   return ffi.load(DLLToLoad)
@@ -3962,6 +3974,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnableBarcodeDetection(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
+        DTWAIN_BOOL DTWAIN_EnableGetMessageLoop(DTWAIN_SOURCE Source, BOOL bSet);
         DTWAIN_BOOL DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableIndicator(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
         DTWAIN_BOOL DTWAIN_EnableJobFileHandling(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
@@ -4142,6 +4155,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetAcquireStripSizes(DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred);
         HANDLE DTWAIN_GetAcquiredImage(DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib);
         DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG nWhichAcq);
+        DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetActiveDSMPath(DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMPathW(LPWSTR lpszBuffer, LONG nMaxLen);
@@ -4506,6 +4520,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsFileXferSupported(DTWAIN_SOURCE Source, LONG lFileType);
         DTWAIN_BOOL DTWAIN_IsGetMessageLoopDetectionOn();
+        DTWAIN_BOOL DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldALevelSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIAFieldAPrintFormatSupported(DTWAIN_SOURCE Source);
@@ -4924,6 +4939,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
+        DTWAIN_BOOL DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib);
         DTWAIN_BOOL DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet);
   ]]
   return ffi.load(DLLToLoad)

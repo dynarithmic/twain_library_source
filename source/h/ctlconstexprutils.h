@@ -101,6 +101,56 @@ namespace dynarithmic
         return false;
     }
 
+    static constexpr bool IsTwain32BitIntegralType(TW_UINT16 nDataType)
+    {
+		switch (nDataType)
+		{
+    		case TWTY_INT32:
+    			return true;
+		}
+		return false;
+    }
+
+	static constexpr bool IsTwain32BitUIntegralType(TW_UINT16 nDataType)
+	{
+		switch (nDataType)
+		{
+		    case TWTY_UINT32:
+			    return true;
+		}
+		return false;
+	}
+
+	static constexpr bool IsTwain16BitIntegralType(TW_UINT16 nItemType)
+	{
+        switch (nItemType)
+        {
+            case TWTY_INT16:
+                return TRUE;
+        }
+        return false;
+	}
+
+	static constexpr bool IsTwain16BitUIntegralType(TW_UINT16 nItemType)
+	{
+		switch (nItemType)
+		{
+    		case TWTY_UINT16:
+	    		return TRUE;
+		}
+		return false;
+	}
+
+	static constexpr bool IsTwain8BitIntegralType(TW_UINT16 nItemType)
+	{
+		switch (nItemType)
+		{
+		    case TWTY_INT8:
+			    return TRUE;
+		}
+		return false;
+	}
+
     static constexpr bool IsTwainHandleType(TW_UINT16 nItemType)
     {
         return nItemType == TWTY_HANDLE;

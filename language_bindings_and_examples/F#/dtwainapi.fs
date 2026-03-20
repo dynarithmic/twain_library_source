@@ -319,6 +319,7 @@ module TwainAPI =
     let public DTWAIN_USESOURCEMODE = 128
     let public DTWAIN_USELIST = 256
     let public DTWAIN_CREATE_DIRECTORY = 512
+    let public DTWAIN_NODELETEDIBS = 1024
     let public DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY
     let public DTWAIN_ARRAYANY = 1
     let public DTWAIN_ArrayTypePTR = 1
@@ -334,6 +335,7 @@ module TwainAPI =
     let public DTWAIN_ARRAYLONG64 = 10
     let public DTWAIN_ARRAYANSISTRING = 11
     let public DTWAIN_ARRAYWIDESTRING = 12
+    let public DTWAIN_ARRAYULONG = 13
     let public DTWAIN_ARRAYTWFIX32 = 200
     let public DTWAIN_ArrayTypeINVALID = 0
     let public DTWAIN_ARRAYINT16 = 100
@@ -342,6 +344,8 @@ module TwainAPI =
     let public DTWAIN_ARRAYINT32 = 130
     let public DTWAIN_ARRAYINT64 = 140
     let public DTWAIN_ARRAYUINT64 = 150
+    let public DTWAIN_ARRAYSHORTINT16 = 160
+    let public DTWAIN_ARRAYSHORTUINT16 = 170
     let public DTWAIN_RANGELONG = DTWAIN_ARRAYLONG
     let public DTWAIN_RANGEFLOAT = DTWAIN_ARRAYFLOAT
     let public DTWAIN_RANGEMIN = 0
@@ -518,6 +522,8 @@ module TwainAPI =
     let public DTWAIN_TN_QUERYACQUIREPAGES = 1305
     let public DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306
     let public DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
+    let public DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
+    let public DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
     let public DTWAIN_PDFOCR_CLEANTEXT1 = 1
     let public DTWAIN_PDFOCR_CLEANTEXT2 = 2
     let public DTWAIN_MODAL = 0
@@ -2324,6 +2330,9 @@ module TwainAPI =
     type DTWAIN_EnableFeederDelegate = delegate of DTWAIN_SOURCE * DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_EnableGetMessageLoopDelegate = delegate of DTWAIN_SOURCE * BOOL -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnableGetMessageLoopDetectionDelegate = delegate of DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -2814,6 +2823,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetAcquiredImageArrayDelegate = delegate of DTWAIN_ARRAY * LONG -> DTWAIN_ARRAY
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetAcquisitionArrayDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetActiveDSMPathDelegate = delegate of System.Text.StringBuilder * LONG -> LONG
@@ -3540,6 +3552,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_IsGetMessageLoopDetectionOnDelegate = delegate of unit -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_IsGetMessageLoopEnabledDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_IsIAFieldALastPageSupportedDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
@@ -4391,6 +4406,9 @@ module TwainAPI =
     type DTWAIN_UnlockMemoryExDelegate = delegate of HANDLE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_UpdateCurrentAcquiredImageDelegate = delegate of DTWAIN_SOURCE * HANDLE -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_UseMultipleThreadsDelegate = delegate of DTWAIN_BOOL -> DTWAIN_BOOL
     let private AcquireAudioFile = lazy (DynamicDll.Bind "DTWAIN_AcquireAudioFile" : DTWAIN_AcquireAudioFileDelegate)
     let private AcquireAudioNative = lazy (DynamicDll.Bind "DTWAIN_AcquireAudioNative" : DTWAIN_AcquireAudioNativeDelegate)
@@ -4548,6 +4566,7 @@ module TwainAPI =
     let private EnableBarcodeDetection = lazy (DynamicDll.Bind "DTWAIN_EnableBarcodeDetection" : DTWAIN_EnableBarcodeDetectionDelegate)
     let private EnableDuplex = lazy (DynamicDll.Bind "DTWAIN_EnableDuplex" : DTWAIN_EnableDuplexDelegate)
     let private EnableFeeder = lazy (DynamicDll.Bind "DTWAIN_EnableFeeder" : DTWAIN_EnableFeederDelegate)
+    let private EnableGetMessageLoop = lazy (DynamicDll.Bind "DTWAIN_EnableGetMessageLoop" : DTWAIN_EnableGetMessageLoopDelegate)
     let private EnableGetMessageLoopDetection = lazy (DynamicDll.Bind "DTWAIN_EnableGetMessageLoopDetection" : DTWAIN_EnableGetMessageLoopDetectionDelegate)
     let private EnableIndicator = lazy (DynamicDll.Bind "DTWAIN_EnableIndicator" : DTWAIN_EnableIndicatorDelegate)
     let private EnableJobFileHandling = lazy (DynamicDll.Bind "DTWAIN_EnableJobFileHandling" : DTWAIN_EnableJobFileHandlingDelegate)
@@ -4712,6 +4731,7 @@ module TwainAPI =
     let private GetAcquireStripSizes = lazy (DynamicDll.Bind "DTWAIN_GetAcquireStripSizes" : DTWAIN_GetAcquireStripSizesDelegate)
     let private GetAcquiredImage = lazy (DynamicDll.Bind "DTWAIN_GetAcquiredImage" : DTWAIN_GetAcquiredImageDelegate)
     let private GetAcquiredImageArray = lazy (DynamicDll.Bind "DTWAIN_GetAcquiredImageArray" : DTWAIN_GetAcquiredImageArrayDelegate)
+    let private GetAcquisitionArray = lazy (DynamicDll.Bind "DTWAIN_GetAcquisitionArray" : DTWAIN_GetAcquisitionArrayDelegate)
     let private GetActiveDSMPath = lazy (DynamicDll.Bind "DTWAIN_GetActiveDSMPath" : DTWAIN_GetActiveDSMPathDelegate)
     let private GetActiveDSMVersionInfo = lazy (DynamicDll.Bind "DTWAIN_GetActiveDSMVersionInfo" : DTWAIN_GetActiveDSMVersionInfoDelegate)
     let private GetAlarmVolume = lazy (DynamicDll.Bind "DTWAIN_GetAlarmVolume" : DTWAIN_GetAlarmVolumeDelegate)
@@ -4954,6 +4974,7 @@ module TwainAPI =
     let private IsFileSystemSupported = lazy (DynamicDll.Bind "DTWAIN_IsFileSystemSupported" : DTWAIN_IsFileSystemSupportedDelegate)
     let private IsFileXferSupported = lazy (DynamicDll.Bind "DTWAIN_IsFileXferSupported" : DTWAIN_IsFileXferSupportedDelegate)
     let private IsGetMessageLoopDetectionOn = lazy (DynamicDll.Bind "DTWAIN_IsGetMessageLoopDetectionOn" : DTWAIN_IsGetMessageLoopDetectionOnDelegate)
+    let private IsGetMessageLoopEnabled = lazy (DynamicDll.Bind "DTWAIN_IsGetMessageLoopEnabled" : DTWAIN_IsGetMessageLoopEnabledDelegate)
     let private IsIAFieldALastPageSupported = lazy (DynamicDll.Bind "DTWAIN_IsIAFieldALastPageSupported" : DTWAIN_IsIAFieldALastPageSupportedDelegate)
     let private IsIAFieldALevelSupported = lazy (DynamicDll.Bind "DTWAIN_IsIAFieldALevelSupported" : DTWAIN_IsIAFieldALevelSupportedDelegate)
     let private IsIAFieldAPrintFormatSupported = lazy (DynamicDll.Bind "DTWAIN_IsIAFieldAPrintFormatSupported" : DTWAIN_IsIAFieldAPrintFormatSupportedDelegate)
@@ -5237,6 +5258,7 @@ module TwainAPI =
     let private TestGetCap = lazy (DynamicDll.Bind "DTWAIN_TestGetCap" : DTWAIN_TestGetCapDelegate)
     let private UnlockMemory = lazy (DynamicDll.Bind "DTWAIN_UnlockMemory" : DTWAIN_UnlockMemoryDelegate)
     let private UnlockMemoryEx = lazy (DynamicDll.Bind "DTWAIN_UnlockMemoryEx" : DTWAIN_UnlockMemoryExDelegate)
+    let private UpdateCurrentAcquiredImage = lazy (DynamicDll.Bind "DTWAIN_UpdateCurrentAcquiredImage" : DTWAIN_UpdateCurrentAcquiredImageDelegate)
     let private UseMultipleThreads = lazy (DynamicDll.Bind "DTWAIN_UseMultipleThreads" : DTWAIN_UseMultipleThreadsDelegate)
     /// Loads the DTWAIN DLL and performs post-load business logic
     let Load (dllPath: string) =
@@ -5881,6 +5903,10 @@ module TwainAPI =
     let DTWAIN_EnableFeeder (source: DTWAIN_SOURCE) (bset: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnableFeeder.Value.Invoke(source, bset)
+
+    let DTWAIN_EnableGetMessageLoop (source: DTWAIN_SOURCE) (bset: BOOL) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        EnableGetMessageLoop.Value.Invoke(source, bset)
 
     let DTWAIN_EnableGetMessageLoopDetection (benable: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -6537,6 +6563,10 @@ module TwainAPI =
     let DTWAIN_GetAcquiredImageArray (aacq: DTWAIN_ARRAY) (nwhichacq: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetAcquiredImageArray.Value.Invoke(aacq, nwhichacq)
+
+    let DTWAIN_GetAcquisitionArray (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetAcquisitionArray.Value.Invoke(source)
 
     let DTWAIN_GetActiveDSMPath (lpszbuffer: System.Text.StringBuilder) (nmaxlen: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -7505,6 +7535,10 @@ module TwainAPI =
     let DTWAIN_IsGetMessageLoopDetectionOn() : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         IsGetMessageLoopDetectionOn.Value.Invoke()
+
+    let DTWAIN_IsGetMessageLoopEnabled (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        IsGetMessageLoopEnabled.Value.Invoke(source)
 
     let DTWAIN_IsIAFieldALastPageSupported (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -8637,6 +8671,10 @@ module TwainAPI =
     let DTWAIN_UnlockMemoryEx (h: HANDLE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         UnlockMemoryEx.Value.Invoke(h)
+
+    let DTWAIN_UpdateCurrentAcquiredImage (source: DTWAIN_SOURCE) (hnewdib: HANDLE) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        UpdateCurrentAcquiredImage.Value.Invoke(source, hnewdib)
 
     let DTWAIN_UseMultipleThreads (bset: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

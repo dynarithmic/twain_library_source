@@ -1106,6 +1106,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LP
             *pTheData = factory->get_value(pArray, nWhere, pVariant);
         }
         break;
+        case CTL_ArrayFactory::arrayTag::Int16Type:
+        {
+            short pValue = {};
+            factory->get_value(pArray, nWhere, &pValue);
+			auto pTheData = static_cast<LONG*>(pVariant);
+            *pTheData = pValue;
+        }
+        break;
+		case CTL_ArrayFactory::arrayTag::UInt16Type:
+		{
+			unsigned short pValue = {};
+			factory->get_value(pArray, nWhere, &pValue);
+			auto pTheData = static_cast<ULONG*>(pVariant);
+			*pTheData = pValue;
+		}
+        break;
         default:
             factory->get_value(pArray, nWhere, pVariant);
     }
@@ -2308,6 +2324,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrame(DTWAIN_ARRAY FrameArray, LONG nW
         if ( pbottom )
             *pbottom = Frame->Bottom();
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pleft, ptop, pright, pbottom))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(FALSE)
 }
@@ -2471,7 +2488,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAll(DTWAIN_FRAME Frame, LPDTWAIN_FLOAT L
         *Right = pPtr.Right();
     if ( Bottom )
         *Bottom = pPtr.Bottom();
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+	LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Left, Top, Right, Bottom))
+	LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -2489,7 +2507,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValue(DTWAIN_FRAME Frame, LONG nWhich, L
         auto& pPtr = vOne.front();
         *Value = pPtr.m_FrameComponent[nWhich];
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+	LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Value))
+	LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -3017,6 +3036,17 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG n
     auto& factory = pHandle->m_ArrayFactory;
     DTWAIN_ARRAY aDib = factory->get_value(aAcq, nWhichAcq, nullptr);
     const DTWAIN_ARRAY aCopy = CreateArrayCopyFromFactory(pHandle, aDib);
+    LOG_FUNC_EXIT_NONAME_PARAMS(aCopy)
+	CATCH_BLOCK(nullptr)
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto theArray = pSource->GetUserAcquisitionArray();
+    //use a copy
+    const DTWAIN_ARRAY aCopy = CreateArrayCopyFromFactory(pHandle, theArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(aCopy)
 	CATCH_BLOCK(nullptr)
 }

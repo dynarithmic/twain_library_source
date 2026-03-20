@@ -148,6 +148,7 @@
 #define DTWAIN_USESOURCEMODE      128
 #define DTWAIN_USELIST            256
 #define DTWAIN_CREATE_DIRECTORY   512
+#define DTWAIN_NODELETEDIBS       1024
 
 
 /* DTWAIN_ARRAY types */
@@ -172,6 +173,7 @@
    if compiling UNICODE applications */
 #define DTWAIN_ARRAYWIDESTRING      12
 #define DTWAIN_ARRAYTWFIX32         200
+#define DTWAIN_ARRAYULONG           13
 
 #define DTWAIN_ArrayTypeINVALID     0
 
@@ -186,6 +188,9 @@
 #define DTWAIN_ARRAYINT32         130
 #define DTWAIN_ARRAYINT64         140
 #define DTWAIN_ARRAYUINT64        150
+#define DTWAIN_ARRAYSHORTINT16    160
+#define DTWAIN_ARRAYSHORTUINT16   170
+
 
 /* DTWAIN_RANGE types */
 #define DTWAIN_RANGELONG      DTWAIN_ARRAYLONG
@@ -544,6 +549,8 @@
 #define DTWAIN_TN_QUERYACQUIREPAGES             1305
 #define DTWAIN_TN_ACQUIREPAGESSTOPPING          1306
 #define DTWAIN_TN_ACQUIREPAGESSTOPPED           1307
+#define DTWAIN_TN_QUERYUPDATEDIBORIG            1308
+#define DTWAIN_TN_QUERYUPDATEDIBRESAMPLED       1309
 
 /* PDF OCR clean text flags */
 #define DTWAIN_PDFOCR_CLEANTEXT1            1

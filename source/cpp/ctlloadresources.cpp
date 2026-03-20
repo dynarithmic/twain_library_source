@@ -285,21 +285,8 @@ namespace dynarithmic
             CTL_StaticData::GetGeneralCapInfo().insert({ static_cast<TW_UINT16>(lCap), cStruct });
         }
 
-        auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
-        std::string line;
-        while (std::getline(ifs, line))
-        {
-            ++curLine;
-            StringStreamInA strm(line);
-            LONG imgType;
-            strm >> imgType;
-            if (imgType == -1)
-                break;
-            int bppValue;
-            while (strm >> bppValue)
-                bppMap.insert({ imgType, std::vector<int>() }).first->second.push_back(bppValue);
-        }
-
+		std::string line;
+		ifs.ignore();
         auto& mediamap = CTL_StaticData::GetPDFMediaMap();
         while (std::getline(ifs, line))
         {
@@ -410,6 +397,8 @@ namespace dynarithmic
 
         // Read in the image resampling data
         auto& imageMap = CTL_StaticData::GetImageResamplerMap();
+		auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
+        bppMap.clear();
         imageMap.clear();
         while (std::getline(ifs, totalLine))
         {
@@ -445,6 +434,10 @@ namespace dynarithmic
                 break;
             std::string sgoodBits = totalLine.substr(pos, pos2 - pos + 1);
             auto vGoodBits = parseBracketedNumberList(sgoodBits);
+
+            // Create entries in the bits-per-pixel map for all the types
+            for (auto fType : vImageConstants )
+                bppMap[fType] = vGoodBits;
 
             // Get the resample to-from information
             totalLine.erase(totalLine.begin(), totalLine.begin() + pos2 + 1);

@@ -316,6 +316,7 @@ namespace Dynarithmic
         public const int DTWAIN_USESOURCEMODE = 128;
         public const int DTWAIN_USELIST = 256;
         public const int DTWAIN_CREATE_DIRECTORY = 512;
+        public const int DTWAIN_NODELETEDIBS = 1024;
         public const int DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY;
         public const int DTWAIN_ARRAYANY = 1;
         public const int DTWAIN_ArrayTypePTR = 1;
@@ -331,6 +332,7 @@ namespace Dynarithmic
         public const int DTWAIN_ARRAYLONG64 = 10;
         public const int DTWAIN_ARRAYANSISTRING = 11;
         public const int DTWAIN_ARRAYWIDESTRING = 12;
+        public const int DTWAIN_ARRAYULONG = 13;
         public const int DTWAIN_ARRAYTWFIX32 = 200;
         public const int DTWAIN_ArrayTypeINVALID = 0;
         public const int DTWAIN_ARRAYINT16 = 100;
@@ -339,6 +341,8 @@ namespace Dynarithmic
         public const int DTWAIN_ARRAYINT32 = 130;
         public const int DTWAIN_ARRAYINT64 = 140;
         public const int DTWAIN_ARRAYUINT64 = 150;
+        public const int DTWAIN_ARRAYSHORTINT16 = 160;
+        public const int DTWAIN_ARRAYSHORTUINT16 = 170;
         public const int DTWAIN_RANGELONG = DTWAIN_ARRAYLONG;
         public const int DTWAIN_RANGEFLOAT = DTWAIN_ARRAYFLOAT;
         public const int DTWAIN_RANGEMIN = 0;
@@ -515,6 +519,8 @@ namespace Dynarithmic
         public const int DTWAIN_TN_QUERYACQUIREPAGES = 1305;
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
+        public const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
+        public const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
@@ -2273,6 +2279,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, int bSet);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_EnableGetMessageLoop(DTWAIN_SOURCE Source, int bSet);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_EnableGetMessageLoopDetection(int bEnable);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
@@ -2772,6 +2781,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, int nWhichAcq);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetActiveDSMPath([MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
@@ -3671,6 +3683,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_IsGetMessageLoopDetectionOn();
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
@@ -4551,6 +4566,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_UnlockMemoryEx(HANDLE h);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_UseMultipleThreads(int bSet);

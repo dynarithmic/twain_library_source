@@ -354,35 +354,8 @@
 0x1251    TWEI_IALEVEL                            4    0    0    0    0    0    0    0                                  
 0x1252    TWEI_PRINTER                            4    0    0    0    0    0    0    0                                  
 0x1253    TWEI_BARCODETEXT2                       15   0    0    0    0    0    0    0                                  
-32768     CAP_CUSTOMBASE                          5    0    0    0    0    0    0    0                                  
--1000 END 0 0 0
-100  1 4 8 16 24 32
-200  8  16  24
-3000  8  16  24  32
-300  1  8  24
-8501  24  32 
-400  8  24  32 
-600  1  4  8  16  24  32 
-700  1 
-800  1 
-801  1  4  8  16  24  32 
-802  1  4  8  16  24  32 
-500  1  4  8  16  24  32 
-803  8  24 
-850 24 
-851 24 
-950 1  8 
-1000  1  8  16  24  32 
-10000  1  4  8  16  24 
-2000  24 
-251  1  8  16  24 
-1  1  8  16  24 
-0  1  8  16  24  
-8000  1  4  8  16  24  32 
-8002  1  4  8  16  24  32 
-8500  1
-11000 1
--1 0
+32768     CAP_CUSTOMBASE                          5    0    0    0    0    0    0    0
+-1000 END 0 0 0 0 0 0 0 0
 0 NONE          [0 0 0 0]       
 1 A4            [0 0 595.28 841.89]
 2 JISB5         [0 0 518.4 727.2]
@@ -1661,6 +1634,8 @@
 1305 DTWAIN_TN_QUERYACQUIREPAGES
 1306 DTWAIN_TN_ACQUIREPAGESSTOPPING
 1307 DTWAIN_TN_ACQUIREPAGESSTOPPED
+1308 DTWAIN_TN_QUERYUPDATEDIBORIG
+1309 DTWAIN_TN_QUERYUPDATEDIBRESAMPLED
 1500 DTWAIN_TN_MESSAGELOOPERROR                
 3000 DTWAIN_TN_UICLOSING                       
 3001 DTWAIN_TN_UICLOSED                        
@@ -2422,5 +2397,5 @@ TWCP_BITFIELDS  [TWFF_BMP]
 TWCP_ZIP [TWFF_TIFF TWFF_TIFFMULTI]
 TWCP_JPEG2000 [TWFF_JP2]
 END
-1181782959
+1939440288
 END END END

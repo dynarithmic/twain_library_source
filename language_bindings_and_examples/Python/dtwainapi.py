@@ -229,6 +229,7 @@ DTWAIN_USELONGNAME = 64
 DTWAIN_USESOURCEMODE = 128
 DTWAIN_USELIST = 256
 DTWAIN_CREATE_DIRECTORY = 512
+DTWAIN_NODELETEDIBS = 1024
 DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY
 DTWAIN_ARRAYANY = 1
 DTWAIN_ArrayTypePTR = 1
@@ -244,6 +245,7 @@ DTWAIN_ARRAYUNICODESTRING = 9
 DTWAIN_ARRAYLONG64 = 10
 DTWAIN_ARRAYANSISTRING = 11
 DTWAIN_ARRAYWIDESTRING = 12
+DTWAIN_ARRAYULONG = 13
 DTWAIN_ARRAYTWFIX32 = 200
 DTWAIN_ArrayTypeINVALID = 0
 DTWAIN_ARRAYINT16 = 100
@@ -252,6 +254,8 @@ DTWAIN_ARRAYUINT32 = 120
 DTWAIN_ARRAYINT32 = 130
 DTWAIN_ARRAYINT64 = 140
 DTWAIN_ARRAYUINT64 = 150
+DTWAIN_ARRAYSHORTINT16 = 160
+DTWAIN_ARRAYSHORTUINT16 = 170
 DTWAIN_RANGELONG = DTWAIN_ARRAYLONG
 DTWAIN_RANGEFLOAT = DTWAIN_ARRAYFLOAT
 DTWAIN_RANGEMIN = 0
@@ -428,6 +432,8 @@ DTWAIN_TN_SOURCEDETAILS = 1304
 DTWAIN_TN_QUERYACQUIREPAGES = 1305
 DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306
 DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
+DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
+DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
 DTWAIN_PDFOCR_CLEANTEXT1 = 1
 DTWAIN_PDFOCR_CLEANTEXT2 = 2
 DTWAIN_MODAL = 0
@@ -1966,6 +1972,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnableBarcodeDetection.restype = ct.c_long
      theDLL.DTWAIN_EnableDuplex.restype = ct.c_long
      theDLL.DTWAIN_EnableFeeder.restype = ct.c_long
+     theDLL.DTWAIN_EnableGetMessageLoop.restype = ct.c_long
      theDLL.DTWAIN_EnableGetMessageLoopDetection.restype = ct.c_long
      theDLL.DTWAIN_EnableIndicator.restype = ct.c_long
      theDLL.DTWAIN_EnableJobFileHandling.restype = ct.c_long
@@ -2146,6 +2153,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetAcquireStripSizes.restype = ct.c_long
      theDLL.DTWAIN_GetAcquiredImage.restype = ct.c_void_p
      theDLL.DTWAIN_GetAcquiredImageArray.restype = ct.c_void_p
+     theDLL.DTWAIN_GetAcquisitionArray.restype = ct.c_void_p
      theDLL.DTWAIN_GetActiveDSMPath.restype = ct.c_long
      theDLL.DTWAIN_GetActiveDSMPathA.restype = ct.c_long
      theDLL.DTWAIN_GetActiveDSMPathW.restype = ct.c_long
@@ -2513,6 +2521,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_IsFileSystemSupported.restype = ct.c_long
      theDLL.DTWAIN_IsFileXferSupported.restype = ct.c_long
      theDLL.DTWAIN_IsGetMessageLoopDetectionOn.restype = ct.c_long
+     theDLL.DTWAIN_IsGetMessageLoopEnabled.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldALastPageSupported.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldALevelSupported.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldAPrintFormatSupported.restype = ct.c_long
@@ -2931,6 +2940,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
      theDLL.DTWAIN_UnlockMemory.restype = ct.c_long
      theDLL.DTWAIN_UnlockMemoryEx.restype = ct.c_long
+     theDLL.DTWAIN_UpdateCurrentAcquiredImage.restype = ct.c_long
      theDLL.DTWAIN_UseMultipleThreads.restype = ct.c_long
 
      #set up the argument types
@@ -3134,6 +3144,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnableBarcodeDetection.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableDuplex.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableFeeder.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_EnableGetMessageLoop.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableGetMessageLoopDetection.argtypes = [ct.c_long]
      theDLL.DTWAIN_EnableIndicator.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableJobFileHandling.argtypes = [ct.c_void_p, ct.c_long]
@@ -3308,6 +3319,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetAcquireStripSizes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong)]
      theDLL.DTWAIN_GetAcquiredImage.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_GetAcquiredImageArray.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_GetAcquisitionArray.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetActiveDSMPath.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetActiveDSMPathA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetActiveDSMPathW.argtypes = [ct.c_wchar_p, ct.c_long]
@@ -3652,6 +3664,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_IsFeederSupported.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsFileSystemSupported.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsFileXferSupported.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_IsGetMessageLoopEnabled.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsIAFieldALastPageSupported.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsIAFieldALevelSupported.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsIAFieldAPrintFormatSupported.argtypes = [ct.c_void_p]
@@ -4057,6 +4070,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_UnlockMemoryEx.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_UpdateCurrentAcquiredImage.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_UseMultipleThreads.argtypes = [ct.c_long]
 
 def setup_ansi(theDLL):
@@ -4278,6 +4292,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnableBarcodeDetection.restype = ct.c_long
      theDLL.DTWAIN_EnableDuplex.restype = ct.c_long
      theDLL.DTWAIN_EnableFeeder.restype = ct.c_long
+     theDLL.DTWAIN_EnableGetMessageLoop.restype = ct.c_long
      theDLL.DTWAIN_EnableGetMessageLoopDetection.restype = ct.c_long
      theDLL.DTWAIN_EnableIndicator.restype = ct.c_long
      theDLL.DTWAIN_EnableJobFileHandling.restype = ct.c_long
@@ -4458,6 +4473,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetAcquireStripSizes.restype = ct.c_long
      theDLL.DTWAIN_GetAcquiredImage.restype = ct.c_void_p
      theDLL.DTWAIN_GetAcquiredImageArray.restype = ct.c_void_p
+     theDLL.DTWAIN_GetAcquisitionArray.restype = ct.c_void_p
      theDLL.DTWAIN_GetActiveDSMPath.restype = ct.c_long
      theDLL.DTWAIN_GetActiveDSMPathA.restype = ct.c_long
      theDLL.DTWAIN_GetActiveDSMPathW.restype = ct.c_long
@@ -4825,6 +4841,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_IsFileSystemSupported.restype = ct.c_long
      theDLL.DTWAIN_IsFileXferSupported.restype = ct.c_long
      theDLL.DTWAIN_IsGetMessageLoopDetectionOn.restype = ct.c_long
+     theDLL.DTWAIN_IsGetMessageLoopEnabled.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldALastPageSupported.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldALevelSupported.restype = ct.c_long
      theDLL.DTWAIN_IsIAFieldAPrintFormatSupported.restype = ct.c_long
@@ -5243,6 +5260,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
      theDLL.DTWAIN_UnlockMemory.restype = ct.c_long
      theDLL.DTWAIN_UnlockMemoryEx.restype = ct.c_long
+     theDLL.DTWAIN_UpdateCurrentAcquiredImage.restype = ct.c_long
      theDLL.DTWAIN_UseMultipleThreads.restype = ct.c_long
 
      #set up the argument types
@@ -5446,6 +5464,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnableBarcodeDetection.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableDuplex.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableFeeder.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_EnableGetMessageLoop.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableGetMessageLoopDetection.argtypes = [ct.c_long]
      theDLL.DTWAIN_EnableIndicator.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnableJobFileHandling.argtypes = [ct.c_void_p, ct.c_long]
@@ -5620,6 +5639,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetAcquireStripSizes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong)]
      theDLL.DTWAIN_GetAcquiredImage.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_GetAcquiredImageArray.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_GetAcquisitionArray.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetActiveDSMPath.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetActiveDSMPathA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetActiveDSMPathW.argtypes = [ct.c_wchar_p, ct.c_long]
@@ -5964,6 +5984,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_IsFeederSupported.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsFileSystemSupported.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsFileXferSupported.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_IsGetMessageLoopEnabled.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsIAFieldALastPageSupported.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsIAFieldALevelSupported.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsIAFieldAPrintFormatSupported.argtypes = [ct.c_void_p]
@@ -6369,4 +6390,5 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_UnlockMemoryEx.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_UpdateCurrentAcquiredImage.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_UseMultipleThreads.argtypes = [ct.c_long]

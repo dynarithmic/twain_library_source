@@ -286,6 +286,9 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     bProcessDibEx = false;
                 }
 
+                // See if the user wants to change the original DIB now
+				ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBORIG);
+
                 // Here we can do a check for blank page.
                 if (ProcessBlankPage(pSession, pSource, CurDib, false, DTWAIN_TN_BLANKPAGEDETECTED1, DTWAIN_TN_BLANKPAGEDISCARDED1, DTWAIN_BP_AUTODISCARD_IMMEDIATE) == 0)
                 {
@@ -294,12 +297,14 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 }
 
                 // Callback function for access to change DIB
-                ProcessUserUpdatingDIB(nLastDib);
+                ProcessUserUpdatingDIB(nLastDib, 0);
 
                 // Change bpp if necessary
                 if (bProcessDibEx && GetDAT() != DAT_AUDIONATIVEXFER)
                     ModifyAcquiredDib();
 
+				ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBRESAMPLED);
+				
                 WPARAM wParamToUse[] = { DTWAIN_TN_PROCESSEDDIBFINAL, DTWAIN_TN_PROCESSDIBFINALACCEPTED };
                 if ( GetDAT() == DAT_AUDIONATIVEXFER )
                 {
@@ -1604,15 +1609,27 @@ bool CTL_ImageXferTriplet::IsBufferedTransfer() const
     return m_IsBuffered;
 }
 
-HANDLE CTL_ImageXferTriplet::ProcessUserUpdatingDIB(size_t nLastDib)
+HANDLE CTL_ImageXferTriplet::ProcessUserUpdatingDIB(size_t nLastDib, int notification)
 {
     CTL_ITwainSession* pSession = GetSessionPtr();
     CTL_ITwainSource* pSource = GetSourcePtr();
     auto sessionHandle = pSource->GetDTWAINHandle();
 
-    if (sessionHandle->m_pDibUpdateProc != nullptr && GetDAT() != DAT_AUDIONATIVEXFER)
+    if (GetDAT() != DAT_AUDIONATIVEXFER)
     {
-        HANDLE hRetDib = (sessionHandle->m_pDibUpdateProc)(pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
+        HANDLE hRetDib = nullptr;
+        if (notification == 0)
+        {
+            if (sessionHandle->m_pDibUpdateProc != nullptr)
+                hRetDib = (sessionHandle->m_pDibUpdateProc)(pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
+        }
+        else
+        {
+            pSource->SetUpdatedDIB(nullptr);
+			CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, notification, reinterpret_cast<LPARAM>(pSource));
+            hRetDib = pSource->GetUpdatedDIB();
+        }
+
         if (hRetDib && hRetDib != m_hDataHandle)
         {
             // Application changed DIB.  So make this the current dib
@@ -1621,6 +1638,7 @@ HANDLE CTL_ImageXferTriplet::ProcessUserUpdatingDIB(size_t nLastDib)
             #endif
             m_hDataHandle = hRetDib;
             pSource->SetDibHandle(m_hDataHandle, nLastDib);
+            pSource->SetUpdatedDIB(nullptr);
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_APPUPDATEDDIB, reinterpret_cast<LPARAM>(pSource));
             return m_hDataHandle;
         }

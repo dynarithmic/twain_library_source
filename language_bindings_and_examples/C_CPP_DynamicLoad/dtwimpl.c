@@ -258,6 +258,7 @@
     D_ENABLEBARCODEDETECTIONFUNC                  DYNDTWAIN_API::DTWAIN_EnableBarcodeDetection = nullptr;
     D_ENABLEDUPLEXFUNC                            DYNDTWAIN_API::DTWAIN_EnableDuplex = nullptr;
     D_ENABLEFEEDERFUNC                            DYNDTWAIN_API::DTWAIN_EnableFeeder = nullptr;
+    D_ENABLEGETMESSAGELOOPFUNC                    DYNDTWAIN_API::DTWAIN_EnableGetMessageLoop = nullptr;
     D_ENABLEGETMESSAGELOOPDETECTIONFUNC           DYNDTWAIN_API::DTWAIN_EnableGetMessageLoopDetection = nullptr;
     D_ENABLEINDICATORFUNC                         DYNDTWAIN_API::DTWAIN_EnableIndicator = nullptr;
     D_ENABLEJOBFILEHANDLINGFUNC                   DYNDTWAIN_API::DTWAIN_EnableJobFileHandling = nullptr;
@@ -438,6 +439,7 @@
     D_GETACQUIRESTRIPSIZESFUNC                    DYNDTWAIN_API::DTWAIN_GetAcquireStripSizes = nullptr;
     D_GETACQUIREDIMAGEFUNC                        DYNDTWAIN_API::DTWAIN_GetAcquiredImage = nullptr;
     D_GETACQUIREDIMAGEARRAYFUNC                   DYNDTWAIN_API::DTWAIN_GetAcquiredImageArray = nullptr;
+    D_GETACQUISITIONARRAYFUNC                     DYNDTWAIN_API::DTWAIN_GetAcquisitionArray = nullptr;
     D_GETACTIVEDSMPATHFUNC                        DYNDTWAIN_API::DTWAIN_GetActiveDSMPath = nullptr;
     D_GETACTIVEDSMPATHAFUNC                       DYNDTWAIN_API::DTWAIN_GetActiveDSMPathA = nullptr;
     D_GETACTIVEDSMPATHWFUNC                       DYNDTWAIN_API::DTWAIN_GetActiveDSMPathW = nullptr;
@@ -806,6 +808,7 @@
     D_ISFILESYSTEMSUPPORTEDFUNC                   DYNDTWAIN_API::DTWAIN_IsFileSystemSupported = nullptr;
     D_ISFILEXFERSUPPORTEDFUNC                     DYNDTWAIN_API::DTWAIN_IsFileXferSupported = nullptr;
     D_ISGETMESSAGELOOPDETECTIONONFUNC             DYNDTWAIN_API::DTWAIN_IsGetMessageLoopDetectionOn = nullptr;
+    D_ISGETMESSAGELOOPENABLEDFUNC                 DYNDTWAIN_API::DTWAIN_IsGetMessageLoopEnabled = nullptr;
     D_ISIAFIELDALASTPAGESUPPORTEDFUNC             DYNDTWAIN_API::DTWAIN_IsIAFieldALastPageSupported = nullptr;
     D_ISIAFIELDALEVELSUPPORTEDFUNC                DYNDTWAIN_API::DTWAIN_IsIAFieldALevelSupported = nullptr;
     D_ISIAFIELDAPRINTFORMATSUPPORTEDFUNC          DYNDTWAIN_API::DTWAIN_IsIAFieldAPrintFormatSupported = nullptr;
@@ -1226,6 +1229,7 @@
     D_TESTGETCAPFUNC                              DYNDTWAIN_API::DTWAIN_TestGetCap = nullptr;
     D_UNLOCKMEMORYFUNC                            DYNDTWAIN_API::DTWAIN_UnlockMemory = nullptr;
     D_UNLOCKMEMORYEXFUNC                          DYNDTWAIN_API::DTWAIN_UnlockMemoryEx = nullptr;
+    D_UPDATECURRENTACQUIREDIMAGEFUNC              DYNDTWAIN_API::DTWAIN_UpdateCurrentAcquiredImage = nullptr;
     D_USEMULTIPLETHREADSFUNC                      DYNDTWAIN_API::DTWAIN_UseMultipleThreads = nullptr;
 #endif
 
@@ -1501,6 +1505,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_EnableBarcodeDetection, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnableDuplex, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnableFeeder, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_EnableGetMessageLoop, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnableGetMessageLoopDetection, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnableIndicator, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnableJobFileHandling, hModule);
@@ -1681,6 +1686,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetAcquireStripSizes, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetAcquiredImage, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetAcquiredImageArray, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetAcquisitionArray, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetActiveDSMPath, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetActiveDSMPathA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetActiveDSMPathW, hModule);
@@ -2049,6 +2055,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_IsFileSystemSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsFileXferSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsGetMessageLoopDetectionOn, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_IsGetMessageLoopEnabled, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsIAFieldALastPageSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsIAFieldALevelSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsIAFieldAPrintFormatSupported, hModule);
@@ -2469,6 +2476,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_TestGetCap, hModule);
           LOADFUNCTIONIMPL(DTWAIN_UnlockMemory, hModule);
           LOADFUNCTIONIMPL(DTWAIN_UnlockMemoryEx, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_UpdateCurrentAcquiredImage, hModule);
           LOADFUNCTIONIMPL(DTWAIN_UseMultipleThreads, hModule);
     }
     return 1;

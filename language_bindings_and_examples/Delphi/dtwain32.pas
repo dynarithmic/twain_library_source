@@ -359,6 +359,7 @@ const
   DTWAIN_USESOURCEMODE = 128;
   DTWAIN_USELIST = 256;
   DTWAIN_CREATE_DIRECTORY = 512;
+  DTWAIN_NODELETEDIBS = 1024;
   DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY;
   DTWAIN_ARRAYANY = 1;
   DTWAIN_ArrayTypePTR = 1;
@@ -374,6 +375,7 @@ const
   DTWAIN_ARRAYLONG64 = 10;
   DTWAIN_ARRAYANSISTRING = 11;
   DTWAIN_ARRAYWIDESTRING = 12;
+  DTWAIN_ARRAYULONG = 13;
   DTWAIN_ARRAYTWFIX32 = 200;
   DTWAIN_ArrayTypeINVALID = 0;
   DTWAIN_ARRAYINT16 = 100;
@@ -382,6 +384,8 @@ const
   DTWAIN_ARRAYINT32 = 130;
   DTWAIN_ARRAYINT64 = 140;
   DTWAIN_ARRAYUINT64 = 150;
+  DTWAIN_ARRAYSHORTINT16 = 160;
+  DTWAIN_ARRAYSHORTUINT16 = 170;
   DTWAIN_RANGELONG = DTWAIN_ARRAYLONG;
   DTWAIN_RANGEFLOAT = DTWAIN_ARRAYFLOAT;
   DTWAIN_RANGEMIN = 0;
@@ -558,6 +562,8 @@ const
   DTWAIN_TN_QUERYACQUIREPAGES = 1305;
   DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
   DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
+  DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
+  DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
   DTWAIN_PDFOCR_CLEANTEXT1 = 1;
   DTWAIN_PDFOCR_CLEANTEXT2 = 2;
   DTWAIN_MODAL = 0;
@@ -2045,6 +2051,7 @@ function DTWAIN_EnableAutomaticSenseMedium(Source:DTWAIN_SOURCE; bSet:BOOL) : BO
 function DTWAIN_EnableBarcodeDetection(Source:DTWAIN_SOURCE; bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_EnableBarcodeDetection';
 function DTWAIN_EnableDuplex(Source:DTWAIN_SOURCE; bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_EnableDuplex';
 function DTWAIN_EnableFeeder(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_EnableFeeder';
+function DTWAIN_EnableGetMessageLoop(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_EnableGetMessageLoop';
 function DTWAIN_EnableGetMessageLoopDetection(bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_EnableGetMessageLoopDetection';
 function DTWAIN_EnableIndicator(Source:DTWAIN_SOURCE; bEnable:BOOL) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_EnableIndicator';
 function DTWAIN_EnableJobFileHandling(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_EnableJobFileHandling';
@@ -2225,6 +2232,7 @@ function DTWAIN_GetAcquireStripData(Source:DTWAIN_SOURCE; lpCompression:LPLONG; 
 function DTWAIN_GetAcquireStripSizes(Source:DTWAIN_SOURCE; lpMin:LPDWORD; lpMax:LPDWORD; lpPreferred:LPDWORD) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetAcquireStripSizes';
 function DTWAIN_GetAcquiredImage(aAcq:DTWAIN_ARRAY; nWhichAcq:LONG; nWhichDib:LONG) : NativeInt; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetAcquiredImage';
 function DTWAIN_GetAcquiredImageArray(aAcq:DTWAIN_ARRAY; nWhichAcq:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetAcquiredImageArray';
+function DTWAIN_GetAcquisitionArray(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetAcquisitionArray';
 function DTWAIN_GetActiveDSMPath(lpszBuffer:LPTSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetActiveDSMPath';
 function DTWAIN_GetActiveDSMPathA(lpszBuffer:LPSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetActiveDSMPathA';
 function DTWAIN_GetActiveDSMPathW(lpszBuffer:LPWSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetActiveDSMPathW';
@@ -2593,6 +2601,7 @@ function DTWAIN_IsFeederSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  extern
 function DTWAIN_IsFileSystemSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsFileSystemSupported';
 function DTWAIN_IsFileXferSupported(Source:DTWAIN_SOURCE; lFileType:LONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsFileXferSupported';
 function DTWAIN_IsGetMessageLoopDetectionOn : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsGetMessageLoopDetectionOn';
+function DTWAIN_IsGetMessageLoopEnabled(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsGetMessageLoopEnabled';
 function DTWAIN_IsIAFieldALastPageSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsIAFieldALastPageSupported';
 function DTWAIN_IsIAFieldALevelSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsIAFieldALevelSupported';
 function DTWAIN_IsIAFieldAPrintFormatSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsIAFieldAPrintFormatSupported';
@@ -3013,6 +3022,7 @@ function DTWAIN_SysInitializeNoBlocking : DTWAIN_HANDLE; stdcall;  external 'dtw
 function DTWAIN_TestGetCap(Source:DTWAIN_SOURCE; lCapability:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_TestGetCap';
 function DTWAIN_UnlockMemory(h:NativeInt) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_UnlockMemory';
 function DTWAIN_UnlockMemoryEx(h:NativeInt) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_UnlockMemoryEx';
+function DTWAIN_UpdateCurrentAcquiredImage(Source:DTWAIN_SOURCE; hNewDib:NativeInt) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_UpdateCurrentAcquiredImage';
 function DTWAIN_UseMultipleThreads(bSet:BOOL) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_UseMultipleThreads';
 
 implementation

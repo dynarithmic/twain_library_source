@@ -146,7 +146,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_F
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const DTWAIN_BOOL bRet = GetImageSize2(pSource, left, top, right, bottom, Unit);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+	LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
+	LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 

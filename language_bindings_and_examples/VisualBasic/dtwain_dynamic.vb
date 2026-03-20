@@ -434,6 +434,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_USESOURCEMODE As Integer = 128
         Public Const DTWAIN_USELIST As Integer = 256
         Public Const DTWAIN_CREATE_DIRECTORY As Integer = 512
+        Public Const DTWAIN_NODELETEDIBS As Integer = 1024
         Public Const DTWAIN_CREATEDIRECTORY As Integer = DTWAIN_CREATE_DIRECTORY
         Public Const DTWAIN_ARRAYANY As Integer = 1
         Public Const DTWAIN_ArrayTypePTR As Integer = 1
@@ -449,6 +450,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_ARRAYLONG64 As Integer = 10
         Public Const DTWAIN_ARRAYANSISTRING As Integer = 11
         Public Const DTWAIN_ARRAYWIDESTRING As Integer = 12
+        Public Const DTWAIN_ARRAYULONG As Integer = 13
         Public Const DTWAIN_ARRAYTWFIX32 As Integer = 200
         Public Const DTWAIN_ArrayTypeINVALID As Integer = 0
         Public Const DTWAIN_ARRAYINT16 As Integer = 100
@@ -457,6 +459,8 @@ Namespace Dynarithmic
         Public Const DTWAIN_ARRAYINT32 As Integer = 130
         Public Const DTWAIN_ARRAYINT64 As Integer = 140
         Public Const DTWAIN_ARRAYUINT64 As Integer = 150
+        Public Const DTWAIN_ARRAYSHORTINT16 As Integer = 160
+        Public Const DTWAIN_ARRAYSHORTUINT16 As Integer = 170
         Public Const DTWAIN_RANGELONG As Integer = DTWAIN_ARRAYLONG
         Public Const DTWAIN_RANGEFLOAT As Integer = DTWAIN_ARRAYFLOAT
         Public Const DTWAIN_RANGEMIN As Integer = 0
@@ -633,6 +637,8 @@ Namespace Dynarithmic
         Public Const DTWAIN_TN_QUERYACQUIREPAGES As Integer = 1305
         Public Const DTWAIN_TN_ACQUIREPAGESSTOPPING As Integer = 1306
         Public Const DTWAIN_TN_ACQUIREPAGESSTOPPED As Integer = 1307
+        Public Const DTWAIN_TN_QUERYUPDATEDIBORIG As Integer = 1308
+        Public Const DTWAIN_TN_QUERYUPDATEDIBRESAMPLED As Integer = 1309
         Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
         Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
         Public Const DTWAIN_MODAL As Integer = 0
@@ -2387,6 +2393,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_EnableFeederDelegate(Source As System.IntPtr, bSet As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_EnableGetMessageLoopDelegate(Source As System.IntPtr, bSet As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnableGetMessageLoopDetectionDelegate(bEnable As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -2877,6 +2886,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetAcquiredImageArrayDelegate(aAcq As System.IntPtr, nWhichAcq As Integer) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetAcquisitionArrayDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetActiveDSMPathDelegate(<MarshalAs(UnmanagedType.LPTStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
@@ -3597,6 +3609,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_IsGetMessageLoopDetectionOnDelegate() As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_IsGetMessageLoopEnabledDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_IsIAFieldALastPageSupportedDelegate(Source As System.IntPtr) As Integer
@@ -4466,6 +4481,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_UnlockMemoryExDelegate(h As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_UpdateCurrentAcquiredImageDelegate(Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_UseMultipleThreadsDelegate(bSet As Integer) As Integer
         Public Function DTWAIN_AcquireAudioFile(Source As System.IntPtr, lpszFile As String, lFileFlags As Integer, lMaxClips As Integer, bShowUI As Integer, bCloseSource As Integer, ByRef pStatus As Integer) As Integer
         Return api.DTWAIN_AcquireAudioFile(Source, lpszFile, lFileFlags, lMaxClips, bShowUI, bCloseSource, pStatus)
@@ -5089,6 +5107,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_EnableFeeder(Source As System.IntPtr, bSet As Integer) As Integer
         Return api.DTWAIN_EnableFeeder(Source, bSet)
+        End Function
+        
+        Public Function DTWAIN_EnableGetMessageLoop(Source As System.IntPtr, bSet As Integer) As Integer
+        Return api.DTWAIN_EnableGetMessageLoop(Source, bSet)
         End Function
         
         Public Function DTWAIN_EnableGetMessageLoopDetection(bEnable As Integer) As Integer
@@ -5745,6 +5767,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_GetAcquiredImageArray(aAcq As System.IntPtr, nWhichAcq As Integer) As System.IntPtr
         Return api.DTWAIN_GetAcquiredImageArray(aAcq, nWhichAcq)
+        End Function
+        
+        Public Function DTWAIN_GetAcquisitionArray(Source As System.IntPtr) As System.IntPtr
+        Return api.DTWAIN_GetAcquisitionArray(Source)
         End Function
         
         Public Function DTWAIN_GetActiveDSMPath(<MarshalAs(UnmanagedType.LPTStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
@@ -6705,6 +6731,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_IsGetMessageLoopDetectionOn() As Integer
         Return api.DTWAIN_IsGetMessageLoopDetectionOn()
+        End Function
+        
+        Public Function DTWAIN_IsGetMessageLoopEnabled(Source As System.IntPtr) As Integer
+        Return api.DTWAIN_IsGetMessageLoopEnabled(Source)
         End Function
         
         Public Function DTWAIN_IsIAFieldALastPageSupported(Source As System.IntPtr) As Integer
@@ -7863,6 +7893,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_UnlockMemoryEx(h)
         End Function
         
+        Public Function DTWAIN_UpdateCurrentAcquiredImage(Source As System.IntPtr, hNewDib As System.IntPtr) As Integer
+        Return api.DTWAIN_UpdateCurrentAcquiredImage(Source, hNewDib)
+        End Function
+        
         Public Function DTWAIN_UseMultipleThreads(bSet As Integer) As Integer
         Return api.DTWAIN_UseMultipleThreads(bSet)
         End Function
@@ -8023,6 +8057,7 @@ Namespace Dynarithmic
             Public DTWAIN_EnableBarcodeDetection As DTWAIN_EnableBarcodeDetectionDelegate
             Public DTWAIN_EnableDuplex As DTWAIN_EnableDuplexDelegate
             Public DTWAIN_EnableFeeder As DTWAIN_EnableFeederDelegate
+            Public DTWAIN_EnableGetMessageLoop As DTWAIN_EnableGetMessageLoopDelegate
             Public DTWAIN_EnableGetMessageLoopDetection As DTWAIN_EnableGetMessageLoopDetectionDelegate
             Public DTWAIN_EnableIndicator As DTWAIN_EnableIndicatorDelegate
             Public DTWAIN_EnableJobFileHandling As DTWAIN_EnableJobFileHandlingDelegate
@@ -8187,6 +8222,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetAcquireStripSizes As DTWAIN_GetAcquireStripSizesDelegate
             Public DTWAIN_GetAcquiredImage As DTWAIN_GetAcquiredImageDelegate
             Public DTWAIN_GetAcquiredImageArray As DTWAIN_GetAcquiredImageArrayDelegate
+            Public DTWAIN_GetAcquisitionArray As DTWAIN_GetAcquisitionArrayDelegate
             Public DTWAIN_GetActiveDSMPath As DTWAIN_GetActiveDSMPathDelegate
             Public DTWAIN_GetActiveDSMVersionInfo As DTWAIN_GetActiveDSMVersionInfoDelegate
             Public DTWAIN_GetAlarmVolume As DTWAIN_GetAlarmVolumeDelegate
@@ -8427,6 +8463,7 @@ Namespace Dynarithmic
             Public DTWAIN_IsFileSystemSupported As DTWAIN_IsFileSystemSupportedDelegate
             Public DTWAIN_IsFileXferSupported As DTWAIN_IsFileXferSupportedDelegate
             Public DTWAIN_IsGetMessageLoopDetectionOn As DTWAIN_IsGetMessageLoopDetectionOnDelegate
+            Public DTWAIN_IsGetMessageLoopEnabled As DTWAIN_IsGetMessageLoopEnabledDelegate
             Public DTWAIN_IsIAFieldALastPageSupported As DTWAIN_IsIAFieldALastPageSupportedDelegate
             Public DTWAIN_IsIAFieldALevelSupported As DTWAIN_IsIAFieldALevelSupportedDelegate
             Public DTWAIN_IsIAFieldAPrintFormatSupported As DTWAIN_IsIAFieldAPrintFormatSupportedDelegate
@@ -8716,6 +8753,7 @@ Namespace Dynarithmic
             Public DTWAIN_TestGetCap As DTWAIN_TestGetCapDelegate
             Public DTWAIN_UnlockMemory As DTWAIN_UnlockMemoryDelegate
             Public DTWAIN_UnlockMemoryEx As DTWAIN_UnlockMemoryExDelegate
+            Public DTWAIN_UpdateCurrentAcquiredImage As DTWAIN_UpdateCurrentAcquiredImageDelegate
             Public DTWAIN_UseMultipleThreads As DTWAIN_UseMultipleThreadsDelegate
         End Class
     End Class

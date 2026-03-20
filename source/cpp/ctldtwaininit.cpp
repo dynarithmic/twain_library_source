@@ -2117,9 +2117,9 @@ LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainName(LPCTSTR lpszBuffer)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto badValue = std::numeric_limits<LONG>::min();
     auto retVal = CTL_StaticData::GetIDFromTwainName(StringConversion::Convert_NativePtr_To_Ansi(lpszBuffer));
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.first; }, DTWAIN_ERR_STRINGID_NOTFOUND, static_cast<int>(retVal.second), FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)retVal.second)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first ? static_cast<LONG>(retVal.second) : badValue);
     CATCH_BLOCK(std::numeric_limits<LONG>::min())
 }
 

@@ -339,6 +339,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_EnableBarcodeDetection
    attr_reader :DTWAIN_EnableDuplex
    attr_reader :DTWAIN_EnableFeeder
+   attr_reader :DTWAIN_EnableGetMessageLoop
    attr_reader :DTWAIN_EnableGetMessageLoopDetection
    attr_reader :DTWAIN_EnableIndicator
    attr_reader :DTWAIN_EnableJobFileHandling
@@ -519,6 +520,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetAcquireStripSizes
    attr_reader :DTWAIN_GetAcquiredImage
    attr_reader :DTWAIN_GetAcquiredImageArray
+   attr_reader :DTWAIN_GetAcquisitionArray
    attr_reader :DTWAIN_GetActiveDSMPath
    attr_reader :DTWAIN_GetActiveDSMPathA
    attr_reader :DTWAIN_GetActiveDSMPathW
@@ -886,6 +888,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_IsFileSystemSupported
    attr_reader :DTWAIN_IsFileXferSupported
    attr_reader :DTWAIN_IsGetMessageLoopDetectionOn
+   attr_reader :DTWAIN_IsGetMessageLoopEnabled
    attr_reader :DTWAIN_IsIAFieldALastPageSupported
    attr_reader :DTWAIN_IsIAFieldALevelSupported
    attr_reader :DTWAIN_IsIAFieldAPrintFormatSupported
@@ -1304,6 +1307,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_TestGetCap
    attr_reader :DTWAIN_UnlockMemory
    attr_reader :DTWAIN_UnlockMemoryEx
+   attr_reader :DTWAIN_UpdateCurrentAcquiredImage
    attr_reader :DTWAIN_UseMultipleThreads
    DTWAIN_FF_TIFF = 0
    DTWAIN_FF_PICT = 1
@@ -1475,6 +1479,7 @@ class DTWAINAPI
    DTWAIN_USESOURCEMODE = 128
    DTWAIN_USELIST = 256
    DTWAIN_CREATE_DIRECTORY = 512
+   DTWAIN_NODELETEDIBS = 1024
    DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY
    DTWAIN_ARRAYANY = 1
    DTWAIN_ArrayTypePTR = 1
@@ -1490,6 +1495,7 @@ class DTWAINAPI
    DTWAIN_ARRAYLONG64 = 10
    DTWAIN_ARRAYANSISTRING = 11
    DTWAIN_ARRAYWIDESTRING = 12
+   DTWAIN_ARRAYULONG = 13
    DTWAIN_ARRAYTWFIX32 = 200
    DTWAIN_ArrayTypeINVALID = 0
    DTWAIN_ARRAYINT16 = 100
@@ -1498,6 +1504,8 @@ class DTWAINAPI
    DTWAIN_ARRAYINT32 = 130
    DTWAIN_ARRAYINT64 = 140
    DTWAIN_ARRAYUINT64 = 150
+   DTWAIN_ARRAYSHORTINT16 = 160
+   DTWAIN_ARRAYSHORTUINT16 = 170
    DTWAIN_RANGELONG = DTWAIN_ARRAYLONG
    DTWAIN_RANGEFLOAT = DTWAIN_ARRAYFLOAT
    DTWAIN_RANGEMIN = 0
@@ -1674,6 +1682,8 @@ class DTWAINAPI
    DTWAIN_TN_QUERYACQUIREPAGES = 1305
    DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306
    DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
+   DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
+   DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
    DTWAIN_PDFOCR_CLEANTEXT1 = 1
    DTWAIN_PDFOCR_CLEANTEXT2 = 2
    DTWAIN_MODAL = 0
@@ -3194,6 +3204,7 @@ class DTWAINAPI
        @DTWAIN_EnableBarcodeDetection = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableBarcodeDetection'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_EnableDuplex = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableDuplex'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_EnableFeeder = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableFeeder'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
+       @DTWAIN_EnableGetMessageLoop = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableGetMessageLoop'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_EnableGetMessageLoopDetection = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableGetMessageLoopDetection'],[Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_EnableIndicator = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableIndicator'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_EnableJobFileHandling = Fiddle::Function::new(dtwain_dll['DTWAIN_EnableJobFileHandling'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
@@ -3374,6 +3385,7 @@ class DTWAINAPI
        @DTWAIN_GetAcquireStripSizes = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAcquireStripSizes'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetAcquiredImage = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAcquiredImage'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_GetAcquiredImageArray = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAcquiredImageArray'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
+       @DTWAIN_GetAcquisitionArray = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAcquisitionArray'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_GetActiveDSMPath = Fiddle::Function::new(dtwain_dll['DTWAIN_GetActiveDSMPath'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetActiveDSMPathA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetActiveDSMPathA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetActiveDSMPathW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetActiveDSMPathW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
@@ -3741,6 +3753,7 @@ class DTWAINAPI
        @DTWAIN_IsFileSystemSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsFileSystemSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsFileXferSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsFileXferSupported'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_IsGetMessageLoopDetectionOn = Fiddle::Function::new(dtwain_dll['DTWAIN_IsGetMessageLoopDetectionOn'],[],Fiddle::TYPE_INT)
+       @DTWAIN_IsGetMessageLoopEnabled = Fiddle::Function::new(dtwain_dll['DTWAIN_IsGetMessageLoopEnabled'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsIAFieldALastPageSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsIAFieldALastPageSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsIAFieldALevelSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsIAFieldALevelSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsIAFieldAPrintFormatSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsIAFieldAPrintFormatSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
@@ -4159,6 +4172,7 @@ class DTWAINAPI
        @DTWAIN_TestGetCap = Fiddle::Function::new(dtwain_dll['DTWAIN_TestGetCap'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_UnlockMemory = Fiddle::Function::new(dtwain_dll['DTWAIN_UnlockMemory'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_UnlockMemoryEx = Fiddle::Function::new(dtwain_dll['DTWAIN_UnlockMemoryEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_UpdateCurrentAcquiredImage = Fiddle::Function::new(dtwain_dll['DTWAIN_UpdateCurrentAcquiredImage'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_UseMultipleThreads = Fiddle::Function::new(dtwain_dll['DTWAIN_UseMultipleThreads'],[Fiddle::TYPE_INT],Fiddle::TYPE_INT)
     end
 end

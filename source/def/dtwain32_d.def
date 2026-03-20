@@ -1191,3 +1191,7 @@ DTWAIN_GetCapHelpW                                @31220
 DTWAIN_EnumCapLabels                              @31221 
 DTWAIN_EnableGetMessageLoopDetection              @31222
 DTWAIN_IsGetMessageLoopDetectionOn                @31223 
+DTWAIN_UpdateCurrentAcquiredImage                 @31224
+DTWAIN_GetAcquisitionArray                        @31225
+DTWAIN_IsGetMessageLoopEnabled                    @31226
+DTWAIN_EnableGetMessageLoop                       @31227

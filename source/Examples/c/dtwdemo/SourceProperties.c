@@ -149,7 +149,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
     {
         int nControl = LOWORD(wParam);
         int nNotification = HIWORD(wParam);
-		HWND hCheckBox = GetDlgItem(hDlg, IDC_chkResetCapsOnClose);
+        HWND hCheckBox = GetDlgItem(hDlg, IDC_chkResetCapsOnClose);
         switch (nControl)
         {
             /* Quit the dialog */
@@ -164,7 +164,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             so make sure we reset all the caps to default when we return if requested */
             LRESULT checkState = SendMessage(hCheckBox, BM_GETCHECK, 0, 0);
             if (checkState == BST_CHECKED)
-            DTWAIN_SetAllCapsToDefault(g_CurrentSource);
+                DTWAIN_SetAllCapsToDefault(g_CurrentSource);
             EndDialog(hDlg, 1);
             break;
         case IDC_btnTestCap:
@@ -544,6 +544,10 @@ void TestGetCap(HWND hWnd, LONG capValue)
             bGotID = (nTranslationID != capValue);
         }
     }
+
+    /* Choose the data type */
+    LONG bestDataType = DTWAIN_GetCapDataType(g_CurrentSource, capValue);
+
     /* Call the capability function */
     DTWAIN_ARRAY values;
     LONG ret = DTWAIN_GetCapValuesEx2(g_CurrentSource, capValue, nGetType, nContainerType, nDataType, &values);
@@ -558,6 +562,7 @@ void TestGetCap(HWND hWnd, LONG capValue)
         LONG i = 0;
         for (i = 0; i < numItems; ++i)
         {
+            BOOL bGotValue = TRUE;
             if (i >= 1000)
             {
                 SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"~ Number of values exceeded 1000 ... ~");
@@ -565,65 +570,93 @@ void TestGetCap(HWND hWnd, LONG capValue)
             }
             switch (nArrayType)
             {
-            case DTWAIN_ARRAYLONG:
-            {
-                LONG lVal;
-                DTWAIN_ArrayGetAtLong(values, i, &lVal);
-                if (capValue == CAP_SUPPORTEDDATS)
+                case DTWAIN_ARRAYLONG:
                 {
-                    char szHi[100];
-                    char szLo[100];
-                    int hiWord = lVal >> 16;
-                    int loWord = lVal & 0x0000FFFF;
-                    DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, hiWord, szHi, 100);
-                    DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, loWord, szLo, 100);
-                    sprintf(szValues, "%s / %s", szHi, szLo);
-                }
-                else
+                    LONG lVal;
+                    BOOL isRange = (nContainerType == DTWAIN_CONTRANGE);
+                    const char* rangeFormatU = "%s%u";
+                    const char* rangeFormatD = "%s%d";
+                    const char* rangeNameToPrint = "";
+                    if (isRange)
+                    {
+                        rangeFormatU = "%s: %u";
+                        rangeFormatD = "%s: %d";
+                        rangeNameToPrint = rangeName[i];
+                    }
+
+                    DTWAIN_ArrayGetAtLong(values, i, &lVal);
+                    if (capValue == CAP_SUPPORTEDDATS)
+                    {
+                        char szHi[100];
+                        char szLo[100];
+                        int hiWord = lVal >> 16;
+                        int loWord = lVal & 0x0000FFFF;
+                        DTWAIN_GetTwainNameFromConstantExA(DTWAIN_CONSTANT_DG, hiWord, szHi, 100);
+                        DTWAIN_GetTwainNameFromConstantExA(DTWAIN_CONSTANT_DAT, loWord, szLo, 100);
+                        sprintf(szValues, "%s / %s", szHi, szLo);
+                    }
+                    else
                     if (bIsCapNameSupported)
                         DTWAIN_GetNameFromCapA(lVal, szValues, 256);
                     else
-                        if (nDataType == TWTY_BOOL)
-                            sprintf(szValues, "%s", lVal == 1 ? "TRUE" : "FALSE");
+                    if (nDataType == TWTY_BOOL)
+                        sprintf(szValues, "%s", lVal == 1 ? "TRUE" : "FALSE");
+                    else
+                    if (bGotID)
+                    {
+                        char szTempBuf[100];
+                        if (nDataType == TWTY_INT32 || nDataType == TWTY_INT16)
+                            sprintf(szTempBuf, "%d", lVal);
                         else
-                            if (bGotID)
-                                DTWAIN_GetTwainNameFromConstantA(nTranslationID, lVal, szValues, 256);
-                            else
-                                if (nContainerType == DTWAIN_CONTRANGE)
-                                    sprintf(szValues, "%s: %d", rangeName[i], lVal);
-                                else
-                                    sprintf(szValues, "%d", lVal);
-                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-            }
-            break;
+                            sprintf(szTempBuf, "%u", lVal);
+                        DTWAIN_GetTwainNameFromConstantExA(nTranslationID, lVal, szValues, 256);
 
-            case DTWAIN_ARRAYFLOAT:
-            {
-                double dVal;
-                DTWAIN_ArrayGetAtFloat(values, i, &dVal);
-                if (nContainerType == DTWAIN_CONTRANGE)
-                    sprintf(szValues, "%s: %lf", rangeName[i], dVal);
-                else
-                    sprintf(szValues, "%lf", dVal);
-                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-            }
-            break;
+                        // Name does not really exist
+                        if (strcmp(szTempBuf, szValues) == 0)
+                        {
+                            bGotValue = FALSE;
+                            szValues[0] = 0;
+                        }
+                    }
 
-            case DTWAIN_ARRAYANSISTRING:
-            {
-                DTWAIN_ArrayGetAtANSIString(values, i, szValues);
-                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-            }
-            break;
+                    if (!bGotValue && szValues[0] == 0)
+                    {
+                        if (nDataType == TWTY_UINT32)
+                            sprintf(szValues, rangeFormatU, rangeNameToPrint, (TW_UINT32)lVal);
+                        else
+                            sprintf(szValues, rangeFormatD, rangeNameToPrint, lVal);
+                    }
+                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
+                }
+                break;
 
-            case DTWAIN_ARRAYFRAME:
-            {
-                double left, top, right, bottom;
-                DTWAIN_ArrayGetAtFrame(values, i, &left, &top, &right, &bottom);
-                sprintf(szValues, "Left: %lf  Top: %lf  Right: %lf  Bottom: %lf", left, top, right, bottom);
-                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-            }
-            break;
+                case DTWAIN_ARRAYFLOAT:
+                {
+                    double dVal;
+                    DTWAIN_ArrayGetAtFloat(values, i, &dVal);
+                    if (nContainerType == DTWAIN_CONTRANGE)
+                        sprintf(szValues, "%s: %lf", rangeName[i], dVal);
+                    else
+                        sprintf(szValues, "%lf", dVal);
+                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
+                }
+                break;
+
+                case DTWAIN_ARRAYANSISTRING:
+                {
+                    DTWAIN_ArrayGetAtANSIString(values, i, szValues);
+                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
+                }
+                break;
+
+                case DTWAIN_ARRAYFRAME:
+                {
+                    double left, top, right, bottom;
+                    DTWAIN_ArrayGetAtFrame(values, i, &left, &top, &right, &bottom);
+                    sprintf(szValues, "Left: %lf  Top: %lf  Right: %lf  Bottom: %lf", left, top, right, bottom);
+                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
+                }
+                break;
             }
         }
         DTWAIN_ArrayDestroy(values);

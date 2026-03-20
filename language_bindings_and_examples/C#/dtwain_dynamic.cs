@@ -334,6 +334,7 @@
         public const int DTWAIN_USESOURCEMODE = 128;
         public const int DTWAIN_USELIST = 256;
         public const int DTWAIN_CREATE_DIRECTORY = 512;
+        public const int DTWAIN_NODELETEDIBS = 1024;
         public const int DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY;
         public const int DTWAIN_ARRAYANY = 1;
         public const int DTWAIN_ArrayTypePTR = 1;
@@ -349,6 +350,7 @@
         public const int DTWAIN_ARRAYLONG64 = 10;
         public const int DTWAIN_ARRAYANSISTRING = 11;
         public const int DTWAIN_ARRAYWIDESTRING = 12;
+        public const int DTWAIN_ARRAYULONG = 13;
         public const int DTWAIN_ARRAYTWFIX32 = 200;
         public const int DTWAIN_ArrayTypeINVALID = 0;
         public const int DTWAIN_ARRAYINT16 = 100;
@@ -357,6 +359,8 @@
         public const int DTWAIN_ARRAYINT32 = 130;
         public const int DTWAIN_ARRAYINT64 = 140;
         public const int DTWAIN_ARRAYUINT64 = 150;
+        public const int DTWAIN_ARRAYSHORTINT16 = 160;
+        public const int DTWAIN_ARRAYSHORTUINT16 = 170;
         public const int DTWAIN_RANGELONG = DTWAIN_ARRAYLONG;
         public const int DTWAIN_RANGEFLOAT = DTWAIN_ARRAYFLOAT;
         public const int DTWAIN_RANGEMIN = 0;
@@ -533,6 +537,8 @@
         public const int DTWAIN_TN_QUERYACQUIREPAGES = 1305;
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306;
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
+        public const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
+        public const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
@@ -2064,6 +2070,7 @@
         public delegate int DTWAIN_EnableBarcodeDetectionDelegate(DTWAIN_SOURCE Source, int bEnable);
         public delegate int DTWAIN_EnableDuplexDelegate(DTWAIN_SOURCE Source, int bEnable);
         public delegate int DTWAIN_EnableFeederDelegate(DTWAIN_SOURCE Source, int bSet);
+        public delegate int DTWAIN_EnableGetMessageLoopDelegate(DTWAIN_SOURCE Source, int bSet);
         public delegate int DTWAIN_EnableGetMessageLoopDetectionDelegate(int bEnable);
         public delegate int DTWAIN_EnableIndicatorDelegate(DTWAIN_SOURCE Source, int bEnable);
         public delegate int DTWAIN_EnableJobFileHandlingDelegate(DTWAIN_SOURCE Source, int bSet);
@@ -2231,6 +2238,7 @@
         public delegate int DTWAIN_GetAcquireStripSizesDelegate(DTWAIN_SOURCE Source, ref DWORD lpMin, ref DWORD lpMax, ref DWORD lpPreferred);
         public delegate HANDLE DTWAIN_GetAcquiredImageDelegate(DTWAIN_ARRAY aAcq, int nWhichAcq, int nWhichDib);
         public delegate DTWAIN_ARRAY DTWAIN_GetAcquiredImageArrayDelegate(DTWAIN_ARRAY aAcq, int nWhichAcq);
+        public delegate DTWAIN_ARRAY DTWAIN_GetAcquisitionArrayDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetActiveDSMPathDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetActiveDSMPathDelegate_overload(System.IntPtr lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetActiveDSMVersionInfoDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szDLLInfo, int nMaxLen);
@@ -2530,6 +2538,7 @@
         public delegate int DTWAIN_IsFileSystemSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsFileXferSupportedDelegate(DTWAIN_SOURCE Source, int lFileType);
         public delegate int DTWAIN_IsGetMessageLoopDetectionOnDelegate();
+        public delegate int DTWAIN_IsGetMessageLoopEnabledDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsIAFieldALastPageSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsIAFieldALevelSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsIAFieldAPrintFormatSupportedDelegate(DTWAIN_SOURCE Source);
@@ -2824,6 +2833,7 @@
         public delegate DTWAIN_ARRAY DTWAIN_TestGetCapDelegate(DTWAIN_SOURCE Source, int lCapability);
         public delegate int DTWAIN_UnlockMemoryDelegate(HANDLE h);
         public delegate int DTWAIN_UnlockMemoryExDelegate(HANDLE h);
+        public delegate int DTWAIN_UpdateCurrentAcquiredImageDelegate(DTWAIN_SOURCE Source, HANDLE hNewDib);
         public delegate int DTWAIN_UseMultipleThreadsDelegate(int bSet);
 
         public TwainAPI(string dllPath)
@@ -3318,6 +3328,9 @@
 
         [DTWAINNativeFunction("DTWAIN_EnableFeeder")]
         private readonly DTWAIN_EnableFeederDelegate  _DTWAIN_EnableFeeder;
+
+        [DTWAINNativeFunction("DTWAIN_EnableGetMessageLoop")]
+        private readonly DTWAIN_EnableGetMessageLoopDelegate  _DTWAIN_EnableGetMessageLoop;
 
         [DTWAINNativeFunction("DTWAIN_EnableGetMessageLoopDetection")]
         private readonly DTWAIN_EnableGetMessageLoopDetectionDelegate  _DTWAIN_EnableGetMessageLoopDetection;
@@ -3819,6 +3832,9 @@
 
         [DTWAINNativeFunction("DTWAIN_GetAcquiredImageArray")]
         private readonly DTWAIN_GetAcquiredImageArrayDelegate  _DTWAIN_GetAcquiredImageArray;
+
+        [DTWAINNativeFunction("DTWAIN_GetAcquisitionArray")]
+        private readonly DTWAIN_GetAcquisitionArrayDelegate  _DTWAIN_GetAcquisitionArray;
 
         [DTWAINNativeFunction("DTWAIN_GetActiveDSMPath")]
         private readonly DTWAIN_GetActiveDSMPathDelegate  _DTWAIN_GetActiveDSMPath;
@@ -4717,6 +4733,9 @@
         [DTWAINNativeFunction("DTWAIN_IsGetMessageLoopDetectionOn")]
         private readonly DTWAIN_IsGetMessageLoopDetectionOnDelegate  _DTWAIN_IsGetMessageLoopDetectionOn;
 
+        [DTWAINNativeFunction("DTWAIN_IsGetMessageLoopEnabled")]
+        private readonly DTWAIN_IsGetMessageLoopEnabledDelegate  _DTWAIN_IsGetMessageLoopEnabled;
+
         [DTWAINNativeFunction("DTWAIN_IsIAFieldALastPageSupported")]
         private readonly DTWAIN_IsIAFieldALastPageSupportedDelegate  _DTWAIN_IsIAFieldALastPageSupported;
 
@@ -5599,6 +5618,9 @@
         [DTWAINNativeFunction("DTWAIN_UnlockMemoryEx")]
         private readonly DTWAIN_UnlockMemoryExDelegate  _DTWAIN_UnlockMemoryEx;
 
+        [DTWAINNativeFunction("DTWAIN_UpdateCurrentAcquiredImage")]
+        private readonly DTWAIN_UpdateCurrentAcquiredImageDelegate  _DTWAIN_UpdateCurrentAcquiredImage;
+
         [DTWAINNativeFunction("DTWAIN_UseMultipleThreads")]
         private readonly DTWAIN_UseMultipleThreadsDelegate  _DTWAIN_UseMultipleThreads;
         public  int DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string lpszFile, int lFileFlags, int lMaxClips, int bShowUI, int bCloseSource, ref int pStatus)
@@ -6080,6 +6102,9 @@
 
         public  int DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, int bSet)
         => _DTWAIN_EnableFeeder(Source, bSet);
+
+        public  int DTWAIN_EnableGetMessageLoop(DTWAIN_SOURCE Source, int bSet)
+        => _DTWAIN_EnableGetMessageLoop(Source, bSet);
 
         public  int DTWAIN_EnableGetMessageLoopDetection(int bEnable)
         => _DTWAIN_EnableGetMessageLoopDetection(bEnable);
@@ -6581,6 +6606,9 @@
 
         public  DTWAIN_ARRAY DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, int nWhichAcq)
         => _DTWAIN_GetAcquiredImageArray(aAcq, nWhichAcq);
+
+        public  DTWAIN_ARRAY DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source)
+        => _DTWAIN_GetAcquisitionArray(Source);
 
         public  int DTWAIN_GetActiveDSMPath([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen)
         => _DTWAIN_GetActiveDSMPath(lpszBuffer, nMaxLen);
@@ -7479,6 +7507,9 @@
         public  int DTWAIN_IsGetMessageLoopDetectionOn()
         => _DTWAIN_IsGetMessageLoopDetectionOn();
 
+        public  int DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source)
+        => _DTWAIN_IsGetMessageLoopEnabled(Source);
+
         public  int DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source)
         => _DTWAIN_IsIAFieldALastPageSupported(Source);
 
@@ -8360,6 +8391,9 @@
 
         public  int DTWAIN_UnlockMemoryEx(HANDLE h)
         => _DTWAIN_UnlockMemoryEx(h);
+
+        public  int DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib)
+        => _DTWAIN_UpdateCurrentAcquiredImage(Source, hNewDib);
 
         public  int DTWAIN_UseMultipleThreads(int bSet)
         => _DTWAIN_UseMultipleThreads(bSet);

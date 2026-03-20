@@ -54,13 +54,12 @@ void AcquireFile(BOOL bUseSource, LONG fileType);
 BOOL IsAllSpace(LPCTSTR p);
 void ToggleCheckedItem(UINT resId);
 BOOL GetToggleMenuState(UINT resID);
-BOOL IsTypeAvailable(LONG filetype);
 void DisplayLoggingOptions();
 void LoadLanguage(int message);
 void LoadLanguageStrings(LPCTSTR szLang);
 void DisplayCustomLangDlg();
-INT_PTR DisplayGetFileNameDlg();
 void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable);
+INT_PTR DisplayGetFileNameDlg();
 
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -104,55 +103,6 @@ typedef struct
     int  dtwainType;
 } AllFileTypes;
 
-AllTypes g_allTypes[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
-                            {_T("BMP File (RLE)"), DTWAIN_BMP_RLE, _T("test.bmp")},
-                            {_T("PCX File"),DTWAIN_PCX, _T("test.pcx")},
-                            {_T("Multi-page DCX File"),DTWAIN_DCX, _T("test.dcx")},
-                            {_T("Enhanced Meta File (EMF)"),DTWAIN_EMF, _T("test.emf")},
-                            {_T("GIF File"), DTWAIN_GIF, _T("test.gif")},
-                            {_T("JPEG File"), DTWAIN_JPEG, _T("test.jpg")},
-                            {_T("JPEG-2000 File"), DTWAIN_JPEG2000, _T("test.jp2")},
-                            {_T("JPEG-XR File"), DTWAIN_JPEGXR, _T("test.jxr")},
-                            {_T("Adobe PDF File"), DTWAIN_PDFMULTI, _T("test.pdf")},
-                            {_T("Postscript Level 1 File"), DTWAIN_POSTSCRIPT1MULTI, _T("test.ps")},
-                            {_T("Postscript Level 2 File"), DTWAIN_POSTSCRIPT2MULTI, _T("test.ps")},
-                            {_T("PNG File"), DTWAIN_PNG, _T("test.png")},
-                            {_T("Adobe Paintshop (PSD) File"), DTWAIN_PSD, _T("test.psd")},
-                            {_T("SVG File"), DTWAIN_SVG, _T("test.svg")},
-                            {_T("SVGZ File"), DTWAIN_SVGZ, _T("test.svgz")},
-                            {_T("Text File"), DTWAIN_TEXTMULTI, _T("test.txt")},
-                            {_T("TIFF (No compression)"), DTWAIN_TIFFNONEMULTI, _T("test.tif")},
-                            {_T("TIFF (CCITT Group 3)"), DTWAIN_TIFFG3MULTI, _T("test.tif")},
-                            {_T("TIFF (CCITT Group 4)"), DTWAIN_TIFFG4MULTI, _T("test.tif")},
-                            {_T("TIFF (JPEG compression)"), DTWAIN_TIFFJPEGMULTI, _T("test.tif")},
-                            {_T("TIFF (Packbits)"), DTWAIN_TIFFPACKBITSMULTI, _T("test.tif")},
-                            {_T("TIFF (Flate compression)"), DTWAIN_TIFFDEFLATEMULTI, _T("test.tif")},
-                            {_T("TIFF (LZW compression)"), DTWAIN_TIFFLZWMULTI, _T("test.tif")},
-                            {_T("BigTIFF (No compression)"), DTWAIN_BIGTIFFNONEMULTI, _T("test.tif")},
-                            {_T("BigTIFF (CCITT Group 3)"), DTWAIN_BIGTIFFG3MULTI, _T("test.tif")},
-                            {_T("BigTIFF (CCITT Group 4)"), DTWAIN_BIGTIFFG4MULTI, _T("test.tif")},
-                            {_T("BigTIFF (JPEG compression)"), DTWAIN_BIGTIFFJPEGMULTI, _T("test.tif")},
-                            {_T("BigTIFF (Packbits)"), DTWAIN_BIGTIFFPACKBITSMULTI, _T("test.tif")},
-                            {_T("BigTIFF (Flate compression)"), DTWAIN_BIGTIFFDEFLATEMULTI, _T("test.tif")},
-                            {_T("BigTIFF (LZW compression)"), DTWAIN_BIGTIFFLZWMULTI, _T("test.tif")},
-                            {_T("Targa (TGA) File"), DTWAIN_TGA, _T("test.tga")},
-                            {_T("Targa Run Length Encoded(TGA) File"), DTWAIN_TGA_RLE, _T("test.tga")},
-                            {_T("Windows Meta File (WMF)"), DTWAIN_WMF, _T("test.wmf")},
-                            {_T("Windows ICON File (ICO)"), DTWAIN_ICO_RESIZED, _T("test.ico")},
-                            {_T("Windows ICON File- Vista compatible (ICO)"), DTWAIN_ICO_VISTA, _T("test.ico")},
-                            {_T("Wireless Bitmap File (WBMP)"), DTWAIN_WBMP_RESIZED, _T("test.wbmp")},
-                            {_T("Google WebP (WEBP)"), DTWAIN_WEBP, _T("test.webp")},
-
-                        };
-
-AllTypes g_allTypesDemo[] = {{_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
-                            {_T("JPEG File"), DTWAIN_JPEG, _T("test.jpg")},
-                            {_T("Adobe PDF File"), DTWAIN_PDFMULTI, _T("test.pdf")},
-                            {_T("Text File"), DTWAIN_TEXTMULTI, _T("test.txt")},
-                            {_T("TIFF (No compression)"), DTWAIN_TIFFNONEMULTI, _T("test.tif")},
-                            {_T("TIFF (CCITT Group 4)"), DTWAIN_TIFFG4MULTI, _T("test.tif")},
-                       };
-
 AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("english")},
                                  {ID_LANGUAGE_FRENCH                , _T("french")},
                                  {ID_LANGUAGE_SPANISH               , _T("spanish")},
@@ -169,69 +119,66 @@ AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("engli
                                  {ID_LANGUAGE_KOREAN                , _T("korean")}
                                 };
 
-AllFileTypes g_allSourceModeTypes[] = { {IDM_ACQUIREFILESOURCE_WINDOWSBMP, DTWAIN_FF_BMP},
-                                              {IDM_ACQUIREFILESOURCE_JPEG, DTWAIN_FF_JFIF},
-                                              {IDM_ACQUIREFILESOURCE_TIFF, DTWAIN_FF_TIFF },
-                                              {IDM_ACQUIREFILESOURCE_TIFFMULTIPAGE, DTWAIN_FF_TIFFMULTI},
-                                              {IDM_ACQUIREFILESOURCE_PNG, DTWAIN_FF_PNG},
-                                              {IDM_ACQUIREFILESOURCE_PDF, DTWAIN_FF_PDF},
-                                              {IDM_ACQUIREFILESOURCE_PDFA, DTWAIN_FF_PDFA},
-                                              {IDM_ACQUIREFILESOURCE_PDFA2, DTWAIN_FF_PDFA2},
-                                              {IDM_ACQUIREFILESOURCE_PDFRASTER, DTWAIN_FF_PDFRASTER},
-                                              {IDM_ACQUIREFILESOURCE_FLASHPIX, DTWAIN_FF_FPX},
-                                              {IDM_ACQUIREFILESOURCE_EXIF, DTWAIN_FF_EXIF},
-                                              {IDM_ACQUIREFILESOURCE_SPIFF, DTWAIN_FF_SPIFF},
-                                              {IDM_ACQUIREFILESOURCE_XBM, DTWAIN_FF_XBM},
-                                              {IDM_ACQUIREFILESOURCE_PICT, DTWAIN_FF_PICT},
-                                              {IDM_ACQUIREFILESOURCE_JP2, DTWAIN_FF_JP2},
-                                              {IDM_ACQUIREFILESOURCE_JPX, DTWAIN_FF_JPX},
-                                              {IDM_ACQUIREFILESOURCE_DEJAVU, DTWAIN_FF_DEJAVU} };
-
-AllFileTypes g_allDTWAINFileTypes[] = 
-{
-        { IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION  ,  DTWAIN_BIGTIFFNONEMULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_GROUP3         ,  DTWAIN_BIGTIFFG3MULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_GROUP4         ,  DTWAIN_BIGTIFFG4MULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_FLATE          ,  DTWAIN_BIGTIFFDEFLATEMULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_JPEG           ,  DTWAIN_BIGTIFFJPEGMULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_LZW            ,  DTWAIN_BIGTIFFLZWMULTI },
-        { IDM_ACQUIREFILE_BIGTIFF_PACKBITS       ,  DTWAIN_BIGTIFFPACKBITS },
-        { IDM_ACQUIREFILE_BMP                    ,  DTWAIN_BMP },
-        { IDM_ACQUIREFILE_BMPRLE                 ,  DTWAIN_BMP_RLE },
-        { IDM_ACQUIREFILE_DCX                    ,  DTWAIN_DCX },
-        { IDM_ACQUIREFILE_ENHANCEDMETAFILE       ,  DTWAIN_EMF },
-        { IDM_ACQUIREFILE_GIF                    ,  DTWAIN_GIF },
-        { IDM_ACQUIREFILE_ICO                    ,  DTWAIN_ICO_RESIZED },
-        { IDM_ACQUIREFILE_ICOVISTA               ,  DTWAIN_ICO_VISTA },
-        { IDM_ACQUIREFILE_JPEG                   ,  DTWAIN_JPEG },
-        { IDM_ACQUIREFILE_JPEG2000               ,  DTWAIN_JPEG2000 },
-        { IDM_ACQUIREFILE_JPEGXR                 ,  DTWAIN_JPEGXR },
-        { IDM_ACQUIREFILE_PAINTSHOP              ,  DTWAIN_PSD },
-        { IDM_ACQUIREFILE_PCX                    ,  DTWAIN_PCX },
-        { IDM_ACQUIREFILE_PDF                    ,  DTWAIN_PDFMULTI },
-        { IDM_ACQUIREFILE_PNG                    ,  DTWAIN_PNG },
-        { IDM_ACQUIREFILE_POSTSCRIPTLEVEL1       ,  DTWAIN_POSTSCRIPT1MULTI },
-        { IDM_ACQUIREFILE_POSTSCRIPTLEVEL2       ,  DTWAIN_POSTSCRIPT2MULTI },
-        { IDM_ACQUIREFILE_SVG                    ,  DTWAIN_SVG },
-        { IDM_ACQUIREFILE_SVGZ                   ,  DTWAIN_SVGZ },
-        { IDM_ACQUIREFILE_TGA                    ,  DTWAIN_TGA },
-        { IDM_ACQUIREFILE_TGARLE                 ,  DTWAIN_TGA_RLE },
-        { IDM_ACQUIREFILE_TEXT                   ,  DTWAIN_TEXTMULTI },
-        { IDM_ACQUIREFILE_TIFF_NOCOMPRESSION     ,  DTWAIN_TIFFNONEMULTI },
-        { IDM_ACQUIREFILE_TIFF_GROUP3            ,  DTWAIN_TIFFG3MULTI },
-        { IDM_ACQUIREFILE_TIFF_GROUP4            ,  DTWAIN_TIFFG4MULTI },
-        { IDM_ACQUIREFILE_TIFF_FLATE             ,  DTWAIN_TIFFDEFLATEMULTI },
-        { IDM_ACQUIREFILE_TIFF_JPEG              ,  DTWAIN_TIFFJPEGMULTI },
-        { IDM_ACQUIREFILE_TIFF_LZW               ,  DTWAIN_TIFFLZWMULTI },
-        { IDM_ACQUIREFILE_TIFF_PACKBITS          ,  DTWAIN_TIFFPACKBITSMULTI },
-        { IDM_ACQUIREFILE_WEBP                   ,  DTWAIN_WEBP },
-        { IDM_ACQUIREFILE_WINDOWSMETAFILE        ,  DTWAIN_WMF },
-        { IDM_ACQUIREFILE_WIRELESSBITMAP         ,  DTWAIN_WBMP_RESIZED },
-};
+AllFileTypes g_allDTWAINFileTypes[] = {
+        {IDM_ACQUIREFILESOURCE_WINDOWSBMP, DTWAIN_FF_BMP},
+        {IDM_ACQUIREFILESOURCE_JPEG, DTWAIN_FF_JFIF},
+        {IDM_ACQUIREFILESOURCE_TIFF, DTWAIN_FF_TIFF },
+        {IDM_ACQUIREFILESOURCE_TIFFMULTIPAGE, DTWAIN_FF_TIFFMULTI},
+        {IDM_ACQUIREFILESOURCE_PNG, DTWAIN_FF_PNG},
+        {IDM_ACQUIREFILESOURCE_PDF, DTWAIN_FF_PDF},
+        {IDM_ACQUIREFILESOURCE_PDFA, DTWAIN_FF_PDFA},
+        {IDM_ACQUIREFILESOURCE_PDFA2, DTWAIN_FF_PDFA2},
+        {IDM_ACQUIREFILESOURCE_PDFRASTER, DTWAIN_FF_PDFRASTER},
+        {IDM_ACQUIREFILESOURCE_FLASHPIX, DTWAIN_FF_FPX},
+        {IDM_ACQUIREFILESOURCE_EXIF, DTWAIN_FF_EXIF},
+        {IDM_ACQUIREFILESOURCE_SPIFF, DTWAIN_FF_SPIFF},
+        {IDM_ACQUIREFILESOURCE_XBM, DTWAIN_FF_XBM},
+        {IDM_ACQUIREFILESOURCE_PICT, DTWAIN_FF_PICT},
+        {IDM_ACQUIREFILESOURCE_JP2, DTWAIN_FF_JP2},
+        {IDM_ACQUIREFILESOURCE_JPX, DTWAIN_FF_JPX},
+        {IDM_ACQUIREFILESOURCE_DEJAVU, DTWAIN_FF_DEJAVU},
+        {IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION  ,  DTWAIN_BIGTIFFNONEMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_GROUP3         ,  DTWAIN_BIGTIFFG3MULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_GROUP4         ,  DTWAIN_BIGTIFFG4MULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_FLATE          ,  DTWAIN_BIGTIFFDEFLATEMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_JPEG           ,  DTWAIN_BIGTIFFJPEGMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_LZW            ,  DTWAIN_BIGTIFFLZWMULTI },
+        {IDM_ACQUIREFILE_BIGTIFF_PACKBITS       ,  DTWAIN_BIGTIFFPACKBITS },
+        {IDM_ACQUIREFILE_BMP                    ,  DTWAIN_BMP },
+        {IDM_ACQUIREFILE_BMPRLE                 ,  DTWAIN_BMP_RLE },
+        {IDM_ACQUIREFILE_DCX                    ,  DTWAIN_DCX },
+        {IDM_ACQUIREFILE_ENHANCEDMETAFILE       ,  DTWAIN_EMF },
+        {IDM_ACQUIREFILE_GIF                    ,  DTWAIN_GIF },
+        {IDM_ACQUIREFILE_ICO                    ,  DTWAIN_ICO_RESIZED },
+        {IDM_ACQUIREFILE_ICOVISTA               ,  DTWAIN_ICO_VISTA },
+        {IDM_ACQUIREFILE_JPEG                   ,  DTWAIN_JPEG },
+        {IDM_ACQUIREFILE_JPEG2000               ,  DTWAIN_JPEG2000 },
+        {IDM_ACQUIREFILE_JPEGXR                 ,  DTWAIN_JPEGXR },
+        {IDM_ACQUIREFILE_PAINTSHOP              ,  DTWAIN_PSD },
+        {IDM_ACQUIREFILE_PCX                    ,  DTWAIN_PCX },
+        {IDM_ACQUIREFILE_PDF                    ,  DTWAIN_PDFMULTI },
+        {IDM_ACQUIREFILE_PNG                    ,  DTWAIN_PNG },
+        {IDM_ACQUIREFILE_POSTSCRIPTLEVEL1       ,  DTWAIN_POSTSCRIPT1MULTI },
+        {IDM_ACQUIREFILE_POSTSCRIPTLEVEL2       ,  DTWAIN_POSTSCRIPT2MULTI },
+        {IDM_ACQUIREFILE_SVG                    ,  DTWAIN_SVG },
+        {IDM_ACQUIREFILE_SVGZ                   ,  DTWAIN_SVGZ },
+        {IDM_ACQUIREFILE_TGA                    ,  DTWAIN_TGA },
+        {IDM_ACQUIREFILE_TGARLE                 ,  DTWAIN_TGA_RLE },
+        {IDM_ACQUIREFILE_TEXT                   ,  DTWAIN_TEXTMULTI },
+        {IDM_ACQUIREFILE_TIFF_NOCOMPRESSION     ,  DTWAIN_TIFFNONEMULTI },
+        {IDM_ACQUIREFILE_TIFF_GROUP3            ,  DTWAIN_TIFFG3MULTI },
+        {IDM_ACQUIREFILE_TIFF_GROUP4            ,  DTWAIN_TIFFG4MULTI },
+        {IDM_ACQUIREFILE_TIFF_FLATE             ,  DTWAIN_TIFFDEFLATEMULTI },
+        {IDM_ACQUIREFILE_TIFF_JPEG              ,  DTWAIN_TIFFJPEGMULTI },
+        {IDM_ACQUIREFILE_TIFF_LZW               ,  DTWAIN_TIFFLZWMULTI },
+        {IDM_ACQUIREFILE_TIFF_PACKBITS          ,  DTWAIN_TIFFPACKBITSMULTI },
+        {IDM_ACQUIREFILE_WEBP                   ,  DTWAIN_WEBP },
+        {IDM_ACQUIREFILE_WINDOWSMETAFILE        ,  DTWAIN_WMF },
+        {IDM_ACQUIREFILE_WIRELESSBITMAP         ,  DTWAIN_WBMP_RESIZED },
+    };
 
 const UINT nFirstAcquireSourceID = IDM_ACQUIREFILESOURCE_WINDOWSBMP;
 const UINT nLastAcquireSourceID = IDM_ACQUIREFILESOURCE_DEJAVU;
-const UINT numSourceModeTypes = sizeof(g_allSourceModeTypes) / sizeof(g_allSourceModeTypes[0]);
 
 const UINT nFirstAcquireFileID = IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION;
 const UINT nLastAcquireFileID = IDM_ACQUIREFILE_WIRELESSBITMAP;
@@ -388,33 +335,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             /* See if the acquisition is to a file using source mode */
             UINT i;
-            if (wmId >= nFirstAcquireSourceID && wmId <= nLastAcquireSourceID)
-            {
-                for (i = 0; i < numSourceModeTypes; ++i)
-                {
-                    if (g_allSourceModeTypes[i].resourceId == wmId)
-                    {
-                        AcquireFile(TRUE, g_allSourceModeTypes[i].dtwainType);
-                        break;
-                    }
-                }
-                return 0;
-            }
-
-            /* See if the acquisition is to a file */
-            if (wmId >= nFirstAcquireFileID && wmId <= nLastAcquireFileID)
+            if (wmId >= nFirstAcquireSourceID && wmId <= nLastAcquireFileID)
             {
                 for (i = 0; i < numDTWAINFileTypes; ++i)
                 {
                     if (g_allDTWAINFileTypes[i].resourceId == wmId)
                     {
-                        AcquireFile(FALSE, g_allDTWAINFileTypes[i].dtwainType);
+                        g_FileType = g_allDTWAINFileTypes[i].dtwainType;
+                        AcquireFile(g_allDTWAINFileTypes[i].resourceId < nFirstAcquireFileID, g_allDTWAINFileTypes[i].dtwainType);
                         break;
                     }
                 }
                 return 0;
             }
-
 
             /* Parse the menu selections : */
             switch (wmId)
@@ -583,6 +516,14 @@ BOOL GetToggleMenuState(UINT resID)
     if ( nState != -1 )
         return (nState & MF_CHECKED)?TRUE:FALSE;
     return TRUE;
+}
+
+BOOL IsMenuItemEnabled(UINT resID) 
+{
+	UINT nState = GetMenuState(g_Menu, resID, MF_BYCOMMAND);
+	if (nState != -1)
+		return (nState & (MF_DISABLED | MF_GRAYED)) ? FALSE: TRUE;
+	return FALSE;
 }
 
 void SelectTheSource(int nWhich)
@@ -1372,96 +1313,6 @@ LRESULT CALLBACK DisplayAcquireSettingsProc(HWND hDlg, UINT message, WPARAM wPar
 }
 
 
-LRESULT CALLBACK DisplayFileTypesProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    static HWND hWndCombo;
-    static HWND hWndEdit;
-    switch (message)
-    {
-        case WM_INITDIALOG:
-        {
-            int i;
-            int nTypes = sizeof(g_allTypes) / sizeof(g_allTypes[0]);
-            hWndCombo = GetDlgItem(hDlg, IDC_cmbFileType);
-            hWndEdit = GetDlgItem(hDlg, IDC_edFileName);
-            for (i = 0; i < nTypes; ++i )
-                SendMessage(hWndCombo, CB_ADDSTRING, 0, (LPARAM)g_allTypes[i].fType);
-            SendMessage(hWndCombo, CB_SETCURSEL, 0, 0);
-            SendMessage(hWndEdit, WM_SETTEXT, 0, (LPARAM)g_allTypes[0].defName);
-            return TRUE;
-        }
-        break;
-
-        case WM_COMMAND:
-        {
-            int nControl = LOWORD(wParam);
-            int nNotification = HIWORD(wParam);
-
-            switch( nControl )
-            {
-                /* Quit the dialog */
-                case IDOK:
-                {
-                    /* Get the current selection */
-                        SendMessage( hWndEdit, WM_GETTEXT, 256, (LPARAM)g_FileName);
-
-                    if ( g_FileName[0] == 0 || IsAllSpace(g_FileName))
-                    {
-                        MessageBox(hDlg, _T("A file name must be entered"), _T("Error"), MB_ICONSTOP);
-                    }
-                    else
-                    {
-                        g_FileType = g_allTypes[(int)SendMessage(hWndCombo, CB_GETCURSEL, 0, 0)].DTWAINType;
-                        if ( nDTwainType & DTWAIN_DEMODLL_VERSION ) 
-                        {
-                            if ( !IsTypeAvailable(g_FileType) )
-                            {
-                                MessageBox(hDlg, _T("Sorry.  This file type is not available in the demo version of DTWAIN"), _T("Error"), MB_ICONSTOP);
-                                return TRUE;
-                            }
-                        }
-                        EndDialog(hDlg, 1);
-                    }
-                }
-                break;
-                case IDCANCEL:
-                     g_FileType = g_allTypes[(int)SendMessage(hWndCombo, CB_GETCURSEL, 0, 0)].DTWAINType;
-                     EndDialog(hDlg, 0);
-                break;
-                case IDC_cmbFileType:
-                {
-                    if ( nNotification == CBN_SELCHANGE )
-                    {
-                        /* Set the default file name */
-                        LRESULT nCurSel = SendMessage( hWndCombo, CB_GETCURSEL, 0, 0);
-                        SendMessage(hWndEdit, WM_SETTEXT, 0, (LPARAM)g_allTypes[nCurSel].defName);
-                    }
-                }
-                break;
-            }
-        }
-        break;
-    }
-    return FALSE;
-}
-
-BOOL IsTypeAvailable(LONG lFileType)
-{
-    if ( nDTwainType & DTWAIN_DEMODLL_VERSION )
-    {
-       return ( lFileType == DTWAIN_BMP ||
-           lFileType == DTWAIN_PDF ||
-           lFileType == DTWAIN_PDFMULTI ||
-           lFileType == DTWAIN_TIFFNONE ||
-           lFileType == DTWAIN_TIFFNONEMULTI ||
-           lFileType == DTWAIN_TIFFG4 ||
-           lFileType == DTWAIN_TIFFG4MULTI ||
-           lFileType == DTWAIN_TEXT ||
-           lFileType == DTWAIN_TEXTMULTI );
-    }
-    return TRUE;
-}
-
 // Message handler for about box.
 LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1544,15 +1395,17 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
 
         case DTWAIN_TN_TRANSFERDONE:
         {
-            BOOL showBarCodes = GetToggleMenuState(IDM_SHOW_BARCODEINFO);
+            BOOL showBarCodes = GetToggleMenuState(IDM_SHOW_BARCODEINFO) && IsMenuItemEnabled(IDM_SHOW_BARCODEINFO);
             if (showBarCodes)
                 DisplayBarCodeInfo();
         }
         break;
+
         /* See if we want to keep the DIB */
         case DTWAIN_TN_QUERYPAGEDISCARD:
         {
             LRESULT retVal;
+
             /* First let's see if menu option is checked */
             BOOL showPreview = GetToggleMenuState(IDM_SHOW_PREVIEW);
             if (!showPreview)
@@ -1636,6 +1489,7 @@ void EnableAllMenuItems(BOOL bEnable)
         EnableMenuItem(g_Menu, g_AllMenuItems[i], nOptions);
     EnableBarcodeMenuItem(g_CurrentSource);
     EnableFileXFerMenuItems(g_CurrentSource, bEnable);
+    EnableMenuItem(g_Menu, IDM_ACQUIRETEST_USEGETMESSAGE, nOptions);
 }
 
 void DisableFileXFerSubItems()
@@ -1704,7 +1558,7 @@ void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable)
                 DTWAIN_ArrayGetAtLong(arrFileTypes, i, &fileType);
                 for (nFound = nFirstAcquireSourceID; nFound <= nLastAcquireSourceID; ++nFound, ++curId)
                 {
-                    if (g_allSourceModeTypes[curId].dtwainType == fileType)
+                    if (g_allDTWAINFileTypes[curId].dtwainType == fileType)
                     {
                         EnableMenuItem(hSubMenu2, curId, MF_BYPOSITION | MF_ENABLED);
                         break;
