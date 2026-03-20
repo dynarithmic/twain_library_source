@@ -2649,10 +2649,10 @@ func Load_DTWAINDLL(path string) (*DTWAIN_DLL, error) {
     arr[879] = "DTWAIN_RemovePDFTextElement"
     arr[880] = "DTWAIN_ResetPDFTextElement"
     arr[881] = "DTWAIN_RewindPage"
-    arr[882] = "DTWAIN_RotateDIB"
-    arr[883] = "DTWAIN_RotateDIBString"
-    arr[884] = "DTWAIN_RotateDIBStringA"
-    arr[885] = "DTWAIN_RotateDIBStringW"
+    arr[882] = "DTWAIN_RotateImage"
+    arr[883] = "DTWAIN_RotateImageString"
+    arr[884] = "DTWAIN_RotateImageStringA"
+    arr[885] = "DTWAIN_RotateImageStringW"
     arr[886] = "DTWAIN_SelectDefaultOCREngine"
     arr[887] = "DTWAIN_SelectDefaultSource"
     arr[888] = "DTWAIN_SelectDefaultSourceWithOpen"
@@ -8343,27 +8343,27 @@ func (d *DTWAIN_DLL) DTWAIN_RewindPage(Source DTWAIN_SOURCE) int32 {
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_RotateDIB(hDib HANDLE, rotationAngle float64) HANDLE {
-    theProc := d.procs["DTWAIN_RotateDIB"]
+func (d *DTWAIN_DLL) DTWAIN_RotateImage(hDib HANDLE, rotationAngle float64) HANDLE {
+    theProc := d.procs["DTWAIN_RotateImage"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(hDib), uintptr(rotationAngle))
     return HANDLE(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_RotateDIBString(hDib HANDLE, rotationAngle uintptr) HANDLE {
-    theProc := d.procs["DTWAIN_RotateDIBString"]
+func (d *DTWAIN_DLL) DTWAIN_RotateImageString(hDib HANDLE, rotationAngle uintptr) HANDLE {
+    theProc := d.procs["DTWAIN_RotateImageString"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(hDib), rotationAngle)
     return HANDLE(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_RotateDIBStringA(hDib HANDLE, rotationAngle string) HANDLE {
-    theProc := d.procs["DTWAIN_RotateDIBStringA"]
+func (d *DTWAIN_DLL) DTWAIN_RotateImageStringA(hDib HANDLE, rotationAngle string) HANDLE {
+    theProc := d.procs["DTWAIN_RotateImageStringA"]
     arg_0 := []byte(rotationAngle)
     v1, _, _ := syscall.SyscallN(theProc, uintptr(hDib), uintptr(unsafe.Pointer(&arg_0[0])))
     return HANDLE(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_RotateDIBStringW(hDib HANDLE, rotationAngle uintptr) HANDLE {
-    theProc := d.procs["DTWAIN_RotateDIBStringW"]
+func (d *DTWAIN_DLL) DTWAIN_RotateImageStringW(hDib HANDLE, rotationAngle uintptr) HANDLE {
+    theProc := d.procs["DTWAIN_RotateImageStringW"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(hDib), rotationAngle)
     return HANDLE(v1)
 }

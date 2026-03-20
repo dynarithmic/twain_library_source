@@ -4032,10 +4032,10 @@ namespace Dynarithmic
         public static extern int DTWAIN_RewindPage(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern HANDLE DTWAIN_RotateDIB(HANDLE hDib, DTWAIN_FLOAT rotationAngle);
+        public static extern HANDLE DTWAIN_RotateImage(HANDLE hDib, DTWAIN_FLOAT rotationAngle);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern HANDLE DTWAIN_RotateDIBString(HANDLE hDib, [MarshalAs(UnmanagedType.LPTStr)] string rotationAngle);
+        public static extern HANDLE DTWAIN_RotateImageString(HANDLE hDib, [MarshalAs(UnmanagedType.LPTStr)] string rotationAngle);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern DTWAIN_OCRENGINE DTWAIN_SelectDefaultOCREngine();
