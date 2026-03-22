@@ -99,7 +99,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if ( !pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_FIRST )
     {
         // Check for the Postscript option
-        if ( m_ImageInfoEx.IsPostscript )
+        if ( m_ImageInfoEx.IsPostscript && m_ImageInfoEx.theSource )
         {
             CTL_StringType szTempPath;
             // This is a postscript save, so

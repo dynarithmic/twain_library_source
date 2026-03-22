@@ -616,7 +616,6 @@ namespace dynarithmic
         static HINSTANCE GetDLLInstanceHandle() { return s_StaticData.s_DLLInstance; }
         static CTL_GeneralErrorInfo& GetGeneralErrorInfoMap() { return s_StaticData.s_mapGeneralErrorInfo; }
         static void SetDLLInstanceHandle(HINSTANCE h) { s_StaticData.s_DLLInstance = h; }
-        static auto& GetErrorFilterFlags() { return s_StaticData.s_logFilterFlags; }
         static ImageResamplerMap& GetImageResamplerMap() { return s_StaticData.s_ImageResamplerMap; }
         static SourceStatusMap& GetSourceStatusMap() { return s_StaticData.s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_StaticData.s_ResourceVersion; }
