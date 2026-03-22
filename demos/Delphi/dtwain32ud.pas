@@ -2734,10 +2734,10 @@ function DTWAIN_RangeSetValueLong(pArray:DTWAIN_RANGE; nWhich:LONG; Val:LONG) : 
 function DTWAIN_RemovePDFTextElement(Source:DTWAIN_SOURCE; TextElement:DTWAIN_PDFTEXTELEMENT) : BOOL; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_RemovePDFTextElement';
 function DTWAIN_ResetPDFTextElement(TextElement:DTWAIN_PDFTEXTELEMENT) : BOOL; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_ResetPDFTextElement';
 function DTWAIN_RewindPage(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_RewindPage';
-function DTWAIN_RotateDIB(hDib:NativeInt; rotationAngle:DTWAIN_FLOAT) : NativeInt; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_RotateDIB';
-function DTWAIN_RotateDIBString(hDib:NativeInt; rotationAngle:LPCTSTR) : NativeInt; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_RotateDIBString';
-function DTWAIN_RotateDIBStringA(hDib:NativeInt; rotationAngle:LPCSTR) : NativeInt; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_RotateDIBStringA';
-function DTWAIN_RotateDIBStringW(hDib:NativeInt; rotationAngle:LPCWSTR) : NativeInt; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_RotateDIBStringW';
+function DTWAIN_RotateImage(hDib:NativeInt; rotationAngle:DTWAIN_FLOAT) : NativeInt; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_RotateImage';
+function DTWAIN_RotateImageString(hDib:NativeInt; rotationAngle:LPCTSTR) : NativeInt; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_RotateImageString';
+function DTWAIN_RotateImageStringA(hDib:NativeInt; rotationAngle:LPCSTR) : NativeInt; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_RotateImageStringA';
+function DTWAIN_RotateImageStringW(hDib:NativeInt; rotationAngle:LPCWSTR) : NativeInt; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_RotateImageStringW';
 function DTWAIN_SelectDefaultOCREngine : DTWAIN_OCRENGINE; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_SelectDefaultOCREngine';
 function DTWAIN_SelectDefaultSource : DTWAIN_SOURCE; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_SelectDefaultSource';
 function DTWAIN_SelectDefaultSourceWithOpen(bOpen:BOOL) : DTWAIN_SOURCE; stdcall;  external 'dtwain32ud.dll'  name 'DTWAIN_SelectDefaultSourceWithOpen';

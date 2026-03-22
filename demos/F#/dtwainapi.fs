@@ -3887,10 +3887,10 @@ module TwainAPI =
     type DTWAIN_RewindPageDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_RotateDIBDelegate = delegate of HANDLE * DTWAIN_FLOAT -> HANDLE
+    type DTWAIN_RotateImageDelegate = delegate of HANDLE * DTWAIN_FLOAT -> HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_RotateDIBStringDelegate = delegate of HANDLE * string -> HANDLE
+    type DTWAIN_RotateImageStringDelegate = delegate of HANDLE * string -> HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SelectDefaultOCREngineDelegate = delegate of unit -> DTWAIN_OCRENGINE
@@ -5085,8 +5085,8 @@ module TwainAPI =
     let private RemovePDFTextElement = lazy (DynamicDll.Bind "DTWAIN_RemovePDFTextElement" : DTWAIN_RemovePDFTextElementDelegate)
     let private ResetPDFTextElement = lazy (DynamicDll.Bind "DTWAIN_ResetPDFTextElement" : DTWAIN_ResetPDFTextElementDelegate)
     let private RewindPage = lazy (DynamicDll.Bind "DTWAIN_RewindPage" : DTWAIN_RewindPageDelegate)
-    let private RotateDIB = lazy (DynamicDll.Bind "DTWAIN_RotateDIB" : DTWAIN_RotateDIBDelegate)
-    let private RotateDIBString = lazy (DynamicDll.Bind "DTWAIN_RotateDIBString" : DTWAIN_RotateDIBStringDelegate)
+    let private RotateImage = lazy (DynamicDll.Bind "DTWAIN_RotateImage" : DTWAIN_RotateImageDelegate)
+    let private RotateImageString = lazy (DynamicDll.Bind "DTWAIN_RotateImageString" : DTWAIN_RotateImageStringDelegate)
     let private SelectDefaultOCREngine = lazy (DynamicDll.Bind "DTWAIN_SelectDefaultOCREngine" : DTWAIN_SelectDefaultOCREngineDelegate)
     let private SelectDefaultSource = lazy (DynamicDll.Bind "DTWAIN_SelectDefaultSource" : DTWAIN_SelectDefaultSourceDelegate)
     let private SelectDefaultSourceWithOpen = lazy (DynamicDll.Bind "DTWAIN_SelectDefaultSourceWithOpen" : DTWAIN_SelectDefaultSourceWithOpenDelegate)
@@ -7980,13 +7980,13 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         RewindPage.Value.Invoke(source)
 
-    let DTWAIN_RotateDIB (hdib: HANDLE) (rotationangle: DTWAIN_FLOAT) : HANDLE =
+    let DTWAIN_RotateImage (hdib: HANDLE) (rotationangle: DTWAIN_FLOAT) : HANDLE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        RotateDIB.Value.Invoke(hdib, rotationangle)
+        RotateImage.Value.Invoke(hdib, rotationangle)
 
-    let DTWAIN_RotateDIBString (hdib: HANDLE) (rotationangle: string) : HANDLE =
+    let DTWAIN_RotateImageString (hdib: HANDLE) (rotationangle: string) : HANDLE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        RotateDIBString.Value.Invoke(hdib, rotationangle)
+        RotateImageString.Value.Invoke(hdib, rotationangle)
 
     let DTWAIN_SelectDefaultOCREngine() : DTWAIN_OCRENGINE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
