@@ -610,7 +610,7 @@ void TestGetCap(HWND hWnd, LONG capValue)
                         if (nDataType == TWTY_INT32 || nDataType == TWTY_INT16)
                             sprintf(szTempBuf, "%d", lVal);
                         else
-                            sprintf(szTempBuf, "%u", lVal);
+                            sprintf(szTempBuf, "%u", (TW_UINT32)lVal);
                         DTWAIN_GetTwainNameFromConstantExA(nTranslationID, lVal, szValues, 256);
 
                         // Name does not really exist
