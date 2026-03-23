@@ -290,8 +290,13 @@ namespace dynarithmic
         if ( !bOk )
             return { false, DTWAIN_ERR_GETCAP_FAILED };
 
-        *pAssign = Array[0];
-        return { true, DTWAIN_NO_ERROR };
+        if (!Array.empty())
+        {
+            *pAssign = Array[0];
+            return { true, DTWAIN_NO_ERROR };
+        }
+        *pAssign = TwainType{};
+		return { false, DTWAIN_ERR_GETCAP_FAILED };
     }
 
     template <class T>

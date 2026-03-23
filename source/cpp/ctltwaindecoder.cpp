@@ -134,27 +134,27 @@ void CTL_TWAINTypeDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest
     std::string pMemRefStr;
 
     // Decode the pSource argument
-    auto lErrorFilter = CTL_StaticData::GetErrorFilterFlags();
+    auto logFilterFlags = CTL_StaticData::GetLogFilterFlags();
     if ( nDG == DG_CONTROL && nDAT == DAT_EVENT && nMSG == MSG_PROCESSEVENT )
     {
-        if (!(lErrorFilter & DTWAIN_LOG_DECODE_TWEVENT) )
+        if (!(logFilterFlags & DTWAIN_LOG_DECODE_TWEVENT) )
             return;
     }
-    if ( lErrorFilter & DTWAIN_LOG_DECODE_SOURCE )
+    if ( logFilterFlags & DTWAIN_LOG_DECODE_SOURCE )
     {
         pSourceStr = DecodeSourceInfo(pSource, "pSource");
         pSourceStr += "\n";
     }
 
     // Decode the pDest argument
-    if ( lErrorFilter & DTWAIN_LOG_DECODE_DEST)
+    if ( logFilterFlags & DTWAIN_LOG_DECODE_DEST)
     {
         pDestStr   = DecodeSourceInfo(pDest, "pDest");
         pDestStr += "\n";
     }
 
     // Decode the TW_MEMREF structure
-    if ( lErrorFilter & DTWAIN_LOG_DECODE_TWMEMREF)
+    if ( logFilterFlags & DTWAIN_LOG_DECODE_TWMEMREF)
         pMemRefStr = DecodeData(this, Data, sType);
 
     m_pString = s1 + pSourceStr;
@@ -270,8 +270,8 @@ std::string DecodeData(CTL_TWAINTypeDecoder* pDecoder, TW_MEMREF pData, ErrorStr
 
             case ERRSTRUCT_TW_EVENT:
             {
-                auto lErrorFlags = CTL_StaticData::GetErrorFilterFlags();
-                if ( lErrorFlags & DTWAIN_LOG_DECODE_TWEVENT )
+                auto logFilterFlags = CTL_StaticData::GetLogFilterFlags();
+                if ( logFilterFlags & DTWAIN_LOG_DECODE_TWEVENT )
                 {
                     auto p = static_cast<pTW_EVENT>(pData);
                     MSG *pmsg = static_cast<MSG*>(p->pEvent);
