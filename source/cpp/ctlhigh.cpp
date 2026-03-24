@@ -42,7 +42,7 @@
 #endif
 using namespace dynarithmic;
 
-static bool GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue );
+static std::pair<bool, int> GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue );
 static LONG GetAllCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetCurrentCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetDefaultCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
@@ -906,31 +906,40 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLO
     }
 	DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return lCap == 0; }, DTWAIN_ERR_CAP_NO_SUPPORT,
 		                                         false, FUNC_MACRO, false, { pCapName });
-    const DTWAIN_BOOL bRet = GetDoubleCap( pSource, lCap, Resolution);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    auto bRet = GetDoubleCap( pSource, lCap, Resolution);
+    if ( !bRet.first )
+		DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return true; }, bRet.second,
+			false, FUNC_MACRO, false, { pCapName });
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first)
     CATCH_BLOCK(FALSE)
 }
 
-static bool GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue )
+static std::pair<bool, int> GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue )
 {
-    double *pRealValue = pValue;
+	const auto pHandle = pSource->GetDTWAINHandle();
+	if (!pValue)
+	{
+		pHandle->m_lLastError = DTWAIN_ERR_INVALID_PARAM;
+		return  { false, DTWAIN_ERR_INVALID_PARAM };
+	}
+	double* pRealValue = pValue;
     if (DTWAIN_GetCapDataType(pSource, lCap) != TWTY_FIX32)
-        return false;
+        return { false, DTWAIN_ERR_BAD_CAPTYPE };
     DTWAIN_ARRAY Array = nullptr;
-    const auto pHandle = pSource->GetDTWAINHandle();
     bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
-        return false;
+        return { false, pHandle->m_lLastError };
+
     DTWAINArrayLowLevelPtr_RAII arr(pHandle, &Array);
     const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<double>(Array);
     if ( bRet && Array )
     {
-        if ( vIn.empty() )
-            bRet = false;
+        if (vIn.empty())
+            return { false, DTWAIN_ERR_GETCAP_FAILED };
         else
             *pRealValue = vIn[0];
     }
-    return bRet;
+    return { true, DTWAIN_NO_ERROR };
 }
 
 static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, LONG GetType, DTWAIN_BOOL bExpandRange)
