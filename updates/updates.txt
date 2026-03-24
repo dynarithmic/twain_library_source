@@ -148,6 +148,9 @@ DTWAIN Version changes
   cap values.  This can occur if the client program calls either of the 
   DTWAIN_GetCapValuesEx... functions using the wrong data type.
 
+- Fixed wrong error code being returned if a DTWAIN function that requires the DTWAIN
+  DLL to be initialized is called.
+
 
 5.8.1
 
