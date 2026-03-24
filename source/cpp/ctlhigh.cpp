@@ -65,20 +65,32 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
 #endif
 
 template <typename CapArrayType>
-static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
-                                 GetCapValuesFn /*capFn*/)
+static std::pair<bool, int> GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
+                                          GetCapValuesFn /*capFn*/)
 {
+	auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_VERIFY_SOURCEHANDLE_SETLASTERROR | DTWAIN_VERIFY_SOURCEHANDLE 
+                                                    | DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
+    if (!pSource || !pHandle)
+		return  { false, pHandle?pHandle->m_lLastError:DTWAIN_ERR_BAD_HANDLE };
+    if (!value)
+    {
+        pHandle->m_lLastError = DTWAIN_ERR_INVALID_PARAM;
+        return  { false, DTWAIN_ERR_INVALID_PARAM };
+    }
     DTWAIN_ARRAY ArrayValues = nullptr;
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, GetCurrentCapValues);
     DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ArrayValues);
     if (retVal > 0 && ArrayValues)
     {
         auto& vOut = pHandle->m_ArrayFactory->underlying_container_t<typename CapArrayType::value_type>(ArrayValues);
-        *value = vOut[0];
-        return true;
+        if (!vOut.empty())
+        {
+            *value = vOut[0];
+            return { true, DTWAIN_NO_ERROR };
+        }
     }
-    return false;
+    pHandle->m_lLastError = DTWAIN_ERR_GETCAP_FAILED;
+	return { false, DTWAIN_ERR_GETCAP_FAILED };
 }
 
 template <typename CapDataType>
@@ -349,7 +361,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     {\
        LOG_FUNC_ENTRY_PARAMS((Source, value)) \
        auto bRet = GetCapability<CapDataType>(Source, Cap, value, CapFn); \
-       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first); \
        CATCH_BLOCK(false) \
     }
 
@@ -359,7 +371,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
        LOG_FUNC_ENTRY_PARAMS((Source)) \
        CapDataType::value_type value = {}; \
        auto bRet = GetCapability<CapDataType>(Source, Cap, &value, CapFn); \
-       LOG_FUNC_EXIT_NONAME_PARAMS(bRet?value : errorRetValue); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first?value : errorRetValue); \
        CATCH_BLOCK(errorRetValue) \
     }
 
@@ -377,12 +389,12 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType::value_type* value, DTWAIN_BOOL bCurrent)\
     {\
         LOG_FUNC_ENTRY_PARAMS((Source, value, bCurrent)) \
-        DTWAIN_BOOL bRet = FALSE; \
+        std::pair <bool, int> bRet = {}; \
         if ( bCurrent ) \
             bRet = GetCapability<CapDataType>(Source, Cap, value, GetCurrentCapValues); \
         else \
             bRet = GetCapability<CapDataType>(Source, Cap, value, GetDefaultCapValues); \
-       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first); \
        CATCH_BLOCK(false) \
     }
 

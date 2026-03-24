@@ -488,7 +488,7 @@ namespace dynarithmic
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
-        int                          s_nLoadingError = DTWAIN_NO_ERROR;
+        int                          s_nLoadingError = DTWAIN_ERR_BAD_HANDLE;
         bool                         s_bINIFileLoaded = false;
         bool                         s_bDoResampling = true;
         bool                         s_bCheckHandles = true;
