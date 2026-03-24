@@ -101,7 +101,7 @@ DTWAIN Version changes
   changing the DIB both when the image is retrieved directly from the device, and after the 
   image has been resampled.
 
-= Reordered ordinal numbers used in the DTWAIN DLL to have consecutive numbering.  The reordering
+- Reordered ordinal numbers used in the DTWAIN DLL to have consecutive numbering.  The reordering
   of the ordinal numbers reduces the size of the DTWAIN DLL.
 
   This should affect a very small number of users who are using a programming environment that
