@@ -29,7 +29,7 @@ int CTL_WebpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if (!m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
 
-    if (!IsValidBitDepth(DTWAIN_PSD, m_pDib->GetBitsPerPixel()))
+    if (!IsValidBitDepth(DTWAIN_WEBP, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
     m_SaveParams.hDib = hDib;

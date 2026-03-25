@@ -914,7 +914,14 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 auto& appTitle = CTL_StaticData::GetAppTitle();
                 appTitle.resize(256, '\0');
                 auto nSize = GetResourceStringA(IDS_DTWAIN_APPTITLE, &appTitle[0], 255);
-                appTitle.resize(nSize);
+                if ( nSize != 0)
+                    appTitle.resize(nSize - 1);
+
+                auto& appTitleHTML = CTL_StaticData::GetAppTitleHTML();
+				appTitleHTML.resize(256, '\0');
+				nSize = GetResourceStringA(IDS_DTWAIN_APPTITLE_HTML, &appTitleHTML[0], 255);
+				if (nSize != 0)
+					appTitleHTML.resize(nSize - 1);
             }
             LOG_FUNC_ENTRY_PARAMS(())
             LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<DTWAIN_HANDLE>(pHandle))

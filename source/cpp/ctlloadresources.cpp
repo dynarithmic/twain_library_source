@@ -366,7 +366,7 @@ namespace dynarithmic
 
                 // Get all the names associated with this constant
                 std::vector<std::string> saNames;
-                if (twainValue == IDS_DTWAIN_APPTITLE)
+                if (twainValue == IDS_DTWAIN_APPTITLE || twainValue == IDS_DTWAIN_APPTITLE_HTML)
                     saNames.push_back(name);
                 else
                     StringWrapperA::Tokenize(name, ", ", saNames);
@@ -385,12 +385,12 @@ namespace dynarithmic
                 // Always insert the special name that has more than one entry
                 if (bPlaceInMap)
                 {
-                if (saNames.size() > 1)
-                    stringToConstantMap.insert({ name, twainValue });
+                    if (saNames.size() > 1)
+                        stringToConstantMap.insert({ name, twainValue });
 
-                // Insert the actual entries
-                for (auto& oneName : saNames)
-                    stringToConstantMap.insert({ oneName, twainValue });
+                    // Insert the actual entries
+                    for (auto& oneName : saNames)
+                        stringToConstantMap.insert({ oneName, twainValue });
                 }
             }
         }
@@ -707,13 +707,17 @@ namespace dynarithmic
                 while (strm >> resourceID)
                 {
                     getline(strm, descr);
-                    if (resourceID == IDS_DTWAIN_APPTITLE)
+                    if (resourceID == IDS_DTWAIN_APPTITLE || resourceID == IDS_DTWAIN_APPTITLE_HTML)
                         descr = StringConversion::Convert_Native_To_Ansi(
-                            CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, IDS_DTWAIN_APPTITLE).second);
+                            CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, resourceID).second);
                     StringWrapperA::TrimAll(descr);
                     descr = StringWrapperA::ReplaceAll(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
                     descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
-                    descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                    if (resourceID == IDS_DTWAIN_APPTITLE)
+                        descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                    else
+                    if (resourceID == IDS_DTWAIN_APPTITLE_HTML)
+						descr = StringWrapperA::ReplaceAll(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
                     resourceMap.insert({ resourceID, descr });
                 }
             }
