@@ -23,7 +23,6 @@
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4786)
-#pragma warning (disable : 4786)
 #pragma warning (disable : 4127)
 #endif
 
@@ -534,6 +533,7 @@ namespace dynarithmic
         CTL_FileSaveMap          s_FileSaveMap;
         CTL_CompressionMap       s_CompressionMap;
         std::string              s_AppTitle;
+        std::string              s_AppTitleHTML;
         std::pair<int32_t, int32_t> s_SavedSelectSourcePos;
         CTL_TEXTELEMENTPTRLIST   s_PDFTextElementList;
         int64_t                  s_logFileSaveThreshold = -1LL;
@@ -625,6 +625,7 @@ namespace dynarithmic
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
         static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
         static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
+        static std::string& GetAppTitleHTML() { return s_StaticData.s_AppTitleHTML; }
         static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
         static auto& GetPDFTextElementList() { return s_StaticData.s_PDFTextElementList; }
         static auto& GetLogFileSaveThreshold() { return s_StaticData.s_logFileSaveThreshold; }
@@ -1136,6 +1137,7 @@ namespace dynarithmic
     LONG  TS_Command(LPCTSTR lpCommand);
 
     #define IDS_DTWAIN_APPTITLE       9700
+    #define IDS_DTWAIN_APPTITLE_HTML  9701
 
     #define IDS_LIMITEDFUNCMSG1     8894
     #define IDS_LIMITEDFUNCMSG2     8895

@@ -127,13 +127,28 @@ bool IsLikelyLineArt(const BITMAPINFOHEADER& bih)
 	return false;
 }
 
+static std::string CreateMetaData()
+{
+	std::string& appTitle = CTL_StaticData::GetAppTitleHTML();
+	std::string sMetaData = "    <metadata>\n";
+	sMetaData += "      <rdf:RDF>\n";
+	sMetaData += "        <rdf:Description>\n";
+	sMetaData += "          <dc:creator>" + appTitle + "</dc:creator>\n";
+	sMetaData += "        </rdf:Description>\n";
+	sMetaData += "      </rdf:RDF>\n";  
+	sMetaData += "    </metadata>";
+	return sMetaData;
+}
+
 std::string VectorizeMonochromeToSVG(const uint8_t* bits, int width, int height, int stride, bool bottomUp)
 {
 	std::ostringstream svg;
 
-	svg << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\""
-		<< width << "\" height=\"" << height << "\">\n";
-
+	svg << "<svg xmlns=\"http://www.w3.org/2000/svg\"" <<
+		   " xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"" <<
+		   " xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " <<		
+			"width = \"" << width << "\" height=\"" << height << "\">\n";
+	svg << CreateMetaData() + "\n";
 	for (int y = 0; y < height; ++y)
 	{
 		// DIBs are usually bottom-up when biHeight > 0
@@ -189,15 +204,20 @@ std::string RasterToSVG(const BITMAPINFOHEADER& bih, const uint8_t* bits)
 	std::string b64;
 	Base64Encode(png.data(), b64, png.size());
 
-	std::ostringstream s;
-	s << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\""
-		<< bih.biWidth << "\" height=\"" << abs(bih.biHeight) << "\">";
+	std::ostringstream svg;
 
-	s << "<image width=\"100%\" height=\"100%\" href=\"data:image/png;base64,"
+	svg << "<svg xmlns=\"http://www.w3.org/2000/svg\"" <<
+		" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"" <<
+		" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " <<
+		"width = \"" << bih.biWidth << "\" height=\"" << abs(bih.biHeight) << "\">\n";
+
+	svg << CreateMetaData() << "\n";
+
+	svg << "<image width=\"100%\" height=\"100%\" href=\"data:image/png;base64,"
 		<< b64 << "\"/>";
 
-	s << "</svg>";
-	return s.str();
+	svg << "</svg>";
+	return svg.str();
 }
 
 std::pair<bool, int> SaveDIBAsSVG(const BITMAPINFOHEADER& bih, const uint8_t* bits, const std::string filename, bool isSVGZ)
