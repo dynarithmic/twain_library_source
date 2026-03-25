@@ -64,18 +64,3 @@ LONG DLLENTRY_DEF DTWAIN_GetExtNameFromCap(LONG nValue, LPTSTR szValue, LONG nMa
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(-1)
 }
-
-static TwainConstantType GetGenericTwainValue(LONG lConstantType, LPCTSTR name)
-{
-    auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
-    auto iter1 = constantsmap.find(lConstantType);
-    if (iter1 == constantsmap.end())
-        return -1LL;
-    auto& twainMap = iter1->second;
-    const std::string s = StringConversion::Convert_Native_To_Ansi(name);
-    const auto iter = std::find_if(twainMap.begin(), twainMap.end(), [&](const auto& vt)
-                                   {return std::find(vt.second.begin(), vt.second.end(), s) != vt.second.end(); });
-    if (iter != twainMap.end())
-        return iter->first;
-    return -1LL;
-}

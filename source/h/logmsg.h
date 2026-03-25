@@ -39,6 +39,7 @@ namespace dynarithmic
         bool m_bAppend = false;
         bool m_bCreateDirectory = false;
         bool m_bSetConsoleHandler = false;
+        int64_t  m_autoSaveCount = -1;
     };
 
     class CBaseLogger
@@ -75,10 +76,19 @@ namespace dynarithmic
         std::string m_fileName;
         std::ofstream m_ostr;
         bool m_bFileCreated = false;
+        int64_t m_autoSaveThreshold = -1;
+        int64_t m_currentLineCount = 0;
+
+        private:
+            void checkAutoCount();
+
         public:
             File_Logger(const LPCSTR filename, const LoggingTraits& fTraits);
             ~File_Logger();
-            bool IsFileCreated() const { return m_bFileCreated; }
+            bool isFileCreated() const { return m_bFileCreated; }
+            std::string getFileName() const { return m_fileName; }
+            int64_t getAutoSaveThreshold() const { return m_autoSaveThreshold; }
+            void setAutoSaveThreshold(int64_t count);
             void trace(std::string_view msg) override;
     };
 
@@ -129,6 +139,8 @@ namespace dynarithmic
        void     SetAppName(LPCSTR pName) {m_csAppName = pName;}
 
        bool     Flush();
+
+       bool     SetLogSaveThreshold(int64_t lineCount);
 
        void     PrintBanner(bool bStarted = true);
 

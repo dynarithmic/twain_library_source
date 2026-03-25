@@ -101,6 +101,56 @@ namespace dynarithmic
         return false;
     }
 
+    static constexpr bool IsTwain32BitIntegralType(TW_UINT16 nDataType)
+    {
+		switch (nDataType)
+		{
+    		case TWTY_INT32:
+    			return true;
+		}
+		return false;
+    }
+
+	static constexpr bool IsTwain32BitUIntegralType(TW_UINT16 nDataType)
+	{
+		switch (nDataType)
+		{
+		    case TWTY_UINT32:
+			    return true;
+		}
+		return false;
+	}
+
+	static constexpr bool IsTwain16BitIntegralType(TW_UINT16 nItemType)
+	{
+        switch (nItemType)
+        {
+            case TWTY_INT16:
+                return TRUE;
+        }
+        return false;
+	}
+
+	static constexpr bool IsTwain16BitUIntegralType(TW_UINT16 nItemType)
+	{
+		switch (nItemType)
+		{
+    		case TWTY_UINT16:
+	    		return TRUE;
+		}
+		return false;
+	}
+
+	static constexpr bool IsTwain8BitIntegralType(TW_UINT16 nItemType)
+	{
+		switch (nItemType)
+		{
+		    case TWTY_INT8:
+			    return TRUE;
+		}
+		return false;
+	}
+
     static constexpr bool IsTwainHandleType(TW_UINT16 nItemType)
     {
         return nItemType == TWTY_HANDLE;
@@ -565,6 +615,73 @@ namespace dynarithmic
     {
         return  (value + (upto - 1)) / upto * upto;
     }
+
+	static constexpr int GetDTWAINContainerFromTWAINContainer(int containerType) noexcept
+	{
+        switch (containerType)
+        {
+            case TWON_ONEVALUE:
+            case DTWAIN_CONTONEVALUE:
+                return DTWAIN_CONTONEVALUE;
+
+            case TWON_RANGE:
+            case DTWAIN_CONTRANGE:
+                return DTWAIN_CONTRANGE;
+
+			case TWON_ARRAY:
+			case DTWAIN_CONTARRAY:
+				return DTWAIN_CONTARRAY;
+
+			case TWON_ENUMERATION:
+			case DTWAIN_CONTENUMERATION:
+				return DTWAIN_CONTENUMERATION;
+        }
+        return containerType;
+	}
+
+	static constexpr int GetTWAINContainerFromDTWAINContainer(int containerType) noexcept
+	{
+		switch (containerType)
+		{
+		    case DTWAIN_CONTONEVALUE:
+                return TWON_ONEVALUE;
+
+		    case DTWAIN_CONTRANGE:
+                return TWON_RANGE;
+
+		    case DTWAIN_CONTARRAY:
+                return TWON_ARRAY;
+
+		    case DTWAIN_CONTENUMERATION:
+			    return TWON_ENUMERATION;
+		}
+		return containerType;
+	}
+
+	static constexpr bool IsValidContainerType(TW_UINT16 containerType, bool testDTWAINType = true)
+	{
+		switch (containerType)
+		{
+            case TWON_ONEVALUE:
+            case TWON_RANGE:
+            case TWON_ARRAY:
+            case TWON_ENUMERATION:
+                return true;
+		}
+        if (testDTWAINType)
+        {
+            switch (containerType)
+            {
+                case DTWAIN_CONTONEVALUE:
+                case DTWAIN_CONTRANGE:
+                case DTWAIN_CONTARRAY:
+                case DTWAIN_CONTENUMERATION:
+                case DTWAIN_CONTDEFAULT:
+                    return true;
+            }
+        }
+        return false;
+	}
 };
 
 #endif

@@ -344,6 +344,8 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
           case DTWAIN_TN_FEEDERNOTSUPPORTED:
           case DTWAIN_TN_PREACQUIRESTART:
 		  case DTWAIN_TN_QUERYACQUIREPAGES:
+          case DTWAIN_TN_QUERYUPDATEDIBORIG:  
+		  case DTWAIN_TN_QUERYUPDATEDIBRESAMPLED:
           {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) )
@@ -696,7 +698,7 @@ void dynarithmic::LogDTWAINMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 {
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_NOTIFICATIONS)
     {
-        CTL_ErrorStruct e;
+        CTL_TWAINDecoderStruct e;
         std::string s;
         if ( bToCallback )
             s = "To callback: ";

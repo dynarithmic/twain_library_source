@@ -42,7 +42,7 @@
 #endif
 using namespace dynarithmic;
 
-static bool GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue );
+static std::pair<bool, int> GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue );
 static LONG GetAllCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetCurrentCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetDefaultCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
@@ -65,20 +65,32 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
 #endif
 
 template <typename CapArrayType>
-static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
-                                 GetCapValuesFn /*capFn*/)
+static std::pair<bool, int> GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
+                                          GetCapValuesFn /*capFn*/)
 {
+	auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_VERIFY_SOURCEHANDLE_SETLASTERROR | DTWAIN_VERIFY_SOURCEHANDLE 
+                                                    | DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
+    if (!pSource || !pHandle)
+		return  { false, pHandle?pHandle->m_lLastError:DTWAIN_ERR_BAD_HANDLE };
+    if (!value)
+    {
+        pHandle->m_lLastError = DTWAIN_ERR_INVALID_PARAM;
+        return  { false, DTWAIN_ERR_INVALID_PARAM };
+    }
     DTWAIN_ARRAY ArrayValues = nullptr;
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, GetCurrentCapValues);
     DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ArrayValues);
     if (retVal > 0 && ArrayValues)
     {
         auto& vOut = pHandle->m_ArrayFactory->underlying_container_t<typename CapArrayType::value_type>(ArrayValues);
-        *value = vOut[0];
-        return true;
+        if (!vOut.empty())
+        {
+            *value = vOut[0];
+            return { true, DTWAIN_NO_ERROR };
+        }
     }
-    return false;
+    pHandle->m_lLastError = DTWAIN_ERR_GETCAP_FAILED;
+	return { false, DTWAIN_ERR_GETCAP_FAILED };
 }
 
 template <typename CapDataType>
@@ -349,7 +361,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     {\
        LOG_FUNC_ENTRY_PARAMS((Source, value)) \
        auto bRet = GetCapability<CapDataType>(Source, Cap, value, CapFn); \
-       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first); \
        CATCH_BLOCK(false) \
     }
 
@@ -359,7 +371,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
        LOG_FUNC_ENTRY_PARAMS((Source)) \
        CapDataType::value_type value = {}; \
        auto bRet = GetCapability<CapDataType>(Source, Cap, &value, CapFn); \
-       LOG_FUNC_EXIT_NONAME_PARAMS(bRet?value : errorRetValue); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first?value : errorRetValue); \
        CATCH_BLOCK(errorRetValue) \
     }
 
@@ -377,12 +389,12 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType::value_type* value, DTWAIN_BOOL bCurrent)\
     {\
         LOG_FUNC_ENTRY_PARAMS((Source, value, bCurrent)) \
-        DTWAIN_BOOL bRet = FALSE; \
+        std::pair <bool, int> bRet = {}; \
         if ( bCurrent ) \
             bRet = GetCapability<CapDataType>(Source, Cap, value, GetCurrentCapValues); \
         else \
             bRet = GetCapability<CapDataType>(Source, Cap, value, GetDefaultCapValues); \
-       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first); \
        CATCH_BLOCK(false) \
     }
 
@@ -636,7 +648,7 @@ EXPORT_GET_CAP_VALUE_I(DTWAIN_GetPixelFlavor, ICAP_PIXELFLAVOR)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPrinter, CAP_PRINTER)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetPrinterEx, DTWAIN_GetPrinter, CAP_PRINTER, -1)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetPrinterStartNumber, CAP_PRINTERINDEX)
-EXPORT_GET_CAP_VALUE_RETURNVAL_I(DTWAIN_GetPrinterStartNumberEx, ICAP_UNITS, -1)
+EXPORT_GET_CAP_VALUE_RETURNVAL_I(DTWAIN_GetPrinterStartNumberEx, CAP_PRINTERINDEX, -1)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPrinterStringMode, CAP_PRINTERMODE)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetPrinterStringModeEx, DTWAIN_GetPrinterStringMode, CAP_PRINTERMODE, -1)
 EXPORT_GET_CAP_VALUE_A(DTWAIN_GetPrinterStrings, CAP_PRINTERSTRING)
@@ -774,7 +786,6 @@ EXPORT_ENUM_CAP_VALUES_NOEXPAND(DTWAIN_EnumBarcodeTimeOutValues, ICAP_BARCODETIM
 EXPORT_ENUM_CAP_VALUES_NOEXPAND(DTWAIN_EnumPrinterStringModes, CAP_PRINTERMODE)
 EXPORT_ENUM_CAP_VALUES_NOEXPAND(DTWAIN_EnumSourceUnits, ICAP_UNITS)
 EXPORT_ENUM_CAP_VALUES_NOEXPAND(DTWAIN_EnumTwainPrinters, CAP_PRINTER)
-EXPORT_ENUM_CAP_VALUES_NOEXPAND(DTWAIN_EnumTwainPrintersArray, CAP_PRINTER)
 EXPORT_ENUM_CAP_VALUES(DTWAIN_EnumHighlightValues, ICAP_HIGHLIGHT)
 EXPORT_ENUM_CAP_VALUES(DTWAIN_EnumMaxBuffers, CAP_MAXBATCHBUFFERS)
 EXPORT_ENUM_CAP_VALUES(DTWAIN_EnumResolutionValues, ICAP_XRESOLUTION)
@@ -828,7 +839,6 @@ EXPORT_ENUM_CAP_VALUES_NOEXPAND_EX(DTWAIN_EnumPatchcodeTimeOutValuesEx, ICAP_PAT
 EXPORT_ENUM_CAP_VALUES_NOEXPAND_EX(DTWAIN_EnumBarcodeTimeOutValuesEx, ICAP_BARCODETIMEOUT)
 EXPORT_ENUM_CAP_VALUES_NOEXPAND_EX(DTWAIN_EnumPrinterStringModesEx, CAP_PRINTERMODE)
 EXPORT_ENUM_CAP_VALUES_NOEXPAND_EX(DTWAIN_EnumTwainPrintersEx, CAP_PRINTER)
-EXPORT_ENUM_CAP_VALUES_NOEXPAND_EX(DTWAIN_EnumTwainPrintersArrayEx, CAP_PRINTER)
 EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumHighlightValuesEx, ICAP_HIGHLIGHT)
 EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumMaxBuffersEx, CAP_MAXBATCHBUFFERS)
 EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumResolutionValuesEx, ICAP_XRESOLUTION)
@@ -896,31 +906,40 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLO
     }
 	DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return lCap == 0; }, DTWAIN_ERR_CAP_NO_SUPPORT,
 		                                         false, FUNC_MACRO, false, { pCapName });
-    const DTWAIN_BOOL bRet = GetDoubleCap( pSource, lCap, Resolution);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    auto bRet = GetDoubleCap( pSource, lCap, Resolution);
+    if ( !bRet.first )
+		DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return true; }, bRet.second,
+			false, FUNC_MACRO, false, { pCapName });
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first)
     CATCH_BLOCK(FALSE)
 }
 
-static bool GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue )
+static std::pair<bool, int> GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue )
 {
-    double *pRealValue = pValue;
+	const auto pHandle = pSource->GetDTWAINHandle();
+	if (!pValue)
+	{
+		pHandle->m_lLastError = DTWAIN_ERR_INVALID_PARAM;
+		return  { false, DTWAIN_ERR_INVALID_PARAM };
+	}
+	double* pRealValue = pValue;
     if (DTWAIN_GetCapDataType(pSource, lCap) != TWTY_FIX32)
-        return false;
+        return { false, DTWAIN_ERR_BAD_CAPTYPE };
     DTWAIN_ARRAY Array = nullptr;
-    const auto pHandle = pSource->GetDTWAINHandle();
     bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
-        return false;
+        return { false, pHandle->m_lLastError };
+
     DTWAINArrayLowLevelPtr_RAII arr(pHandle, &Array);
     const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<double>(Array);
     if ( bRet && Array )
     {
-        if ( vIn.empty() )
-            bRet = false;
+        if (vIn.empty())
+            return { false, DTWAIN_ERR_GETCAP_FAILED };
         else
             *pRealValue = vIn[0];
     }
-    return bRet;
+    return { true, DTWAIN_NO_ERROR };
 }
 
 static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, LONG GetType, DTWAIN_BOOL bExpandRange)
@@ -980,7 +999,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
     else
     {
         // Error occurred
-		DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return true; }, pHandle->m_lLastError, 
+		DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return true; }, pHandle->m_lLastError, 
                                                      0, FUNC_MACRO, false, { CTL_TwainAppMgr::GetCapNameFromCap(lCap) });
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(nValues)

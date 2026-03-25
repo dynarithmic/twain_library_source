@@ -30,13 +30,14 @@
 #include "ctltwainsession.h"
 #include "ctlenum.h"
 #include "capstruc.h"
-#include "errstruc.h"
+#include "ctltwaindecoder.h"
 #include "ctltripletbase.h"
 #include "ctltr011.h"
 #include "ctltr012.h"
 #include "ctltr014.h"
 #include "ctltr015.h"
 #include "ctltr035.h"
+#include "ctltr045.h"
 #include <boost/dll/shared_library.hpp>
 namespace dynarithmic
 {
@@ -57,6 +58,7 @@ namespace dynarithmic
     using SourceToXferReadyList = std::vector<std::pair<std::string, uint32_t>>;
     using SourceFlatbedOnlyList = std::unordered_set<std::string>;
     using SourceGetMessageList = std::unordered_set<std::string>;
+    using SourceSheetcountMap = std::vector<std::pair<std::string, std::string>>;
     using SourcePaperDetectableMap = std::map<std::string, bool>;
 
     class CTL_TwainAppMgr;
@@ -143,7 +145,7 @@ namespace dynarithmic
 
             // Gets the transfer count for a selected source
             static int GetTransferCount( const CTL_ITwainSource *pSource );
-            static int SetTransferCount( const CTL_ITwainSource *pSource, int nCount );
+            static int SetTransferCount( CTL_ITwainSource *pSource, int nCount );
 
             // Get capabilities for selected source
             static void GetCapabilities(const CTL_ITwainSource *pSource,CTL_TwainCapArray& rArray);
@@ -156,6 +158,8 @@ namespace dynarithmic
 
             static CTL_CapabilityQueryTriplet GetCapabilityOperations(const CTL_ITwainSource *pSource, // Uses the MSG_QUERYSUPPORT triplet
                                                                       int nCap);
+
+			static CTL_CapabilityLabelTriplet GetCapabilityLabel(int nCap); // Uses the MSG_GETLABEL triplet
 
             static CTL_IntArray EnumTransferMechanisms( const CTL_ITwainSource *pSource );
             static std::vector<TW_UINT32> EnumSupportedDATS(const CTL_ITwainSource* pSource);
@@ -263,6 +267,7 @@ namespace dynarithmic
             static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_SourceFlatbedOnlyList; }
             static SourceGetMessageList& GetSourceGetMessageList() { return s_SourceGetMessageList; }
             static SourcePaperDetectableMap& GetSourcePaperDetectionMap() { return s_SourcePaperDetectableMap; }
+            static SourceSheetcountMap& GetSourceSheetcountMap() { return s_SourceSheetcountList; }
             const CTL_TwainTriplet* GetCurrentTriplet() const { return m_pCurrentTriplet;}
 
         private:
@@ -437,7 +442,7 @@ namespace dynarithmic
                    }
             };
 
-            static CTL_ErrorStruct GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG);
+            static CTL_TWAINDecoderStruct GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG);
 
             void DestroySession(const CTL_ITwainSession* pSession);
             void DestroyAllTwainSessions();
@@ -470,6 +475,7 @@ namespace dynarithmic
             static SourceFlatbedOnlyList s_SourceFlatbedOnlyList;
             static SourceGetMessageList s_SourceGetMessageList;
             static SourcePaperDetectableMap s_SourcePaperDetectableMap;
+            static SourceSheetcountMap      s_SourceSheetcountList;
     };
 
     #define DTWAIN_ERROR_CONDITION(Err, RetVal, mustReport) {               \

@@ -22,6 +22,7 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "ctlsourcedibs.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -160,21 +161,20 @@ struct NestedAcquisitionDestroyer
     }
 };
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAIN_BOOL bDestroyDibs)
+std::pair<bool, int> dynarithmic::DestroyAcquisitionArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, bool bDestroyDibs)
 {
-    LOG_FUNC_ENTRY_PARAMS((aAcq))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-
     const auto& factory = pHandle->m_ArrayFactory;
 
     // Check if array exists
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !factory->is_valid(aAcq); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+    std::pair<bool, int> retFalse = { false, DTWAIN_ERR_WRONG_ARRAY_TYPE };
+    if (!factory->is_valid(aAcq))
+        return { false, DTWAIN_ERR_WRONG_ARRAY_TYPE };
 
     // Make sure this array is destroyed when we exit this function
     DTWAINArrayLowLevel_RAII raiiMain(pHandle, aAcq);
 
     // get instance of acquisition destroy class
-    const NestedAcquisitionDestroyer acqDestroyer(pHandle, bDestroyDibs ? true : false);
+    const NestedAcquisitionDestroyer acqDestroyer(pHandle, bDestroyDibs);
 
     // underlying images array
     auto& vImagesArray = factory->underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(aAcq);
@@ -182,6 +182,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAI
     // for each image array, destroy it
     std::for_each(vImagesArray.begin(), vImagesArray.end(), acqDestroyer);
 
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    return { true, DTWAIN_NO_ERROR };
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAIN_BOOL bDestroyDibs)
+{
+    LOG_FUNC_ENTRY_PARAMS((aAcq))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto retVal = DestroyAcquisitionArray(pHandle, aAcq, bDestroyDibs);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.first; }, retVal.second, nullptr, FUNC_MACRO);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first)
     CATCH_BLOCK(false)
 }

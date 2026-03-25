@@ -34,6 +34,9 @@ std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
 
 static bool DTWAIN_ShouldUseGetMessage()
 {
+    if (!CTL_StaticData::IsTestForGetMessage())
+        return false;
+
 	MSG msg;
 
     // 1) If no window belongs to this thread, likely script host
@@ -85,6 +88,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePeekMessageLoop(DTWAIN_SOURCE Source, BOOL
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableGetMessageLoop(DTWAIN_SOURCE Source, BOOL bSet)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, bSet))
+    auto bRet = DTWAIN_EnablePeekMessageLoop(Source, FALSE);
+	LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+	CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPeekMessageLoopEnabled(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
@@ -95,6 +107,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPeekMessageLoopEnabled(DTWAIN_SOURCE Source)
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    auto bRet = !DTWAIN_IsPeekMessageLoopEnabled(Source);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet);
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
 
 std::pair<int, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts)
 {
@@ -280,7 +301,7 @@ int TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, b
     // has explicitly stated to use GetMessage() by either calling 
     // DTWAIN_EnablePeekMessageLoop() to FALSE, or the DTWAIN32/64.INI
     // has the Source listed as one that must use GetMessage(), then we use GetMessage().
-    auto isGetMessageRequired = DTWAIN_ShouldUseGetMessage() || !pSource->IsUsePeekMessage();
+	auto isGetMessageRequired = !pSource->IsUsePeekMessage() || DTWAIN_ShouldUseGetMessage();
     if (isGetMessageRequired)
         pSource->SetUsePeekMessage(false);
 

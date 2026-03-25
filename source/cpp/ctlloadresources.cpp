@@ -148,7 +148,7 @@ namespace dynarithmic
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = true;
-        CTL_ErrorStruct ErrorStruct;
+        CTL_TWAINDecoderStruct ErrorStruct;
         TW_UINT32 dg;
         TW_UINT16 dat, msg;
         int structtype, retcode, successcode;
@@ -285,21 +285,8 @@ namespace dynarithmic
             CTL_StaticData::GetGeneralCapInfo().insert({ static_cast<TW_UINT16>(lCap), cStruct });
         }
 
-        auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
-        std::string line;
-        while (std::getline(ifs, line))
-        {
-            ++curLine;
-            StringStreamInA strm(line);
-            LONG imgType;
-            strm >> imgType;
-            if (imgType == -1)
-                break;
-            int bppValue;
-            while (strm >> bppValue)
-                bppMap.insert({ imgType, std::vector<int>() }).first->second.push_back(bppValue);
-        }
-
+		std::string line;
+		ifs.ignore();
         auto& mediamap = CTL_StaticData::GetPDFMediaMap();
         while (std::getline(ifs, line))
         {
@@ -379,7 +366,7 @@ namespace dynarithmic
 
                 // Get all the names associated with this constant
                 std::vector<std::string> saNames;
-                if (twainValue == IDS_DTWAIN_APPTITLE)
+                if (twainValue == IDS_DTWAIN_APPTITLE || twainValue == IDS_DTWAIN_APPTITLE_HTML)
                     saNames.push_back(name);
                 else
                     StringWrapperA::Tokenize(name, ", ", saNames);
@@ -398,18 +385,20 @@ namespace dynarithmic
                 // Always insert the special name that has more than one entry
                 if (bPlaceInMap)
                 {
-                if (saNames.size() > 1)
-                    stringToConstantMap.insert({ name, twainValue });
+                    if (saNames.size() > 1)
+                        stringToConstantMap.insert({ name, twainValue });
 
-                // Insert the actual entries
-                for (auto& oneName : saNames)
-                    stringToConstantMap.insert({ oneName, twainValue });
+                    // Insert the actual entries
+                    for (auto& oneName : saNames)
+                        stringToConstantMap.insert({ oneName, twainValue });
                 }
             }
         }
 
         // Read in the image resampling data
         auto& imageMap = CTL_StaticData::GetImageResamplerMap();
+		auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
+        bppMap.clear();
         imageMap.clear();
         while (std::getline(ifs, totalLine))
         {
@@ -445,6 +434,10 @@ namespace dynarithmic
                 break;
             std::string sgoodBits = totalLine.substr(pos, pos2 - pos + 1);
             auto vGoodBits = parseBracketedNumberList(sgoodBits);
+
+            // Create entries in the bits-per-pixel map for all the types
+            for (auto fType : vImageConstants )
+                bppMap[fType] = vGoodBits;
 
             // Get the resample to-from information
             totalLine.erase(totalLine.begin(), totalLine.begin() + pos2 + 1);
@@ -714,13 +707,17 @@ namespace dynarithmic
                 while (strm >> resourceID)
                 {
                     getline(strm, descr);
-                    if (resourceID == IDS_DTWAIN_APPTITLE)
+                    if (resourceID == IDS_DTWAIN_APPTITLE || resourceID == IDS_DTWAIN_APPTITLE_HTML)
                         descr = StringConversion::Convert_Native_To_Ansi(
-                            CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, IDS_DTWAIN_APPTITLE).second);
+                            CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, resourceID).second);
                     StringWrapperA::TrimAll(descr);
                     descr = StringWrapperA::ReplaceAll(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
                     descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
-                    descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                    if (resourceID == IDS_DTWAIN_APPTITLE)
+                        descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                    else
+                    if (resourceID == IDS_DTWAIN_APPTITLE_HTML)
+						descr = StringWrapperA::ReplaceAll(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
                     resourceMap.insert({ resourceID, descr });
                 }
             }
@@ -841,12 +838,12 @@ namespace dynarithmic
             return m_strCapName;
     }
     ////////////////////////////////////////////////////////////////////
-    bool CTL_ErrorStruct::IsFailureMatch(TW_UINT16 cc) const
+    bool CTL_TWAINDecoderStruct::IsFailureMatch(TW_UINT16 cc) const
     {
         return 1L << cc & m_nTWCCErrorCodes?true:false;
     }
 
-    bool CTL_ErrorStruct::IsSuccessMatch(TW_UINT16 rc) const
+    bool CTL_TWAINDecoderStruct::IsSuccessMatch(TW_UINT16 rc) const
     {
         if (rc == TWRC_SUCCESS)
             return true;

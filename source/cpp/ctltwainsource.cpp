@@ -250,6 +250,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_tbIsAudioTransferSupported(boost::logic::indeterminate),
     m_tbUIControllable(boost::logic::indeterminate),
     m_tbIsFeederSensitive(boost::logic::indeterminate),
+    m_tbUseSheetCountAsSheets(boost::logic::indeterminate),
     m_pDLLHandle(pHandle),
     m_BufferedXFerInfo{},
     m_ImageInfo(),

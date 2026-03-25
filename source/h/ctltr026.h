@@ -105,7 +105,7 @@ namespace dynarithmic
             bool ResampleAcquiredDib();
             bool EndTwainUI() const { return m_bEndTwainUI; }
             void SetEndTwainUI(bool bSet = true) { m_bEndTwainUI = bSet; }
-            HANDLE ProcessUserUpdatingDIB(size_t nLastDib);
+            HANDLE ProcessUserUpdatingDIB(size_t nLastDib, int notification);
 
         protected:
             HANDLE          m_hDataHandle;

@@ -59,6 +59,9 @@ namespace dynarithmic
         CTL_ArrayAnyType = 1000,
         CTL_ArrayToHandleArray = 2000,
         CTL_ArrayFrameSingleType = 3000,
+		CTL_ArrayUIntType = 120,
+        CTL_ArrayShortIntType = 160,
+        CTL_ArrayShortUIntType = 170,
         CTL_ArrayInvalid = -1
     };
 
@@ -84,6 +87,9 @@ namespace dynarithmic
             static constexpr int Long64Type = 9;
             static constexpr int FrameSingleType = 10;
             static constexpr int TWFrameType = 11;
+            static constexpr int Int16Type = 12;
+            static constexpr int UInt16Type = 13;
+            static constexpr int UInt32Type = 14;
             static constexpr int UnknownType = -1;
 
             int nTag;
@@ -106,6 +112,9 @@ namespace dynarithmic
         };
 
         // all of the DTWAIN array types.
+        using tagged_array_int16 = tagged_array<int16_t>;
+		using tagged_array_uint16 = tagged_array<uint16_t>;
+		using tagged_array_uint32 = tagged_array<uint32_t>;
         using tagged_array_long = tagged_array<LONG>;
         using tagged_array_double = tagged_array<double>;
         using tagged_array_string = tagged_array<std::string>;
@@ -529,9 +538,12 @@ namespace dynarithmic
 
         static constexpr int arraytype_to_tagtype(CTL_ArrayType arrayType)
         {
-            constexpr std::array<std::pair<CTL_ArrayType, int>, 12> mapArrayTypeToTag =
+            constexpr std::array<std::pair<CTL_ArrayType, int>, 15> mapArrayTypeToTag =
             { {
-                {CTL_ArrayIntType, arrayTag::LongType},
+				{CTL_ArrayIntType, arrayTag::LongType},
+				{CTL_ArrayUIntType, arrayTag::UInt32Type},
+				{CTL_ArrayShortIntType, arrayTag::Int16Type},
+                {CTL_ArrayShortUIntType, arrayTag::UInt16Type},
                 {CTL_ArrayInt64Type, arrayTag::Long64Type},
                 {CTL_ArrayDoubleType, arrayTag::DoubleType},
                 {CTL_ArrayHandleType,arrayTag::VoidPtrType},
@@ -551,8 +563,11 @@ namespace dynarithmic
 
         static constexpr CTL_ArrayType tagtype_to_arraytype(int tag)
         {
-            constexpr std::array<std::pair<int, CTL_ArrayType>, 12> mapTagToArrayType = { {
+            constexpr std::array<std::pair<int, CTL_ArrayType>, 15> mapTagToArrayType = { {
+				{arrayTag::Int16Type,                           CTL_ArrayShortIntType},
+				{arrayTag::UInt16Type,                          CTL_ArrayShortUIntType},
                 {arrayTag::LongType,                            CTL_ArrayIntType},
+				{arrayTag::UInt32Type,                          CTL_ArrayUIntType},
                 {arrayTag::Long64Type,                          CTL_ArrayInt64Type},
                 {arrayTag::DoubleType,                          CTL_ArrayDoubleType},
                 {arrayTag::VoidPtrType,                         CTL_ArrayHandleType},

@@ -48,7 +48,7 @@ namespace dynarithmic
     CTL_CapInfo* GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap);
 
     template <class T>
-    bool    GetCapabilityValues( const CTL_ITwainSource *pSource,
+    std::pair<bool, TW_UINT16> GetCapabilityValues( const CTL_ITwainSource *pSource,
                                 TW_UINT16 nCap,
                                 TW_UINT16 GetType,
                                 UINT      nContainerTypes,
@@ -57,7 +57,7 @@ namespace dynarithmic
                                 std::vector<T> &rArray
                               );
     template <class T>
-    bool GetCapabilityValues( const CTL_ITwainSource *pSource,
+    std::pair<bool, TW_UINT16> GetCapabilityValues( const CTL_ITwainSource *pSource,
                              TW_UINT16 nCap,
                              TW_UINT16 GetType,
                              UINT      nContainerTypes,
@@ -66,10 +66,19 @@ namespace dynarithmic
                              std::vector<T> &rArray
                             )
     {
-        auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-        const auto pSession = pTempSource->GetTwainSession();
+        CTL_ITwainSource* pTempSource = nullptr;
+        CTL_ITwainSession* pSession = nullptr;
+        if (pSource)
+        {
+            pTempSource = const_cast<CTL_ITwainSource*>(pSource);
+            pSession = pTempSource->GetTwainSession();
+        }
+        else
+            pSession = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal())->m_pTwainSession;
+
         rArray.erase(rArray.begin(), rArray.end());
         std::unique_ptr<CTL_CapabilityGetTriplet> pGetTriplet;
+        TW_UINT16 rc = TWRC_FAILURE;
 
         // Try the array version
         if ( nContainerTypes & TwainContainer_ARRAY )
@@ -108,9 +117,10 @@ namespace dynarithmic
                                                                            TwainDataType);
         }
         else
-            return false;
+            return { false, rc };
 
-        const TW_UINT16 rc = pGetTriplet->Execute();
+        rc = pGetTriplet->Execute();
+
         if ( rc == TWRC_SUCCESS )
         {
             const size_t nValues = pGetTriplet->GetNumItems();
@@ -165,9 +175,9 @@ namespace dynarithmic
                     }
                 }
             }
-            return true;
+            return { true, rc };
         }
-        return false;
+        return { false, rc };
     }
 
     template <class T>
@@ -251,7 +261,7 @@ namespace dynarithmic
     }
 
     template <class TwainType, class AssignType>
-    bool GetOneCapValue( DTWAIN_HANDLE DLLHandle,
+    std::pair<bool, int> GetOneCapValue( DTWAIN_HANDLE DLLHandle,
                         DTWAIN_SOURCE Source,
                         TW_UINT16 nCap,
                         TW_UINT16 GetType,
@@ -261,7 +271,7 @@ namespace dynarithmic
                         );
 
     template <class TwainType, class AssignType>
-    bool GetOneCapValue( DTWAIN_HANDLE DLLHandle,
+    std::pair<bool, int> GetOneCapValue( DTWAIN_HANDLE DLLHandle,
                         DTWAIN_SOURCE Source,
                         TW_UINT16 nCap,
                         TW_UINT16 GetType,
@@ -272,24 +282,22 @@ namespace dynarithmic
     {
         CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
 
-        if ( !p )
-            return false;
-
         std::vector<TwainType> Array;
-        const int bOk = GetCapabilityValues( p,
-                                             nCap,
-                                             GetType,
-                                             static_cast<UINT>(TwainContainer_ONEVALUE),
-                                             bUseStrings,
-                                             TwainDataType,
-                                             Array );
+        auto ret = GetCapabilityValues(p,nCap,GetType,static_cast<UINT>(TwainContainer_ONEVALUE),
+                                       bUseStrings,TwainDataType,Array);
+        const int bOk = ret.first;
+
         if ( !bOk )
-            return false;
+            return { false, DTWAIN_ERR_GETCAP_FAILED };
 
-        *pAssign = Array[0];
-        return true;
+        if (!Array.empty())
+        {
+            *pAssign = Array[0];
+            return { true, DTWAIN_NO_ERROR };
+        }
+        *pAssign = TwainType{};
+		return { false, DTWAIN_ERR_GETCAP_FAILED };
     }
-
 
     template <class T>
     bool SetOneCapValue(const CTL_ITwainSource* pSource, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType);
@@ -424,7 +432,7 @@ namespace dynarithmic
                     nAll[i],
                     StringType,
                     TwainDataType,
-                    Array );
+                    Array ).first;
                 if ( bOk )
                     break;
             }

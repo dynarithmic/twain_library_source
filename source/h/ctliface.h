@@ -23,7 +23,6 @@
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4786)
-#pragma warning (disable : 4786)
 #pragma warning (disable : 4127)
 #endif
 
@@ -66,7 +65,7 @@ struct dtwain_library_loader : library_loader_impl
 #include "ctltmpl4.h"
 #include "ctltwainsession.h"
 #include "dtwain_resource_constants.h"
-#include "errstruc.h"
+#include "ctltwaindecoder.h"
 #include "logmsg.h"
 #include "winconst.h"
 #include <map>
@@ -483,10 +482,12 @@ namespace dynarithmic
                INI_SELECTSOURCEPOS_KEY,
                INI_SAVESELECTSOURCEPOS_KEY,
                INI_TWAINLOOPGETMSG_KEY,
+               INI_SHEETCOUNT_KEY,
+               INI_TESTGET_ITEM,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
-        int                          s_nLoadingError = DTWAIN_NO_ERROR;
+        int                          s_nLoadingError = DTWAIN_ERR_BAD_HANDLE;
         bool                         s_bINIFileLoaded = false;
         bool                         s_bDoResampling = true;
         bool                         s_bCheckHandles = true;
@@ -532,8 +533,11 @@ namespace dynarithmic
         CTL_FileSaveMap          s_FileSaveMap;
         CTL_CompressionMap       s_CompressionMap;
         std::string              s_AppTitle;
+        std::string              s_AppTitleHTML;
         std::pair<int32_t, int32_t> s_SavedSelectSourcePos;
         CTL_TEXTELEMENTPTRLIST   s_PDFTextElementList;
+        int64_t                  s_logFileSaveThreshold = -1LL;
+        bool                     s_bTestGetMessage = true;
         CTL_StaticDataStruct();
     };
 
@@ -612,7 +616,6 @@ namespace dynarithmic
         static HINSTANCE GetDLLInstanceHandle() { return s_StaticData.s_DLLInstance; }
         static CTL_GeneralErrorInfo& GetGeneralErrorInfoMap() { return s_StaticData.s_mapGeneralErrorInfo; }
         static void SetDLLInstanceHandle(HINSTANCE h) { s_StaticData.s_DLLInstance = h; }
-        static auto& GetErrorFilterFlags() { return s_StaticData.s_logFilterFlags; }
         static ImageResamplerMap& GetImageResamplerMap() { return s_StaticData.s_ImageResamplerMap; }
         static SourceStatusMap& GetSourceStatusMap() { return s_StaticData.s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_StaticData.s_ResourceVersion; }
@@ -622,8 +625,11 @@ namespace dynarithmic
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
         static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
         static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
+        static std::string& GetAppTitleHTML() { return s_StaticData.s_AppTitleHTML; }
         static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
         static auto& GetPDFTextElementList() { return s_StaticData.s_PDFTextElementList; }
+        static auto& GetLogFileSaveThreshold() { return s_StaticData.s_logFileSaveThreshold; }
+        static bool& IsTestForGetMessage() { return s_StaticData.s_bTestGetMessage; }
     };
 
     struct CTL_LoggerCallbackInfo
@@ -779,6 +785,7 @@ namespace dynarithmic
             CTL_StringType                  m_TwainDSMUserDirectory;
             CTL_StringType                  m_strSessionDetails;
             CTL_StringType                  m_strSourceDetails;
+            const CTL_ITwainSession* GetTwainSession() const { return m_pTwainSession; }
     };
 
     template <typename T>
@@ -1130,6 +1137,7 @@ namespace dynarithmic
     LONG  TS_Command(LPCTSTR lpCommand);
 
     #define IDS_DTWAIN_APPTITLE       9700
+    #define IDS_DTWAIN_APPTITLE_HTML  9701
 
     #define IDS_LIMITEDFUNCMSG1     8894
     #define IDS_LIMITEDFUNCMSG2     8895

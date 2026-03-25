@@ -1677,41 +1677,79 @@ int CTL_TwainAppMgr::GetTransferCount( const CTL_ITwainSource *pSource )
     return nValue;
 }
 
-int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
-                                       int nCount )
+int CTL_TwainAppMgr::SetTransferCount( CTL_ITwainSource *pSource, int nCount )
 {
-    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS )
+    int numActualPages = nCount; // A value of -1 means that all pages are to be acquired
+
+    bool loggingOn = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS;
+    if ( loggingOn )
     {
         char szOutBuf[100];
         DTWAIN_SPRINTF_FUNC(szOutBuf, "Setting Transfer Count.  Transfer Count = %d", nCount);
         LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
     }
 
+	// Check if duplex is on
+	int duplexOn = 0;
+    GetOneTwainCapValue(pSource, &duplexOn, CAP_DUPLEXENABLED, MSG_GETCURRENT, TWTY_BOOL);
+
     // If the device supports the CAP_SHEETCOUNT capability, use that to set the number of
     // pages to acquire
-    if (IsCapabilitySupported(pSource, CAP_SHEETCOUNT))
+	auto useSheets = pSource->IsUseSheetCountAsSheets().value;
+    if (useSheets != boost::tribool::indeterminate_value && 
+        useSheets && 
+        IsCapabilitySupported(pSource, CAP_SHEETCOUNT))
     {
+		if (loggingOn)
+		{
+			LogWriterUtils::WriteLogInfoIndentedA("Using CAP_SHEETCOUNT for sheet count support...");
+		}
         SetOneCapValue(pSource, CAP_XFERCOUNT, MSG_SET, -1, TWTY_INT16);
 
         if ( nCount == -1 )
             SetOneCapValue(pSource, CAP_SHEETCOUNT, MSG_SET, 0, TWTY_UINT32);
         else
-            SetOneCapValue(pSource, CAP_SHEETCOUNT, MSG_SET,  nCount, TWTY_UINT32);
+        {
+            SetOneCapValue(pSource, CAP_SHEETCOUNT, MSG_SET, nCount, TWTY_UINT32);
+        }
+        if (duplexOn)
+        {
+            // Set the max acquire count to double the page count if the number of pages
+            // is not infinite.
+            if (nCount != -1)
+            {
+                numActualPages = nCount * 2;
+            }
+        }
     }
     else
     {
-        // If we are in duplex mode, we need to set the transfer count to 2 * the number
-        // of pages, since each page will use two transfers
-        LONG isDuplex = 0;
-        GetOneTwainCapValue(pSource, &isDuplex, CAP_DUPLEXENABLED, MSG_GETCURRENT, TWTY_BOOL);
-        if (isDuplex == 1 && nCount != -1)
+        // No CAP_SHEETCOUNT.  If we are in duplex mode and the page count is limited to a certain amount, 
+        // we may need to set the transfer count to 2 * the number of pages, since each page will use 
+        // two transfers.
+        if (duplexOn == 1 && nCount != -1)
         {
+            // Only do this if the doublePageOnDuplex flag is on for the Source (this is the default)
             if (pSource->IsDoublePageCountOnDuplex())
+            {
+                if (loggingOn)
+                {
+                    LogWriterUtils::WriteLogInfoIndentedA("CAP_SHEETCOUNT not supported -- In duplex mode, double the number of pages...");
+                    // double the page count, since CAP_SHEETCOUNT doesn't work correctly
+                }
                 nCount *= 2; // double the number of images that may be received
-            SetOneCapValue( pSource, CAP_XFERCOUNT, MSG_SET, nCount, TWTY_INT16);
+				numActualPages = nCount * 2;
+            }
         }
+		if (loggingOn)
+		{
+			char szOutBuf[100];
+			DTWAIN_SPRINTF_FUNC(szOutBuf, "Setting actual transfer count.  Actual Transfer Count = %d", nCount);
+			LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
+		}
+		SetOneCapValue(pSource, CAP_XFERCOUNT, MSG_SET, nCount, TWTY_INT16);
     }
-    return nCount;
+    return numActualPages;
 }
 
 
@@ -1891,6 +1929,18 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
     CTL_CapabilityQueryTriplet QT(pSession, pTempSource, static_cast<TW_UINT16>(nCap));
     QT.Execute();
     return QT;
+}
+
+CTL_CapabilityLabelTriplet CTL_TwainAppMgr::GetCapabilityLabel(int nCap)
+{
+	const auto pSession = static_cast<CTL_ITwainSession*>(GetDTWAINHandle_Internal());
+
+	if (!IsValidTwainSession(pSession))
+		return { nullptr, 0 };
+
+	CTL_CapabilityLabelTriplet LabelTrip(pSession, static_cast<TW_UINT16>(nCap));
+	LabelTrip.Execute();
+	return LabelTrip;
 }
 
 ////////////////// End Capabilities that should be supported /////////////////
@@ -2086,9 +2136,9 @@ UINT CTL_TwainAppMgr::GetContainerTypesFromCap( TW_UINT16 Cap, bool nType )
     return cStruct.m_nSetContainer;
 }
 
-CTL_ErrorStruct CTL_TwainAppMgr::GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG)
+CTL_TWAINDecoderStruct CTL_TwainAppMgr::GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG)
 {
-    CTL_ErrorStruct eStruct;
+    CTL_TWAINDecoderStruct eStruct;
     auto& errorInfoMap = CTL_StaticData::GetGeneralErrorInfoMap();
     const auto it = errorInfoMap.find(std::make_tuple(nDG, nDAT, nMSG));
     if ( it != errorInfoMap.end() )
@@ -2406,7 +2456,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 
     TW_UINT16 retcode = TWRC_SUCCESS;
 
-    CTL_ErrorStruct e;
+    CTL_TWAINDecoderStruct e;
     std::string s;
 
     pTW_IDENTITY pOrigin = pTriplet.GetOriginID();
@@ -2582,3 +2632,4 @@ SourceToXferReadyList CTL_TwainAppMgr::s_SourceToXferReadyList;
 SourceFlatbedOnlyList CTL_TwainAppMgr::s_SourceFlatbedOnlyList;
 SourceGetMessageList CTL_TwainAppMgr::s_SourceGetMessageList;
 SourcePaperDetectableMap CTL_TwainAppMgr::s_SourcePaperDetectableMap;
+SourceSheetcountMap CTL_TwainAppMgr::s_SourceSheetcountList;

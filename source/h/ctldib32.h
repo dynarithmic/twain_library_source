@@ -99,7 +99,7 @@ namespace dynarithmic
             bool m_bAllWritten;
             bool m_bOnePageWritten;
             IOSaveParams m_SaveParams;
-            static boost::container::flat_map<LONG, std::vector<int>> s_supportedBitDepths;
+            static boost::container::flat_map<LONG, std::vector<uint16_t>> s_supportedBitDepths;
     };
 
     typedef std::shared_ptr<CTL_ImageIOHandler> CTL_ImageIOHandlerPtr;

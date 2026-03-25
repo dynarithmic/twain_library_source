@@ -118,7 +118,7 @@ namespace dynarithmic
             }
         }
         // no error
-        if (Testing & DTWAIN_TEST_SETLASTERROR)
+        if (pHandle && Testing & DTWAIN_TEST_SETLASTERROR)
             pHandle->m_lLastError = DTWAIN_NO_ERROR;
         return { pHandle, pSource };
     }

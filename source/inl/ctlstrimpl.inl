@@ -3267,22 +3267,67 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDSMSearchOrderExW(LPWSTR SearchDirectory, LPW
 #endif
 }
 
-HANDLE DLLENTRY_DEF DTWAIN_RotateDIBStringA(HANDLE hDib, LPCSTR angle)
+HANDLE DLLENTRY_DEF DTWAIN_RotateImageStringA(HANDLE hDib, LPCSTR angle)
 {
 #ifdef _UNICODE
-    return DTWAIN_RotateDIBString(hDib, StringConversion::Convert_AnsiPtr_To_Native(angle).c_str());
+    return DTWAIN_RotateImageString(hDib, StringConversion::Convert_AnsiPtr_To_Native(angle).c_str());
 #else
-    return DTWAIN_RotateDIBString(hDib, angle);
+    return DTWAIN_RotateImageString(hDib, angle);
 #endif
 }
 
-HANDLE DLLENTRY_DEF DTWAIN_RotateDIBStringW(HANDLE hDib, LPCWSTR angle)
+HANDLE DLLENTRY_DEF DTWAIN_RotateImageStringW(HANDLE hDib, LPCWSTR angle)
 {
 #ifdef _UNICODE
-    return DTWAIN_RotateDIBString(hDib, angle);
+    return DTWAIN_RotateImageString(hDib, angle);
 #else
-    return DTWAIN_RotateDIBString(hDib, StringConversion::Convert_WidePtr_To_Native(angle).c_str());
+    return DTWAIN_RotateImageString(hDib, StringConversion::Convert_WidePtr_To_Native(angle).c_str());
 #endif
 }
 
+LONG DLLENTRY_DEF DTWAIN_GetCapLabelW(LONG lCapability, LPWSTR lpszOut, LONG nSize) 
+{
+#ifdef _UNICODE
+	return DTWAIN_GetCapLabel(lCapability, lpszOut, nSize);
+#else
+	std::string arg((std::max)(nSize, 0L), 0);
+	LONG retVal = DTWAIN_GetCapLabel(lCapability, (nSize > 0 && lpszOut) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+	return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#endif
+}
+
+
+LONG DLLENTRY_DEF DTWAIN_GetCapLabelA(LONG lCapability, LPSTR lpszOut, LONG nSize)
+{
+#ifdef _UNICODE
+	std::wstring arg((std::max)(nSize, 0L), 0);
+	LONG retVal = DTWAIN_GetCapLabel(lCapability, (nSize > 0 && lpszOut) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+	return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#else
+	return DTWAIN_GetCapLabel(lCapability, lpszOut, nSize);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetCapHelpW(LONG lCapability, LPWSTR lpszOut, LONG nSize)
+{
+#ifdef _UNICODE
+	return DTWAIN_GetCapHelp(lCapability, lpszOut, nSize);
+#else
+	std::string arg((std::max)(nSize, 0L), 0);
+	LONG retVal = DTWAIN_GetCapHelp(lCapability, (nSize > 0 && lpszOut) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+	return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#endif
+}
+
+
+LONG DLLENTRY_DEF DTWAIN_GetCapHelpA(LONG lCapability, LPSTR lpszOut, LONG nSize)
+{
+#ifdef _UNICODE
+	std::wstring arg((std::max)(nSize, 0L), 0);
+	LONG retVal = DTWAIN_GetCapHelp(lCapability, (nSize > 0 && lpszOut) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+	return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#else
+	return DTWAIN_GetCapHelp(lCapability, lpszOut, nSize);
+#endif
+}
 #endif // CTLSTRIMPL_INL

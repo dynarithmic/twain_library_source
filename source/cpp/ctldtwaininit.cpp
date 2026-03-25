@@ -96,10 +96,11 @@ static void LoadFlatbedOnlyOverrides();
 static void LoadTwainLoopOverrides();
 static void LoadPaperDetectionOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
+static void LoadSheetcountProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
 static void LoadSelectSourcePosition();
-
+static void LoadGetMessageTestOverride();
 
 #ifdef _WIN32
 static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM w, LPARAM lparam);
@@ -242,6 +243,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainMsg(MSG *pMsg)
 LONG DLLENTRY_DEF DTWAIN_GetLastError()
 {
     LOG_FUNC_ENTRY_PARAMS(())
+
+    // Test stuff
+    std::string sTest = "VueScan TWAIN";
+
+    auto sNew = StringWrapperA::TrimAll(sTest);
+
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if ( !pHandle )
     {
@@ -869,11 +876,17 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 // Load whether paper detection is supported
                 LoadPaperDetectionOverrides();
 
+                // Load whether there will be an explicit test for GetMessage()
+                LoadGetMessageTestOverride();
+
                 // Load flatbed only list of devices
                 LoadFlatbedOnlyOverrides();
 
                 // Load check feeder on open status
                 LoadOnSourceOpenProperties(pHandle);
+
+                // Load the CAP_SHEETCOUNT behavior
+                LoadSheetcountProperties(pHandle);
 
                 // Load image file related options
                 LoadImageFileOptions(pHandle);
@@ -901,7 +914,14 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 auto& appTitle = CTL_StaticData::GetAppTitle();
                 appTitle.resize(256, '\0');
                 auto nSize = GetResourceStringA(IDS_DTWAIN_APPTITLE, &appTitle[0], 255);
-                appTitle.resize(nSize);
+                if ( nSize != 0)
+                    appTitle.resize(nSize - 1);
+
+                auto& appTitleHTML = CTL_StaticData::GetAppTitleHTML();
+				appTitleHTML.resize(256, '\0');
+				nSize = GetResourceStringA(IDS_DTWAIN_APPTITLE_HTML, &appTitleHTML[0], 255);
+				if (nSize != 0)
+					appTitleHTML.resize(nSize - 1);
             }
             LOG_FUNC_ENTRY_PARAMS(())
             LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<DTWAIN_HANDLE>(pHandle))
@@ -1080,6 +1100,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(!logFailed)
     CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLogSaveThreshold(LONG64 lineCount)
+{
+	LOG_FUNC_ENTRY_PARAMS((lineCount))
+	auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    if (lineCount <= 0)
+        lineCount = -1LL;
+    CTL_StaticData::GetLogFileSaveThreshold() = lineCount;
+    CTL_StaticData::GetLogger().SetLogSaveThreshold(lineCount);
+	LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+	CATCH_BLOCK(false)
 }
 
 bool dynarithmic::UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle)
@@ -2092,9 +2124,9 @@ LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainName(LPCTSTR lpszBuffer)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto badValue = std::numeric_limits<LONG>::min();
     auto retVal = CTL_StaticData::GetIDFromTwainName(StringConversion::Convert_NativePtr_To_Ansi(lpszBuffer));
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.first; }, DTWAIN_ERR_STRINGID_NOTFOUND, static_cast<int>(retVal.second), FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)retVal.second)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first ? static_cast<LONG>(retVal.second) : badValue);
     CATCH_BLOCK(std::numeric_limits<LONG>::min())
 }
 
@@ -2122,6 +2154,22 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantEx(LONG lConstantType, LONG lTw
 	auto numChars = StringWrapper::CopyInfoToCString(ret.second, lpszOut, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+    CATCH_BLOCK(0)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable)
+{
+    LOG_FUNC_ENTRY_PARAMS((bEnable))
+    auto& bTest = CTL_StaticData::IsTestForGetMessage();
+    bTest = (bEnable ? true : false);
+    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+    CATCH_BLOCK(0)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopDetectionOn(VOID_PROTOTYPE)
+{
+    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_EXIT_NONAME_PARAMS(CTL_StaticData::IsTestForGetMessage()?TRUE:FALSE)
     CATCH_BLOCK(0)
 }
 
@@ -2423,6 +2471,15 @@ void LoadTwainLoopOverrides()
     }
 }
 
+void LoadGetMessageTestOverride()
+{
+	auto* customProfile = CTL_StaticData::GetINIInterface();
+	if (!customProfile)
+		return;
+    auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TWAINLOOPPEEK_KEY).data();
+    CTL_StaticData::IsTestForGetMessage() = customProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TESTGET_ITEM).data(), true);
+}
+
 // This loads the sources that will override DTWAIN_IsFeederSensitive() with 
 // whether the source supports checking for paper loaded in feeder
 void LoadPaperDetectionOverrides()
@@ -2462,6 +2519,33 @@ void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle)
     // Check if the default opened source name is saved to the INI file when a source is opened
 	iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data();
 	pHandle->m_OnSourceOpenProperties.m_bSaveDefaultToINI = iniInterface->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCE_SAVEDEFAULT).data(), false);
+}
+
+// This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [SheetCount]
+// section.  This section determines whether the TWAIN driver supports
+// CAP_SHEETCOUNT correctly (interprets the CAP_SHEETCOUNT as the number
+// of sheets of paper, not the number of images)
+void LoadSheetcountProperties(CTL_TwainDLLHandle* pHandle)
+{
+	auto& sheetcount_map = CTL_TwainAppMgr::GetSourceSheetcountMap();
+	sheetcount_map.clear();
+
+	// Get the section name
+	auto* customProfile = CTL_StaticData::GetINIInterface();
+	if (!customProfile)
+		return;
+	CSimpleIniA::TNamesDepend keys;
+	auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SHEETCOUNT_KEY).data();
+	customProfile->GetAllKeys(iniKey, keys);
+	auto iter = keys.begin();
+	while (iter != keys.end())
+	{
+		CSimpleIniA::TNamesDepend vals;
+		customProfile->GetAllValues(iniKey, iter->pItem, vals);
+        if ( !vals.empty() )
+            sheetcount_map.push_back({ iter->pItem,vals.front().pItem });
+		++iter;
+	}
 }
 
 void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)

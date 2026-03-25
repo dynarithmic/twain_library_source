@@ -264,6 +264,8 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     SourceCloserRAII sourceCloser(p, !bSourcePreOpened);
 
     const auto acqType = opts.getAcquireType();
+
+
     switch (acqType)
     {
         case ACQUIREAUDIONATIVE:
@@ -407,6 +409,8 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     pDLLHandle->m_bTransferDone = false;
     pDLLHandle->m_bSourceClosed = false;
     pDLLHandle->m_lLastError = 0;
+
+    pSource->SetUserAcquisitionArray(nullptr);
 
     if (pDLLHandle->m_lAcquireMode == DTWAIN_MODELESS)
     {
@@ -555,8 +559,9 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                                       DTWAIN_ERR_SOURCE_ACQUIRING, -1, FUNC_MACRO);
     // Negotiate transfer
 
-    // We may have to reset the max number of pages double the amount if 
-    // SetTransferCount() detects that the scanner is running a duplex scan
+    // Set the transfer count.  In addition, we may have to reset the max number of 
+    // pages double the amount if SetTransferCount() detects that the scanner is 
+    // running a duplex scan
     opts.setMaxPages(CTL_TwainAppMgr::SetTransferCount(pSource, opts.getMaxPages()));
 
     pSource->SetSpecialTransferMode(opts.getTransferMode());

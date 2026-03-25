@@ -115,5 +115,12 @@ namespace dynarithmic
             return CreateContainerHelper<Container, std::string>(pHandle, theArray, maxElements);
         return {};
     }
+
+    template <typename ArrayType, typename TwainTypeOut>
+    void ConvertArrayInPlace(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray)
+    {
+		auto& vect = GetArrayFactoryFromHandle(pHandle)->underlying_container_t<ArrayType>(theArray);
+        std::transform(vect.begin(), vect.end(), vect.begin(), [&](ArrayType value) { return static_cast<TwainTypeOut>(value); });
+    }
 }
 #endif
