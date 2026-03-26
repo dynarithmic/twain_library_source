@@ -361,6 +361,17 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     {\
        LOG_FUNC_ENTRY_PARAMS((Source, value)) \
        auto bRet = GetCapability<CapDataType>(Source, Cap, value, CapFn); \
+       LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first); \
+       CATCH_BLOCK(false) \
+    }
+
+#define EXPORT_GET_CAP_VALUE_CONVERTED(FuncName, Cap, CapDataType, CapFn) \
+    DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType::value_converted_type* value)\
+    {\
+       LOG_FUNC_ENTRY_PARAMS((Source, value)) \
+       auto bRet = GetCapability<CapDataType>(Source, Cap, reinterpret_cast<CapDataType::value_type*>(value), CapFn); \
+       LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
        LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first); \
        CATCH_BLOCK(false) \
     }
@@ -372,6 +383,16 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
        CapDataType::value_type value = {}; \
        auto bRet = GetCapability<CapDataType>(Source, Cap, &value, CapFn); \
        LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first?value : errorRetValue); \
+       CATCH_BLOCK(errorRetValue) \
+    }
+
+#define EXPORT_GET_CAP_VALUE_RETURNVAL_CONVERTED(FuncName, Cap, CapDataType, errorRetValue, CapFn) \
+    CapDataType::value_converted_type DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source)\
+    {\
+       LOG_FUNC_ENTRY_PARAMS((Source)) \
+       CapDataType::value_type value = {}; \
+       auto bRet = GetCapability<CapDataType>(Source, Cap, &value, CapFn); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first?static_cast<CapDataType::value_converted_type>(value) : errorRetValue); \
        CATCH_BLOCK(errorRetValue) \
     }
 
@@ -394,6 +415,21 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
             bRet = GetCapability<CapDataType>(Source, Cap, value, GetCurrentCapValues); \
         else \
             bRet = GetCapability<CapDataType>(Source, Cap, value, GetDefaultCapValues); \
+       LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first); \
+       CATCH_BLOCK(false) \
+    }
+
+#define EXPORT_GET_CAP_VALUE_OPT_CURRENT_CONVERT(FuncName, Cap, CapDataType) \
+    DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType::value_converted_type* value, DTWAIN_BOOL bCurrent)\
+    {\
+        LOG_FUNC_ENTRY_PARAMS((Source, value, bCurrent)) \
+        std::pair <bool, int> bRet = {}; \
+        if ( bCurrent ) \
+            bRet = GetCapability<CapDataType>(Source, Cap, reinterpret_cast<CapDataType::value_type*>(value), GetCurrentCapValues); \
+        else \
+            bRet = GetCapability<CapDataType>(Source, Cap, reinterpret_cast<CapDataType::value_type*>(value), GetDefaultCapValues); \
+       LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
        LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first); \
        CATCH_BLOCK(false) \
     }
@@ -439,8 +475,10 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 
 #define EXPORT_GET_CAP_VALUE_D(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_double, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_I(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_DWORD(FuncName, Cap) EXPORT_GET_CAP_VALUE_CONVERTED(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_A(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_voidptr, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_RETURNVAL_I(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, ErrorVal, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_RETURNVAL_DWORD(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL_CONVERTED(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, ErrorVal, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_RETURNVAL_D(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_double, ErrorVal, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_RETURNVAL_A(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_voidptr, ErrorVal, GetCurrentCapValues)
 
@@ -471,6 +509,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     }
 
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CTL_ArrayFactory::tagged_array_long)
+#define EXPORT_GET_CAP_VALUE_OPT_CURRENT_DWORD(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT_CONVERT(FuncName, Cap, CTL_ArrayFactory::tagged_array_long)
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT_D(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CTL_ArrayFactory::tagged_array_double)
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(FuncName, FuncNameToCall, Cap, ErrorValue) EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN(FuncName, FuncNameToCall, Cap, CTL_ArrayFactory::tagged_array_long, ErrorValue)
 
@@ -495,6 +534,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 
 #define EXPORT_SET_CAP_VALUE_D(FuncName, Cap) EXPORT_SET_CAP_VALUE(FuncName, Cap, DTWAIN_FLOAT, SetSupportFn1<DTWAIN_FLOAT>)
 #define EXPORT_SET_CAP_VALUE_I(FuncName, Cap) EXPORT_SET_CAP_VALUE(FuncName, Cap, LONG, SetSupportFn1<LONG>)
+#define EXPORT_SET_CAP_VALUE_DWORD(FuncName, Cap) EXPORT_SET_CAP_VALUE(FuncName, Cap, DWORD, SetSupportFn1<DWORD>)
 #define EXPORT_SET_CAP_VALUE_S(FuncName, Cap) EXPORT_SET_CAP_VALUE(FuncName, Cap, LPCTSTR, SetSupportFn1<LPCTSTR>)
 #define EXPORT_SET_CAP_VALUE_OPT_CURRENT_I(FuncName, Cap) EXPORT_SET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, LONG, SetSupportFn1<LONG>)
 #define EXPORT_SET_CAP_VALUE_A(FuncName, Cap) EXPORT_SET_CAP_VALUE(FuncName, Cap, DTWAIN_ARRAY, SetSupportFn2<DTWAIN_ARRAY>)
@@ -632,23 +672,23 @@ EXPORT_ENUM_CURRENTCAP_VALUES_NOEXPAND_EX(DTWAIN_GetLightSourcesEx, ICAP_LIGHTSO
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetNoiseFilter,  ICAP_NOISEFILTER)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetOrientation, ICAP_ORIENTATION)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetOrientationEx, DTWAIN_GetOrientation, ICAP_ORIENTATION, -1)
-EXPORT_GET_CAP_VALUE_I(DTWAIN_GetMaxBuffers, CAP_MAXBATCHBUFFERS)
+EXPORT_GET_CAP_VALUE_DWORD(DTWAIN_GetMaxBuffers, CAP_MAXBATCHBUFFERS)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPaperSize, ICAP_SUPPORTEDSIZES)
-EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPatchcodeMaxPriorities, ICAP_PATCHCODEMAXSEARCHPRIORITIES)
-EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetBarcodeMaxPriorities, ICAP_BARCODEMAXSEARCHPRIORITIES)
-EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPatchcodeMaxRetries, ICAP_PATCHCODEMAXRETRIES)
-EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetBarcodeMaxRetries, ICAP_BARCODEMAXRETRIES)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_DWORD(DTWAIN_GetPatchcodeMaxPriorities, ICAP_PATCHCODEMAXSEARCHPRIORITIES)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_DWORD(DTWAIN_GetBarcodeMaxPriorities, ICAP_BARCODEMAXSEARCHPRIORITIES)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_DWORD(DTWAIN_GetPatchcodeMaxRetries, ICAP_PATCHCODEMAXRETRIES)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_DWORD(DTWAIN_GetBarcodeMaxRetries, ICAP_BARCODEMAXRETRIES)
 EXPORT_GET_CAP_VALUE_A(DTWAIN_GetPatchcodePriorities, ICAP_PATCHCODESEARCHPRIORITIES)
 EXPORT_GET_CAP_VALUE_A(DTWAIN_GetBarcodePriorities, ICAP_BARCODESEARCHPRIORITIES)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPatchcodeSearchMode, ICAP_PATCHCODESEARCHMODE)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetBarcodeSearchMode, ICAP_BARCODESEARCHMODE)
-EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPatchcodeTimeOut, ICAP_PATCHCODETIMEOUT)
-EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetBarcodeTimeOut, ICAP_BARCODETIMEOUT)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_DWORD(DTWAIN_GetPatchcodeTimeOut, ICAP_PATCHCODETIMEOUT)
+EXPORT_GET_CAP_VALUE_OPT_CURRENT_DWORD(DTWAIN_GetBarcodeTimeOut, ICAP_BARCODETIMEOUT)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetPixelFlavor, ICAP_PIXELFLAVOR)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPrinter, CAP_PRINTER)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetPrinterEx, DTWAIN_GetPrinter, CAP_PRINTER, -1)
-EXPORT_GET_CAP_VALUE_I(DTWAIN_GetPrinterStartNumber, CAP_PRINTERINDEX)
-EXPORT_GET_CAP_VALUE_RETURNVAL_I(DTWAIN_GetPrinterStartNumberEx, CAP_PRINTERINDEX, -1)
+EXPORT_GET_CAP_VALUE_DWORD(DTWAIN_GetPrinterStartNumber, CAP_PRINTERINDEX)
+EXPORT_GET_CAP_VALUE_RETURNVAL_DWORD(DTWAIN_GetPrinterStartNumberEx, CAP_PRINTERINDEX, std::numeric_limits<DWORD>::max())
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPrinterStringMode, CAP_PRINTERMODE)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetPrinterStringModeEx, DTWAIN_GetPrinterStringMode, CAP_PRINTERMODE, -1)
 EXPORT_GET_CAP_VALUE_A(DTWAIN_GetPrinterStrings, CAP_PRINTERSTRING)
@@ -701,23 +741,23 @@ EXPORT_SET_CAP_VALUE_I(DTWAIN_SetLightPath, ICAP_LIGHTPATH)
 EXPORT_SET_CAP_VALUE_A(DTWAIN_SetLightPathEx, ICAP_LIGHTPATH)
 EXPORT_SET_CAP_VALUE_I(DTWAIN_SetLightSource, ICAP_LIGHTSOURCE)
 EXPORT_SET_CAP_VALUE_A(DTWAIN_SetLightSources, ICAP_LIGHTSOURCE)
-EXPORT_SET_CAP_VALUE_I(DTWAIN_SetMaxBuffers, CAP_MAXBATCHBUFFERS)
+EXPORT_SET_CAP_VALUE_DWORD(DTWAIN_SetMaxBuffers, CAP_MAXBATCHBUFFERS)
 EXPORT_SET_CAP_VALUE_I(DTWAIN_SetNoiseFilter, ICAP_NOISEFILTER)
 EXPORT_SET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_SetOrientation, ICAP_ORIENTATION)
 EXPORT_SET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_SetOverscan, ICAP_OVERSCAN)
 EXPORT_SET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_SetPaperSize, ICAP_SUPPORTEDSIZES)
-EXPORT_SET_CAP_VALUE_I(DTWAIN_SetPatchcodeMaxPriorities, ICAP_PATCHCODEMAXSEARCHPRIORITIES)
-EXPORT_SET_CAP_VALUE_I(DTWAIN_SetBarcodeMaxPriorities, ICAP_BARCODEMAXSEARCHPRIORITIES)
-EXPORT_SET_CAP_VALUE_I(DTWAIN_SetPatchcodeMaxRetries,  ICAP_PATCHCODEMAXRETRIES)
-EXPORT_SET_CAP_VALUE_I(DTWAIN_SetBarcodeMaxRetries, ICAP_BARCODEMAXRETRIES)
+EXPORT_SET_CAP_VALUE_DWORD(DTWAIN_SetPatchcodeMaxPriorities, ICAP_PATCHCODEMAXSEARCHPRIORITIES)
+EXPORT_SET_CAP_VALUE_DWORD(DTWAIN_SetBarcodeMaxPriorities, ICAP_BARCODEMAXSEARCHPRIORITIES)
+EXPORT_SET_CAP_VALUE_DWORD(DTWAIN_SetPatchcodeMaxRetries,  ICAP_PATCHCODEMAXRETRIES)
+EXPORT_SET_CAP_VALUE_DWORD(DTWAIN_SetBarcodeMaxRetries, ICAP_BARCODEMAXRETRIES)
 EXPORT_SET_CAP_VALUE_A(DTWAIN_SetPatchcodePriorities, ICAP_PATCHCODESEARCHPRIORITIES)
 EXPORT_SET_CAP_VALUE_A(DTWAIN_SetBarcodePriorities, ICAP_BARCODESEARCHPRIORITIES)
 EXPORT_SET_CAP_VALUE_I(DTWAIN_SetPatchcodeSearchMode, ICAP_PATCHCODESEARCHMODE)
 EXPORT_SET_CAP_VALUE_I(DTWAIN_SetBarcodeSearchMode, ICAP_BARCODESEARCHMODE)
-EXPORT_SET_CAP_VALUE_I(DTWAIN_SetPatchcodeTimeOut, ICAP_PATCHCODETIMEOUT)
-EXPORT_SET_CAP_VALUE_I(DTWAIN_SetBarcodeTimeOut, ICAP_BARCODETIMEOUT)
+EXPORT_SET_CAP_VALUE_DWORD(DTWAIN_SetPatchcodeTimeOut, ICAP_PATCHCODETIMEOUT)
+EXPORT_SET_CAP_VALUE_DWORD(DTWAIN_SetBarcodeTimeOut, ICAP_BARCODETIMEOUT)
 EXPORT_SET_CAP_VALUE_I(DTWAIN_SetPixelFlavor, ICAP_PIXELFLAVOR)
-EXPORT_SET_CAP_VALUE_I(DTWAIN_SetPrinterStartNumber, CAP_PRINTERINDEX)
+EXPORT_SET_CAP_VALUE_DWORD(DTWAIN_SetPrinterStartNumber, CAP_PRINTERINDEX)
 EXPORT_SET_CAP_VALUE_S(DTWAIN_SetPrinterSuffixString, CAP_PRINTERSUFFIX)
 EXPORT_SET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_SetPrinterStringMode, CAP_PRINTERMODE)
 EXPORT_SET_CAP_VALUE_D(DTWAIN_SetRotation, ICAP_ROTATION)

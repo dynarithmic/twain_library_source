@@ -99,10 +99,11 @@ namespace dynarithmic
         };
 
         // This is the basic class that is created for each DTWAIN Array
-        template <typename T>
+        template <typename T, typename ConvertedType = T>
         struct tagged_array : arrayTag
         {
             using value_type = T;  // The underlying array type
+			using value_converted_type = ConvertedType;
             using container_type = std::vector<T>; // the backing container for the array values
             container_type vData;
             container_type& get_container() noexcept { return vData; }  // returns the vector
@@ -115,7 +116,7 @@ namespace dynarithmic
         using tagged_array_int16 = tagged_array<int16_t>;
 		using tagged_array_uint16 = tagged_array<uint16_t>;
 		using tagged_array_uint32 = tagged_array<uint32_t>;
-        using tagged_array_long = tagged_array<LONG>;
+        using tagged_array_long = tagged_array<LONG, DWORD>;
         using tagged_array_double = tagged_array<double>;
         using tagged_array_string = tagged_array<std::string>;
         using tagged_array_wstring = tagged_array<std::wstring>;
@@ -125,7 +126,7 @@ namespace dynarithmic
         using tagged_array_frame = tagged_array<TwainFrameInternal>;
         using tagged_array_twframe = tagged_array<TW_FRAME>;
         using tagged_array_fix32 = tagged_array<TW_FIX32Ex>;
-        using tagged_array_long64 = tagged_array<LONG64>;
+        using tagged_array_long64 = tagged_array<LONG64, ULONG64>;
 
         // Map type that maps the array tag to a function that manipulates the 
         // DTWAIN array
