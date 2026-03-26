@@ -425,6 +425,7 @@ namespace Dynarithmic
         public const int DTWAIN_USEMEMFILE = 8;
         public const int DTWAIN_FAILURE1 = (-1);
         public const int DTWAIN_FAILURE2 = (-2);
+        public const uint DTWAIN_FAILURE3 = 0xFFFFFFFFU;
         public const int DTWAIN_DELETEALL = (-1);
         public const int DTWAIN_TN_ACQUIREDONE = 1000;
         public const int DTWAIN_TN_ACQUIREFAILED = 1001;
@@ -2810,10 +2811,10 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetAuthor(DTWAIN_SOURCE Source, System.IntPtr szAuthor);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetBarcodeMaxPriorities(DTWAIN_SOURCE Source, ref int pMaxPriorities, int bCurrent);
+        public static extern int DTWAIN_GetBarcodeMaxPriorities(DTWAIN_SOURCE Source, ref DWORD pMaxPriorities, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetBarcodeMaxRetries(DTWAIN_SOURCE Source, ref int pMaxRetries, int bCurrent);
+        public static extern int DTWAIN_GetBarcodeMaxRetries(DTWAIN_SOURCE Source, ref DWORD pMaxRetries, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetBarcodePriorities(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY SearchPriorities);
@@ -2822,7 +2823,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetBarcodeSearchMode(DTWAIN_SOURCE Source, ref int pSearchMode, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetBarcodeTimeOut(DTWAIN_SOURCE Source, ref int pTimeOut, int bCurrent);
+        public static extern int DTWAIN_GetBarcodeTimeOut(DTWAIN_SOURCE Source, ref DWORD pTimeOut, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetBatteryMinutes(DTWAIN_SOURCE Source, ref int lpMinutes);
@@ -3158,7 +3159,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetMaxBuffers(DTWAIN_SOURCE Source, ref int pMaxBuf);
+        public static extern int DTWAIN_GetMaxBuffers(DTWAIN_SOURCE Source, ref DWORD pMaxBuf);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source);
@@ -3278,10 +3279,10 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetPaperSizeName(int paperNumber, System.IntPtr outName, int nSize);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetPatchcodeMaxPriorities(DTWAIN_SOURCE Source, ref int pMaxPriorities, int bCurrent);
+        public static extern int DTWAIN_GetPatchcodeMaxPriorities(DTWAIN_SOURCE Source, ref DWORD pMaxPriorities, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetPatchcodeMaxRetries(DTWAIN_SOURCE Source, ref int pMaxRetries, int bCurrent);
+        public static extern int DTWAIN_GetPatchcodeMaxRetries(DTWAIN_SOURCE Source, ref DWORD pMaxRetries, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetPatchcodePriorities(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY SearchPriorities);
@@ -3290,7 +3291,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetPatchcodeSearchMode(DTWAIN_SOURCE Source, ref int pSearchMode, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, ref int pTimeOut, int bCurrent);
+        public static extern int DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, ref DWORD pTimeOut, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetPixelFlavor(DTWAIN_SOURCE Source, ref int lpPixelFlavor);
@@ -3305,10 +3306,10 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetPrinterEx(DTWAIN_SOURCE Source, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetPrinterStartNumber(DTWAIN_SOURCE Source, ref int nStart);
+        public static extern int DTWAIN_GetPrinterStartNumber(DTWAIN_SOURCE Source, ref DWORD nStart);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetPrinterStartNumberEx(DTWAIN_SOURCE Source);
+        public static extern uint DTWAIN_GetPrinterStartNumberEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetPrinterStringMode(DTWAIN_SOURCE Source, ref int PrinterMode, int bCurrent);
@@ -4115,10 +4116,10 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetAvailablePrintersArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY AvailPrinters);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_SetBarcodeMaxPriorities(DTWAIN_SOURCE Source, int nMaxSearchRetries);
+        public static extern int DTWAIN_SetBarcodeMaxPriorities(DTWAIN_SOURCE Source, uint nMaxPriorities);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_SetBarcodeMaxRetries(DTWAIN_SOURCE Source, int nMaxRetries);
+        public static extern int DTWAIN_SetBarcodeMaxRetries(DTWAIN_SOURCE Source, uint nMaxRetries);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_SetBarcodePriorities(DTWAIN_SOURCE Source, DTWAIN_ARRAY SearchPriorities);
@@ -4127,7 +4128,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetBarcodeSearchMode(DTWAIN_SOURCE Source, int nSearchMode);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_SetBarcodeTimeOut(DTWAIN_SOURCE Source, int TimeOutValue);
+        public static extern int DTWAIN_SetBarcodeTimeOut(DTWAIN_SOURCE Source, uint TimeOutValue);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, int BitDepth, int bSetCurrent);
@@ -4301,7 +4302,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetMaxAcquisitions(DTWAIN_SOURCE Source, int MaxAcquires);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_SetMaxBuffers(DTWAIN_SOURCE Source, int MaxBuf);
+        public static extern int DTWAIN_SetMaxBuffers(DTWAIN_SOURCE Source, uint MaxBuf);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_SetMaxRetryAttempts(DTWAIN_SOURCE Source, int nAttempts);
@@ -4394,10 +4395,10 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetPaperSize(DTWAIN_SOURCE Source, int PaperSize, int bSetCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_SetPatchcodeMaxPriorities(DTWAIN_SOURCE Source, int nMaxSearchRetries);
+        public static extern int DTWAIN_SetPatchcodeMaxPriorities(DTWAIN_SOURCE Source, uint nMaxSearchRetries);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_SetPatchcodeMaxRetries(DTWAIN_SOURCE Source, int nMaxRetries);
+        public static extern int DTWAIN_SetPatchcodeMaxRetries(DTWAIN_SOURCE Source, uint nMaxRetries);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_SetPatchcodePriorities(DTWAIN_SOURCE Source, DTWAIN_ARRAY SearchPriorities);
@@ -4406,7 +4407,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetPatchcodeSearchMode(DTWAIN_SOURCE Source, int nSearchMode);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_SetPatchcodeTimeOut(DTWAIN_SOURCE Source, int TimeOutValue);
+        public static extern int DTWAIN_SetPatchcodeTimeOut(DTWAIN_SOURCE Source, uint TimeOutValue);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_SetPixelFlavor(DTWAIN_SOURCE Source, int PixelFlavor);
@@ -4427,7 +4428,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, int Printer, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_SetPrinterStartNumber(DTWAIN_SOURCE Source, int nStart);
+        public static extern int DTWAIN_SetPrinterStartNumber(DTWAIN_SOURCE Source, uint nStart);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_SetPrinterStringMode(DTWAIN_SOURCE Source, int PrinterMode, int bSetCurrent);

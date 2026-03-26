@@ -380,6 +380,7 @@ const (
     DTWAIN_USEMEMFILE = 8
     DTWAIN_FAILURE1 = -1
     DTWAIN_FAILURE2 = -2
+    DTWAIN_FAILURE3 = 0xFFFFFFFF
     DTWAIN_DELETEALL = -1
     DTWAIN_TN_ACQUIREDONE = 1000
     DTWAIN_TN_ACQUIREFAILED = 1001
@@ -5402,13 +5403,13 @@ func (d *DTWAIN_DLL) DTWAIN_GetAuthorW(Source DTWAIN_SOURCE, szAuthor []uint16) 
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetBarcodeMaxPriorities(Source DTWAIN_SOURCE, pMaxPriorities *int32, bCurrent int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetBarcodeMaxPriorities(Source DTWAIN_SOURCE, pMaxPriorities *uint32, bCurrent int32) int32 {
     theProc := d.procs["DTWAIN_GetBarcodeMaxPriorities"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(pMaxPriorities)), uintptr(bCurrent))
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetBarcodeMaxRetries(Source DTWAIN_SOURCE, pMaxRetries *int32, bCurrent int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetBarcodeMaxRetries(Source DTWAIN_SOURCE, pMaxRetries *uint32, bCurrent int32) int32 {
     theProc := d.procs["DTWAIN_GetBarcodeMaxRetries"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(pMaxRetries)), uintptr(bCurrent))
     return int32(v1)
@@ -5426,7 +5427,7 @@ func (d *DTWAIN_DLL) DTWAIN_GetBarcodeSearchMode(Source DTWAIN_SOURCE, pSearchMo
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetBarcodeTimeOut(Source DTWAIN_SOURCE, pTimeOut *int32, bCurrent int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetBarcodeTimeOut(Source DTWAIN_SOURCE, pTimeOut *uint32, bCurrent int32) int32 {
     theProc := d.procs["DTWAIN_GetBarcodeTimeOut"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(pTimeOut)), uintptr(bCurrent))
     return int32(v1)
@@ -6257,7 +6258,7 @@ func (d *DTWAIN_DLL) DTWAIN_GetMaxAcquisitions(Source DTWAIN_SOURCE) int32 {
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetMaxBuffers(Source DTWAIN_SOURCE, pMaxBuf *int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetMaxBuffers(Source DTWAIN_SOURCE, pMaxBuf *uint32) int32 {
     theProc := d.procs["DTWAIN_GetMaxBuffers"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(pMaxBuf)))
     return int32(v1)
@@ -6557,13 +6558,13 @@ func (d *DTWAIN_DLL) DTWAIN_GetPaperSizeNameW(paperNumber int32, outName []uint1
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetPatchcodeMaxPriorities(Source DTWAIN_SOURCE, pMaxPriorities *int32, bCurrent int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetPatchcodeMaxPriorities(Source DTWAIN_SOURCE, pMaxPriorities *uint32, bCurrent int32) int32 {
     theProc := d.procs["DTWAIN_GetPatchcodeMaxPriorities"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(pMaxPriorities)), uintptr(bCurrent))
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetPatchcodeMaxRetries(Source DTWAIN_SOURCE, pMaxRetries *int32, bCurrent int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetPatchcodeMaxRetries(Source DTWAIN_SOURCE, pMaxRetries *uint32, bCurrent int32) int32 {
     theProc := d.procs["DTWAIN_GetPatchcodeMaxRetries"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(pMaxRetries)), uintptr(bCurrent))
     return int32(v1)
@@ -6581,7 +6582,7 @@ func (d *DTWAIN_DLL) DTWAIN_GetPatchcodeSearchMode(Source DTWAIN_SOURCE, pSearch
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetPatchcodeTimeOut(Source DTWAIN_SOURCE, pTimeOut *int32, bCurrent int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetPatchcodeTimeOut(Source DTWAIN_SOURCE, pTimeOut *uint32, bCurrent int32) int32 {
     theProc := d.procs["DTWAIN_GetPatchcodeTimeOut"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(pTimeOut)), uintptr(bCurrent))
     return int32(v1)
@@ -6611,16 +6612,16 @@ func (d *DTWAIN_DLL) DTWAIN_GetPrinterEx(Source DTWAIN_SOURCE, bCurrent int32) i
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetPrinterStartNumber(Source DTWAIN_SOURCE, nStart *int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetPrinterStartNumber(Source DTWAIN_SOURCE, nStart *uint32) int32 {
     theProc := d.procs["DTWAIN_GetPrinterStartNumber"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(nStart)))
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetPrinterStartNumberEx(Source DTWAIN_SOURCE) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetPrinterStartNumberEx(Source DTWAIN_SOURCE) uint32 {
     theProc := d.procs["DTWAIN_GetPrinterStartNumberEx"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source))
-    return int32(v1)
+    return uint32(v1)
 }
 
 func (d *DTWAIN_DLL) DTWAIN_GetPrinterStringMode(Source DTWAIN_SOURCE, PrinterMode *int32, bCurrent int32) int32 {
@@ -8678,13 +8679,13 @@ func (d *DTWAIN_DLL) DTWAIN_SetAvailablePrintersArray(Source DTWAIN_SOURCE, Avai
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_SetBarcodeMaxPriorities(Source DTWAIN_SOURCE, nMaxSearchRetries int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_SetBarcodeMaxPriorities(Source DTWAIN_SOURCE, nMaxPriorities uint32) int32 {
     theProc := d.procs["DTWAIN_SetBarcodeMaxPriorities"]
-    v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(nMaxSearchRetries))
+    v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(nMaxPriorities))
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_SetBarcodeMaxRetries(Source DTWAIN_SOURCE, nMaxRetries int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_SetBarcodeMaxRetries(Source DTWAIN_SOURCE, nMaxRetries uint32) int32 {
     theProc := d.procs["DTWAIN_SetBarcodeMaxRetries"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(nMaxRetries))
     return int32(v1)
@@ -8702,7 +8703,7 @@ func (d *DTWAIN_DLL) DTWAIN_SetBarcodeSearchMode(Source DTWAIN_SOURCE, nSearchMo
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_SetBarcodeTimeOut(Source DTWAIN_SOURCE, TimeOutValue int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_SetBarcodeTimeOut(Source DTWAIN_SOURCE, TimeOutValue uint32) int32 {
     theProc := d.procs["DTWAIN_SetBarcodeTimeOut"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(TimeOutValue))
     return int32(v1)
@@ -9219,7 +9220,7 @@ func (d *DTWAIN_DLL) DTWAIN_SetMaxAcquisitions(Source DTWAIN_SOURCE, MaxAcquires
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_SetMaxBuffers(Source DTWAIN_SOURCE, MaxBuf int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_SetMaxBuffers(Source DTWAIN_SOURCE, MaxBuf uint32) int32 {
     theProc := d.procs["DTWAIN_SetMaxBuffers"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(MaxBuf))
     return int32(v1)
@@ -9552,13 +9553,13 @@ func (d *DTWAIN_DLL) DTWAIN_SetPaperSize(Source DTWAIN_SOURCE, PaperSize int32, 
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_SetPatchcodeMaxPriorities(Source DTWAIN_SOURCE, nMaxSearchRetries int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_SetPatchcodeMaxPriorities(Source DTWAIN_SOURCE, nMaxSearchRetries uint32) int32 {
     theProc := d.procs["DTWAIN_SetPatchcodeMaxPriorities"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(nMaxSearchRetries))
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_SetPatchcodeMaxRetries(Source DTWAIN_SOURCE, nMaxRetries int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_SetPatchcodeMaxRetries(Source DTWAIN_SOURCE, nMaxRetries uint32) int32 {
     theProc := d.procs["DTWAIN_SetPatchcodeMaxRetries"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(nMaxRetries))
     return int32(v1)
@@ -9576,7 +9577,7 @@ func (d *DTWAIN_DLL) DTWAIN_SetPatchcodeSearchMode(Source DTWAIN_SOURCE, nSearch
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_SetPatchcodeTimeOut(Source DTWAIN_SOURCE, TimeOutValue int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_SetPatchcodeTimeOut(Source DTWAIN_SOURCE, TimeOutValue uint32) int32 {
     theProc := d.procs["DTWAIN_SetPatchcodeTimeOut"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(TimeOutValue))
     return int32(v1)
@@ -9631,7 +9632,7 @@ func (d *DTWAIN_DLL) DTWAIN_SetPrinterEx(Source DTWAIN_SOURCE, Printer int32, bC
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_SetPrinterStartNumber(Source DTWAIN_SOURCE, nStart int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_SetPrinterStartNumber(Source DTWAIN_SOURCE, nStart uint32) int32 {
     theProc := d.procs["DTWAIN_SetPrinterStartNumber"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(nStart))
     return int32(v1)

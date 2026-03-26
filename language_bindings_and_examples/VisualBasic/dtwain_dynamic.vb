@@ -543,6 +543,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_USEMEMFILE As Integer = 8
         Public Const DTWAIN_FAILURE1 As Integer = (-1)
         Public Const DTWAIN_FAILURE2 As Integer = (-2)
+        Public Const DTWAIN_FAILURE3 As UInteger = &HFFFFFFFFUI
         Public Const DTWAIN_DELETEALL As Integer = (-1)
         Public Const DTWAIN_TN_ACQUIREDONE As Integer = 1000
         Public Const DTWAIN_TN_ACQUIREFAILED As Integer = 1001
@@ -2903,10 +2904,10 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetAuthorDelegate(Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> szAuthor As StringBuilder) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetBarcodeMaxPrioritiesDelegate(Source As System.IntPtr, ByRef pMaxPriorities As Integer, bCurrent As Integer) As Integer
+        Private Delegate Function DTWAIN_GetBarcodeMaxPrioritiesDelegate(Source As System.IntPtr, ByRef pMaxPriorities As UInteger, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetBarcodeMaxRetriesDelegate(Source As System.IntPtr, ByRef pMaxRetries As Integer, bCurrent As Integer) As Integer
+        Private Delegate Function DTWAIN_GetBarcodeMaxRetriesDelegate(Source As System.IntPtr, ByRef pMaxRetries As UInteger, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetBarcodePrioritiesDelegate(Source As System.IntPtr, ByRef SearchPriorities As System.IntPtr) As Integer
@@ -2915,7 +2916,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetBarcodeSearchModeDelegate(Source As System.IntPtr, ByRef pSearchMode As Integer, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetBarcodeTimeOutDelegate(Source As System.IntPtr, ByRef pTimeOut As Integer, bCurrent As Integer) As Integer
+        Private Delegate Function DTWAIN_GetBarcodeTimeOutDelegate(Source As System.IntPtr, ByRef pTimeOut As UInteger, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetBatteryMinutesDelegate(Source As System.IntPtr, ByRef lpMinutes As Integer) As Integer
@@ -3197,7 +3198,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetMaxAcquisitionsDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetMaxBuffersDelegate(Source As System.IntPtr, ByRef pMaxBuf As Integer) As Integer
+        Private Delegate Function DTWAIN_GetMaxBuffersDelegate(Source As System.IntPtr, ByRef pMaxBuf As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetMaxPagesToAcquireDelegate(Source As System.IntPtr) As Integer
@@ -3287,10 +3288,10 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetPaperSizeNameDelegate(paperNumber As Integer, <MarshalAs(UnmanagedType.LPTStr)> outName As StringBuilder, nSize As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetPatchcodeMaxPrioritiesDelegate(Source As System.IntPtr, ByRef pMaxPriorities As Integer, bCurrent As Integer) As Integer
+        Private Delegate Function DTWAIN_GetPatchcodeMaxPrioritiesDelegate(Source As System.IntPtr, ByRef pMaxPriorities As UInteger, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetPatchcodeMaxRetriesDelegate(Source As System.IntPtr, ByRef pMaxRetries As Integer, bCurrent As Integer) As Integer
+        Private Delegate Function DTWAIN_GetPatchcodeMaxRetriesDelegate(Source As System.IntPtr, ByRef pMaxRetries As UInteger, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetPatchcodePrioritiesDelegate(Source As System.IntPtr, ByRef SearchPriorities As System.IntPtr) As Integer
@@ -3299,7 +3300,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetPatchcodeSearchModeDelegate(Source As System.IntPtr, ByRef pSearchMode As Integer, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetPatchcodeTimeOutDelegate(Source As System.IntPtr, ByRef pTimeOut As Integer, bCurrent As Integer) As Integer
+        Private Delegate Function DTWAIN_GetPatchcodeTimeOutDelegate(Source As System.IntPtr, ByRef pTimeOut As UInteger, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetPixelFlavorDelegate(Source As System.IntPtr, ByRef lpPixelFlavor As Integer) As Integer
@@ -3314,10 +3315,10 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetPrinterExDelegate(Source As System.IntPtr, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetPrinterStartNumberDelegate(Source As System.IntPtr, ByRef nStart As Integer) As Integer
+        Private Delegate Function DTWAIN_GetPrinterStartNumberDelegate(Source As System.IntPtr, ByRef nStart As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetPrinterStartNumberExDelegate(Source As System.IntPtr) As Integer
+        Private Delegate Function DTWAIN_GetPrinterStartNumberExDelegate(Source As System.IntPtr) As UInteger
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetPrinterStringModeDelegate(Source As System.IntPtr, ByRef PrinterMode As Integer, bCurrent As Integer) As Integer
@@ -4028,10 +4029,10 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_SetAvailablePrintersArrayDelegate(Source As System.IntPtr, AvailPrinters As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SetBarcodeMaxPrioritiesDelegate(Source As System.IntPtr, nMaxSearchRetries As Integer) As Integer
+        Private Delegate Function DTWAIN_SetBarcodeMaxPrioritiesDelegate(Source As System.IntPtr, nMaxPriorities As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SetBarcodeMaxRetriesDelegate(Source As System.IntPtr, nMaxRetries As Integer) As Integer
+        Private Delegate Function DTWAIN_SetBarcodeMaxRetriesDelegate(Source As System.IntPtr, nMaxRetries As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetBarcodePrioritiesDelegate(Source As System.IntPtr, SearchPriorities As System.IntPtr) As Integer
@@ -4040,7 +4041,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_SetBarcodeSearchModeDelegate(Source As System.IntPtr, nSearchMode As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SetBarcodeTimeOutDelegate(Source As System.IntPtr, TimeOutValue As Integer) As Integer
+        Private Delegate Function DTWAIN_SetBarcodeTimeOutDelegate(Source As System.IntPtr, TimeOutValue As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetBitDepthDelegate(Source As System.IntPtr, BitDepth As Integer, bSetCurrent As Integer) As Integer
@@ -4214,7 +4215,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_SetMaxAcquisitionsDelegate(Source As System.IntPtr, MaxAcquires As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SetMaxBuffersDelegate(Source As System.IntPtr, MaxBuf As Integer) As Integer
+        Private Delegate Function DTWAIN_SetMaxBuffersDelegate(Source As System.IntPtr, MaxBuf As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetMaxRetryAttemptsDelegate(Source As System.IntPtr, nAttempts As Integer) As Integer
@@ -4307,10 +4308,10 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_SetPaperSizeDelegate(Source As System.IntPtr, PaperSize As Integer, bSetCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SetPatchcodeMaxPrioritiesDelegate(Source As System.IntPtr, nMaxSearchRetries As Integer) As Integer
+        Private Delegate Function DTWAIN_SetPatchcodeMaxPrioritiesDelegate(Source As System.IntPtr, nMaxSearchRetries As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SetPatchcodeMaxRetriesDelegate(Source As System.IntPtr, nMaxRetries As Integer) As Integer
+        Private Delegate Function DTWAIN_SetPatchcodeMaxRetriesDelegate(Source As System.IntPtr, nMaxRetries As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetPatchcodePrioritiesDelegate(Source As System.IntPtr, SearchPriorities As System.IntPtr) As Integer
@@ -4319,7 +4320,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_SetPatchcodeSearchModeDelegate(Source As System.IntPtr, nSearchMode As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SetPatchcodeTimeOutDelegate(Source As System.IntPtr, TimeOutValue As Integer) As Integer
+        Private Delegate Function DTWAIN_SetPatchcodeTimeOutDelegate(Source As System.IntPtr, TimeOutValue As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetPixelFlavorDelegate(Source As System.IntPtr, PixelFlavor As Integer) As Integer
@@ -4340,7 +4341,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_SetPrinterExDelegate(Source As System.IntPtr, Printer As Integer, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SetPrinterStartNumberDelegate(Source As System.IntPtr, nStart As Integer) As Integer
+        Private Delegate Function DTWAIN_SetPrinterStartNumberDelegate(Source As System.IntPtr, nStart As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetPrinterStringModeDelegate(Source As System.IntPtr, PrinterMode As Integer, bSetCurrent As Integer) As Integer
@@ -5783,11 +5784,11 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetAuthor(Source, szAuthor)
         End Function
         
-        Public Function DTWAIN_GetBarcodeMaxPriorities(Source As System.IntPtr, ByRef pMaxPriorities As Integer, bCurrent As Integer) As Integer
+        Public Function DTWAIN_GetBarcodeMaxPriorities(Source As System.IntPtr, ByRef pMaxPriorities As UInteger, bCurrent As Integer) As Integer
         Return api.DTWAIN_GetBarcodeMaxPriorities(Source, pMaxPriorities, bCurrent)
         End Function
         
-        Public Function DTWAIN_GetBarcodeMaxRetries(Source As System.IntPtr, ByRef pMaxRetries As Integer, bCurrent As Integer) As Integer
+        Public Function DTWAIN_GetBarcodeMaxRetries(Source As System.IntPtr, ByRef pMaxRetries As UInteger, bCurrent As Integer) As Integer
         Return api.DTWAIN_GetBarcodeMaxRetries(Source, pMaxRetries, bCurrent)
         End Function
         
@@ -5799,7 +5800,7 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetBarcodeSearchMode(Source, pSearchMode, bCurrent)
         End Function
         
-        Public Function DTWAIN_GetBarcodeTimeOut(Source As System.IntPtr, ByRef pTimeOut As Integer, bCurrent As Integer) As Integer
+        Public Function DTWAIN_GetBarcodeTimeOut(Source As System.IntPtr, ByRef pTimeOut As UInteger, bCurrent As Integer) As Integer
         Return api.DTWAIN_GetBarcodeTimeOut(Source, pTimeOut, bCurrent)
         End Function
         
@@ -6175,7 +6176,7 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetMaxAcquisitions(Source)
         End Function
         
-        Public Function DTWAIN_GetMaxBuffers(Source As System.IntPtr, ByRef pMaxBuf As Integer) As Integer
+        Public Function DTWAIN_GetMaxBuffers(Source As System.IntPtr, ByRef pMaxBuf As UInteger) As Integer
         Return api.DTWAIN_GetMaxBuffers(Source, pMaxBuf)
         End Function
         
@@ -6295,11 +6296,11 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetPaperSizeName(paperNumber, outName, nSize)
         End Function
         
-        Public Function DTWAIN_GetPatchcodeMaxPriorities(Source As System.IntPtr, ByRef pMaxPriorities As Integer, bCurrent As Integer) As Integer
+        Public Function DTWAIN_GetPatchcodeMaxPriorities(Source As System.IntPtr, ByRef pMaxPriorities As UInteger, bCurrent As Integer) As Integer
         Return api.DTWAIN_GetPatchcodeMaxPriorities(Source, pMaxPriorities, bCurrent)
         End Function
         
-        Public Function DTWAIN_GetPatchcodeMaxRetries(Source As System.IntPtr, ByRef pMaxRetries As Integer, bCurrent As Integer) As Integer
+        Public Function DTWAIN_GetPatchcodeMaxRetries(Source As System.IntPtr, ByRef pMaxRetries As UInteger, bCurrent As Integer) As Integer
         Return api.DTWAIN_GetPatchcodeMaxRetries(Source, pMaxRetries, bCurrent)
         End Function
         
@@ -6311,7 +6312,7 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetPatchcodeSearchMode(Source, pSearchMode, bCurrent)
         End Function
         
-        Public Function DTWAIN_GetPatchcodeTimeOut(Source As System.IntPtr, ByRef pTimeOut As Integer, bCurrent As Integer) As Integer
+        Public Function DTWAIN_GetPatchcodeTimeOut(Source As System.IntPtr, ByRef pTimeOut As UInteger, bCurrent As Integer) As Integer
         Return api.DTWAIN_GetPatchcodeTimeOut(Source, pTimeOut, bCurrent)
         End Function
         
@@ -6331,11 +6332,11 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetPrinterEx(Source, bCurrent)
         End Function
         
-        Public Function DTWAIN_GetPrinterStartNumber(Source As System.IntPtr, ByRef nStart As Integer) As Integer
+        Public Function DTWAIN_GetPrinterStartNumber(Source As System.IntPtr, ByRef nStart As UInteger) As Integer
         Return api.DTWAIN_GetPrinterStartNumber(Source, nStart)
         End Function
         
-        Public Function DTWAIN_GetPrinterStartNumberEx(Source As System.IntPtr) As Integer
+        Public Function DTWAIN_GetPrinterStartNumberEx(Source As System.IntPtr) As UInteger
         Return api.DTWAIN_GetPrinterStartNumberEx(Source)
         End Function
         
@@ -7283,11 +7284,11 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetAvailablePrintersArray(Source, AvailPrinters)
         End Function
         
-        Public Function DTWAIN_SetBarcodeMaxPriorities(Source As System.IntPtr, nMaxSearchRetries As Integer) As Integer
-        Return api.DTWAIN_SetBarcodeMaxPriorities(Source, nMaxSearchRetries)
+        Public Function DTWAIN_SetBarcodeMaxPriorities(Source As System.IntPtr, nMaxPriorities As UInteger) As Integer
+        Return api.DTWAIN_SetBarcodeMaxPriorities(Source, nMaxPriorities)
         End Function
         
-        Public Function DTWAIN_SetBarcodeMaxRetries(Source As System.IntPtr, nMaxRetries As Integer) As Integer
+        Public Function DTWAIN_SetBarcodeMaxRetries(Source As System.IntPtr, nMaxRetries As UInteger) As Integer
         Return api.DTWAIN_SetBarcodeMaxRetries(Source, nMaxRetries)
         End Function
         
@@ -7299,7 +7300,7 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetBarcodeSearchMode(Source, nSearchMode)
         End Function
         
-        Public Function DTWAIN_SetBarcodeTimeOut(Source As System.IntPtr, TimeOutValue As Integer) As Integer
+        Public Function DTWAIN_SetBarcodeTimeOut(Source As System.IntPtr, TimeOutValue As UInteger) As Integer
         Return api.DTWAIN_SetBarcodeTimeOut(Source, TimeOutValue)
         End Function
         
@@ -7531,7 +7532,7 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetMaxAcquisitions(Source, MaxAcquires)
         End Function
         
-        Public Function DTWAIN_SetMaxBuffers(Source As System.IntPtr, MaxBuf As Integer) As Integer
+        Public Function DTWAIN_SetMaxBuffers(Source As System.IntPtr, MaxBuf As UInteger) As Integer
         Return api.DTWAIN_SetMaxBuffers(Source, MaxBuf)
         End Function
         
@@ -7655,11 +7656,11 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetPaperSize(Source, PaperSize, bSetCurrent)
         End Function
         
-        Public Function DTWAIN_SetPatchcodeMaxPriorities(Source As System.IntPtr, nMaxSearchRetries As Integer) As Integer
+        Public Function DTWAIN_SetPatchcodeMaxPriorities(Source As System.IntPtr, nMaxSearchRetries As UInteger) As Integer
         Return api.DTWAIN_SetPatchcodeMaxPriorities(Source, nMaxSearchRetries)
         End Function
         
-        Public Function DTWAIN_SetPatchcodeMaxRetries(Source As System.IntPtr, nMaxRetries As Integer) As Integer
+        Public Function DTWAIN_SetPatchcodeMaxRetries(Source As System.IntPtr, nMaxRetries As UInteger) As Integer
         Return api.DTWAIN_SetPatchcodeMaxRetries(Source, nMaxRetries)
         End Function
         
@@ -7671,7 +7672,7 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetPatchcodeSearchMode(Source, nSearchMode)
         End Function
         
-        Public Function DTWAIN_SetPatchcodeTimeOut(Source As System.IntPtr, TimeOutValue As Integer) As Integer
+        Public Function DTWAIN_SetPatchcodeTimeOut(Source As System.IntPtr, TimeOutValue As UInteger) As Integer
         Return api.DTWAIN_SetPatchcodeTimeOut(Source, TimeOutValue)
         End Function
         
@@ -7699,7 +7700,7 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetPrinterEx(Source, Printer, bCurrent)
         End Function
         
-        Public Function DTWAIN_SetPrinterStartNumber(Source As System.IntPtr, nStart As Integer) As Integer
+        Public Function DTWAIN_SetPrinterStartNumber(Source As System.IntPtr, nStart As UInteger) As Integer
         Return api.DTWAIN_SetPrinterStartNumber(Source, nStart)
         End Function
         

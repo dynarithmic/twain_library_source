@@ -443,6 +443,7 @@
         public const int DTWAIN_USEMEMFILE = 8;
         public const int DTWAIN_FAILURE1 = (-1);
         public const int DTWAIN_FAILURE2 = (-2);
+        public const uint DTWAIN_FAILURE3 = 0xFFFFFFFFU;
         public const int DTWAIN_DELETEALL = (-1);
         public const int DTWAIN_TN_ACQUIREDONE = 1000;
         public const int DTWAIN_TN_ACQUIREFAILED = 1001;
@@ -2247,11 +2248,11 @@
         public delegate int DTWAIN_GetAppInfoDelegate_overload(System.IntPtr szVerStr, System.IntPtr szManu, System.IntPtr szProdFam, System.IntPtr szProdName);
         public delegate int DTWAIN_GetAuthorDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szAuthor);
         public delegate int DTWAIN_GetAuthorDelegate_overload(DTWAIN_SOURCE Source, System.IntPtr szAuthor);
-        public delegate int DTWAIN_GetBarcodeMaxPrioritiesDelegate(DTWAIN_SOURCE Source, ref int pMaxPriorities, int bCurrent);
-        public delegate int DTWAIN_GetBarcodeMaxRetriesDelegate(DTWAIN_SOURCE Source, ref int pMaxRetries, int bCurrent);
+        public delegate int DTWAIN_GetBarcodeMaxPrioritiesDelegate(DTWAIN_SOURCE Source, ref DWORD pMaxPriorities, int bCurrent);
+        public delegate int DTWAIN_GetBarcodeMaxRetriesDelegate(DTWAIN_SOURCE Source, ref DWORD pMaxRetries, int bCurrent);
         public delegate int DTWAIN_GetBarcodePrioritiesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY SearchPriorities);
         public delegate int DTWAIN_GetBarcodeSearchModeDelegate(DTWAIN_SOURCE Source, ref int pSearchMode, int bCurrent);
-        public delegate int DTWAIN_GetBarcodeTimeOutDelegate(DTWAIN_SOURCE Source, ref int pTimeOut, int bCurrent);
+        public delegate int DTWAIN_GetBarcodeTimeOutDelegate(DTWAIN_SOURCE Source, ref DWORD pTimeOut, int bCurrent);
         public delegate int DTWAIN_GetBatteryMinutesDelegate(DTWAIN_SOURCE Source, ref int lpMinutes);
         public delegate int DTWAIN_GetBatteryPercentDelegate(DTWAIN_SOURCE Source, ref int lpPercent);
         public delegate int DTWAIN_GetBitDepthDelegate(DTWAIN_SOURCE Source, ref int BitDepth, int bCurrent);
@@ -2363,7 +2364,7 @@
         public delegate DTwainLoggerProc DTWAIN_GetLoggerCallbackDelegate();
         public delegate int DTWAIN_GetManualDuplexCountDelegate(DTWAIN_SOURCE Source, ref int pSide1, ref int pSide2);
         public delegate int DTWAIN_GetMaxAcquisitionsDelegate(DTWAIN_SOURCE Source);
-        public delegate int DTWAIN_GetMaxBuffersDelegate(DTWAIN_SOURCE Source, ref int pMaxBuf);
+        public delegate int DTWAIN_GetMaxBuffersDelegate(DTWAIN_SOURCE Source, ref DWORD pMaxBuf);
         public delegate int DTWAIN_GetMaxPagesToAcquireDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetMaxRetryAttemptsDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetNameFromCapDelegate(int nCapValue, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szValue, int nMaxLen);
@@ -2403,17 +2404,17 @@
         public delegate int DTWAIN_GetPaperSizeDelegate(DTWAIN_SOURCE Source, ref int lpPaperSize, int bCurrent);
         public delegate int DTWAIN_GetPaperSizeNameDelegate(int paperNumber, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder outName, int nSize);
         public delegate int DTWAIN_GetPaperSizeNameDelegate_overload(int paperNumber, System.IntPtr outName, int nSize);
-        public delegate int DTWAIN_GetPatchcodeMaxPrioritiesDelegate(DTWAIN_SOURCE Source, ref int pMaxPriorities, int bCurrent);
-        public delegate int DTWAIN_GetPatchcodeMaxRetriesDelegate(DTWAIN_SOURCE Source, ref int pMaxRetries, int bCurrent);
+        public delegate int DTWAIN_GetPatchcodeMaxPrioritiesDelegate(DTWAIN_SOURCE Source, ref DWORD pMaxPriorities, int bCurrent);
+        public delegate int DTWAIN_GetPatchcodeMaxRetriesDelegate(DTWAIN_SOURCE Source, ref DWORD pMaxRetries, int bCurrent);
         public delegate int DTWAIN_GetPatchcodePrioritiesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY SearchPriorities);
         public delegate int DTWAIN_GetPatchcodeSearchModeDelegate(DTWAIN_SOURCE Source, ref int pSearchMode, int bCurrent);
-        public delegate int DTWAIN_GetPatchcodeTimeOutDelegate(DTWAIN_SOURCE Source, ref int pTimeOut, int bCurrent);
+        public delegate int DTWAIN_GetPatchcodeTimeOutDelegate(DTWAIN_SOURCE Source, ref DWORD pTimeOut, int bCurrent);
         public delegate int DTWAIN_GetPixelFlavorDelegate(DTWAIN_SOURCE Source, ref int lpPixelFlavor);
         public delegate int DTWAIN_GetPixelTypeDelegate(DTWAIN_SOURCE Source, ref int PixelType, ref int BitDepth, int bCurrent);
         public delegate int DTWAIN_GetPrinterDelegate(DTWAIN_SOURCE Source, ref int lpPrinter, int bCurrent);
         public delegate int DTWAIN_GetPrinterExDelegate(DTWAIN_SOURCE Source, int bCurrent);
-        public delegate int DTWAIN_GetPrinterStartNumberDelegate(DTWAIN_SOURCE Source, ref int nStart);
-        public delegate int DTWAIN_GetPrinterStartNumberExDelegate(DTWAIN_SOURCE Source);
+        public delegate int DTWAIN_GetPrinterStartNumberDelegate(DTWAIN_SOURCE Source, ref DWORD nStart);
+        public delegate uint DTWAIN_GetPrinterStartNumberExDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetPrinterStringModeDelegate(DTWAIN_SOURCE Source, ref int PrinterMode, int bCurrent);
         public delegate int DTWAIN_GetPrinterStringModeExDelegate(DTWAIN_SOURCE Source, int bCurrent);
         public delegate int DTWAIN_GetPrinterStringsDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY ArrayString);
@@ -2682,11 +2683,11 @@
         public delegate int DTWAIN_SetAuthorDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szAuthor);
         public delegate int DTWAIN_SetAvailablePrintersDelegate(DTWAIN_SOURCE Source, int lpAvailPrinters);
         public delegate int DTWAIN_SetAvailablePrintersArrayDelegate(DTWAIN_SOURCE Source, DTWAIN_ARRAY AvailPrinters);
-        public delegate int DTWAIN_SetBarcodeMaxPrioritiesDelegate(DTWAIN_SOURCE Source, int nMaxSearchRetries);
-        public delegate int DTWAIN_SetBarcodeMaxRetriesDelegate(DTWAIN_SOURCE Source, int nMaxRetries);
+        public delegate int DTWAIN_SetBarcodeMaxPrioritiesDelegate(DTWAIN_SOURCE Source, uint nMaxPriorities);
+        public delegate int DTWAIN_SetBarcodeMaxRetriesDelegate(DTWAIN_SOURCE Source, uint nMaxRetries);
         public delegate int DTWAIN_SetBarcodePrioritiesDelegate(DTWAIN_SOURCE Source, DTWAIN_ARRAY SearchPriorities);
         public delegate int DTWAIN_SetBarcodeSearchModeDelegate(DTWAIN_SOURCE Source, int nSearchMode);
-        public delegate int DTWAIN_SetBarcodeTimeOutDelegate(DTWAIN_SOURCE Source, int TimeOutValue);
+        public delegate int DTWAIN_SetBarcodeTimeOutDelegate(DTWAIN_SOURCE Source, uint TimeOutValue);
         public delegate int DTWAIN_SetBitDepthDelegate(DTWAIN_SOURCE Source, int BitDepth, int bSetCurrent);
         public delegate int DTWAIN_SetBlankPageDetectionDelegate(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold, int discard_option, int bSet);
         public delegate int DTWAIN_SetBlankPageDetectionExDelegate(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold, int autodetect, int detectOpts, int bSet);
@@ -2744,7 +2745,7 @@
         public delegate int DTWAIN_SetLoggerCallbackDelegate(DTwainLoggerProc logProc, long UserData);
         public delegate int DTWAIN_SetManualDuplexModeDelegate(DTWAIN_SOURCE Source, int Flags, int bSet);
         public delegate int DTWAIN_SetMaxAcquisitionsDelegate(DTWAIN_SOURCE Source, int MaxAcquires);
-        public delegate int DTWAIN_SetMaxBuffersDelegate(DTWAIN_SOURCE Source, int MaxBuf);
+        public delegate int DTWAIN_SetMaxBuffersDelegate(DTWAIN_SOURCE Source, uint MaxBuf);
         public delegate int DTWAIN_SetMaxRetryAttemptsDelegate(DTWAIN_SOURCE Source, int nAttempts);
         public delegate int DTWAIN_SetMultipageScanModeDelegate(DTWAIN_SOURCE Source, int ScanType);
         public delegate int DTWAIN_SetNoiseFilterDelegate(DTWAIN_SOURCE Source, int NoiseFilter);
@@ -2775,18 +2776,18 @@
         public delegate int DTWAIN_SetPDFTextElementStringDelegate(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPTStr)] string val1, int Flags);
         public delegate int DTWAIN_SetPDFTitleDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string lpTitle);
         public delegate int DTWAIN_SetPaperSizeDelegate(DTWAIN_SOURCE Source, int PaperSize, int bSetCurrent);
-        public delegate int DTWAIN_SetPatchcodeMaxPrioritiesDelegate(DTWAIN_SOURCE Source, int nMaxSearchRetries);
-        public delegate int DTWAIN_SetPatchcodeMaxRetriesDelegate(DTWAIN_SOURCE Source, int nMaxRetries);
+        public delegate int DTWAIN_SetPatchcodeMaxPrioritiesDelegate(DTWAIN_SOURCE Source, uint nMaxSearchRetries);
+        public delegate int DTWAIN_SetPatchcodeMaxRetriesDelegate(DTWAIN_SOURCE Source, uint nMaxRetries);
         public delegate int DTWAIN_SetPatchcodePrioritiesDelegate(DTWAIN_SOURCE Source, DTWAIN_ARRAY SearchPriorities);
         public delegate int DTWAIN_SetPatchcodeSearchModeDelegate(DTWAIN_SOURCE Source, int nSearchMode);
-        public delegate int DTWAIN_SetPatchcodeTimeOutDelegate(DTWAIN_SOURCE Source, int TimeOutValue);
+        public delegate int DTWAIN_SetPatchcodeTimeOutDelegate(DTWAIN_SOURCE Source, uint TimeOutValue);
         public delegate int DTWAIN_SetPixelFlavorDelegate(DTWAIN_SOURCE Source, int PixelFlavor);
         public delegate int DTWAIN_SetPixelTypeDelegate(DTWAIN_SOURCE Source, int PixelType, int BitDepth, int bSetCurrent);
         public delegate int DTWAIN_SetPostScriptTitleDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szTitle);
         public delegate int DTWAIN_SetPostScriptTypeDelegate(DTWAIN_SOURCE Source, int PSType);
         public delegate int DTWAIN_SetPrinterDelegate(DTWAIN_SOURCE Source, int Printer, int bCurrent);
         public delegate int DTWAIN_SetPrinterExDelegate(DTWAIN_SOURCE Source, int Printer, int bCurrent);
-        public delegate int DTWAIN_SetPrinterStartNumberDelegate(DTWAIN_SOURCE Source, int nStart);
+        public delegate int DTWAIN_SetPrinterStartNumberDelegate(DTWAIN_SOURCE Source, uint nStart);
         public delegate int DTWAIN_SetPrinterStringModeDelegate(DTWAIN_SOURCE Source, int PrinterMode, int bSetCurrent);
         public delegate int DTWAIN_SetPrinterStringsDelegate(DTWAIN_SOURCE Source, DTWAIN_ARRAY ArrayString, ref int pNumStrings);
         public delegate int DTWAIN_SetPrinterSuffixStringDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string Suffix);
@@ -6626,10 +6627,10 @@
         public  int DTWAIN_GetAuthor (DTWAIN_SOURCE Source, System.IntPtr szAuthor)
         => _DTWAIN_GetAuthor_overload(Source, szAuthor);
 
-        public  int DTWAIN_GetBarcodeMaxPriorities(DTWAIN_SOURCE Source, ref int pMaxPriorities, int bCurrent)
+        public  int DTWAIN_GetBarcodeMaxPriorities(DTWAIN_SOURCE Source, ref DWORD pMaxPriorities, int bCurrent)
         => _DTWAIN_GetBarcodeMaxPriorities(Source, ref pMaxPriorities, bCurrent);
 
-        public  int DTWAIN_GetBarcodeMaxRetries(DTWAIN_SOURCE Source, ref int pMaxRetries, int bCurrent)
+        public  int DTWAIN_GetBarcodeMaxRetries(DTWAIN_SOURCE Source, ref DWORD pMaxRetries, int bCurrent)
         => _DTWAIN_GetBarcodeMaxRetries(Source, ref pMaxRetries, bCurrent);
 
         public  int DTWAIN_GetBarcodePriorities(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY SearchPriorities)
@@ -6638,7 +6639,7 @@
         public  int DTWAIN_GetBarcodeSearchMode(DTWAIN_SOURCE Source, ref int pSearchMode, int bCurrent)
         => _DTWAIN_GetBarcodeSearchMode(Source, ref pSearchMode, bCurrent);
 
-        public  int DTWAIN_GetBarcodeTimeOut(DTWAIN_SOURCE Source, ref int pTimeOut, int bCurrent)
+        public  int DTWAIN_GetBarcodeTimeOut(DTWAIN_SOURCE Source, ref DWORD pTimeOut, int bCurrent)
         => _DTWAIN_GetBarcodeTimeOut(Source, ref pTimeOut, bCurrent);
 
         public  int DTWAIN_GetBatteryMinutes(DTWAIN_SOURCE Source, ref int lpMinutes)
@@ -6974,7 +6975,7 @@
         public  int DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source)
         => _DTWAIN_GetMaxAcquisitions(Source);
 
-        public  int DTWAIN_GetMaxBuffers(DTWAIN_SOURCE Source, ref int pMaxBuf)
+        public  int DTWAIN_GetMaxBuffers(DTWAIN_SOURCE Source, ref DWORD pMaxBuf)
         => _DTWAIN_GetMaxBuffers(Source, ref pMaxBuf);
 
         public  int DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source)
@@ -7094,10 +7095,10 @@
         public  int DTWAIN_GetPaperSizeName (int paperNumber, System.IntPtr outName, int nSize)
         => _DTWAIN_GetPaperSizeName_overload(paperNumber, outName, nSize);
 
-        public  int DTWAIN_GetPatchcodeMaxPriorities(DTWAIN_SOURCE Source, ref int pMaxPriorities, int bCurrent)
+        public  int DTWAIN_GetPatchcodeMaxPriorities(DTWAIN_SOURCE Source, ref DWORD pMaxPriorities, int bCurrent)
         => _DTWAIN_GetPatchcodeMaxPriorities(Source, ref pMaxPriorities, bCurrent);
 
-        public  int DTWAIN_GetPatchcodeMaxRetries(DTWAIN_SOURCE Source, ref int pMaxRetries, int bCurrent)
+        public  int DTWAIN_GetPatchcodeMaxRetries(DTWAIN_SOURCE Source, ref DWORD pMaxRetries, int bCurrent)
         => _DTWAIN_GetPatchcodeMaxRetries(Source, ref pMaxRetries, bCurrent);
 
         public  int DTWAIN_GetPatchcodePriorities(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY SearchPriorities)
@@ -7106,7 +7107,7 @@
         public  int DTWAIN_GetPatchcodeSearchMode(DTWAIN_SOURCE Source, ref int pSearchMode, int bCurrent)
         => _DTWAIN_GetPatchcodeSearchMode(Source, ref pSearchMode, bCurrent);
 
-        public  int DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, ref int pTimeOut, int bCurrent)
+        public  int DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, ref DWORD pTimeOut, int bCurrent)
         => _DTWAIN_GetPatchcodeTimeOut(Source, ref pTimeOut, bCurrent);
 
         public  int DTWAIN_GetPixelFlavor(DTWAIN_SOURCE Source, ref int lpPixelFlavor)
@@ -7121,10 +7122,10 @@
         public  int DTWAIN_GetPrinterEx(DTWAIN_SOURCE Source, int bCurrent)
         => _DTWAIN_GetPrinterEx(Source, bCurrent);
 
-        public  int DTWAIN_GetPrinterStartNumber(DTWAIN_SOURCE Source, ref int nStart)
+        public  int DTWAIN_GetPrinterStartNumber(DTWAIN_SOURCE Source, ref DWORD nStart)
         => _DTWAIN_GetPrinterStartNumber(Source, ref nStart);
 
-        public  int DTWAIN_GetPrinterStartNumberEx(DTWAIN_SOURCE Source)
+        public  uint DTWAIN_GetPrinterStartNumberEx(DTWAIN_SOURCE Source)
         => _DTWAIN_GetPrinterStartNumberEx(Source);
 
         public  int DTWAIN_GetPrinterStringMode(DTWAIN_SOURCE Source, ref int PrinterMode, int bCurrent)
@@ -7931,10 +7932,10 @@
         public  int DTWAIN_SetAvailablePrintersArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY AvailPrinters)
         => _DTWAIN_SetAvailablePrintersArray(Source, AvailPrinters);
 
-        public  int DTWAIN_SetBarcodeMaxPriorities(DTWAIN_SOURCE Source, int nMaxSearchRetries)
-        => _DTWAIN_SetBarcodeMaxPriorities(Source, nMaxSearchRetries);
+        public  int DTWAIN_SetBarcodeMaxPriorities(DTWAIN_SOURCE Source, uint nMaxPriorities)
+        => _DTWAIN_SetBarcodeMaxPriorities(Source, nMaxPriorities);
 
-        public  int DTWAIN_SetBarcodeMaxRetries(DTWAIN_SOURCE Source, int nMaxRetries)
+        public  int DTWAIN_SetBarcodeMaxRetries(DTWAIN_SOURCE Source, uint nMaxRetries)
         => _DTWAIN_SetBarcodeMaxRetries(Source, nMaxRetries);
 
         public  int DTWAIN_SetBarcodePriorities(DTWAIN_SOURCE Source, DTWAIN_ARRAY SearchPriorities)
@@ -7943,7 +7944,7 @@
         public  int DTWAIN_SetBarcodeSearchMode(DTWAIN_SOURCE Source, int nSearchMode)
         => _DTWAIN_SetBarcodeSearchMode(Source, nSearchMode);
 
-        public  int DTWAIN_SetBarcodeTimeOut(DTWAIN_SOURCE Source, int TimeOutValue)
+        public  int DTWAIN_SetBarcodeTimeOut(DTWAIN_SOURCE Source, uint TimeOutValue)
         => _DTWAIN_SetBarcodeTimeOut(Source, TimeOutValue);
 
         public  int DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, int BitDepth, int bSetCurrent)
@@ -8117,7 +8118,7 @@
         public  int DTWAIN_SetMaxAcquisitions(DTWAIN_SOURCE Source, int MaxAcquires)
         => _DTWAIN_SetMaxAcquisitions(Source, MaxAcquires);
 
-        public  int DTWAIN_SetMaxBuffers(DTWAIN_SOURCE Source, int MaxBuf)
+        public  int DTWAIN_SetMaxBuffers(DTWAIN_SOURCE Source, uint MaxBuf)
         => _DTWAIN_SetMaxBuffers(Source, MaxBuf);
 
         public  int DTWAIN_SetMaxRetryAttempts(DTWAIN_SOURCE Source, int nAttempts)
@@ -8210,10 +8211,10 @@
         public  int DTWAIN_SetPaperSize(DTWAIN_SOURCE Source, int PaperSize, int bSetCurrent)
         => _DTWAIN_SetPaperSize(Source, PaperSize, bSetCurrent);
 
-        public  int DTWAIN_SetPatchcodeMaxPriorities(DTWAIN_SOURCE Source, int nMaxSearchRetries)
+        public  int DTWAIN_SetPatchcodeMaxPriorities(DTWAIN_SOURCE Source, uint nMaxSearchRetries)
         => _DTWAIN_SetPatchcodeMaxPriorities(Source, nMaxSearchRetries);
 
-        public  int DTWAIN_SetPatchcodeMaxRetries(DTWAIN_SOURCE Source, int nMaxRetries)
+        public  int DTWAIN_SetPatchcodeMaxRetries(DTWAIN_SOURCE Source, uint nMaxRetries)
         => _DTWAIN_SetPatchcodeMaxRetries(Source, nMaxRetries);
 
         public  int DTWAIN_SetPatchcodePriorities(DTWAIN_SOURCE Source, DTWAIN_ARRAY SearchPriorities)
@@ -8222,7 +8223,7 @@
         public  int DTWAIN_SetPatchcodeSearchMode(DTWAIN_SOURCE Source, int nSearchMode)
         => _DTWAIN_SetPatchcodeSearchMode(Source, nSearchMode);
 
-        public  int DTWAIN_SetPatchcodeTimeOut(DTWAIN_SOURCE Source, int TimeOutValue)
+        public  int DTWAIN_SetPatchcodeTimeOut(DTWAIN_SOURCE Source, uint TimeOutValue)
         => _DTWAIN_SetPatchcodeTimeOut(Source, TimeOutValue);
 
         public  int DTWAIN_SetPixelFlavor(DTWAIN_SOURCE Source, int PixelFlavor)
@@ -8243,7 +8244,7 @@
         public  int DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, int Printer, int bCurrent)
         => _DTWAIN_SetPrinterEx(Source, Printer, bCurrent);
 
-        public  int DTWAIN_SetPrinterStartNumber(DTWAIN_SOURCE Source, int nStart)
+        public  int DTWAIN_SetPrinterStartNumber(DTWAIN_SOURCE Source, uint nStart)
         => _DTWAIN_SetPrinterStartNumber(Source, nStart);
 
         public  int DTWAIN_SetPrinterStringMode(DTWAIN_SOURCE Source, int PrinterMode, int bSetCurrent)

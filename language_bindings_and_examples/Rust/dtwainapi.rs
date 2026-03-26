@@ -445,11 +445,11 @@ type DtwaingetappinfowFunc = unsafe extern "C" fn(*mut u16,*mut u16,*mut u16,*mu
 type DtwaingetauthorFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
 type DtwaingetauthoraFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
 type DtwaingetauthorwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetbarcodemaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetbarcodemaxretriesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetbarcodemaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut u32,i32) -> i32;
+type DtwaingetbarcodemaxretriesFunc = unsafe extern "C" fn(*mut c_void,*mut u32,i32) -> i32;
 type DtwaingetbarcodeprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwaingetbarcodesearchmodeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetbarcodetimeoutFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetbarcodetimeoutFunc = unsafe extern "C" fn(*mut c_void,*mut u32,i32) -> i32;
 type DtwaingetbatteryminutesFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
 type DtwaingetbatterypercentFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
 type DtwaingetbitdepthFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
@@ -587,7 +587,7 @@ type DtwaingetloggercallbackaFunc = unsafe extern "C" fn() -> DTWAIN_LOGGER_PROC
 type DtwaingetloggercallbackwFunc = unsafe extern "C" fn() -> DTWAIN_LOGGER_PROCW;
 type DtwaingetmanualduplexcountFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
 type DtwaingetmaxacquisitionsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetmaxbuffersFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetmaxbuffersFunc = unsafe extern "C" fn(*mut c_void,*mut u32) -> i32;
 type DtwaingetmaxpagestoacquireFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingetmaxretryattemptsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingetnamefromcapFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
@@ -637,17 +637,17 @@ type DtwaingetpapersizeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> 
 type DtwaingetpapersizenameFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
 type DtwaingetpapersizenameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
 type DtwaingetpapersizenamewFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
-type DtwaingetpatchcodemaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetpatchcodemaxretriesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetpatchcodemaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut u32,i32) -> i32;
+type DtwaingetpatchcodemaxretriesFunc = unsafe extern "C" fn(*mut c_void,*mut u32,i32) -> i32;
 type DtwaingetpatchcodeprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwaingetpatchcodesearchmodeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetpatchcodetimeoutFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetpatchcodetimeoutFunc = unsafe extern "C" fn(*mut c_void,*mut u32,i32) -> i32;
 type DtwaingetpixelflavorFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
 type DtwaingetpixeltypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32,i32) -> i32;
 type DtwaingetprinterFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
 type DtwaingetprinterexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwaingetprinterstartnumberFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetprinterstartnumberexFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetprinterstartnumberFunc = unsafe extern "C" fn(*mut c_void,*mut u32) -> i32;
+type DtwaingetprinterstartnumberexFunc = unsafe extern "C" fn(*mut c_void) -> u32;
 type DtwaingetprinterstringmodeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
 type DtwaingetprinterstringmodeexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwaingetprinterstringsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
@@ -984,11 +984,11 @@ type DtwainsetauthoraFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i
 type DtwainsetauthorwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
 type DtwainsetavailableprintersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainsetavailableprintersarrayFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainsetbarcodemaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetbarcodemaxretriesFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetbarcodemaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,u32) -> i32;
+type DtwainsetbarcodemaxretriesFunc = unsafe extern "C" fn(*mut c_void,u32) -> i32;
 type DtwainsetbarcodeprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
 type DtwainsetbarcodesearchmodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetbarcodetimeoutFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetbarcodetimeoutFunc = unsafe extern "C" fn(*mut c_void,u32) -> i32;
 type DtwainsetbitdepthFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
 type DtwainsetblankpagedetectionFunc = unsafe extern "C" fn(*mut c_void,f64,i32,i32) -> i32;
 type DtwainsetblankpagedetectionexFunc = unsafe extern "C" fn(*mut c_void,f64,i32,i32,i32) -> i32;
@@ -1072,7 +1072,7 @@ type DtwainsetloggercallbackaFunc = unsafe extern "C" fn(DTWAIN_LOGGER_PROCA,i64
 type DtwainsetloggercallbackwFunc = unsafe extern "C" fn(DTWAIN_LOGGER_PROCW,i64) -> i32;
 type DtwainsetmanualduplexmodeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
 type DtwainsetmaxacquisitionsFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetmaxbuffersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetmaxbuffersFunc = unsafe extern "C" fn(*mut c_void,u32) -> i32;
 type DtwainsetmaxretryattemptsFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainsetmultipagescanmodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainsetnoisefilterFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
@@ -1125,11 +1125,11 @@ type DtwainsetpdftitleFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32
 type DtwainsetpdftitleaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
 type DtwainsetpdftitlewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
 type DtwainsetpapersizeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetpatchcodemaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpatchcodemaxretriesFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpatchcodemaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,u32) -> i32;
+type DtwainsetpatchcodemaxretriesFunc = unsafe extern "C" fn(*mut c_void,u32) -> i32;
 type DtwainsetpatchcodeprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
 type DtwainsetpatchcodesearchmodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpatchcodetimeoutFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpatchcodetimeoutFunc = unsafe extern "C" fn(*mut c_void,u32) -> i32;
 type DtwainsetpixelflavorFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainsetpixeltypeFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
 type DtwainsetpostscripttitleFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
@@ -1138,7 +1138,7 @@ type DtwainsetpostscripttitlewFunc = unsafe extern "C" fn(*mut c_void,*const u16
 type DtwainsetpostscripttypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainsetprinterFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
 type DtwainsetprinterexFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetprinterstartnumberFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetprinterstartnumberFunc = unsafe extern "C" fn(*mut c_void,u32) -> i32;
 type DtwainsetprinterstringmodeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
 type DtwainsetprinterstringsFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut i32) -> i32;
 type DtwainsetprintersuffixstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
@@ -2675,6 +2675,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_USEMEMFILE: i32 = 8;
     pub const DTWAIN_FAILURE1: i32 = -1;
     pub const DTWAIN_FAILURE2: i32 = -2;
+    pub const DTWAIN_FAILURE3: u32 = 0xFFFFFFFF;
     pub const DTWAIN_DELETEALL: i32 = -1;
     pub const DTWAIN_TN_ACQUIREDONE: i32 = 1000;
     pub const DTWAIN_TN_ACQUIREFAILED: i32 = 1001;
@@ -7989,11 +7990,11 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetAuthorWFunc)(Source, szAuthor);  }
     }
 
-    pub fn DTWAIN_GetBarcodeMaxPriorities(&self, Source: *mut c_void, pMaxPriorities: *mut i32, bCurrent: i32) -> i32 {
+    pub fn DTWAIN_GetBarcodeMaxPriorities(&self, Source: *mut c_void, pMaxPriorities: *mut u32, bCurrent: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetBarcodeMaxPrioritiesFunc)(Source, pMaxPriorities, bCurrent);  }
     }
 
-    pub fn DTWAIN_GetBarcodeMaxRetries(&self, Source: *mut c_void, pMaxRetries: *mut i32, bCurrent: i32) -> i32 {
+    pub fn DTWAIN_GetBarcodeMaxRetries(&self, Source: *mut c_void, pMaxRetries: *mut u32, bCurrent: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetBarcodeMaxRetriesFunc)(Source, pMaxRetries, bCurrent);  }
     }
 
@@ -8005,7 +8006,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetBarcodeSearchModeFunc)(Source, pSearchMode, bCurrent);  }
     }
 
-    pub fn DTWAIN_GetBarcodeTimeOut(&self, Source: *mut c_void, pTimeOut: *mut i32, bCurrent: i32) -> i32 {
+    pub fn DTWAIN_GetBarcodeTimeOut(&self, Source: *mut c_void, pTimeOut: *mut u32, bCurrent: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetBarcodeTimeOutFunc)(Source, pTimeOut, bCurrent);  }
     }
 
@@ -8557,7 +8558,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetMaxAcquisitionsFunc)(Source);  }
     }
 
-    pub fn DTWAIN_GetMaxBuffers(&self, Source: *mut c_void, pMaxBuf: *mut i32) -> i32 {
+    pub fn DTWAIN_GetMaxBuffers(&self, Source: *mut c_void, pMaxBuf: *mut u32) -> i32 {
         unsafe { return (self.DTWAIN_GetMaxBuffersFunc)(Source, pMaxBuf);  }
     }
 
@@ -8757,11 +8758,11 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetPaperSizeNameWFunc)(paperNumber, outName, nSize);  }
     }
 
-    pub fn DTWAIN_GetPatchcodeMaxPriorities(&self, Source: *mut c_void, pMaxPriorities: *mut i32, bCurrent: i32) -> i32 {
+    pub fn DTWAIN_GetPatchcodeMaxPriorities(&self, Source: *mut c_void, pMaxPriorities: *mut u32, bCurrent: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetPatchcodeMaxPrioritiesFunc)(Source, pMaxPriorities, bCurrent);  }
     }
 
-    pub fn DTWAIN_GetPatchcodeMaxRetries(&self, Source: *mut c_void, pMaxRetries: *mut i32, bCurrent: i32) -> i32 {
+    pub fn DTWAIN_GetPatchcodeMaxRetries(&self, Source: *mut c_void, pMaxRetries: *mut u32, bCurrent: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetPatchcodeMaxRetriesFunc)(Source, pMaxRetries, bCurrent);  }
     }
 
@@ -8773,7 +8774,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetPatchcodeSearchModeFunc)(Source, pSearchMode, bCurrent);  }
     }
 
-    pub fn DTWAIN_GetPatchcodeTimeOut(&self, Source: *mut c_void, pTimeOut: *mut i32, bCurrent: i32) -> i32 {
+    pub fn DTWAIN_GetPatchcodeTimeOut(&self, Source: *mut c_void, pTimeOut: *mut u32, bCurrent: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetPatchcodeTimeOutFunc)(Source, pTimeOut, bCurrent);  }
     }
 
@@ -8793,11 +8794,11 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetPrinterExFunc)(Source, bCurrent);  }
     }
 
-    pub fn DTWAIN_GetPrinterStartNumber(&self, Source: *mut c_void, nStart: *mut i32) -> i32 {
+    pub fn DTWAIN_GetPrinterStartNumber(&self, Source: *mut c_void, nStart: *mut u32) -> i32 {
         unsafe { return (self.DTWAIN_GetPrinterStartNumberFunc)(Source, nStart);  }
     }
 
-    pub fn DTWAIN_GetPrinterStartNumberEx(&self, Source: *mut c_void) -> i32 {
+    pub fn DTWAIN_GetPrinterStartNumberEx(&self, Source: *mut c_void) -> u32 {
         unsafe { return (self.DTWAIN_GetPrinterStartNumberExFunc)(Source);  }
     }
 
@@ -10145,11 +10146,11 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetAvailablePrintersArrayFunc)(Source, AvailPrinters);  }
     }
 
-    pub fn DTWAIN_SetBarcodeMaxPriorities(&self, Source: *mut c_void, nMaxSearchRetries: i32) -> i32 {
-        unsafe { return (self.DTWAIN_SetBarcodeMaxPrioritiesFunc)(Source, nMaxSearchRetries);  }
+    pub fn DTWAIN_SetBarcodeMaxPriorities(&self, Source: *mut c_void, nMaxPriorities: u32) -> i32 {
+        unsafe { return (self.DTWAIN_SetBarcodeMaxPrioritiesFunc)(Source, nMaxPriorities);  }
     }
 
-    pub fn DTWAIN_SetBarcodeMaxRetries(&self, Source: *mut c_void, nMaxRetries: i32) -> i32 {
+    pub fn DTWAIN_SetBarcodeMaxRetries(&self, Source: *mut c_void, nMaxRetries: u32) -> i32 {
         unsafe { return (self.DTWAIN_SetBarcodeMaxRetriesFunc)(Source, nMaxRetries);  }
     }
 
@@ -10161,7 +10162,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetBarcodeSearchModeFunc)(Source, nSearchMode);  }
     }
 
-    pub fn DTWAIN_SetBarcodeTimeOut(&self, Source: *mut c_void, TimeOutValue: i32) -> i32 {
+    pub fn DTWAIN_SetBarcodeTimeOut(&self, Source: *mut c_void, TimeOutValue: u32) -> i32 {
         unsafe { return (self.DTWAIN_SetBarcodeTimeOutFunc)(Source, TimeOutValue);  }
     }
 
@@ -10497,7 +10498,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetMaxAcquisitionsFunc)(Source, MaxAcquires);  }
     }
 
-    pub fn DTWAIN_SetMaxBuffers(&self, Source: *mut c_void, MaxBuf: i32) -> i32 {
+    pub fn DTWAIN_SetMaxBuffers(&self, Source: *mut c_void, MaxBuf: u32) -> i32 {
         unsafe { return (self.DTWAIN_SetMaxBuffersFunc)(Source, MaxBuf);  }
     }
 
@@ -10709,11 +10710,11 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPaperSizeFunc)(Source, PaperSize, bSetCurrent);  }
     }
 
-    pub fn DTWAIN_SetPatchcodeMaxPriorities(&self, Source: *mut c_void, nMaxSearchRetries: i32) -> i32 {
+    pub fn DTWAIN_SetPatchcodeMaxPriorities(&self, Source: *mut c_void, nMaxSearchRetries: u32) -> i32 {
         unsafe { return (self.DTWAIN_SetPatchcodeMaxPrioritiesFunc)(Source, nMaxSearchRetries);  }
     }
 
-    pub fn DTWAIN_SetPatchcodeMaxRetries(&self, Source: *mut c_void, nMaxRetries: i32) -> i32 {
+    pub fn DTWAIN_SetPatchcodeMaxRetries(&self, Source: *mut c_void, nMaxRetries: u32) -> i32 {
         unsafe { return (self.DTWAIN_SetPatchcodeMaxRetriesFunc)(Source, nMaxRetries);  }
     }
 
@@ -10725,7 +10726,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPatchcodeSearchModeFunc)(Source, nSearchMode);  }
     }
 
-    pub fn DTWAIN_SetPatchcodeTimeOut(&self, Source: *mut c_void, TimeOutValue: i32) -> i32 {
+    pub fn DTWAIN_SetPatchcodeTimeOut(&self, Source: *mut c_void, TimeOutValue: u32) -> i32 {
         unsafe { return (self.DTWAIN_SetPatchcodeTimeOutFunc)(Source, TimeOutValue);  }
     }
 
@@ -10761,7 +10762,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPrinterExFunc)(Source, Printer, bCurrent);  }
     }
 
-    pub fn DTWAIN_SetPrinterStartNumber(&self, Source: *mut c_void, nStart: i32) -> i32 {
+    pub fn DTWAIN_SetPrinterStartNumber(&self, Source: *mut c_void, nStart: u32) -> i32 {
         unsafe { return (self.DTWAIN_SetPrinterStartNumberFunc)(Source, nStart);  }
     }
 
