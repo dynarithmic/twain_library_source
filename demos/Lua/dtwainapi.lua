@@ -144,7 +144,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
-        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
+        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, DTWAIN_BOOL bAsUnsigned);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
         LONG DTWAIN_ArrayFindANSIString(DTWAIN_ARRAY pArray, LPCSTR pString);
         LONG DTWAIN_ArrayFindFloat(DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, DTWAIN_FLOAT Tolerance);
@@ -1373,7 +1373,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
-        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
+        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, DTWAIN_BOOL bAsUnsigned);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
         LONG DTWAIN_ArrayFindANSIString(DTWAIN_ARRAY pArray, LPCSTR pString);
         LONG DTWAIN_ArrayFindFloat(DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, DTWAIN_FLOAT Tolerance);
@@ -2602,7 +2602,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
-        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
+        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, DTWAIN_BOOL bAsUnsigned);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
         LONG DTWAIN_ArrayFindANSIString(DTWAIN_ARRAY pArray, LPCSTR pString);
         LONG DTWAIN_ArrayFindFloat(DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, DTWAIN_FLOAT Tolerance);
@@ -3831,7 +3831,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
-        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
+        DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, DTWAIN_BOOL bAsUnsigned);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
         LONG DTWAIN_ArrayFindANSIString(DTWAIN_ARRAY pArray, LPCSTR pString);
         LONG DTWAIN_ArrayFindFloat(DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, DTWAIN_FLOAT Tolerance);

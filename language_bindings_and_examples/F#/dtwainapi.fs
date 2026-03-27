@@ -2013,7 +2013,7 @@ module TwainAPI =
     type DTWAIN_ArrayDestroyFramesDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_ArrayDumpToLogDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
+    type DTWAIN_ArrayDumpToLogDelegate = delegate of DTWAIN_ARRAY * DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayFindDelegate = delegate of DTWAIN_ARRAY * LPVOID -> LONG
@@ -5473,9 +5473,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayDestroyFrames.Value.Invoke(framearray)
 
-    let DTWAIN_ArrayDumpToLog (parray: DTWAIN_ARRAY) : DTWAIN_BOOL =
+    let DTWAIN_ArrayDumpToLog (parray: DTWAIN_ARRAY) (basunsigned: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        ArrayDumpToLog.Value.Invoke(parray)
+        ArrayDumpToLog.Value.Invoke(parray, basunsigned)
 
     let DTWAIN_ArrayFind (parray: DTWAIN_ARRAY) (pvariant: LPVOID) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

@@ -1915,7 +1915,7 @@ function DTWAIN_ArrayCreateFromStringsA(nSize:LONG) : DTWAIN_ARRAY; stdcall;  ex
 function DTWAIN_ArrayCreateFromStringsW(nSize:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayCreateFromStringsW';
 function DTWAIN_ArrayDestroy(pArray:DTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayDestroy';
 function DTWAIN_ArrayDestroyFrames(FrameArray:DTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayDestroyFrames';
-function DTWAIN_ArrayDumpToLog(pArray:DTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayDumpToLog';
+function DTWAIN_ArrayDumpToLog(pArray:DTWAIN_ARRAY; bAsUnsigned:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayDumpToLog';
 function DTWAIN_ArrayFind(pArray:DTWAIN_ARRAY; pVariant:LPVOID) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayFind';
 function DTWAIN_ArrayFindANSIString(pArray:DTWAIN_ARRAY; pString:LPCSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayFindANSIString';
 function DTWAIN_ArrayFindFloat(pArray:DTWAIN_ARRAY; Val:DTWAIN_FLOAT; Tolerance:DTWAIN_FLOAT) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayFindFloat';

@@ -2076,7 +2076,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_ArrayDestroyFramesDelegate(FrameArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_ArrayDumpToLogDelegate(pArray As System.IntPtr) As Integer
+        Private Delegate Function DTWAIN_ArrayDumpToLogDelegate(pArray As System.IntPtr, bAsUnsigned As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayFindDelegate(pArray As System.IntPtr, pVariant As System.IntPtr) As Integer
@@ -4680,8 +4680,8 @@ Namespace Dynarithmic
         Return api.DTWAIN_ArrayDestroyFrames(FrameArray)
         End Function
         
-        Public Function DTWAIN_ArrayDumpToLog(pArray As System.IntPtr) As Integer
-        Return api.DTWAIN_ArrayDumpToLog(pArray)
+        Public Function DTWAIN_ArrayDumpToLog(pArray As System.IntPtr, bAsUnsigned As Integer) As Integer
+        Return api.DTWAIN_ArrayDumpToLog(pArray, bAsUnsigned)
         End Function
         
         Public Function DTWAIN_ArrayFind(pArray As System.IntPtr, pVariant As System.IntPtr) As Integer

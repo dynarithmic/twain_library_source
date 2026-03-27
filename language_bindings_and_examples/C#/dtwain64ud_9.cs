@@ -1951,7 +1951,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern int DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
+        public static extern int DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, int bAsUnsigned);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, System.IntPtr pVariant);

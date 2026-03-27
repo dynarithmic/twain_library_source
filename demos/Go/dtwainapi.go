@@ -3405,9 +3405,9 @@ func (d *DTWAIN_DLL) DTWAIN_ArrayDestroyFrames(FrameArray DTWAIN_ARRAY) int32 {
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_ArrayDumpToLog(pArray DTWAIN_ARRAY) int32 {
+func (d *DTWAIN_DLL) DTWAIN_ArrayDumpToLog(pArray DTWAIN_ARRAY, bAsUnsigned int32) int32 {
     theProc := d.procs["DTWAIN_ArrayDumpToLog"]
-    v1, _, _ := syscall.SyscallN(theProc, uintptr(pArray))
+    v1, _, _ := syscall.SyscallN(theProc, uintptr(pArray), uintptr(bAsUnsigned))
     return int32(v1)
 }
 

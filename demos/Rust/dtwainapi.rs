@@ -114,7 +114,7 @@ type DtwainarraycreatefromlongsFunc = unsafe extern "C" fn(*mut i32,i32) -> *mut
 type DtwainarraycreatefromrealsFunc = unsafe extern "C" fn(i32) -> *mut c_void;
 type DtwainarraydestroyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainarraydestroyframesFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainarraydumptologFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainarraydumptologFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainarrayfindFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
 type DtwainarrayfindansistringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
 type DtwainarrayfindfloatFunc = unsafe extern "C" fn(*mut c_void,f64,f64) -> i32;
@@ -6666,8 +6666,8 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayDestroyFramesFunc)(FrameArray);  }
     }
 
-    pub fn DTWAIN_ArrayDumpToLog(&self, pArray: *mut c_void) -> i32 {
-        unsafe { return (self.DTWAIN_ArrayDumpToLogFunc)(pArray);  }
+    pub fn DTWAIN_ArrayDumpToLog(&self, pArray: *mut c_void, bAsUnsigned: i32) -> i32 {
+        unsafe { return (self.DTWAIN_ArrayDumpToLogFunc)(pArray, bAsUnsigned);  }
     }
 
     pub fn DTWAIN_ArrayFind(&self, pArray: *mut c_void, pVariant: *mut c_void) -> i32 {

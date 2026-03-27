@@ -1803,7 +1803,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_ArrayCreateFromReals Lib "dtwain64d.dll" (ByRef pCArray As System.Double, nSize As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayDestroy Lib "dtwain64d.dll" (pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayDestroyFrames Lib "dtwain64d.dll" (FrameArray As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_ArrayDumpToLog Lib "dtwain64d.dll" (pArray As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_ArrayDumpToLog Lib "dtwain64d.dll" (pArray As System.IntPtr, bAsUnsigned As Integer) As Integer
     Public Declare Function DTWAIN_ArrayFind Lib "dtwain64d.dll" (pArray As System.IntPtr, pVariant As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_ArrayFindANSIString Lib "dtwain64d.dll" (pArray As System.IntPtr, pString As String) As Integer
     Public Declare Function DTWAIN_ArrayFindFloat Lib "dtwain64d.dll" (pArray As System.IntPtr, Val As System.Double, Tolerance As System.Double) As Integer

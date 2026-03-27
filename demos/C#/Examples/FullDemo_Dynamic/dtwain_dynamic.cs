@@ -1961,7 +1961,7 @@
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromRealsDelegate(ref DTWAIN_FLOAT pCArray, int nSize);
         public delegate int DTWAIN_ArrayDestroyDelegate(DTWAIN_ARRAY pArray);
         public delegate int DTWAIN_ArrayDestroyFramesDelegate(DTWAIN_ARRAY FrameArray);
-        public delegate int DTWAIN_ArrayDumpToLogDelegate(DTWAIN_ARRAY pArray);
+        public delegate int DTWAIN_ArrayDumpToLogDelegate(DTWAIN_ARRAY pArray, int bAsUnsigned);
         public delegate int DTWAIN_ArrayFindDelegate(DTWAIN_ARRAY pArray, System.IntPtr pVariant);
         public delegate int DTWAIN_ArrayFindANSIStringDelegate(DTWAIN_ARRAY pArray, string pString);
         public delegate int DTWAIN_ArrayFindFloatDelegate(DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, DTWAIN_FLOAT Tolerance);
@@ -5766,8 +5766,8 @@
         public  int DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray)
         => _DTWAIN_ArrayDestroyFrames(FrameArray);
 
-        public  int DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray)
-        => _DTWAIN_ArrayDumpToLog(pArray);
+        public  int DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, int bAsUnsigned)
+        => _DTWAIN_ArrayDumpToLog(pArray, bAsUnsigned);
 
         public  int DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, System.IntPtr pVariant)
         => _DTWAIN_ArrayFind(pArray, pVariant);

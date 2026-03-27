@@ -1991,7 +1991,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_ARRAY function(LPCWSTR*, LONG) DTWAIN_ArrayCreateFromStringsW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY) DTWAIN_ArrayDestroy;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY) DTWAIN_ArrayDestroyFrames;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY) DTWAIN_ArrayDumpToLog;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, DTWAIN_BOOL) DTWAIN_ArrayDumpToLog;
     extern(Windows) LONG function(DTWAIN_ARRAY, LPVOID) DTWAIN_ArrayFind;
     extern(Windows) LONG function(DTWAIN_ARRAY, LPCSTR) DTWAIN_ArrayFindANSIString;
     extern(Windows) LONG function(DTWAIN_ARRAY, DTWAIN_FLOAT, DTWAIN_FLOAT) DTWAIN_ArrayFindFloat;

@@ -3066,7 +3066,7 @@ class DTWAINAPI
        @DTWAIN_ArrayCreateFromReals = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateFromReals'],[Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayDestroy = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayDestroy'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayDestroyFrames = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayDestroyFrames'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_ArrayDumpToLog = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayDumpToLog'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_ArrayDumpToLog = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayDumpToLog'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_ArrayFind = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayFind'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_ArrayFindANSIString = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayFindANSIString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_ArrayFindFloat = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayFindFloat'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE],Fiddle::TYPE_LONG)
