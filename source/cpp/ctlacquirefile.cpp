@@ -283,7 +283,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     LOG_FUNC_ENTRY_PARAMS((opts))
     CTL_ITwainSource *pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
 
-    DumpArrayContents(opts.getFileList(), 0);
+    DumpArrayContents(opts.getFileList(), 0, false, false);
     #ifdef _UNICODE
         auto vTest = FileListToVector<std::wstring>(opts);
     #else

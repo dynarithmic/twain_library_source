@@ -439,7 +439,7 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
 	    SetCapabilityInfo<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(pHandle, pSource, lContainerType, lCap);
 
     dynarithmic::MoveArray(pHandle, pArray, &ThisArray); 
-    dynarithmic::DumpArrayContents(*pArray, lCap);
+    dynarithmic::DumpArrayContents(*pArray, lCap, false, dynarithmic::IsTwainUIntegralType(static_cast<TW_UINT16>(nDataType)));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -529,7 +529,7 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
 
 	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !IsValidContainerType(static_cast<TW_UINT16>(lContainerType)); }, DTWAIN_ERR_BAD_CONTAINER, false, FUNC_MACRO);
 
-    DumpArrayContents(pArray, lCap);
+    DumpArrayContents(pArray, lCap, false, dynarithmic::IsTwainUIntegralType(static_cast<TW_UINT16>(nDataType)));
 
     // If the container type has multiple options, we will try each container until we get an ok or we get a failure of all attempts of setting the
     // capability.

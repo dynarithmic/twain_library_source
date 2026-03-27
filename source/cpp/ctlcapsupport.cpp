@@ -82,7 +82,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
             {
                 LONG statusValue = (LONG)DataTypeArray[i] << 16 | ContainerTypeArray[j];
                 vValues.push_back(statusValue);
-                DumpArrayContents(testArray, lCapability);
+                DumpArrayContents(testArray, lCapability, false, 
+                                  dynarithmic::IsTwainUIntegralType(static_cast<TW_UINT16>(DataTypeArray[i])));
             }
         }
     }

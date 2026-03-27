@@ -141,6 +141,11 @@ namespace dynarithmic
 		return false;
 	}
 
+    static constexpr bool IsTwainUIntegralType(TW_UINT16 nItemType)
+    {
+        return IsTwain16BitUIntegralType(nItemType) || IsTwain32BitUIntegralType(nItemType);
+    }
+
 	static constexpr bool IsTwain8BitIntegralType(TW_UINT16 nItemType)
 	{
 		switch (nItemType)

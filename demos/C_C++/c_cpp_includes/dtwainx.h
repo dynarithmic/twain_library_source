@@ -202,7 +202,7 @@ LPVOID         DLLENTRY_DEF      DTWAIN_ArrayGetBuffer(DTWAIN_ARRAY pArray, LONG
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
 DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreateFromCap(DTWAIN_SOURCE Source, LONG lCapType, LONG lSize);
 
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
+DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, DTWAIN_BOOL bAsUnsigned);
 
 /* DTWAIN Range functions */
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeSetAll(DTWAIN_RANGE pArray, LPVOID pVariantLow,LPVOID pVariantUp, LPVOID pVariantStep,LPVOID pVariantDefault,LPVOID pVariantCurrent );

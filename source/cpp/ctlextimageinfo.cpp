@@ -140,7 +140,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
                 for (auto val : vValues)
                     aValues.push_back(CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, val).second);
                 LogWriterUtils::WriteLogInfoIndentedA("Supported Extended Image Info types:");
-                DumpArrayContents(aStrings, 0);
+                DumpArrayContents(aStrings, 0, false, false);
             }
         }
         MoveArray(pHandle, Array, &ThisArray);
