@@ -130,11 +130,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
     CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
-	DTWAIN_Check_Error_Condition_0_Ex(pSource->GetDTWAINHandle(), [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    auto pHandle = pSource->GetDTWAINHandle();
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
-    const auto pHandle = pSource->GetDTWAINHandle();
-    const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pHandle, pArray);
+    DTWAIN_ARRAY arr = {};
+    DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arr);
+    const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pHandle, arr);
+    dynarithmic::MoveArray(pHandle, pArray, &arr);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpEvent))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
