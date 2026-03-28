@@ -69,7 +69,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, 
                                           pH->m_lLastError, false, FUNC_MACRO);
 
         // Set the types supported into the Source object.
-        pS->SetSupportedExtImageInfos(CreateContainerFromArray<std::vector<LONG>>(pHandle, Array));
+		pS->SetSupportedExtImageInfos(CreateContainerFromArray<std::vector<LONG>>(pHandle, *Array));
     }
     else
     {
