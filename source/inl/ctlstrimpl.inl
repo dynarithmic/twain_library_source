@@ -3021,7 +3021,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloatStringA(DTWAIN_ARRAY pArray, LONG
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloatStringW(DTWAIN_SOURCE pArray, LONG nWhere, LPWSTR dValue)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloatStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPWSTR dValue)
 {
 #ifdef _UNICODE
     return DTWAIN_ArrayGetAtFloatString(pArray, nWhere, dValue);
