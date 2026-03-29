@@ -3146,6 +3146,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY theArray, DTWAIN_BOO
 	CATCH_BLOCK(0)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayIsValid(DTWAIN_ARRAY theArray)
+{
+	LOG_FUNC_ENTRY_PARAMS((theArray))
+	auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
+	auto checkStatus = ArrayChecker().SetArray1(theArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
+
+	// Check if array exists
+	if (checkStatus.Check(pHandle).first == DTWAIN_NO_ERROR)
+		LOG_FUNC_EXIT_NONAME_PARAMS(true)
+	LOG_FUNC_EXIT_NONAME_PARAMS(false)
+	CATCH_BLOCK(0)
+}
+
 void CTL_TwainDLLHandle::RemoveAllEnumerators()
 {
     m_ArrayFactory.reset();

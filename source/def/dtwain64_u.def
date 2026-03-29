@@ -1186,3 +1186,4 @@ DTWAIN_UpdateCurrentAcquiredImage                 @1182
 DTWAIN_GetAcquisitionArray                        @1183
 DTWAIN_IsGetMessageLoopEnabled                    @1184
 DTWAIN_EnableGetMessageLoop                       @1185
+DTWAIN_ArrayIsValid                               @1186
