@@ -132,10 +132,10 @@ struct NestedAcquisitionDestroyer
     bool m_bDestroyDibs;
     NestedAcquisitionDestroyer(CTL_TwainDLLHandle* pHandle, bool bDestroyDibs) : m_pHandle(pHandle), m_bDestroyDibs(bDestroyDibs) {}
 
-    void operator()(DTWAIN_ARRAY ImagesArray) const
+    void operator()(void* ImagesArray) const
     {
         // we want this array destroyed when we're finished
-        DTWAINArrayLowLevel_RAII raii(m_pHandle, ImagesArray);
+        DTWAINArrayLowLevel_RAII raii(m_pHandle, VOID_TO_DTWAIN_ARRAY(ImagesArray));
 
         // Test if the DIB data should also be destroyed
         if (m_bDestroyDibs)

@@ -46,6 +46,7 @@ static std::pair<bool, int> GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, 
 static LONG GetAllCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetCurrentCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetDefaultCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
+static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, LONG GetType, DTWAIN_BOOL bExpandRange);
 
 typedef bool (*SetDoubleCapFn)(DTWAIN_SOURCE, LONG, double);
 typedef bool (*GetDoubleCapFn)(DTWAIN_SOURCE, LONG, double *);
@@ -386,6 +387,16 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
        CATCH_BLOCK(errorRetValue) \
     }
 
+#define EXPORT_GET_CAP_VALUE_RETURNVAL_ARRAY(FuncName, Cap, CapFn, bExpandRange) \
+    DTWAIN_ARRAY DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source)\
+    {\
+       LOG_FUNC_ENTRY_PARAMS((Source)) \
+       DTWAIN_ARRAY value = {}; \
+       auto bRet = GetCapValues(Source, &value, Cap, CapFn, bExpandRange); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet?value:nullptr); \
+       CATCH_BLOCK(nullptr) \
+    }
+
 #define EXPORT_GET_CAP_VALUE_RETURNVAL_CONVERTED(FuncName, Cap, CapDataType, errorRetValue, CapFn) \
     CapDataType::value_converted_type DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source)\
     {\
@@ -481,6 +492,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE_RETURNVAL_DWORD(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL_CONVERTED(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, ErrorVal, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_RETURNVAL_D(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_double, ErrorVal, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_RETURNVAL_A(FuncName, Cap, ErrorVal) EXPORT_GET_CAP_VALUE_RETURNVAL(FuncName, Cap, CTL_ArrayFactory::tagged_array_voidptr, ErrorVal, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_RETURNVAL_DTWAIN_ARRAY(FuncName, Cap, CapFn, bExpandRange) EXPORT_GET_CAP_VALUE_RETURNVAL_ARRAY(FuncName, Cap, CapFn, bExpandRange)
 
 #define EXPORT_GET_CAP_VALUE_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value)\
@@ -692,7 +704,7 @@ EXPORT_GET_CAP_VALUE_RETURNVAL_DWORD(DTWAIN_GetPrinterStartNumberEx, CAP_PRINTER
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetPrinterStringMode, CAP_PRINTERMODE)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_RETURN_I(DTWAIN_GetPrinterStringModeEx, DTWAIN_GetPrinterStringMode, CAP_PRINTERMODE, -1)
 EXPORT_GET_CAP_VALUE_A(DTWAIN_GetPrinterStrings, CAP_PRINTERSTRING)
-EXPORT_GET_CAP_VALUE_RETURNVAL_A(DTWAIN_GetPrinterStringsEx, CAP_PRINTERSTRING, nullptr)
+EXPORT_GET_CAP_VALUE_RETURNVAL_DTWAIN_ARRAY(DTWAIN_GetPrinterStringsEx, CAP_PRINTERSTRING, MSG_GETCURRENT, FALSE)
 EXPORT_GET_VALUE_OPT_MAXLENGTH_S(DTWAIN_GetPrinterSuffixString, CAP_PRINTERSUFFIX)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetOverscan, ICAP_OVERSCAN)
 EXPORT_GET_CAP_VALUE_D(DTWAIN_GetRotation, ICAP_ROTATION)
