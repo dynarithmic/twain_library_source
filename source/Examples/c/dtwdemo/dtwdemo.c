@@ -202,8 +202,9 @@ UINT g_AllMenuItems[] = { IDM_SELECT_SOURCE,
 
 TCHAR g_CustomLanguage[256];
 
-
 DTWAIN_PDFTEXTELEMENT g_PDFTextElement;
+
+#include "DebugUtils.h"
 
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,

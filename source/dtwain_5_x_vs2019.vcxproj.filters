@@ -1278,10 +1278,18 @@
     <Filter Include="miniz">
       <UniqueIdentifier>{4fce70b8-1277-454a-a982-e3f1de3ea842}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Natvis">
+      <UniqueIdentifier>{7b688719-c9a6-40b3-9705-5cd9b3bedee0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\rc\twil32.rc">
       <Filter>RC Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="natvis\dtwain.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

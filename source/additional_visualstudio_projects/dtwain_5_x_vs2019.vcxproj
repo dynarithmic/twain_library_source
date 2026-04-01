@@ -1966,6 +1966,9 @@ copy $(TargetDir)$(TargetName).lib .
     <Text Include="txt\twainresourcestrings_spanish.txt" />
     <Text Include="txt\twainresourcestrings_traditional_chinese.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="natvis\dtwain.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
