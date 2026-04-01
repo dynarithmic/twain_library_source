@@ -1994,6 +1994,7 @@ function DTWAIN_ArrayInsertAtStringNW(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCW
 function DTWAIN_ArrayInsertAtStringW(pArray:DTWAIN_ARRAY; nWhere:LONG; pVal:LPCWSTR) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_ArrayInsertAtStringW';
 function DTWAIN_ArrayInsertAtWideString(pArray:DTWAIN_ARRAY; nWhere:LONG; pVal:LPCWSTR) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_ArrayInsertAtWideString';
 function DTWAIN_ArrayInsertAtWideStringN(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCWSTR; num:LONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_ArrayInsertAtWideStringN';
+function DTWAIN_ArrayIsValid(theArray:DTWAIN_ARRAY) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_ArrayIsValid';
 function DTWAIN_ArrayRemoveAll(pArray:DTWAIN_ARRAY) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_ArrayRemoveAll';
 function DTWAIN_ArrayRemoveAt(pArray:DTWAIN_ARRAY; nWhere:LONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_ArrayRemoveAt';
 function DTWAIN_ArrayRemoveAtN(pArray:DTWAIN_ARRAY; nWhere:LONG; num:LONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_ArrayRemoveAtN';

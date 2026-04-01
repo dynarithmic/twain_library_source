@@ -2070,6 +2070,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPCWSTR) DTWAIN_ArrayInsertAtStringW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPCWSTR) DTWAIN_ArrayInsertAtWideString;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPCWSTR, LONG) DTWAIN_ArrayInsertAtWideStringN;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY) DTWAIN_ArrayIsValid;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY) DTWAIN_ArrayRemoveAll;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG) DTWAIN_ArrayRemoveAt;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LONG) DTWAIN_ArrayRemoveAtN;
@@ -3243,6 +3244,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_ArrayInsertAtStringW, "DTWAIN_ArrayInsertAtStringW");
         bindFunction(cast(void**)&DTWAIN_ArrayInsertAtWideString, "DTWAIN_ArrayInsertAtWideString");
         bindFunction(cast(void**)&DTWAIN_ArrayInsertAtWideStringN, "DTWAIN_ArrayInsertAtWideStringN");
+        bindFunction(cast(void**)&DTWAIN_ArrayIsValid, "DTWAIN_ArrayIsValid");
         bindFunction(cast(void**)&DTWAIN_ArrayRemoveAll, "DTWAIN_ArrayRemoveAll");
         bindFunction(cast(void**)&DTWAIN_ArrayRemoveAt, "DTWAIN_ArrayRemoveAt");
         bindFunction(cast(void**)&DTWAIN_ArrayRemoveAtN, "DTWAIN_ArrayRemoveAtN");

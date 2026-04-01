@@ -223,6 +223,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayInsertAtStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtWideString(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtWideStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR Val, LONG num);
+        DTWAIN_BOOL DTWAIN_ArrayIsValid(DTWAIN_ARRAY theArray);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAll(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAt(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAtN(DTWAIN_ARRAY pArray, LONG nWhere, LONG num);
@@ -1452,6 +1453,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayInsertAtStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtWideString(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtWideStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR Val, LONG num);
+        DTWAIN_BOOL DTWAIN_ArrayIsValid(DTWAIN_ARRAY theArray);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAll(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAt(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAtN(DTWAIN_ARRAY pArray, LONG nWhere, LONG num);
@@ -2681,6 +2683,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayInsertAtStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtWideString(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtWideStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR Val, LONG num);
+        DTWAIN_BOOL DTWAIN_ArrayIsValid(DTWAIN_ARRAY theArray);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAll(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAt(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAtN(DTWAIN_ARRAY pArray, LONG nWhere, LONG num);
@@ -3910,6 +3913,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayInsertAtStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtWideString(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtWideStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR Val, LONG num);
+        DTWAIN_BOOL DTWAIN_ArrayIsValid(DTWAIN_ARRAY theArray);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAll(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAt(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayRemoveAtN(DTWAIN_ARRAY pArray, LONG nWhere, LONG num);

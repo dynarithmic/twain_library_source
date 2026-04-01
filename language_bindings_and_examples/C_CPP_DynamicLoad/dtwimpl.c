@@ -200,6 +200,7 @@
     D_ARRAYINSERTATSTRINGWFUNC                    DYNDTWAIN_API::DTWAIN_ArrayInsertAtStringW = nullptr;
     D_ARRAYINSERTATWIDESTRINGFUNC                 DYNDTWAIN_API::DTWAIN_ArrayInsertAtWideString = nullptr;
     D_ARRAYINSERTATWIDESTRINGNFUNC                DYNDTWAIN_API::DTWAIN_ArrayInsertAtWideStringN = nullptr;
+    D_ARRAYISVALIDFUNC                            DYNDTWAIN_API::DTWAIN_ArrayIsValid = nullptr;
     D_ARRAYREMOVEALLFUNC                          DYNDTWAIN_API::DTWAIN_ArrayRemoveAll = nullptr;
     D_ARRAYREMOVEATFUNC                           DYNDTWAIN_API::DTWAIN_ArrayRemoveAt = nullptr;
     D_ARRAYREMOVEATNFUNC                          DYNDTWAIN_API::DTWAIN_ArrayRemoveAtN = nullptr;
@@ -1445,6 +1446,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_ArrayInsertAtStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayInsertAtWideString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayInsertAtWideStringN, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ArrayIsValid, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayRemoveAll, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayRemoveAt, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayRemoveAtN, hModule);

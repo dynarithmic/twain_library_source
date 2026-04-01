@@ -1861,6 +1861,7 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_ArrayInsertAtStringN Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, Val As String, num As Integer) As Integer
     Public Declare Unicode Function DTWAIN_ArrayInsertAtWideString Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, pVal As String) As Integer
     Public Declare Unicode Function DTWAIN_ArrayInsertAtWideStringN Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, Val As String, num As Integer) As Integer
+    Public Declare Function DTWAIN_ArrayIsValid Lib "dtwain32.dll" (theArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayRemoveAll Lib "dtwain32.dll" (pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayRemoveAt Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer) As Integer
     Public Declare Function DTWAIN_ArrayRemoveAtN Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, num As Integer) As Integer

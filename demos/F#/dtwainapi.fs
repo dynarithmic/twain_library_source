@@ -2187,6 +2187,9 @@ module TwainAPI =
     type DTWAIN_ArrayInsertAtWideStringNDelegate = delegate of DTWAIN_ARRAY * LONG * string * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayIsValidDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayRemoveAllDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4513,6 +4516,7 @@ module TwainAPI =
     let private ArrayInsertAtStringN = lazy (DynamicDll.Bind "DTWAIN_ArrayInsertAtStringN" : DTWAIN_ArrayInsertAtStringNDelegate)
     let private ArrayInsertAtWideString = lazy (DynamicDll.Bind "DTWAIN_ArrayInsertAtWideString" : DTWAIN_ArrayInsertAtWideStringDelegate)
     let private ArrayInsertAtWideStringN = lazy (DynamicDll.Bind "DTWAIN_ArrayInsertAtWideStringN" : DTWAIN_ArrayInsertAtWideStringNDelegate)
+    let private ArrayIsValid = lazy (DynamicDll.Bind "DTWAIN_ArrayIsValid" : DTWAIN_ArrayIsValidDelegate)
     let private ArrayRemoveAll = lazy (DynamicDll.Bind "DTWAIN_ArrayRemoveAll" : DTWAIN_ArrayRemoveAllDelegate)
     let private ArrayRemoveAt = lazy (DynamicDll.Bind "DTWAIN_ArrayRemoveAt" : DTWAIN_ArrayRemoveAtDelegate)
     let private ArrayRemoveAtN = lazy (DynamicDll.Bind "DTWAIN_ArrayRemoveAtN" : DTWAIN_ArrayRemoveAtNDelegate)
@@ -5704,6 +5708,10 @@ module TwainAPI =
     let DTWAIN_ArrayInsertAtWideStringN (parray: DTWAIN_ARRAY) (nwhere: LONG) (val1: string) (num: LONG) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayInsertAtWideStringN.Value.Invoke(parray, nwhere, val1, num)
+
+    let DTWAIN_ArrayIsValid (thearray: DTWAIN_ARRAY) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayIsValid.Value.Invoke(thearray)
 
     let DTWAIN_ArrayRemoveAll (parray: DTWAIN_ARRAY) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

@@ -281,6 +281,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_ArrayInsertAtStringW
    attr_reader :DTWAIN_ArrayInsertAtWideString
    attr_reader :DTWAIN_ArrayInsertAtWideStringN
+   attr_reader :DTWAIN_ArrayIsValid
    attr_reader :DTWAIN_ArrayRemoveAll
    attr_reader :DTWAIN_ArrayRemoveAt
    attr_reader :DTWAIN_ArrayRemoveAtN
@@ -3145,6 +3146,7 @@ class DTWAINAPI
        @DTWAIN_ArrayInsertAtStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayInsertAtStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayInsertAtWideString = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayInsertAtWideString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayInsertAtWideStringN = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayInsertAtWideStringN'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
+       @DTWAIN_ArrayIsValid = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayIsValid'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayRemoveAll = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayRemoveAll'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayRemoveAt = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayRemoveAt'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_ArrayRemoveAtN = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayRemoveAtN'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)

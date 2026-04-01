@@ -1820,6 +1820,7 @@ my $DTWAIN_ArrayInsertAtStringNW = new Win32::API($dtwain_dllName, 'DTWAIN_Array
 my $DTWAIN_ArrayInsertAtStringW = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayInsertAtStringW', 'NiP', 'I');
 my $DTWAIN_ArrayInsertAtWideString = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayInsertAtWideString', 'NiP', 'I');
 my $DTWAIN_ArrayInsertAtWideStringN = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayInsertAtWideStringN', 'NiPi', 'I');
+my $DTWAIN_ArrayIsValid = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayIsValid', 'N', 'I');
 my $DTWAIN_ArrayRemoveAll = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayRemoveAll', 'N', 'I');
 my $DTWAIN_ArrayRemoveAt = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayRemoveAt', 'Ni', 'I');
 my $DTWAIN_ArrayRemoveAtN = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayRemoveAtN', 'Nii', 'I');

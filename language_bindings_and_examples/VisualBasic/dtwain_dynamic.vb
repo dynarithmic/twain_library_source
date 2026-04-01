@@ -2250,6 +2250,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_ArrayInsertAtWideStringNDelegate(pArray As System.IntPtr, nWhere As Integer, Val As String, num As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayIsValidDelegate(theArray As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayRemoveAllDelegate(pArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -4910,6 +4913,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_ArrayInsertAtWideStringN(pArray As System.IntPtr, nWhere As Integer, Val As String, num As Integer) As Integer
         Return api.DTWAIN_ArrayInsertAtWideStringN(pArray, nWhere, Val, num)
+        End Function
+        
+        Public Function DTWAIN_ArrayIsValid(theArray As System.IntPtr) As Integer
+        Return api.DTWAIN_ArrayIsValid(theArray)
         End Function
         
         Public Function DTWAIN_ArrayRemoveAll(pArray As System.IntPtr) As Integer
@@ -7996,6 +8003,7 @@ Namespace Dynarithmic
             Public DTWAIN_ArrayInsertAtStringN As DTWAIN_ArrayInsertAtStringNDelegate
             Public DTWAIN_ArrayInsertAtWideString As DTWAIN_ArrayInsertAtWideStringDelegate
             Public DTWAIN_ArrayInsertAtWideStringN As DTWAIN_ArrayInsertAtWideStringNDelegate
+            Public DTWAIN_ArrayIsValid As DTWAIN_ArrayIsValidDelegate
             Public DTWAIN_ArrayRemoveAll As DTWAIN_ArrayRemoveAllDelegate
             Public DTWAIN_ArrayRemoveAt As DTWAIN_ArrayRemoveAtDelegate
             Public DTWAIN_ArrayRemoveAtN As DTWAIN_ArrayRemoveAtNDelegate

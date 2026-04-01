@@ -2022,6 +2022,7 @@
         public delegate int DTWAIN_ArrayInsertAtStringNDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] string Val, int num);
         public delegate int DTWAIN_ArrayInsertAtWideStringDelegate(DTWAIN_ARRAY pArray, int nWhere, string pVal);
         public delegate int DTWAIN_ArrayInsertAtWideStringNDelegate(DTWAIN_ARRAY pArray, int nWhere, string Val, int num);
+        public delegate int DTWAIN_ArrayIsValidDelegate(DTWAIN_ARRAY theArray);
         public delegate int DTWAIN_ArrayRemoveAllDelegate(DTWAIN_ARRAY pArray);
         public delegate int DTWAIN_ArrayRemoveAtDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayRemoveAtNDelegate(DTWAIN_ARRAY pArray, int nWhere, int num);
@@ -3180,6 +3181,9 @@
 
         [DTWAINNativeFunction("DTWAIN_ArrayInsertAtWideStringN")]
         private readonly DTWAIN_ArrayInsertAtWideStringNDelegate  _DTWAIN_ArrayInsertAtWideStringN;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayIsValid")]
+        private readonly DTWAIN_ArrayIsValidDelegate  _DTWAIN_ArrayIsValid;
 
         [DTWAINNativeFunction("DTWAIN_ArrayRemoveAll")]
         private readonly DTWAIN_ArrayRemoveAllDelegate  _DTWAIN_ArrayRemoveAll;
@@ -5948,6 +5952,9 @@
 
         public  int DTWAIN_ArrayInsertAtWideStringN(DTWAIN_ARRAY pArray, int nWhere, string Val, int num)
         => _DTWAIN_ArrayInsertAtWideStringN(pArray, nWhere, Val, num);
+
+        public  int DTWAIN_ArrayIsValid(DTWAIN_ARRAY theArray)
+        => _DTWAIN_ArrayIsValid(theArray);
 
         public  int DTWAIN_ArrayRemoveAll(DTWAIN_ARRAY pArray)
         => _DTWAIN_ArrayRemoveAll(pArray);

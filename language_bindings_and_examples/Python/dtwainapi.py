@@ -1915,6 +1915,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayInsertAtStringW.restype = ct.c_long
      theDLL.DTWAIN_ArrayInsertAtWideString.restype = ct.c_long
      theDLL.DTWAIN_ArrayInsertAtWideStringN.restype = ct.c_long
+     theDLL.DTWAIN_ArrayIsValid.restype = ct.c_long
      theDLL.DTWAIN_ArrayRemoveAll.restype = ct.c_long
      theDLL.DTWAIN_ArrayRemoveAt.restype = ct.c_long
      theDLL.DTWAIN_ArrayRemoveAtN.restype = ct.c_long
@@ -3088,6 +3089,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayInsertAtStringW.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
      theDLL.DTWAIN_ArrayInsertAtWideString.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
      theDLL.DTWAIN_ArrayInsertAtWideStringN.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p, ct.c_long]
+     theDLL.DTWAIN_ArrayIsValid.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ArrayRemoveAll.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ArrayRemoveAt.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayRemoveAtN.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
@@ -4231,6 +4233,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayInsertAtStringW.restype = ct.c_long
      theDLL.DTWAIN_ArrayInsertAtWideString.restype = ct.c_long
      theDLL.DTWAIN_ArrayInsertAtWideStringN.restype = ct.c_long
+     theDLL.DTWAIN_ArrayIsValid.restype = ct.c_long
      theDLL.DTWAIN_ArrayRemoveAll.restype = ct.c_long
      theDLL.DTWAIN_ArrayRemoveAt.restype = ct.c_long
      theDLL.DTWAIN_ArrayRemoveAtN.restype = ct.c_long
@@ -5404,6 +5407,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayInsertAtStringW.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
      theDLL.DTWAIN_ArrayInsertAtWideString.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
      theDLL.DTWAIN_ArrayInsertAtWideStringN.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p, ct.c_long]
+     theDLL.DTWAIN_ArrayIsValid.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ArrayRemoveAll.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ArrayRemoveAt.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayRemoveAtN.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]

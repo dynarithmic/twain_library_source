@@ -193,6 +193,7 @@ type DtwainarrayinsertatstringnwFunc = unsafe extern "C" fn(*mut c_void,i32,*con
 type DtwainarrayinsertatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
 type DtwainarrayinsertatwidestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
 type DtwainarrayinsertatwidestringnFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,i32) -> i32;
+type DtwainarrayisvalidFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainarrayremoveallFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainarrayremoveatFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainarrayremoveatnFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
@@ -1367,6 +1368,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_ArrayInsertAtStringWFunc: Symbol<'a, DtwainarrayinsertatstringwFunc>,
     DTWAIN_ArrayInsertAtWideStringFunc: Symbol<'a, DtwainarrayinsertatwidestringFunc>,
     DTWAIN_ArrayInsertAtWideStringNFunc: Symbol<'a, DtwainarrayinsertatwidestringnFunc>,
+    DTWAIN_ArrayIsValidFunc: Symbol<'a, DtwainarrayisvalidFunc>,
     DTWAIN_ArrayRemoveAllFunc: Symbol<'a, DtwainarrayremoveallFunc>,
     DTWAIN_ArrayRemoveAtFunc: Symbol<'a, DtwainarrayremoveatFunc>,
     DTWAIN_ArrayRemoveAtNFunc: Symbol<'a, DtwainarrayremoveatnFunc>,
@@ -4195,6 +4197,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_ArrayInsertAtStringW: Symbol<DtwainarrayinsertatstringwFunc> = unsafe { library.get(b"DTWAIN_ArrayInsertAtStringW")? };
         let DTWAIN_ArrayInsertAtWideString: Symbol<DtwainarrayinsertatwidestringFunc> = unsafe { library.get(b"DTWAIN_ArrayInsertAtWideString")? };
         let DTWAIN_ArrayInsertAtWideStringN: Symbol<DtwainarrayinsertatwidestringnFunc> = unsafe { library.get(b"DTWAIN_ArrayInsertAtWideStringN")? };
+        let DTWAIN_ArrayIsValid: Symbol<DtwainarrayisvalidFunc> = unsafe { library.get(b"DTWAIN_ArrayIsValid")? };
         let DTWAIN_ArrayRemoveAll: Symbol<DtwainarrayremoveallFunc> = unsafe { library.get(b"DTWAIN_ArrayRemoveAll")? };
         let DTWAIN_ArrayRemoveAt: Symbol<DtwainarrayremoveatFunc> = unsafe { library.get(b"DTWAIN_ArrayRemoveAt")? };
         let DTWAIN_ArrayRemoveAtN: Symbol<DtwainarrayremoveatnFunc> = unsafe { library.get(b"DTWAIN_ArrayRemoveAtN")? };
@@ -5368,6 +5371,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_ArrayInsertAtStringWFunc: DTWAIN_ArrayInsertAtStringW,
             DTWAIN_ArrayInsertAtWideStringFunc: DTWAIN_ArrayInsertAtWideString,
             DTWAIN_ArrayInsertAtWideStringNFunc: DTWAIN_ArrayInsertAtWideStringN,
+            DTWAIN_ArrayIsValidFunc: DTWAIN_ArrayIsValid,
             DTWAIN_ArrayRemoveAllFunc: DTWAIN_ArrayRemoveAll,
             DTWAIN_ArrayRemoveAtFunc: DTWAIN_ArrayRemoveAt,
             DTWAIN_ArrayRemoveAtNFunc: DTWAIN_ArrayRemoveAtN,
@@ -6980,6 +6984,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_ArrayInsertAtWideStringN(&self, pArray: *mut c_void, nWhere: i32, Val: *const u16, num: i32) -> i32 {
         unsafe { return (self.DTWAIN_ArrayInsertAtWideStringNFunc)(pArray, nWhere, Val, num);  }
+    }
+
+    pub fn DTWAIN_ArrayIsValid(&self, theArray: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_ArrayIsValidFunc)(theArray);  }
     }
 
     pub fn DTWAIN_ArrayRemoveAll(&self, pArray: *mut c_void) -> i32 {
