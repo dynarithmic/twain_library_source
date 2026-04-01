@@ -276,7 +276,7 @@ static DTWAIN_ARRAY GenericEnumCameras(DTWAIN_SOURCE Source, LONG nWhichCamera, 
 	{
 		CTL_TwainDLLHandle* pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
 		MoveArray(pHandle, Cameras, &retVal);
-        return Cameras;
+        return *Cameras;
 	}
     return nullptr;
 }
