@@ -312,7 +312,7 @@ std::pair<int, DTWAIN_ARRAY> dynarithmic::CreateArrayFromFactory(CTL_TwainDLLHan
     DTWAIN_ARRAY retArray = {};
     if (nEnumType == DTWAIN_ARRAYFRAME)
     {
-        retArray = pHandle->m_ArrayFactory->create_frame(0, 0, 0, 0);
+        retArray = VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_frame(0, 0, 0, 0));
         if (retArray)
         {
             auto& vect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(retArray);
@@ -320,7 +320,7 @@ std::pair<int, DTWAIN_ARRAY> dynarithmic::CreateArrayFromFactory(CTL_TwainDLLHan
         }
     }
     else
-        retArray = pHandle->m_ArrayFactory->create_array(static_cast<CTL_ArrayType>(nEnumType), &dummy, nInitialSize);
+        retArray = VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_array(static_cast<CTL_ArrayType>(nEnumType), &dummy, nInitialSize));
     if ( retArray )
         return { DTWAIN_NO_ERROR, retArray };
     return { DTWAIN_ERR_BAD_ARRAY, nullptr };
@@ -363,7 +363,7 @@ void dynarithmic::SetArrayValueFromFactory(const CTL_TwainDLLHandle* pHandle, DT
 
 DTWAIN_FRAME dynarithmic::CreateFrameArray(const CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom)
 {
-    return pHandle->m_ArrayFactory->create_frame(Left, Top, Right, Bottom);
+    return VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_frame(Left, Top, Right, Bottom));
 }
 
 std::pair<int, DTWAIN_ARRAY> dynarithmic::CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize)
@@ -634,7 +634,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFrameN(DTWAIN_ARRAY pArray, DTWAIN_FRAME
         DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return true; },
             nTestValue, false, FUNC_MACRO, true, {});
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false);
 
     auto& vect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(pArray);
     auto& vectOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(frame);
@@ -2736,7 +2735,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayConvertFloatToFix32(DTWAIN_ARRAY FloatArra
     // remove the old array
     factory->destroy(FloatArrayV);
 
-    LOG_FUNC_EXIT_NONAME_PARAMS(aFix32)
+    LOG_FUNC_EXIT_NONAME_PARAMS(VOID_TO_DTWAIN_ARRAY(aFix32))
     CATCH_BLOCK(nullptr)
 }
 
@@ -2760,7 +2759,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayConvertFix32ToFloat(DTWAIN_ARRAY Fix32Arra
 
     // remove the old array
     factory->destroy(Fix32Array);
-    LOG_FUNC_EXIT_NONAME_PARAMS(aFloat)
+    LOG_FUNC_EXIT_NONAME_PARAMS(VOID_TO_DTWAIN_ARRAY(aFloat))
 	CATCH_BLOCK(nullptr)
 }
 
@@ -2809,7 +2808,7 @@ DTWAIN_ARRAY GenericArrayFloatToString(const CTL_TwainDLLHandle* pHandle,
             return sValue;
         });
     retVal = DTWAIN_NO_ERROR;
-    return aString;
+    return VOID_TO_DTWAIN_ARRAY(aString);
 }
 
 template <typename WrapperType>
@@ -2852,7 +2851,7 @@ DTWAIN_ARRAY GenericArrayStringToFloat(const CTL_TwainDLLHandle* pHandle,
             return WrapperType::ToDouble(str);
         });
     retVal = DTWAIN_NO_ERROR;
-    return aDouble;
+    return VOID_TO_DTWAIN_ARRAY(aDouble);
 }
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayFloatToANSIString(DTWAIN_ARRAY FloatArray)
@@ -2992,7 +2991,7 @@ static LONG GetNumAcquiredImages(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq,
     if (nWhich >= lCount)
         return DTWAIN_FAILURE1;
 
-    DTWAIN_ARRAY aDib = factory->get_value(aAcq, nWhich, nullptr);
+    DTWAIN_ARRAY aDib = VOID_TO_DTWAIN_ARRAY(factory->get_value(aAcq, nWhich, nullptr));
     lCount = static_cast<LONG>(factory->size( aDib ));
     return lCount;
 }
@@ -3016,7 +3015,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetAcquiredImage( DTWAIN_ARRAY aAcq, LONG nWhichAcq, 
     if ( nDibs == DTWAIN_FAILURE1 || nWhichDib >= nDibs )
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     auto& factory = pHandle->m_ArrayFactory;
-    DTWAIN_ARRAY aDib = factory->get_value(aAcq, nWhichAcq, nullptr);
+    DTWAIN_ARRAY aDib = VOID_TO_DTWAIN_ARRAY(factory->get_value(aAcq, nWhichAcq, nullptr));
     HANDLE hDib = factory->get_value(aDib, nWhichDib, nullptr);
     LOG_FUNC_EXIT_NONAME_PARAMS(hDib)
 	CATCH_BLOCK(nullptr)
@@ -3034,7 +3033,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG n
 
     //use a copy
     auto& factory = pHandle->m_ArrayFactory;
-    DTWAIN_ARRAY aDib = factory->get_value(aAcq, nWhichAcq, nullptr);
+    DTWAIN_ARRAY aDib = VOID_TO_DTWAIN_ARRAY(factory->get_value(aAcq, nWhichAcq, nullptr));
     const DTWAIN_ARRAY aCopy = CreateArrayCopyFromFactory(pHandle, aDib);
     LOG_FUNC_EXIT_NONAME_PARAMS(aCopy)
 	CATCH_BLOCK(nullptr)
