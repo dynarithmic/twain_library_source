@@ -440,6 +440,9 @@ typedef LONG (DLLENTRY_DEF * D_GETACTIVEDSMVERSIONINFOAFUNC)                    
 typedef LONG (DLLENTRY_DEF * D_GETACTIVEDSMVERSIONINFOWFUNC)                    (LPWSTR, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETALARMVOLUMEFUNC)                       (DTWAIN_SOURCE, LPLONG);
 typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_GETALLSOURCEDIBSFUNC)                    (DTWAIN_SOURCE);
+typedef LONG (DLLENTRY_DEF * D_GETALLSOURCEINFOFUNC)                            (DTWAIN_SOURCE, LPTSTR, LONG, LONG);
+typedef LONG (DLLENTRY_DEF * D_GETALLSOURCEINFOAFUNC)                           (DTWAIN_SOURCE, LPSTR, LONG, LONG);
+typedef LONG (DLLENTRY_DEF * D_GETALLSOURCEINFOWFUNC)                           (DTWAIN_SOURCE, LPWSTR, LONG, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETAPPINFOFUNC)                           (LPTSTR, LPTSTR, LPTSTR, LPTSTR);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETAPPINFOAFUNC)                          (LPSTR, LPSTR, LPSTR, LPSTR);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETAPPINFOWFUNC)                          (LPWSTR, LPWSTR, LPWSTR, LPWSTR);
@@ -1636,6 +1639,9 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_GETACTIVEDSMVERSIONINFOWFUNC                   DTWAIN_GetActiveDSMVersionInfoW;
     STATIC D_GETALARMVOLUMEFUNC                             DTWAIN_GetAlarmVolume;
     STATIC D_GETALLSOURCEDIBSFUNC                           DTWAIN_GetAllSourceDibs;
+    STATIC D_GETALLSOURCEINFOFUNC                           DTWAIN_GetAllSourceInfo;
+    STATIC D_GETALLSOURCEINFOAFUNC                          DTWAIN_GetAllSourceInfoA;
+    STATIC D_GETALLSOURCEINFOWFUNC                          DTWAIN_GetAllSourceInfoW;
     STATIC D_GETAPPINFOFUNC                                 DTWAIN_GetAppInfo;
     STATIC D_GETAPPINFOAFUNC                                DTWAIN_GetAppInfoA;
     STATIC D_GETAPPINFOWFUNC                                DTWAIN_GetAppInfoW;

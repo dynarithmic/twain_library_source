@@ -528,6 +528,9 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetActiveDSMVersionInfoW
    attr_reader :DTWAIN_GetAlarmVolume
    attr_reader :DTWAIN_GetAllSourceDibs
+   attr_reader :DTWAIN_GetAllSourceInfo
+   attr_reader :DTWAIN_GetAllSourceInfoA
+   attr_reader :DTWAIN_GetAllSourceInfoW
    attr_reader :DTWAIN_GetAppInfo
    attr_reader :DTWAIN_GetAppInfoA
    attr_reader :DTWAIN_GetAppInfoW
@@ -3393,6 +3396,9 @@ class DTWAINAPI
        @DTWAIN_GetActiveDSMVersionInfoW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetActiveDSMVersionInfoW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetAlarmVolume = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAlarmVolume'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetAllSourceDibs = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAllSourceDibs'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
+       @DTWAIN_GetAllSourceInfo = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAllSourceInfo'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetAllSourceInfoA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAllSourceInfoA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetAllSourceInfoW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAllSourceInfoW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetAppInfo = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAppInfo'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetAppInfoA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAppInfoA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetAppInfoW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetAppInfoW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)

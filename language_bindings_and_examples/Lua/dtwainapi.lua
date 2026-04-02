@@ -470,6 +470,9 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nMaxLen);
         DTWAIN_BOOL DTWAIN_GetAlarmVolume(DTWAIN_SOURCE Source, LPLONG lpVolume);
         DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source);
+        LONG DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSourceInfoW(DTWAIN_SOURCE Source, LPWSTR lpszOut, LONG indentFactor, LONG nSize);
         DTWAIN_BOOL DTWAIN_GetAppInfo(DTWAIN_CHARPTRTYPE szVerStr, DTWAIN_CHARPTRTYPE szManu, DTWAIN_CHARPTRTYPE szProdFam, DTWAIN_CHARPTRTYPE szProdName);
         DTWAIN_BOOL DTWAIN_GetAppInfoA(LPSTR szVerStr, LPSTR szManu, LPSTR szProdFam, LPSTR szProdName);
         DTWAIN_BOOL DTWAIN_GetAppInfoW(LPWSTR szVerStr, LPWSTR szManu, LPWSTR szProdFam, LPWSTR szProdName);
@@ -1700,6 +1703,9 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nMaxLen);
         DTWAIN_BOOL DTWAIN_GetAlarmVolume(DTWAIN_SOURCE Source, LPLONG lpVolume);
         DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source);
+        LONG DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSourceInfoW(DTWAIN_SOURCE Source, LPWSTR lpszOut, LONG indentFactor, LONG nSize);
         DTWAIN_BOOL DTWAIN_GetAppInfo(DTWAIN_CHARPTRTYPE szVerStr, DTWAIN_CHARPTRTYPE szManu, DTWAIN_CHARPTRTYPE szProdFam, DTWAIN_CHARPTRTYPE szProdName);
         DTWAIN_BOOL DTWAIN_GetAppInfoA(LPSTR szVerStr, LPSTR szManu, LPSTR szProdFam, LPSTR szProdName);
         DTWAIN_BOOL DTWAIN_GetAppInfoW(LPWSTR szVerStr, LPWSTR szManu, LPWSTR szProdFam, LPWSTR szProdName);
@@ -2930,6 +2936,9 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nMaxLen);
         DTWAIN_BOOL DTWAIN_GetAlarmVolume(DTWAIN_SOURCE Source, LPLONG lpVolume);
         DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source);
+        LONG DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSourceInfoW(DTWAIN_SOURCE Source, LPWSTR lpszOut, LONG indentFactor, LONG nSize);
         DTWAIN_BOOL DTWAIN_GetAppInfo(DTWAIN_CHARPTRTYPE szVerStr, DTWAIN_CHARPTRTYPE szManu, DTWAIN_CHARPTRTYPE szProdFam, DTWAIN_CHARPTRTYPE szProdName);
         DTWAIN_BOOL DTWAIN_GetAppInfoA(LPSTR szVerStr, LPSTR szManu, LPSTR szProdFam, LPSTR szProdName);
         DTWAIN_BOOL DTWAIN_GetAppInfoW(LPWSTR szVerStr, LPWSTR szManu, LPWSTR szProdFam, LPWSTR szProdName);
@@ -4160,6 +4169,9 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nMaxLen);
         DTWAIN_BOOL DTWAIN_GetAlarmVolume(DTWAIN_SOURCE Source, LPLONG lpVolume);
         DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source);
+        LONG DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSourceInfoW(DTWAIN_SOURCE Source, LPWSTR lpszOut, LONG indentFactor, LONG nSize);
         DTWAIN_BOOL DTWAIN_GetAppInfo(DTWAIN_CHARPTRTYPE szVerStr, DTWAIN_CHARPTRTYPE szManu, DTWAIN_CHARPTRTYPE szProdFam, DTWAIN_CHARPTRTYPE szProdName);
         DTWAIN_BOOL DTWAIN_GetAppInfoA(LPSTR szVerStr, LPSTR szManu, LPSTR szProdFam, LPSTR szProdName);
         DTWAIN_BOOL DTWAIN_GetAppInfoW(LPWSTR szVerStr, LPWSTR szManu, LPWSTR szProdFam, LPWSTR szProdName);

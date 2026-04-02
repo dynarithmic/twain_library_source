@@ -2901,6 +2901,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetAllSourceDibsDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Private Delegate Function DTWAIN_GetAllSourceInfoDelegate(Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, indentFactor As Integer, nSize As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetAppInfoDelegate(<MarshalAs(UnmanagedType.LPTStr)> szVerStr As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> szManu As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> szProdFam As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> szProdName As StringBuilder) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
@@ -5783,6 +5786,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetAllSourceDibs(Source)
         End Function
         
+        Public Function DTWAIN_GetAllSourceInfo(Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, indentFactor As Integer, nSize As Integer) As Integer
+        Return api.DTWAIN_GetAllSourceInfo(Source, lpszOut, indentFactor, nSize)
+        End Function
+        
         Public Function DTWAIN_GetAppInfo(<MarshalAs(UnmanagedType.LPTStr)> szVerStr As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> szManu As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> szProdFam As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> szProdName As StringBuilder) As Integer
         Return api.DTWAIN_GetAppInfo(szVerStr, szManu, szProdFam, szProdName)
         End Function
@@ -8220,6 +8227,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetActiveDSMVersionInfo As DTWAIN_GetActiveDSMVersionInfoDelegate
             Public DTWAIN_GetAlarmVolume As DTWAIN_GetAlarmVolumeDelegate
             Public DTWAIN_GetAllSourceDibs As DTWAIN_GetAllSourceDibsDelegate
+            Public DTWAIN_GetAllSourceInfo As DTWAIN_GetAllSourceInfoDelegate
             Public DTWAIN_GetAppInfo As DTWAIN_GetAppInfoDelegate
             Public DTWAIN_GetAuthor As DTWAIN_GetAuthorDelegate
             Public DTWAIN_GetBarcodeMaxPriorities As DTWAIN_GetBarcodeMaxPrioritiesDelegate

@@ -440,6 +440,9 @@ type DtwaingetactivedsmversioninfoaFunc = unsafe extern "C" fn(*mut c_char,i32) 
 type DtwaingetactivedsmversioninfowFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
 type DtwaingetalarmvolumeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
 type DtwaingetallsourcedibsFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwaingetallsourceinfoFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32,i32) -> i32;
+type DtwaingetallsourceinfoaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32,i32) -> i32;
+type DtwaingetallsourceinfowFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32,i32) -> i32;
 type DtwaingetappinfoFunc = unsafe extern "C" fn(*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
 type DtwaingetappinfoaFunc = unsafe extern "C" fn(*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
 type DtwaingetappinfowFunc = unsafe extern "C" fn(*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
@@ -1615,6 +1618,9 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetActiveDSMVersionInfoWFunc: Symbol<'a, DtwaingetactivedsmversioninfowFunc>,
     DTWAIN_GetAlarmVolumeFunc: Symbol<'a, DtwaingetalarmvolumeFunc>,
     DTWAIN_GetAllSourceDibsFunc: Symbol<'a, DtwaingetallsourcedibsFunc>,
+    DTWAIN_GetAllSourceInfoFunc: Symbol<'a, DtwaingetallsourceinfoFunc>,
+    DTWAIN_GetAllSourceInfoAFunc: Symbol<'a, DtwaingetallsourceinfoaFunc>,
+    DTWAIN_GetAllSourceInfoWFunc: Symbol<'a, DtwaingetallsourceinfowFunc>,
     DTWAIN_GetAppInfoFunc: Symbol<'a, DtwaingetappinfoFunc>,
     DTWAIN_GetAppInfoAFunc: Symbol<'a, DtwaingetappinfoaFunc>,
     DTWAIN_GetAppInfoWFunc: Symbol<'a, DtwaingetappinfowFunc>,
@@ -4444,6 +4450,9 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetActiveDSMVersionInfoW: Symbol<DtwaingetactivedsmversioninfowFunc> = unsafe { library.get(b"DTWAIN_GetActiveDSMVersionInfoW")? };
         let DTWAIN_GetAlarmVolume: Symbol<DtwaingetalarmvolumeFunc> = unsafe { library.get(b"DTWAIN_GetAlarmVolume")? };
         let DTWAIN_GetAllSourceDibs: Symbol<DtwaingetallsourcedibsFunc> = unsafe { library.get(b"DTWAIN_GetAllSourceDibs")? };
+        let DTWAIN_GetAllSourceInfo: Symbol<DtwaingetallsourceinfoFunc> = unsafe { library.get(b"DTWAIN_GetAllSourceInfo")? };
+        let DTWAIN_GetAllSourceInfoA: Symbol<DtwaingetallsourceinfoaFunc> = unsafe { library.get(b"DTWAIN_GetAllSourceInfoA")? };
+        let DTWAIN_GetAllSourceInfoW: Symbol<DtwaingetallsourceinfowFunc> = unsafe { library.get(b"DTWAIN_GetAllSourceInfoW")? };
         let DTWAIN_GetAppInfo: Symbol<DtwaingetappinfoFunc> = unsafe { library.get(b"DTWAIN_GetAppInfo")? };
         let DTWAIN_GetAppInfoA: Symbol<DtwaingetappinfoaFunc> = unsafe { library.get(b"DTWAIN_GetAppInfoA")? };
         let DTWAIN_GetAppInfoW: Symbol<DtwaingetappinfowFunc> = unsafe { library.get(b"DTWAIN_GetAppInfoW")? };
@@ -5618,6 +5627,9 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetActiveDSMVersionInfoWFunc: DTWAIN_GetActiveDSMVersionInfoW,
             DTWAIN_GetAlarmVolumeFunc: DTWAIN_GetAlarmVolume,
             DTWAIN_GetAllSourceDibsFunc: DTWAIN_GetAllSourceDibs,
+            DTWAIN_GetAllSourceInfoFunc: DTWAIN_GetAllSourceInfo,
+            DTWAIN_GetAllSourceInfoAFunc: DTWAIN_GetAllSourceInfoA,
+            DTWAIN_GetAllSourceInfoWFunc: DTWAIN_GetAllSourceInfoW,
             DTWAIN_GetAppInfoFunc: DTWAIN_GetAppInfo,
             DTWAIN_GetAppInfoAFunc: DTWAIN_GetAppInfoA,
             DTWAIN_GetAppInfoWFunc: DTWAIN_GetAppInfoW,
@@ -7972,6 +7984,18 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetAllSourceDibs(&self, Source: *mut c_void) -> *mut c_void {
         unsafe { return (self.DTWAIN_GetAllSourceDibsFunc)(Source);  }
+    }
+
+    pub fn DTWAIN_GetAllSourceInfo(&self, Source: *mut c_void, lpszOut: *mut u16, indentFactor: i32, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetAllSourceInfoFunc)(Source, lpszOut, indentFactor, nSize);  }
+    }
+
+    pub fn DTWAIN_GetAllSourceInfoA(&self, Source: *mut c_void, lpszOut: *mut c_char, indentFactor: i32, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetAllSourceInfoAFunc)(Source, lpszOut, indentFactor, nSize);  }
+    }
+
+    pub fn DTWAIN_GetAllSourceInfoW(&self, Source: *mut c_void, lpszOut: *mut u16, indentFactor: i32, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetAllSourceInfoWFunc)(Source, lpszOut, indentFactor, nSize);  }
     }
 
     pub fn DTWAIN_GetAppInfo(&self, szVerStr: *mut u16, szManu: *mut u16, szProdFam: *mut u16, szProdName: *mut u16) -> i32 {

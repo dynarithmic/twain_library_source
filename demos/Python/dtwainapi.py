@@ -2162,6 +2162,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetActiveDSMVersionInfoW.restype = ct.c_long
      theDLL.DTWAIN_GetAlarmVolume.restype = ct.c_long
      theDLL.DTWAIN_GetAllSourceDibs.restype = ct.c_void_p
+     theDLL.DTWAIN_GetAllSourceInfo.restype = ct.c_long
+     theDLL.DTWAIN_GetAllSourceInfoA.restype = ct.c_long
+     theDLL.DTWAIN_GetAllSourceInfoW.restype = ct.c_long
      theDLL.DTWAIN_GetAppInfo.restype = ct.c_long
      theDLL.DTWAIN_GetAppInfoA.restype = ct.c_long
      theDLL.DTWAIN_GetAppInfoW.restype = ct.c_long
@@ -3327,6 +3330,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetActiveDSMVersionInfoW.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetAlarmVolume.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetAllSourceDibs.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_GetAllSourceInfo.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_GetAllSourceInfoA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_GetAllSourceInfoW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_GetAppInfo.argtypes = [ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
      theDLL.DTWAIN_GetAppInfoA.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p]
      theDLL.DTWAIN_GetAppInfoW.argtypes = [ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
@@ -4480,6 +4486,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetActiveDSMVersionInfoW.restype = ct.c_long
      theDLL.DTWAIN_GetAlarmVolume.restype = ct.c_long
      theDLL.DTWAIN_GetAllSourceDibs.restype = ct.c_void_p
+     theDLL.DTWAIN_GetAllSourceInfo.restype = ct.c_long
+     theDLL.DTWAIN_GetAllSourceInfoA.restype = ct.c_long
+     theDLL.DTWAIN_GetAllSourceInfoW.restype = ct.c_long
      theDLL.DTWAIN_GetAppInfo.restype = ct.c_long
      theDLL.DTWAIN_GetAppInfoA.restype = ct.c_long
      theDLL.DTWAIN_GetAppInfoW.restype = ct.c_long
@@ -5645,6 +5654,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetActiveDSMVersionInfoW.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetAlarmVolume.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetAllSourceDibs.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_GetAllSourceInfo.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_GetAllSourceInfoA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_GetAllSourceInfoW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_GetAppInfo.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p]
      theDLL.DTWAIN_GetAppInfoA.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p]
      theDLL.DTWAIN_GetAppInfoW.argtypes = [ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]

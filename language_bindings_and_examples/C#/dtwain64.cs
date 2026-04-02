@@ -2802,6 +2802,12 @@ namespace Dynarithmic
         public static extern DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder lpszOut, int indentFactor, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, System.IntPtr lpszOut, int indentFactor, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
         public static extern int DTWAIN_GetAppInfo([MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder szVerStr, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder szManu, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder szProdFam, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder szProdName);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]

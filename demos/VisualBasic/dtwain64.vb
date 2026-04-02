@@ -2078,6 +2078,7 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_GetActiveDSMVersionInfo Lib "dtwain64.dll" (<MarshalAs(UnmanagedType.LPStr)> szDLLInfo As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetAlarmVolume Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lpVolume As Integer) As Integer
     Public Declare Function DTWAIN_GetAllSourceDibs Lib "dtwain64.dll" (Source As System.IntPtr) As System.IntPtr
+    Public Declare Ansi Function DTWAIN_GetAllSourceInfo Lib "dtwain64.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, indentFactor As Integer, nSize As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetAppInfo Lib "dtwain64.dll" (<MarshalAs(UnmanagedType.LPStr)> szVerStr As StringBuilder, <MarshalAs(UnmanagedType.LPStr)> szManu As StringBuilder, <MarshalAs(UnmanagedType.LPStr)> szProdFam As StringBuilder, <MarshalAs(UnmanagedType.LPStr)> szProdName As StringBuilder) As Integer
     Public Declare Ansi Function DTWAIN_GetAuthor Lib "dtwain64.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> szAuthor As StringBuilder) As Integer
     Public Declare Function DTWAIN_GetBarcodeMaxPriorities Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pMaxPriorities As UInteger, bCurrent As Integer) As Integer

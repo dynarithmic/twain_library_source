@@ -2245,6 +2245,8 @@
         public delegate int DTWAIN_GetActiveDSMVersionInfoDelegate_overload(System.IntPtr szDLLInfo, int nMaxLen);
         public delegate int DTWAIN_GetAlarmVolumeDelegate(DTWAIN_SOURCE Source, ref int lpVolume);
         public delegate DTWAIN_ARRAY DTWAIN_GetAllSourceDibsDelegate(DTWAIN_SOURCE Source);
+        public delegate int DTWAIN_GetAllSourceInfoDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int indentFactor, int nSize);
+        public delegate int DTWAIN_GetAllSourceInfoDelegate_overload(DTWAIN_SOURCE Source, System.IntPtr lpszOut, int indentFactor, int nSize);
         public delegate int DTWAIN_GetAppInfoDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szVerStr, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szManu, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szProdFam, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szProdName);
         public delegate int DTWAIN_GetAppInfoDelegate_overload(System.IntPtr szVerStr, System.IntPtr szManu, System.IntPtr szProdFam, System.IntPtr szProdName);
         public delegate int DTWAIN_GetAuthorDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szAuthor);
@@ -3850,6 +3852,12 @@
 
         [DTWAINNativeFunction("DTWAIN_GetAllSourceDibs")]
         private readonly DTWAIN_GetAllSourceDibsDelegate  _DTWAIN_GetAllSourceDibs;
+
+        [DTWAINNativeFunction("DTWAIN_GetAllSourceInfo")]
+        private readonly DTWAIN_GetAllSourceInfoDelegate  _DTWAIN_GetAllSourceInfo;
+
+        [DTWAINNativeFunction("DTWAIN_GetAllSourceInfo")]
+        private readonly DTWAIN_GetAllSourceInfoDelegate_overload _DTWAIN_GetAllSourceInfo_overload; 
 
         [DTWAINNativeFunction("DTWAIN_GetAppInfo")]
         private readonly DTWAIN_GetAppInfoDelegate  _DTWAIN_GetAppInfo;
@@ -6621,6 +6629,12 @@
 
         public  DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source)
         => _DTWAIN_GetAllSourceDibs(Source);
+
+        public  int DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int indentFactor, int nSize)
+        => _DTWAIN_GetAllSourceInfo(Source, lpszOut, indentFactor, nSize);
+
+        public  int DTWAIN_GetAllSourceInfo (DTWAIN_SOURCE Source, System.IntPtr lpszOut, int indentFactor, int nSize)
+        => _DTWAIN_GetAllSourceInfo_overload(Source, lpszOut, indentFactor, nSize);
 
         public  int DTWAIN_GetAppInfo([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szVerStr, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szManu, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szProdFam, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szProdName)
         => _DTWAIN_GetAppInfo(szVerStr, szManu, szProdFam, szProdName);

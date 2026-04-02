@@ -2838,6 +2838,9 @@ module TwainAPI =
     type DTWAIN_GetAllSourceDibsDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetAllSourceInfoDelegate = delegate of DTWAIN_SOURCE * System.Text.StringBuilder * LONG * LONG -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetAppInfoDelegate = delegate of System.Text.StringBuilder * System.Text.StringBuilder * System.Text.StringBuilder * System.Text.StringBuilder -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
@@ -4733,6 +4736,7 @@ module TwainAPI =
     let private GetActiveDSMVersionInfo = lazy (DynamicDll.Bind "DTWAIN_GetActiveDSMVersionInfo" : DTWAIN_GetActiveDSMVersionInfoDelegate)
     let private GetAlarmVolume = lazy (DynamicDll.Bind "DTWAIN_GetAlarmVolume" : DTWAIN_GetAlarmVolumeDelegate)
     let private GetAllSourceDibs = lazy (DynamicDll.Bind "DTWAIN_GetAllSourceDibs" : DTWAIN_GetAllSourceDibsDelegate)
+    let private GetAllSourceInfo = lazy (DynamicDll.Bind "DTWAIN_GetAllSourceInfo" : DTWAIN_GetAllSourceInfoDelegate)
     let private GetAppInfo = lazy (DynamicDll.Bind "DTWAIN_GetAppInfo" : DTWAIN_GetAppInfoDelegate)
     let private GetAuthor = lazy (DynamicDll.Bind "DTWAIN_GetAuthor" : DTWAIN_GetAuthorDelegate)
     let private GetBarcodeMaxPriorities = lazy (DynamicDll.Bind "DTWAIN_GetBarcodeMaxPriorities" : DTWAIN_GetBarcodeMaxPrioritiesDelegate)
@@ -6576,6 +6580,10 @@ module TwainAPI =
     let DTWAIN_GetAllSourceDibs (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetAllSourceDibs.Value.Invoke(source)
+
+    let DTWAIN_GetAllSourceInfo (source: DTWAIN_SOURCE) (lpszout: System.Text.StringBuilder) (indentfactor: LONG) (nsize: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetAllSourceInfo.Value.Invoke(source, lpszout, indentfactor, nsize)
 
     let DTWAIN_GetAppInfo (szverstr: System.Text.StringBuilder) (szmanu: System.Text.StringBuilder) (szprodfam: System.Text.StringBuilder) (szprodname: System.Text.StringBuilder) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

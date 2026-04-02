@@ -2317,6 +2317,9 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LPWSTR, LONG) DTWAIN_GetActiveDSMVersionInfoW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetAlarmVolume;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_GetAllSourceDibs;
+    extern(Windows) LONG function(DTWAIN_SOURCE, DTWAIN_CHARPTRTYPE, LONG, LONG) DTWAIN_GetAllSourceInfo;
+    extern(Windows) LONG function(DTWAIN_SOURCE, LPSTR, LONG, LONG) DTWAIN_GetAllSourceInfoA;
+    extern(Windows) LONG function(DTWAIN_SOURCE, LPWSTR, LONG, LONG) DTWAIN_GetAllSourceInfoW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_CHARPTRTYPE, DTWAIN_CHARPTRTYPE, DTWAIN_CHARPTRTYPE, DTWAIN_CHARPTRTYPE) DTWAIN_GetAppInfo;
     extern(Windows) DTWAIN_BOOL function(LPSTR, LPSTR, LPSTR, LPSTR) DTWAIN_GetAppInfoA;
     extern(Windows) DTWAIN_BOOL function(LPWSTR, LPWSTR, LPWSTR, LPWSTR) DTWAIN_GetAppInfoW;
@@ -3491,6 +3494,9 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetActiveDSMVersionInfoW, "DTWAIN_GetActiveDSMVersionInfoW");
         bindFunction(cast(void**)&DTWAIN_GetAlarmVolume, "DTWAIN_GetAlarmVolume");
         bindFunction(cast(void**)&DTWAIN_GetAllSourceDibs, "DTWAIN_GetAllSourceDibs");
+        bindFunction(cast(void**)&DTWAIN_GetAllSourceInfo, "DTWAIN_GetAllSourceInfo");
+        bindFunction(cast(void**)&DTWAIN_GetAllSourceInfoA, "DTWAIN_GetAllSourceInfoA");
+        bindFunction(cast(void**)&DTWAIN_GetAllSourceInfoW, "DTWAIN_GetAllSourceInfoW");
         bindFunction(cast(void**)&DTWAIN_GetAppInfo, "DTWAIN_GetAppInfo");
         bindFunction(cast(void**)&DTWAIN_GetAppInfoA, "DTWAIN_GetAppInfoA");
         bindFunction(cast(void**)&DTWAIN_GetAppInfoW, "DTWAIN_GetAppInfoW");
