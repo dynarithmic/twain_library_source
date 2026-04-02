@@ -1481,6 +1481,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\ctltwaincompliancy.cpp" />
     <ClCompile Include="cpp\ctltwaindecoder.cpp" />
     <ClCompile Include="cpp\ctltwainfilesystem.cpp" />
+    <ClCompile Include="cpp\ctltwainidentity.cpp" />
     <ClCompile Include="cpp\ctltwainmanager.cpp" />
     <ClCompile Include="cpp\ctltwainsession.cpp" />
     <ClCompile Include="cpp\ctltwainsource.cpp" />
