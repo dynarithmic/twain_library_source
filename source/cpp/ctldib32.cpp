@@ -298,7 +298,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
             DTWAIN_ARRAY a = nullptr;
             const auto pHandle = ImageInfo.theSource->GetDTWAINHandle();
             auto& factory = pHandle->m_ArrayFactory;
-            DTWAIN_GetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
+            DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                                     DTWAIN_CAPGETCURRENT, &a);
             DTWAINArrayLowLevelPtr_RAII raii(pHandle, &a);
             if ( a )
@@ -391,7 +391,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
             // Get the current OCR engine's input format
             DTWAIN_ARRAY a = nullptr;
             const auto pHandle = ImageInfo.theSource->GetDTWAINHandle();
-            DTWAIN_GetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
+            DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                                     DTWAIN_CAPGETCURRENT, &a);
             DTWAINArrayLowLevelPtr_RAII raii(pHandle, &a);
             if ( a )

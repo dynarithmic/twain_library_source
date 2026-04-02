@@ -244,14 +244,15 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
         opts.setFileFlags(opts.getFileFlags() | DTWAIN_USELIST);
     if ( opts.getAcquireType() != TWAINAcquireType_AudioFile)
         opts.setActualAcquireType(TWAINAcquireType_File);
-    const auto pHandle = static_cast<CTL_ITwainSource*>(opts.getSource())->GetDTWAINHandle();
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+    const auto pHandle = pSource->GetDTWAINHandle();
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
-    auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
+    auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
 	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
 	if (pr.first != DTWAIN_NO_ERROR)
 	{
-		CTL_TwainAppMgr::DisableUserInterface(static_cast<CTL_ITwainSource*>(opts.getSource()));
+		CTL_TwainAppMgr::DisableUserInterface(pSource);
 		LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
 	}
     LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
@@ -281,7 +282,7 @@ static std::string GetDirectoryCreationError(CTL_StringViewType fileName)
 bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
-    CTL_ITwainSource *pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
+    CTL_ITwainSource *pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
 
     DumpArrayContents(opts.getFileList(), 0, false, false);
     #ifdef _UNICODE

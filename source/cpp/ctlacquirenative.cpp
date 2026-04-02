@@ -78,14 +78,15 @@ DTWAIN_BOOL   DLLENTRY_DEF  DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG Pi
 DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireNative(SourceAcquireOptions& opts)
 {
     opts.setActualAcquireType(TWAINAcquireType_Native);
-    const auto pHandle = static_cast<CTL_ITwainSource*>(opts.getSource())->GetDTWAINHandle();
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+    const auto pHandle = pSource->GetDTWAINHandle();
     if ( pHandle->m_lAcquireMode == DTWAIN_MODELESS )
          return LLAcquireImage(opts);
-    auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
+    auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
 	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
 	if (pr.first != DTWAIN_NO_ERROR)
 	{
-		CTL_TwainAppMgr::DisableUserInterface(static_cast<CTL_ITwainSource*>(opts.getSource()));
+		CTL_TwainAppMgr::DisableUserInterface(pSource);
         return DTWAIN_FAILURE1;
 	}
     return pr.second;

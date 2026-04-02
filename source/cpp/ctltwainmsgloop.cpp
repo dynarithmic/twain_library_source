@@ -117,13 +117,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source)
 }
 
 
-std::pair<int, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts)
+std::pair<int, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(CTL_ITwainSource* pSource, SourceAcquireOptions& opts)
 {
-    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
     if (!pSource)
         return { false, -1 };
 
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    const auto pHandle = pSource->GetDTWAINHandle();
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return { true, 0 };
 

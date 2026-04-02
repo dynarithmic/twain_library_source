@@ -248,7 +248,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, fn);
     if (nLen > 0)
         value[0] = '\0';
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ArrayValues);
     if (retVal > 0 && ArrayValues)
     {
@@ -975,7 +975,7 @@ static std::pair<bool, int> GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, 
 		return  { false, DTWAIN_ERR_INVALID_PARAM };
 	}
 	double* pRealValue = pValue;
-    if (DTWAIN_GetCapDataType(pSource, lCap) != TWTY_FIX32)
+    if (DTWAIN_GetCapDataType(reinterpret_cast<DTWAIN_SOURCE>(pSource), lCap) != TWTY_FIX32)
         return { false, DTWAIN_ERR_BAD_CAPTYPE };
     DTWAIN_ARRAY Array = nullptr;
     bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;

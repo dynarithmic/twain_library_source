@@ -76,7 +76,7 @@ bool dynarithmic::CloseSourceInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSou
     if (bRetval)
     {
         pHandle->m_mapStringToSource.erase(sProductName);
-        pHandle->m_aFeederSources.erase(pSource);
+        pHandle->m_aFeederSources.erase(reinterpret_cast<DTWAIN_SOURCE>(pSource));
     }
     std::string sProductNameA = StringConversion::Convert_Native_To_Ansi(sProductName);
     auto& sourceMap = CTL_StaticData::GetSourceStatusMap();

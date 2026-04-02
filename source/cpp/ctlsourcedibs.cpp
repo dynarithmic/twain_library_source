@@ -43,7 +43,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetSourceAcquisitions(DTWAIN_SOURCE Source)
 DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibsInternal(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray))
-    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
     const auto& factory = pHandle->m_ArrayFactory;
 

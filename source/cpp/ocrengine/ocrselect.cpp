@@ -57,8 +57,8 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectDefaultOCREngine()
     // Get the OCR engine associated with the name
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return pH->m_OCRInterfaceArray.empty(); },
         DTWAIN_ERR_OCR_NOTACTIVE, 0, FUNC_MACRO);
-    const auto SelectedEngine = static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get());
-    const auto pEngine = static_cast<OCREngine*>(SelectedEngine);
+    const auto SelectedEngine = reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get());
+    const auto pEngine = reinterpret_cast<OCREngine*>(SelectedEngine);
     if (!pEngine->IsActivated())
         pEngine->StartupOCREngine();
 
@@ -86,7 +86,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByName(LPCTSTR lpszName)
 
             if (!SelectedEngine->IsActivated())
                 SelectedEngine->StartupOCREngine();
-            ocrEngine_ = SelectedEngine.get();
+            ocrEngine_ = reinterpret_cast<DTWAIN_OCRENGINE>(SelectedEngine.get());
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(ocrEngine_)

@@ -33,7 +33,7 @@ typedef struct tagDTWAIN_ARRAY__ { int unused; } *DTWAIN_ARRAY;
 typedef DTWAIN_ARRAY  DTWAIN_RANGE;
 typedef DTWAIN_ARRAY  DTWAIN_FRAME;
 typedef DTWAIN_ARRAY  DTWAIN_FIX32;
-typedef void *   DTWAIN_SOURCE;
+typedef struct tagDTWAIN_SOURCE__ { int unused; } *DTWAIN_SOURCE;
 typedef LONG_PTR    DTWAIN_ACQUIRE;
 typedef LONG        DTWAIN_LONG;
 typedef LONGLONG    DTWAIN_LONG64;

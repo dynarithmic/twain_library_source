@@ -129,7 +129,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
     if (!DTWAIN_GetDeviceEvent(Source, lpEvent))
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     auto pHandle = pSource->GetDTWAINHandle();
 	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 

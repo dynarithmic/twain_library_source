@@ -151,7 +151,7 @@ struct EnumCustomTraits
     {
         if (!pSource->RetrievedAllCaps())
         {
-            if (!DTWAIN_EnumSupportedCaps(pSource, Array))
+            if (!DTWAIN_EnumSupportedCaps(reinterpret_cast<DTWAIN_SOURCE>(pSource), Array))
                 return false;
         }
         return true;
@@ -170,7 +170,7 @@ struct EnumExtendedTraits
 template <typename EnumFn, typename CacheFn>
 static int32_t EnumCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, CacheFn fn)
 {
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
 
     bool bRet = EnumFn::EnumAllCaps(pSource, Array);

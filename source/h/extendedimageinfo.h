@@ -117,7 +117,7 @@ static constexpr std::array<TW_UINT16, 81> aRequiredTypeMatches = { TWEI_BARCODE
 
 namespace dynarithmic
 {
-    std::pair<bool, int> GetExtImageInfoDataInternal(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data);
+    std::pair<bool, int> GetExtImageInfoDataInternal(CTL_ITwainSource* pSource, LONG nWhich, LPDTWAIN_ARRAY Data);
     std::pair<bool, int> GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nWhich, LPDTWAIN_ARRAY Data);
 
     struct ExtendedImageInfo_Barcode

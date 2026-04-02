@@ -55,7 +55,7 @@ static constexpr std::array<std::pair<int, SourceFn>, 4> SourcefnMap = { {{SELEC
 
 static LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOptions& opts)
 {
-    const auto p = static_cast<CTL_ITwainSource *>(Source);
+    const auto p = reinterpret_cast<CTL_ITwainSource *>(Source);
     if (p)
         p->SetSelected(true);
     else
@@ -99,7 +99,7 @@ static DTWAIN_SOURCE SelectAndOpenSource(CTL_TwainDLLHandle* pHandle, SourceSele
     auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
     if (Source)
     {
-        auto pSource = static_cast<CTL_ITwainSource*>(Source);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
 
 		// Set this as the default source
 		SetDefaultSource_Internal(pSource, opts);
@@ -271,7 +271,7 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelec
     // Open and close the source to initialize capability structure
     // Return a dead source.  This allows closing of the source without
     // destroying the source info
-    auto pRealSource = static_cast<CTL_ITwainSource*>(pSource);
+    auto pRealSource = reinterpret_cast<CTL_ITwainSource*>(pSource);
     DTWAIN_SOURCE pDead = nullptr;
 
     bool bFound = false;
@@ -290,18 +290,18 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelec
 
     if (pDeadIt != vSources.end())
     {
-        pDead = *pDeadIt;
+        pDead = reinterpret_cast<DTWAIN_SOURCE>(*pDeadIt);
         bFound = true;
     }
     if (bFound)
     {
-        if (pRealSource != pDead)
+        if (pRealSource != reinterpret_cast<CTL_ITwainSource*>(pDead))
         {
             const auto pSession = CTL_TwainAppMgr::GetCurrentSession();
             if ( pSession )
                 pSession->DestroyOneSource(pRealSource);
         }
-        CTL_TwainAppMgr::SetDefaultSource(static_cast<CTL_ITwainSource*>(pDead));
+        CTL_TwainAppMgr::SetDefaultSource(reinterpret_cast<CTL_ITwainSource*>(pDead));
         LOG_FUNC_EXIT_NONAME_PARAMS(pDead)
     }
     DTWAIN_EndTwainSession();
@@ -332,7 +332,7 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource2(CTL_TwainDLLHandle* pHandle,  
             SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTSOURCEBYNAME, IDS_SELECT_SOURCE_TEXT, actualSourceName.c_str()), openWhenSelected);
     // Set the default Source
     if ( Source )
-        CTL_TwainAppMgr::SetDefaultSource(static_cast<CTL_ITwainSource*>(Source));
+        CTL_TwainAppMgr::SetDefaultSource(reinterpret_cast<CTL_ITwainSource*>(Source));
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
     CATCH_BLOCK(nullptr)
 }
@@ -343,7 +343,7 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSourceByName(CTL_TwainDLLHandle* pHand
     // Select a source from the source dialog
     const CTL_ITwainSource *pSource = CTL_TwainAppMgr::SelectSource( pHandle->m_pTwainSession, opts.szProduct);
     // Check if a source was selected
-    LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource *>(pSource)))
+    LOG_FUNC_EXIT_NONAME_PARAMS(reinterpret_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource *>(pSource)))
     CATCH_BLOCK(nullptr)
 }
 
@@ -351,7 +351,7 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectDefaultSource(CTL_TwainDLLHandle* pHan
 {
     LOG_FUNC_ENTRY_PARAMS((pHandle))
     const CTL_ITwainSource* pSource = CTL_TwainAppMgr::GetDefaultSource(pHandle->m_pTwainSession);
-    const DTWAIN_SOURCE Source = static_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource *>(pSource));
+    const DTWAIN_SOURCE Source = reinterpret_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource *>(pSource));
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
     CATCH_BLOCK(nullptr)
 }
@@ -416,12 +416,12 @@ static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
         }
         if (DefSource)
         {
-            SourceCloserRAII sourcecloser(static_cast<CTL_ITwainSource*>(DefSource), true); 
-            LONG nCharacters = GetSourceInfo(static_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, nullptr, 0);
+            SourceCloserRAII sourcecloser(reinterpret_cast<CTL_ITwainSource*>(DefSource), true); 
+            LONG nCharacters = GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, nullptr, 0);
             if (nCharacters > 0)
             {
                 DefName.resize(nCharacters);
-                GetSourceInfo(static_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, DefName.data(), nCharacters);
+                GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, DefName.data(), nCharacters);
                 if (bLogMessages)
                     LogWriterUtils::WriteLogInfoIndentedA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...");
             }

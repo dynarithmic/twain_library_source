@@ -170,7 +170,7 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
     const DTWAIN_SOURCE Source = opts.getSource();
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
 
     if (pSource->IsTileModeOn())
@@ -195,7 +195,7 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
     opts.setActualAcquireType(TWAINAcquireType_Buffer);
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
-    auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
+    auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
 	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] 
         { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
     if (pr.first != DTWAIN_NO_ERROR)

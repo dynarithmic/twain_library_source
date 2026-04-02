@@ -169,7 +169,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 {
                     // Send this message on
                     bPassMsg = true;
-                    DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,pHandle, pSource, wParam, reinterpret_cast<LPARAM>(pSource) );
+                    DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,pHandle, reinterpret_cast<DTWAIN_SOURCE>(pSource), wParam, reinterpret_cast<LPARAM>(pSource) );
                 }
             }
             break;
@@ -231,7 +231,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                     bPassMsg = true;
                 if (wParam == DTWAIN_TN_FILEPAGESAVEOK)
                     acquireFileStatus.SetFileSavePageCount(acquireFileStatus.GetFileSavePageCount() + 1);
-                DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,pHandle,pSource, wParam, reinterpret_cast<LPARAM>(pSource) );
+                DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,pHandle, reinterpret_cast<DTWAIN_SOURCE>(pSource), wParam, reinterpret_cast<LPARAM>(pSource) );
             }
             break;
 
@@ -244,7 +244,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                     bPassMsg = true;
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
-                                    static_cast<DTWAIN_SOURCE>(pSource),
+                                    reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                     wParam, lParam );
 
                 // Increment the acquire count
@@ -255,7 +255,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 {
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Copying DIBS to Source...)
                     DTWAIN_ARRAY aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0).second;
-                    DTWAIN_GetAllSourceDibsInternal( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
+                    DTWAIN_GetAllSourceDibsInternal( reinterpret_cast<DTWAIN_SOURCE>(pSource), aDibs );
                     pSource->AddDibsToAcquisition(aDibs);
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Finished Copying DIBS to Source...)
                 }
@@ -303,7 +303,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
 
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
-                                    static_cast<DTWAIN_SOURCE>(pSource),
+                                    reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                     wParam, static_cast<LPARAM>(pSource->GetAcquireNum()) );
             }
             break;
@@ -316,7 +316,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                       bPassMsg = true;
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
-                                    static_cast<DTWAIN_SOURCE>(pSource),
+                                    reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                      wParam, lParam );
             }
             break;
@@ -360,7 +360,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
 
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
-                                    static_cast<DTWAIN_SOURCE>(pSource),
+                                    reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                      wParam, lParam );
           }
           break;
@@ -374,7 +374,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 // Couldn't acquire the first page, so acquire failed totally!
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
-                                    static_cast<DTWAIN_SOURCE>(pSource),
+                                    reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                      wParam, lParam );
 
                 // Execute the callback for DTWAIN_TN_PAGECANCELLED:
@@ -404,7 +404,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                     bPassMsg = true;
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
-                                    static_cast<DTWAIN_SOURCE>(pSource),
+                                    reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                     wParam, lParam);
                 // Post a message back to the app and main window that the source will be closed
                 ::SendMessage( hWnd, uMsg, DTWAIN_AcquireSourceClosed, reinterpret_cast<LPARAM>(pSource));
@@ -442,7 +442,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                         ::SendMessage( pHandle->m_hNotifyWnd, uMsg, DTWAIN_TN_ACQUIRECANCELLED_EX, lParam );
                     DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                         static_cast<DTWAIN_HANDLE>(pHandle),
-                                        static_cast<DTWAIN_SOURCE>(pSource),
+                                        reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                         static_cast<WPARAM>(DTWAIN_TN_ACQUIRECANCELLED), 0 );
                 }
 
@@ -455,7 +455,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 DisableAppWindows(false);
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
-                                    static_cast<DTWAIN_SOURCE>(pSource),
+                                    reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                      wParam, 0 );
                 // Post a message back to the app and main window that the source will be closed
                 ::SendMessage( hWnd, uMsg, DTWAIN_TN_ACQUIRECANCELLED, reinterpret_cast<LPARAM>(pSource) );
@@ -483,7 +483,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                                 char buf[25] = {};
                                 LOG_FUNC_STRING(No UI Mode Done -- Copying DIBS to Source...)
                                 DTWAIN_ARRAY aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0).second;
-                                DTWAIN_GetAllSourceDibsInternal(pSource, aDibs);
+                                DTWAIN_GetAllSourceDibsInternal(reinterpret_cast<DTWAIN_SOURCE>(pSource), aDibs);
                                 int nDibs = static_cast<int>(pHandle->m_ArrayFactory->size(aDibs));
                                 StringStreamA strm;
                                 strm << buf;
@@ -505,7 +505,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                                 bPassMsg = true;
                             DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
                                 static_cast<DTWAIN_HANDLE>(pHandle),
-                                static_cast<DTWAIN_SOURCE>(pSource),
+                                reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                 wParam, 0);
                         }
                     }
@@ -523,7 +523,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                         bPassMsg = true;
                     DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                         static_cast<DTWAIN_HANDLE>(pHandle),
-                                        static_cast<DTWAIN_SOURCE>(pSource),
+                                        reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                          wParam, 0L );
                 }
             }

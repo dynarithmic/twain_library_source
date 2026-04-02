@@ -266,7 +266,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                     // Get the current job control if the user may have changed it
                     // in the UI of the TWAIN driver
                     DTWAINScopedLogControllerExclude sLogerr(DTWAIN_LOG_ERRORMSGBOX);
-                    if (DTWAIN_GetJobControl(pSource, &JobControl, TRUE) != FALSE)
+                    if (DTWAIN_GetJobControl(reinterpret_cast<DTWAIN_SOURCE>(pSource), &JobControl, TRUE) != FALSE)
                         pSource->SetCurrentJobControl( static_cast<TW_UINT16>(JobControl));
                 }
 

@@ -28,7 +28,7 @@ using namespace dynarithmic;
 
 static std::pair<bool, int> GetDuplexType(DTWAIN_SOURCE Source)
 {
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     if (!pSource->IsCapInSupportedList(CAP_DUPLEX))
         return { false, TWDX_NONE };
 

@@ -266,7 +266,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItemEx(DTWAIN_SOURCE Source, LONG
     auto bRet = DTWAIN_GetExtImageInfoItem(Source, nWhich, InfoID, NumItems, Type);
     if (bRet)
     {
-        auto pTheSource = static_cast<CTL_ITwainSource*>(Source);
+        auto pTheSource = reinterpret_cast<CTL_ITwainSource*>(Source);
         const TW_INFO Info = pTheSource->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
         if (ReturnCode)
             *ReturnCode = Info.ReturnCode;
@@ -305,7 +305,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
 
 	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Data; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-    auto retValue = GetExtImageInfoDataInternal(Source, nWhich, Data);
+    auto retValue = GetExtImageInfoDataInternal(pTheSource, nWhich, Data);
     LOG_FUNC_EXIT_NONAME_PARAMS(retValue.first)
     CATCH_BLOCK(false)
 }

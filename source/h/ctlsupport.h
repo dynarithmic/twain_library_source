@@ -36,7 +36,7 @@ namespace dynarithmic
         if (getAnySupport)
             return true;
         DTWAIN_ARRAY Array = {};
-        auto pSource = static_cast<CTL_ITwainSource*>(Source);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
         auto pHandle = pSource->GetDTWAINHandle();
         if (GetCapValuesEx2_Internal(pSource, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array))
         {
@@ -70,7 +70,7 @@ namespace dynarithmic
     {
         if (DTWAIN_IsCapSupported(Source, Cap))
         {
-            auto pSource = static_cast<CTL_ITwainSource*>(Source);
+            auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
             const auto pHandle = pSource->GetDTWAINHandle();
             DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, pSource, Cap, 1).second;
             if (!Array)
@@ -109,7 +109,7 @@ namespace dynarithmic
     template <typename T>
     int GetSupport(DTWAIN_SOURCE Source, typename T::value_type* lpSupport, LONG Cap, LONG CapOp=DTWAIN_CAPGET)
     {
-        auto pSource = static_cast<CTL_ITwainSource*>(Source);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
         const auto pHandle = pSource->GetDTWAINHandle();
         if (lpSupport == NULL)
         {

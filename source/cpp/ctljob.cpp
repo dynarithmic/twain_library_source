@@ -66,7 +66,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, LONG
     DTWAIN_BOOL bRet = FALSE;
     if ( DTWAIN_EnumJobControls(Source, &Array) )
     {
-        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+        const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         DTWAINArrayLowLevel_RAII raii(pHandle, Array);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         const LONG lCount = static_cast<LONG>(vValues.size());

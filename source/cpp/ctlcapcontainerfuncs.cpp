@@ -174,7 +174,7 @@ LONG dynarithmic::GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCa
 LONG dynarithmic::GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap))
-    auto p = static_cast<CTL_ITwainSource*>(Source);
+    auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
     auto pHandle = p->GetDTWAINHandle();
     if (!p->IsCapInSupportedList(static_cast<TW_UINT16>(nCap)))
     {

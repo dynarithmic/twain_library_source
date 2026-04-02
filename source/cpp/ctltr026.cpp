@@ -185,7 +185,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 // Get the current job control if the user may have changed it
                 // in the UI of the TWAIN driver
                 DTWAINScopedLogControllerExclude sLogerr(DTWAIN_LOG_ERRORMSGBOX);
-                if ( DTWAIN_GetJobControl(pSource,&JobControl, TRUE) != FALSE )
+                if ( DTWAIN_GetJobControl(reinterpret_cast<DTWAIN_SOURCE>(pSource),&JobControl, TRUE) != FALSE )
                     pSource->SetCurrentJobControl( static_cast<TW_UINT16>(JobControl) );
             }
 
@@ -1094,7 +1094,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
             ImageInfo.ResolutionX = 300;
             ImageInfo.ResolutionY = 300;
 
-            if (!DTWAIN_GetSourceUnit(pSource, &ImageInfo.UnitOfMeasure))
+            if (!DTWAIN_GetSourceUnit(reinterpret_cast<DTWAIN_SOURCE>(pSource), &ImageInfo.UnitOfMeasure))
                 ImageInfo.UnitOfMeasure = DTWAIN_INCHES;
 
             ResolveImageResolution( pSource, &ImageInfo );
@@ -1258,11 +1258,11 @@ bool CTL_ImageXferTriplet::CropDib(CTL_ITwainSession *pSession,
         }
 
         // Now get the unit of measure
-        if ( DTWAIN_GetSourceUnit(const_cast<CTL_ITwainSource*>(pSource), &SourceUnit) )
+        if ( DTWAIN_GetSourceUnit(reinterpret_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource*>(pSource)), &SourceUnit) )
         {
             // Get the image resolution
             double Resolution;
-            DTWAIN_GetResolution(const_cast<CTL_ITwainSource*>(pSource), &Resolution);
+            DTWAIN_GetResolution(reinterpret_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource*>(pSource)), &Resolution);
 
             // Crop the dib here
             if (CurDib->CropDib(Actual, Requested, SourceUnit, DestUnit, static_cast<int>(Resolution),
@@ -1432,7 +1432,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
     char szOutBuf[1024];
     if ( IsState7InfoNeeded(pSource) )
     {
-      if ( DTWAIN_GetImageInfo(pSource,
+      if ( DTWAIN_GetImageInfo(reinterpret_cast<DTWAIN_SOURCE>(pSource),
                               &ResolutionX,
                               &ResolutionY,
                               nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr))
@@ -1483,7 +1483,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
     {
         bool bWriteMisc = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS;
         // Try TWAIN driver setting
-        if ( DTWAIN_GetResolution(pSource, &Resolution) )
+        if ( DTWAIN_GetResolution(reinterpret_cast<DTWAIN_SOURCE>(pSource), &Resolution) )
         {
             if ( bWriteMisc )
             {
@@ -1621,7 +1621,7 @@ HANDLE CTL_ImageXferTriplet::ProcessUserUpdatingDIB(size_t nLastDib, int notific
         if (notification == 0)
         {
             if (sessionHandle->m_pDibUpdateProc != nullptr)
-                hRetDib = (sessionHandle->m_pDibUpdateProc)(pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
+                hRetDib = (sessionHandle->m_pDibUpdateProc)(reinterpret_cast<DTWAIN_SOURCE>(pSource), static_cast<LONG>(nLastDib), m_hDataHandle);
         }
         else
         {

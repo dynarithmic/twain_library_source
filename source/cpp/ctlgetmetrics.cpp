@@ -42,7 +42,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireMetrics(DTWAIN_SOURCE Source, LPLONG I
 
 static bool GetMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
 {
-    auto p = static_cast<CTL_ITwainSource*>(Source);
+    auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
     CTL_DSMMetricsTriplet triplet(p->GetTwainSession(), p);
     const TW_UINT16 rc = triplet.Execute();
     switch (rc)

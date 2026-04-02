@@ -54,7 +54,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPixelType(DTWAIN_SOURCE Source, LONG PixelTyp
 
 DTWAIN_BOOL DTWAIN_SetPixelTypeHelper(DTWAIN_SOURCE Source, LONG PixelType, LONG BitDepth, DTWAIN_BOOL bSetCurrent)
 {
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     auto pHandle = pSource->GetDTWAINHandle();
 
     LONG SetType = DTWAIN_CAPSET;
@@ -122,7 +122,7 @@ DTWAIN_BOOL GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth
     const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, ICAP_PIXELTYPE,  GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array );
     if ( bRet && Array )
     {
-        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+        const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         DTWAINArrayLowLevel_RAII arr(pHandle, Array);
         const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
 

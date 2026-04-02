@@ -36,7 +36,7 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
     const bool bRet = DTWAIN_GetCapValuesEx2(Source, Cap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array)?true:false;
     if (!bRet || !Array )
         return false;
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAINArrayLowLevel_RAII raii(pHandle, Array);
     CTL_StringType sVal;
     pHandle->m_ArrayFactory->get_value(Array, 0, &sVal);
@@ -47,7 +47,7 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
 
 bool dynarithmic::EnumSupported(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG Cap)
 {
-    const bool bRet = GetCapValuesEx2_Internal(static_cast<CTL_ITwainSource*>(Source), Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray)?true:false;
+    const bool bRet = GetCapValuesEx2_Internal(reinterpret_cast<CTL_ITwainSource*>(Source), Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray)?true:false;
     return bRet;
 }
 

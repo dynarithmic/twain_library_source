@@ -224,7 +224,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     opts.setStatus(0);
     bool bSessionPreStarted = false;
 
-    const CTL_ITwainSource *pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
+    const CTL_ITwainSource *pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
 
     if (!pHandle->m_bSessionAllocated)
     {
@@ -240,7 +240,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     // Make sure that we end the TWAIN session if we started the session
     SessionCloserRAII sesCloser(!bSessionPreStarted);
 
-    auto p = static_cast<CTL_ITwainSource *>(opts.getSource());
+    auto p = reinterpret_cast<CTL_ITwainSource *>(opts.getSource());
     DTWAIN_SOURCE pRealSource;
     bool bSourcePreOpened = true;
     if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
@@ -258,7 +258,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         }
     }
     else
-        pRealSource = p;
+        pRealSource = reinterpret_cast<DTWAIN_SOURCE>(p);
 
     // Make sure TWAIN Source is closed if we opened it.
     SourceCloserRAII sourceCloser(p, !bSourcePreOpened);
@@ -281,7 +281,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     }
 
     // Set the max # of pages to retrieve
-    auto pAcquireSource = static_cast<CTL_ITwainSource*>(pRealSource);
+    auto pAcquireSource = reinterpret_cast<CTL_ITwainSource*>(pRealSource);
 
     pAcquireSource->SetDibAutoDelete(FALSE);
     pAcquireSource->SetAcquireCount(0);
@@ -341,7 +341,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
                         nullptr, DTWAIN_TN_FEEDERTOFLATBED, reinterpret_cast<LPARAM>(pSource));
 
                     // Continue and try the flatbed instead
-                    DTWAIN_EnableFeeder(pAcquireSource, FALSE);
+                    DTWAIN_EnableFeeder(reinterpret_cast<DTWAIN_SOURCE>(pAcquireSource), FALSE);
                 }
             }
         }
@@ -391,7 +391,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     const auto pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
     DTWAINArrayLowLevel_RAII a1(pDLLHandle, nullptr);
 
-    auto pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
     pSource->SetShutdownAcquire(false);
     pSource->SetLastAcquireError(0);
     pSource->ResetAcquisitionAttempts(nullptr);
@@ -518,7 +518,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 bool dynarithmic::AcquireExHelper(SourceAcquireOptions& opts)
 {
     DTWAIN_ARRAY aDibs = SourceAcquire(opts);
-    auto pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
     DTWAINArrayLowLevel_RAII arr(pSource->GetDTWAINHandle(), aDibs);
     if (!aDibs)
     {
@@ -548,7 +548,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     DTWAIN_ACQUIRE nNum = -1;
     LONG ClipboardTransferType = -1;
     const DTWAIN_SOURCE Source = opts.getSource();
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
 
     // Open the source (if source is closed)
@@ -808,7 +808,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 bool dynarithmic::TileModeOn(DTWAIN_SOURCE Source)
 {
     BOOL bMode;
-    auto p = static_cast<CTL_ITwainSource*>(Source);
+    auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
     if (CTL_TwainAppMgr::GetOneTwainCapValue(p, &bMode, ICAP_TILES, MSG_GETCURRENT, TWTY_BOOL ))
         return static_cast<TW_BOOL>(bMode)?true:false;
     return false;

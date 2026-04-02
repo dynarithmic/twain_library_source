@@ -45,7 +45,7 @@ std::pair<CTL_TwainDLLHandle*, OCREngine*> dynarithmic::VerifyOCRHandles(DTWAIN_
     if (!Engine)
         return { pHandle, nullptr };
 
-    const auto pEngine = static_cast<OCREngine*>(Engine);
+    const auto pEngine = reinterpret_cast<OCREngine*>(Engine);
 
     // check if Engine exists
     if (OCREngineExists(pHandle, pEngine))
@@ -314,7 +314,7 @@ DTWAIN_OCRTEXTINFOHANDLE DLLENTRY_DEF DTWAIN_GetOCRTextInfoHandle(DTWAIN_OCRENGI
     std::vector<OCRCharacterInfo>& cInfo = pEngine->GetCharacterInfo(nPageNo, status);
 
     OCRCharacterInfo* pInfo = &cInfo[0];
-    const auto pReturn = static_cast<DTWAIN_OCRTEXTINFOHANDLE>(pInfo);
+    const auto pReturn = reinterpret_cast<DTWAIN_OCRTEXTINFOHANDLE>(pInfo);
     LOG_FUNC_EXIT_NONAME_PARAMS(pReturn)
     CATCH_BLOCK(nullptr)
 }
@@ -327,7 +327,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLong(DTWAIN_OCRTEXTINFOHANDLE OCRT
     
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-    const OCRCharacterInfo *cInfo = static_cast<OCRCharacterInfo*>(OCRTextInfo);
+    const OCRCharacterInfo *cInfo = reinterpret_cast<OCRCharacterInfo*>(OCRTextInfo);
 
     switch (nWhichItem)
     {
@@ -377,7 +377,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloat(DTWAIN_OCRTEXTINFOHANDLE OCR
 
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-    const OCRCharacterInfo *cInfo = static_cast<OCRCharacterInfo*>(OCRTextInfo);
+    const OCRCharacterInfo *cInfo = reinterpret_cast<OCRCharacterInfo*>(OCRTextInfo);
 
     switch (nWhichItem)
     {
@@ -406,7 +406,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLongEx(DTWAIN_OCRTEXTINFOHANDLE OC
     // check if Engine exists
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-    auto cInfo = static_cast<OCRCharacterInfo*>(OCRTextInfo);
+    auto cInfo = reinterpret_cast<OCRCharacterInfo*>(OCRTextInfo);
 
     auto itStart = cInfo->iChar.end();
     auto itEnd = cInfo->iChar.end();
@@ -464,7 +464,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloatEx(DTWAIN_OCRTEXTINFOHANDLE O
 
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-    auto cInfo = static_cast<OCRCharacterInfo*>(OCRTextInfo);
+    auto cInfo = reinterpret_cast<OCRCharacterInfo*>(OCRTextInfo);
     const LONG realSize = static_cast<LONG>(std::distance(cInfo->dConfidence.begin(), cInfo->dConfidence.end()));
     const LONG actualSize = (std::min)(bufSize, realSize);
     switch (nWhichItem)

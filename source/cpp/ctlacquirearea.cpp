@@ -153,7 +153,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_F
 
 static bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType)
 {
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
     DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, 4).second;
     if (!FloatArrayOut)
         return false;
@@ -192,7 +192,7 @@ static bool FillActualArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ActualArra
 static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray, TW_UINT16 SetType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, FloatArray, ActualArray, SetType))
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = p->GetDTWAINHandle();
     if (SetType == MSG_RESET)
     {

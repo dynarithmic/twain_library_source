@@ -179,6 +179,7 @@ namespace dynarithmic
         std::wstring GetProductNameW() const { return StringConversion::Convert_Ansi_To_Wide(m_SourceId.get_product_name()); }
 
         std::string GetSourceInfo() const { return m_SourceId.to_json(); }
+        std::string GetSourceInfoFormatted(int indentFactor) const { return m_SourceId.to_json_formatted(indentFactor);  }
         SourceCompressionMap& GetCompressionMap() noexcept { return m_CompressionMap; }
 
         bool         IsOpened() const { return m_bIsOpened; }

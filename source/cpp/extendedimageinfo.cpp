@@ -63,7 +63,7 @@ bool ExtendedImageInformation::BeginRetrieval()
     auto pHandle = m_theSource->GetDTWAINHandle();
 
     // Get all of the Extended Image Information types supported by the source
-    DTWAIN_EnumExtImageInfoTypes(m_theSource, &aValues);
+    DTWAIN_EnumExtImageInfoTypes(reinterpret_cast<DTWAIN_SOURCE>(m_theSource), &aValues);
     m_vFoundTypes = CreateContainerFromArray<std::vector<LONG>>(pHandle, aValues);
     if (!m_vFoundTypes.empty())
     {
@@ -1228,9 +1228,8 @@ DTWAIN_ARRAY ExtendedImageInformation::GetPatchCodeInfo(long nWhichInfo)
     return nullptr;
 }
 
-std::pair<bool, int> dynarithmic::GetExtImageInfoDataInternal(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data)
+std::pair<bool, int> dynarithmic::GetExtImageInfoDataInternal(CTL_ITwainSource* pTheSource, LONG nWhich, LPDTWAIN_ARRAY Data)
 {
-    CTL_ITwainSource* pTheSource = static_cast<CTL_ITwainSource*>(Source);
     CTL_TwainDLLHandle* pHandle = pTheSource->GetDTWAINHandle();
     // We clear the user array here, since we do not want to 
     // report information back to user if capability is not supported
@@ -1397,7 +1396,7 @@ std::pair<bool, int> dynarithmic::GetCachedExtImageInfoData(CTL_TwainDLLHandle* 
     LONG ReturnCode = 0;
 
     // If the ext image info item does not exist for the source, return an error.
-    DTWAIN_GetExtImageInfoItemEx(pSource, nWhich, nullptr, nullptr, &ItemType, &ReturnCode);
+    DTWAIN_GetExtImageInfoItemEx(reinterpret_cast<DTWAIN_SOURCE>(pSource), nWhich, nullptr, nullptr, &ItemType, &ReturnCode);
     if (ReturnCode == TWRC_DATANOTAVAILABLE)
         return { false, DTWAIN_ERR_UNAVAILABLE_EXTINFO };
     else

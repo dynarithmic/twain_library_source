@@ -280,7 +280,7 @@ namespace dynarithmic
                         TW_UINT16 TwainDataType
                         )
     {
-        CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
 
         std::vector<TwainType> Array;
         auto ret = GetCapabilityValues(p,nCap,GetType,static_cast<UINT>(TwainContainer_ONEVALUE),
@@ -315,7 +315,7 @@ namespace dynarithmic
     template <class T>
     bool SetOneCapValue( DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT16 nCap, TW_UINT16 SetType, T dValue,TW_UINT16 nDataType)
     {
-        CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
         if ( !p )
             return false;
         return SetOneCapValue(p, nCap, SetType, dValue, nDataType);
@@ -364,7 +364,7 @@ namespace dynarithmic
                                     )
         {
             UNUSED_PARAM(TT);
-            CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+            CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
             CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle*>(DLLHandle);
 
             if ( !p )
@@ -522,7 +522,7 @@ namespace dynarithmic
                           TW_UINT16 OriginalTwainType
                           )
     {
-        CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
         CTL_TwainDLLHandle*  pHandle = static_cast<CTL_TwainDLLHandle*>(DLLHandle);
 
         if ( !p )

@@ -106,7 +106,7 @@ namespace dynarithmic
     };
 
 
-    std::pair<int, DTWAIN_ACQUIRE> StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts);
+    std::pair<int, DTWAIN_ACQUIRE> StartModalMessageLoop(CTL_ITwainSource* pSource, SourceAcquireOptions& opts);
 }
 
 #endif

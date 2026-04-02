@@ -807,7 +807,7 @@ namespace dynarithmic
     template <int CapInfoIdx>
     void SetCapabilityInfo(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LONG value, LONG lCap)
     {
-        auto pSource = static_cast<CTL_ITwainSource*>(Source);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
         const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, pSource);
 
         // Get the cap array values
