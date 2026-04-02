@@ -29,8 +29,10 @@
 #endif
 
 #define DTWAIN_DBG_MAX_ITEMS         256
-#define DTWAIN_DBG_MAX_ANSI_CHARS    260
-#define DTWAIN_DBG_MAX_WIDE_CHARS    260
+#define DTWAIN_DBG_MAX_ANSI_CHARS    512
+#define DTWAIN_DBG_MAX_WIDE_CHARS    512
+#define DTWAIN_DBG_SOURCE_JSON_CHARS 4096
+
 
 static DTWAIN_DBG_THREAD_LOCAL char g_astring_buffers[DTWAIN_DBG_MAX_ITEMS][DTWAIN_DBG_MAX_ANSI_CHARS];
 static DTWAIN_DBG_THREAD_LOCAL const char* g_astring_ptrs[DTWAIN_DBG_MAX_ITEMS];
@@ -43,6 +45,10 @@ static DTWAIN_DBG_THREAD_LOCAL const wchar_t* g_source_name_ptrs[DTWAIN_DBG_MAX_
 
 static DTWAIN_DBG_THREAD_LOCAL DTWAIN_ARRAY_DEBUG_VIEW g_nested_views[DTWAIN_DBG_MAX_ITEMS];
 static DTWAIN_DBG_THREAD_LOCAL DTWAIN_FRAME_DEBUG_ITEM g_frame_items[DTWAIN_DBG_MAX_ITEMS];
+
+/* Source JSON buffers/views */
+static DTWAIN_DBG_THREAD_LOCAL char g_source_json_buffers[DTWAIN_DBG_MAX_ITEMS][DTWAIN_DBG_SOURCE_JSON_CHARS];
+static DTWAIN_DBG_THREAD_LOCAL DTWAIN_SOURCE_DEBUG_VIEW g_source_views[DTWAIN_DBG_MAX_ITEMS];
 
 static void dtwain_dbg_copy_str(char* dest, size_t destCount, const char* src)
 {
@@ -66,6 +72,38 @@ static void dtwain_dbg_copy_wstr(wchar_t* dest, size_t destCount, const wchar_t*
 	for (i = 0; i + 1 < destCount && src[i] != 0; ++i)
 		dest[i] = src[i];
 	dest[i] = 0;
+}
+
+static DTWAIN_SOURCE_DEBUG_VIEW DTWAIN_CreateSourceDebugViewAt(DTWAIN_SOURCE s, int slot)
+{
+	DTWAIN_SOURCE_DEBUG_VIEW v;
+	char* buf;
+
+	if (slot < 0 || slot >= DTWAIN_DBG_MAX_ITEMS)
+	{
+		v.json = "<invalid slot>";
+		return v;
+	}
+
+	buf = g_source_json_buffers[slot];
+	v.json = buf;
+	buf[0] = '\0';
+
+	if (!s)
+	{
+		strcpy(buf, "<null DTWAIN_SOURCE>");
+		return v;
+	}
+
+	if (DTWAIN_GetAllSourceInfoA(s, buf, 2, DTWAIN_DBG_SOURCE_JSON_CHARS) == 0 || buf[0] == '\0')
+		strcpy(buf, "<unable to retrieve source info>");
+
+	return v;
+}
+
+DTWAIN_SOURCE_DEBUG_VIEW DTWAIN_CreateSourceDebugView(DTWAIN_SOURCE s)
+{
+	return DTWAIN_CreateSourceDebugViewAt(s, 0);
 }
 
 DTWAIN_ARRAY_DEBUG_VIEW DTWAIN_CreateArrayDebugView(DTWAIN_ARRAY a)
@@ -175,25 +213,15 @@ DTWAIN_ARRAY_DEBUG_VIEW DTWAIN_CreateArrayDebugView(DTWAIN_ARRAY a)
 	}
 
 	case DTWAIN_ARRAYSOURCE:
-	{
-		long sourceCount = v.count;
 		v.type = DTWAIN_DBG_ARRAY_SOURCE;
-
-		for (i = 0; i < sourceCount; ++i)
+		for (i = 0; i < visibleCount; ++i)
 		{
-			wchar_t src_name[100];
-			DTWAIN_SOURCE src = DTWAIN_ArrayGetAtSourceEx(a, i);
-
-			DTWAIN_GetSourceProductNameW(src, src_name, 100);
-
-			dtwain_dbg_copy_wstr(g_source_name_buffers[i], 256, src_name);
-			g_source_name_ptrs[i] = g_source_name_buffers[i];
+			DTWAIN_SOURCE src = ((DTWAIN_SOURCE*)DTWAIN_ArrayGetBuffer(a, 0))[i];
+			g_source_views[i] = DTWAIN_CreateSourceDebugViewAt(src, (int)i);
 		}
-
 		v.count = visibleCount;
-		v.source_names = g_source_name_ptrs;
+		v.source_views = g_source_views;
 		break;
-	}
 
 	case DTWAIN_ARRAYOFHANDLEARRAYS:
 		v.type = DTWAIN_DBG_ARRAY_ARRAY;

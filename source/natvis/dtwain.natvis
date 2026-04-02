@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
+    <Type Name="tagDTWAIN_SOURCE_DEBUG_VIEW">
+    <DisplayString>{json}</DisplayString>
+    <StringView>json</StringView>
+    <Expand>
+      <Item Name="[json]">json</Item>
+    </Expand>
+  </Type>
+
   <Type Name="tagDTWAIN_FRAME_DEBUG_ITEM">
     <DisplayString>{{L={left}, T={top}, R={right}, B={bottom}}}</DisplayString>
     <Expand>
@@ -45,7 +53,7 @@
 
       <ArrayItems Condition="type == DTWAIN_DBG_ARRAY_SOURCE">
         <Size>count</Size>
-        <ValuePointer>source_names</ValuePointer>
+        <ValuePointer>source_views</ValuePointer>
       </ArrayItems>
 
       <ArrayItems Condition="type == DTWAIN_DBG_ARRAY_ARRAY">

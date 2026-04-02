@@ -50,6 +50,11 @@ extern "C" {
 		double bottom;
 	} DTWAIN_FRAME_DEBUG_ITEM;
 
+	typedef struct tagDTWAIN_SOURCE_DEBUG_VIEW
+	{
+		const char* json;
+	} DTWAIN_SOURCE_DEBUG_VIEW;
+
 	typedef struct tagDTWAIN_ARRAY_DEBUG_VIEW
 	{
 		long count;
@@ -61,17 +66,19 @@ extern "C" {
 
 		const char** astring_ptrs;
 		const wchar_t** widestring_ptrs;
-		const wchar_t** source_names;
 
+		const struct tagDTWAIN_SOURCE_DEBUG_VIEW* source_views;
 		const struct tagDTWAIN_ARRAY_DEBUG_VIEW* nested_views;
-		const void** handle_data;
 
-		const DTWAIN_FRAME_DEBUG_ITEM* frame_items;
+		const void** handle_data;
+		const struct tagDTWAIN_FRAME_DEBUG_ITEM* frame_items;
 	} DTWAIN_ARRAY_DEBUG_VIEW;
 
 	DTWAIN_ARRAY_DEBUG_VIEW DTWAIN_CreateArrayDebugView(DTWAIN_ARRAY a);
+	DTWAIN_SOURCE_DEBUG_VIEW DTWAIN_CreateSourceDebugView(DTWAIN_SOURCE s);
 
-#define DTWAIN_DEBUG_VIEW(a) DTWAIN_CreateArrayDebugView((a))
+	#define DTWAIN_DEBUG_VIEW(a) DTWAIN_CreateArrayDebugView((a))
+	#define DTWAIN_DEBUG_SOURCE_VIEW(s) DTWAIN_CreateSourceDebugView((s))
 
 #ifdef __cplusplus
 }
