@@ -1187,3 +1187,6 @@ DTWAIN_GetAcquisitionArray                        @1183
 DTWAIN_IsGetMessageLoopEnabled                    @1184
 DTWAIN_EnableGetMessageLoop                       @1185
 DTWAIN_ArrayIsValid                               @1186
+DTWAIN_GetAllSourceInfo                           @1187
+DTWAIN_GetAllSourceInfoA                          @1188
+DTWAIN_GetAllSourceInfoW                          @1189

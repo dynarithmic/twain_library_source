@@ -631,6 +631,9 @@
     <ClCompile Include="cpp\ctltwaindecoder.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\ctltwainidentity.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">

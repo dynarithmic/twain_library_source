@@ -3330,4 +3330,27 @@ LONG DLLENTRY_DEF DTWAIN_GetCapHelpA(LONG lCapability, LPSTR lpszOut, LONG nSize
 	return DTWAIN_GetCapHelp(lCapability, lpszOut, nSize);
 #endif
 }
+
+LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize)
+{
+#ifdef _UNICODE
+	std::wstring arg((std::max)(nSize, 0L), 0);
+	LONG retVal = DTWAIN_GetAllSourceInfo(Source, (nSize > 0 && lpszOut) ? &arg[0] : nullptr, indentFactor, static_cast<LONG>(arg.size()));
+	return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#else
+	return DTWAIN_GetAllSourceInfo(Source, lpszOut, indentFactor, nSize);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfoW(DTWAIN_SOURCE Source, LPWSTR lpszOut, LONG indentFactor, LONG nSize)
+{
+#ifdef _UNICODE
+	return DTWAIN_GetAllSourceInfo(Source, lpszOut, indentFactor, nSize);
+#else
+	std::string arg((std::max)(nSize, 0L), 0);
+	LONG retVal = DTWAIN_GetAllSourceInfo(Source, (nSize > 0 && lpszOut) ? &arg[0] : nullptr, indentFactor, static_cast<LONG>(arg.size()));
+	return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#endif
+}
+
 #endif // CTLSTRIMPL_INL
