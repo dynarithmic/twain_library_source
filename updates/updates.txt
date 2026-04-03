@@ -35,6 +35,13 @@ DTWAIN Version changes
   For a demonstration of the above, the DTWDEMO project includes all of the necessary 
   files for debugging the DTWAIN_ARRAY and DTWAIN_SOURCE types.
 
+- Add DTWAIN_ArrayIsValid function to test if a DTWAIN_ARRAY is valid.  The prototype is:
+
+  BOOL DTWAIN_ArrayIsValid(DTWAIN_ARRAY array);
+
+  where the return value is either TRUE (1) or FALSE (0).
+
+
 - Add DTWAIN_GetAllSourceInfo function that returns a small JSON object describing the
   DTWAIN_SOURCE.
 
