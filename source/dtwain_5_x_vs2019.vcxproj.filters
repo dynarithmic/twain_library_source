@@ -1249,6 +1249,9 @@
     <Text Include="txt\twainresourcestrings_greek.txt">
       <Filter>Resource Text Files</Filter>
     </Text>
+    <Text Include="txt\twainresourcestrings_turkish.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
