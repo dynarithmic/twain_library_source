@@ -41,7 +41,7 @@ DTWAIN_GetLanguage                                @37
 DTWAIN_SetDefaultSource                           @38
 DTWAIN_WindowProc                                 @39
 DTWAIN_AcquireProc                                @40
-DTWAIN_ArrayCreateFromReals                       @41
+DTWAIN_ArrayCreateFromFloats                      @41
 DTWAIN_ArrayCreateFromLongs                       @42
 DTWAIN_ArrayCreateFromStrings                     @43
 DTWAIN_ArrayCreate                                @44
@@ -1045,8 +1045,8 @@ DTWAIN_ArrayInsertAtFrameN                        @1041
 DTWAIN_ArrayInsertAtFrame                         @1042
 DTWAIN_ArrayGetAtFrame                            @1043
 DTWAIN_ArraySetAtFrame                            @1044
-DTWAIN_ArrayCreateFromStringsA                    @1045
-DTWAIN_ArrayCreateFromStringsW                    @1046
+DTWAIN_ArrayCreateFromANSIStrings                 @1045
+DTWAIN_ArrayCreateFromWideStrings                 @1046
 DTWAIN_ArrayGetAtFrameEx                          @1047
 DTWAIN_ArraySetAtFrameEx                          @1048
 DTWAIN_ArrayGetAtFrameStringA                     @1049

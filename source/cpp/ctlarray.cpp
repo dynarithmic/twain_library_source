@@ -744,7 +744,7 @@ DTWAIN_ARRAY  DLLENTRY_DEF  DTWAIN_ArrayCreateFromLong64s(LPLONG64 pCArray, LONG
     CATCH_BLOCK(nullptr)
 }
 
-DTWAIN_ARRAY  DLLENTRY_DEF  DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nSize)
+DTWAIN_ARRAY  DLLENTRY_DEF  DTWAIN_ArrayCreateFromFloats(double* pCArray, LONG nSize)
 {
     LOG_FUNC_ENTRY_PARAMS((pCArray, nSize))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
@@ -773,7 +773,7 @@ static DTWAIN_ARRAY CreateStringArrayFromFactory(PointerType* pCArray, CTL_Twain
     return Dest;
 }
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromStringsA(LPCSTR* pCArray, LONG nSize)
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromANSIStrings(LPCSTR* pCArray, LONG nSize)
 {
     LOG_FUNC_ENTRY_PARAMS((pCArray, nSize))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
@@ -786,7 +786,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromStringsA(LPCSTR* pCArray, LONG n
     CATCH_BLOCK(nullptr)
 }
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromStringsW(LPCWSTR* pCArray, LONG nSize)
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromWideStrings(LPCWSTR* pCArray, LONG nSize)
 {
     LOG_FUNC_ENTRY_PARAMS((pCArray, nSize))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);

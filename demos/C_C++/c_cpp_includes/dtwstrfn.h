@@ -305,8 +305,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExA(LPCSTR szFilePath, LONG 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExW(LPCWSTR szFilePath, LONG CreationFlags);
 LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExA(LPCSTR lpOrigString, LPSTR lpOutString, LONG nSize);
 LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExW(LPCWSTR lpOrigString, LPWSTR lpOutString, LONG nSize);
-DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreateFromStringsA(LPCSTR* pCArray, LONG nSize);
-DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreateFromStringsW(LPCWSTR* pCArray, LONG nSize);
+DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreateFromANSIStrings(LPCSTR* pCArray, LONG nSize);
+DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreateFromWideStrings(LPCWSTR* pCArray, LONG nSize);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrameStringA(DTWAIN_ARRAY FrameArray, LONG nWhere, LPSTR left, LPSTR top, LPSTR right, LPSTR bottom);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrameStringW(DTWAIN_ARRAY FrameArray, LONG nWhere, LPWSTR left, LPWSTR top, LPWSTR right, LPWSTR bottom);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameStringA(DTWAIN_ARRAY FrameArray, LONG nWhere, LPCSTR left, LPCSTR top, LPCSTR right, LPCSTR bottom);

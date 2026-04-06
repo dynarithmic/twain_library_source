@@ -146,7 +146,7 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source,LONG
 DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreate(LONG nEnumType,LONG nInitialSize );
 DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreateFromLongs(LPLONG pCArray, LONG nSize);
 DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreateFromLong64s(LPLONG64 pCArray, LONG nSize);
-DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nSize);
+DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreateFromFloats(double* pCArray, LONG nSize);
 DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_ArrayCreateCopy(DTWAIN_ARRAY Source);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_ArrayCopy(DTWAIN_ARRAY Source,DTWAIN_ARRAY Dest);
 

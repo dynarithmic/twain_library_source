@@ -128,7 +128,7 @@ BEGIN
         MENUITEM "Romanian",                    ID_LANGUAGE_ROMANIAN
         MENUITEM "Russian",                     ID_LANGUAGE_RUSSIAN
         MENUITEM "Simplified Chinese",          ID_LANGUAGE_SIMPLIFIEDCHINESE
-        MENUITEM "Traditioanl Chinese",         ID_LANGUAGE_TRADITIONALCHINESE
+        MENUITEM "Traditional Chinese",         ID_LANGUAGE_TRADITIONALCHINESE
         MENUITEM "Spanish",                     ID_LANGUAGE_SPANISH
         MENUITEM "Custom Language...",          ID_LANGUAGE_CUSTOMLANGUAGE
     END
