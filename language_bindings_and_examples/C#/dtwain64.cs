@@ -1932,16 +1932,25 @@ namespace Dynarithmic
         public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateCopy(DTWAIN_ARRAY Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateFromANSIStrings([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] pCArray, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateFromCap(DTWAIN_SOURCE Source, int lCapType, int lSize);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64s(ref long pCArray, int nSize);
+        public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateFromFloats([In] double[] pCArray, int nSize);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongs(ref int pCArray, int nSize);
+        public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64s([In] long[] pCArray, int nSize);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateFromReals(ref DTWAIN_FLOAT pCArray, int nSize);
+        public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongs([In] int[] pCArray, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPTStr)] string[] pCArray, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)] string[] pCArray, int nSize);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
@@ -1998,6 +2007,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_ArrayGetAtANSIString(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder pStr);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern System.IntPtr DTWAIN_ArrayGetAtANSIStringPtr(DTWAIN_ARRAY pArray, int nWhere);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_FLOAT pVal);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
@@ -2045,8 +2057,14 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
         public static extern int DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, int nWhere, System.IntPtr pStr);
 
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern System.IntPtr DTWAIN_ArrayGetAtStringPtr(DTWAIN_ARRAY pArray, int nWhere);
+
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
         public static extern int DTWAIN_ArrayGetAtWideString(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder pStr);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern System.IntPtr DTWAIN_ArrayGetAtWideStringPtr(DTWAIN_ARRAY pArray, int nWhere);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern System.IntPtr DTWAIN_ArrayGetBuffer(DTWAIN_ARRAY pArray, int nPos);

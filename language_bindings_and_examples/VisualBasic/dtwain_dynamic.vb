@@ -2058,16 +2058,25 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_ArrayCreateCopyDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayCreateFromANSIStringsDelegate(<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPStr)> pCArray() As String, nSize As Integer) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayCreateFromCapDelegate(Source As System.IntPtr, lCapType As Integer, lSize As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_ArrayCreateFromLong64sDelegate(ByRef pCArray As System.Int64, nSize As Integer) As System.IntPtr
+        Private Delegate Function DTWAIN_ArrayCreateFromFloatsDelegate(<[In]> pCArray() As System.Double, nSize As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_ArrayCreateFromLongsDelegate(ByRef pCArray As Integer, nSize As Integer) As System.IntPtr
+        Private Delegate Function DTWAIN_ArrayCreateFromLong64sDelegate(<[In]> pCArray() As System.Int64, nSize As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_ArrayCreateFromRealsDelegate(ByRef pCArray As System.Double, nSize As Integer) As System.IntPtr
+        Private Delegate Function DTWAIN_ArrayCreateFromLongsDelegate(<[In]> pCArray() As Integer, nSize As Integer) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayCreateFromStringsDelegate(<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPTStr)> pCArray() As String, nSize As Integer) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayCreateFromWideStringsDelegate(<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPWStr)> pCArray() As String, nSize As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayDestroyDelegate(pArray As System.IntPtr) As Integer
@@ -2124,6 +2133,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_ArrayGetAtANSIStringDelegate(pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> pStr As StringBuilder) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayGetAtANSIStringPtrDelegate(pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayGetAtFloatDelegate(pArray As System.IntPtr, nWhere As Integer, ByRef pVal As System.Double) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -2162,8 +2174,14 @@ Namespace Dynarithmic
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_ArrayGetAtStringDelegate(pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> pStr As StringBuilder) As Integer
         
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayGetAtStringPtrDelegate(pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
+        
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_ArrayGetAtWideStringDelegate(pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPWStr)> pStr As StringBuilder) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayGetAtWideStringPtrDelegate(pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayGetBufferDelegate(pArray As System.IntPtr, nPos As Integer) As System.IntPtr
@@ -4662,20 +4680,32 @@ Namespace Dynarithmic
         Return api.DTWAIN_ArrayCreateCopy(Source)
         End Function
         
+        Public Function DTWAIN_ArrayCreateFromANSIStrings(<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPStr)> pCArray() As String, nSize As Integer) As System.IntPtr
+        Return api.DTWAIN_ArrayCreateFromANSIStrings(pCArray, nSize)
+        End Function
+        
         Public Function DTWAIN_ArrayCreateFromCap(Source As System.IntPtr, lCapType As Integer, lSize As Integer) As System.IntPtr
         Return api.DTWAIN_ArrayCreateFromCap(Source, lCapType, lSize)
         End Function
         
-        Public Function DTWAIN_ArrayCreateFromLong64s(ByRef pCArray As System.Int64, nSize As Integer) As System.IntPtr
+        Public Function DTWAIN_ArrayCreateFromFloats(<[In]> pCArray() As System.Double, nSize As Integer) As System.IntPtr
+        Return api.DTWAIN_ArrayCreateFromFloats(pCArray, nSize)
+        End Function
+        
+        Public Function DTWAIN_ArrayCreateFromLong64s(<[In]> pCArray() As System.Int64, nSize As Integer) As System.IntPtr
         Return api.DTWAIN_ArrayCreateFromLong64s(pCArray, nSize)
         End Function
         
-        Public Function DTWAIN_ArrayCreateFromLongs(ByRef pCArray As Integer, nSize As Integer) As System.IntPtr
+        Public Function DTWAIN_ArrayCreateFromLongs(<[In]> pCArray() As Integer, nSize As Integer) As System.IntPtr
         Return api.DTWAIN_ArrayCreateFromLongs(pCArray, nSize)
         End Function
         
-        Public Function DTWAIN_ArrayCreateFromReals(ByRef pCArray As System.Double, nSize As Integer) As System.IntPtr
-        Return api.DTWAIN_ArrayCreateFromReals(pCArray, nSize)
+        Public Function DTWAIN_ArrayCreateFromStrings(<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPTStr)> pCArray() As String, nSize As Integer) As System.IntPtr
+        Return api.DTWAIN_ArrayCreateFromStrings(pCArray, nSize)
+        End Function
+        
+        Public Function DTWAIN_ArrayCreateFromWideStrings(<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPWStr)> pCArray() As String, nSize As Integer) As System.IntPtr
+        Return api.DTWAIN_ArrayCreateFromWideStrings(pCArray, nSize)
         End Function
         
         Public Function DTWAIN_ArrayDestroy(pArray As System.IntPtr) As Integer
@@ -4750,6 +4780,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_ArrayGetAtANSIString(pArray, nWhere, pStr)
         End Function
         
+        Public Function DTWAIN_ArrayGetAtANSIStringPtr(pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
+        Return api.DTWAIN_ArrayGetAtANSIStringPtr(pArray, nWhere)
+        End Function
+        
         Public Function DTWAIN_ArrayGetAtFloat(pArray As System.IntPtr, nWhere As Integer, ByRef pVal As System.Double) As Integer
         Return api.DTWAIN_ArrayGetAtFloat(pArray, nWhere, pVal)
         End Function
@@ -4802,8 +4836,16 @@ Namespace Dynarithmic
         Return api.DTWAIN_ArrayGetAtString(pArray, nWhere, pStr)
         End Function
         
+        Public Function DTWAIN_ArrayGetAtStringPtr(pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
+        Return api.DTWAIN_ArrayGetAtStringPtr(pArray, nWhere)
+        End Function
+        
         Public Function DTWAIN_ArrayGetAtWideString(pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPWStr)> pStr As StringBuilder) As Integer
         Return api.DTWAIN_ArrayGetAtWideString(pArray, nWhere, pStr)
+        End Function
+        
+        Public Function DTWAIN_ArrayGetAtWideStringPtr(pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
+        Return api.DTWAIN_ArrayGetAtWideStringPtr(pArray, nWhere)
         End Function
         
         Public Function DTWAIN_ArrayGetBuffer(pArray As System.IntPtr, nPos As Integer) As System.IntPtr
@@ -7946,10 +7988,13 @@ Namespace Dynarithmic
             Public DTWAIN_ArrayCopy As DTWAIN_ArrayCopyDelegate
             Public DTWAIN_ArrayCreate As DTWAIN_ArrayCreateDelegate
             Public DTWAIN_ArrayCreateCopy As DTWAIN_ArrayCreateCopyDelegate
+            Public DTWAIN_ArrayCreateFromANSIStrings As DTWAIN_ArrayCreateFromANSIStringsDelegate
             Public DTWAIN_ArrayCreateFromCap As DTWAIN_ArrayCreateFromCapDelegate
+            Public DTWAIN_ArrayCreateFromFloats As DTWAIN_ArrayCreateFromFloatsDelegate
             Public DTWAIN_ArrayCreateFromLong64s As DTWAIN_ArrayCreateFromLong64sDelegate
             Public DTWAIN_ArrayCreateFromLongs As DTWAIN_ArrayCreateFromLongsDelegate
-            Public DTWAIN_ArrayCreateFromReals As DTWAIN_ArrayCreateFromRealsDelegate
+            Public DTWAIN_ArrayCreateFromStrings As DTWAIN_ArrayCreateFromStringsDelegate
+            Public DTWAIN_ArrayCreateFromWideStrings As DTWAIN_ArrayCreateFromWideStringsDelegate
             Public DTWAIN_ArrayDestroy As DTWAIN_ArrayDestroyDelegate
             Public DTWAIN_ArrayDestroyFrames As DTWAIN_ArrayDestroyFramesDelegate
             Public DTWAIN_ArrayDumpToLog As DTWAIN_ArrayDumpToLogDelegate
@@ -7968,6 +8013,7 @@ Namespace Dynarithmic
             Public DTWAIN_ArrayFloatToWideString As DTWAIN_ArrayFloatToWideStringDelegate
             Public DTWAIN_ArrayGetAt As DTWAIN_ArrayGetAtDelegate
             Public DTWAIN_ArrayGetAtANSIString As DTWAIN_ArrayGetAtANSIStringDelegate
+            Public DTWAIN_ArrayGetAtANSIStringPtr As DTWAIN_ArrayGetAtANSIStringPtrDelegate
             Public DTWAIN_ArrayGetAtFloat As DTWAIN_ArrayGetAtFloatDelegate
             Public DTWAIN_ArrayGetAtFloatEx As DTWAIN_ArrayGetAtFloatExDelegate
             Public DTWAIN_ArrayGetAtFloatString As DTWAIN_ArrayGetAtFloatStringDelegate
@@ -7981,7 +8027,9 @@ Namespace Dynarithmic
             Public DTWAIN_ArrayGetAtSource As DTWAIN_ArrayGetAtSourceDelegate
             Public DTWAIN_ArrayGetAtSourceEx As DTWAIN_ArrayGetAtSourceExDelegate
             Public DTWAIN_ArrayGetAtString As DTWAIN_ArrayGetAtStringDelegate
+            Public DTWAIN_ArrayGetAtStringPtr As DTWAIN_ArrayGetAtStringPtrDelegate
             Public DTWAIN_ArrayGetAtWideString As DTWAIN_ArrayGetAtWideStringDelegate
+            Public DTWAIN_ArrayGetAtWideStringPtr As DTWAIN_ArrayGetAtWideStringPtrDelegate
             Public DTWAIN_ArrayGetBuffer As DTWAIN_ArrayGetBufferDelegate
             Public DTWAIN_ArrayGetCapValues As DTWAIN_ArrayGetCapValuesDelegate
             Public DTWAIN_ArrayGetCapValuesEx As DTWAIN_ArrayGetCapValuesExDelegate

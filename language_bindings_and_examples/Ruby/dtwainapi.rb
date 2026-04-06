@@ -196,10 +196,13 @@ class DTWAINAPI
    attr_reader :DTWAIN_ArrayCopy
    attr_reader :DTWAIN_ArrayCreate
    attr_reader :DTWAIN_ArrayCreateCopy
+   attr_reader :DTWAIN_ArrayCreateFromANSIStrings
    attr_reader :DTWAIN_ArrayCreateFromCap
+   attr_reader :DTWAIN_ArrayCreateFromFloats
    attr_reader :DTWAIN_ArrayCreateFromLong64s
    attr_reader :DTWAIN_ArrayCreateFromLongs
-   attr_reader :DTWAIN_ArrayCreateFromReals
+   attr_reader :DTWAIN_ArrayCreateFromStrings
+   attr_reader :DTWAIN_ArrayCreateFromWideStrings
    attr_reader :DTWAIN_ArrayDestroy
    attr_reader :DTWAIN_ArrayDestroyFrames
    attr_reader :DTWAIN_ArrayDumpToLog
@@ -3064,10 +3067,13 @@ class DTWAINAPI
        @DTWAIN_ArrayCopy = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCopy'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayCreate = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreate'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayCreateCopy = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateCopy'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
+       @DTWAIN_ArrayCreateFromANSIStrings = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateFromANSIStrings'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayCreateFromCap = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateFromCap'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
+       @DTWAIN_ArrayCreateFromFloats = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateFromFloats'],[Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayCreateFromLong64s = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateFromLong64s'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayCreateFromLongs = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateFromLongs'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
-       @DTWAIN_ArrayCreateFromReals = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateFromReals'],[Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
+       @DTWAIN_ArrayCreateFromStrings = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateFromStrings'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
+       @DTWAIN_ArrayCreateFromWideStrings = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayCreateFromWideStrings'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayDestroy = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayDestroy'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayDestroyFrames = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayDestroyFrames'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayDumpToLog = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayDumpToLog'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)

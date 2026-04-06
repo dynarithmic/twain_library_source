@@ -1797,10 +1797,13 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_ArrayCopy Lib "dtwain32.dll" (Source As System.IntPtr, Dest As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayCreate Lib "dtwain32.dll" (nEnumType As Integer, nInitialSize As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayCreateCopy Lib "dtwain32.dll" (Source As System.IntPtr) As System.IntPtr
+    Public Declare Function DTWAIN_ArrayCreateFromANSIStrings Lib "dtwain32.dll" (<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPStr)> pCArray() As String, nSize As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayCreateFromCap Lib "dtwain32.dll" (Source As System.IntPtr, lCapType As Integer, lSize As Integer) As System.IntPtr
-    Public Declare Function DTWAIN_ArrayCreateFromLong64s Lib "dtwain32.dll" (ByRef pCArray As System.Int64, nSize As Integer) As System.IntPtr
-    Public Declare Function DTWAIN_ArrayCreateFromLongs Lib "dtwain32.dll" (ByRef pCArray As Integer, nSize As Integer) As System.IntPtr
-    Public Declare Function DTWAIN_ArrayCreateFromReals Lib "dtwain32.dll" (ByRef pCArray As System.Double, nSize As Integer) As System.IntPtr
+    Public Declare Function DTWAIN_ArrayCreateFromFloats Lib "dtwain32.dll" (<[In]> pCArray() As System.Double, nSize As Integer) As System.IntPtr
+    Public Declare Function DTWAIN_ArrayCreateFromLong64s Lib "dtwain32.dll" (<[In]> pCArray() As System.Int64, nSize As Integer) As System.IntPtr
+    Public Declare Function DTWAIN_ArrayCreateFromLongs Lib "dtwain32.dll" (<[In]> pCArray() As Integer, nSize As Integer) As System.IntPtr
+    Public Declare Function DTWAIN_ArrayCreateFromStrings Lib "dtwain32.dll" (<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPTStr)> pCArray() As String, nSize As Integer) As System.IntPtr
+    Public Declare Function DTWAIN_ArrayCreateFromWideStrings Lib "dtwain32.dll" (<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPWStr)> pCArray() As String, nSize As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayDestroy Lib "dtwain32.dll" (pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayDestroyFrames Lib "dtwain32.dll" (FrameArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayDumpToLog Lib "dtwain32.dll" (pArray As System.IntPtr, bAsUnsigned As Integer) As Integer
@@ -1819,6 +1822,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_ArrayFloatToWideString Lib "dtwain32.dll" (FloatArray As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_ArrayGetAt Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, pVariant As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_ArrayGetAtANSIString Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> pStr As StringBuilder) As Integer
+    Public Declare Function DTWAIN_ArrayGetAtANSIStringPtr Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayGetAtFloat Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, ByRef pVal As System.Double) As Integer
     Public Declare Function DTWAIN_ArrayGetAtFloatEx Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer) As System.Double
     Public Declare Ansi Function DTWAIN_ArrayGetAtFloatString Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> Val As StringBuilder) As Integer
@@ -1832,7 +1836,9 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_ArrayGetAtSource Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, ByRef ppSource As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayGetAtSourceEx Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
     Public Declare Ansi Function DTWAIN_ArrayGetAtString Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> pStr As StringBuilder) As Integer
+    Public Declare Function DTWAIN_ArrayGetAtStringPtr Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
     Public Declare Unicode Function DTWAIN_ArrayGetAtWideString Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPWStr)> pStr As StringBuilder) As Integer
+    Public Declare Function DTWAIN_ArrayGetAtWideStringPtr Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayGetBuffer Lib "dtwain32.dll" (pArray As System.IntPtr, nPos As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayGetCapValues Lib "dtwain32.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayGetCapValuesEx Lib "dtwain32.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer, lContainerType As Integer) As System.IntPtr

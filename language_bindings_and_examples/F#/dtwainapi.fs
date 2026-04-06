@@ -1995,16 +1995,25 @@ module TwainAPI =
     type DTWAIN_ArrayCreateCopyDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayCreateFromANSIStringsDelegate = delegate of [<MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)>] pcArray: string[] * LONG -> DTWAIN_ARRAY
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayCreateFromCapDelegate = delegate of DTWAIN_SOURCE * LONG * LONG -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_ArrayCreateFromLong64sDelegate = delegate of Int64 byref * LONG -> DTWAIN_ARRAY
+    type DTWAIN_ArrayCreateFromFloatsDelegate = delegate of double[] * LONG -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_ArrayCreateFromLongsDelegate = delegate of int byref * LONG -> DTWAIN_ARRAY
+    type DTWAIN_ArrayCreateFromLong64sDelegate = delegate of int64[] * LONG -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_ArrayCreateFromRealsDelegate = delegate of DTWAIN_FLOAT byref * LONG -> DTWAIN_ARRAY
+    type DTWAIN_ArrayCreateFromLongsDelegate = delegate of int[] * LONG -> DTWAIN_ARRAY
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayCreateFromStringsDelegate = delegate of [<MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPTStr)>] pcArray: string[] * LONG -> DTWAIN_ARRAY
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayCreateFromWideStringsDelegate = delegate of [<MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)>] pcArray: string[] * LONG -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayDestroyDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
@@ -2061,6 +2070,9 @@ module TwainAPI =
     type DTWAIN_ArrayGetAtANSIStringDelegate = delegate of DTWAIN_ARRAY * LONG * System.Text.StringBuilder -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayGetAtANSIStringPtrDelegate = delegate of DTWAIN_ARRAY * LONG -> nativeint
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayGetAtFloatDelegate = delegate of DTWAIN_ARRAY * LONG * DTWAIN_FLOAT byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -2099,8 +2111,14 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_ArrayGetAtStringDelegate = delegate of DTWAIN_ARRAY * LONG * System.Text.StringBuilder -> DTWAIN_BOOL
 
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayGetAtStringPtrDelegate = delegate of DTWAIN_ARRAY * LONG -> nativeint
+
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_ArrayGetAtWideStringDelegate = delegate of DTWAIN_ARRAY * LONG * System.Text.StringBuilder -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayGetAtWideStringPtrDelegate = delegate of DTWAIN_ARRAY * LONG -> nativeint
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayGetBufferDelegate = delegate of DTWAIN_ARRAY * LONG -> LPVOID
@@ -4455,10 +4473,13 @@ module TwainAPI =
     let private ArrayCopy = lazy (DynamicDll.Bind "DTWAIN_ArrayCopy" : DTWAIN_ArrayCopyDelegate)
     let private ArrayCreate = lazy (DynamicDll.Bind "DTWAIN_ArrayCreate" : DTWAIN_ArrayCreateDelegate)
     let private ArrayCreateCopy = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateCopy" : DTWAIN_ArrayCreateCopyDelegate)
+    let private ArrayCreateFromANSIStrings = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromANSIStrings" : DTWAIN_ArrayCreateFromANSIStringsDelegate)
     let private ArrayCreateFromCap = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromCap" : DTWAIN_ArrayCreateFromCapDelegate)
+    let private ArrayCreateFromFloats = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromFloats" : DTWAIN_ArrayCreateFromFloatsDelegate)
     let private ArrayCreateFromLong64s = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromLong64s" : DTWAIN_ArrayCreateFromLong64sDelegate)
     let private ArrayCreateFromLongs = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromLongs" : DTWAIN_ArrayCreateFromLongsDelegate)
-    let private ArrayCreateFromReals = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromReals" : DTWAIN_ArrayCreateFromRealsDelegate)
+    let private ArrayCreateFromStrings = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromStrings" : DTWAIN_ArrayCreateFromStringsDelegate)
+    let private ArrayCreateFromWideStrings = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromWideStrings" : DTWAIN_ArrayCreateFromWideStringsDelegate)
     let private ArrayDestroy = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroy" : DTWAIN_ArrayDestroyDelegate)
     let private ArrayDestroyFrames = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroyFrames" : DTWAIN_ArrayDestroyFramesDelegate)
     let private ArrayDumpToLog = lazy (DynamicDll.Bind "DTWAIN_ArrayDumpToLog" : DTWAIN_ArrayDumpToLogDelegate)
@@ -4477,6 +4498,7 @@ module TwainAPI =
     let private ArrayFloatToWideString = lazy (DynamicDll.Bind "DTWAIN_ArrayFloatToWideString" : DTWAIN_ArrayFloatToWideStringDelegate)
     let private ArrayGetAt = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAt" : DTWAIN_ArrayGetAtDelegate)
     let private ArrayGetAtANSIString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtANSIString" : DTWAIN_ArrayGetAtANSIStringDelegate)
+    let private ArrayGetAtANSIStringPtr = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtANSIStringPtr" : DTWAIN_ArrayGetAtANSIStringPtrDelegate)
     let private ArrayGetAtFloat = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFloat" : DTWAIN_ArrayGetAtFloatDelegate)
     let private ArrayGetAtFloatEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFloatEx" : DTWAIN_ArrayGetAtFloatExDelegate)
     let private ArrayGetAtFloatString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFloatString" : DTWAIN_ArrayGetAtFloatStringDelegate)
@@ -4490,7 +4512,9 @@ module TwainAPI =
     let private ArrayGetAtSource = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtSource" : DTWAIN_ArrayGetAtSourceDelegate)
     let private ArrayGetAtSourceEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtSourceEx" : DTWAIN_ArrayGetAtSourceExDelegate)
     let private ArrayGetAtString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtString" : DTWAIN_ArrayGetAtStringDelegate)
+    let private ArrayGetAtStringPtr = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtStringPtr" : DTWAIN_ArrayGetAtStringPtrDelegate)
     let private ArrayGetAtWideString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtWideString" : DTWAIN_ArrayGetAtWideStringDelegate)
+    let private ArrayGetAtWideStringPtr = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtWideStringPtr" : DTWAIN_ArrayGetAtWideStringPtrDelegate)
     let private ArrayGetBuffer = lazy (DynamicDll.Bind "DTWAIN_ArrayGetBuffer" : DTWAIN_ArrayGetBufferDelegate)
     let private ArrayGetCapValues = lazy (DynamicDll.Bind "DTWAIN_ArrayGetCapValues" : DTWAIN_ArrayGetCapValuesDelegate)
     let private ArrayGetCapValuesEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetCapValuesEx" : DTWAIN_ArrayGetCapValuesExDelegate)
@@ -5457,21 +5481,33 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayCreateCopy.Value.Invoke(source)
 
+    let DTWAIN_ArrayCreateFromANSIStrings (pcarray: string[]) (nsize: LONG) : DTWAIN_ARRAY =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayCreateFromANSIStrings.Value.Invoke(pcarray, nsize)
+
     let DTWAIN_ArrayCreateFromCap (source: DTWAIN_SOURCE) (lcaptype: LONG) (lsize: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayCreateFromCap.Value.Invoke(source, lcaptype, lsize)
 
-    let DTWAIN_ArrayCreateFromLong64s (pcarray: Int64 byref) (nsize: LONG) : DTWAIN_ARRAY =
+    let DTWAIN_ArrayCreateFromFloats (pcarray: double[]) (nsize: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        ArrayCreateFromLong64s.Value.Invoke(&pcarray, nsize)
+        ArrayCreateFromFloats.Value.Invoke(pcarray, nsize)
 
-    let DTWAIN_ArrayCreateFromLongs (pcarray: int byref) (nsize: LONG) : DTWAIN_ARRAY =
+    let DTWAIN_ArrayCreateFromLong64s (pcarray: int64[]) (nsize: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        ArrayCreateFromLongs.Value.Invoke(&pcarray, nsize)
+        ArrayCreateFromLong64s.Value.Invoke(pcarray, nsize)
 
-    let DTWAIN_ArrayCreateFromReals (pcarray: DTWAIN_FLOAT byref) (nsize: LONG) : DTWAIN_ARRAY =
+    let DTWAIN_ArrayCreateFromLongs (pcarray: int[]) (nsize: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        ArrayCreateFromReals.Value.Invoke(&pcarray, nsize)
+        ArrayCreateFromLongs.Value.Invoke(pcarray, nsize)
+
+    let DTWAIN_ArrayCreateFromStrings (pcarray: string[]) (nsize: LONG) : DTWAIN_ARRAY =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayCreateFromStrings.Value.Invoke(pcarray, nsize)
+
+    let DTWAIN_ArrayCreateFromWideStrings (pcarray: string[]) (nsize: LONG) : DTWAIN_ARRAY =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayCreateFromWideStrings.Value.Invoke(pcarray, nsize)
 
     let DTWAIN_ArrayDestroy (parray: DTWAIN_ARRAY) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -5545,6 +5581,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtANSIString.Value.Invoke(parray, nwhere, pstr)
 
+    let DTWAIN_ArrayGetAtANSIStringPtr (parray: DTWAIN_ARRAY) (nwhere: LONG) : nativeint =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayGetAtANSIStringPtr.Value.Invoke(parray, nwhere)
+
     let DTWAIN_ArrayGetAtFloat (parray: DTWAIN_ARRAY) (nwhere: LONG) (pval: DTWAIN_FLOAT byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtFloat.Value.Invoke(parray, nwhere, &pval)
@@ -5597,9 +5637,17 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtString.Value.Invoke(parray, nwhere, pstr)
 
+    let DTWAIN_ArrayGetAtStringPtr (parray: DTWAIN_ARRAY) (nwhere: LONG) : nativeint =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayGetAtStringPtr.Value.Invoke(parray, nwhere)
+
     let DTWAIN_ArrayGetAtWideString (parray: DTWAIN_ARRAY) (nwhere: LONG) (pstr: System.Text.StringBuilder) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtWideString.Value.Invoke(parray, nwhere, pstr)
+
+    let DTWAIN_ArrayGetAtWideStringPtr (parray: DTWAIN_ARRAY) (nwhere: LONG) : nativeint =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayGetAtWideStringPtr.Value.Invoke(parray, nwhere)
 
     let DTWAIN_ArrayGetBuffer (parray: DTWAIN_ARRAY) (npos: LONG) : LPVOID =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

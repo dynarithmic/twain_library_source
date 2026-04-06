@@ -35,12 +35,17 @@ type
   PWChar = PWideChar;
   HWND = NativeInt;
 
+  PPAnsiChar = ^PAnsiChar;
+  PPWideChar = ^PWideChar;
+  PPChar = ^PChar;
+
   LPSTR = PAnsiChar;
   LPCSTR = PAnsiChar;
   LPWSTR = PWideChar;
   LPCWSTR = PWideChar;
   LPCTSTR = PChar;
   LPTSTR = PChar;
+  
   LPVOID = Pointer;
   DTWAIN_CALLBACK_PROC = Pointer;
   DTWAIN_CALLBACK_PROC64 = Pointer;
@@ -1906,13 +1911,13 @@ function DTWAIN_ArrayConvertFloatToFix32(FloatArray:DTWAIN_ARRAY) : DTWAIN_ARRAY
 function DTWAIN_ArrayCopy(Source:DTWAIN_ARRAY; Dest:DTWAIN_ARRAY) : BOOL; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCopy';
 function DTWAIN_ArrayCreate(nEnumType:LONG; nInitialSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreate';
 function DTWAIN_ArrayCreateCopy(Source:DTWAIN_ARRAY) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateCopy';
+function DTWAIN_ArrayCreateFromANSIStrings(pCArray:PPAnsiChar; nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromANSIStrings';
 function DTWAIN_ArrayCreateFromCap(Source:DTWAIN_SOURCE; lCapType:LONG; lSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromCap';
+function DTWAIN_ArrayCreateFromFloats(nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromFloats';
 function DTWAIN_ArrayCreateFromLong64s(pCArray:LPLONG64; nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromLong64s';
 function DTWAIN_ArrayCreateFromLongs(pCArray:LPLONG; nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromLongs';
-function DTWAIN_ArrayCreateFromReals(nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromReals';
-function DTWAIN_ArrayCreateFromStrings(nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromStrings';
-function DTWAIN_ArrayCreateFromStringsA(nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromStringsA';
-function DTWAIN_ArrayCreateFromStringsW(nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromStringsW';
+function DTWAIN_ArrayCreateFromStrings(pCArray:PPChar; nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromStrings';
+function DTWAIN_ArrayCreateFromWideStrings(pCArray:PPWideChar; nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromWideStrings';
 function DTWAIN_ArrayDestroy(pArray:DTWAIN_ARRAY) : BOOL; external 'dtwain64u.dll'  name 'DTWAIN_ArrayDestroy';
 function DTWAIN_ArrayDestroyFrames(FrameArray:DTWAIN_ARRAY) : BOOL; external 'dtwain64u.dll'  name 'DTWAIN_ArrayDestroyFrames';
 function DTWAIN_ArrayDumpToLog(pArray:DTWAIN_ARRAY; bAsUnsigned:BOOL) : BOOL; external 'dtwain64u.dll'  name 'DTWAIN_ArrayDumpToLog';

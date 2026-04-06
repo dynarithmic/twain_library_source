@@ -1955,10 +1955,13 @@
         public delegate int DTWAIN_ArrayCopyDelegate(DTWAIN_ARRAY Source, DTWAIN_ARRAY Dest);
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateDelegate(int nEnumType, int nInitialSize);
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateCopyDelegate(DTWAIN_ARRAY Source);
+        public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromANSIStringsDelegate([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] pCArray, int nSize);
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromCapDelegate(DTWAIN_SOURCE Source, int lCapType, int lSize);
-        public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64sDelegate(ref long pCArray, int nSize);
-        public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongsDelegate(ref int pCArray, int nSize);
-        public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromRealsDelegate(ref DTWAIN_FLOAT pCArray, int nSize);
+        public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromFloatsDelegate([In] double[] pCArray, int nSize);
+        public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64sDelegate([In] long[] pCArray, int nSize);
+        public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongsDelegate([In] int[] pCArray, int nSize);
+        public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromStringsDelegate([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPTStr)] string[] pCArray, int nSize);
+        public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStringsDelegate([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)] string[] pCArray, int nSize);
         public delegate int DTWAIN_ArrayDestroyDelegate(DTWAIN_ARRAY pArray);
         public delegate int DTWAIN_ArrayDestroyFramesDelegate(DTWAIN_ARRAY FrameArray);
         public delegate int DTWAIN_ArrayDumpToLogDelegate(DTWAIN_ARRAY pArray, int bAsUnsigned);
@@ -1977,6 +1980,7 @@
         public delegate DTWAIN_ARRAY DTWAIN_ArrayFloatToWideStringDelegate(DTWAIN_ARRAY FloatArray);
         public delegate int DTWAIN_ArrayGetAtDelegate(DTWAIN_ARRAY pArray, int nWhere, System.IntPtr pVariant);
         public delegate int DTWAIN_ArrayGetAtANSIStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder pStr);
+        public delegate System.IntPtr DTWAIN_ArrayGetAtANSIStringPtrDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtFloatDelegate(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_FLOAT pVal);
         public delegate DTWAIN_FLOAT DTWAIN_ArrayGetAtFloatExDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtFloatStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder Val);
@@ -1993,7 +1997,9 @@
         public delegate DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceExDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder pStr);
         public delegate int DTWAIN_ArrayGetAtStringDelegate_overload(DTWAIN_ARRAY pArray, int nWhere, System.IntPtr pStr);
+        public delegate System.IntPtr DTWAIN_ArrayGetAtStringPtrDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtWideStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder pStr);
+        public delegate System.IntPtr DTWAIN_ArrayGetAtWideStringPtrDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate System.IntPtr DTWAIN_ArrayGetBufferDelegate(DTWAIN_ARRAY pArray, int nPos);
         public delegate DTWAIN_ARRAY DTWAIN_ArrayGetCapValuesDelegate(DTWAIN_SOURCE Source, int lCap, int lGetType);
         public delegate DTWAIN_ARRAY DTWAIN_ArrayGetCapValuesExDelegate(DTWAIN_SOURCE Source, int lCap, int lGetType, int lContainerType);
@@ -2983,8 +2989,14 @@
         [DTWAINNativeFunction("DTWAIN_ArrayCreateCopy")]
         private readonly DTWAIN_ArrayCreateCopyDelegate  _DTWAIN_ArrayCreateCopy;
 
+        [DTWAINNativeFunction("DTWAIN_ArrayCreateFromANSIStrings")]
+        private readonly DTWAIN_ArrayCreateFromANSIStringsDelegate  _DTWAIN_ArrayCreateFromANSIStrings;
+
         [DTWAINNativeFunction("DTWAIN_ArrayCreateFromCap")]
         private readonly DTWAIN_ArrayCreateFromCapDelegate  _DTWAIN_ArrayCreateFromCap;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayCreateFromFloats")]
+        private readonly DTWAIN_ArrayCreateFromFloatsDelegate  _DTWAIN_ArrayCreateFromFloats;
 
         [DTWAINNativeFunction("DTWAIN_ArrayCreateFromLong64s")]
         private readonly DTWAIN_ArrayCreateFromLong64sDelegate  _DTWAIN_ArrayCreateFromLong64s;
@@ -2992,8 +3004,11 @@
         [DTWAINNativeFunction("DTWAIN_ArrayCreateFromLongs")]
         private readonly DTWAIN_ArrayCreateFromLongsDelegate  _DTWAIN_ArrayCreateFromLongs;
 
-        [DTWAINNativeFunction("DTWAIN_ArrayCreateFromReals")]
-        private readonly DTWAIN_ArrayCreateFromRealsDelegate  _DTWAIN_ArrayCreateFromReals;
+        [DTWAINNativeFunction("DTWAIN_ArrayCreateFromStrings")]
+        private readonly DTWAIN_ArrayCreateFromStringsDelegate  _DTWAIN_ArrayCreateFromStrings;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayCreateFromWideStrings")]
+        private readonly DTWAIN_ArrayCreateFromWideStringsDelegate  _DTWAIN_ArrayCreateFromWideStrings;
 
         [DTWAINNativeFunction("DTWAIN_ArrayDestroy")]
         private readonly DTWAIN_ArrayDestroyDelegate  _DTWAIN_ArrayDestroy;
@@ -3049,6 +3064,9 @@
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtANSIString")]
         private readonly DTWAIN_ArrayGetAtANSIStringDelegate  _DTWAIN_ArrayGetAtANSIString;
 
+        [DTWAINNativeFunction("DTWAIN_ArrayGetAtANSIStringPtr")]
+        private readonly DTWAIN_ArrayGetAtANSIStringPtrDelegate  _DTWAIN_ArrayGetAtANSIStringPtr;
+
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtFloat")]
         private readonly DTWAIN_ArrayGetAtFloatDelegate  _DTWAIN_ArrayGetAtFloat;
 
@@ -3097,8 +3115,14 @@
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtString")]
         private readonly DTWAIN_ArrayGetAtStringDelegate_overload _DTWAIN_ArrayGetAtString_overload; 
 
+        [DTWAINNativeFunction("DTWAIN_ArrayGetAtStringPtr")]
+        private readonly DTWAIN_ArrayGetAtStringPtrDelegate  _DTWAIN_ArrayGetAtStringPtr;
+
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtWideString")]
         private readonly DTWAIN_ArrayGetAtWideStringDelegate  _DTWAIN_ArrayGetAtWideString;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayGetAtWideStringPtr")]
+        private readonly DTWAIN_ArrayGetAtWideStringPtrDelegate  _DTWAIN_ArrayGetAtWideStringPtr;
 
         [DTWAINNativeFunction("DTWAIN_ArrayGetBuffer")]
         private readonly DTWAIN_ArrayGetBufferDelegate  _DTWAIN_ArrayGetBuffer;
@@ -5760,17 +5784,26 @@
         public  DTWAIN_ARRAY DTWAIN_ArrayCreateCopy(DTWAIN_ARRAY Source)
         => _DTWAIN_ArrayCreateCopy(Source);
 
+        public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromANSIStrings([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] pCArray, int nSize)
+        => _DTWAIN_ArrayCreateFromANSIStrings(pCArray, nSize);
+
         public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromCap(DTWAIN_SOURCE Source, int lCapType, int lSize)
         => _DTWAIN_ArrayCreateFromCap(Source, lCapType, lSize);
 
-        public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64s(ref long pCArray, int nSize)
-        => _DTWAIN_ArrayCreateFromLong64s(ref pCArray, nSize);
+        public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromFloats([In] double[] pCArray, int nSize)
+        => _DTWAIN_ArrayCreateFromFloats(pCArray, nSize);
 
-        public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongs(ref int pCArray, int nSize)
-        => _DTWAIN_ArrayCreateFromLongs(ref pCArray, nSize);
+        public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64s([In] long[] pCArray, int nSize)
+        => _DTWAIN_ArrayCreateFromLong64s(pCArray, nSize);
 
-        public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromReals(ref DTWAIN_FLOAT pCArray, int nSize)
-        => _DTWAIN_ArrayCreateFromReals(ref pCArray, nSize);
+        public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongs([In] int[] pCArray, int nSize)
+        => _DTWAIN_ArrayCreateFromLongs(pCArray, nSize);
+
+        public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPTStr)] string[] pCArray, int nSize)
+        => _DTWAIN_ArrayCreateFromStrings(pCArray, nSize);
+
+        public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)] string[] pCArray, int nSize)
+        => _DTWAIN_ArrayCreateFromWideStrings(pCArray, nSize);
 
         public  int DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray)
         => _DTWAIN_ArrayDestroy(pArray);
@@ -5826,6 +5859,9 @@
         public  int DTWAIN_ArrayGetAtANSIString(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder pStr)
         => _DTWAIN_ArrayGetAtANSIString(pArray, nWhere, pStr);
 
+        public  System.IntPtr DTWAIN_ArrayGetAtANSIStringPtr(DTWAIN_ARRAY pArray, int nWhere)
+        => _DTWAIN_ArrayGetAtANSIStringPtr(pArray, nWhere);
+
         public  int DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_FLOAT pVal)
         => _DTWAIN_ArrayGetAtFloat(pArray, nWhere, ref pVal);
 
@@ -5874,8 +5910,14 @@
         public  int DTWAIN_ArrayGetAtString (DTWAIN_ARRAY pArray, int nWhere, System.IntPtr pStr)
         => _DTWAIN_ArrayGetAtString_overload(pArray, nWhere, pStr);
 
+        public  System.IntPtr DTWAIN_ArrayGetAtStringPtr(DTWAIN_ARRAY pArray, int nWhere)
+        => _DTWAIN_ArrayGetAtStringPtr(pArray, nWhere);
+
         public  int DTWAIN_ArrayGetAtWideString(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder pStr)
         => _DTWAIN_ArrayGetAtWideString(pArray, nWhere, pStr);
+
+        public  System.IntPtr DTWAIN_ArrayGetAtWideStringPtr(DTWAIN_ARRAY pArray, int nWhere)
+        => _DTWAIN_ArrayGetAtWideStringPtr(pArray, nWhere);
 
         public  System.IntPtr DTWAIN_ArrayGetBuffer(DTWAIN_ARRAY pArray, int nPos)
         => _DTWAIN_ArrayGetBuffer(pArray, nPos);
