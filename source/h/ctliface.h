@@ -658,7 +658,7 @@ namespace dynarithmic
             CTL_TwainDLLHandle();
             ~CTL_TwainDLLHandle() = default;
             static void    NotifyWindows( UINT nMsg, WPARAM wParam, LPARAM lParam );
-            void    RemoveAllEnumerators();
+            void    RemoveAllArrays();
             void    RemoveAllSourceCapInfo();
             void    RemoveAllSourceMaps();
             void    RemoveAllPDFTextElements();

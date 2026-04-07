@@ -1190,3 +1190,4 @@ DTWAIN_ArrayIsValid                               @1186
 DTWAIN_GetAllSourceInfo                           @1187
 DTWAIN_GetAllSourceInfoA                          @1188
 DTWAIN_GetAllSourceInfoW                          @1189
+DTWAIN_ArrayDestroyAll                            @1190

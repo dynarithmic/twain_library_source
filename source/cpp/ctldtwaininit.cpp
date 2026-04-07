@@ -1804,7 +1804,7 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
         // Note that the assumption is that no exception is thrown from
         // this point on.
         UnhookAllDisplays();
-        pHandle->RemoveAllEnumerators();
+        pHandle->RemoveAllArrays();
         pHandle->RemoveAllSourceCapInfo();
         pHandle->RemoveAllSourceMaps();
         pHandle->RemoveAllPDFTextElements();

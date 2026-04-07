@@ -1079,6 +1079,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopDetectionOn(VOID_PROTOTYPE);
    flag of DTWAIN_NODELETEDIBS */
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquisitionArray(DTWAIN_SOURCE Source);
 
+/* Destroy all "active" DTWAIN_ARRAYs */
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayDestroyAll(VOID_PROTOTYPE);
+
 #include "dtwstrfn.h"
 
 #ifdef __cplusplus

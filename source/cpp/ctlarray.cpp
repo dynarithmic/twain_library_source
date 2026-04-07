@@ -3158,7 +3158,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayIsValid(DTWAIN_ARRAY theArray)
 	CATCH_BLOCK(0)
 }
 
-void CTL_TwainDLLHandle::RemoveAllEnumerators()
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayDestroyAll()
+{
+	LOG_FUNC_ENTRY_PARAMS(())
+	auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
+	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return DTWAIN_IsAcquiring() == 1; }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+    pHandle->m_ArrayFactory = std::make_shared<CTL_ArrayFactory>();
+	LOG_FUNC_EXIT_NONAME_PARAMS(true)
+	CATCH_BLOCK(0)
+}
+
+void CTL_TwainDLLHandle::RemoveAllArrays()
 {
     m_ArrayFactory.reset();
 }
