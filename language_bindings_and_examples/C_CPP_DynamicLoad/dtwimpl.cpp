@@ -120,6 +120,7 @@
     D_ARRAYCREATEFROMSTRINGSFUNC                  DYNDTWAIN_API::DTWAIN_ArrayCreateFromStrings = nullptr;
     D_ARRAYCREATEFROMWIDESTRINGSFUNC              DYNDTWAIN_API::DTWAIN_ArrayCreateFromWideStrings = nullptr;
     D_ARRAYDESTROYFUNC                            DYNDTWAIN_API::DTWAIN_ArrayDestroy = nullptr;
+    D_ARRAYDESTROYALLFUNC                         DYNDTWAIN_API::DTWAIN_ArrayDestroyAll = nullptr;
     D_ARRAYDESTROYFRAMESFUNC                      DYNDTWAIN_API::DTWAIN_ArrayDestroyFrames = nullptr;
     D_ARRAYDUMPTOLOGFUNC                          DYNDTWAIN_API::DTWAIN_ArrayDumpToLog = nullptr;
     D_ARRAYFINDFUNC                               DYNDTWAIN_API::DTWAIN_ArrayFind = nullptr;
@@ -1369,6 +1370,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_ArrayCreateFromStrings, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayCreateFromWideStrings, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayDestroy, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ArrayDestroyAll, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayDestroyFrames, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayDumpToLog, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayFind, hModule);

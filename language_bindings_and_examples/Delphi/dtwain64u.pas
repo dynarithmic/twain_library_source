@@ -1919,6 +1919,7 @@ function DTWAIN_ArrayCreateFromLongs(pCArray:LPLONG; nSize:LONG) : DTWAIN_ARRAY;
 function DTWAIN_ArrayCreateFromStrings(pCArray:PPChar; nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromStrings';
 function DTWAIN_ArrayCreateFromWideStrings(pCArray:PPWideChar; nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64u.dll'  name 'DTWAIN_ArrayCreateFromWideStrings';
 function DTWAIN_ArrayDestroy(pArray:DTWAIN_ARRAY) : BOOL; external 'dtwain64u.dll'  name 'DTWAIN_ArrayDestroy';
+function DTWAIN_ArrayDestroyAll : BOOL; external 'dtwain64u.dll'  name 'DTWAIN_ArrayDestroyAll';
 function DTWAIN_ArrayDestroyFrames(FrameArray:DTWAIN_ARRAY) : BOOL; external 'dtwain64u.dll'  name 'DTWAIN_ArrayDestroyFrames';
 function DTWAIN_ArrayDumpToLog(pArray:DTWAIN_ARRAY; bAsUnsigned:BOOL) : BOOL; external 'dtwain64u.dll'  name 'DTWAIN_ArrayDumpToLog';
 function DTWAIN_ArrayFind(pArray:DTWAIN_ARRAY; pVariant:LPVOID) : LONG; external 'dtwain64u.dll'  name 'DTWAIN_ArrayFind';

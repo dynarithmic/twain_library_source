@@ -2019,6 +2019,9 @@ module TwainAPI =
     type DTWAIN_ArrayDestroyDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayDestroyAllDelegate = delegate of unit -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayDestroyFramesDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4481,6 +4484,7 @@ module TwainAPI =
     let private ArrayCreateFromStrings = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromStrings" : DTWAIN_ArrayCreateFromStringsDelegate)
     let private ArrayCreateFromWideStrings = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromWideStrings" : DTWAIN_ArrayCreateFromWideStringsDelegate)
     let private ArrayDestroy = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroy" : DTWAIN_ArrayDestroyDelegate)
+    let private ArrayDestroyAll = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroyAll" : DTWAIN_ArrayDestroyAllDelegate)
     let private ArrayDestroyFrames = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroyFrames" : DTWAIN_ArrayDestroyFramesDelegate)
     let private ArrayDumpToLog = lazy (DynamicDll.Bind "DTWAIN_ArrayDumpToLog" : DTWAIN_ArrayDumpToLogDelegate)
     let private ArrayFind = lazy (DynamicDll.Bind "DTWAIN_ArrayFind" : DTWAIN_ArrayFindDelegate)
@@ -5512,6 +5516,10 @@ module TwainAPI =
     let DTWAIN_ArrayDestroy (parray: DTWAIN_ARRAY) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayDestroy.Value.Invoke(parray)
+
+    let DTWAIN_ArrayDestroyAll() : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayDestroyAll.Value.Invoke()
 
     let DTWAIN_ArrayDestroyFrames (framearray: DTWAIN_ARRAY) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

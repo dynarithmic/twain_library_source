@@ -1743,6 +1743,7 @@ my $DTWAIN_ArrayCreateFromLongs = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayC
 my $DTWAIN_ArrayCreateFromStrings = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayCreateFromStrings', 'Pi', 'P');
 my $DTWAIN_ArrayCreateFromWideStrings = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayCreateFromWideStrings', 'Pi', 'P');
 my $DTWAIN_ArrayDestroy = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayDestroy', 'P', 'I');
+my $DTWAIN_ArrayDestroyAll = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayDestroyAll', '', 'I');
 my $DTWAIN_ArrayDestroyFrames = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayDestroyFrames', 'P', 'I');
 my $DTWAIN_ArrayDumpToLog = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayDumpToLog', 'PI', 'I');
 my $DTWAIN_ArrayFind = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayFind', 'PP', 'i');

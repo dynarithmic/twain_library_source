@@ -1990,6 +1990,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_CCHARPTRTYPE*, LONG) DTWAIN_ArrayCreateFromStrings;
     extern(Windows) DTWAIN_ARRAY function(LPCWSTR*, LONG) DTWAIN_ArrayCreateFromWideStrings;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY) DTWAIN_ArrayDestroy;
+    extern(Windows) DTWAIN_BOOL function() DTWAIN_ArrayDestroyAll;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY) DTWAIN_ArrayDestroyFrames;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, DTWAIN_BOOL) DTWAIN_ArrayDumpToLog;
     extern(Windows) LONG function(DTWAIN_ARRAY, LPVOID) DTWAIN_ArrayFind;
@@ -3167,6 +3168,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_ArrayCreateFromStrings, "DTWAIN_ArrayCreateFromStrings");
         bindFunction(cast(void**)&DTWAIN_ArrayCreateFromWideStrings, "DTWAIN_ArrayCreateFromWideStrings");
         bindFunction(cast(void**)&DTWAIN_ArrayDestroy, "DTWAIN_ArrayDestroy");
+        bindFunction(cast(void**)&DTWAIN_ArrayDestroyAll, "DTWAIN_ArrayDestroyAll");
         bindFunction(cast(void**)&DTWAIN_ArrayDestroyFrames, "DTWAIN_ArrayDestroyFrames");
         bindFunction(cast(void**)&DTWAIN_ArrayDumpToLog, "DTWAIN_ArrayDumpToLog");
         bindFunction(cast(void**)&DTWAIN_ArrayFind, "DTWAIN_ArrayFind");

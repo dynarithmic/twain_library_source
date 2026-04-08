@@ -113,6 +113,7 @@ typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ARRAYCREATEFROMLONGSFUNC)                
 typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ARRAYCREATEFROMSTRINGSFUNC)              (LPCTSTR*, LONG);
 typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ARRAYCREATEFROMWIDESTRINGSFUNC)          (LPCWSTR*, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_ARRAYDESTROYFUNC)                         (DTWAIN_ARRAY);
+typedef DTWAIN_BOOL (DLLENTRY_DEF * D_ARRAYDESTROYALLFUNC)                      (VOID_PROTOTYPE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_ARRAYDESTROYFRAMESFUNC)                   (DTWAIN_ARRAY);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_ARRAYDUMPTOLOGFUNC)                       (DTWAIN_ARRAY, DTWAIN_BOOL);
 typedef LONG (DLLENTRY_DEF * D_ARRAYFINDFUNC)                                   (DTWAIN_ARRAY, LPVOID);
@@ -1312,6 +1313,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_ARRAYCREATEFROMSTRINGSFUNC                     DTWAIN_ArrayCreateFromStrings;
     STATIC D_ARRAYCREATEFROMWIDESTRINGSFUNC                 DTWAIN_ArrayCreateFromWideStrings;
     STATIC D_ARRAYDESTROYFUNC                               DTWAIN_ArrayDestroy;
+    STATIC D_ARRAYDESTROYALLFUNC                            DTWAIN_ArrayDestroyAll;
     STATIC D_ARRAYDESTROYFRAMESFUNC                         DTWAIN_ArrayDestroyFrames;
     STATIC D_ARRAYDUMPTOLOGFUNC                             DTWAIN_ArrayDumpToLog;
     STATIC D_ARRAYFINDFUNC                                  DTWAIN_ArrayFind;

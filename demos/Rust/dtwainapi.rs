@@ -116,6 +116,7 @@ type DtwainarraycreatefromlongsFunc = unsafe extern "C" fn(*mut i32,i32) -> *mut
 type DtwainarraycreatefromstringsFunc = unsafe extern "C" fn(*const *const u16,i32) -> *mut c_void;
 type DtwainarraycreatefromwidestringsFunc = unsafe extern "C" fn(*const *const u16,i32) -> *mut c_void;
 type DtwainarraydestroyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainarraydestroyallFunc = unsafe extern "C" fn() -> i32;
 type DtwainarraydestroyframesFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainarraydumptologFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainarrayfindFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
@@ -1297,6 +1298,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_ArrayCreateFromStringsFunc: Symbol<'a, DtwainarraycreatefromstringsFunc>,
     DTWAIN_ArrayCreateFromWideStringsFunc: Symbol<'a, DtwainarraycreatefromwidestringsFunc>,
     DTWAIN_ArrayDestroyFunc: Symbol<'a, DtwainarraydestroyFunc>,
+    DTWAIN_ArrayDestroyAllFunc: Symbol<'a, DtwainarraydestroyallFunc>,
     DTWAIN_ArrayDestroyFramesFunc: Symbol<'a, DtwainarraydestroyframesFunc>,
     DTWAIN_ArrayDumpToLogFunc: Symbol<'a, DtwainarraydumptologFunc>,
     DTWAIN_ArrayFindFunc: Symbol<'a, DtwainarrayfindFunc>,
@@ -4132,6 +4134,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_ArrayCreateFromStrings: Symbol<DtwainarraycreatefromstringsFunc> = unsafe { library.get(b"DTWAIN_ArrayCreateFromStrings")? };
         let DTWAIN_ArrayCreateFromWideStrings: Symbol<DtwainarraycreatefromwidestringsFunc> = unsafe { library.get(b"DTWAIN_ArrayCreateFromWideStrings")? };
         let DTWAIN_ArrayDestroy: Symbol<DtwainarraydestroyFunc> = unsafe { library.get(b"DTWAIN_ArrayDestroy")? };
+        let DTWAIN_ArrayDestroyAll: Symbol<DtwainarraydestroyallFunc> = unsafe { library.get(b"DTWAIN_ArrayDestroyAll")? };
         let DTWAIN_ArrayDestroyFrames: Symbol<DtwainarraydestroyframesFunc> = unsafe { library.get(b"DTWAIN_ArrayDestroyFrames")? };
         let DTWAIN_ArrayDumpToLog: Symbol<DtwainarraydumptologFunc> = unsafe { library.get(b"DTWAIN_ArrayDumpToLog")? };
         let DTWAIN_ArrayFind: Symbol<DtwainarrayfindFunc> = unsafe { library.get(b"DTWAIN_ArrayFind")? };
@@ -5312,6 +5315,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_ArrayCreateFromStringsFunc: DTWAIN_ArrayCreateFromStrings,
             DTWAIN_ArrayCreateFromWideStringsFunc: DTWAIN_ArrayCreateFromWideStrings,
             DTWAIN_ArrayDestroyFunc: DTWAIN_ArrayDestroy,
+            DTWAIN_ArrayDestroyAllFunc: DTWAIN_ArrayDestroyAll,
             DTWAIN_ArrayDestroyFramesFunc: DTWAIN_ArrayDestroyFrames,
             DTWAIN_ArrayDumpToLogFunc: DTWAIN_ArrayDumpToLog,
             DTWAIN_ArrayFindFunc: DTWAIN_ArrayFind,
@@ -6700,6 +6704,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_ArrayDestroy(&self, pArray: *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_ArrayDestroyFunc)(pArray);  }
+    }
+
+    pub fn DTWAIN_ArrayDestroyAll(&self) -> i32 {
+        unsafe { return (self.DTWAIN_ArrayDestroyAllFunc)();  }
     }
 
     pub fn DTWAIN_ArrayDestroyFrames(&self, FrameArray: *mut c_void) -> i32 {

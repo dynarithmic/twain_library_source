@@ -1957,6 +1957,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_ArrayDestroyAll();
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]

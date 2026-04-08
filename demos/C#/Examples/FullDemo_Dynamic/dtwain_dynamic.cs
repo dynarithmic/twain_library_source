@@ -1963,6 +1963,7 @@
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromStringsDelegate([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPTStr)] string[] pCArray, int nSize);
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStringsDelegate([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)] string[] pCArray, int nSize);
         public delegate int DTWAIN_ArrayDestroyDelegate(DTWAIN_ARRAY pArray);
+        public delegate int DTWAIN_ArrayDestroyAllDelegate();
         public delegate int DTWAIN_ArrayDestroyFramesDelegate(DTWAIN_ARRAY FrameArray);
         public delegate int DTWAIN_ArrayDumpToLogDelegate(DTWAIN_ARRAY pArray, int bAsUnsigned);
         public delegate int DTWAIN_ArrayFindDelegate(DTWAIN_ARRAY pArray, System.IntPtr pVariant);
@@ -3012,6 +3013,9 @@
 
         [DTWAINNativeFunction("DTWAIN_ArrayDestroy")]
         private readonly DTWAIN_ArrayDestroyDelegate  _DTWAIN_ArrayDestroy;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayDestroyAll")]
+        private readonly DTWAIN_ArrayDestroyAllDelegate  _DTWAIN_ArrayDestroyAll;
 
         [DTWAINNativeFunction("DTWAIN_ArrayDestroyFrames")]
         private readonly DTWAIN_ArrayDestroyFramesDelegate  _DTWAIN_ArrayDestroyFrames;
@@ -5807,6 +5811,9 @@
 
         public  int DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray)
         => _DTWAIN_ArrayDestroy(pArray);
+
+        public  int DTWAIN_ArrayDestroyAll()
+        => _DTWAIN_ArrayDestroyAll();
 
         public  int DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray)
         => _DTWAIN_ArrayDestroyFrames(FrameArray);

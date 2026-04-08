@@ -146,6 +146,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings(DTWAIN_CCHARPTRTYPE* pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings(LPCWSTR* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
+        DTWAIN_BOOL DTWAIN_ArrayDestroyAll();
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
         DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, DTWAIN_BOOL bAsUnsigned);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
@@ -1382,6 +1383,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings(DTWAIN_CCHARPTRTYPE* pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings(LPCWSTR* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
+        DTWAIN_BOOL DTWAIN_ArrayDestroyAll();
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
         DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, DTWAIN_BOOL bAsUnsigned);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
@@ -2618,6 +2620,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings(DTWAIN_CCHARPTRTYPE* pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings(LPCWSTR* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
+        DTWAIN_BOOL DTWAIN_ArrayDestroyAll();
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
         DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, DTWAIN_BOOL bAsUnsigned);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);
@@ -3854,6 +3857,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings(DTWAIN_CCHARPTRTYPE* pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings(LPCWSTR* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
+        DTWAIN_BOOL DTWAIN_ArrayDestroyAll();
         DTWAIN_BOOL DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
         DTWAIN_BOOL DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray, DTWAIN_BOOL bAsUnsigned);
         LONG DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, LPVOID pVariant);

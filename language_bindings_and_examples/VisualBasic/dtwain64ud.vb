@@ -1806,6 +1806,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_ArrayCreateFromStrings Lib "dtwain64ud.dll" (<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPTStr)> pCArray() As String, nSize As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayCreateFromWideStrings Lib "dtwain64ud.dll" (<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPWStr)> pCArray() As String, nSize As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayDestroy Lib "dtwain64ud.dll" (pArray As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_ArrayDestroyAll Lib "dtwain64ud.dll" () As Integer
     Public Declare Function DTWAIN_ArrayDestroyFrames Lib "dtwain64ud.dll" (FrameArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayDumpToLog Lib "dtwain64ud.dll" (pArray As System.IntPtr, bAsUnsigned As Integer) As Integer
     Public Declare Function DTWAIN_ArrayFind Lib "dtwain64ud.dll" (pArray As System.IntPtr, pVariant As System.IntPtr) As Integer

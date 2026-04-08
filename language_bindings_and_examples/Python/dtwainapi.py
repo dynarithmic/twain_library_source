@@ -1838,6 +1838,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayCreateFromStrings.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayCreateFromWideStrings.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayDestroy.restype = ct.c_long
+     theDLL.DTWAIN_ArrayDestroyAll.restype = ct.c_long
      theDLL.DTWAIN_ArrayDestroyFrames.restype = ct.c_long
      theDLL.DTWAIN_ArrayDumpToLog.restype = ct.c_long
      theDLL.DTWAIN_ArrayFind.restype = ct.c_long
@@ -4168,6 +4169,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayCreateFromStrings.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayCreateFromWideStrings.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayDestroy.restype = ct.c_long
+     theDLL.DTWAIN_ArrayDestroyAll.restype = ct.c_long
      theDLL.DTWAIN_ArrayDestroyFrames.restype = ct.c_long
      theDLL.DTWAIN_ArrayDumpToLog.restype = ct.c_long
      theDLL.DTWAIN_ArrayFind.restype = ct.c_long
