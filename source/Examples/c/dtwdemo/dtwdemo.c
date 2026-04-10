@@ -59,6 +59,8 @@ void LoadLanguage(int message);
 void LoadLanguageStrings(LPCTSTR szLang);
 void DisplayCustomLangDlg();
 void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable);
+void SetUpAcquire();
+
 INT_PTR DisplayGetFileNameDlg();
 
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
@@ -618,21 +620,30 @@ void SetCaptionToSourceName()
         SetWindowText(g_hWnd, szTitle);
 }
 
+void SetUpAcquire()
+{
+	LONG ErrStatus;
+	/* Disable main window */
+	DTWAIN_DisableAppWindow(g_hWnd, TRUE);
+
+	/* Check if feeder or duplex is supported */
+	if (DTWAIN_IsFeederSupported(g_CurrentSource) || DTWAIN_IsDuplexSupported(g_CurrentSource))
+		DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSettings, g_hWnd, (DLGPROC)DisplayAcquireSettingsProc);
+
+	/* Check if we want to discard blank pages */
+	/* Set the threshold to 98% blank */
+	DTWAIN_SetBlankPageDetection(g_CurrentSource, 98.0, DTWAIN_BP_AUTODISCARD_ANY,
+		GetToggleMenuState(IDM_DISCARD_BLANKS));
+
+	BOOL bRet = FALSE;
+	EnableSourceItems(FALSE);
+}
+
 void GenericAcquire(LONG nWhichOne)
 {
+    SetUpAcquire();
+
     LONG ErrStatus;
-    /* Disable main window */
-    DTWAIN_DisableAppWindow(g_hWnd, TRUE);
-
-    /* Check if feeder or duplex is supported */
-    if ( DTWAIN_IsFeederSupported(g_CurrentSource) || DTWAIN_IsDuplexSupported(g_CurrentSource))
-        DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSettings, g_hWnd, (DLGPROC)DisplayAcquireSettingsProc);
-
-    /* Check if we want to discard blank pages */
-    /* Set the threshold to 98% blank */
-    DTWAIN_SetBlankPageDetection(g_CurrentSource, 98.0, DTWAIN_BP_AUTODISCARD_ANY, 
-                                 GetToggleMenuState(IDM_DISCARD_BLANKS));
-
     BOOL bRet = FALSE;
     EnableSourceItems(FALSE);
     g_AcquireArray = DTWAIN_CreateAcquisitionArray();
@@ -748,12 +759,8 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
         }
     }
 
-    /* Disable main window */
-    /* Check if feeder or duplex is supported */
-    if ( DTWAIN_IsFeederSupported(g_CurrentSource) || DTWAIN_IsDuplexSupported(g_CurrentSource))
-        DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSettings, g_hWnd, (DLGPROC)DisplayAcquireSettingsProc);
-    EnableWindow(g_hWnd, FALSE);
-    
+    SetUpAcquire();
+
     /* Create the array of names.  This function is to be used
        since the user may have entered a file name that has
        embedded spaces */
