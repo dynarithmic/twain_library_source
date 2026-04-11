@@ -114,11 +114,12 @@ AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("engli
                                  {ID_LANGUAGE_DUTCH                 , _T("dutch")},
                                  {ID_LANGUAGE_RUSSIAN               , _T("russian")},
                                  {ID_LANGUAGE_ROMANIAN              , _T("romanian")},
-                                 {ID_LANGUAGE_PORTUGUESE              , _T("portuguese")},
+                                 {ID_LANGUAGE_PORTUGUESE            , _T("portuguese")},
                                  {ID_LANGUAGE_SIMPLIFIEDCHINESE     , _T("simplified_chinese")},
                                  {ID_LANGUAGE_TRADITIONALCHINESE    , _T("traditional_chinese")},
                                  {ID_LANGUAGE_JAPANESE              , _T("japanese")},
-                                 {ID_LANGUAGE_KOREAN                , _T("korean")}
+                                 {ID_LANGUAGE_KOREAN                , _T("korean")},
+                                 {ID_LANGUAGE_TURKISH               , _T("turkish")}
                                 };
 
 AllFileTypes g_allDTWAINFileTypes[] = {
@@ -445,7 +446,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case ID_LANGUAGE_ROMANIAN           : 
                 case ID_LANGUAGE_SIMPLIFIEDCHINESE  : 
                 case ID_LANGUAGE_PORTUGUESE:
-                    LoadLanguage(wmId);
+				case ID_LANGUAGE_TURKISH:
+					LoadLanguage(wmId);
                 break;
 
                 case ID_LANGUAGE_CUSTOMLANGUAGE:
@@ -622,7 +624,6 @@ void SetCaptionToSourceName()
 
 void SetUpAcquire()
 {
-	LONG ErrStatus;
 	/* Disable main window */
 	DTWAIN_DisableAppWindow(g_hWnd, TRUE);
 

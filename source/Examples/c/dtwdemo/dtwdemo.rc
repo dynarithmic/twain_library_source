@@ -120,6 +120,7 @@ BEGIN
         MENUITEM "English",                     ID_LANGUAGE_ENGLISH
         MENUITEM "French",                      ID_LANGUAGE_FRENCH
         MENUITEM "German",                      ID_LANGUAGE_GERMAN
+        MENUITEM "Spanish",                     ID_LANGUAGE_SPANISH
         MENUITEM "Greek",                       ID_LANGUAGE_GREEK
         MENUITEM "Italian",                     ID_LANGUAGE_ITALIAN
         MENUITEM "Japanese",                    ID_LANGUAGE_JAPANESE
@@ -127,9 +128,9 @@ BEGIN
         MENUITEM "Portuguese",                  ID_LANGUAGE_PORTUGUESE
         MENUITEM "Romanian",                    ID_LANGUAGE_ROMANIAN
         MENUITEM "Russian",                     ID_LANGUAGE_RUSSIAN
+        MENUITEM "Turkish",                     ID_LANGUAGE_TURKISH
         MENUITEM "Simplified Chinese",          ID_LANGUAGE_SIMPLIFIEDCHINESE
         MENUITEM "Traditional Chinese",         ID_LANGUAGE_TRADITIONALCHINESE
-        MENUITEM "Spanish",                     ID_LANGUAGE_SPANISH
         MENUITEM "Custom Language...",          ID_LANGUAGE_CUSTOMLANGUAGE
     END
     POPUP "&Help"
