@@ -41,7 +41,6 @@ DTWAIN Version changes
 
   where the return value is either TRUE (1) or FALSE (0).
 
-
 - Add DTWAIN_GetAllSourceInfo function that returns a small JSON object describing the
   DTWAIN_SOURCE.
 
@@ -65,6 +64,7 @@ DTWAIN Version changes
 
 - Fix issue with DTWAIN_ArrayAddFrameN not adding the DTWAIN_FRAME to the array.
 
+- Fix issue with the DTWDEMO program and file acquisitions if blank page detection is turned on.
 
 
 5.8.2
