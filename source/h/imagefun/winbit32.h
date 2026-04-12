@@ -356,6 +356,7 @@ namespace dynarithmic
             static bool    IsGrayScale(BYTE *pImage, int bpp);
             static bool    IsGrayScale(HANDLE hDib, int bpp);
             static bool    IsBlankDIB(HANDLE hDib, double threshold=0.99);
+            static bool    IsBlankDIBEx(HANDLE hDib, double threshold = 99.0);
 
             // Crop functions
             static HANDLE ResampleDIB(HANDLE hDib, long newx, long newy);
@@ -386,8 +387,6 @@ namespace dynarithmic
 
         protected:
             void SetError(LONG nError) { m_lasterror = nError; }
-            static bool IsBlankDIBHelper(HANDLE hDib, double threshold);
-
             virtual void DestroyAllObjects() { }
             static unsigned GetLine(BYTE *pDib, BYTE *pDest, int nWhichLine);
             // Lower level routines

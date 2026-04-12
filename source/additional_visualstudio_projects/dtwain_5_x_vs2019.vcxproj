@@ -1488,6 +1488,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\ctlupdatedibproc.cpp" />
     <ClCompile Include="cpp\ctlwindowproc.cpp" />
     <ClCompile Include="cpp\extendedimageinfo.cpp" />
+    <ClCompile Include="cpp\imagefun\ctldibblank.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
     <ClCompile Include="cpp\imagefun\txtfun32.cpp" />

@@ -824,7 +824,7 @@ bool CTL_TwainDib::IsBlankDIB(double threshold) const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if (hDib)
-        return CDibInterface::IsBlankDIB(hDib, threshold) ? true : false;
+        return CDibInterface::IsBlankDIBEx(hDib, threshold) ? true : false;
     return false;
 }
 

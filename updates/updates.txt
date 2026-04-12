@@ -2,6 +2,9 @@ DTWAIN Version changes
 
 5.8.3
 
+- Improve blank page handling when acquiring images.  See function DTWAIN_SetBlankPageDetection()
+  to turn on or off blank page detection.
+
 - Add dtwain.natvis Visual Studio debugger visualizer for DTWAIN_ARRAY and
   DTWAIN_SOURCE.  Without the visualizer, the DTWAIN_ARRAY and DTWAIN_SOURCE will
   show up as void pointers, without any further information.  The visualizer will
