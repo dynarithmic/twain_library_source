@@ -542,6 +542,7 @@ void SelectTheSource(int nWhich)
         {
             DTWAIN_CloseSource(g_CurrentSource);
             g_CurrentSource = NULL;
+            SetCaptionToSourceName();
             EnableSourceItems(FALSE);
         }
         else
