@@ -535,7 +535,7 @@ FloatRect CDibInterface::Normalize(fipImage& pImage, const FloatRect& ActualRect
 // Test for blank page here
 bool CDibInterface::IsBlankDIB(HANDLE hDib, double threshold)
 {
-    return IsBlankDIBEx(hDib, threshold / 100.0);
+    return IsBlankDIBEx(hDib, threshold / 100.0).m_bIsBlank;
 }
 
 LPSTR CDibInterface::GetMonoPalette(LPSTR palette)

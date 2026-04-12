@@ -820,12 +820,12 @@ int CTL_TwainDib::NormalizeDib()
     return 0;
 }
 
-bool CTL_TwainDib::IsBlankDIB(double threshold) const
+CDibInterface::BlankDIBInfo CTL_TwainDib::IsBlankDIB(double threshold) const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if (hDib)
-        return CDibInterface::IsBlankDIBEx(hDib, threshold) ? true : false;
-    return false;
+        return CDibInterface::IsBlankDIBEx(hDib, threshold);
+    return { false, {-1, -1 } };
 }
 
 HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)

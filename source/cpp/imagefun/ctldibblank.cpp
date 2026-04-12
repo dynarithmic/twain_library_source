@@ -65,30 +65,36 @@ namespace
 	}
 
 	bool IsSupportedHeader(const BITMAPINFOHEADER* bih)
-	{
-		if (!bih)
-			return false;
-		if (bih->biSize < sizeof(BITMAPINFOHEADER))
-			return false;
-		if (bih->biPlanes != 1)
-			return false;
-		if (bih->biWidth <= 0)
-			return false;
-		if (bih->biHeight == 0)
-			return false;
-		if (bih->biCompression != BI_RGB)
-			return false;
+    {
+        if (!bih)
+            return false;
+        if (bih->biSize < sizeof(BITMAPINFOHEADER))
+            return false;
+        if (bih->biPlanes != 1)
+            return false;
+        if (bih->biWidth <= 0)
+            return false;
+        if (bih->biHeight == 0)
+            return false;
 
-		switch (bih->biBitCount)
-		{
-			case 1:
-			case 8:
-			case 24:
-			case 32:
-				return true;
-			default:
-				return false;
-		}
+        switch (bih->biBitCount)
+        {
+            case 1:
+            case 4:
+            case 8:
+            case 16:
+            case 24:
+            case 32:
+                break;
+            default:
+                return false;
+        }
+
+        // Not handling BI_BITFIELDS here.
+        if (bih->biCompression != BI_RGB)
+            return false;
+
+        return true;
 	}
 
 	int GetAllPaletteEntries(const BITMAPINFOHEADER* bih)
@@ -200,6 +206,25 @@ namespace
 		return (lum1 >= lum0) ? 1 : 0;
 	}
 
+	BYTE Nibble4BPP(const BYTE* row, int x)
+	{
+		const BYTE byteVal = row[x / 2];
+		return (x % 2 == 0)
+			? static_cast<BYTE>((byteVal >> 4) & 0x0F)
+			: static_cast<BYTE>(byteVal & 0x0F);
+	}
+
+	void Decode16BPP_RGB555(std::uint16_t pix, BYTE& r, BYTE& g, BYTE& b)
+	{
+		const int rr = (pix >> 10) & 0x1F;
+		const int gg = (pix >> 5) & 0x1F;
+		const int bb = pix & 0x1F;
+
+		r = static_cast<BYTE>((rr << 3) | (rr >> 2));
+		g = static_cast<BYTE>((gg << 3) | (gg >> 2));
+		b = static_cast<BYTE>((bb << 3) | (bb >> 2));
+	}
+
 	struct BlankPageOptions
 	{
 		bool enableForegroundNoiseFilter = true;
@@ -302,6 +327,44 @@ namespace
 		return mask;
 	}
 
+	BinaryMask BuildForegroundMask4BPP(const DibContext& ctx)
+	{
+		std::array<std::uint64_t, 256> hist{};
+		hist.fill(0);
+
+		for (int y = ctx.top; y < ctx.bottom; ++y)
+		{
+			const BYTE* row = GetRowPointer(ctx, y);
+			for (int x = ctx.left; x < ctx.right; ++x)
+			{
+				const BYTE idx = Nibble4BPP(row, x);
+				const RGBQUAD& q = ctx.palette[idx];
+				const int gray = ComputeGray(q.rgbRed, q.rgbGreen, q.rgbBlue);
+				++hist[gray];
+			}
+		}
+
+		const int bgGray = FindDominantLightPeak(hist);
+		const int tol = 8;
+
+		BinaryMask mask(ctx.right - ctx.left, ctx.bottom - ctx.top);
+
+		for (int y = ctx.top; y < ctx.bottom; ++y)
+		{
+			const BYTE* row = GetRowPointer(ctx, y);
+			for (int x = ctx.left; x < ctx.right; ++x)
+			{
+				const BYTE idx = Nibble4BPP(row, x);
+				const RGBQUAD& q = ctx.palette[idx];
+				const int gray = ComputeGray(q.rgbRed, q.rgbGreen, q.rgbBlue);
+
+				const bool isBackground = (std::abs(gray - bgGray) <= tol);
+				mask.at(x - ctx.left, y - ctx.top) = isBackground ? 0 : 1;
+			}
+		}
+		return mask;
+	}
+
 	BinaryMask BuildForegroundMask8BPP(const DibContext& ctx)
 	{
 		std::array<std::uint64_t, 256> hist{};
@@ -334,6 +397,53 @@ namespace
 				const int gray = ComputeGray(q.rgbRed, q.rgbGreen, q.rgbBlue);
 
 				const bool isBackground = (std::abs(gray - bgGray) <= tol);
+				mask.at(x - ctx.left, y - ctx.top) = isBackground ? 0 : 1;
+			}
+		}
+
+		return mask;
+	}
+
+	BinaryMask BuildForegroundMask16BPP(const DibContext& ctx)
+	{
+		std::array<std::uint64_t, 256> hist{};
+		hist.fill(0);
+
+		for (int y = ctx.top; y < ctx.bottom; ++y)
+		{
+			const BYTE* row = GetRowPointer(ctx, y);
+			for (int x = ctx.left; x < ctx.right; ++x)
+			{
+				const auto* pPix = reinterpret_cast<const std::uint16_t*>(row + static_cast<std::ptrdiff_t>(x) * 2);
+				const std::uint16_t pix = *pPix;
+
+				BYTE r = 0, g = 0, b = 0;
+				Decode16BPP_RGB555(pix, r, g, b);
+
+				const int gray = ComputeGray(r, g, b);
+				++hist[gray];
+			}
+		}
+
+		const int bgGray = FindDominantLightPeak(hist);
+		const int tol = 12;
+
+		BinaryMask mask(ctx.right - ctx.left, ctx.bottom - ctx.top);
+
+		for (int y = ctx.top; y < ctx.bottom; ++y)
+		{
+			const BYTE* row = GetRowPointer(ctx, y);
+			for (int x = ctx.left; x < ctx.right; ++x)
+			{
+				const auto* pPix = reinterpret_cast<const std::uint16_t*>(row + static_cast<std::ptrdiff_t>(x) * 2);
+				const std::uint16_t pix = *pPix;
+
+				BYTE r = 0, g = 0, b = 0;
+				Decode16BPP_RGB555(pix, r, g, b);
+
+				const int gray = ComputeGray(r, g, b);
+				const bool isBackground = (std::abs(gray - bgGray) <= tol);
+
 				mask.at(x - ctx.left, y - ctx.top) = isBackground ? 0 : 1;
 			}
 		}
@@ -378,11 +488,11 @@ namespace
 		return mask;
 	}
 
-	bool IsDibBlankImpl(const BITMAPINFOHEADER* bih, double threshold)
+	CDibInterface::BlankDIBInfo IsDibBlankImpl(const BITMAPINFOHEADER* bih, double threshold)
 	{
 		DibContext ctx;
 		if (!MakeDibContext(bih, ctx))
-			return false;
+			return { false, {-1, -1 } };
 
 		BlankPageOptions opts;
 
@@ -393,8 +503,16 @@ namespace
 				mask = BuildForegroundMask1BPP(ctx);
 				break;
 
+			case 4:
+				mask = BuildForegroundMask4BPP(ctx);
+				break;
+
 			case 8:
 				mask = BuildForegroundMask8BPP(ctx);
+				break;
+
+			case 16:
+				mask = BuildForegroundMask16BPP(ctx);
 				break;
 
 			case 24:
@@ -403,7 +521,7 @@ namespace
 				break;
 
 			default:
-				return false;
+				return { false, {-1, -1} };
 		}
 
 		if (opts.enableForegroundNoiseFilter)
@@ -414,25 +532,25 @@ namespace
 		}
 
 		const double blankPercent = ComputeBlankPercentFromMask(mask);
-		return blankPercent >= threshold;
+		return { blankPercent >= threshold, {blankPercent, threshold } };
 	}
 }
 
 
-bool CDibInterface::IsBlankDIBEx(HANDLE hDib, double threshold)
+CDibInterface::BlankDIBInfo CDibInterface::IsBlankDIBEx(HANDLE hDib, double threshold)
 {
 	if (!hDib)
-		return false;
+		return { false, {-1, -1} };
 
 	if (threshold < 0.0 || threshold > 100.0)
-		return false;
+		return { false, {-1, -1} };
 
 	const auto* pBI = static_cast<const BITMAPINFOHEADER*>(::GlobalLock(hDib));
 	if (!pBI)
-		return false;
+		return { false, {-1, -1} };
 
 	DTWAINGlobalHandle_RAII handler(hDib);
-	const bool result = IsDibBlankImpl(pBI, threshold);
+	auto result = IsDibBlankImpl(pBI, threshold);
 
 	return result;
 }

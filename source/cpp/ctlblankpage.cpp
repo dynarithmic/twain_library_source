@@ -108,7 +108,7 @@ LONG DLLENTRY_DEF DTWAIN_IsDIBBlankString(HANDLE hDib, LPCTSTR threshold)
 LONG DLLENTRY_DEF DTWAIN_IsDIBBlank(HANDLE hDib, DTWAIN_FLOAT threshold)
 {
     LOG_FUNC_ENTRY_PARAMS((hDib, threshold))
-	const LONG retval = CDibInterface::IsBlankDIBEx(hDib, threshold) ? 1 : 0;
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+    auto retval = CDibInterface::IsBlankDIBEx(hDib, threshold);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retval.m_bIsBlank)
     CATCH_BLOCK(0)
 }

@@ -562,7 +562,7 @@ namespace dynarithmic
             int         GetBitsPerPixel() const;
             boost::optional<DWORD> GetBitsOffset() const;
             bool        IsGrayScale() const;
-            bool        IsBlankDIB(double threshold) const;
+            CDibInterface::BlankDIBInfo IsBlankDIB(double threshold) const;
             void        Delete();
             bool        FlipBitMap(bool bRGB=false);
 

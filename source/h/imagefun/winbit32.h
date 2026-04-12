@@ -352,11 +352,17 @@ namespace dynarithmic
 
             static LPSTR GetMonoPalette(LPSTR palette);
 
+            struct BlankDIBInfo
+            {
+                bool m_bIsBlank = false;
+                std::pair<double, double> PercentBlankAndThreshold = {};
+            };
+
             LONG    GetLastError() { return m_lasterror; }
             static bool    IsGrayScale(BYTE *pImage, int bpp);
             static bool    IsGrayScale(HANDLE hDib, int bpp);
             static bool    IsBlankDIB(HANDLE hDib, double threshold=0.99);
-            static bool    IsBlankDIBEx(HANDLE hDib, double threshold = 99.0);
+            static BlankDIBInfo IsBlankDIBEx(HANDLE hDib, double threshold = 99.0);
 
             // Crop functions
             static HANDLE ResampleDIB(HANDLE hDib, long newx, long newy);

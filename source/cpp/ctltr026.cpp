@@ -211,7 +211,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     {
                         CTL_TwainDib theDib;
                         theDib.SetHandle(m_hDataHandle);
-                        bEndOfJobDetected = theDib.IsBlankDIB(pSource->GetBlankPageThreshold());
+                        bEndOfJobDetected = theDib.IsBlankDIB(pSource->GetBlankPageThreshold()).m_bIsBlank;
                     }
                     bSuccess = true;
                 }
@@ -1330,7 +1330,8 @@ int CTL_ImageXferTriplet::ProcessBlankPage(CTL_ITwainSession *pSession,
 {
     if (GetDAT() == DAT_AUDIONATIVEXFER)
         return 1;
-    const bool bIsBlankPage = IsPageBlank(pSession, pSource, resampled, CurDib)?true:false;
+    auto retval = IsPageBlank(pSession, pSource, resampled, CurDib);
+    bool bIsBlankPage = retval.m_bIsBlank;
     if (bIsBlankPage)
     {
         LONG bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, static_cast<WPARAM>(message_to_send1), reinterpret_cast<LPARAM>(pSource));
@@ -1342,6 +1343,20 @@ int CTL_ImageXferTriplet::ProcessBlankPage(CTL_ITwainSession *pSession,
         }
         if ( !bKeepPage )
         {
+			auto logFlags = CTL_StaticData::GetLogFilterFlags();
+			if (logFlags)
+			{
+				std::string sPercentages = "Blank page processing returning ";
+				if (retval.m_bIsBlank)
+					sPercentages += "true ";
+				else
+					sPercentages += "false ";
+				sPercentages += "with the following computed percentages (blank, threshold): ";
+				sPercentages += "(" + std::to_string(retval.PercentBlankAndThreshold.first) + ", " +
+					std::to_string(retval.PercentBlankAndThreshold.second) + ")";
+				LogWriterUtils::WriteLogInfoIndentedA(sPercentages);
+			}
+
             // remove dib from array and delete the memory for the DIB
             CurDib->SetAutoDelete(true);
             pSource->GetDibArray()->RemoveDib(m_hDataHandle);
@@ -1353,18 +1368,18 @@ int CTL_ImageXferTriplet::ProcessBlankPage(CTL_ITwainSession *pSession,
 }
 
 
-bool CTL_ImageXferTriplet::IsPageBlank(CTL_ITwainSession*,
+CDibInterface::BlankDIBInfo CTL_ImageXferTriplet::IsPageBlank(CTL_ITwainSession*,
                                        const CTL_ITwainSource* pSource,
                                        bool resampled,
                                        const CTL_TwainDibPtr& CurDib)
 {
-    if ( pSource->IsBlankPageDetectionOn() )
+    if (pSource->IsBlankPageDetectionOn())
     {
-        if ( resampled && pSource->IsBlankPageDetectionSampleOn() ||
+        if (resampled && pSource->IsBlankPageDetectionSampleOn() ||
             !resampled && pSource->IsBlankPageDetectionNoSampleOn())
             return CurDib->IsBlankDIB(pSource->GetBlankPageThreshold());
     }
-    return false;
+    return { false, {-1, -1} };
 }
 
 CTL_TwainFileFormatEnum CTL_ImageXferTriplet::GetFileTypeFromCompression(int nCompression)
