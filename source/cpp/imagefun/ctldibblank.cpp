@@ -50,6 +50,25 @@ namespace
 		int top = 0;
 		int right = 0;
 		int bottom = 0;
+
+		// 16-bpp direct-color decoding
+		bool useBitfields16 = false;
+		DWORD redMask = 0;
+		DWORD greenMask = 0;
+		DWORD blueMask = 0;
+	};
+
+	struct BlankPageOptions
+	{
+		bool enableForegroundNoiseFilter = true;
+		int minForegroundNeighbors = 2; // 0..8, good starting range: 1..3
+	};
+
+	struct ChannelMaskInfo
+	{
+		DWORD mask = 0;
+		int shift = 0;
+		int bits = 0;
 	};
 
 	int ComputeGray(BYTE r, BYTE g, BYTE b)
@@ -90,9 +109,16 @@ namespace
                 return false;
         }
 
-        // Not handling BI_BITFIELDS here.
-        if (bih->biCompression != BI_RGB)
-            return false;
+        switch (bih->biCompression)
+        {
+            case BI_RGB:
+                return true;
+            case BI_BITFIELDS:
+                // only meaningful for direct-color images
+                return (bih->biBitCount == 16 || bih->biBitCount == 32);
+            default:
+                return false;
+        }
 
         return true;
 	}
@@ -125,6 +151,12 @@ namespace
 		return p;
 	}
 
+	const DWORD* GetBitfieldsPtr(const BITMAPINFOHEADER* bih)
+	{
+		return reinterpret_cast<const DWORD*>(
+			reinterpret_cast<const BYTE*>(bih) + bih->biSize);
+	}
+
 	bool MakeDibContext(const BITMAPINFOHEADER* bih, DibContext& ctx)
 	{
 		if (!IsSupportedHeader(bih))
@@ -139,6 +171,15 @@ namespace
 		ctx.bytesPerPixel = (ctx.bpp >= 8) ? (ctx.bpp / 8) : 0;
 		ctx.palette = GetPalettePtr(bih);
 		ctx.bits = GetBitsPtr(bih);
+
+		if (ctx.bpp == 16 && bih->biCompression == BI_BITFIELDS)
+		{
+			const DWORD* masks = GetBitfieldsPtr(bih);
+			ctx.useBitfields16 = true;
+			ctx.redMask = masks[0];
+			ctx.greenMask = masks[1];
+			ctx.blueMask = masks[2];
+		}
 
 		const int borderX = std::max(2, ctx.width / 100);
 		const int borderY = std::max(2, ctx.height / 100);
@@ -166,6 +207,46 @@ namespace
 
 		const int physicalRow = ctx.height - 1 - y;
 		return ctx.bits + static_cast<std::ptrdiff_t>(physicalRow) * ctx.stride;
+	}
+
+	bool MakeChannelMaskInfo(DWORD mask, ChannelMaskInfo& out)
+	{
+		out = {};
+
+		if (mask == 0)
+			return false;
+
+		int shift = 0;
+		while (((mask >> shift) & 1u) == 0u && shift < 32)
+			++shift;
+
+		int bits = 0;
+		while (((mask >> (shift + bits)) & 1u) != 0u && (shift + bits) < 32)
+			++bits;
+
+		if (bits <= 0)
+			return false;
+
+		out.mask = mask;
+		out.shift = shift;
+		out.bits = bits;
+		return true;
+	}
+
+	BYTE ExpandMaskedChannelTo8Bit(std::uint32_t pixel, const ChannelMaskInfo& info)
+	{
+		if (info.mask == 0 || info.bits == 0)
+			return 0;
+
+		const std::uint32_t raw = (pixel & info.mask) >> info.shift;
+		const std::uint32_t maxVal = (1u << info.bits) - 1u;
+
+		if (maxVal == 0)
+			return 0;
+
+		// scale to [0,255]
+		const std::uint32_t scaled = (raw * 255u + (maxVal / 2u)) / maxVal;
+		return static_cast<BYTE>(scaled);
 	}
 
 	int FindDominantLightPeak(const std::array<std::uint64_t, 256>& hist)
@@ -225,11 +306,27 @@ namespace
 		b = static_cast<BYTE>((bb << 3) | (bb >> 2));
 	}
 
-	struct BlankPageOptions
+	void Decode16BPP_Pixel(const DibContext& ctx, std::uint16_t pix, BYTE& r, BYTE& g, BYTE& b)
 	{
-		bool enableForegroundNoiseFilter = true;
-		int minForegroundNeighbors = 2; // 0..8, good starting range: 1..3
-	};
+		if (!ctx.useBitfields16)
+		{
+			Decode16BPP_RGB555(pix, r, g, b);
+			return;
+		}
+
+		ChannelMaskInfo rInfo{}, gInfo{}, bInfo{};
+		if (!MakeChannelMaskInfo(ctx.redMask, rInfo) ||
+			!MakeChannelMaskInfo(ctx.greenMask, gInfo) ||
+			!MakeChannelMaskInfo(ctx.blueMask, bInfo))
+		{
+			Decode16BPP_RGB555(pix, r, g, b);
+			return;
+		}
+
+		r = ExpandMaskedChannelTo8Bit(pix, rInfo);
+		g = ExpandMaskedChannelTo8Bit(pix, gInfo);
+		b = ExpandMaskedChannelTo8Bit(pix, bInfo);
+	}
 
 	struct BinaryMask
 	{
@@ -414,11 +511,11 @@ namespace
 			const BYTE* row = GetRowPointer(ctx, y);
 			for (int x = ctx.left; x < ctx.right; ++x)
 			{
-				const auto* pPix = reinterpret_cast<const std::uint16_t*>(row + static_cast<std::ptrdiff_t>(x) * 2);
-				const std::uint16_t pix = *pPix;
+				const auto* pPix = reinterpret_cast<const std::uint16_t*>(
+					row + static_cast<std::ptrdiff_t>(x) * 2);
 
 				BYTE r = 0, g = 0, b = 0;
-				Decode16BPP_RGB555(pix, r, g, b);
+				Decode16BPP_Pixel(ctx, *pPix, r, g, b);
 
 				const int gray = ComputeGray(r, g, b);
 				++hist[gray];
@@ -435,19 +532,17 @@ namespace
 			const BYTE* row = GetRowPointer(ctx, y);
 			for (int x = ctx.left; x < ctx.right; ++x)
 			{
-				const auto* pPix = reinterpret_cast<const std::uint16_t*>(row + static_cast<std::ptrdiff_t>(x) * 2);
-				const std::uint16_t pix = *pPix;
+				const auto* pPix = reinterpret_cast<const std::uint16_t*>(
+					row + static_cast<std::ptrdiff_t>(x) * 2);
 
 				BYTE r = 0, g = 0, b = 0;
-				Decode16BPP_RGB555(pix, r, g, b);
+				Decode16BPP_Pixel(ctx, *pPix, r, g, b);
 
 				const int gray = ComputeGray(r, g, b);
 				const bool isBackground = (std::abs(gray - bgGray) <= tol);
-
 				mask.at(x - ctx.left, y - ctx.top) = isBackground ? 0 : 1;
 			}
 		}
-
 		return mask;
 	}
 
