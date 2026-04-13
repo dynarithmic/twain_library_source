@@ -60,6 +60,7 @@ void LoadLanguageStrings(LPCTSTR szLang);
 void DisplayCustomLangDlg();
 void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable);
 void SetUpAcquire();
+void DisplayBlankThresholdOptions();
 
 INT_PTR DisplayGetFileNameDlg();
 
@@ -80,6 +81,7 @@ LRESULT CALLBACK DisplayCustomSelectProc(HWND hDlg, UINT message, WPARAM wParam,
 LRESULT CALLBACK DisplayBarCodeInfoProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayAcquireSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayLoggingProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK DisplayBlankThresholdProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK EnterFileNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR DisplayOneDibPage(HINSTANCE hInstance, HANDLE hDib, UINT resID, HWND wndHandle);
@@ -206,6 +208,7 @@ UINT g_AllMenuItems[] = { IDM_SELECT_SOURCE,
 TCHAR g_CustomLanguage[256];
 
 DTWAIN_PDFTEXTELEMENT g_PDFTextElement;
+int g_BlankThresholdPct = 98;
 
 #include "DebugUtils.h"
 
@@ -418,6 +421,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 case IDM_DISCARD_BLANKS:
                     ToggleCheckedItem(IDM_DISCARD_BLANKS);
+                    if (GetToggleMenuState(IDM_DISCARD_BLANKS))
+                    {
+                        DisplayBlankThresholdOptions();
+                    }
                 break;
 
                 case IDM_SHOW_PREVIEW:
@@ -633,9 +640,8 @@ void SetUpAcquire()
 		DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSettings, g_hWnd, (DLGPROC)DisplayAcquireSettingsProc);
 
 	/* Check if we want to discard blank pages */
-	/* Set the threshold to 98% blank */
-	DTWAIN_SetBlankPageDetection(g_CurrentSource, 98.0, DTWAIN_BP_AUTODISCARD_ANY,
-		GetToggleMenuState(IDM_DISCARD_BLANKS));
+    DTWAIN_SetBlankPageDetection(g_CurrentSource, (double)g_BlankThresholdPct, DTWAIN_BP_AUTODISCARD_ANY,
+	                             GetToggleMenuState(IDM_DISCARD_BLANKS));
 
 	BOOL bRet = FALSE;
 	EnableSourceItems(FALSE);
@@ -845,6 +851,12 @@ void DisplaySourceProps()
     DialogBox(g_hInstance, (LPCTSTR)IDD_dlgProperties, g_hWnd, (DLGPROC)DisplaySourcePropsProc);
 }
 
+
+void DisplayBlankThresholdOptions()
+{
+    DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterBlankThreshold, g_hWnd, (DLGPROC)DisplayBlankThresholdProc);
+}
+
 void DisplayLoggingOptions()
 {
     LONG LogFlags = DTWAIN_LOG_ALL &~ (DTWAIN_LOG_ISTWAINMSG | DTWAIN_LOG_USEFILE | DTWAIN_LOG_DEBUGMONITOR | DTWAIN_LOG_CONSOLE);
@@ -1024,6 +1036,52 @@ LRESULT CALLBACK EnterFileNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARA
             }
         }
         break;
+    }
+    return FALSE;
+}
+
+
+LRESULT CALLBACK DisplayBlankThresholdProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+        case WM_INITDIALOG:
+        {
+            char szBuf[10];
+            HWND hWndPct = GetDlgItem(hDlg, IDC_edBlankThresholdPct);
+            sprintf(szBuf, "%d", g_BlankThresholdPct);
+            SetWindowTextA(hWndPct, szBuf);
+            return TRUE;
+        }
+
+        case WM_COMMAND:
+        {
+            int nControl = LOWORD(wParam);
+            int nNotification = HIWORD(wParam);
+			HWND hWndPct = GetDlgItem(hDlg, IDC_edBlankThresholdPct);
+            switch( nControl )
+            {
+                case IDOK:
+                {
+					char szBuf[10];
+                    int nThreshold = 0;
+                    GetWindowTextA(hWndPct, szBuf, 10);
+                    nThreshold = atoi(szBuf);
+                    if (nThreshold > 100)
+                        nThreshold = 100;
+                    g_BlankThresholdPct = nThreshold;
+                    EndDialog(hDlg, LOWORD(wParam));
+                }
+                break;
+                
+                case IDCANCEL:
+                    EndDialog(hDlg, LOWORD(wParam));
+                    return TRUE;
+                    break;
+            }
+        }
+        break;
+
     }
     return FALSE;
 }

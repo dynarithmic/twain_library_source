@@ -163,6 +163,9 @@
 #define IDC_chkResetCapsOnClose             8023
 #define IDC_edSaveFileName                  8024
 
+#define IDD_dlgEnterBlankThreshold     9000
+#define IDC_edBlankThresholdPct        9001
+
 #define ID_LANGUAGE_ENGLISH             32771
 #define ID_LANGUAGE_FRENCH              32772
 #define ID_LANGUAGE_SPANISH             32773
