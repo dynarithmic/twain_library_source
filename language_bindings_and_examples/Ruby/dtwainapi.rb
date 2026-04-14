@@ -684,6 +684,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetManualDuplexCount
    attr_reader :DTWAIN_GetMaxAcquisitions
    attr_reader :DTWAIN_GetMaxBuffers
+   attr_reader :DTWAIN_GetMaxBuffersEx
    attr_reader :DTWAIN_GetMaxPagesToAcquire
    attr_reader :DTWAIN_GetMaxRetryAttempts
    attr_reader :DTWAIN_GetNameFromCap
@@ -3556,6 +3557,7 @@ class DTWAINAPI
        @DTWAIN_GetManualDuplexCount = Fiddle::Function::new(dtwain_dll['DTWAIN_GetManualDuplexCount'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetMaxAcquisitions = Fiddle::Function::new(dtwain_dll['DTWAIN_GetMaxAcquisitions'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetMaxBuffers = Fiddle::Function::new(dtwain_dll['DTWAIN_GetMaxBuffers'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_GetMaxBuffersEx = Fiddle::Function::new(dtwain_dll['DTWAIN_GetMaxBuffersEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_UINT)
        @DTWAIN_GetMaxPagesToAcquire = Fiddle::Function::new(dtwain_dll['DTWAIN_GetMaxPagesToAcquire'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetMaxRetryAttempts = Fiddle::Function::new(dtwain_dll['DTWAIN_GetMaxRetryAttempts'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetNameFromCap = Fiddle::Function::new(dtwain_dll['DTWAIN_GetNameFromCap'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)

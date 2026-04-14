@@ -2223,6 +2223,7 @@ my $DTWAIN_GetLoggerCallbackW = new Win32::API($dtwain_dllName, 'DTWAIN_GetLogge
 my $DTWAIN_GetManualDuplexCount = new Win32::API($dtwain_dllName, 'DTWAIN_GetManualDuplexCount', 'PPP', 'I');
 my $DTWAIN_GetMaxAcquisitions = new Win32::API($dtwain_dllName, 'DTWAIN_GetMaxAcquisitions', 'P', 'i');
 my $DTWAIN_GetMaxBuffers = new Win32::API($dtwain_dllName, 'DTWAIN_GetMaxBuffers', 'PP', 'I');
+my $DTWAIN_GetMaxBuffersEx = new Win32::API($dtwain_dllName, 'DTWAIN_GetMaxBuffersEx', 'P', 'I');
 my $DTWAIN_GetMaxPagesToAcquire = new Win32::API($dtwain_dllName, 'DTWAIN_GetMaxPagesToAcquire', 'P', 'i');
 my $DTWAIN_GetMaxRetryAttempts = new Win32::API($dtwain_dllName, 'DTWAIN_GetMaxRetryAttempts', 'P', 'i');
 my $DTWAIN_GetNameFromCap = new Win32::API($dtwain_dllName, 'DTWAIN_GetNameFromCap', 'iPi', 'i');

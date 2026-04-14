@@ -2187,6 +2187,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetManualDuplexCount Lib "dtwain32.dll" (Source As System.IntPtr, ByRef pSide1 As Integer, ByRef pSide2 As Integer) As Integer
     Public Declare Function DTWAIN_GetMaxAcquisitions Lib "dtwain32.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetMaxBuffers Lib "dtwain32.dll" (Source As System.IntPtr, ByRef pMaxBuf As UInteger) As Integer
+    Public Declare Function DTWAIN_GetMaxBuffersEx Lib "dtwain32.dll" (Source As System.IntPtr) As UInteger
     Public Declare Function DTWAIN_GetMaxPagesToAcquire Lib "dtwain32.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetMaxRetryAttempts Lib "dtwain32.dll" (Source As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_GetNameFromCap Lib "dtwain32.dll" (nCapValue As Integer, <MarshalAs(UnmanagedType.LPStr)> szValue As StringBuilder, nMaxLen As Integer) As Integer

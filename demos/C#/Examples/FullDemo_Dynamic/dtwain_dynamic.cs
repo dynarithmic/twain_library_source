@@ -2375,6 +2375,7 @@
         public delegate int DTWAIN_GetManualDuplexCountDelegate(DTWAIN_SOURCE Source, ref int pSide1, ref int pSide2);
         public delegate int DTWAIN_GetMaxAcquisitionsDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetMaxBuffersDelegate(DTWAIN_SOURCE Source, ref DWORD pMaxBuf);
+        public delegate uint DTWAIN_GetMaxBuffersExDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetMaxPagesToAcquireDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetMaxRetryAttemptsDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetNameFromCapDelegate(int nCapValue, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szValue, int nMaxLen);
@@ -4249,6 +4250,9 @@
 
         [DTWAINNativeFunction("DTWAIN_GetMaxBuffers")]
         private readonly DTWAIN_GetMaxBuffersDelegate  _DTWAIN_GetMaxBuffers;
+
+        [DTWAINNativeFunction("DTWAIN_GetMaxBuffersEx")]
+        private readonly DTWAIN_GetMaxBuffersExDelegate  _DTWAIN_GetMaxBuffersEx;
 
         [DTWAINNativeFunction("DTWAIN_GetMaxPagesToAcquire")]
         private readonly DTWAIN_GetMaxPagesToAcquireDelegate  _DTWAIN_GetMaxPagesToAcquire;
@@ -7047,6 +7051,9 @@
 
         public  int DTWAIN_GetMaxBuffers(DTWAIN_SOURCE Source, ref DWORD pMaxBuf)
         => _DTWAIN_GetMaxBuffers(Source, ref pMaxBuf);
+
+        public  uint DTWAIN_GetMaxBuffersEx(DTWAIN_SOURCE Source)
+        => _DTWAIN_GetMaxBuffersEx(Source);
 
         public  int DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source)
         => _DTWAIN_GetMaxPagesToAcquire(Source);

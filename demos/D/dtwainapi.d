@@ -2463,6 +2463,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPLONG) DTWAIN_GetManualDuplexCount;
     extern(Windows) LONG function(DTWAIN_SOURCE) DTWAIN_GetMaxAcquisitions;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDWORD) DTWAIN_GetMaxBuffers;
+    extern(Windows) DWORD function(DTWAIN_SOURCE) DTWAIN_GetMaxBuffersEx;
     extern(Windows) LONG function(DTWAIN_SOURCE) DTWAIN_GetMaxPagesToAcquire;
     extern(Windows) LONG function(DTWAIN_SOURCE) DTWAIN_GetMaxRetryAttempts;
     extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetNameFromCap;
@@ -3641,6 +3642,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetManualDuplexCount, "DTWAIN_GetManualDuplexCount");
         bindFunction(cast(void**)&DTWAIN_GetMaxAcquisitions, "DTWAIN_GetMaxAcquisitions");
         bindFunction(cast(void**)&DTWAIN_GetMaxBuffers, "DTWAIN_GetMaxBuffers");
+        bindFunction(cast(void**)&DTWAIN_GetMaxBuffersEx, "DTWAIN_GetMaxBuffersEx");
         bindFunction(cast(void**)&DTWAIN_GetMaxPagesToAcquire, "DTWAIN_GetMaxPagesToAcquire");
         bindFunction(cast(void**)&DTWAIN_GetMaxRetryAttempts, "DTWAIN_GetMaxRetryAttempts");
         bindFunction(cast(void**)&DTWAIN_GetNameFromCap, "DTWAIN_GetNameFromCap");

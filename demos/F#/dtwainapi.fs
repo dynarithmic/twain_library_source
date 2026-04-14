@@ -3165,6 +3165,9 @@ module TwainAPI =
     type DTWAIN_GetMaxBuffersDelegate = delegate of DTWAIN_SOURCE * DWORD byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetMaxBuffersExDelegate = delegate of DTWAIN_SOURCE -> DWORD
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetMaxPagesToAcquireDelegate = delegate of DTWAIN_SOURCE -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4866,6 +4869,7 @@ module TwainAPI =
     let private GetManualDuplexCount = lazy (DynamicDll.Bind "DTWAIN_GetManualDuplexCount" : DTWAIN_GetManualDuplexCountDelegate)
     let private GetMaxAcquisitions = lazy (DynamicDll.Bind "DTWAIN_GetMaxAcquisitions" : DTWAIN_GetMaxAcquisitionsDelegate)
     let private GetMaxBuffers = lazy (DynamicDll.Bind "DTWAIN_GetMaxBuffers" : DTWAIN_GetMaxBuffersDelegate)
+    let private GetMaxBuffersEx = lazy (DynamicDll.Bind "DTWAIN_GetMaxBuffersEx" : DTWAIN_GetMaxBuffersExDelegate)
     let private GetMaxPagesToAcquire = lazy (DynamicDll.Bind "DTWAIN_GetMaxPagesToAcquire" : DTWAIN_GetMaxPagesToAcquireDelegate)
     let private GetMaxRetryAttempts = lazy (DynamicDll.Bind "DTWAIN_GetMaxRetryAttempts" : DTWAIN_GetMaxRetryAttemptsDelegate)
     let private GetNameFromCap = lazy (DynamicDll.Bind "DTWAIN_GetNameFromCap" : DTWAIN_GetNameFromCapDelegate)
@@ -7044,6 +7048,10 @@ module TwainAPI =
     let DTWAIN_GetMaxBuffers (source: DTWAIN_SOURCE) (pmaxbuf: DWORD byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetMaxBuffers.Value.Invoke(source, &pmaxbuf)
+
+    let DTWAIN_GetMaxBuffersEx (source: DTWAIN_SOURCE) : DWORD =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetMaxBuffersEx.Value.Invoke(source)
 
     let DTWAIN_GetMaxPagesToAcquire (source: DTWAIN_SOURCE) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

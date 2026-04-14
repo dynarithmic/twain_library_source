@@ -625,6 +625,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetManualDuplexCount(DTWAIN_SOURCE Source, LPLONG pSide1, LPLONG pSide2);
         LONG DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetMaxBuffers(DTWAIN_SOURCE Source, LPDWORD pMaxBuf);
+        DWORD DTWAIN_GetMaxBuffersEx(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetMaxRetryAttempts(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetNameFromCap(LONG nCapValue, DTWAIN_CHARPTRTYPE szValue, LONG nMaxLen);
@@ -1862,6 +1863,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetManualDuplexCount(DTWAIN_SOURCE Source, LPLONG pSide1, LPLONG pSide2);
         LONG DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetMaxBuffers(DTWAIN_SOURCE Source, LPDWORD pMaxBuf);
+        DWORD DTWAIN_GetMaxBuffersEx(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetMaxRetryAttempts(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetNameFromCap(LONG nCapValue, DTWAIN_CHARPTRTYPE szValue, LONG nMaxLen);
@@ -3099,6 +3101,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetManualDuplexCount(DTWAIN_SOURCE Source, LPLONG pSide1, LPLONG pSide2);
         LONG DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetMaxBuffers(DTWAIN_SOURCE Source, LPDWORD pMaxBuf);
+        DWORD DTWAIN_GetMaxBuffersEx(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetMaxRetryAttempts(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetNameFromCap(LONG nCapValue, DTWAIN_CHARPTRTYPE szValue, LONG nMaxLen);
@@ -4336,6 +4339,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetManualDuplexCount(DTWAIN_SOURCE Source, LPLONG pSide1, LPLONG pSide2);
         LONG DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetMaxBuffers(DTWAIN_SOURCE Source, LPDWORD pMaxBuf);
+        DWORD DTWAIN_GetMaxBuffersEx(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetMaxRetryAttempts(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetNameFromCap(LONG nCapValue, DTWAIN_CHARPTRTYPE szValue, LONG nMaxLen);

@@ -596,6 +596,7 @@ type DtwaingetloggercallbackwFunc = unsafe extern "C" fn() -> DTWAIN_LOGGER_PROC
 type DtwaingetmanualduplexcountFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
 type DtwaingetmaxacquisitionsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingetmaxbuffersFunc = unsafe extern "C" fn(*mut c_void,*mut u32) -> i32;
+type DtwaingetmaxbuffersexFunc = unsafe extern "C" fn(*mut c_void) -> u32;
 type DtwaingetmaxpagestoacquireFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingetmaxretryattemptsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingetnamefromcapFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
@@ -1778,6 +1779,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetManualDuplexCountFunc: Symbol<'a, DtwaingetmanualduplexcountFunc>,
     DTWAIN_GetMaxAcquisitionsFunc: Symbol<'a, DtwaingetmaxacquisitionsFunc>,
     DTWAIN_GetMaxBuffersFunc: Symbol<'a, DtwaingetmaxbuffersFunc>,
+    DTWAIN_GetMaxBuffersExFunc: Symbol<'a, DtwaingetmaxbuffersexFunc>,
     DTWAIN_GetMaxPagesToAcquireFunc: Symbol<'a, DtwaingetmaxpagestoacquireFunc>,
     DTWAIN_GetMaxRetryAttemptsFunc: Symbol<'a, DtwaingetmaxretryattemptsFunc>,
     DTWAIN_GetNameFromCapFunc: Symbol<'a, DtwaingetnamefromcapFunc>,
@@ -4614,6 +4616,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetManualDuplexCount: Symbol<DtwaingetmanualduplexcountFunc> = unsafe { library.get(b"DTWAIN_GetManualDuplexCount")? };
         let DTWAIN_GetMaxAcquisitions: Symbol<DtwaingetmaxacquisitionsFunc> = unsafe { library.get(b"DTWAIN_GetMaxAcquisitions")? };
         let DTWAIN_GetMaxBuffers: Symbol<DtwaingetmaxbuffersFunc> = unsafe { library.get(b"DTWAIN_GetMaxBuffers")? };
+        let DTWAIN_GetMaxBuffersEx: Symbol<DtwaingetmaxbuffersexFunc> = unsafe { library.get(b"DTWAIN_GetMaxBuffersEx")? };
         let DTWAIN_GetMaxPagesToAcquire: Symbol<DtwaingetmaxpagestoacquireFunc> = unsafe { library.get(b"DTWAIN_GetMaxPagesToAcquire")? };
         let DTWAIN_GetMaxRetryAttempts: Symbol<DtwaingetmaxretryattemptsFunc> = unsafe { library.get(b"DTWAIN_GetMaxRetryAttempts")? };
         let DTWAIN_GetNameFromCap: Symbol<DtwaingetnamefromcapFunc> = unsafe { library.get(b"DTWAIN_GetNameFromCap")? };
@@ -5795,6 +5798,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetManualDuplexCountFunc: DTWAIN_GetManualDuplexCount,
             DTWAIN_GetMaxAcquisitionsFunc: DTWAIN_GetMaxAcquisitions,
             DTWAIN_GetMaxBuffersFunc: DTWAIN_GetMaxBuffers,
+            DTWAIN_GetMaxBuffersExFunc: DTWAIN_GetMaxBuffersEx,
             DTWAIN_GetMaxPagesToAcquireFunc: DTWAIN_GetMaxPagesToAcquire,
             DTWAIN_GetMaxRetryAttemptsFunc: DTWAIN_GetMaxRetryAttempts,
             DTWAIN_GetNameFromCapFunc: DTWAIN_GetNameFromCap,
@@ -8624,6 +8628,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetMaxBuffers(&self, Source: *mut c_void, pMaxBuf: *mut u32) -> i32 {
         unsafe { return (self.DTWAIN_GetMaxBuffersFunc)(Source, pMaxBuf);  }
+    }
+
+    pub fn DTWAIN_GetMaxBuffersEx(&self, Source: *mut c_void) -> u32 {
+        unsafe { return (self.DTWAIN_GetMaxBuffersExFunc)(Source);  }
     }
 
     pub fn DTWAIN_GetMaxPagesToAcquire(&self, Source: *mut c_void) -> i32 {

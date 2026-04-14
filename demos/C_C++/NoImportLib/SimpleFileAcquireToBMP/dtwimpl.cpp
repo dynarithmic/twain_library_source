@@ -600,6 +600,7 @@
     D_GETMANUALDUPLEXCOUNTFUNC                    DYNDTWAIN_API::DTWAIN_GetManualDuplexCount = nullptr;
     D_GETMAXACQUISITIONSFUNC                      DYNDTWAIN_API::DTWAIN_GetMaxAcquisitions = nullptr;
     D_GETMAXBUFFERSFUNC                           DYNDTWAIN_API::DTWAIN_GetMaxBuffers = nullptr;
+    D_GETMAXBUFFERSEXFUNC                         DYNDTWAIN_API::DTWAIN_GetMaxBuffersEx = nullptr;
     D_GETMAXPAGESTOACQUIREFUNC                    DYNDTWAIN_API::DTWAIN_GetMaxPagesToAcquire = nullptr;
     D_GETMAXRETRYATTEMPTSFUNC                     DYNDTWAIN_API::DTWAIN_GetMaxRetryAttempts = nullptr;
     D_GETNAMEFROMCAPFUNC                          DYNDTWAIN_API::DTWAIN_GetNameFromCap = nullptr;
@@ -1850,6 +1851,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetManualDuplexCount, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetMaxAcquisitions, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetMaxBuffers, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetMaxBuffersEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetMaxPagesToAcquire, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetMaxRetryAttempts, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetNameFromCap, hModule);

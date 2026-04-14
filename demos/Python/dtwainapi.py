@@ -2318,6 +2318,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetManualDuplexCount.restype = ct.c_long
      theDLL.DTWAIN_GetMaxAcquisitions.restype = ct.c_long
      theDLL.DTWAIN_GetMaxBuffers.restype = ct.c_long
+     theDLL.DTWAIN_GetMaxBuffersEx.restype = ct.c_ulong
      theDLL.DTWAIN_GetMaxPagesToAcquire.restype = ct.c_long
      theDLL.DTWAIN_GetMaxRetryAttempts.restype = ct.c_long
      theDLL.DTWAIN_GetNameFromCap.restype = ct.c_long
@@ -3476,6 +3477,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetManualDuplexCount.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetMaxAcquisitions.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetMaxBuffers.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ulong)]
+     theDLL.DTWAIN_GetMaxBuffersEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetMaxPagesToAcquire.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetMaxRetryAttempts.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetNameFromCap.argtypes = [ct.c_long, ct.c_wchar_p, ct.c_long]
@@ -4649,6 +4651,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetManualDuplexCount.restype = ct.c_long
      theDLL.DTWAIN_GetMaxAcquisitions.restype = ct.c_long
      theDLL.DTWAIN_GetMaxBuffers.restype = ct.c_long
+     theDLL.DTWAIN_GetMaxBuffersEx.restype = ct.c_ulong
      theDLL.DTWAIN_GetMaxPagesToAcquire.restype = ct.c_long
      theDLL.DTWAIN_GetMaxRetryAttempts.restype = ct.c_long
      theDLL.DTWAIN_GetNameFromCap.restype = ct.c_long
@@ -5807,6 +5810,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetManualDuplexCount.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetMaxAcquisitions.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetMaxBuffers.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ulong)]
+     theDLL.DTWAIN_GetMaxBuffersEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetMaxPagesToAcquire.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetMaxRetryAttempts.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetNameFromCap.argtypes = [ct.c_long, ct.c_char_p, ct.c_long]

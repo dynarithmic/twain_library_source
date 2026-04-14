@@ -2394,6 +2394,7 @@ function DTWAIN_GetLoggerCallbackW : DTwainLoggerProcW; external 'dtwain64d.dll'
 function DTWAIN_GetManualDuplexCount(Source:DTWAIN_SOURCE; pSide1:LPLONG; pSide2:LPLONG) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetManualDuplexCount';
 function DTWAIN_GetMaxAcquisitions(Source:DTWAIN_SOURCE) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetMaxAcquisitions';
 function DTWAIN_GetMaxBuffers(Source:DTWAIN_SOURCE; pMaxBuf:LPDWORD) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetMaxBuffers';
+function DTWAIN_GetMaxBuffersEx(Source:DTWAIN_SOURCE) : DWORD; external 'dtwain64d.dll'  name 'DTWAIN_GetMaxBuffersEx';
 function DTWAIN_GetMaxPagesToAcquire(Source:DTWAIN_SOURCE) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetMaxPagesToAcquire';
 function DTWAIN_GetMaxRetryAttempts(Source:DTWAIN_SOURCE) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetMaxRetryAttempts';
 function DTWAIN_GetNameFromCap(nCapValue:LONG; szValue:LPTSTR; nMaxLen:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetNameFromCap';

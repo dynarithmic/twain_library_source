@@ -593,6 +593,7 @@ typedef DTWAIN_LOGGER_PROCW (DLLENTRY_DEF * D_GETLOGGERCALLBACKWFUNC)           
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETMANUALDUPLEXCOUNTFUNC)                 (DTWAIN_SOURCE, LPLONG, LPLONG);
 typedef LONG (DLLENTRY_DEF * D_GETMAXACQUISITIONSFUNC)                          (DTWAIN_SOURCE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETMAXBUFFERSFUNC)                        (DTWAIN_SOURCE, LPDWORD);
+typedef DWORD (DLLENTRY_DEF * D_GETMAXBUFFERSEXFUNC)                            (DTWAIN_SOURCE);
 typedef LONG (DLLENTRY_DEF * D_GETMAXPAGESTOACQUIREFUNC)                        (DTWAIN_SOURCE);
 typedef LONG (DLLENTRY_DEF * D_GETMAXRETRYATTEMPTSFUNC)                         (DTWAIN_SOURCE);
 typedef LONG (DLLENTRY_DEF * D_GETNAMEFROMCAPFUNC)                              (LONG, LPTSTR, LONG);
@@ -1793,6 +1794,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_GETMANUALDUPLEXCOUNTFUNC                       DTWAIN_GetManualDuplexCount;
     STATIC D_GETMAXACQUISITIONSFUNC                         DTWAIN_GetMaxAcquisitions;
     STATIC D_GETMAXBUFFERSFUNC                              DTWAIN_GetMaxBuffers;
+    STATIC D_GETMAXBUFFERSEXFUNC                            DTWAIN_GetMaxBuffersEx;
     STATIC D_GETMAXPAGESTOACQUIREFUNC                       DTWAIN_GetMaxPagesToAcquire;
     STATIC D_GETMAXRETRYATTEMPTSFUNC                        DTWAIN_GetMaxRetryAttempts;
     STATIC D_GETNAMEFROMCAPFUNC                             DTWAIN_GetNameFromCap;

@@ -3228,6 +3228,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetMaxBuffersDelegate(Source As System.IntPtr, ByRef pMaxBuf As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetMaxBuffersExDelegate(Source As System.IntPtr) As UInteger
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetMaxPagesToAcquireDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -6243,6 +6246,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetMaxBuffers(Source, pMaxBuf)
         End Function
         
+        Public Function DTWAIN_GetMaxBuffersEx(Source As System.IntPtr) As UInteger
+        Return api.DTWAIN_GetMaxBuffersEx(Source)
+        End Function
+        
         Public Function DTWAIN_GetMaxPagesToAcquire(Source As System.IntPtr) As Integer
         Return api.DTWAIN_GetMaxPagesToAcquire(Source)
         End Function
@@ -8385,6 +8392,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetManualDuplexCount As DTWAIN_GetManualDuplexCountDelegate
             Public DTWAIN_GetMaxAcquisitions As DTWAIN_GetMaxAcquisitionsDelegate
             Public DTWAIN_GetMaxBuffers As DTWAIN_GetMaxBuffersDelegate
+            Public DTWAIN_GetMaxBuffersEx As DTWAIN_GetMaxBuffersExDelegate
             Public DTWAIN_GetMaxPagesToAcquire As DTWAIN_GetMaxPagesToAcquireDelegate
             Public DTWAIN_GetMaxRetryAttempts As DTWAIN_GetMaxRetryAttemptsDelegate
             Public DTWAIN_GetNameFromCap As DTWAIN_GetNameFromCapDelegate
