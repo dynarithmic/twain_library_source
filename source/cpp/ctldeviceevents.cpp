@@ -40,7 +40,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
     auto pTheSource = pSource;
 
     // See if Source supports the DEVICEEVENTS capability
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, CAP_DEVICEEVENT); },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, CAP_DEVICEEVENT); },
                                       DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
     // Set the notifications
@@ -57,7 +57,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
         auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, nBits);
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retValue.second; },
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retValue.second; },
 			                              retValue.first, false, FUNC_MACRO);
 
         Array = retValue.second;
@@ -89,7 +89,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
     DTWAINArrayPtr_RAII raii(pHandle, &Array);
 
     // See if Source supports the DEVICEEVENTS capability
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, CAP_DEVICEEVENT); },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, CAP_DEVICEEVENT); },
         DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
     const bool bRet = GetCapValuesEx2_Internal(pSource, CAP_DEVICEEVENT, DTWAIN_CAPGETCURRENT, 
@@ -131,7 +131,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
 
     CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     auto pHandle = pSource->GetDTWAINHandle();
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     DTWAIN_ARRAY arr = {};
@@ -230,7 +230,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventInfo(DTWAIN_SOURCE Source, LONG nW
         break;
 
     default:
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, []{return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)

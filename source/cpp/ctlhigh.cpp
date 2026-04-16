@@ -47,6 +47,7 @@ static LONG GetAllCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lC
 static LONG GetCurrentCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetDefaultCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, LONG GetType, DTWAIN_BOOL bExpandRange);
+static bool GetStringCapabilityGeneric(DTWAIN_SOURCE Source, LPTSTR value, LONG Cap, LONG NumChars);
 
 typedef bool (*SetDoubleCapFn)(DTWAIN_SOURCE, LONG, double);
 typedef bool (*GetDoubleCapFn)(DTWAIN_SOURCE, LONG, double *);
@@ -498,10 +499,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value)\
     {\
         LOG_FUNC_ENTRY_PARAMS((Source, value)) \
-        std::string valueTemp((NumChars) + 1, '\0');\
-        auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, GetCurrentCapValues); \
-        valueTemp.resize(NumChars); \
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, NumChars); \
+        auto retVal = GetStringCapabilityGeneric(Source, value, Cap, NumChars);\
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal); \
         CATCH_BLOCK(false) \
@@ -511,10 +509,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value, LONG MaxLen)\
     {\
         LOG_FUNC_ENTRY_PARAMS((Source, value, MaxLen)) \
-        std::string valueTemp(MaxLen + 1, '\0');\
-        auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], MaxLen, GetCurrentCapValues); \
-        valueTemp.resize(MaxLen); \
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, MaxLen); \
+        auto retVal = GetStringCapabilityGeneric(Source, value, Cap, MaxLen);\
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal); \
         CATCH_BLOCK(false) \
@@ -957,11 +952,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLO
         if (pSource->IsCapInSupportedList(ICAP_XNATIVERESOLUTION))
             lCap = ICAP_XNATIVERESOLUTION;
     }
-	DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return lCap == 0; }, DTWAIN_ERR_CAP_NO_SUPPORT,
+	DTWAIN_Check_Error_Condition_WithThrow_Ex_WithParams(pHandle, [&] { return lCap == 0; }, DTWAIN_ERR_CAP_NO_SUPPORT,
 		                                         false, FUNC_MACRO, false, { pCapName });
     auto bRet = GetDoubleCap( pSource, lCap, Resolution);
     if ( !bRet.first )
-		DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return true; }, bRet.second,
+		DTWAIN_Check_Error_Condition_NoThrow_Ex_WithParams(pHandle, [&] { return true; }, bRet.second,
 			false, FUNC_MACRO, false, { pCapName });
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first)
     CATCH_BLOCK(FALSE)
@@ -999,7 +994,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray, lCap, bExpandRange))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO); 
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO); 
     LONG nValues = 0;
 
     if (pHandle->m_ArrayFactory->is_valid(*pArray))
@@ -1052,7 +1047,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
     else
     {
         // Error occurred
-		DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] { return true; }, pHandle->m_lLastError, 
+		DTWAIN_Check_Error_Condition_NoThrow_Ex_WithParams(pHandle, [&] { return true; }, pHandle->m_lLastError, 
                                                      0, FUNC_MACRO, false, { CTL_TwainAppMgr::GetCapNameFromCap(lCap) });
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
@@ -1067,3 +1062,14 @@ static LONG GetDefaultCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LON
 
 static LONG GetAllCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange)
 { return GetCapValues(Source, pArray, lCap, DTWAIN_CAPGET, bExpandRange); }
+
+
+bool GetStringCapabilityGeneric(DTWAIN_SOURCE Source, LPTSTR value, LONG Cap, LONG NumChars)
+{
+    std::string valueTemp((NumChars) + 1, '\0');
+    auto retVal = GetStringCapability(Source, static_cast<TW_UINT16>(Cap), &valueTemp[0], NumChars, GetCurrentCapValues); 
+    valueTemp.resize(NumChars); 
+    StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, NumChars); 
+    return retVal;
+}
+

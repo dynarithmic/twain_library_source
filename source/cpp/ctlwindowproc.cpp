@@ -712,7 +712,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DisableAppWindow(HWND hWnd, DTWAIN_BOOL bDisable
    LOG_FUNC_ENTRY_PARAMS((hWnd, bDisable))
    #ifdef _WIN32
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !IsWindow( hWnd );}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !IsWindow( hWnd );}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
    auto& appWindows = CTL_StaticData::GetAppWindowsToDisable();
    if ( bDisable )

@@ -34,10 +34,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
     auto pTheSource = pSource;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return DTWAIN_IsSourceAcquiring(Source); },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return DTWAIN_IsSourceAcquiring(Source); },
                                       DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pTheSource->IsUIOpen(); },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pTheSource->IsUIOpen(); },
                                       DTWAIN_ERR_UI_ALREADY_OPENED, false, FUNC_MACRO);
 
     // Open the source (if source is closed)
@@ -52,13 +52,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
     else
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bIsSourceOpen; }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bIsSourceOpen; }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     // Make sure the source is closed if it was opened by us.
     SourceCloserRAII sourcecloser(pSource, bCloseSource);
 
     // Check if capability is supported
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !pTheSource->IsCapInSupportedList(CAP_ENABLEDSUIONLY); },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !pTheSource->IsCapInSupportedList(CAP_ENABLEDSUIONLY); },
         DTWAIN_ERR_UIONLY_NOT_SUPPORTED, false, FUNC_MACRO);
 
     // Start a thread depending on Twain Mode.
@@ -73,7 +73,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
         SourceAcquireOptions opts;
         opts.setIsUIIOnly(true);
         auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
-		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, false, FUNC_MACRO);
+		DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, false, FUNC_MACRO);
     }
 
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

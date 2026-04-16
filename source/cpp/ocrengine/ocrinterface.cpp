@@ -75,8 +75,8 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
     auto pEng = pEngine;
 
     // Check if OCR is active
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCRIsActive(pEng); }, DTWAIN_ERR_OCR_NOTACTIVE, NULL, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pEng->IsValidOCRPage(nPageNo); }, DTWAIN_ERR_OCR_INVALIDPAGENUM, NULL, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !OCRIsActive(pEng); }, DTWAIN_ERR_OCR_NOTACTIVE, NULL, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !pEng->IsValidOCRPage(nPageNo); }, DTWAIN_ERR_OCR_INVALIDPAGENUM, NULL, FUNC_MACRO);
 
     const std::string sText = pEngine->GetOCRText(nPageNo);
 
@@ -119,7 +119,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, OCRCapValue, GetType, CapValues))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !CapValues; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !CapValues; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     if (pEngine->IsCapSupported(OCRCapValue))
     {
         const LONG nDataType = pEngine->GetCapDataType(OCRCapValue);
@@ -132,7 +132,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
                 OCREngine::OCRLongArrayValues vals;
                 pEngine->GetCapValues(OCRCapValue, GetType, vals);
                 auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
-				DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+				DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
                 auto theArray = retVal.second;
                 DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
                 for (LONG i = 0; i < static_cast<LONG>(vals.size()); ++i)
@@ -146,7 +146,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
                 OCREngine::OCRStringArrayValues vals;
                 pEngine->GetCapValues(OCRCapValue, GetType, vals);
                 auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, static_cast<LONG>(vals.size()));
-				DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+				DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
 				auto theArray = retVal.second;
 				DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
 
@@ -253,7 +253,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCR(DTWAIN_OCRENGINE Engine, LPCTSTR szFi
     auto pEng = pEngine;
 
     // Check if OCR is active
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCRIsActive(pEng); }, DTWAIN_ERR_OCR_NOTACTIVE, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !OCRIsActive(pEng); }, DTWAIN_ERR_OCR_NOTACTIVE, false, FUNC_MACRO);
 
     if (nStartPage > nEndPage)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
@@ -272,7 +272,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCR(DTWAIN_OCRENGINE Engine, LPCTSTR szFi
         nEndPage = nPages - 1;
     }
     else
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nStartPage >= nPages; },
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return nStartPage >= nPages; },
         DTWAIN_ERR_OCR_INVALIDPAGENUM, false, FUNC_MACRO);
 
     const LONG minEndPage = (std::min)(nEndPage, nPages - 1);
@@ -291,7 +291,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCR(DTWAIN_OCRENGINE Engine, LPCTSTR szFi
         {
             // No good, we need to get out and report the error
             pEngine->SetLastError(retCode);
-            DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; },
+            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1; },
                 DTWAIN_ERR_OCR_RECOGNITIONERROR, false, FUNC_MACRO);
         }
         ++curPage;
@@ -306,8 +306,8 @@ DTWAIN_OCRTEXTINFOHANDLE DLLENTRY_DEF DTWAIN_GetOCRTextInfoHandle(DTWAIN_OCRENGI
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
     auto pEng = pEngine;
     // Check if OCR is active
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCRIsActive(pEng); }, DTWAIN_ERR_OCR_NOTACTIVE, false, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pEng->IsValidOCRPage(nPageNo); }, DTWAIN_ERR_OCR_INVALIDPAGENUM, NULL, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !OCRIsActive(pEng); }, DTWAIN_ERR_OCR_NOTACTIVE, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !pEng->IsValidOCRPage(nPageNo); }, DTWAIN_ERR_OCR_INVALIDPAGENUM, NULL, FUNC_MACRO);
 
     // If nNumInfo is not NULL, fill it in with the number of items
     int status;
@@ -325,7 +325,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLong(DTWAIN_OCRTEXTINFOHANDLE OCRT
     LOG_FUNC_ENTRY_PARAMS((OCRTextInfo, nCharPos, nWhichItem, pInfo))
     auto [pHandle, pEngine] = VerifyOCRHandles();
     
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     const OCRCharacterInfo *cInfo = reinterpret_cast<OCRCharacterInfo*>(OCRTextInfo);
 
@@ -361,7 +361,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLong(DTWAIN_OCRTEXTINFOHANDLE OCRT
 
     default:
     {
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     }
     break;
     }
@@ -375,7 +375,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloat(DTWAIN_OCRTEXTINFOHANDLE OCR
     LOG_FUNC_ENTRY_PARAMS((OCRTextInfo, nCharPos, nWhichItem, pInfo))
     auto [pHandle, pEngine] = VerifyOCRHandles();
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     const OCRCharacterInfo *cInfo = reinterpret_cast<OCRCharacterInfo*>(OCRTextInfo);
 
@@ -387,7 +387,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloat(DTWAIN_OCRTEXTINFOHANDLE OCR
 
     default:
     {
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return TRUE; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return TRUE; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     }
     break;
 
@@ -404,7 +404,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLongEx(DTWAIN_OCRTEXTINFOHANDLE OC
     auto [pHandle, pEngine] = VerifyOCRHandles();
 
     // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     auto cInfo = reinterpret_cast<OCRCharacterInfo*>(OCRTextInfo);
 
@@ -440,7 +440,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLongEx(DTWAIN_OCRTEXTINFOHANDLE OC
 
     default:
     {
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     }
     break;
     }
@@ -462,7 +462,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloatEx(DTWAIN_OCRTEXTINFOHANDLE O
     LOG_FUNC_ENTRY_PARAMS((OCRTextInfo, nWhichItem, pInfo, bufSize))
     auto [pHandle, pEngine] = VerifyOCRHandles();
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     auto cInfo = reinterpret_cast<OCRCharacterInfo*>(OCRTextInfo);
     const LONG realSize = static_cast<LONG>(std::distance(cInfo->dConfidence.begin(), cInfo->dConfidence.end()));
@@ -475,7 +475,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloatEx(DTWAIN_OCRTEXTINFOHANDLE O
 
     default:
     {
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     }
     break;
 
@@ -490,7 +490,7 @@ LONG DLLENTRY_DEF DTWAIN_SetPDFOCRConversion(DTWAIN_OCRENGINE Engine,LONG PageTy
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
 
     // check if PageType is OK
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !(PageType == 0 || PageType == 1); },
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !(PageType == 0 || PageType == 1); },
         DTWAIN_ERR_INVALID_PARAM, NULL, FUNC_MACRO);
 
     // Check if BW format, pixel type, and bit depth are supported
@@ -582,11 +582,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LP
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, SupportedCaps))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !SupportedCaps; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !SupportedCaps; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     OCREngine::OCRLongArrayValues vals;
     pEngine->GetSupportedCaps(vals);
 	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
 	auto theArray = retVal.second;
 	DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
 
@@ -665,13 +665,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRArray)
 {
     LOG_FUNC_ENTRY_PARAMS((OCRArray))
     auto [pHandle, pEngine] = VerifyOCRHandles();
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !OCRArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !OCRArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     if (pHandle->m_OCRInterfaceArray.empty())
         *OCRArray = nullptr;
     else
     {
         auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOCRENGINE, 0);
-		DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+		DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
 		auto theArray = retVal.second;
 		DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
         const auto& factory = pHandle->m_ArrayFactory;

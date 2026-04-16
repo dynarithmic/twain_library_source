@@ -400,7 +400,7 @@ TransymOCR::TransymOCR(CTL_TwainDLLHandle* DLLHandle) : OCREngine(DLLHandle), m_
     }
     else
     {
-        DTWAIN_Check_Error_Condition_0_Ex(DLLHandle, [&] { return !m_hMod; },
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(DLLHandle, [&] { return !m_hMod; },
                     DTWAIN_ERR_OCRLIBRARY_NOTFOUND, false, FUNC_MACRO);
     }
 }

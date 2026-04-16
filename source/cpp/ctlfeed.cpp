@@ -102,7 +102,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederLoaded(DTWAIN_SOURCE Source)
         const DTWAIN_BOOL bReturn = GetCapValuesEx2_Internal(pSource, CAP_FEEDERLOADED, 
                                                              DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &a);
         DTWAINArrayLowLevelPtr_RAII arr(pHandle, &a);
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bReturn || !a;}, DTWAIN_ERR_NO_FEEDER_QUERY, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !bReturn || !a;}, DTWAIN_ERR_NO_FEEDER_QUERY, false, FUNC_MACRO);
         auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(a);
         LONG Val = 0;
         if ( !vFeeder.empty() )
@@ -204,7 +204,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFeederWaitTime(DTWAIN_SOURCE Source, LONG wai
     LOG_FUNC_ENTRY_PARAMS((Source, waitTime, flags))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto isSensitive = DTWAIN_IsFeederSensitive(Source);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !isSensitive; }, DTWAIN_ERR_FEEDER_NOPAPERSENSOR, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !isSensitive; }, DTWAIN_ERR_FEEDER_NOPAPERSENSOR, false, FUNC_MACRO);
     CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
     p->SetFeederWaitTime(std::max(DTWAIN_WAIT_INFINITE, static_cast<int>(waitTime)));
     p->SetFeederWaitTimeOption(std::max(flags, static_cast<LONG>(DTWAIN_FEEDER_TERMINATE)));

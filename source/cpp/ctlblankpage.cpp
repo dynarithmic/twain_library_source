@@ -62,7 +62,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DT
 {
     LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, detectOpts, bSet))
     auto [pHandle, pSource] = VerifyHandles(Source);
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return threshold < 0.0 || threshold > 100.0; }, DTWAIN_ERR_INVALID_PARAM, 
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return threshold < 0.0 || threshold > 100.0; }, DTWAIN_ERR_INVALID_PARAM, 
                                       FALSE, FUNC_MACRO);
     if (detectOpts & DTWAIN_BP_DETECTORIGINAL )
         pSource->SetBlankPageDetectionNoSampleOn(bSet ? true : false);

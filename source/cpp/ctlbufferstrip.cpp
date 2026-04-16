@@ -60,7 +60,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripBuffer(DTWAIN_SOURCE Source, HAND
     else
     {
         const SIZE_T dSize = ImageMemoryHandler::GlobalSize( hMem );
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !dSize; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !dSize; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
         pSource->SetUserStripBuffer(hMem);
         pSource->SetUserStripBufSize(dSize);
     }
@@ -81,11 +81,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripSize(DTWAIN_SOURCE Source, DWORD 
 
     if ( DTWAIN_GetAcquireStripSizes(Source, &MinSize, &MaxSize, nullptr) )
     {
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return StripSize < MinSize || StripSize > MaxSize;},
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return StripSize < MinSize || StripSize > MaxSize;},
                                                     DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     }
     else
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return true;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, []{ return true;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     pSource->SetUserStripBufSize(StripSize);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

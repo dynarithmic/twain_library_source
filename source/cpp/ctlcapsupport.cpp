@@ -66,7 +66,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
     DTWAIN_ARRAY outputArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0).second;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return outputArray == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, nullptr, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return outputArray == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, nullptr, FUNC_MACRO);
 
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(outputArray);
 
@@ -99,8 +99,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
 
     // Test if the capability is supported
     bool bInList = pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCapability));
-    DTWAIN_Check_Error_Condition_2_Ex_WithParams(pHandle, [&] {return !bInList; }, DTWAIN_ERR_CAP_NO_SUPPORT, 
-                                                 false, FUNC_MACRO, false, 
+    DTWAIN_Check_Error_Condition_NoThrow_Ex_WithParams(pHandle, [&] {return !bInList; }, DTWAIN_ERR_CAP_NO_SUPPORT, 
+                                                        false, FUNC_MACRO, false, 
                                                  { CTL_TwainAppMgr::GetCapNameFromCap(lCapability) });
     LOG_FUNC_EXIT_NONAME_PARAMS(bInList)
     CATCH_BLOCK_LOG_PARAMS(false)

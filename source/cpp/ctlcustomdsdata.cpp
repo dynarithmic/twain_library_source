@@ -115,7 +115,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     {
         // Allocate local copy of handle
         pData = static_cast<char*>(ImageMemoryHandler::GlobalAllocPr(GMEM_DDESHARE, dSize));
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pData == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return pData == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
 
         // Make sure memory is cleaned up at the end
         memHandler.reset(ImageMemoryHandler::GlobalHandle(pData));
@@ -124,7 +124,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     }
 
     // return TRUE or FALSE depending on return code of TWAIN
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return nTwainRet != TWRC_SUCCESS; },
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return nTwainRet != TWRC_SUCCESS; },
                                         -(IDS_TWRC_ERRORSTART + nTwainRet), false, FUNC_MACRO );
 
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

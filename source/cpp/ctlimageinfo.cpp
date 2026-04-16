@@ -77,7 +77,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
 
     // Call TWAIN to get the information
     auto bOk = CTL_TwainAppMgr::GetImageInfo(p, &II);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bOk; }, DTWAIN_ERR_IMAGEINFO_INVALID, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bOk; }, DTWAIN_ERR_IMAGEINFO_INVALID, false, FUNC_MACRO);
 
     // Retrieve the image information.
     TW_IMAGEINFO *pInfo = II.GetImageInfoBuffer();

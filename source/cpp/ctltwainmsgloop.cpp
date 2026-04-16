@@ -80,7 +80,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePeekMessageLoop(DTWAIN_SOURCE Source, BOOL
     auto pS = pSource;
 
     // Cannot change TWAIN message loop implementation while acquiring images
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pS->IsTwainLoopStarted(); },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pS->IsTwainLoopStarted(); },
                                         DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
     pSource->SetUsePeekMessage(bSet);

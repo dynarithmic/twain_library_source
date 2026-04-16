@@ -410,9 +410,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DT
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL, bClear))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !sLangDLL; }, DTWAIN_ERR_BLANKNAMEDETECTED, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !sLangDLL; }, DTWAIN_ERR_BLANKNAMEDETECTED, false, FUNC_MACRO);
     bool bRet = GenericResourceLoader(pHandle, sLangDLL, bClear);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -624,7 +624,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen
     auto availability = GetTwainAvailablityInternal();
 
     // If not available set the error and exit
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return availability.first == 0; },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return availability.first == 0; },
                                         DTWAIN_ERR_TWAIN_NOT_INSTALLED, 0, FUNC_MACRO);
 
     // Provide "<null>" for either TWAIN 1 or TWAIN 2 directories in the
@@ -1095,7 +1095,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
         if (logFailed)
         {
             // Indicate that there is at least one logger that failed
-            DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO, false);
+            DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO, false);
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(!logFailed)
@@ -1385,7 +1385,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
         #endif
     }
     // Error if the window does not exist
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return !hWndMsg;}, DTWAIN_ERR_NULL_WINDOW, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{ return !hWndMsg;}, DTWAIN_ERR_NULL_WINDOW, false, FUNC_MACRO);
     // Set the callback window
     pHandle->m_hWndTwain = hWndMsg;
 #else
@@ -1412,9 +1412,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
         {
             if ( pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
                  pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2 )
-               DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1;}, DTWAIN_ERR_TWAINOPENSOURCEDSMNOTFOUND, false, FUNC_MACRO);
+               DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1;}, DTWAIN_ERR_TWAINOPENSOURCEDSMNOTFOUND, false, FUNC_MACRO);
             else
-               DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_TWAIN32DSMNOTFOUND, false, FUNC_MACRO);
+               DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_TWAIN32DSMNOTFOUND, false, FUNC_MACRO);
         }
     }
 
@@ -1423,7 +1423,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
 
     if ( Session == nullptr)
     {
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, []{return 1;}, DTWAIN_ERR_TWAIN, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, []{return 1;}, DTWAIN_ERR_TWAIN, false, FUNC_MACRO);
     }
     #ifdef DTWAIN_LIB
     CTL_TwainAppMgr::SetDLLInstance( CTL_StaticData::s_DLLInstance );
@@ -1620,7 +1620,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     LOG_FUNC_ENTRY_PARAMS(())
     // Delete it
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
     // Check if any source is still acquiring
     if ( pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE )
@@ -1629,7 +1629,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         DTWAIN_CloseAllSources();
     }
     else
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
     if ( !pHandle->m_bSessionAllocated )
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -1887,7 +1887,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainMode(LONG lMode)
             LOG_FUNC_EXIT_NONAME_PARAMS(true)
         break;
     }
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return 0;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, []{return 0;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
 }

@@ -43,9 +43,9 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
 {
     LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer, pArray))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, 0L, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, 0L, FUNC_MACRO);
     DTWAIN_ARRAY pDTWAINArray = retVal.second;
     DTWAINArrayLowLevelPtr_RAII raii(pHandle, &pDTWAINArray);
 
@@ -186,7 +186,7 @@ LONG dynarithmic::GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
 
     DTWAIN_CacheCapabilityInfo(p, pHandle, nCap);
     CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, p);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_NO_CAPS_DEFINED, 0L, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_NO_CAPS_DEFINED, 0L, FUNC_MACRO);
 
     const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
     if (iter != pArray->end())

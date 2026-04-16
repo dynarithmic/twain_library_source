@@ -56,7 +56,7 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
     auto dllHandle = CTL_StaticData::GetDLLInstanceHandle();
     const HGLOBAL hglb = LoadResource(dllHandle, static_cast<HRSRC>(FindResource(dllHandle,
                                                                       MAKEINTRESOURCE(10000), RT_DIALOG)));
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return !hglb;}, DTWAIN_ERR_NULL_WINDOW, NULL, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{ return !hglb;}, DTWAIN_ERR_NULL_WINDOW, NULL, FUNC_MACRO);
 
     const auto lpTemplate = static_cast<LPDLGTEMPLATE>(LockResource(hglb));
 

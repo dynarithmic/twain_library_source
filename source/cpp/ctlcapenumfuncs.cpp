@@ -65,7 +65,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
     // Check if Array is nullptr
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     auto& factory = pHandle->m_ArrayFactory;
 
@@ -73,7 +73,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
         factory->clear(*Array);
 
     auto retvalue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retvalue.second; }, retvalue.first, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !retvalue.second; }, retvalue.first, false, FUNC_MACRO);
     auto ThisArray = retvalue.second;
 
     DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ThisArray);
@@ -186,13 +186,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, LPDTWAIN_
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
     auto [pHandle, pSource] = VerifyHandles(Source);
 
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     // Enumerate the extended caps
     auto retVal = EnumCaps<EnumExtendedTraits>(Source, Array, &CTL_ITwainSource::GetExtendedCapCache);
 
     // Check for any error return code
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; },
                                        retVal, false, FUNC_MACRO);
 
     // Everything is ok
@@ -205,13 +205,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_AR
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
     auto [pHandle, pSource] = VerifyHandles(Source);
 
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     // Enumerate the custom caps
     auto retVal = EnumCaps<EnumCustomTraits>(Source, Array, &CTL_ITwainSource::GetCustomCapCache);
 
     // Check for any error return code
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; },
                                       retVal, false, FUNC_MACRO);
 
     // Everything is ok.
@@ -253,12 +253,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
     // Check for null lpOps
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return lpOps == nullptr; },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return lpOps == nullptr; },
                                       DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     // Check for cap support
     bool isSupported = pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCapability));
-    DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return isSupported == false; },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex_WithParams(pHandle, [&] { return isSupported == false; },
                                                  DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, 
                                                 { CTL_TwainAppMgr::GetCapNameFromCap(lCapability) });
     // Get the capability operations

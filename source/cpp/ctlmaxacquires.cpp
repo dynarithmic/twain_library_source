@@ -32,7 +32,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMaxAcquisitions(DTWAIN_SOURCE Source, LONG Ma
     LOG_FUNC_ENTRY_PARAMS((Source, MaxAcquires))
     auto [pHandle, pSource] = VerifyHandles(Source);
     // Check if array is of the correct type
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return MaxAcquires < 0L && MaxAcquires != DTWAIN_MAXACQUIRE; },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return MaxAcquires < 0L && MaxAcquires != DTWAIN_MAXACQUIRE; },
         DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     pSource->SetMaxAcquisitions(MaxAcquires);
     pSource->SetUIMaxAcquisitions(MaxAcquires);

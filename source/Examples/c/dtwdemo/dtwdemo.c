@@ -51,7 +51,6 @@ void SetCaptionToSourceName();
 void AcquireNative();
 void AcquireBuffered();
 void AcquireFile(BOOL bUseSource, LONG fileType);
-BOOL IsAllSpace(LPCTSTR p);
 void ToggleCheckedItem(UINT resId);
 BOOL GetToggleMenuState(UINT resID);
 void DisplayLoggingOptions();
@@ -1414,18 +1413,6 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             break;
     }
     return FALSE;
-}
-
-BOOL IsAllSpace(LPCTSTR p)
-{
-    size_t nLen = lstrlen(p);
-    size_t i;
-    for ( i = 0; i < nLen; i++ )
-    {
-        if ( !_istspace((TCHAR)*p))
-            return FALSE;
-    }
-    return TRUE;
 }
 
 void WaitLoop()

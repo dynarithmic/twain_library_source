@@ -48,7 +48,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibsInternal(DTWAIN_SOURCE Source, D
     const auto& factory = pHandle->m_ArrayFactory;
 
     // Check if array is of the correct type
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !factory->is_valid(pArray, CTL_ArrayFactory::arrayTag::VoidPtrType); },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !factory->is_valid(pArray, CTL_ArrayFactory::arrayTag::VoidPtrType); },
                                                     DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     const DTWAIN_ARRAY pDTWAINArray = pArray;
     factory->clear(pDTWAINArray);
@@ -70,9 +70,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAllSourceDibsEx(DTWAIN_SOURCE Source, LPDTWAI
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
 
     auto DibArray = retVal.second;
     DTWAINArrayLowLevelPtr_RAII raii(pHandle, &DibArray);
@@ -120,7 +120,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
     LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second)
     CATCH_BLOCK(nullptr)
 }
@@ -190,7 +190,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAI
     LOG_FUNC_ENTRY_PARAMS((aAcq))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto retVal = DestroyAcquisitionArray(pHandle, aAcq, bDestroyDibs);
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.first; }, retVal.second, nullptr, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.first; }, retVal.second, nullptr, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first)
     CATCH_BLOCK(false)
 }
