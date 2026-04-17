@@ -64,7 +64,7 @@ namespace dynarithmic
 
         constexpr TW_FRAME To_TWFRAME() const
         {
-			TW_FRAME ret;
+			TW_FRAME ret = {};
 			ret.Top = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMETOP]));
 			ret.Left = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMELEFT]));
 			ret.Right = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMERIGHT]));
