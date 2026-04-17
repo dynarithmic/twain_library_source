@@ -427,9 +427,6 @@
     <ClCompile Include=".\cpp\ocrengine\transym_ocrinterface.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpp\twainframe.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\imagefun\txtfun32.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>

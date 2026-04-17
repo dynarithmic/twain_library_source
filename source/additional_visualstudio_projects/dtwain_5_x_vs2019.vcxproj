@@ -1516,7 +1516,6 @@ copy $(TargetDir)$(TargetName).lib .
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="cpp\twainframe.cpp" />
     <ClCompile Include="cpp\windows_versioninfo.cpp" />
     <ClCompile Include="cximage\ximabmp.cpp" />
     <ClCompile Include="cximage\ximadsp.cpp" />

@@ -102,7 +102,7 @@ namespace dynarithmic
 	}
 
     template <typename Func, typename RetType>
-    void DTWAIN_Check_Error_Condition_3_Ex(CTL_TwainDLLHandle* Handle,
+    void DTWAIN_Check_Error_Condition_NoLogError_WithThrow(CTL_TwainDLLHandle* Handle,
                                            Func f,
                                            int32_t Err,
                                            const char *errInfo, 
