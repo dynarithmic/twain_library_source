@@ -35,6 +35,8 @@ OF THIRD PARTY RIGHTS.
 #include "FreeImagePlus.h"
 #include <unordered_map>
 #include "dtwain_filetypes.h"
+#include "tiffwriter.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4100)
 #endif
@@ -157,12 +159,15 @@ namespace dynarithmic
             int  GetTiffFormat() const { return m_nFormat; }
             CTL_StringType GetFileName() const { return sActualFileName; }
             CTL_StringType GetPostscriptName() const { return sPostscriptName; }
+            DTWAINTiffOutput& GetOutputHandler() { return m_TiffOutputHandler; }
 
         private:
             int m_nFormat;
             DTWAINImageInfoEx m_ImageInfoEx;
             CTL_StringType sActualFileName;
             CTL_StringType sPostscriptName;
+            DTWAINTiffOutput m_TiffOutputHandler;
+
     };
 
     class CTL_PngIOHandler : public CTL_ImageIOHandler

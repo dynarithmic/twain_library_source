@@ -109,7 +109,10 @@ namespace dynarithmic
             void DestroyAllObjects() override;
 
         protected:
-            int ProcessCompressionType(fipImage& im, unsigned long&) const;
+//            int ProcessCompressionType(fipImage& im, unsigned long&) const;
+			std::pair<int, int> ProcessCompressionType() const;
+            std::pair<int, int> ProcessCompressionTypeInternal() const;
+
     };
 }
 #endif

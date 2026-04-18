@@ -83,8 +83,77 @@ static constexpr int GetTiffCompressionFromFormat(int m_nFormat)
 
 int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {
-    HANDLE hDib = nullptr;
+    // Get the current TIFF type from the Source
+    if (m_ImageInfoEx.theSource &&
+        !m_ImageInfoEx.IsPDF &&
+        !m_ImageInfoEx.IsPostscript &&
+        !m_ImageInfoEx.IsPostscriptMultipage &&
+        !m_ImageInfoEx.IsOCRTempImage)
+        m_nFormat = m_ImageInfoEx.theSource->GetAcquireFileStatusRef().GetAcquireFileFormat();
 
+    // Check for the Postscript option
+    if (m_ImageInfoEx.IsPostscript && m_ImageInfoEx.theSource)
+    {
+        CTL_StringType szTempPath;
+        // This is a postscript save, so
+        // create a temp file
+        szTempPath = GetDTWAINTempFilePath(m_ImageInfoEx.theSource->GetDTWAINHandle());
+        if (szTempPath.empty())
+            return DTWAIN_ERR_FILEWRITE;
+        szTempPath += StringWrapper::GetGUID() + _T("TIF");
+
+        LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + StringConversion::Convert_Native_To_Ansi(szTempPath));
+
+        // OK, now remember that the file we are writing is a TIF file, and this is
+        // the file that is created first
+        sActualFileName = std::move(szTempPath);
+        sPostscriptName = szFile;
+    }
+    else
+        sActualFileName = szFile;
+
+    CTIFFImageHandler imgHandler(m_nFormat, m_ImageInfoEx);
+    imgHandler.SetMultiPageStatus(pMultiPageStruct);
+    auto retVal = imgHandler.WriteGraphicFile(this, sActualFileName.c_str(), m_pDib->GetHandle());
+    if (retVal == DTWAIN_NO_ERROR)
+    {
+        // Convert the TIFF file to Postscript if necessary
+        if (m_ImageInfoEx.IsPostscript)
+        {
+            // This will have to call the routine to convert
+            LONG Level;
+            switch (m_ImageInfoEx.PostscriptType)
+            {
+                case DTWAIN_POSTSCRIPT1:
+                case DTWAIN_POSTSCRIPT1MULTI:
+                    Level = 1;
+                    break;
+
+                case DTWAIN_POSTSCRIPT2:
+                case DTWAIN_POSTSCRIPT2MULTI:
+                    Level = 2;
+                    break;
+                default:
+                    Level = 3;
+                    break;
+            }
+            CTL_StringType sTitle;
+            sTitle = m_ImageInfoEx.PSTitle;
+            if (sTitle.empty())
+                sTitle = _T("DTWAIN Postscript");
+            retVal = CTIFFImageHandler::Tiff2PS(sActualFileName.c_str(), sPostscriptName.c_str(), Level,
+                sTitle.c_str(), m_ImageInfoEx.PSType == DTWAIN_PS_ENCAPSULATED);
+
+            if (retVal == -1)
+                retVal = DTWAIN_ERR_FILEWRITE;
+            delete_file(sActualFileName.c_str());
+        }
+        return retVal;
+    }
+    return DTWAIN_NO_ERROR;
+}
+#if 0
+	HANDLE hDib = nullptr;
     // Check if this is the first page
     LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF or Postscript file");
 
@@ -233,3 +302,4 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
     return retval;
 }
+#endif
