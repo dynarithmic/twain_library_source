@@ -154,6 +154,7 @@ namespace dynarithmic
                                 m_ImageInfoEx(ImageInfoEx) {}
             CTL_TiffIOHandler( CTL_TwainDib *pDib, int nFormat, DTWAINImageInfoEx &ImageInfoEx ): CTL_ImageIOHandler(pDib),
                             m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
+            ~CTL_TiffIOHandler();
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct) override;
             void SetTiffFormat(int nFormat) { m_nFormat = nFormat; }
             int  GetTiffFormat() const { return m_nFormat; }

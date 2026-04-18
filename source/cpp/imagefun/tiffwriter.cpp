@@ -30,6 +30,7 @@
 #include <memory>
 #include <utility>
 #include "tiffwriter.h"
+#include "dtwaindefs.h"
 
 // ============================================================
 // Internal helpers
@@ -78,11 +79,25 @@ static PageTagInfo describe_page_tags(const PreparedDibPage& page)
             info.samplesPerPixel = 1;
             info.bitsPerSample = 1;
             // Default bilevel interpretation used by this writer.
-            info.photometric = PHOTOMETRIC_MINISWHITE;
+            info.photometric = page.bwpolarity;
             info.writeColorMap = false;
             break;
 
-        case PixelFlavor::Gray8:
+		case PixelFlavor::Gray4:
+			info.samplesPerPixel = 1;
+			info.bitsPerSample = 4;
+			info.photometric = PHOTOMETRIC_MINISBLACK;
+			info.writeColorMap = false;
+			break;
+
+		case PixelFlavor::Palette4:
+			info.samplesPerPixel = 1;
+			info.bitsPerSample = 4;
+			info.photometric = PHOTOMETRIC_PALETTE;
+			info.writeColorMap = true;
+			break;
+			
+		case PixelFlavor::Gray8:
             info.samplesPerPixel = 1;
             info.bitsPerSample = 8;
             info.photometric = PHOTOMETRIC_MINISBLACK;
@@ -95,6 +110,13 @@ static PageTagInfo describe_page_tags(const PreparedDibPage& page)
             info.photometric = PHOTOMETRIC_PALETTE;
             info.writeColorMap = true;
             break;
+
+		case PixelFlavor::Gray16:
+			info.samplesPerPixel = 1;
+			info.bitsPerSample = 16;
+			info.photometric = PHOTOMETRIC_MINISBLACK;
+			info.writeColorMap = false;
+			break;
 
         case PixelFlavor::Bgr24:
         case PixelFlavor::Bgra32:
@@ -111,6 +133,9 @@ static size_t calc_output_row_size(const PreparedDibPage& page, const PageTagInf
 {
 	if (tagInfo.bitsPerSample == 1 && tagInfo.samplesPerPixel == 1)
 		return static_cast<size_t>((page.width + 7) / 8);
+
+	if (tagInfo.bitsPerSample == 4 && tagInfo.samplesPerPixel == 1)
+		return static_cast<size_t>((page.width + 1) / 2);
 
 	return static_cast<size_t>(page.width) *
 		static_cast<size_t>(tagInfo.samplesPerPixel) *
@@ -141,6 +166,17 @@ static bool convert_row(const PreparedDibPage& page,
             return true;
         }
 
+		case PixelFlavor::Gray4:
+		case PixelFlavor::Palette4:
+		{
+			const size_t n = static_cast<size_t>((page.width + 1) / 2);
+			if (dstSize < n)
+				return false;
+
+			std::memcpy(dst, src, n);
+			return true;
+		}
+
         case PixelFlavor::Gray8:
         case PixelFlavor::Palette8:
         {
@@ -151,6 +187,16 @@ static bool convert_row(const PreparedDibPage& page,
             std::memcpy(dst, src, n);
             return true;
         }
+
+		case PixelFlavor::Gray16:
+		{
+			const size_t n = static_cast<size_t>(page.width) * 2;
+			if (dstSize < n)
+				return false;
+
+			std::memcpy(dst, src, n);
+			return true;
+		}
 
         case PixelFlavor::Bgr24:
         {
@@ -337,6 +383,14 @@ bool TiffSessionWriter::ValidateCurrentPage() const
 	case PixelFlavor::BW1:
 		return currentPage_.bitsPerPixel == 1;
 
+	case PixelFlavor::Gray4:
+		return currentPage_.bitsPerPixel == 4;
+
+	case PixelFlavor::Palette4:
+		return currentPage_.bitsPerPixel == 4 &&
+			currentPage_.palette != nullptr &&
+			currentPage_.paletteEntries > 0;
+
 	case PixelFlavor::Gray8:
 		return currentPage_.bitsPerPixel == 8;
 
@@ -344,6 +398,9 @@ bool TiffSessionWriter::ValidateCurrentPage() const
 		return currentPage_.bitsPerPixel == 8 &&
 			currentPage_.palette != nullptr &&
 			currentPage_.paletteEntries > 0;
+
+	case PixelFlavor::Gray16:
+		return currentPage_.bitsPerPixel == 16;
 
 	case PixelFlavor::Bgr24:
 		return currentPage_.bitsPerPixel == 24;
@@ -358,15 +415,6 @@ bool TiffSessionWriter::ValidateCurrentPage() const
 bool TiffSessionWriter::SetCommonTags(const PageTagInfo& tagInfo)
 {
 	uint16_t photometric = tagInfo.photometric;
-
-	// Make fax intent explicit for bilevel G3/G4 pages.
-	if (currentPage_.pixelFlavor == PixelFlavor::BW1 &&
-		(currentPageSettings_.compression == TiffCompression::Group3 ||
-			currentPageSettings_.compression == TiffCompression::Group4))
-	{
-		photometric = PHOTOMETRIC_MINISWHITE;
-	}
-
 	TIFFSetField(tif_, TIFFTAG_IMAGEWIDTH, currentPage_.width);
 	TIFFSetField(tif_, TIFFTAG_IMAGELENGTH, currentPage_.height);
 	TIFFSetField(tif_, TIFFTAG_SAMPLESPERPIXEL, tagInfo.samplesPerPixel);
@@ -541,10 +589,6 @@ static const RGBQUAD* dib_palette_ptr_from_locked_dib(const BITMAPINFOHEADER* pB
 
 	const uint8_t* p = reinterpret_cast<const uint8_t*>(pBih);
 	p += pBih->biSize;
-
-	// For <= 8-bpp BI_RGB DIBs, palette starts right after the header.
-	// 16-bpp BI_BITFIELDS is assumed to have been resampled upstream and
-	// is therefore intentionally not handled here.
 	return reinterpret_cast<const RGBQUAD*>(p);
 }
 
@@ -600,27 +644,38 @@ LockedDibPage::LockedDibPage(HANDLE hDib) : hDib_(hDib)
 
 	switch (bpp)
 	{
-		case 1:
-			page.pixelFlavor = PixelFlavor::BW1;
-			break;
+	case 1:
+		page.pixelFlavor = PixelFlavor::BW1;
+		break;
 
-		case 8:
-			page.pixelFlavor = (page.palette && page.paletteEntries > 0)
-				? PixelFlavor::Palette8
-				: PixelFlavor::Gray8;
-			break;
+	case 4:
+		page.pixelFlavor = (page.palette && page.paletteEntries > 0)
+			? PixelFlavor::Palette4
+			: PixelFlavor::Gray4;
+		break;
 
-		case 24:
-			page.pixelFlavor = PixelFlavor::Bgr24;
-			break;
+	case 8:
+		page.pixelFlavor = (page.palette && page.paletteEntries > 0)
+			? PixelFlavor::Palette8
+			: PixelFlavor::Gray8;
+		break;
 
-		case 32:
-			page.pixelFlavor = PixelFlavor::Bgra32;
-			break;
+	case 16:
+		// Explicitly support 16-bit grayscale only.
+		// 16-bpp packed color should be resampled upstream.
+		page.pixelFlavor = PixelFlavor::Gray16;
+		break;
 
-		default:
-			// Per your DTWAIN plan, 16-bpp should be resampled upstream.
-			return;
+	case 24:
+		page.pixelFlavor = PixelFlavor::Bgr24;
+		break;
+
+	case 32:
+		page.pixelFlavor = PixelFlavor::Bgra32;
+		break;
+
+	default:
+		return;
 	}
 
 	page_ = page;
@@ -673,39 +728,39 @@ const PreparedDibPage& LockedDibPage::GetPage() const noexcept
 	return page_;
 }
 
-bool DTWAINTiffOutput::OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedDibPage& page,
+std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedDibPage& page,
 		TiffPageSettings settings)
 {
 	if (writer_)
-		return false;
+		return { false, DTWAIN_ERR_FILEWRITE };
 
 	writer_ = std::make_unique<TiffSessionWriter>();
 	if (!writer_->Open(filename, sessionOptions))
 	{
 		writer_.reset();
-		return false;
+		return { false, DTWAIN_ERR_FILEOPEN };
 	}
 
 	pageIndex_ = 0;
 	return write_page(page, settings);
 }
 
-bool DTWAINTiffOutput::OnNextPage(const PreparedDibPage& page, TiffPageSettings settings)
+std::pair<bool, int> DTWAINTiffOutput::OnNextPage(const PreparedDibPage& page, TiffPageSettings settings)
 {
 	if (!writer_)
-		return false;
+		return { false, DTWAIN_ERR_FILEWRITE };
 
 	return write_page(page, settings);
 }
 
-bool DTWAINTiffOutput::OnLastPage()
+std::pair<bool, int> DTWAINTiffOutput::OnLastPage()
 {
 	if (!writer_)
-		return false;
+		return { false, DTWAIN_ERR_FILEWRITE };
 
 	writer_.reset(); // closes TIFF
 	pageIndex_ = 0;
-	return true;
+	return { true, DTWAIN_NO_ERROR };
 }
 
 bool DTWAINTiffOutput::IsOpen() const noexcept
@@ -713,17 +768,17 @@ bool DTWAINTiffOutput::IsOpen() const noexcept
 	return writer_ != nullptr && writer_->IsOpen();
 }
 
-bool DTWAINTiffOutput::write_page(const PreparedDibPage& page, TiffPageSettings settings)
+std::pair<bool, int> DTWAINTiffOutput::write_page(const PreparedDibPage& page, TiffPageSettings settings)
 {
 	settings.pageIndex = static_cast<uint16_t>(pageIndex_);
 
 	if (!writer_->SetPageInfo(page, settings))
-		return false;
+		return { false, DTWAIN_ERR_FILEWRITE };
 
 	if (!writer_->WriteCurrentPage())
-		return false;
+		return { false, DTWAIN_ERR_FILEWRITE };
 
 	++pageIndex_;
-	return true;
+	return { true, DTWAIN_NO_ERROR };
 }
 

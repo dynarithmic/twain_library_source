@@ -44,11 +44,14 @@ enum class TiffCompression
 
 enum class PixelFlavor
 {
-	BW1,        // 1-bpp bilevel
-	Gray8,      // 8-bpp grayscale
-	Palette8,   // 8-bpp indexed/paletted
-	Bgr24,      // 24-bpp Windows DIB
-	Bgra32      // 32-bpp Windows DIB, alpha ignored
+	BW1,         // 1-bpp bilevel
+	Gray4,       // 4-bpp grayscale
+	Palette4,    // 4-bpp indexed/paletted
+	Gray8,       // 8-bpp grayscale
+	Palette8,    // 8-bpp indexed/paletted
+	Gray16,      // 16-bpp grayscale (single sample)
+	Bgr24,       // 24-bpp Windows DIB
+	Bgra32       // 32-bpp Windows DIB, alpha ignored};
 };
 
 struct TiffPageSettings
@@ -70,6 +73,9 @@ struct TiffPageSettings
 	uint16_t pageIndex = 0;
 	uint16_t pageCount = 0;
 
+	// Bilevel TIFF meaning
+	uint16_t bilevelPhotometric = PHOTOMETRIC_MINISWHITE;
+
 	// 1-bpp / fax handling
 	// Set true if the source DIB uses opposite polarity from the outgoing TIFF.
 	bool invertBilevelPolarity = false;
@@ -85,6 +91,7 @@ struct PreparedDibPage
 	uint32_t height = 0;
 	uint16_t bitsPerPixel = 0;
 	uint32_t strideBytes = 0;
+	uint16_t bwpolarity = PHOTOMETRIC_MINISWHITE;
 	bool bottomUp = true;
 
 	PixelFlavor pixelFlavor = PixelFlavor::Bgr24;
@@ -104,7 +111,6 @@ struct TiffSessionOptions
 {
 	TiffContainerFormat containerFormat = TiffContainerFormat::ClassicTiff;
 
-	// Optional TIFF open mode flags
 	bool littleEndian = false;
 	bool bigEndian = false;
 	bool fillOrderLsbToMsb = false;
@@ -140,6 +146,8 @@ class LockedDibPage
 		LockedDibPage& operator=(LockedDibPage&& other) noexcept;
 		bool IsValid() const noexcept;
 		const PreparedDibPage& GetPage() const noexcept;
+		PreparedDibPage& GetPageRef() { return page_; }
+
 	private:
 		HANDLE hDib_ = nullptr;
 		void* locked_ = nullptr;
@@ -184,13 +192,13 @@ class TiffSessionWriter
 class DTWAINTiffOutput
 {
 	public:
-		bool OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedDibPage& page,
-						 TiffPageSettings settings);
-		bool OnNextPage(const PreparedDibPage& page, TiffPageSettings settings);
-		bool OnLastPage();
+		std::pair<bool, int> OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedDibPage& page,
+										 TiffPageSettings settings);
+		std::pair<bool, int> OnNextPage(const PreparedDibPage& page, TiffPageSettings settings);
+		std::pair<bool, int> OnLastPage();
 		bool IsOpen() const noexcept;
 	private:
-		bool write_page(const PreparedDibPage& page, TiffPageSettings settings);
+		std::pair<bool, int> write_page(const PreparedDibPage& page, TiffPageSettings settings);
 
 	private:
 		std::unique_ptr<TiffSessionWriter> writer_;
