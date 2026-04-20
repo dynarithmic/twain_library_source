@@ -20,11 +20,27 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "pngwriter.h"
 
 using namespace dynarithmic;
 
 int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
+    struct PngWriterRAII
+    {
+        PngSessionWriter* m_pWriter = nullptr;
+        PngWriterRAII(PngSessionWriter* pWriter) : m_pWriter(pWriter) {}
+        ~PngWriterRAII()
+        {
+            try
+            {
+                if (m_pWriter)
+                    m_pWriter->Close();
+            }
+            catch (...) {}
+        }
+    };
+
     HANDLE hDib = {};
     if (!m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
@@ -32,11 +48,28 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!IsValidBitDepth(DTWAIN_PNG, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
-    m_SaveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
-    m_SaveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
+	LockedPngDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+    std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-    return SaveToFile();
+    PngSessionOptions sessionOptions;
+	// Get the comment string (copyright information)
+	char commentStr[256] = {};
+	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+    sessionOptions.text.copyright = commentStr;
+
+	PngSessionWriter writer;
+
+    if (!writer.Open(sFileName, sessionOptions))
+        return DTWAIN_ERR_FILEWRITE;
+
+	PngWriterRAII raii(&writer);
+
+	if (!writer.SetPageInfo(lockedPage.GetPage()))
+		return DTWAIN_ERR_FILEWRITE; 
+
+    auto retVal = writer.WriteCurrentPage();
+    return retVal.second;
 }
 

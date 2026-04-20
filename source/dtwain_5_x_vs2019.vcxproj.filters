@@ -637,6 +637,9 @@
     <ClCompile Include="cpp\imagefun\tiffwriter.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\imagefun\pngwriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1117,6 +1120,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\imagefun\tiffwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\pngwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

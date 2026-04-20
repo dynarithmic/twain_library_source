@@ -286,7 +286,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_ImageInfoEx.PDFCustomScale[1] = 100.0;
     m_ImageInfoEx.PDFUseThumbnail = false;
     m_ImageInfoEx.PDFThumbnailScale[0] = m_ImageInfoEx.PDFThumbnailScale[1] = 0.1;
-    m_ImageInfoEx.PhotoMetric = PHOTOMETRIC_MINISBLACK;
+    m_ImageInfoEx.PhotoMetric = PHOTOMETRIC_MINISWHITE;
     m_ImageInfoEx.theSource = this;
     m_AltAcquireArea.UnitOfMeasure = DTWAIN_INCHES;
     m_ImageInfoEx.IsCreateDirectory = false;

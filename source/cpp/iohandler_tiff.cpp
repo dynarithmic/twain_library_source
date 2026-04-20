@@ -37,8 +37,8 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
         !m_ImageInfoEx.IsOCRTempImage)
         m_nFormat = m_ImageInfoEx.theSource->GetAcquireFileStatusRef().GetAcquireFileFormat();
 
-    bool isFirstPage = (pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_FIRST);
-    bool isLastPage =  (pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
+    bool isFirstPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_FIRST);
+    bool isLastPage =  (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
     bool isWriteablePage = isFirstPage || !isLastPage;
 
 	if (isWriteablePage && m_pDib && !IsValidBitDepth(m_nFormat, m_pDib->GetBitsPerPixel()))

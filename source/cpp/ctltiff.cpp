@@ -31,7 +31,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFInvert(DTWAIN_SOURCE Source, LONG Setting
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Setting))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    pSource->SetPhotometric( !Setting );
+    pSource->SetPhotometric( Setting );
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

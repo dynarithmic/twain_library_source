@@ -1489,8 +1489,10 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\ctlwindowproc.cpp" />
     <ClCompile Include="cpp\extendedimageinfo.cpp" />
     <ClCompile Include="cpp\imagefun\ctldibblank.cpp" />
+    <ClCompile Include="cpp\imagefun\pngwriter.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
+    <ClCompile Include="cpp\imagefun\tiffwriter.cpp" />
     <ClCompile Include="cpp\imagefun\txtfun32.cpp" />
     <ClCompile Include="cpp\iohandler_jpegxr.cpp" />
     <ClCompile Include="cpp\iohandler_pbm.cpp" />
@@ -1866,8 +1868,10 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />
     <ClInclude Include="h\imagefun\pcxfun32.h" />
     <ClInclude Include="h\imagefun\pdffun32.h" />
+    <ClInclude Include="h\imagefun\pngwriter.h" />
     <ClInclude Include="h\imagefun\resamplefactory.h" />
     <ClInclude Include="h\imagefun\tiffun32.h" />
+    <ClInclude Include="h\imagefun\tiffwriter.h" />
     <ClInclude Include="h\imagefun\txtfun32.h" />
     <ClInclude Include="h\imagefun\winbit32.h" />
     <ClInclude Include="h\imagefun\wmffun32.h" />

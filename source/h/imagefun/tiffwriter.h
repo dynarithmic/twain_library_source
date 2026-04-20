@@ -23,6 +23,7 @@ OF THIRD PARTY RIGHTS.
 
 #include <string>
 #include <memory>
+#include <vector>
 #include "tiffio.h"
 
 enum class TiffContainerFormat
@@ -44,14 +45,27 @@ enum class TiffCompression
 
 enum class PixelFlavor
 {
-	BW1,         // 1-bpp bilevel
-	Gray4,       // 4-bpp grayscale
-	Palette4,    // 4-bpp indexed/paletted
-	Gray8,       // 8-bpp grayscale
-	Palette8,    // 8-bpp indexed/paletted
-	Gray16,      // 16-bpp grayscale (single sample)
-	Bgr24,       // 24-bpp Windows DIB
-	Bgra32       // 32-bpp Windows DIB, alpha ignored};
+	BW1,        // 1-bpp bilevel
+	Gray8,      // 8-bpp grayscale
+	Palette8,   // 8-bpp indexed/paletted
+	Gray16,     // 16-bpp grayscale
+	Bgr24,      // 24-bpp Windows DIB
+	Bgra32      // 32-bpp Windows DIB, alpha ignored
+};
+
+
+struct TiffSessionOptions
+{
+	TiffContainerFormat containerFormat = TiffContainerFormat::ClassicTiff;
+
+	// Optional TIFF open mode flags
+	bool littleEndian = false;
+	bool bigEndian = false;
+	bool fillOrderLsbToMsb = false;
+
+	// Metadata
+	std::string software = "DTWAIN";
+	std::string copyright;
 };
 
 struct TiffPageSettings
@@ -73,16 +87,22 @@ struct TiffPageSettings
 	uint16_t pageIndex = 0;
 	uint16_t pageCount = 0;
 
-	// Bilevel TIFF meaning
+	// 1-bpp TIFF meaning requested by the caller:
+	// PHOTOMETRIC_MINISWHITE => 0 = white, 1 = black
+	// PHOTOMETRIC_MINISBLACK => 0 = black, 1 = white
 	uint16_t bilevelPhotometric = PHOTOMETRIC_MINISWHITE;
 
-	// 1-bpp / fax handling
-	// Set true if the source DIB uses opposite polarity from the outgoing TIFF.
-	bool invertBilevelPolarity = false;
+	// Low-level packed-bit inversion. This is derived automatically in
+	// SetPageInfo() for BW1 based on the assumed source convention:
+	// source BW1 DIB uses 0 = black, 1 = white.
+	bool invertBilevelBits = false;
 
-	// Optional per-page fill-order override (useful for fax testing / compatibility)
+	// Optional per-page fill-order override
 	bool forceFillOrder = false;
 	uint16_t forcedFillOrder = FILLORDER_MSB2LSB;
+
+	// Setting specific to DTWAIN for TIFF image inversion
+	bool invertImage = false;
 };
 
 struct PreparedDibPage
@@ -91,7 +111,6 @@ struct PreparedDibPage
 	uint32_t height = 0;
 	uint16_t bitsPerPixel = 0;
 	uint32_t strideBytes = 0;
-	uint16_t bwpolarity = PHOTOMETRIC_MINISWHITE;
 	bool bottomUp = true;
 
 	PixelFlavor pixelFlavor = PixelFlavor::Bgr24;
@@ -105,19 +124,6 @@ struct PreparedDibPage
 	// Resolution
 	double xDpi = 200.0;
 	double yDpi = 200.0;
-};
-
-struct TiffSessionOptions
-{
-	TiffContainerFormat containerFormat = TiffContainerFormat::ClassicTiff;
-
-	bool littleEndian = false;
-	bool bigEndian = false;
-	bool fillOrderLsbToMsb = false;
-
-	// Metadata
-	std::string software = "DTWAIN";
-	std::string copyright;
 };
 
 struct PageTagInfo
@@ -175,8 +181,9 @@ class TiffSessionWriter
 		bool ValidateCurrentPage() const;
 		bool SetCommonTags(const PageTagInfo& tagInfo);
 		bool SetCompressionTags(const PageTagInfo& tagInfo);
-		bool SetPaletteTags();
+		bool SetPaletteTags(uint16_t bitsPerSample);
 		bool WritePixels(const PageTagInfo& tagInfo);
+		bool EnsureRowBufferSize(size_t sizeNeeded);
 
 	private:
 		TIFF* tif_ = nullptr;
@@ -187,6 +194,7 @@ class TiffSessionWriter
 		PreparedDibPage currentPage_{};
 		TiffPageSettings currentPageSettings_{};
 		bool hasCurrentPage_ = false;
+		std::vector<uint8_t> rowBuffer_;
 };
 
 class DTWAINTiffOutput

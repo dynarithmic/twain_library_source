@@ -233,7 +233,7 @@ FreeImage_Initialise(BOOL load_local_plugins_only) {
         s_plugins->AddNode(InitPNM, FIF_PBMRAW, NULL, "PBMRAW", "Portable Bitmap (RAW)", "pbm", "^P4");
         s_plugins->AddNode(InitPNM, FIF_PGM, NULL, "PGM", "Portable Greymap (ASCII)", "pgm", "^P2");
         s_plugins->AddNode(InitPNM, FIF_PGMRAW, NULL, "PGMRAW", "Portable Greymap (RAW)", "pgm", "^P5");
-        s_plugins->AddNode(InitPNG, FIF_PNG);
+        // s_plugins->AddNode(InitPNG, FIF_PNG);
         s_plugins->AddNode(InitPNM, FIF_PPM, NULL, "PPM", "Portable Pixelmap (ASCII)", "ppm", "^P3");
         s_plugins->AddNode(InitPNM, FIF_PPMRAW, NULL, "PPMRAW", "Portable Pixelmap (RAW)", "ppm", "^P6");
 //        s_plugins->AddNode(InitTIFF, FIF_TIFF);

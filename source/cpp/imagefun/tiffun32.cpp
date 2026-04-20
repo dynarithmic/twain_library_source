@@ -116,6 +116,9 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
 	// Get a reference to the DIB
 	auto& theDibPage = lockedPage.GetPageRef();
 
+    // Get the bits-per-pixel
+    auto bpp = theDibPage.bitsPerPixel;
+
     // Get the page settings
     TiffPageSettings tiffPageSettings;
 
@@ -128,20 +131,29 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
 	tiffPageSettings.compression = TranslateCompression(retVal.second);
 
     // Now go through the special Group 3/4 options
-    if (tiffPageSettings.compression == TiffCompression::Group3 ||
-        tiffPageSettings.compression == TiffCompression::Group4)
+    bool isGroup3Or4Compression = (tiffPageSettings.compression == TiffCompression::Group3 ||
+                                    tiffPageSettings.compression == TiffCompression::Group4);
+
+    if (bpp == 1)
     {
-        tiffPageSettings.invertBilevelPolarity = true;
-        if (tiffPageSettings.compression == TiffCompression::Group3)
-            tiffPageSettings.group3Options = GROUP3OPT_2DENCODING | GROUP3OPT_FILLBITS;
+        if (!isGroup3Or4Compression)
+        {
+            tiffPageSettings.bilevelPhotometric = static_cast<uint16_t>(m_ImageInfoEx.PhotoMetric);
+            tiffPageSettings.forceFillOrder = true;
+            tiffPageSettings.forcedFillOrder = FILLORDER_MSB2LSB;
+        }
+        else
+        {
+            tiffPageSettings.bilevelPhotometric = PHOTOMETRIC_MINISWHITE;
+            tiffPageSettings.forceFillOrder = true;
+            tiffPageSettings.forcedFillOrder = FILLORDER_MSB2LSB;
+        }
     }
+    
+    tiffPageSettings.invertImage = (m_ImageInfoEx.PhotoMetric == PHOTOMETRIC_MINISWHITE) ? true : false;
 
     // Set the JPEG quality
     tiffPageSettings.jpegQuality = m_ImageInfoEx.nJpegQuality;
-
-    // Set the photometric setting
-    if (theDibPage.bitsPerPixel == 1)
-        theDibPage.bwpolarity = m_ImageInfoEx.PhotoMetric;
 
     if (m_MultiPageStruct.Stage == 0 || m_MultiPageStruct.Stage == DIB_MULTI_FIRST)
     {

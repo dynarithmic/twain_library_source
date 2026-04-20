@@ -31,8 +31,6 @@ OF THIRD PARTY RIGHTS.
 #include "dibmulti.h"
 #include "dibinfox.h"
 #include "fltrect.h"
-#include "FreeImage.h"
-#include "FreeImagePlus.h"
 #include <unordered_map>
 #include "dtwain_filetypes.h"
 #include "tiffwriter.h"
