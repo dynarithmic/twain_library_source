@@ -640,6 +640,9 @@
     <ClCompile Include="cpp\imagefun\pngwriter.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\imagefun\bmprlewriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1123,6 +1126,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\imagefun\pngwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\bmprlewriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

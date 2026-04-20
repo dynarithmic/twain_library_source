@@ -1488,6 +1488,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\ctlupdatedibproc.cpp" />
     <ClCompile Include="cpp\ctlwindowproc.cpp" />
     <ClCompile Include="cpp\extendedimageinfo.cpp" />
+    <ClCompile Include="cpp\imagefun\bmprlewriter.cpp" />
     <ClCompile Include="cpp\imagefun\ctldibblank.cpp" />
     <ClCompile Include="cpp\imagefun\pngwriter.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
@@ -1864,6 +1865,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\dtwain_version.h" />
     <ClInclude Include="h\dtwtype.h" />
     <ClInclude Include="h\extendedimageinfo.h" />
+    <ClInclude Include="h\imagefun\bmprlewriter.h" />
     <ClInclude Include="h\imagefun\dtwpdf\crc32_aux.h" />
     <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />
     <ClInclude Include="h\imagefun\pcxfun32.h" />

@@ -941,7 +941,7 @@ copy $(TargetDir)$(TargetName).lib .
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibPNG;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MinSpace</Optimization>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
@@ -1488,6 +1488,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\ctlupdatedibproc.cpp" />
     <ClCompile Include="cpp\ctlwindowproc.cpp" />
     <ClCompile Include="cpp\extendedimageinfo.cpp" />
+    <ClCompile Include="cpp\imagefun\bmprlewriter.cpp" />
     <ClCompile Include="cpp\imagefun\ctldibblank.cpp" />
     <ClCompile Include="cpp\imagefun\pngwriter.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
@@ -1864,6 +1865,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\dtwain_version.h" />
     <ClInclude Include="h\dtwtype.h" />
     <ClInclude Include="h\extendedimageinfo.h" />
+    <ClInclude Include="h\imagefun\bmprlewriter.h" />
     <ClInclude Include="h\imagefun\dtwpdf\crc32_aux.h" />
     <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />
     <ClInclude Include="h\imagefun\pcxfun32.h" />
