@@ -31,6 +31,7 @@
 #include <utility>
 #include "tiffwriter.h"
 #include "dtwaindefs.h"
+#include "dibutil.h"
 
 // ============================================================
 // Internal helpers
@@ -209,54 +210,7 @@ static bool convert_row(const PreparedDibPage& page,
             return true;
         }
     }
-
     return false;
-}
-
-static uint32_t calc_dib_stride_bytes(uint32_t width, uint16_t bitsPerPixel)
-{
-	const uint64_t bitsPerRow = static_cast<uint64_t>(width) * bitsPerPixel;
-	const uint64_t alignedBits = (bitsPerRow + 31ULL) & ~31ULL;
-	return static_cast<uint32_t>(alignedBits / 8ULL);
-}
-
-static uint32_t dib_palette_entries(const BITMAPINFOHEADER& bih)
-{
-	if (bih.biClrUsed != 0)
-		return static_cast<uint32_t>(bih.biClrUsed);
-
-	if (bih.biBitCount <= 8)
-		return (1u << bih.biBitCount);
-
-	return 0;
-}
-
-static const RGBQUAD* dib_palette_ptr_from_locked_dib(const BITMAPINFOHEADER* pBih)
-{
-	if (!pBih)
-		return nullptr;
-
-	if (pBih->biBitCount > 8)
-		return nullptr;
-
-	const uint32_t palEntries = dib_palette_entries(*pBih);
-	if (palEntries == 0)
-		return nullptr;
-
-	const uint8_t* p = reinterpret_cast<const uint8_t*>(pBih);
-	p += pBih->biSize;
-	return reinterpret_cast<const RGBQUAD*>(p);
-}
-
-static const uint8_t* dib_bits_ptr_from_locked_dib(const BITMAPINFOHEADER* pBih)
-{
-	const uint8_t* p = reinterpret_cast<const uint8_t*>(pBih);
-	p += pBih->biSize;
-
-	if (pBih->biBitCount <= 8)
-		p += dib_palette_entries(*pBih) * sizeof(RGBQUAD);
-
-	return p;
 }
 
 // ============================================================
@@ -610,6 +564,42 @@ bool TiffSessionWriter::WritePixels(const PageTagInfo& tagInfo)
 	return true;
 }
 
+LockedTiffPage::LockedTiffPage(HANDLE hDib) : dib_(hDib)
+{
+	if (!dib_.IsValid())
+		return;
+
+	const auto* bih = dib_.Header();
+	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
+		return;
+
+	PreparedDibPage page{};
+	page.width = dib_.Width();
+	page.height = dib_.Height();
+	page.bitsPerPixel = dib_.BitsPerPixel();
+	page.strideBytes = dib_.StrideBytes();
+	page.bottomUp = dib_.BottomUp();
+	page.bits = dib_.Bits();
+	page.palette = dib_.Palette();
+	page.paletteEntries = dib_.PaletteEntries();
+	page.xDpi = dib_.XDpi() > 0.0 ? dib_.XDpi() : 200.0;
+	page.yDpi = dib_.YDpi() > 0.0 ? dib_.YDpi() : 200.0;
+
+	switch (page.bitsPerPixel)
+	{
+		case 1:  page.pixelFlavor = PixelFlavor::BW1; break;
+		case 8:  page.pixelFlavor = page.palette ? PixelFlavor::Palette8 : PixelFlavor::Gray8; break;
+		case 16: page.pixelFlavor = PixelFlavor::Gray16; break;
+		case 24: page.pixelFlavor = PixelFlavor::Bgr24; break;
+		case 32: page.pixelFlavor = PixelFlavor::Bgra32; break;
+		default: return;
+	}
+
+	page_ = page;
+	valid_ = true;
+}
+
+#if 0
 // ============================================================
 // RAII view for HANDLE-based DIBs
 //
@@ -733,6 +723,7 @@ const PreparedDibPage& LockedDibPage::GetPage() const noexcept
 {
 	return page_;
 }
+#endif
 
 std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedDibPage& page,
 		TiffPageSettings settings)

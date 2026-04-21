@@ -227,8 +227,8 @@ FreeImage_Initialise(BOOL load_local_plugins_only) {
         The order used to initialize internal plugins below MUST BE the same order 
         as the one used to define the FREE_IMAGE_FORMAT enum. 
         */
-        s_plugins->AddNode(InitICO, FIF_ICO);
-        s_plugins->AddNode(InitJPEG, FIF_JPEG);
+        // s_plugins->AddNode(InitICO, FIF_ICO);
+        // s_plugins->AddNode(InitJPEG, FIF_JPEG);
         s_plugins->AddNode(InitPNM, FIF_PBM, NULL, "PBM", "Portable Bitmap (ASCII)", "pbm", "^P1");
         s_plugins->AddNode(InitPNM, FIF_PBMRAW, NULL, "PBMRAW", "Portable Bitmap (RAW)", "pbm", "^P4");
         s_plugins->AddNode(InitPNM, FIF_PGM, NULL, "PGM", "Portable Greymap (ASCII)", "pgm", "^P2");
@@ -239,7 +239,7 @@ FreeImage_Initialise(BOOL load_local_plugins_only) {
 //        s_plugins->AddNode(InitTIFF, FIF_TIFF);
         s_plugins->AddNode(InitWBMP, FIF_WBMP);
         s_plugins->AddNode(InitPSD, FIF_PSD);
-        s_plugins->AddNode(InitGIF, FIF_GIF);
+//        s_plugins->AddNode(InitGIF, FIF_GIF);
 //        s_plugins->AddNode(InitG3, FIF_FAXG3);
         s_plugins->AddNode(InitJ2K, FIF_J2K);
         s_plugins->AddNode(InitJP2, FIF_JP2);

@@ -30,6 +30,7 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <utility>
 #include <vector>
+#include "dibutil.h"
 
 // ============================================================
 // Prepared 8-bpp DIB page for BMP-RLE8 output
@@ -56,16 +57,11 @@ class LockedBmpRle8Page
 {
     public:
         explicit LockedBmpRle8Page(HANDLE hDib);
-        ~LockedBmpRle8Page();
-        LockedBmpRle8Page(const LockedBmpRle8Page&) = delete;
-        LockedBmpRle8Page& operator=(const LockedBmpRle8Page&) = delete;
-
         bool IsValid() const noexcept;
         const PreparedBmpRle8Page& GetPage() const noexcept;
 
     private:
-        HANDLE hDib_ = nullptr;
-        void* locked_ = nullptr;
+		dynarithmic::dib::LockedDib dib_;
         PreparedBmpRle8Page page_{};
         bool valid_ = false;
 };

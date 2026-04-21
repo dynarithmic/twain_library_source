@@ -24,96 +24,30 @@
  // HANDLE-based DIB lock helper
  // Assumes the DIB is 8-bpp and already suitable for BMP-RLE8.
  // ============================================================
-
-static uint32_t calc_dib_stride_bytes(uint32_t width, uint16_t bitsPerPixel)
+LockedBmpRle8Page::LockedBmpRle8Page(HANDLE hDib) : dib_(hDib)
 {
-	const uint64_t bitsPerRow = static_cast<uint64_t>(width) * bitsPerPixel;
-	const uint64_t alignedBits = (bitsPerRow + 31ULL) & ~31ULL;
-	return static_cast<uint32_t>(alignedBits / 8ULL);
-}
-
-static uint32_t dib_palette_entries(const BITMAPINFOHEADER& bih)
-{
-	if (bih.biClrUsed != 0)
-		return static_cast<uint32_t>(bih.biClrUsed);
-
-	if (bih.biBitCount <= 8)
-		return (1u << bih.biBitCount);
-
-	return 0;
-}
-
-static const RGBQUAD* dib_palette_ptr_from_locked_dib(const BITMAPINFOHEADER* pBih)
-{
-	if (!pBih || pBih->biBitCount > 8)
-		return nullptr;
-
-	const uint32_t palEntries = dib_palette_entries(*pBih);
-	if (palEntries == 0)
-		return nullptr;
-
-	const uint8_t* p = reinterpret_cast<const uint8_t*>(pBih);
-	p += pBih->biSize;
-	return reinterpret_cast<const RGBQUAD*>(p);
-}
-
-static const uint8_t* dib_bits_ptr_from_locked_dib(const BITMAPINFOHEADER* pBih)
-{
-	const uint8_t* p = reinterpret_cast<const uint8_t*>(pBih);
-	p += pBih->biSize;
-
-	if (pBih->biBitCount <= 8)
-		p += dib_palette_entries(*pBih) * sizeof(RGBQUAD);
-
-	return p;
-}
-
-LockedBmpRle8Page::LockedBmpRle8Page(HANDLE hDib) : hDib_(hDib)
-{
-	if (!hDib_)
+	if (!dib_.IsValid())
 		return;
 
-	locked_ = ::GlobalLock(hDib_);
-	if (!locked_)
+	if (dib_.BitsPerPixel() != 8 || !dib_.Palette() || dib_.PaletteEntries() == 0)
 		return;
-
-	const auto* pBih = static_cast<const BITMAPINFOHEADER*>(locked_);
-	if (!pBih || pBih->biSize < sizeof(BITMAPINFOHEADER))
-		return;
-
-	if (pBih->biWidth <= 0 || pBih->biHeight == 0)
-		return;
-
-	if (pBih->biBitCount != 8)
-		return;
-
-	const bool bottomUp = (pBih->biHeight > 0);
-	const uint32_t width = static_cast<uint32_t>(pBih->biWidth);
-	const uint32_t height = static_cast<uint32_t>(bottomUp ? pBih->biHeight : -pBih->biHeight);
 
 	PreparedBmpRle8Page page{};
-	page.width = width;
-	page.height = height;
+	page.width = dib_.Width();
+	page.height = dib_.Height();
 	page.bitsPerPixel = 8;
-	page.strideBytes = calc_dib_stride_bytes(width, 8);
-	page.bottomUp = bottomUp;
-	page.bits = dib_bits_ptr_from_locked_dib(pBih);
-	page.palette = dib_palette_ptr_from_locked_dib(pBih);
-	page.paletteEntries = dib_palette_entries(*pBih);
-	page.xPelsPerMeter = pBih->biXPelsPerMeter;
-	page.yPelsPerMeter = pBih->biYPelsPerMeter;
+	page.strideBytes = dib_.StrideBytes();
+	page.bottomUp = dib_.BottomUp();
+	page.bits = dib_.Bits();
+	page.palette = dib_.Palette();
+	page.paletteEntries = dib_.PaletteEntries();
 
-	if (!page.bits || !page.palette || page.paletteEntries == 0)
-		return;
+	const auto* bih = dib_.Header();
+	page.xPelsPerMeter = bih ? bih->biXPelsPerMeter : 0;
+	page.yPelsPerMeter = bih ? bih->biYPelsPerMeter : 0;
 
 	page_ = page;
 	valid_ = true;
-}
-
-LockedBmpRle8Page::~LockedBmpRle8Page()
-{
-	if (locked_)
-		::GlobalUnlock(hDib_);
 }
 
 bool LockedBmpRle8Page::IsValid() const noexcept { return valid_; }

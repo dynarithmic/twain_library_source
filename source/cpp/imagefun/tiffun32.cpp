@@ -111,7 +111,7 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
         tiffOptions.containerFormat = TiffContainerFormat::BigTiff;
 
     // Get the DIB
-    LockedDibPage lockedPage(bitmap);
+    LockedTiffPage lockedPage(bitmap);
 
 	// Get a reference to the DIB
 	auto& theDibPage = lockedPage.GetPageRef();

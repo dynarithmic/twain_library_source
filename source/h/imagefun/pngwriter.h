@@ -33,6 +33,7 @@ OF THIRD PARTY RIGHTS.
 #include <utility>
 #include <vector>
 #include "dtwaindefs.h"
+#include "dibutil.h"
 
 // ============================================================
 // Prepared page (already resampled by DTWAIN before reaching PNG)
@@ -94,18 +95,12 @@ class LockedPngDibPage
 {
 	public:
 		explicit LockedPngDibPage(HANDLE hDib);
-		~LockedPngDibPage();
-		LockedPngDibPage(const LockedPngDibPage&) = delete;
-		LockedPngDibPage& operator=(const LockedPngDibPage&) = delete;
-		LockedPngDibPage(LockedPngDibPage&& other) noexcept;
-		LockedPngDibPage& operator=(LockedPngDibPage&& other) noexcept;
 		bool IsValid() const noexcept;
 		const PreparedPngDibPage& GetPage() const noexcept;
 		PreparedPngDibPage& GetPageRef() { return page_; }
 
 	private:
-		HANDLE hDib_ = nullptr;
-		void* locked_ = nullptr;
+		dynarithmic::dib::LockedDib dib_;
 		PreparedPngDibPage page_{};
 		bool valid_ = false;
 };

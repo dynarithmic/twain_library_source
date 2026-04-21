@@ -643,6 +643,45 @@
     <ClCompile Include="cpp\imagefun\bmprlewriter.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="LibGIF\dgif_lib.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\egif_lib.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\getarg.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\gif_err.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\gif_font.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\gif_hash.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\gifalloc.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\openbsd-reallocarray.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\qprintf.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\quantize.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\gifwriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\icowriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\jpegwriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1131,6 +1170,30 @@
     <ClInclude Include="h\imagefun\bmprlewriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LibGIF\getarg.h">
+      <Filter>LibGIF</Filter>
+    </ClInclude>
+    <ClInclude Include="LibGIF\gif_hash.h">
+      <Filter>LibGIF</Filter>
+    </ClInclude>
+    <ClInclude Include="LibGIF\gif_lib.h">
+      <Filter>LibGIF</Filter>
+    </ClInclude>
+    <ClInclude Include="LibGIF\gif_lib_private.h">
+      <Filter>LibGIF</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\gifwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\dibutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\icowriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\jpegwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">
@@ -1304,6 +1367,9 @@
     </Filter>
     <Filter Include="Natvis">
       <UniqueIdentifier>{7b688719-c9a6-40b3-9705-5cd9b3bedee0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibGIF">
+      <UniqueIdentifier>{70f1f93a-6e5d-4f36-b101-0de3f3deb9cf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

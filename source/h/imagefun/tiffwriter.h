@@ -25,6 +25,7 @@ OF THIRD PARTY RIGHTS.
 #include <memory>
 #include <vector>
 #include "tiffio.h"
+#include "dibutil.h"
 
 enum class TiffContainerFormat
 {
@@ -134,29 +135,16 @@ struct PageTagInfo
 	bool writeColorMap = false;
 };
 
-// ============================================================
-// RAII view for HANDLE-based DIBs
-//
-// The DIB remains GlobalLocked() for the lifetime of this object.
-// That ensures PreparedDibPage pointers remain valid through
-// SetPageInfo() + WriteCurrentPage().
-// ============================================================
-class LockedDibPage
+class LockedTiffPage
 {
 	public:
-		explicit LockedDibPage(HANDLE hDib);
-		~LockedDibPage();
-		LockedDibPage(const LockedDibPage&) = delete;
-		LockedDibPage& operator=(const LockedDibPage&) = delete;
-		LockedDibPage(LockedDibPage&& other) noexcept;
-		LockedDibPage& operator=(LockedDibPage&& other) noexcept;
-		bool IsValid() const noexcept;
-		const PreparedDibPage& GetPage() const noexcept;
+		explicit LockedTiffPage(HANDLE hDib);
+		bool IsValid() const noexcept { return valid_; }
+		const PreparedDibPage& GetPage() const noexcept { return page_; }
 		PreparedDibPage& GetPageRef() { return page_; }
 
 	private:
-		HANDLE hDib_ = nullptr;
-		void* locked_ = nullptr;
+		dynarithmic::dib::LockedDib dib_;
 		PreparedDibPage page_{};
 		bool valid_ = false;
 };

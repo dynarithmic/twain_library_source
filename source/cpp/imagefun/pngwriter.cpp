@@ -33,125 +33,31 @@
 	#pragma warning (disable : 4611)
 #endif
 
-// ============================================================
-// Internal helpers
-// ============================================================
-static uint32_t calc_dib_stride_bytes(uint32_t width, uint16_t bitsPerPixel)
+LockedPngDibPage::LockedPngDibPage(HANDLE hDib) : dib_(hDib)
 {
-	const uint64_t bitsPerRow = static_cast<uint64_t>(width) * bitsPerPixel;
-	const uint64_t alignedBits = (bitsPerRow + 31ULL) & ~31ULL;
-	return static_cast<uint32_t>(alignedBits / 8ULL);
-}
-
-static uint32_t dib_palette_entries(const BITMAPINFOHEADER& bih)
-{
-	if (bih.biClrUsed != 0)
-		return static_cast<uint32_t>(bih.biClrUsed);
-
-	if (bih.biBitCount <= 8)
-		return (1u << bih.biBitCount);
-
-	return 0;
-}
-
-static const uint8_t* dib_bits_ptr_from_locked_dib(const BITMAPINFOHEADER* pBih)
-{
-	const uint8_t* p = reinterpret_cast<const uint8_t*>(pBih);
-	p += pBih->biSize;
-
-	if (pBih->biBitCount <= 8)
-		p += dib_palette_entries(*pBih) * sizeof(RGBQUAD);
-
-	return p;
-}
-
-
-static const RGBQUAD* dib_palette_ptr_from_locked_dib(const BITMAPINFOHEADER* pBih)
-{
-	if (!pBih)
-		return nullptr;
-
-	if (pBih->biBitCount > 8)
-		return nullptr;
-
-	const uint32_t palEntries = dib_palette_entries(*pBih);
-	if (palEntries == 0)
-		return nullptr;
-
-	const uint8_t* p = reinterpret_cast<const uint8_t*>(pBih);
-	p += pBih->biSize;
-	return reinterpret_cast<const RGBQUAD*>(p);
-}
-
-static bool is_identity_grayscale_palette(const RGBQUAD* palette, uint32_t entries)
-{
-	if (!palette || entries == 0)
-		return false;
-
-	for (uint32_t i = 0; i < entries; ++i)
-	{
-		const uint8_t expected = static_cast<uint8_t>(i & 0xFF);
-
-		if (palette[i].rgbRed != expected ||
-			palette[i].rgbGreen != expected ||
-			palette[i].rgbBlue != expected)
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-LockedPngDibPage::LockedPngDibPage(HANDLE hDib)
-		: hDib_(hDib)
-{
-	if (!hDib_)
+	if (!dib_.IsValid())
 		return;
-
-	locked_ = ::GlobalLock(hDib_);
-	if (!locked_)
-		return;
-
-	const auto* pBih = static_cast<const BITMAPINFOHEADER*>(locked_);
-	if (!pBih || pBih->biSize < sizeof(BITMAPINFOHEADER))
-		return;
-
-	if (pBih->biWidth <= 0 || pBih->biHeight == 0)
-		return;
-
-	const bool bottomUp = (pBih->biHeight > 0);
-	const uint32_t width = static_cast<uint32_t>(pBih->biWidth);
-	const uint32_t height = static_cast<uint32_t>(bottomUp ? pBih->biHeight : -pBih->biHeight);
-	const uint16_t bpp = static_cast<uint16_t>(pBih->biBitCount);
 
 	PreparedPngDibPage page{};
-	page.width = width;
-	page.height = height;
-	page.bitsPerPixel = bpp;
-	page.strideBytes = calc_dib_stride_bytes(width, bpp);
-	page.bottomUp = bottomUp;
-	page.bits = dib_bits_ptr_from_locked_dib(pBih);
-	page.palette = dib_palette_ptr_from_locked_dib(pBih);
-	page.paletteEntries = dib_palette_entries(*pBih);
+	page.width = dib_.Width();
+	page.height = dib_.Height();
+	page.bitsPerPixel = dib_.BitsPerPixel();
+	page.strideBytes = dib_.StrideBytes();
+	page.bottomUp = dib_.BottomUp();
+	page.bits = dib_.Bits();
+	page.palette = dib_.Palette();
+	page.paletteEntries = dib_.PaletteEntries();
+	page.xDpi = dib_.XDpi() > 0.0 ? dib_.XDpi() : 96.0;
+	page.yDpi = dib_.YDpi() > 0.0 ? dib_.YDpi() : 96.0;
 
-	if (pBih->biXPelsPerMeter > 0)
-		page.xDpi = static_cast<double>(pBih->biXPelsPerMeter) * 0.0254;
-	if (pBih->biYPelsPerMeter > 0)
-		page.yDpi = static_cast<double>(pBih->biYPelsPerMeter) * 0.0254;
-
-	switch (bpp)
+	switch (page.bitsPerPixel)
 	{
 		case 8:
-			if (page.palette && page.paletteEntries > 0)
-			{
-				page.pixelFlavor = is_identity_grayscale_palette(page.palette, page.paletteEntries)
-					? PngPixelFlavor::Gray8
-					: PngPixelFlavor::Palette8;
-			}
+			if (page.palette && page.paletteEntries > 0 &&
+				!dynarithmic::dib::is_identity_grayscale_palette(page.palette, page.paletteEntries))
+				page.pixelFlavor = PngPixelFlavor::Palette8;
 			else
-			{
 				page.pixelFlavor = PngPixelFlavor::Gray8;
-			}
 			break;
 
 		case 16:
@@ -170,54 +76,9 @@ LockedPngDibPage::LockedPngDibPage(HANDLE hDib)
 	valid_ = true;
 }
 
-LockedPngDibPage::~LockedPngDibPage()
-{
-	if (locked_)
-		::GlobalUnlock(hDib_);
-}
-
-LockedPngDibPage::LockedPngDibPage(LockedPngDibPage&& other) noexcept
-	: hDib_(other.hDib_),
-	locked_(other.locked_),
-	page_(other.page_),
-	valid_(other.valid_)
-{
-	other.hDib_ = nullptr;
-	other.locked_ = nullptr;
-	other.valid_ = false;
-}
-
-LockedPngDibPage& LockedPngDibPage::operator=(LockedPngDibPage&& other) noexcept
-{
-	if (this != &other)
-	{
-		if (locked_)
-			::GlobalUnlock(hDib_);
-
-		hDib_ = other.hDib_;
-		locked_ = other.locked_;
-		page_ = other.page_;
-		valid_ = other.valid_;
-
-		other.hDib_ = nullptr;
-		other.locked_ = nullptr;
-		other.valid_ = false;
-	}
-	return *this;
-}
-
 bool LockedPngDibPage::IsValid() const noexcept { return valid_; }
 const PreparedPngDibPage& LockedPngDibPage::GetPage() const noexcept { return page_; }
 
-// ============================================================
-// PNG writer
-//
-// DTWAIN model:
-//   FirstPage -> Open + SetPageInfo + WriteCurrentPage
-//   LastPage  -> Close
-//
-// No NextPage because PNG is single-image.
-// ============================================================
 PngSessionWriter::~PngSessionWriter()
 {
 	Close();
@@ -372,19 +233,19 @@ bool PngSessionWriter::ValidateCurrentPage() const
 
 	switch (currentPage_.pixelFlavor)
 	{
-	case PngPixelFlavor::Gray8:
-		return currentPage_.bitsPerPixel == 8;
+		case PngPixelFlavor::Gray8:
+			return currentPage_.bitsPerPixel == 8;
 
-	case PngPixelFlavor::Palette8:
-		return currentPage_.bitsPerPixel == 8 &&
-			currentPage_.palette != nullptr &&
-			currentPage_.paletteEntries > 0;
+		case PngPixelFlavor::Palette8:
+			return currentPage_.bitsPerPixel == 8 &&
+				currentPage_.palette != nullptr &&
+				currentPage_.paletteEntries > 0;
 
-	case PngPixelFlavor::Gray16:
-		return currentPage_.bitsPerPixel == 16;
+		case PngPixelFlavor::Gray16:
+			return currentPage_.bitsPerPixel == 16;
 
-	case PngPixelFlavor::Bgr24:
-		return currentPage_.bitsPerPixel == 24;
+		case PngPixelFlavor::Bgr24:
+			return currentPage_.bitsPerPixel == 24;
 	}
 	return false;
 }
