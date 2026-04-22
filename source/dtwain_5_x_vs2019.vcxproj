@@ -227,7 +227,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibPNG;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;.\dtwinver;.\LibGIF;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibPNG;.\FreeImage\Source\LibOpenJPEG;.\FreeImage\Source\LibWebP\src;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;.\dtwinver;.\LibGIF;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;USE_DTWAIN_DEBUG_LIB;_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;DTWAIN_DLL;DTWAIN_SUPPORT_AES</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -380,7 +380,7 @@ copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     <ClCompile>
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibPNG;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;.\dtwinver;.\LibGIF;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibPNG;.\FreeImage\Source\LibOpenJPEG;.\FreeImage\Source\LibWebP\src;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;.\dtwinver;.\LibGIF;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;FREEIMAGE_CPP_LIB;_UNICODE;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -1492,12 +1492,16 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\imagefun\ctldibblank.cpp" />
     <ClCompile Include="cpp\imagefun\gifwriter.cpp" />
     <ClCompile Include="cpp\imagefun\icowriter.cpp" />
+    <ClCompile Include="cpp\imagefun\jpeg2kwriter.cpp" />
     <ClCompile Include="cpp\imagefun\jpegwriter.cpp" />
     <ClCompile Include="cpp\imagefun\pngwriter.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
+    <ClCompile Include="cpp\imagefun\tgawriter.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
     <ClCompile Include="cpp\imagefun\tiffwriter.cpp" />
     <ClCompile Include="cpp\imagefun\txtfun32.cpp" />
+    <ClCompile Include="cpp\imagefun\wbmpwriter.cpp" />
+    <ClCompile Include="cpp\imagefun\webpwriter.cpp" />
     <ClCompile Include="cpp\iohandler_jpegxr.cpp" />
     <ClCompile Include="cpp\iohandler_pbm.cpp" />
     <ClCompile Include="cpp\iohandler_svg.cpp" />
@@ -2134,14 +2138,18 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />
     <ClInclude Include="h\imagefun\gifwriter.h" />
     <ClInclude Include="h\imagefun\icowriter.h" />
+    <ClInclude Include="h\imagefun\jpeg2kwriter.h" />
     <ClInclude Include="h\imagefun\jpegwriter.h" />
     <ClInclude Include="h\imagefun\pcxfun32.h" />
     <ClInclude Include="h\imagefun\pdffun32.h" />
     <ClInclude Include="h\imagefun\pngwriter.h" />
     <ClInclude Include="h\imagefun\resamplefactory.h" />
+    <ClInclude Include="h\imagefun\tgawriter.h" />
     <ClInclude Include="h\imagefun\tiffun32.h" />
     <ClInclude Include="h\imagefun\tiffwriter.h" />
     <ClInclude Include="h\imagefun\txtfun32.h" />
+    <ClInclude Include="h\imagefun\wbmpwriter.h" />
+    <ClInclude Include="h\imagefun\webpwriter.h" />
     <ClInclude Include="h\imagefun\winbit32.h" />
     <ClInclude Include="h\imagefun\wmffun32.h" />
     <ClInclude Include="h\imagexferfilewriter.h" />

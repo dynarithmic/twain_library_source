@@ -682,6 +682,18 @@
     <ClCompile Include="cpp\imagefun\jpegwriter.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\imagefun\tgawriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\wbmpwriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\jpeg2kwriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\webpwriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1192,6 +1204,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\imagefun\jpegwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\tgawriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\wbmpwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\jpeg2kwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\webpwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

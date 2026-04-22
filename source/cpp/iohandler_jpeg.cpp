@@ -68,13 +68,4 @@ int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
         return DTWAIN_ERR_FILEWRITE;
 
     return DTWAIN_NO_ERROR;
-/*    flags += m_ImageInfoEx.IsPDF ? m_ImageInfoEx.nPDFJpegQuality : m_ImageInfoEx.nJpegQuality;
-
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
-    m_SaveParams.flags = flags;
-    m_SaveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
-    m_SaveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
-
-    return SaveToFile();*/
 }
