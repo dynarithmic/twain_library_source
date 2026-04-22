@@ -20,7 +20,6 @@
  */
 
 #include "jpegwriter.h"
-#include <jpeglib.h>
 
  // ============================================================
  // Locked page wrapper
@@ -156,6 +155,8 @@ bool JpegSessionWriter::WriteCurrentPage()
 
 	jpeg_start_compress(&cinfo, TRUE);
 
+	write_comment_markers(cinfo);
+
 	const uint32_t rowBytes =
 		(currentPage_.pixelFlavor == JpegPixelFlavor::Bgr24)
 		? currentPage_.width * 3
@@ -179,14 +180,12 @@ bool JpegSessionWriter::WriteCurrentPage()
 		}
 		else if (currentPage_.pixelFlavor == JpegPixelFlavor::Gray16)
 		{
-			// Down-convert 16-bit grayscale to 8-bit grayscale for JPEG.
 			const uint16_t* src16 = reinterpret_cast<const uint16_t*>(src);
 			for (uint32_t x = 0; x < currentPage_.width; ++x)
 				rowBuffer_[x] = static_cast<uint8_t>(src16[x] >> 8);
 		}
 		else
 		{
-			// Convert BGR DIB row -> RGB JPEG row
 			for (uint32_t x = 0; x < currentPage_.width; ++x)
 			{
 				rowBuffer_[x * 3 + 0] = src[x * 3 + 2];
@@ -244,6 +243,56 @@ bool JpegSessionWriter::ValidatePage(const PreparedJpegDibPage& page)
 			return false;
 	}
 	return false;
+}
+
+void JpegSessionWriter::append_metadata_line(std::string& out, const char* key, const std::string& value)
+{
+	if (value.empty())
+		return;
+
+	out += key;
+	out += ": ";
+	out += value;
+	out += "\n";
+}
+
+std::string JpegSessionWriter::build_comment_text() const
+{
+	std::string text;
+	append_metadata_line(text, "Software", options_.text.software);
+	append_metadata_line(text, "Copyright", options_.text.copyright);
+	append_metadata_line(text, "Author", options_.text.author);
+	append_metadata_line(text, "Description", options_.text.description);
+	append_metadata_line(text, "Comment", options_.text.comment);
+
+	if (!text.empty() && text.back() == '\n')
+		text.pop_back();
+
+	return text;
+}
+
+void JpegSessionWriter::write_comment_markers(jpeg_compress_struct& cinfo)
+{
+	const std::string text = build_comment_text();
+	if (text.empty())
+		return;
+
+	const JOCTET* p = reinterpret_cast<const JOCTET*>(text.data());
+	size_t remaining = text.size();
+
+	// Stay comfortably under the JPEG marker-size ceiling.
+	constexpr unsigned int kChunkSize = 65000;
+
+	while (remaining > 0)
+	{
+		const unsigned int chunk =
+			static_cast<unsigned int>(remaining > kChunkSize ? kChunkSize : remaining);
+
+		jpeg_write_marker(&cinfo, JPEG_COM, p, chunk);
+
+		p += chunk;
+		remaining -= chunk;
+	}
 }
 
 bool DTWAINJpegOutput::OnFirstPage(const std::wstring& filename, const JpegSessionOptions& options, const PreparedJpegDibPage& page)

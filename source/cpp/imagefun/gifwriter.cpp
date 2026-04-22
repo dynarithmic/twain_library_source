@@ -41,10 +41,8 @@ LockedGifDibPage::LockedGifDibPage(HANDLE hDib) : dib_(hDib)
 	page.palette = dib_.Palette();
 	page.paletteEntries = dib_.PaletteEntries();
 
-	if (page.palette && page.paletteEntries > 0 &&
-		dynarithmic::dib::is_grayscale_palette(page.palette, page.paletteEntries))
-		page.pixelFlavor = GifPixelFlavor::Gray8;
-	else if (page.palette && page.paletteEntries > 0)
+	// For GIF: preserve palette whenever one exists.
+	if (page.palette && page.paletteEntries > 0)
 		page.pixelFlavor = GifPixelFlavor::Indexed8;
 	else
 		page.pixelFlavor = GifPixelFlavor::Gray8;
@@ -52,7 +50,6 @@ LockedGifDibPage::LockedGifDibPage(HANDLE hDib) : dib_(hDib)
 	page_ = page;
 	valid_ = true;
 }
-
 bool LockedGifDibPage::IsValid() const noexcept { return valid_; }
 const PreparedGifDibPage& LockedGifDibPage::GetPage() const noexcept { return page_; }
 

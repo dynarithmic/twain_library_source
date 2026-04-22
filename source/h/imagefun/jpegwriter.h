@@ -26,6 +26,7 @@ OF THIRD PARTY RIGHTS.
 #include <memory>
 #include <cstdio>
 #include <windows.h>
+#include <jpeglib.h>
 #include "dibutil.h"
 
 // ============================================================
@@ -57,10 +58,20 @@ struct PreparedJpegDibPage
 	const uint8_t* bits = nullptr;
 };
 
+struct JpegTextMetadata
+{
+	std::string software;
+	std::string copyright;
+	std::string author;
+	std::string description;
+	std::string comment;
+};
+
 struct JpegSessionOptions
 {
 	int quality = 75;
 	bool progressive = false;
+	JpegTextMetadata text;
 };
 
 // ============================================================
@@ -97,6 +108,9 @@ class JpegSessionWriter
 
 	private:
 		static bool ValidatePage(const PreparedJpegDibPage& page);
+		static void append_metadata_line(std::string& out, const char* key, const std::string& value);
+		std::string build_comment_text() const;
+		void write_comment_markers(jpeg_compress_struct& cinfo);
 
 	private:
 		FILE* file_ = nullptr;

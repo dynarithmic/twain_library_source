@@ -57,6 +57,11 @@ int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     opts.quality = m_ImageInfoEx.IsPDF ? m_ImageInfoEx.nPDFJpegQuality : m_ImageInfoEx.nJpegQuality;
 	opts.progressive = m_ImageInfoEx.bProgressiveJpeg;
 
+	// Get the comment string (copyright information)
+	char commentStr[256] = {};
+	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+	opts.text.copyright = commentStr;
+
 	std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToJpeg(szFile, opts, hDib))
