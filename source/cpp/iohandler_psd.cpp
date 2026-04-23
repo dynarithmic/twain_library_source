@@ -20,8 +20,30 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "psdwriter.h"
 
 using namespace dynarithmic;
+
+static bool WriteOneDibHandleToPsd(const std::wstring& filename, const PsdSessionOptions& options, HANDLE hDib)
+{
+	LockedPsdDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	PsdSessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+	if (!writer.SetPageInfo(lockedPage.GetPage()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
+
 
 int CTL_PsdIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
@@ -32,9 +54,13 @@ int CTL_PsdIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!IsValidBitDepth(DTWAIN_PSD, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
+	PsdSessionOptions opts{};
+	opts.useRle = true; // raw only in this implementation
 
-    return SaveToFile();
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+
+	if (!WriteOneDibHandleToPsd(fName, opts, hDib))
+		return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }
 

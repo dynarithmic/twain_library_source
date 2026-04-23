@@ -451,7 +451,7 @@
 8002  Windows-ICON-Resized-Single ico
 8500  WBMP-Wireless-Bitmap-Single wbmp
 8501  WEBP-Google-Format-Single webp
-10000 PPM-Portable-Bitmap-Single ppm 
+10000 PPM-Portable-Bitmap-Single pnm pbm pgm ppm
 11000 WBMP-Wireless-Bitmap-Resized-Single wbmp
 11001 TARGA-RLE-Single        tga
 11002 Windows-BMP-RLE-Single  bmp                             
@@ -2357,7 +2357,7 @@
 8002 DTWAIN_ICO_RESIZED "Icon file (*.ico)" "*.ico" ".ico" 
 8500 DTWAIN_WBMP "WBMP (Wireless Bitmap Format) (*.wbmp)" "*.wbmp" ".wbmp" 
 8501 DTWAIN_WEBP "webp format (*.webp)" "*.webp" ".webp" 
-10000 DTWAIN_PBM "pbm format (*.pbm)" "*.pbm" ".pbm" 
+10000 DTWAIN_PBM "pnm format (*.pnm)" "*.pnm" ".pnm" 
 11000 DTWAIN_WBMP_RESIZED "WBMP (Wireless Bitmap Format) (*.wbmp)" "*.wbmp" ".wbmp" 
 11001 DTWAIN_TGARLE "Targa (TGA) Format (Run Length Encoded) (*.tga)" "*.tga" ".tga" 
 11002 DTWAIN_BMPRLE "Windows Bitmap Format (RLE) (*.bmp)" "*.bmp" ".bmp" 
@@ -2395,5 +2395,5 @@ TWCP_BITFIELDS  [TWFF_BMP]
 TWCP_ZIP [TWFF_TIFF TWFF_TIFFMULTI]
 TWCP_JPEG2000 [TWFF_JP2]
 END
-4254785841
+586715870
 END END END

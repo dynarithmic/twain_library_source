@@ -21,13 +21,14 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "pcxwriter.h"
 
 using namespace dynarithmic;
-int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMutiPageStruct)
+int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {
     HANDLE hDib = nullptr;
 
-    if ( !pMutiPageStruct || pMutiPageStruct->Stage != DIB_MULTI_LAST )
+    if ( !pMultiPageStruct || pMultiPageStruct->Stage != DIB_MULTI_LAST )
     {
         if ( !m_pDib )
             return DTWAIN_ERR_DIB;
@@ -37,21 +38,45 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
             return DTWAIN_ERR_DIB;
     }
 
-    if (pMutiPageStruct && pMutiPageStruct->Stage != DIB_MULTI_LAST && !IsValidBitDepth(DTWAIN_PCX, m_pDib->GetBitsPerPixel()))
+    if (pMultiPageStruct && pMultiPageStruct->Stage != DIB_MULTI_LAST && !IsValidBitDepth(DTWAIN_PCX, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    CPCXImageHandler PCXHandler(m_ImageInfoEx);
-    if ( pMutiPageStruct )
-    {
-        PCXHandler.SetMultiPageStatus(pMutiPageStruct);
-    }
+    bool bIsFirstPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_FIRST);
+    bool bIsLastPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
+    bool isDCX = (m_nFormat == DTWAIN_DCX);
 
-    int retval;
-    if ( !pMutiPageStruct || pMutiPageStruct->Stage != DIB_MULTI_LAST )
-        retval = PCXHandler.WriteGraphicFile(this, szFile, hDib);
+    std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
+
+    if ( bIsFirstPage )
+    {
+		LockedPcxDibPage locked(hDib);
+		if (!locked.IsValid())
+			return false;
+
+		PcxSessionOptions opts{};
+		opts.writeDcx = isDCX;
+
+		if (!output.OnFirstPage(filename, opts, locked.GetPage()))
+			return DTWAIN_ERR_FILEWRITE;
+        return DTWAIN_NO_ERROR;
+	}
     else
-        retval = PCXHandler.WriteImage(nullptr,nullptr,0,0,0,0, nullptr);
-    if ( pMutiPageStruct )
-        PCXHandler.GetMultiPageStatus(pMutiPageStruct);
-    return retval;
+    if ( !bIsLastPage && isDCX)
+    {
+		LockedPcxDibPage locked(hDib);
+		if (!locked.IsValid())
+			return DTWAIN_ERR_FILEWRITE;
+
+		if (!output.OnNextPage(locked.GetPage()))
+			return DTWAIN_ERR_FILEWRITE;
+        return DTWAIN_NO_ERROR;
+    }
+    else
+    if ( bIsLastPage || !isDCX )
+    {
+		if (!output.OnLastPage())
+			return DTWAIN_ERR_FILEWRITE;
+        return DTWAIN_NO_ERROR;
+    }
+    return DTWAIN_NO_ERROR;
 }
