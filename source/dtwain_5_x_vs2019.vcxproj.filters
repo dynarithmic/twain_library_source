@@ -694,6 +694,9 @@
     <ClCompile Include="cpp\imagefun\webpwriter.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\imagefun\jpegxrwriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1216,6 +1219,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\imagefun\webpwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\jpegxrwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlstringconversion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

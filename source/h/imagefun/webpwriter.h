@@ -51,13 +51,24 @@ struct PreparedWebPDibPage
 	const uint8_t* bits = nullptr;
 };
 
+struct WebPTextMetadata
+{
+	std::string comment;
+	std::string copyright;
+	std::string author;
+	std::string software;
+};
+
 struct WebPSessionOptions
 {
 	// Match FreeImage defaults
 	bool lossless = false;
 	float quality = 75.0f;
-	int method = 4;      // 0..6
-	bool exact = false;  // preserve transparent RGB for lossless RGBA if needed
+	int method = 4;
+	bool exact = false;
+
+	// Optional new DTWAIN metadata
+	WebPTextMetadata text;
 };
 
 // ============================================================
@@ -105,6 +116,10 @@ class WebPSessionWriter
 		bool ImportBgr24(WebPPicture& picture);
 		bool ImportBgra32(WebPPicture& picture);
 		bool WriteOutputFile(const std::vector<uint8_t>& data) const;
+		static bool HasMetadata(const WebPTextMetadata& text);
+		static std::string XmlEscape(const std::string& s);
+		std::string BuildXmpPacket() const;
+		bool AddMetadataWithMux(const std::vector<uint8_t>& encodedImage, std::vector<uint8_t>& finalImage) const;
 
 	private:
 		std::wstring filename_;

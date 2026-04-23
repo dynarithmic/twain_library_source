@@ -20,10 +20,33 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "jpegxrwriter.h"
+#include <algorithm>
 
 using namespace dynarithmic;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static bool WriteOneDibHandleToJxr(const std::wstring& filename, const JxrSessionOptions& options, HANDLE hDib)
+{
+	LockedJxrDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	JxrSessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+	if (!writer.SetPageInfo(lockedPage.GetPage()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
+
+
 CTL_JpegXRIOHandler::CTL_JpegXRIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx)
 : CTL_ImageIOHandler( pDib ), m_nFormat(0), m_ImageInfoEx(ImageInfoEx)
 { 
@@ -42,15 +65,18 @@ int CTL_JpegXRIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
     if (!IsValidBitDepth(DTWAIN_JPEGXR, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    // Set the image quality within the flags
-    int flags = m_ImageInfoEx.nJpegXRQuality;
-    if (m_ImageInfoEx.bProgressiveJpegXR)
-        flags |= JXR_PROGRESSIVE;
+	// Get the comment string (copyright information)
+	char commentStr[256] = {};
+	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+	JxrSessionOptions opts{};
+	opts.lossless = false;
+	opts.quality = (std::max)(0.0f, (std::min)(1.0f, m_ImageInfoEx.nJpegXRQuality / 100.0f));
+    opts.text.comment = commentStr;
+	opts.progressive = m_ImageInfoEx.bProgressiveJpegXR;
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
-    m_SaveParams.flags = flags;
-    m_SaveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
-    m_SaveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
-    return SaveToFile();
+	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+
+	if (!WriteOneDibHandleToJxr(fName, opts, hDib))
+		return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }

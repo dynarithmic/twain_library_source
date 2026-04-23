@@ -1494,6 +1494,24 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\imagefun\icowriter.cpp" />
     <ClCompile Include="cpp\imagefun\jpeg2kwriter.cpp" />
     <ClCompile Include="cpp\imagefun\jpegwriter.cpp" />
+    <ClCompile Include="cpp\imagefun\jpegxrwriter.cpp">
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
+      </ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
+      </ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
+      </ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
+      </ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
+      </ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
+      </ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
+      </ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
+      </ShowIncludes>
+    </ClCompile>
     <ClCompile Include="cpp\imagefun\pngwriter.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
     <ClCompile Include="cpp\imagefun\tgawriter.cpp" />
@@ -2099,6 +2117,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctlrandnumutils.h" />
     <ClInclude Include="h\ctlsetgetcaps.h" />
     <ClInclude Include="h\ctlsourcedibs.h" />
+    <ClInclude Include="h\ctlstringconversion.h" />
     <ClInclude Include="h\ctlstringutils.h" />
     <ClInclude Include="h\ctlsupport.h" />
     <ClInclude Include="h\ctlthreadutils.h" />
@@ -2140,6 +2159,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\imagefun\icowriter.h" />
     <ClInclude Include="h\imagefun\jpeg2kwriter.h" />
     <ClInclude Include="h\imagefun\jpegwriter.h" />
+    <ClInclude Include="h\imagefun\jpegxrwriter.h" />
     <ClInclude Include="h\imagefun\pcxfun32.h" />
     <ClInclude Include="h\imagefun\pdffun32.h" />
     <ClInclude Include="h\imagefun\pngwriter.h" />

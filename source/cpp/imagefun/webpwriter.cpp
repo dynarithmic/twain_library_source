@@ -18,8 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "webpwriter.h"
 #include <windows.h>
+#include <webp/mux.h>
+#include "webpwriter.h"
 
 static int WebPWriterCallback(const uint8_t* data, size_t data_size, const WebPPicture* picture)
 {
@@ -157,8 +158,11 @@ bool WebPSessionWriter::WriteCurrentPage()
 	if (!ok)
 		return false;
 
-	const bool writeOk = WriteOutputFile(output.data);
-	if (!writeOk)
+	std::vector<uint8_t> finalOutput;
+	if (!AddMetadataWithMux(output.data, finalOutput))
+		return false;
+
+	if (!WriteOutputFile(finalOutput))
 		return false;
 
 	hasCurrentPage_ = false;
@@ -262,6 +266,144 @@ bool WebPSessionWriter::WriteOutputFile(const std::vector<uint8_t>& data) const
 
 	std::fclose(f);
 	return ok;
+}
+
+bool WebPSessionWriter::HasMetadata(const WebPTextMetadata& text)
+{
+	return !text.comment.empty() ||
+		!text.copyright.empty() ||
+		!text.author.empty() ||
+		!text.software.empty();
+}
+
+std::string WebPSessionWriter::XmlEscape(const std::string& s)
+{
+	std::string out;
+	out.reserve(s.size());
+	for (char ch : s)
+	{
+		switch (ch)
+		{
+		case '&':  out += "&amp;";  break;
+		case '<':  out += "&lt;";   break;
+		case '>':  out += "&gt;";   break;
+		case '\"': out += "&quot;"; break;
+		case '\'': out += "&apos;"; break;
+		default:   out += ch;       break;
+		}
+	}
+	return out;
+}
+
+std::string WebPSessionWriter::BuildXmpPacket() const
+{
+	if (!HasMetadata(options_.text))
+		return {};
+
+	std::string xmp;
+	xmp += "<?xpacket begin=\"\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>";
+	xmp += "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">";
+	xmp += "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">";
+	xmp += "<rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" "
+		"xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" "
+		"xmlns:xmpRights=\"http://ns.adobe.com/xap/1.0/rights/\">";
+
+	if (!options_.text.comment.empty())
+	{
+		xmp += "<dc:description><rdf:Alt><rdf:li xml:lang=\"x-default\">";
+		xmp += XmlEscape(options_.text.comment);
+		xmp += "</rdf:li></rdf:Alt></dc:description>";
+	}
+
+	if (!options_.text.author.empty())
+	{
+		xmp += "<dc:creator><rdf:Seq><rdf:li>";
+		xmp += XmlEscape(options_.text.author);
+		xmp += "</rdf:li></rdf:Seq></dc:creator>";
+	}
+
+	if (!options_.text.software.empty())
+	{
+		xmp += "<xmp:CreatorTool>";
+		xmp += XmlEscape(options_.text.software);
+		xmp += "</xmp:CreatorTool>";
+	}
+
+	if (!options_.text.copyright.empty())
+	{
+		xmp += "<dc:rights><rdf:Alt><rdf:li xml:lang=\"x-default\">";
+		xmp += XmlEscape(options_.text.copyright);
+		xmp += "</rdf:li></rdf:Alt></dc:rights>";
+
+		xmp += "<xmpRights:Marked>True</xmpRights:Marked>";
+	}
+
+	xmp += "</rdf:Description>";
+	xmp += "</rdf:RDF>";
+	xmp += "</x:xmpmeta>";
+	xmp += "<?xpacket end=\"w\"?>";
+	return xmp;
+}
+
+bool WebPSessionWriter::AddMetadataWithMux(const std::vector<uint8_t>& encodedImage, std::vector<uint8_t>& finalImage) const
+{
+	finalImage.clear();
+
+	if (!HasMetadata(options_.text))
+	{
+		finalImage = encodedImage;
+		return true;
+	}
+
+	const std::string xmp = BuildXmpPacket();
+	if (xmp.empty())
+	{
+		finalImage = encodedImage;
+		return true;
+	}
+
+	WebPData imageData;
+	WebPDataInit(&imageData);
+	imageData.bytes = encodedImage.data();
+	imageData.size = encodedImage.size();
+
+	WebPMux* mux = WebPMuxNew();
+	if (!mux)
+		return false;
+
+	constexpr int copyData = 1;
+
+	if (WebPMuxSetImage(mux, &imageData, copyData) != WEBP_MUX_OK)
+	{
+		WebPMuxDelete(mux);
+		return false;
+	}
+
+	WebPData xmpData;
+	WebPDataInit(&xmpData);
+	xmpData.bytes = reinterpret_cast<const uint8_t*>(xmp.data());
+	xmpData.size = xmp.size();
+
+	if (WebPMuxSetChunk(mux, "XMP ", &xmpData, copyData) != WEBP_MUX_OK)
+	{
+		WebPMuxDelete(mux);
+		return false;
+	}
+
+	WebPData outputData;
+	WebPDataInit(&outputData);
+
+	if (WebPMuxAssemble(mux, &outputData) != WEBP_MUX_OK)
+	{
+		WebPMuxDelete(mux);
+		return false;
+	}
+
+	finalImage.assign(outputData.bytes, outputData.bytes + outputData.size);
+
+	WebPDataClear(&outputData);
+	WebPMuxDelete(mux);
+	return true;
 }
 
 /////////////////////////////////////////////////////////////
