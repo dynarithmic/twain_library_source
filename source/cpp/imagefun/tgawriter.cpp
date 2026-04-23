@@ -166,9 +166,9 @@ bool TgaSessionWriter::WriteExtensionAreaWithComments()
 
 void TgaSessionWriter::Close()
 {
-	WriteExtensionAreaWithComments();
 	if (file_)
 	{
+		WriteExtensionAreaWithComments();
 		std::fclose(file_);
 		file_ = nullptr;
 	}
