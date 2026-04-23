@@ -31,8 +31,6 @@
 #include "ctldib.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
-#include "FreeImage.h"
-#include "FreeImagePlus.h"
  /* Header signatures for various resources */
 constexpr auto BFT_ICON = 0x4349   /* 'IC' */;
 constexpr auto BFT_BITMAP = 0x4d42   /* 'BM' */;

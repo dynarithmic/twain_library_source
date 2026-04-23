@@ -894,9 +894,6 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 // Load the last "Select Source" file dialog position
                 LoadSelectSourcePosition();
                 
-                // Initialize imaging code
-                FreeImage_Initialise(true);
-
                 WriteVersionToLog(pHandle);
                 // Store the user defined search order for the
                 // TWAIN datasource manager
@@ -1812,8 +1809,6 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
         pHandle->m_CallbackError = nullptr;
         RemoveThreadIdFromAssociation(threadId);
         CTL_StaticData::Reset();
-        FreeImage_ClearPlugins();
-        FreeImage_DeInitialise();
         return true;
     }
     catch (...)

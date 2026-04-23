@@ -23,9 +23,21 @@ OF THIRD PARTY RIGHTS.
 
 #include <windows.h>
 #include <cstdint>
+#include <memory>
 
 namespace dynarithmic::dib
 {
+	struct DibHandleDeleter
+	{
+		void operator()(HGLOBAL h) const noexcept
+		{
+			if (h)
+				::GlobalFree(h);
+		}
+	};
+
+	using unique_dib = std::unique_ptr<std::remove_pointer_t<HGLOBAL>, DibHandleDeleter>;
+
 	inline uint32_t calc_stride_bytes(uint32_t width, uint16_t bitsPerPixel)
 	{
 		const uint64_t bitsPerRow = static_cast<uint64_t>(width) * bitsPerPixel;
@@ -59,6 +71,11 @@ namespace dynarithmic::dib
 		const uint8_t* p = reinterpret_cast<const uint8_t*>(pBih);
 		p += pBih->biSize;
 		return reinterpret_cast<const RGBQUAD*>(p);
+	}
+
+	inline RGBQUAD* palette_ptr_mutable(const BITMAPINFOHEADER* pBih)
+	{
+		return const_cast<RGBQUAD*>(palette_ptr(pBih));
 	}
 
 	inline const uint8_t* bits_ptr(const BITMAPINFOHEADER* pBih)
@@ -209,14 +226,24 @@ namespace dynarithmic::dib
 			return palette_ptr(bih_);
 		}
 
+		RGBQUAD* PalettePtrMutable() noexcept
+		{
+			return palette_ptr_mutable(bih_);
+		}
+
 		uint32_t PaletteEntries() const noexcept
 		{
 			return bih_ ? palette_entries(*bih_) : 0;
 		}
 
+		uint8_t* Bits() noexcept
+		{
+			return const_cast<uint8_t*>(bits_ptr(bih_));
+		}
+
 		const uint8_t* Bits() const noexcept
 		{
-			return bits_ptr(bih_);
+			return const_cast<uint8_t*>(bits_ptr(bih_));
 		}
 
 		uint32_t Width() const noexcept

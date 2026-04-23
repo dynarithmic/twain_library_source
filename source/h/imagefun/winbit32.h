@@ -26,9 +26,11 @@
 #include "fltrect.h"
 #include "dibmulti.h"
 #include "ctlobstr.h"
-#include "FreeImagePlus.h"
 #include "dtwain_raii.h"
 #include "dtwain_filesystem.h"
+
+class CxImage;
+
 #ifdef _MSC_VER
 #pragma warning (disable:4100)
 #endif
@@ -156,27 +158,6 @@ namespace dynarithmic
         static SIZE_T  GlobalSize(HGLOBAL h) { return ::GlobalSize(h); }
     };
 #endif
-    struct FIBITMAP_DestroyTraits
-    {
-        static void Destroy(FIBITMAP* b)
-        {
-            if (b)
-                FreeImage_Unload(b);
-        }
-    };
-
-    struct fipImage_DestroyTraits
-    {
-        static void Destroy(fipImage* fw)
-        {
-            if (fw)
-                fw->clear();
-        }
-    };
-
-    typedef DTWAIN_RAII<FIBITMAP*, FIBITMAP_DestroyTraits> FIBITMAP_RAII;
-    typedef DTWAIN_RAII<fipImage*, fipImage_DestroyTraits> fipWinImage_RAII;
-
     class CTL_ImageIOHandler;
     enum {
         FIC_MINISWHITE = 0,             // min value is white
@@ -335,11 +316,10 @@ namespace dynarithmic
 
             static BYTE *   GetDibBits(BYTE *pDib);
             static unsigned GetPitch(BYTE *pDib);
-            static unsigned GetPitch(fipImage& pDib);
+            static unsigned GetPitch(CxImage& pDib);
 
 
             static RGBQUAD* GetPalettePtr(BYTE *pDibData, int bpp);
-            static int GetDibPalette(fipImage& lpbi,LPSTR palette);
 
             static bool GetWidth(BYTE *pDIB, UINT32 *puWidth);
             static bool GetHeight(BYTE *pDIB, UINT32 *piHeight);
@@ -399,8 +379,8 @@ namespace dynarithmic
             void resetbuffer() { bytesleft=0; }
             int      putbufferedbyte(WORD byte, std::ofstream& fh, bool bRealEOF=false, int *pStatus= nullptr);
 
-            static FloatRect Normalize(fipImage& pImage, const FloatRect& ActualRect, const FloatRect& RequestedRect,
-                                int sourceunit, int destunit, int dpi);
+			static FloatRect Normalize(CxImage& pImage, const FloatRect& ActualRect, const FloatRect& RequestedRect,
+                        			   int sourceunit, int destunit, int dpi);
             static int      putbyte(WORD byte, std::ofstream& fh);
 
             static char masktable[8];

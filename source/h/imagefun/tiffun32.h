@@ -33,7 +33,6 @@ namespace dynarithmic
 {
     struct TiffMultiPageData : DibMultiPageData
     {
-        FIMULTIBITMAP *fp = nullptr;
     };
 
     class CTIFFImageHandler : public CDibInterface
