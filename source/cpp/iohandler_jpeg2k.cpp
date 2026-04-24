@@ -52,7 +52,6 @@ static bool WriteOneDibHandleToJpeg2000(const std::wstring& filename, const Jpeg
 CTL_Jpeg2KIOHandler::CTL_Jpeg2KIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx)
 : CTL_ImageIOHandler( pDib ), m_nFormat(0), m_ImageInfoEx(ImageInfoEx), m_pJpegHandler(nullptr)
 {
-    m_SaveParams.fmt = FIF_J2K;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

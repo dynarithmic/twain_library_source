@@ -64,7 +64,7 @@ int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
 	std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-    if (!WriteOneDibHandleToJpeg(szFile, opts, hDib))
+    if (!WriteOneDibHandleToJpeg(sFileName, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;
 
     return DTWAIN_NO_ERROR;

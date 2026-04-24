@@ -50,8 +50,6 @@ static bool WriteOneDibHandleToJxr(const std::wstring& filename, const JxrSessio
 CTL_JpegXRIOHandler::CTL_JpegXRIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx)
 : CTL_ImageIOHandler( pDib ), m_nFormat(0), m_ImageInfoEx(ImageInfoEx)
 { 
-    m_SaveParams.fmt = FIF_JXR;
-    m_SaveParams.metaDataTag = FIMD_EXIF_MAIN;
     m_SaveParams.commentKey = "Software";
 }
 

@@ -24,7 +24,6 @@ OF THIRD PARTY RIGHTS.
 #include <cstdint>
 #include <string>
 #include <memory>
-#define OPJ_STATIC
 #include <openjpeg.h>
 #include "dibutil.h"
 
