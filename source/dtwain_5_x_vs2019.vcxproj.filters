@@ -310,24 +310,6 @@
     <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwtiff2ps.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipImage.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMemoryIO.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMetadataFind.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMultiPage.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipTag.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipWinImage.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\pdflib32\flateencode.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
