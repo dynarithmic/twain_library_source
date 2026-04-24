@@ -32,8 +32,6 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     // Get the current TIFF type from the Source
     if (m_ImageInfoEx.theSource &&
         !m_ImageInfoEx.IsPDF &&
-        !m_ImageInfoEx.IsPostscript &&
-        !m_ImageInfoEx.IsPostscriptMultipage &&
         !m_ImageInfoEx.IsOCRTempImage)
         m_nFormat = m_ImageInfoEx.theSource->GetAcquireFileStatusRef().GetAcquireFileFormat();
 
@@ -44,95 +42,24 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 	if (isWriteablePage && m_pDib && !IsValidBitDepth(m_nFormat, m_pDib->GetBitsPerPixel()))
 		return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    // Check for the Postscript option
-    if (m_ImageInfoEx.IsPostscript && m_ImageInfoEx.theSource)
+    sActualFileName = szFile;
+    if (isFirstPage)
     {
-        if (isFirstPage)
-        {
-            CTL_StringType szTempPath;
-            // This is a postscript save, so
-            // create a temp file
-            szTempPath = GetDTWAINTempFilePath(m_ImageInfoEx.theSource->GetDTWAINHandle());
-            if (szTempPath.empty())
-                return DTWAIN_ERR_FILEWRITE;
-
-            szTempPath += StringWrapper::GetGUID() + _T("TIF");
-
-            LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + StringConversion::Convert_Native_To_Ansi(szTempPath));
-
-            // OK, now remember that the file we are writing is a TIFF file, and this is
-            // the file that is created first
-            sActualFileName = std::move(szTempPath);
-            sPostscriptName = szFile;
-        }
-    }
-    else
-    {
-        sActualFileName = szFile;
-        if (isFirstPage)
-        {
-            // Attempt to delete the file
-            if (!delete_file(sActualFileName.c_str()))
-                LogWriterUtils::WriteLogInfoIndentedA("Could not delete existing file " + StringConversion::Convert_Native_To_Ansi(sActualFileName));
-        }
+        // Attempt to delete the file
+        if (!delete_file(sActualFileName.c_str()))
+            LogWriterUtils::WriteLogInfoIndentedA("Could not delete existing file " + StringConversion::Convert_Native_To_Ansi(sActualFileName));
     }
 
     if (isFirstPage)
-		LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF or Postscript file");
+		LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF file");
 
     CTIFFImageHandler imgHandler(m_nFormat, m_ImageInfoEx);
     imgHandler.SetMultiPageStatus(pMultiPageStruct);
 	if (!isLastPage)
 	{
 		SetNumPagesWritten(GetNumPagesWritten() + 1);
-		LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF / PS page");
+		LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF page");
 	}
     auto retVal = imgHandler.WriteGraphicFile(this, sActualFileName.c_str(), m_pDib->GetHandle());
-
-    if (retVal == DTWAIN_NO_ERROR)
-    {
-        // Convert the TIFF file to Postscript if necessary
-        if (m_ImageInfoEx.IsPostscript && isLastPage)
-        {
-            // This will have to call the routine to convert
-            LONG Level;
-            switch (m_ImageInfoEx.PostscriptType)
-            {
-                case DTWAIN_POSTSCRIPT1:
-                case DTWAIN_POSTSCRIPT1MULTI:
-                    Level = 1;
-                    break;
-
-                case DTWAIN_POSTSCRIPT2:
-                case DTWAIN_POSTSCRIPT2MULTI:
-                    Level = 2;
-                    break;
-                default:
-                    Level = 3;
-                    break;
-            }
-            CTL_StringType sTitle;
-            sTitle = m_ImageInfoEx.PSTitle;
-            if (sTitle.empty())
-                sTitle = _T("DTWAIN Postscript");
-            retVal = CTIFFImageHandler::Tiff2PS(sActualFileName.c_str(), sPostscriptName.c_str(), Level,
-                                                sTitle.c_str(), m_ImageInfoEx.PSType == DTWAIN_PS_ENCAPSULATED);
-
-            if (retVal == -1)
-                retVal = DTWAIN_ERR_FILEWRITE;
-            delete_file(sActualFileName.c_str());
-            sActualFileName.clear();
-        }
-    }
     return retVal;
-}
-
-CTL_TiffIOHandler::~CTL_TiffIOHandler()
-{
-    // Ensure that temporary Postscript file has been removed
-    if (m_ImageInfoEx.IsPostscript)
-    {
-        if (!sPostscriptName.empty() && !sActualFileName.empty())
-            delete_file(sActualFileName.c_str());
-    }
 }

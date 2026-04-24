@@ -35,6 +35,7 @@ OF THIRD PARTY RIGHTS.
 #include "dtwain_filetypes.h"
 #include "tiffwriter.h"
 #include "pcxwriter.h"
+#include "postscriptwriter.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4100)
@@ -149,12 +150,11 @@ namespace dynarithmic
                                 m_ImageInfoEx(ImageInfoEx) {}
             CTL_TiffIOHandler( CTL_TwainDib *pDib, int nFormat, DTWAINImageInfoEx &ImageInfoEx ): CTL_ImageIOHandler(pDib),
                             m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
-            ~CTL_TiffIOHandler();
+            ~CTL_TiffIOHandler() = default;
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct) override;
             void SetTiffFormat(int nFormat) { m_nFormat = nFormat; }
             int  GetTiffFormat() const { return m_nFormat; }
             CTL_StringType GetFileName() const { return sActualFileName; }
-            CTL_StringType GetPostscriptName() const { return sPostscriptName; }
             DTWAINTiffOutput& GetOutputHandler() { return m_TiffOutputHandler; }
 
         private:
@@ -286,8 +286,7 @@ namespace dynarithmic
             int m_nFormat;
             DTWAINImageInfoEx m_ImageInfoEx;
             CTL_JpegIOHandler* m_pJpegHandler;
-            std::shared_ptr<CTL_TiffIOHandler> m_pTiffHandler;
-
+            PsSessionWriter m_psSessionWriter;
             LONG m_PSType;
             bool m_bIsMultiPage;
     };

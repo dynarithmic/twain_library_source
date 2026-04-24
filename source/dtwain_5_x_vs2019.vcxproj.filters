@@ -301,13 +301,7 @@
     <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwainpdf.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwgetopt.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\dtwinver\Dtwinver.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwtiff2ps.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\pdflib32\flateencode.cpp">
@@ -392,9 +386,6 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\pdflib32\pdflib32.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\pdflib32\pslib32.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp">
@@ -1561,6 +1552,9 @@
     <ClCompile Include="ZLib\zutil.c">
       <Filter>ZLib</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\imagefun\postscriptwriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -2447,6 +2441,9 @@
     </ClInclude>
     <ClInclude Include="LibOpenJPEG\tgt.h">
       <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\postscriptwriter.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

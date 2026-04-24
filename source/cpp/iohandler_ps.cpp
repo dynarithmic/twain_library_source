@@ -33,7 +33,6 @@ CTL_PSIOHandler::CTL_PSIOHandler(CTL_TwainDib* pDib, int /*nFormat*/, const DTWA
                                  :   CTL_ImageIOHandler( pDib ),
                                     m_nFormat(0),
                                     m_ImageInfoEx(ImageInfoEx),
-                                    m_pJpegHandler(nullptr),
                                     m_PSType(PSType),
                                     m_bIsMultiPage(IsMultiPage)
 {
@@ -42,92 +41,63 @@ CTL_PSIOHandler::CTL_PSIOHandler(CTL_TwainDib* pDib, int /*nFormat*/, const DTWA
 int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {
     // Now add this to PDF page
-    CPSImageHandler PSHandler(szFile, m_ImageInfoEx);
-    CTL_StringType szTempPath;
+    bool isFirstPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_FIRST);
+    bool isLastPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
+    bool isNextPage = (pMultiPageStruct && pMultiPageStruct->Stage == DIB_MULTI_NEXT);
 
-    if ( !pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_FIRST )
+    if ( isFirstPage )
     {
-        // This is the first page, so allocate a TIFF handler here
-        // Get the bit depth
-        if ( m_pDib )
-        {
-            const int bitdepth = m_pDib->GetDepth();
+        const int bitdepth = m_pDib->GetDepth();
 
-            if (!IsValidBitDepth(DTWAIN_PS_ENCAPSULATED, bitdepth))
-                return DTWAIN_ERR_INVALID_BITDEPTH;
+        if (!IsValidBitDepth(DTWAIN_PS_ENCAPSULATED, bitdepth))
+            return DTWAIN_ERR_INVALID_BITDEPTH;
 
-            LONG FileType = 0;
-            switch ( bitdepth )
-            {
-            case 1:
-                FileType = DTWAIN_TIFFG4;
-                break;
+		LockedPsDibPage page(m_pDib->GetHandle());
+		if (!page.IsValid())
+			return DTWAIN_ERR_FILEWRITE;
 
-            case 8:
-            case 24:
-                FileType = DTWAIN_TIFFPACKBITS;
-                break;
-            }
+		PsSessionOptions opts{};
 
-            if ( m_bIsMultiPage )
-            {
-                switch(FileType)
-                {
-                case DTWAIN_TIFFG4:
-                    FileType = DTWAIN_TIFFG4MULTI;
-                    break;
+		switch (m_ImageInfoEx.PostscriptType)
+		{
+		    case DTWAIN_POSTSCRIPT1:
+		    case DTWAIN_POSTSCRIPT1MULTI:
+				opts.level = PsLevel::Level1;
+			    break;
 
-                case DTWAIN_TIFFPACKBITS:
-                    FileType = DTWAIN_TIFFPACKBITSMULTI;
-                    break;
-                }
-            }
+		    case DTWAIN_POSTSCRIPT2:
+		    case DTWAIN_POSTSCRIPT2MULTI:
+				opts.level = PsLevel::Level2;
+                opts.invert1bpp = true;
+				break;
+		    default:
+				opts.level = PsLevel::Level2;
+			    break;
+		}
 
-            // Create the TIFF handler
-            m_pTiffHandler = std::make_shared<CTL_TiffIOHandler>(m_pDib, FileType, m_ImageInfoEx);
-        }
+		std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+
+		if (!m_psSessionWriter.Open(fName, opts))
+			return DTWAIN_ERR_FILEWRITE;
+
+		auto retVal = m_psSessionWriter.WritePage(page.GetPage());
+        return retVal ? DTWAIN_NO_ERROR : DTWAIN_ERR_FILEWRITE;
     }
-
-    if (!pMultiPageStruct || pMultiPageStruct->Stage != DIB_MULTI_LAST)
+    else
+    if ( isNextPage )
     {
-        // Create a temporary TIFF file
-        //...
-        szTempPath = GetDTWAINTempFilePath(m_ImageInfoEx.theSource->GetDTWAINHandle());
-        if ( szTempPath.empty() )
-            return DTWAIN_ERR_FILEWRITE;
+		LockedPsDibPage page(m_pDib->GetHandle());
+		if (!page.IsValid())
+			return DTWAIN_ERR_FILEWRITE;
 
-        if ( m_pDib )
-        {
-            // make a temporary TIFF file
-            {
-                szTempPath += StringWrapper::GetGUID() + _T("TIF");
-                const std::string szTempPathA = StringConversion::Convert_Native_To_Ansi(szTempPath);
-                LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempPathA);
-
-                // Create a TIFF file
-                m_pTiffHandler->SetDib(m_pDib);
-                const int bRet = m_pTiffHandler->WriteBitmap(szTempPath.c_str(), bOpenFile, 0, pMultiPageStruct);
-                if ( bRet != 0 )
-                {
-                    LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempPathA);
-                    return bRet;
-                }
-                else
-                    LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " " + szTempPathA);
-                PSHandler.SetImageType(1);
-            }
-        }
+		auto retVal = m_psSessionWriter.WritePage(page.GetPage());
+		return retVal ? DTWAIN_NO_ERROR : DTWAIN_ERR_FILEWRITE;
     }
-    if ( pMultiPageStruct )
-        PSHandler.SetMultiPageStatus(pMultiPageStruct);
-
-    const int bRet = PSHandler.WriteGraphicFile(this, szTempPath.c_str(), nullptr, nullptr);
-    if ( bRet != 0 )
+    else
+    if ( isLastPage )
     {
-        delete_file( szTempPath.c_str() );
+		bool ok = m_psSessionWriter.Close();
+		return ok?DTWAIN_NO_ERROR:DTWAIN_ERR_FILEWRITE;
     }
-
-    if ( pMultiPageStruct )
-        PSHandler.GetMultiPageStatus(pMultiPageStruct);
-    return bRet;
+    return DTWAIN_NO_ERROR;
 }
