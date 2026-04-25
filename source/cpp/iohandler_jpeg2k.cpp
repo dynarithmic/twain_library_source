@@ -20,14 +20,38 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "jpeg2kwriter.h"
 
 using namespace dynarithmic;
+
+// ============================================================
+// Example HANDLE-based helper
+// ============================================================
+
+static bool WriteOneDibHandleToJpeg2000(const std::wstring& filename, const Jpeg2000SessionOptions& options, HANDLE hDib)
+{
+	LockedJpeg2000DibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	Jpeg2000SessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+	if (!writer.SetPageInfo(lockedPage.GetPage()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CTL_Jpeg2KIOHandler::CTL_Jpeg2KIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx)
 : CTL_ImageIOHandler( pDib ), m_nFormat(0), m_ImageInfoEx(ImageInfoEx), m_pJpegHandler(nullptr)
 {
-    m_SaveParams.fmt = FIF_J2K;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,10 +64,18 @@ int CTL_Jpeg2KIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
     if (!IsValidBitDepth(DTWAIN_JPEG2000, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
-    m_SaveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
-    m_SaveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
+	Jpeg2000SessionOptions opts{};
+	opts.useJP2Container = false;   // J2K codestream
+	opts.compressionRate = 16.0f;   // match FreeImage default
 
-    return SaveToFile(); 
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+
+	// Get the comment string (copyright information)
+	char commentStr[256] = {};
+	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+	opts.text.copyright = commentStr;
+
+    if (!WriteOneDibHandleToJpeg2000(fName, opts, hDib))
+		return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }

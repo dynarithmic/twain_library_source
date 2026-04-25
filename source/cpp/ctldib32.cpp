@@ -31,7 +31,7 @@
 #include "ctldib.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
-/* Header signatures for various resources */
+ /* Header signatures for various resources */
 constexpr auto BFT_ICON = 0x4349   /* 'IC' */;
 constexpr auto BFT_BITMAP = 0x4d42   /* 'BM' */;
 constexpr auto BFT_CURSOR = 0x5450   /* 'PT' */;
@@ -189,7 +189,6 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
 {
     std::unique_ptr<CTL_ImageIOHandler> pHandler;
     ImageInfo.IsPDF = false;
-    ResolvePostscriptOptions(ImageInfo, nFormat);
     ImageInfo.IsBigTiff = dynarithmic::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
     switch (nFormat )
     {
@@ -243,13 +242,15 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         case BigTiffFormatGROUP3:
         case BigTiffFormatGROUP4:
         case BigTiffFormatJPEG:
-        case PSFormatLevel1:
-        case PSFormatLevel2:
-        case PSFormatLevel3:
-            if ( nFormat == PSFormatLevel1 || nFormat == PSFormatLevel2 || nFormat == PSFormatLevel3 )
-                ImageInfo.IsPostscript = true;
             pHandler = std::make_unique<CTL_TiffIOHandler>( this, nFormat, ImageInfo );
         break;
+
+		case PSFormatLevel1:
+		case PSFormatLevel2:
+		case PSFormatLevel3:
+			pHandler = std::make_unique<CTL_PSIOHandler>(this, nFormat, ImageInfo, 0, 0);
+        break;
+
         case TgaFormat:
         case TgaFormatRLE:
             ImageInfo.IsRLE = (nFormat == TWAINFileFormat_TGARLE);
@@ -351,7 +352,6 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
 {
     CTL_ImageIOHandlerPtr pHandler;
     ImageInfo.IsPDF = false;
-    ResolvePostscriptOptions(ImageInfo, nFormat);
     ImageInfo.IsBigTiff = dynarithmic::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
     nStatus = DTWAIN_NO_ERROR;
     switch (nFormat)
@@ -370,12 +370,15 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
         case BigTiffFormatGROUP3MULTI:
         case BigTiffFormatGROUP4MULTI:
         case BigTiffFormatJPEGMULTI:
-        case PSFormatLevel1Multi:
-        case PSFormatLevel2Multi:
-        case PSFormatLevel3Multi:
         case TiffFormatPIXARLOGMULTI:
             pHandler = std::make_shared<CTL_TiffIOHandler>( this, nFormat, ImageInfo );
         break;
+
+		case PSFormatLevel1Multi:
+		case PSFormatLevel2Multi:
+		case PSFormatLevel3Multi:
+			pHandler = std::make_shared<CTL_PSIOHandler>(this, nFormat, ImageInfo, 0, 0);
+		break;
 
         case DcxFormat:
             pHandler = std::make_shared<CTL_PcxIOHandler>( this, nFormat, ImageInfo );
@@ -514,19 +517,6 @@ int CTL_TwainDib::WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int 
         nStatus = 0;
     return nStatus;
 }
-
-void CTL_TwainDib::ResolvePostscriptOptions(const DTWAINImageInfoEx& Info, int &nFormat )
-{
-    if ( !Info.IsPostscript )
-        return;
-
-    if ( Info.IsPostscriptMultipage )
-        nFormat = TiffFormatPACKBITSMULTI;
-    else
-        nFormat = TiffFormatPACKBITS;
-}
-
-
 
 /****************************************************************************
  *                                                                          *

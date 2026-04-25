@@ -20,8 +20,29 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "pnmwriter.h"
 
 using namespace dynarithmic;
+
+static bool WriteOneDibHandleToPnm(const std::wstring& filename, const PnmSessionOptions& options, HANDLE hDib)
+{
+	LockedPnmDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	PnmSessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+	if (!writer.SetPageInfo(lockedPage.GetPage()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
 
 int CTL_PBMIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
@@ -32,8 +53,13 @@ int CTL_PBMIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!IsValidBitDepth(DTWAIN_PBM, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
+	PnmSessionOptions opts{};
+	opts.useRaw = true;
+	opts.fixBilevelPolarity = true;
 
-    return SaveToFile();
+	std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
+
+	if (!WriteOneDibHandleToPnm(filename, opts, hDib))
+		return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }

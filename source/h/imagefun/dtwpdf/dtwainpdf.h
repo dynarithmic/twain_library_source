@@ -163,14 +163,7 @@ namespace dynarithmic
 
         protected:
             bool ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb);
-            bool ProcessTIFFImage(int& width, int& height, int& bpp, int& rgb, int&dpix, int& dpiy);
             bool ProcessBMPImage(int& width, int& height, int& bpp, int& rgb, int& dpix, int& dpiy);
-
-            static tsize_t libtiffReadProc (thandle_t fd, tdata_t buf, tsize_t size);
-            static tsize_t libtiffWriteProc(thandle_t fd, tdata_t buf, tsize_t nsize);
-            static toff_t  libtiffSeekProc (thandle_t fd, toff_t off, int i);
-            static int     libtiffCloseProc (thandle_t fd);
-            static toff_t  libtiffSizeProc(thandle_t fd);
 
         private:
             CTL_StringType m_sImgName;

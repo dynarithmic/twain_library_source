@@ -20,8 +20,29 @@ OF THIRD PARTY RIGHTS.
 */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "webpwriter.h"
 
 using namespace dynarithmic;
+
+static bool WriteOneDibHandleToWebP(const std::wstring& filename, const WebPSessionOptions& options, HANDLE hDib)
+{
+	LockedWebPDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	WebPSessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+	if (!writer.SetPageInfo(lockedPage.GetPage()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
 
 int CTL_WebpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
@@ -32,9 +53,21 @@ int CTL_WebpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if (!IsValidBitDepth(DTWAIN_WEBP, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
+	WebPSessionOptions opts{};
+	opts.lossless = false;
+	opts.quality = 75.0f;
+	opts.method = 4;
+	opts.exact = false;
 
-    return SaveToFile();
+	// Get the comment string (copyright information)
+	char commentStr[256] = {};
+	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+	opts.text.copyright = commentStr;
+
+	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+
+	if (!WriteOneDibHandleToWebP(fName, opts, hDib))
+		return DTWAIN_ERR_FILEWRITE;
+	return DTWAIN_NO_ERROR;
 }
 

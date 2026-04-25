@@ -69,14 +69,40 @@ class GdiplusInit
 		Gdiplus::GdiplusStartupInput input{};
 };
 
-bool DIBToPNGBytes(const BITMAPINFOHEADER& bih, const uint8_t* bits, std::vector<uint8_t>& out)
+bool DIBToPNGBytes(const BITMAPINFOHEADER& bih, const uint8_t* dibBase, std::vector<uint8_t>& out)
 {
 	GdiplusInit gdiplus;
 
-	BITMAPINFO bi{};
-	memcpy(&bi.bmiHeader, &bih, sizeof(BITMAPINFOHEADER));
+	const bool hasPalette = (bih.biCompression == BI_RGB && bih.biBitCount <= 8);
 
-	Gdiplus::Bitmap bmp(&bi, const_cast<uint8_t*>(bits));
+	uint32_t paletteEntries = 0;
+	if (hasPalette)
+	{
+		paletteEntries = bih.biClrUsed ? bih.biClrUsed : (1u << bih.biBitCount);
+	}
+
+	const size_t bmiSize =
+		sizeof(BITMAPINFOHEADER) + paletteEntries * sizeof(RGBQUAD);
+
+	std::vector<uint8_t> bmiStorage(bmiSize, 0);
+	auto* bi = reinterpret_cast<BITMAPINFO*>(bmiStorage.data());
+
+	// Copy header
+	std::memcpy(&bi->bmiHeader, &bih, sizeof(BITMAPINFOHEADER));
+
+	// Copy palette if present
+	if (paletteEntries > 0)
+	{
+		const auto* srcPalette =
+			reinterpret_cast<const RGBQUAD*>(
+				reinterpret_cast<const uint8_t*>(&bih) + sizeof(BITMAPINFOHEADER));
+
+		std::memcpy(bi->bmiColors,
+			srcPalette,
+			paletteEntries * sizeof(RGBQUAD));
+	}
+
+	Gdiplus::Bitmap bmp(bi, const_cast<uint8_t*>(dibBase));
 
 	CLSID pngClsid{};
 	UINT num = 0, size = 0;
@@ -86,37 +112,56 @@ bool DIBToPNGBytes(const BITMAPINFOHEADER& bih, const uint8_t* bits, std::vector
 	auto* encoders = reinterpret_cast<Gdiplus::ImageCodecInfo*>(buf.data());
 	Gdiplus::GetImageEncoders(num, size, encoders);
 
+	bool foundPng = false;
 	for (UINT i = 0; i < num; ++i)
 	{
 		if (wcscmp(encoders[i].MimeType, L"image/png") == 0)
 		{
 			pngClsid = encoders[i].Clsid;
+			foundPng = true;
 			break;
 		}
 	}
+
+	if (!foundPng)
+		return false;
 
 	IStream* stream = nullptr;
 	if (CreateStreamOnHGlobal(nullptr, TRUE, &stream) != S_OK)
 		return false;
 
-	if (bmp.Save(stream, &pngClsid, nullptr) != Gdiplus::Ok)
+	const auto saveStatus = bmp.Save(stream, &pngClsid, nullptr);
+	if (saveStatus != Gdiplus::Ok)
 	{
 		stream->Release();
 		return false;
 	}
 
 	STATSTG stat{};
-	stream->Stat(&stat, STATFLAG_NONAME);
+	if (stream->Stat(&stat, STATFLAG_NONAME) != S_OK)
+	{
+		stream->Release();
+		return false;
+	}
 
 	out.resize(static_cast<std::size_t>(stat.cbSize.QuadPart));
 
 	LARGE_INTEGER zero{};
-	stream->Seek(zero, STREAM_SEEK_SET, nullptr);
+	if (stream->Seek(zero, STREAM_SEEK_SET, nullptr) != S_OK)
+	{
+		stream->Release();
+		return false;
+	}
 
 	ULONG read = 0;
-	stream->Read(out.data(), static_cast<ULONG>(out.size()), &read);
-	stream->Release();
+	if (stream->Read(out.data(), static_cast<ULONG>(out.size()), &read) != S_OK ||
+		read != out.size())
+	{
+		stream->Release();
+		return false;
+	}
 
+	stream->Release();
 	return true;
 }
 

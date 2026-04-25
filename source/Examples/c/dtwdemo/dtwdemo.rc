@@ -63,6 +63,7 @@ BEGIN
             MENUITEM "PNG",                         IDM_ACQUIREFILE_PNG
             MENUITEM "PostScript (Level 1)",        IDM_ACQUIREFILE_POSTSCRIPTLEVEL1
             MENUITEM "PostScript (Level 2)",        IDM_ACQUIREFILE_POSTSCRIPTLEVEL2
+            MENUITEM "PostScript (Level 3)",        IDM_ACQUIREFILE_POSTSCRIPTLEVEL3
             MENUITEM "SVG",                         IDM_ACQUIREFILE_SVG
             MENUITEM "SVGZ",                        IDM_ACQUIREFILE_SVGZ
             MENUITEM "Targa (TGA)",                 IDM_ACQUIREFILE_TGA

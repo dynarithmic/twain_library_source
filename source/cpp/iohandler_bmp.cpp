@@ -20,8 +20,31 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "bmprlewriter.h"
 
 using namespace dynarithmic;
+
+static std::pair<bool, int> SaveBMPRLE(LPCTSTR szFile, HANDLE hDib)
+{
+    std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    LockedBmpRle8Page lockedPage(hDib);
+    if (!lockedPage.IsValid())
+        return { false, DTWAIN_ERR_DIB };
+
+    BmpRle8Writer writer;
+    if (!writer.Open(filename))
+        return { false, DTWAIN_ERR_FILEOPEN };
+
+    if (!writer.SetPageInfo(lockedPage.GetPage()))
+        return { false, DTWAIN_ERR_FILEWRITE };
+
+    if (!writer.WriteCurrentPage())
+        return { false, DTWAIN_ERR_FILEWRITE };
+
+    writer.Close();
+    return { true, DTWAIN_NO_ERROR };
+}
+
 int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
     HANDLE hDib = {};
@@ -33,12 +56,12 @@ int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
     if (m_ImageInfoEx.IsRLE)
     {
-        m_SaveParams.hDib = hDib;
-        m_SaveParams.szFile = szFile;
-        m_SaveParams.flags = BMP_SAVE_RLE;
-        return SaveToFile();
+        // Save as a BMP-RLE file
+        auto bOk = SaveBMPRLE(szFile, hDib);
+        return bOk.second;
     }
 
+    // "Regular" BMP file
     HANDLE hHandleToWrite = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
     if (hHandleToWrite)
     {

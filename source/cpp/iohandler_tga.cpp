@@ -20,8 +20,33 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "tgawriter.h"
 
 using namespace dynarithmic;
+
+// ============================================================
+// Example HANDLE-based helper
+// ============================================================
+
+static bool WriteOneDibHandleToTga(const std::wstring& filename, const TgaSessionOptions& options, HANDLE hDib)
+{
+	LockedTgaDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	TgaSessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+	if (!writer.SetPageInfo(lockedPage.GetPage()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
 
 int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
@@ -32,9 +57,17 @@ int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!IsValidBitDepth(DTWAIN_TGA, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
-    m_SaveParams.flags = m_ImageInfoEx.IsRLE ? TARGA_SAVE_RLE : 0;
+	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-    return SaveToFile();
+	TgaSessionOptions opts{};
+    opts.useRle = m_ImageInfoEx.IsRLE;
+
+	// Get the comment string (copyright information)
+	char commentStr[256] = {};
+	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+	opts.comment = commentStr;
+
+	if (!WriteOneDibHandleToTga(fName, opts, hDib))
+		return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }

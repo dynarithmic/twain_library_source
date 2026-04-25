@@ -24,11 +24,11 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
-#include "FreeImagePlus.h"
 #include "../cximage/ximage.h"
 #include "logwriterutils.h"
 #include "ctlconstexprfind.h"
 #include <ctlutils.h>
+#include "resample24to8.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
@@ -166,9 +166,9 @@ unsigned CDibInterface::GetPitch(BYTE *pDib)
     return 0;
 }
 
-unsigned CDibInterface::GetPitch(fipImage& pDib)
+unsigned CDibInterface::GetPitch(CxImage& pDib)
 {
-    return pDib.getScanWidth() + 3 & ~3;
+	return pDib.GetEffWidth() + 3 & ~3;
 }
 
 BYTE * CDibInterface::GetDibBits(BYTE *pDib)
@@ -181,21 +181,6 @@ BYTE * CDibInterface::GetDibBits(BYTE *pDib)
         return p + sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * nColors;
     }
     return nullptr;
-}
-
-int CDibInterface::GetDibPalette(fipImage& lpbi,LPSTR palette)
-{
-    const BITMAPINFO* header = lpbi.getInfo();
-    const unsigned int j = (std::min)(1 << header->bmiHeader.biBitCount, 256);
-
-    for (unsigned int i = 0; i < j; i++)
-    {
-        palette[i*RGB_SIZE + RGB_RED] = header->bmiColors[i].rgbRed;
-        palette[i*RGB_SIZE + RGB_GREEN] = header->bmiColors[i].rgbGreen;
-        palette[i*RGB_SIZE + RGB_BLUE] = header->bmiColors[i].rgbBlue;
-    }
-
-    return j;
 }
 
 // Function to ensure that DIB data is on DWORD boundaries
@@ -349,11 +334,8 @@ HANDLE CDibInterface::IncreaseDecreaseBpp(HANDLE hDib, long newbpp, bool bIncrea
     // FreeImage has better resampling down to gray than CXImage from 24 -> 8
     if (bpp == 24 && newbpp == 8)
     {
-        fipImage im;
-        fipImageUtility::copyFromHandle(im, hDib);
-        fipWinImage_RAII raiiImg(&im);
-        im.convertTo8Bits();
-        return fipImageUtility::copyToHandle(im);
+        HANDLE newDib = Convert24bppDibTo8bppGray(hDib);
+        return newDib;
     }
 
     // Use CxImage resampler
@@ -387,149 +369,147 @@ HANDLE CDibInterface::DecreaseBpp(HANDLE hDib, long newbpp)
     return IncreaseDecreaseBpp(hDib, newbpp, false);
 }
 
-HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const FloatRect& RequestedRect,int sourceunit,
+HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const FloatRect& RequestedRect, int sourceunit,
                               int destunit, int dpi, bool bConvertActual, int& retval)
 {
-    retval = IS_ERR_OK;
+	retval = IS_ERR_OK;
 
-    fipImage fw;
-    if (!fipImageUtility::copyFromHandle(fw, handle))
-        return nullptr;
-    fipWinImage_RAII raii(&fw);
+	// Use CxImage crop
+	BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(handle);
+	DTWAINGlobalHandle_RAII raii(handle);
+	CxImage ImageHandler(pImage, GlobalSize(handle), CXIMAGE_FORMAT_BMP);
+    const UINT32 width = ImageHandler.GetWidth();
+	const UINT32 height = ImageHandler.GetHeight();
 
-    const UINT32 width = fw.getWidth();
-    const UINT32 height = fw.getHeight();
+	// Convert the actual rectangle first if necessary
+	// This assumes that the actual rect is in pixels, but
+	// the source unit does not match up correctly
+	FloatRect TempActual = ActualRect;
+	if (bConvertActual)
+		TempActual = Normalize(ImageHandler, ActualRect, ActualRect, DTWAIN_PIXELS, sourceunit, dpi);
 
-    // Convert the actual rectangle first if necessary
-    // This assumes that the actual rect is in pixels, but
-    // the source unit does not match up correctly
-    FloatRect TempActual = ActualRect;
-    if ( bConvertActual )
-        TempActual = Normalize(fw, ActualRect, ActualRect, DTWAIN_PIXELS, sourceunit, dpi);
+	// Now return a normalized rectangle from the actual and requested rectangles
+	const FloatRect NormalizedRect = Normalize(ImageHandler, TempActual, RequestedRect, sourceunit, destunit, dpi);
 
-    // Now return a normalized rectangle from the actual and requested rectangles
-    const FloatRect NormalizedRect = Normalize(fw, TempActual, RequestedRect, sourceunit, destunit, dpi);
+	const double left = NormalizedRect.left;
+	const double top = NormalizedRect.top;
+	const double right = NormalizedRect.right;
+	const double bottom = NormalizedRect.bottom;
 
-    const double left = NormalizedRect.left;
-    const double top = NormalizedRect.top;
-    const double right = NormalizedRect.right;
-    const double bottom = NormalizedRect.bottom;
+	// DIBs are stored upside down, so adjust coordinates here
+	const int newbottom = height - static_cast<UINT32>(top);
+	const int newtop = height - static_cast<UINT32>(bottom);
 
-    // DIBs are stored upside down, so adjust coordinates here
-    const int newbottom = height - static_cast<UINT32>(top);
-    const int newtop = height - static_cast<UINT32>(bottom);
+	long startx = (std::max)(0L, (std::min<long>)(left, width));
+	long endx = (std::max)(0L, (std::min<long>)(right, width));
 
-    long startx = (std::max)(0L, (std::min<long>)(left, width));
-    long endx = (std::max)(0L, (std::min<long>)(right, width));
+	long starty = (std::max)(0L, (std::min<long>)(newtop, height));
+	long endy = (std::max)(0L, (std::min<long>)(newbottom, height));
 
-    long starty = (std::max)(0L,(std::min<long>)(newtop, height));
-    long endy =   (std::max)(0L,(std::min<long>)(newbottom, height));
+	if (startx == endx || starty == endy)
+	{
+		retval = IS_ERR_BADPARAM;
+		return nullptr;
+	}
 
-    if (startx==endx || starty==endy)
-    {
-        retval = IS_ERR_BADPARAM;
-        return nullptr;
-    }
+	if (startx > endx)
+	{
+		const long tmp = startx;
+		startx = endx;
+		endx = tmp;
+	}
+	if (starty > endy)
+	{
+		const long tmp = starty;
+		starty = endy;
+		endy = tmp;
+	}
 
-    if (startx>endx)
-    {
-        const long tmp=startx;
-        startx=endx;
-        endx=tmp;
-    }
-    if (starty>endy)
-    {
-        const long tmp=starty;
-        starty=endy;
-        endy=tmp;
-    }
-
-    if ( fw.crop(startx, starty, endx, endy) )
-        return fipImageUtility::copyToHandle(fw);
-    return nullptr;
+    if (ImageHandler.Crop(startx, starty, endx, endy))
+        return ImageHandler.CopyToHandle();
+	return nullptr;
 }
 
-FloatRect CDibInterface::Normalize(fipImage& pImage, const FloatRect& ActualRect, const FloatRect& RequestedRect,
-                                   int sourceunit, int destunit, int dpi)
+FloatRect CDibInterface::Normalize(CxImage& pImage, const FloatRect& ActualRect, const FloatRect& RequestedRect,
+	                               int sourceunit, int destunit, int dpi)
 {
-    static constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
-                                                                      {DTWAIN_TWIPS, 1440.0},
-                                                                      {DTWAIN_POINTS, 72.0},
-                                                                      {DTWAIN_PICAS, 6.0},
-                                                                      {DTWAIN_CENTIMETERS, 2.54}} };
+	static constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
+																	  {DTWAIN_TWIPS, 1440.0},
+																	  {DTWAIN_POINTS, 72.0},
+																	  {DTWAIN_PICAS, 6.0},
+																	  {DTWAIN_CENTIMETERS, 2.54}} };
 
-    const UINT32 width = pImage.getWidth();
+	const UINT32 width = pImage.GetWidth();
 
-    // Set up a return rect
-    FloatRect fRect = RequestedRect;
+	// Set up a return rect
+	FloatRect fRect = RequestedRect;
 
-    // Check dimensions
-    if (fabs(ActualRect.right - ActualRect.left) < 1.0 )
-        return fRect;
+	// Check dimensions
+	if (fabs(ActualRect.right - ActualRect.left) < 1.0)
+		return fRect;
 
-    const UINT32 pitch = GetPitch(pImage);
-    if ( pitch == 0 )
-        return fRect;
+	const UINT32 pitch = GetPitch(pImage);
+	if (pitch == 0)
+		return fRect;
 
-    const auto iterSourceUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == sourceunit; });
-    const auto iterDestUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == destunit; });
+	const auto iterSourceUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == sourceunit; });
+	const auto iterDestUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == destunit; });
 
-    // If not found return the original rect
-    if (!iterSourceUnit.first || !iterDestUnit.first)
-        return fRect;
+	// If not found return the original rect
+	if (!iterSourceUnit.first || !iterDestUnit.first)
+		return fRect;
 
-    auto actualSourceUnit = Measurement[iterSourceUnit.second].second;
-    auto actualDestUnit = Measurement[iterDestUnit.second].second;
+	auto actualSourceUnit = Measurement[iterSourceUnit.second].second;
+	auto actualDestUnit = Measurement[iterDestUnit.second].second;
 
-    // Convert Actual rect to pixels
-    double PixelsPerInch = dpi;
-    switch(sourceunit)
-    {
-        case DTWAIN_PIXELS:
-            break;
+	// Convert Actual rect to pixels
+	double PixelsPerInch = dpi;
+	switch (sourceunit)
+	{
+	    case DTWAIN_PIXELS:
+		    break;
 
-        case DTWAIN_INCHES:
-        case DTWAIN_TWIPS:
-        case DTWAIN_CENTIMETERS:
-        case DTWAIN_POINTS:
-        case DTWAIN_PICAS:
-        {
-            const double NumInches = (ActualRect.right - ActualRect.left) / actualSourceUnit;
-            PixelsPerInch = static_cast<double>(width) / NumInches;
-        }
-        break;
-    }
+	    case DTWAIN_INCHES:
+	    case DTWAIN_TWIPS:
+	    case DTWAIN_CENTIMETERS:
+	    case DTWAIN_POINTS:
+	    case DTWAIN_PICAS:
+	    {
+		    const double NumInches = (ActualRect.right - ActualRect.left) / actualSourceUnit;
+		    PixelsPerInch = static_cast<double>(width) / NumInches;
+	    }
+	    break;
+	}
 
-    switch(destunit)
-    {
-        case DTWAIN_PIXELS:
-            break;
+	switch (destunit)
+	{
+	    case DTWAIN_PIXELS:
+		    break;
 
-        case DTWAIN_INCHES:
-        case DTWAIN_TWIPS:
-        case DTWAIN_CENTIMETERS:
-        case DTWAIN_POINTS:
-        case DTWAIN_PICAS:
-        {
-            if ( sourceunit == DTWAIN_PIXELS )
-            {
-                fRect.left   = RequestedRect.left / PixelsPerInch;
-                fRect.right  = RequestedRect.right  /  PixelsPerInch;
-                fRect.top    = RequestedRect.top   /  PixelsPerInch;
-                fRect.bottom = RequestedRect.bottom  / PixelsPerInch;
-            }
-            else
-            {
-                fRect.left   = RequestedRect.left / actualDestUnit * PixelsPerInch;
-                fRect.right  = RequestedRect.right  / actualDestUnit * PixelsPerInch;
-                fRect.top    = RequestedRect.top   / actualDestUnit * PixelsPerInch;
-                fRect.bottom = RequestedRect.bottom  / actualDestUnit * PixelsPerInch;
-            }
-        }
-        break;
-
-    }
-    return fRect;
+	    case DTWAIN_INCHES:
+	    case DTWAIN_TWIPS:
+	    case DTWAIN_CENTIMETERS:
+	    case DTWAIN_POINTS:
+	    case DTWAIN_PICAS:
+	    {
+		    if (sourceunit == DTWAIN_PIXELS)
+		    {
+			    fRect.left = RequestedRect.left / PixelsPerInch;
+			    fRect.right = RequestedRect.right / PixelsPerInch;
+			    fRect.top = RequestedRect.top / PixelsPerInch;
+			    fRect.bottom = RequestedRect.bottom / PixelsPerInch;
+		    }
+		    else
+		    {
+			    fRect.left = RequestedRect.left / actualDestUnit * PixelsPerInch;
+			    fRect.right = RequestedRect.right / actualDestUnit * PixelsPerInch;
+			    fRect.top = RequestedRect.top / actualDestUnit * PixelsPerInch;
+			    fRect.bottom = RequestedRect.bottom / actualDestUnit * PixelsPerInch;
+		    }
+	    }
+	    break;
+	}
+	return fRect;
 }
 
 // Test for blank page here
@@ -663,20 +643,12 @@ bool CDibInterface::IsGrayScale(BYTE *pImage, int bpp)
 
 bool CDibInterface::IsGrayScale(HANDLE hDib, int bpp)
 {
-#ifdef _WIN32
     bool bRetval = false;
     BYTE *pImageTemp = static_cast<BYTE*>(GlobalLock(hDib));
     DTWAINGlobalHandle_RAII dibHandle(hDib);
     if ( pImageTemp )
         bRetval = IsGrayScale(pImageTemp, bpp);
     return bRetval;
-#else
-    fipImage fw;
-    if (fipImageUtility::copyFromHandle(fw, hDib))
-        return false;
-    fipWinImage_RAII raii(&fw);
-    return fw.isGrayscale();
-#endif
 }
 
 int CDibInterface::putbufferedbyte(WORD byte, std::ofstream& fh, bool bRealEOF, int *pStatus/*=NULL*/)
