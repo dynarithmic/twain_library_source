@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "ctlfileutils.h"
 #include "icowriter.h"
+#include "iohandler_ico.h"
 
 using namespace dynarithmic;
 

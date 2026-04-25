@@ -26,6 +26,8 @@
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "logwriterutils.h"
+#include "iohandler_pdf.h"
+#include "iohandler_bmp.h"
 
 using namespace dynarithmic;
 

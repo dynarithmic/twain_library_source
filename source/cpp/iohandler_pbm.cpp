@@ -21,6 +21,7 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "pnmwriter.h"
+#include "iohandler_pbm.h"
 
 using namespace dynarithmic;
 

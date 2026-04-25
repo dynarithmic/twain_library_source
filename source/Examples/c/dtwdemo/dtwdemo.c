@@ -782,7 +782,7 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
                                   AFileNames,
                                   fileType,
                                   FileFlags | DTWAIN_CREATE_DIRECTORY,
-                                  DTWAIN_PT_DEFAULT, /* Use default */
+                                  DTWAIN_PT_RGB, /* Use default */
                                   DTWAIN_ACQUIREALL, /* Get all pages */
                                   UseUI,
                                   TRUE,  /* Close Source when UI is closed */

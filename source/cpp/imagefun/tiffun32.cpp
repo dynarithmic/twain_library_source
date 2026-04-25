@@ -29,6 +29,7 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "tiff.h"
+#include "iohandler_tiff.h"
 
 using namespace dynarithmic;
 

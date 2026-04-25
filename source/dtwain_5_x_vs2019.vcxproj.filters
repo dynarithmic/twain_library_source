@@ -2445,6 +2445,63 @@
     <ClInclude Include="h\imagefun\postscriptwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\iohandler_ps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_bmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_jpeg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_pdf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_tiff.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_jpeg2k.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_png.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_pcx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_tga.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_wmf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_psd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_jpegxr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_gif.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_ico.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_pbm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_wbmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_webp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_svg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">

@@ -18,23 +18,16 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
-#include "ctltwainmanager.h"
-#include "ctlfileutils.h"
-#include "logwriterutils.h"
+#include "iohandler_ps.h"
 
 using namespace dynarithmic;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////      Postscript handler    /////////////////////////////////////////////////////////////////////////////
-CTL_PSIOHandler::CTL_PSIOHandler(CTL_TwainDib* pDib, int /*nFormat*/, const DTWAINImageInfoEx &ImageInfoEx,
-                                 LONG PSType, bool IsMultiPage)
+CTL_PSIOHandler::CTL_PSIOHandler(CTL_TwainDib* pDib, int /*nFormat*/, const DTWAINImageInfoEx &ImageInfoEx)
                                  :   CTL_ImageIOHandler( pDib ),
                                     m_nFormat(0),
-                                    m_ImageInfoEx(ImageInfoEx),
-                                    m_PSType(PSType),
-                                    m_bIsMultiPage(IsMultiPage)
+                                    m_ImageInfoEx(ImageInfoEx)
 {
 }
 

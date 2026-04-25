@@ -23,6 +23,8 @@
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "logwriterutils.h"
+#include "iohandler_bmp.h"
+#include "iohandler_tiff.h"
 
 using namespace dynarithmic;
 std::string CTextImageHandler::GetFileExtension() const

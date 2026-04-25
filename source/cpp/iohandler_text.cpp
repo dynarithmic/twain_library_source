@@ -23,6 +23,7 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "iohandler_text.h"
 
 using namespace dynarithmic;
 

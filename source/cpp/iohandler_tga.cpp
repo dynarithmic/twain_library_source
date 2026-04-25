@@ -21,6 +21,7 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "tgawriter.h"
+#include "iohandler_tga.h"
 
 using namespace dynarithmic;
 

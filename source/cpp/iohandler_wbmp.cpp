@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "ctlfileutils.h"
 #include "wbmpwriter.h"
+#include "iohandler_wbmp.h"
 
 using namespace dynarithmic;
 

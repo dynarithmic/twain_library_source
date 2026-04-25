@@ -31,6 +31,25 @@
 #include "ctldib.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
+#include "iohandler_bmp.h"
+#include "iohandler_jpeg.h"
+#include "iohandler_jpeg2k.h"
+#include "iohandler_pdf.h"
+#include "iohandler_ps.h"
+#include "iohandler_jpegxr.h"
+#include "iohandler_png.h"
+#include "iohandler_pcx.h"
+#include "iohandler_tga.h"
+#include "iohandler_wmf.h"
+#include "iohandler_psd.h"
+#include "iohandler_gif.h"
+#include "iohandler_ico.h"
+#include "iohandler_wbmp.h"
+#include "iohandler_webp.h"
+#include "iohandler_pbm.h"
+#include "iohandler_text.h"
+#include "iohandler_svg.h"
+
  /* Header signatures for various resources */
 constexpr auto BFT_ICON = 0x4349   /* 'IC' */;
 constexpr auto BFT_BITMAP = 0x4d42   /* 'BM' */;
@@ -248,7 +267,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
 		case PSFormatLevel1:
 		case PSFormatLevel2:
 		case PSFormatLevel3:
-			pHandler = std::make_unique<CTL_PSIOHandler>(this, nFormat, ImageInfo, 0, 0);
+			pHandler = std::make_unique<CTL_PSIOHandler>(this, nFormat, ImageInfo);
         break;
 
         case TgaFormat:
@@ -377,7 +396,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
 		case PSFormatLevel1Multi:
 		case PSFormatLevel2Multi:
 		case PSFormatLevel3Multi:
-			pHandler = std::make_shared<CTL_PSIOHandler>(this, nFormat, ImageInfo, 0, 0);
+			pHandler = std::make_shared<CTL_PSIOHandler>(this, nFormat, ImageInfo);
 		break;
 
         case DcxFormat:

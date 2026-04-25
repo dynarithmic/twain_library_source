@@ -18,9 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
+#include "iohandler_bmp.h"
 #include "bmprlewriter.h"
+#include "ctliface.h"
 
 using namespace dynarithmic;
 

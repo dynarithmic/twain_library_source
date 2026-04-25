@@ -21,6 +21,7 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "pngwriter.h"
+#include "iohandler_png.h"
 
 using namespace dynarithmic;
 

@@ -25,6 +25,8 @@
 #include "ctlfileutils.h"
 #include "tiff.h"
 #include "logwriterutils.h"
+#include "iohandler_tiff.h"
+
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)

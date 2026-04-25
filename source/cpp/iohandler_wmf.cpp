@@ -20,6 +20,7 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "iohandler_wmf.h"
 
 using namespace dynarithmic;
 
