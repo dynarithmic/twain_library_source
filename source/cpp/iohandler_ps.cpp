@@ -19,6 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "iohandler_ps.h"
+#include <ctliface.h>
 
 using namespace dynarithmic;
 
@@ -72,6 +73,11 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
 		}
 
 		std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+
+		// Get the comment string (copyright information)
+		char commentStr[256] = {};
+		GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+		opts.creator = commentStr;
 
 		if (!m_psSessionWriter.Open(fName, opts))
 			return DTWAIN_ERR_FILEWRITE;

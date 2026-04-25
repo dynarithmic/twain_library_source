@@ -58,6 +58,11 @@ int CTL_PBMIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 	opts.useRaw = true;
 	opts.fixBilevelPolarity = true;
 
+	// Get the comment string (copyright information)
+	char commentStr[256] = {};
+	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+	opts.comment = commentStr;
+
 	std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
 	if (!WriteOneDibHandleToPnm(filename, opts, hDib))

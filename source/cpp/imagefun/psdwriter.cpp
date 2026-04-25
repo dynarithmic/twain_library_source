@@ -183,7 +183,75 @@ bool PsdSessionWriter::WriteColorModeDataSection()
 
 bool PsdSessionWriter::WriteImageResourcesSection()
 {
-	return dynarithmic::psd::write_u32_be(file_, 0);
+	if (options_.comment.empty())
+		return dynarithmic::psd::write_u32_be(file_, 0);
+
+	std::vector<uint8_t> resources;
+
+	auto write_u16_be_vec = [](std::vector<uint8_t>& v, uint16_t x)
+	{
+		v.push_back(static_cast<uint8_t>((x >> 8) & 0xFF));
+		v.push_back(static_cast<uint8_t>(x & 0xFF));
+	};
+
+	auto write_u32_be_vec = [](std::vector<uint8_t>& v, uint32_t x)
+	{
+		v.push_back(static_cast<uint8_t>((x >> 24) & 0xFF));
+		v.push_back(static_cast<uint8_t>((x >> 16) & 0xFF));
+		v.push_back(static_cast<uint8_t>((x >> 8) & 0xFF));
+		v.push_back(static_cast<uint8_t>(x & 0xFF));
+	};
+
+	auto append_resource = [&](uint16_t resourceId,
+		const std::string& name,
+		const std::vector<uint8_t>& data)
+	{
+		// Signature: '8BIM'
+		resources.push_back('8');
+		resources.push_back('B');
+		resources.push_back('I');
+		resources.push_back('M');
+
+		// Resource ID
+		write_u16_be_vec(resources, resourceId);
+
+		// Pascal string name, padded to even size including length byte.
+		const size_t nameLen = std::min<size_t>(name.size(), 255);
+		resources.push_back(static_cast<uint8_t>(nameLen));
+		resources.insert(resources.end(), name.begin(), name.begin() + nameLen);
+
+		if (((1 + nameLen) & 1) != 0)
+			resources.push_back(0);
+
+		// Data size
+		write_u32_be_vec(resources, static_cast<uint32_t>(data.size()));
+
+		// Data
+		resources.insert(resources.end(), data.begin(), data.end());
+
+		// Data padded to even size
+		if ((data.size() & 1) != 0)
+			resources.push_back(0);
+	};
+
+	// Resource ID 1008 / 0x03F0 = Caption.
+	std::vector<uint8_t> captionData(options_.comment.begin(),
+		options_.comment.end());
+
+	append_resource(1008, "Caption", captionData);
+
+	if (!dynarithmic::psd::write_u32_be(file_,
+		static_cast<uint32_t>(resources.size())))
+	{
+		return false;
+	}
+
+	if (!resources.empty())
+	{
+		if (std::fwrite(resources.data(), 1, resources.size(), file_) != resources.size())
+			return false;
+	}
+	return true;
 }
 
 bool PsdSessionWriter::WriteLayerAndMaskSection()

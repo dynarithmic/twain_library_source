@@ -203,8 +203,16 @@ uint32_t PnmSessionWriter::MaxValue() const
 
 bool PnmSessionWriter::WriteHeader()
 {
-	if (std::fprintf(file_, "%s\n%u %u\n",
-		Magic(),
+	if (std::fprintf(file_, "%s\n", Magic()) < 0)
+		return false;
+
+	if (!options_.comment.empty())
+	{
+		if (!WriteCommentLines(options_.comment))
+			return false;
+	}
+
+	if (std::fprintf(file_, "%u %u\n",
 		currentPage_.width,
 		currentPage_.height) < 0)
 	{
@@ -214,6 +222,52 @@ bool PnmSessionWriter::WriteHeader()
 	if (currentPage_.pixelFlavor != PnmPixelFlavor::BW1)
 	{
 		if (std::fprintf(file_, "%u\n", MaxValue()) < 0)
+			return false;
+	}
+
+	return true;
+}
+
+bool PnmSessionWriter::WriteCommentLines(const std::string& text)
+{
+	size_t start = 0;
+
+	while (start <= text.size())
+	{
+		size_t end = text.find_first_of("\r\n", start);
+		std::string line;
+
+		if (end == std::string::npos)
+		{
+			line = text.substr(start);
+			start = text.size() + 1;
+		}
+		else
+		{
+			line = text.substr(start, end - start);
+
+			// Handle CRLF as one newline.
+			if (text[end] == '\r' &&
+				end + 1 < text.size() &&
+				text[end + 1] == '\n')
+			{
+				start = end + 2;
+			}
+			else
+			{
+				start = end + 1;
+			}
+		}
+
+		if (line.empty())
+			continue;
+
+		// Avoid accidentally creating malformed nested comments.
+		// Netpbm comments begin with '#'; we emit the marker ourselves.
+		while (!line.empty() && line.front() == '#')
+			line.erase(line.begin());
+
+		if (std::fprintf(file_, "# %s\n", line.c_str()) < 0)
 			return false;
 	}
 

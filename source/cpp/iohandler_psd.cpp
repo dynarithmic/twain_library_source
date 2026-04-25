@@ -58,6 +58,11 @@ int CTL_PsdIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 	PsdSessionOptions opts{};
 	opts.useRle = true; // raw only in this implementation
 
+	// Get the comment string (copyright information)
+	char commentStr[256] = {};
+	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+	opts.comment = commentStr;
+
     std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
 	if (!WriteOneDibHandleToPsd(fName, opts, hDib))

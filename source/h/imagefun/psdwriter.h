@@ -46,6 +46,9 @@ struct PsdSessionOptions
 {
 	// Reserved for future use (e.g. PackBits RLE, image resources, metadata)
 	bool useRle = false;
+
+	// Optional PSD image-resource comment/caption.
+	std::string comment;
 };
 
 // ============================================================

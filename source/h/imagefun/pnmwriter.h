@@ -59,12 +59,9 @@ struct PreparedPnmDibPage
 
 struct PnmSessionOptions
 {
-	// FreeImage default behavior is likely plain text.
-	// Set to true for P4/P5/P6 binary output.
-	bool useRaw = false;
-
-	// Fix the apparent FreeImage PBM polarity issue.
+	bool useRaw = true;
 	bool fixBilevelPolarity = true;
+	std::string comment;
 };
 
 // ============================================================
@@ -89,46 +86,47 @@ class LockedPnmDibPage
 
 class PnmSessionWriter
 {
-public:
-	PnmSessionWriter() = default;
-	~PnmSessionWriter();
-	PnmSessionWriter(const PnmSessionWriter&) = delete;
-	PnmSessionWriter& operator=(const PnmSessionWriter&) = delete;
-	bool Open(const std::wstring& filename, const PnmSessionOptions& options);
-	bool SetPageInfo(const PreparedPnmDibPage& page);
-	bool WriteCurrentPage();
-	void Close();
-	bool IsOpen() const noexcept;
+	public:
+		PnmSessionWriter() = default;
+		~PnmSessionWriter();
+		PnmSessionWriter(const PnmSessionWriter&) = delete;
+		PnmSessionWriter& operator=(const PnmSessionWriter&) = delete;
+		bool Open(const std::wstring& filename, const PnmSessionOptions& options);
+		bool SetPageInfo(const PreparedPnmDibPage& page);
+		bool WriteCurrentPage();
+		void Close();
+		bool IsOpen() const noexcept;
 
-private:
-	static bool ValidatePage(const PreparedPnmDibPage& page);
-	static uint8_t ReverseBits(uint8_t v);
-	const char* Magic() const;
-	uint32_t MaxValue() const;
-	bool WriteHeader();
-	bool WritePixels();
-	const uint8_t* GetSourceRow(uint32_t y) const;
-	bool WritePbmPlain();
-	bool WritePbmRaw();
-	bool WriteGray8Plain();
-	bool WriteGray8Raw();
-	bool WriteGray16Plain();
-	bool WriteGray16Raw();
-	bool WriteRgb24Plain();
-	bool WriteRgb24Raw();
-	bool WriteRgba32AsRgbPlain();
-	bool WriteRgba32AsRgbRaw();
+	private:
+		static bool ValidatePage(const PreparedPnmDibPage& page);
+		static uint8_t ReverseBits(uint8_t v);
+		const char* Magic() const;
+		uint32_t MaxValue() const;
+		bool WriteHeader();
+		bool WritePixels();
+		const uint8_t* GetSourceRow(uint32_t y) const;
+		bool WritePbmPlain();
+		bool WritePbmRaw();
+		bool WriteGray8Plain();
+		bool WriteGray8Raw();
+		bool WriteGray16Plain();
+		bool WriteGray16Raw();
+		bool WriteRgb24Plain();
+		bool WriteRgb24Raw();
+		bool WriteRgba32AsRgbPlain();
+		bool WriteRgba32AsRgbRaw();
+		bool WriteCommentLines(const std::string& text);
 
-private:
-	FILE* file_ = nullptr;
-	std::wstring filename_;
-	PnmSessionOptions options_{};
+	private:
+		FILE* file_ = nullptr;
+		std::wstring filename_;
+		PnmSessionOptions options_{};
 
-	PreparedPnmDibPage currentPage_{};
-	bool hasCurrentPage_ = false;
+		PreparedPnmDibPage currentPage_{};
+		bool hasCurrentPage_ = false;
 
-	std::vector<uint8_t> rowBuffer_;
-	std::vector<uint8_t> packedRow_;
+		std::vector<uint8_t> rowBuffer_;
+		std::vector<uint8_t> packedRow_;
 };
 
 // ============================================================
