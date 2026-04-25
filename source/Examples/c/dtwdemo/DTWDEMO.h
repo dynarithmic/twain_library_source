@@ -91,6 +91,7 @@
 #define IDM_ACQUIREFILE_WEBP                452
 #define IDM_ACQUIREFILE_WINDOWSMETAFILE     453
 #define IDM_ACQUIREFILE_WIRELESSBITMAP      454
+#define IDM_ACQUIREFILE_POSTSCRIPTLEVEL3    455
 
 #define IDD_dlgEnterSourceName              1000
 #define IDC_edSourceName                    1001

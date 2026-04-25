@@ -20,6 +20,8 @@
  */
 #include "postscriptwriter.h"
 #include "a85encode.h"
+#include "flateencode.h"
+#include "zlib.h"
 
 static void PsRunLengthEncode(std::string_view input, std::string& output)
 {
@@ -169,7 +171,7 @@ bool PsSessionWriter::WritePage(const PreparedPsDibPage& page)
 	}
 	else
 	{
-		if (!WriteLevel2Image(page))
+		if (!WriteLevel2Or3Image(page))
 			return false;
 	}
 
@@ -335,7 +337,7 @@ const char* PsSessionWriter::DecodeArray(const PreparedPsDibPage& page) const
 	return "[0 1 0 1 0 1]";
 }
 
-bool PsSessionWriter::WriteLevel2Image(const PreparedPsDibPage& page)
+bool PsSessionWriter::WriteLevel2Or3Image(const PreparedPsDibPage& page)
 {
 	const char* colorSpace =
 		(page.pixelFlavor == PsPixelFlavor::Bgr24 ||
@@ -343,10 +345,18 @@ bool PsSessionWriter::WriteLevel2Image(const PreparedPsDibPage& page)
 		? "/DeviceRGB"
 		: "/DeviceGray";
 
-	const char* filterChain =
-		options_.useRunLength
-		? "/ASCII85Decode filter /RunLengthDecode filter"
-		: "/ASCII85Decode filter";
+	const char* filterChain = nullptr;
+
+	if (options_.level == PsLevel::Level3)
+	{
+		filterChain = "/ASCII85Decode filter /FlateDecode filter";
+	}
+	else
+	{
+		filterChain = options_.useRunLength
+			? "/ASCII85Decode filter /RunLengthDecode filter"
+			: "/ASCII85Decode filter";
+	}
 
 	if (std::fprintf(file_,
 		"%s setcolorspace\n"
@@ -372,11 +382,44 @@ bool PsSessionWriter::WriteLevel2Image(const PreparedPsDibPage& page)
 		return false;
 	}
 
+	if (options_.level == PsLevel::Level3)
+		return WriteAscii85FlateImageData(page);
+
 	if (options_.useRunLength)
 		return WriteAscii85RunLengthImageData(page);
 
 	return WriteAscii85ImageData(page);
 }
+
+bool PsSessionWriter::WriteAscii85FlateImageData(const PreparedPsDibPage& page)
+{
+	std::string raw;
+	if (!BuildRawImageData(page, raw))
+		return false;
+
+	std::string flate;
+	if (FlateEncode(std::string_view(raw.data(), raw.size()), flate) != Z_OK)
+		return false;
+
+	std::string encoded;
+	if (ASCII85Encode(std::string_view(flate.data(), flate.size()), encoded) != 1)
+		return false;
+
+	if (!encoded.empty())
+	{
+		if (std::fwrite(encoded.data(), 1, encoded.size(), file_) != encoded.size())
+			return false;
+	}
+
+	if (encoded.empty() || encoded.back() != '\n')
+	{
+		if (std::fputc('\n', file_) == EOF)
+			return false;
+	}
+
+	return true;
+}
+
 bool PsSessionWriter::WriteLevel1Image(const PreparedPsDibPage& page)
 {
 	const uint32_t components = Components(page);

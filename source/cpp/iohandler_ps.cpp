@@ -70,9 +70,12 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
 				opts.level = PsLevel::Level2;
                 opts.invert1bpp = true;
 				break;
-		    default:
-				opts.level = PsLevel::Level2;
-			    break;
+
+			case DTWAIN_POSTSCRIPT3:
+			case DTWAIN_POSTSCRIPT3MULTI:
+				opts.level = PsLevel::Level3;
+				opts.invert1bpp = true;
+				break;
 		}
 
 		std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);

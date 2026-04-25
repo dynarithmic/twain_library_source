@@ -30,12 +30,6 @@ OF THIRD PARTY RIGHTS.
 // PostScript writer
 // ============================================================
 
-enum class PsLevel
-{
-	Level1,
-	Level2
-};
-
 enum class PsPixelFlavor
 {
 	BW1,
@@ -43,6 +37,13 @@ enum class PsPixelFlavor
 	Gray16,
 	Bgr24,
 	Bgra32
+};
+
+enum class PsLevel
+{
+	Level1,
+	Level2,
+	Level3
 };
 
 struct PreparedPsDibPage
@@ -122,8 +123,8 @@ class PsSessionWriter
 		uint32_t Components(const PreparedPsDibPage& page) const;
 		uint32_t BitsPerComponent(const PreparedPsDibPage& page) const;
 		const char* DecodeArray(const PreparedPsDibPage& page) const;
-		bool WriteLevel2Image(const PreparedPsDibPage& page);
 		bool WriteLevel1Image(const PreparedPsDibPage& page);
+		bool WriteLevel2Or3Image(const PreparedPsDibPage& page);
 		const uint8_t* SourceRow(const PreparedPsDibPage& page, uint32_t y) const;
 		bool WriteHexByte(uint8_t v);
 		bool EndHexData();
@@ -138,6 +139,7 @@ class PsSessionWriter
 		bool BuildRawImageData(const PreparedPsDibPage& page, std::string& raw);
 		bool WriteAscii85ImageData(const PreparedPsDibPage& page);
 		bool WriteAscii85RunLengthImageData(const PreparedPsDibPage& page);
+		bool WriteAscii85FlateImageData(const PreparedPsDibPage& page);
 
 		FILE* file_ = nullptr;
 		PsSessionOptions options_{};
