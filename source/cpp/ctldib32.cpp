@@ -249,6 +249,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
 		case PSFormatLevel2:
 		case PSFormatLevel3:
 			pHandler = std::make_unique<CTL_PSIOHandler>(this, nFormat, ImageInfo, 0, 0);
+        break;
 
         case TgaFormat:
         case TgaFormatRLE:
