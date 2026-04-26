@@ -406,9 +406,6 @@
     <ClCompile Include="cpp\windows_versioninfo.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\imagefun\wmffun32.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="c\imagefun\dtwpdf\md5c.c">
       <Filter>C Files</Filter>
     </ClCompile>
@@ -1555,6 +1552,9 @@
     <ClCompile Include="cpp\imagefun\postscriptwriter.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\imagefun\metafilewriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1873,9 +1873,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include=".\h\winconst.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="h\imagefun\wmffun32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\imagefun\txtfun32.h">
@@ -2500,6 +2497,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\iohandler_svg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\metafilewriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

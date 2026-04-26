@@ -103,15 +103,10 @@ namespace dynarithmic
             void SetMultiPageStatus(DibMultiPageStruct *pStruct) override;
             void GetMultiPageStatus(DibMultiPageStruct *pStruct) override;
             LONG GetErrorCode() const { return m_nError; }
-            static int  Tiff2PS(LPCTSTR szFileIn, LPCTSTR szFileOut, LONG PSType,
-                                LPCTSTR szTitle, bool IsEncapsulated);
-            void DestroyAllObjects() override;
 
         protected:
-//            int ProcessCompressionType(fipImage& im, unsigned long&) const;
 			std::pair<int, int> ProcessCompressionType() const;
             std::pair<int, int> ProcessCompressionTypeInternal() const;
-
     };
 }
 #endif

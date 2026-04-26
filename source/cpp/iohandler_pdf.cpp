@@ -28,6 +28,7 @@
 #include "logwriterutils.h"
 #include "iohandler_pdf.h"
 #include "iohandler_bmp.h"
+#include "pdffun32.h"
 
 using namespace dynarithmic;
 

@@ -70,10 +70,6 @@ bool CTIFFImageHandler::CloseOutputFile()
     return true;
 }
 
-void CTIFFImageHandler::DestroyAllObjects()
-{
-}
-
 static constexpr TiffCompression TranslateCompression(int nCompression)
 {
     switch (nCompression)
@@ -249,12 +245,5 @@ std::pair<int, int> CTIFFImageHandler::ProcessCompressionTypeInternal() const
 int CTIFFImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht,
                                   UINT32 bpp, UINT32 /*nColors*/, RGBQUAD * /*pPal*/, void * /*pUserInfo*/)
 {
-    DestroyAllObjects();
     return m_nError;
-}
-
-int CTIFFImageHandler::Tiff2PS(LPCTSTR szFileIn, LPCTSTR szFileOut, LONG PSType,
-                               LPCTSTR szTitle, bool PSEncapsulated)
-{
-    return 1; // PDFInterface().DTWLIB_PSWriteFile(szFileIn, szFileOut, PSType, szTitle, PSEncapsulated);
 }
