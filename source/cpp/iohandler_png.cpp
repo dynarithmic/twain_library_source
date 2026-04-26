@@ -51,7 +51,7 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
 	LockedPngDibPage lockedPage(hDib);
 	if (!lockedPage.IsValid())
-		return false;
+		return DTWAIN_ERR_FILEWRITE;
     std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     PngSessionOptions sessionOptions;

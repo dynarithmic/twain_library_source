@@ -523,7 +523,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                 DTWAIN_SOURCE tempSource = DTWAIN_SelectSourceByNameA(curSource.c_str());
                 if (tempSource)
                 {
-                    pCurrentSourcePtr = (CTL_ITwainSource*)tempSource;
+                    pCurrentSourcePtr = reinterpret_cast<CTL_ITwainSource*>(tempSource);
                     bMustClose = true;
                     DTWAIN_OpenSource(tempSource);
                 }
@@ -532,7 +532,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
             {
                 // Source already opened
                 DTWAIN_SOURCE openedSource = reinterpret_cast<DTWAIN_SOURCE>(iter->second.GetSourceHandle());
-                pCurrentSourcePtr = (CTL_ITwainSource*)openedSource;
+                pCurrentSourcePtr = reinterpret_cast<CTL_ITwainSource*>(openedSource);
             }
         }
 

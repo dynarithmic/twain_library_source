@@ -103,6 +103,8 @@ inline HGLOBAL Convert24bppDibTo8bppGray(HANDLE hSrcDib)
 
 	const uint8_t* srcBits = src.Bits();
 	uint8_t* dstBits = dst.Bits();
+	if (!srcBits || !dstBits)
+		return nullptr;
 
 	for (uint32_t y = 0; y < height; ++y)
 	{

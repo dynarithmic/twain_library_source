@@ -52,7 +52,7 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     {
 		LockedPcxDibPage locked(hDib);
 		if (!locked.IsValid())
-			return false;
+			return DTWAIN_ERR_FILEWRITE;
 
 		PcxSessionOptions opts{};
 		opts.writeDcx = isDCX;
