@@ -55,8 +55,9 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!hDib)
         return DTWAIN_ERR_DIB;
 
-    int height = m_pDib->GetHeight();
-    int width = m_pDib->GetWidth();
+    dynarithmic::dib::LockedDib dibHandle(m_pDib->GetHandle());
+    int height = dibHandle.Height();
+    int width = dibHandle.Width();
 
     if (!m_ImageInfoEx.IsVistaIcon)
     {

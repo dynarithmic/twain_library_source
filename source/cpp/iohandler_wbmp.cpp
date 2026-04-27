@@ -55,8 +55,9 @@ int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if (!IsValidBitDepth(DTWAIN_WBMP, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    int height = m_pDib->GetHeight();
-    int width = m_pDib->GetWidth();
+	dynarithmic::dib::LockedDib dibHandle(m_pDib->GetHandle());
+	int height = dibHandle.Height();
+	int width = dibHandle.Width();
 
     if (m_ImageInfoEx.IsWBMPResized && (height > 255 || width > 255))
     {

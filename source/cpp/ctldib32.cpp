@@ -592,45 +592,30 @@ int CTL_TwainDib::GetDepth() const
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if ( !hDib )
         return -1;
-    DTWAINGlobalHandle_RAII handler(hDib);
-    const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hDib));
-    const int nDepth = pbi->biBitCount;
-    return nDepth;
+	dynarithmic::dib::LockedDib dibHandle(hDib);
+    return dibHandle.BitsPerPixel();
 }
 
 int CTL_TwainDib::GetBitsPerPixel() const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
-    if (!hDib)
-        return 0;
-    DTWAINGlobalHandle_RAII handler(hDib);
-    const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hDib));
-
-    if (pbi->biSize != sizeof(BITMAPINFOHEADER))
-        return 0;
-
-    return pbi->biBitCount;
+    dynarithmic::dib::LockedDib dibHandle(hDib);
+    return dibHandle.BitsPerPixel();
 }
 
 int CTL_TwainDib::GetWidth() const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
-    if ( !hDib )
-        return -1;
-    DTWAINGlobalHandle_RAII handler(hDib);
-    const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hDib));
-    const int nWid = static_cast<int>(pbi->biWidth);
-   return nWid;
+	dynarithmic::dib::LockedDib dibHandle(hDib);
+	return dibHandle.Width();
 }
 
 
 int CTL_TwainDib::GetHeight() const
 {
    const HANDLE hDib = m_TwainDibInfo.GetDib();
-   DTWAINGlobalHandle_RAII handler(hDib);
-   const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hDib));
-   const int nHeight = static_cast<int>(pbi->biHeight);
-   return nHeight;
+   dynarithmic::dib::LockedDib dibHandle(hDib);
+   return dibHandle.Height();
 }
 
 int CTL_TwainDib::GetResolution() const
@@ -644,6 +629,7 @@ int CTL_TwainDib::GetNumColors()  const
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if ( !hDib )
         return -1;
+	dynarithmic::dib::LockedDib dibHandle(hDib);
     DTWAINGlobalHandle_RAII handler(hDib);
     void  *pv = ImageMemoryHandler::GlobalLock(hDib);
     const int nColors = DibNumColors(pv);

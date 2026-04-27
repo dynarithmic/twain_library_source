@@ -1434,7 +1434,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include=".\cpp\iohandler_wbmp.cpp" />
     <ClCompile Include=".\cpp\iohandler_wmf.cpp" />
     <ClCompile Include=".\cpp\imagefun\winbit32.cpp" />
-    <ClCompile Include=".\cpp\imagefun\wmffun32.cpp" />
     <ClCompile Include=".\cpp\ctlpdf.cpp">
     </ClCompile>
     <ClCompile Include=".\cpp\imagefun\pdffun32.cpp">
@@ -1522,6 +1521,7 @@ copy $(TargetDir)$(TargetName).lib .
       <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
       </ShowIncludes>
     </ClCompile>
+    <ClCompile Include="cpp\imagefun\metafilewriter.cpp" />
     <ClCompile Include="cpp\imagefun\pcxwriter.cpp" />
     <ClCompile Include="cpp\imagefun\pngwriter.cpp" />
     <ClCompile Include="cpp\imagefun\pnmwriter.cpp" />
@@ -10144,6 +10144,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\imagefun\jpeg2kwriter.h" />
     <ClInclude Include="h\imagefun\jpegwriter.h" />
     <ClInclude Include="h\imagefun\jpegxrwriter.h" />
+    <ClInclude Include="h\imagefun\metafilewriter.h" />
     <ClInclude Include="h\imagefun\pcxfun32.h" />
     <ClInclude Include="h\imagefun\pcxwriter.h" />
     <ClInclude Include="h\imagefun\pdffun32.h" />
@@ -10160,7 +10161,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\imagefun\wbmpwriter.h" />
     <ClInclude Include="h\imagefun\webpwriter.h" />
     <ClInclude Include="h\imagefun\winbit32.h" />
-    <ClInclude Include="h\imagefun\wmffun32.h" />
     <ClInclude Include="h\imagexferfilewriter.h" />
     <ClInclude Include="h\iohandler_bmp.h" />
     <ClInclude Include="h\iohandler_gif.h" />

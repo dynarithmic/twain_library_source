@@ -284,7 +284,7 @@ namespace dynarithmic
 
             virtual void SetMultiPageStatus(DibMultiPageStruct * /*pStruct*/) { }
             virtual void GetMultiPageStatus(DibMultiPageStruct * /*pStruct*/) { }
-            virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, void * /*pUserInfo*/ = nullptr);
+            virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, void * /*pUserInfo*/ = nullptr) = 0;
             static HANDLE CreateDIB(int width, int height, int bpp, LPSTR palette= nullptr);
 
             static int CalculateLine(int width, int bitdepth) {
@@ -305,23 +305,22 @@ namespace dynarithmic
                 return (width * bpp + 31) / 32 * 4;
             }
 
-            static unsigned GetLine(BYTE *pDib);
+//            static unsigned GetLine(BYTE *pDib);
 
             static unsigned char * CalculateScanLine(unsigned char *bits, unsigned pitch, int scanline)
             {
                 return bits + pitch * scanline;
             }
 
-            static unsigned char * GetScanLine(BYTE *pDib, int scanline);
+//            static unsigned char * GetScanLine(BYTE *pDib, int scanline);
 
-            static BYTE *   GetDibBits(BYTE *pDib);
-            static unsigned GetPitch(BYTE *pDib);
+//            static BYTE *   GetDibBits(BYTE *pDib);
+  //          static unsigned GetPitch(BYTE *pDib);
             static unsigned GetPitch(CxImage& pDib);
 
 
             static RGBQUAD* GetPalettePtr(BYTE *pDibData, int bpp);
 
-            static bool GetWidth(BYTE *pDIB, UINT32 *puWidth);
             static bool GetHeight(BYTE *pDIB, UINT32 *piHeight);
             static bool GetBitsPerPixel(BYTE *pDIB, UINT32 *puBitCount);
             static unsigned char HINIBBLE (unsigned char byte)
@@ -339,7 +338,6 @@ namespace dynarithmic
             };
 
             LONG    GetLastError() { return m_lasterror; }
-            static bool    IsGrayScale(BYTE *pImage, int bpp);
             static bool    IsGrayScale(HANDLE hDib, int bpp);
             static bool    IsBlankDIB(HANDLE hDib, double threshold=0.99);
             static BlankDIBInfo IsBlankDIBEx(HANDLE hDib, double threshold = 99.0);

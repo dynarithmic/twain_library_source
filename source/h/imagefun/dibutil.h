@@ -56,6 +56,11 @@ namespace dynarithmic::dib
 		return 0;
 	}
 
+	inline uint32_t effective_width(uint32_t width, uint16_t bpp)
+	{
+		return (width * bpp + 31) / 32 * 4;
+	}
+
 	inline const RGBQUAD* palette_ptr(const BITMAPINFOHEADER* pBih)
 	{
 		if (!pBih)
@@ -221,6 +226,16 @@ namespace dynarithmic::dib
 			return bih_;
 		}
 
+		const BYTE* HeaderAsBytePtr() noexcept
+		{
+			return reinterpret_cast<const BYTE *>(bih_);
+		}
+
+		BITMAPINFOHEADER* HeaderMutable() noexcept
+		{
+			return const_cast<BITMAPINFOHEADER *>(bih_);
+		}
+
 		const RGBQUAD* Palette() const noexcept
 		{
 			return palette_ptr(bih_);
@@ -266,6 +281,11 @@ namespace dynarithmic::dib
 			return bih_ ? calc_stride_bytes(Width(), BitsPerPixel()) : 0;
 		}
 
+		uint32_t ColorsUsed() const noexcept
+		{
+			return bih_ ? bih_->biClrUsed : 0;
+		}
+
 		bool BottomUp() const noexcept
 		{
 			return bih_ ? is_bottom_up(*bih_) : true;
@@ -279,6 +299,11 @@ namespace dynarithmic::dib
 		double YDpi() const noexcept
 		{
 			return bih_ ? pels_per_meter_to_dpi(bih_->biYPelsPerMeter) : 0.0;
+		}
+
+		uint32_t EffectiveWidth() const noexcept
+		{
+			return bih_ ? effective_width(image_width(*bih_), static_cast<uint16_t>(bih_->biBitCount)): 0;
 		}
 
 	private:

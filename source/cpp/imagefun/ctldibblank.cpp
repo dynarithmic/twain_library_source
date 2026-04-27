@@ -639,13 +639,10 @@ CDibInterface::BlankDIBInfo CDibInterface::IsBlankDIBEx(HANDLE hDib, double thre
 
 	if (threshold < 0.0 || threshold > 100.0)
 		return { false, {-1, -1} };
-
-	const auto* pBI = static_cast<const BITMAPINFOHEADER*>(::GlobalLock(hDib));
-	if (!pBI)
+	dynarithmic::dib::LockedDib dibHandle(hDib);
+	if ( !dibHandle.IsValid())
 		return { false, {-1, -1} };
 
-	DTWAINGlobalHandle_RAII handler(hDib);
-	auto result = IsDibBlankImpl(pBI, threshold);
-
+	auto result = IsDibBlankImpl(dibHandle.Header(), threshold);
 	return result;
 }
