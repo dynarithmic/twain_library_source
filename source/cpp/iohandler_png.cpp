@@ -49,12 +49,13 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!IsValidBitDepth(DTWAIN_PNG, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-	LockedPngDibPage lockedPage(hDib);
+	LockedDibPage lockedPage(hDib);
 	if (!lockedPage.IsValid())
 		return DTWAIN_ERR_FILEWRITE;
     std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     PngSessionOptions sessionOptions;
+
 	// Get the comment string (copyright information)
 	char commentStr[256] = {};
 	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
@@ -67,7 +68,11 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
 	PngWriterRAII raii(&writer);
 
-	if (!writer.SetPageInfo(lockedPage.GetPage()))
+	auto pageInfo = PngSessionWriter::MakePreparedPngDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+	if (!writer.SetPageInfo(pageInfo.value()))
 		return DTWAIN_ERR_FILEWRITE; 
 
     auto retVal = writer.WriteCurrentPage();

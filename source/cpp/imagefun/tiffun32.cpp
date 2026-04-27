@@ -108,10 +108,14 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
         tiffOptions.containerFormat = TiffContainerFormat::BigTiff;
 
     // Get the DIB
-    LockedTiffPage lockedPage(bitmap);
+    LockedDibPage lockedPage(bitmap);
 
 	// Get a reference to the DIB
-	auto& theDibPage = lockedPage.GetPageRef();
+	auto pageInfo = TiffSessionWriter::MakePreparedDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+    auto& theDibPage = pageInfo.value();
 
     // Get the bits-per-pixel
     auto bpp = theDibPage.bitsPerPixel;

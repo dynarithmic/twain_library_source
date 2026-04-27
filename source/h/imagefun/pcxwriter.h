@@ -28,6 +28,7 @@ OF THIRD PARTY RIGHTS.
 #include <vector>
 #include <string>
 #include <windows.h>
+#include "imagefilewriterbase.h"
 
 // ============================================================
 // PCX / DCX model
@@ -64,26 +65,8 @@ struct PcxSessionOptions
 };
 
 // ============================================================
-// Locked page wrapper
-// ============================================================
-
-class LockedPcxDibPage
-{
-	public:
-		explicit LockedPcxDibPage(HANDLE hDib);
-		bool IsValid() const noexcept;
-		const PreparedPcxDibPage& GetPage() const noexcept;
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedPcxDibPage page_{};
-		bool valid_ = false;
-};
-
-// ============================================================
 // On-disk helpers
 // ============================================================
-
 namespace dynarithmic::pcx
 {
 #pragma pack(push, 1)
@@ -171,6 +154,7 @@ class PcxSessionWriter
 		bool Open(const std::wstring& filename, const PcxSessionOptions& options);
 		bool WritePage(const PreparedPcxDibPage& page);
 		bool Close();
+		static std::optional<PreparedPcxDibPage> MakePreparedPcxDibPage(const dynarithmic::DibPageView& view);
 
 	private:
 		static bool ValidatePage(const PreparedPcxDibPage& page);

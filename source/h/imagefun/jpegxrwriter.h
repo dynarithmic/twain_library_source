@@ -27,6 +27,8 @@ OF THIRD PARTY RIGHTS.
 #include "dibutil.h"
 #include "JXRGlue.h"
 #include "ctlstringconversion.h"
+#include "imagefilewriterbase.h"
+
 // ============================================================
 // JPEG-XR model
 // DTWAIN contract:
@@ -76,22 +78,6 @@ struct JxrSessionOptions
 	bool progressive = false;
 
 	JxrTextMetadata text;
-};
-
-// ============================================================
-// Locked page wrapper
-// ============================================================
-class LockedJxrDibPage
-{
-	public:
-		explicit LockedJxrDibPage(HANDLE hDib);
-		bool IsValid() const noexcept;
-		const PreparedJxrDibPage& GetPage() const noexcept;
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedJxrDibPage page_{};
-		bool valid_ = false;
 };
 
 // ============================================================
@@ -192,6 +178,7 @@ class JxrSessionWriter
 		bool WriteCurrentPage();
 		void Close();
 		bool IsOpen() const noexcept;
+		static std::optional<PreparedJxrDibPage> MakePreparedJxrPage(const dynarithmic::DibPageView& view);
 
 	private:
 		static bool ValidatePage(const PreparedJxrDibPage& page);

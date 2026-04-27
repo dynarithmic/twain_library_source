@@ -27,7 +27,7 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToPnm(const std::wstring& filename, const PnmSessionOptions& options, HANDLE hDib)
 {
-	LockedPnmDibPage lockedPage(hDib);
+	LockedDibPage lockedPage(hDib);
 	if (!lockedPage.IsValid())
 		return false;
 
@@ -35,7 +35,11 @@ static bool WriteOneDibHandleToPnm(const std::wstring& filename, const PnmSessio
 	if (!writer.Open(filename, options))
 		return false;
 
-	if (!writer.SetPageInfo(lockedPage.GetPage()))
+	auto pageInfo = PnmSessionWriter::MakePreparedPnmDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+	if (!writer.SetPageInfo(pageInfo.value()))
 		return false;
 
 	if (!writer.WriteCurrentPage())

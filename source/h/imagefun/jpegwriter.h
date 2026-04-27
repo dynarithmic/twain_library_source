@@ -28,6 +28,7 @@ OF THIRD PARTY RIGHTS.
 #include <windows.h>
 #include <jpeglib.h>
 #include "dibutil.h"
+#include "imagefilewriterbase.h"
 
 // ============================================================
 // JPEG page model
@@ -75,22 +76,6 @@ struct JpegSessionOptions
 };
 
 // ============================================================
-// Locked page wrapper
-// ============================================================
-class LockedJpegDibPage
-{
-	public:
-		explicit LockedJpegDibPage(HANDLE hDib);
-		bool IsValid() const noexcept;
-		const PreparedJpegDibPage& GetPage() const noexcept;
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedJpegDibPage page_{};
-		bool valid_ = false;
-};
-
-// ============================================================
 // JPEG writer
 // ============================================================
 class JpegSessionWriter
@@ -105,6 +90,7 @@ class JpegSessionWriter
 		bool WriteCurrentPage();
 		void Close();
 		bool IsOpen() const noexcept;
+		static std::optional<PreparedJpegDibPage> MakePreparedJpegPage(const dynarithmic::DibPageView& view);
 
 	private:
 		static bool ValidatePage(const PreparedJpegDibPage& page);

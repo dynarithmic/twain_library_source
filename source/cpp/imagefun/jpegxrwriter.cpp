@@ -20,28 +20,20 @@
  */
 #include <windows.h>
 #include "jpegxrwriter.h"
+#include "imagefilewriterbase.h"
 
- // ============================================================
- // Locked page wrapper
- // ============================================================
-LockedJxrDibPage::LockedJxrDibPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedJxrDibPage> JxrSessionWriter::MakePreparedJxrPage(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
-
-	const auto* bih = dib_.Header();
-	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
-		return;
+	if (!view.bits)
+		return std::nullopt;
 
 	PreparedJxrDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = dib_.BitsPerPixel();
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
-	page.xDpi = dib_.XDpi();
-	page.yDpi = dib_.YDpi();
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
 
 	switch (page.bitsPerPixel)
 	{
@@ -61,22 +53,11 @@ LockedJxrDibPage::LockedJxrDibPage(HANDLE hDib) : dib_(hDib)
 			page.pixelFlavor = JxrPixelFlavor::Bgra32;
 			break;
 		default:
-			return;
+			return page;
 	}
-
-	page_ = page;
-	valid_ = true;
+	return page;
 }
 
-bool LockedJxrDibPage::IsValid() const noexcept
-{
-	return valid_;
-}
-
-const PreparedJxrDibPage& LockedJxrDibPage::GetPage() const noexcept
-{
-	return page_;
-}
 
 /////////////////////////////////////////////////////////
 // ============================================================

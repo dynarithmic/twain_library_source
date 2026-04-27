@@ -27,7 +27,7 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToMetafile(const std::wstring& filename, HANDLE hDib, const MetafileSessionOptions& options)
 {
-    LockedMetafileDibPage locked(hDib);
+    LockedDibPage locked(hDib);
     if (!locked.IsValid())
         return false;
 
@@ -35,7 +35,11 @@ static bool WriteOneDibHandleToMetafile(const std::wstring& filename, HANDLE hDi
     if (!writer.Open(filename, options))
         return false;
 
-    if (!writer.WritePage(locked.GetPage()))
+	auto pageInfo = MetafileSessionWriter::MakePreparedMetafileDibPage(locked.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+    if (!writer.WritePage(pageInfo.value()))
         return false;
 
     return writer.Close();

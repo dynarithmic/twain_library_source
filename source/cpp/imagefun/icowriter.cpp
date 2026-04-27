@@ -18,37 +18,30 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "icowriter.h"
 #include <windows.h>
 #include <png.h>
+#include "imagefilewriterbase.h"
+#include "icowriter.h"
 
 #ifdef _MSC_VER
 	#pragma warning (disable : 4786)
 	#pragma warning (disable : 4611)
 #endif
 
- // ============================================================
- // HANDLE-based DIB lock helper
- // Assumes the DIB is 8-bpp and already suitable for BMP-RLE8.
- // ============================================================
-LockedIcoDibPage::LockedIcoDibPage(HANDLE hDib) : dib_(hDib)
-{
-	if (!dib_.IsValid())
-		return;
 
-	const auto* bih = dib_.Header();
-	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
-		return;
+std::optional<PreparedIcoDibPage> IcoSessionWriter::MakePreparedIcoDibPage(const dynarithmic::DibPageView& view)
+{
+	if (!view.bits)
+		return std::nullopt;
 
 	PreparedIcoDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = dib_.BitsPerPixel();
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
-	page.palette = dib_.Palette();
-	page.paletteEntries = dib_.PaletteEntries();
+
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
 
 	switch (page.bitsPerPixel)
 	{
@@ -88,22 +81,10 @@ LockedIcoDibPage::LockedIcoDibPage(HANDLE hDib) : dib_(hDib)
 			page.pixelFlavor = IcoPixelFlavor::Bgra32;
 			break;
 
-	default:
-		return;
+		default:
+			return page;
 	}
-
-	page_ = page;
-	valid_ = true;
-}
-
-bool LockedIcoDibPage::IsValid() const noexcept
-{
-	return valid_;
-}
-
-const PreparedIcoDibPage& LockedIcoDibPage::GetPage() const noexcept
-{
-	return page_;
+	return page;
 }
 
 // ============================================================

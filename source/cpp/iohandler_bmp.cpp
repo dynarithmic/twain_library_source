@@ -27,7 +27,7 @@ using namespace dynarithmic;
 static std::pair<bool, int> SaveBMPRLE(LPCTSTR szFile, HANDLE hDib)
 {
     std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
-    LockedBmpRle8Page lockedPage(hDib);
+    LockedDibPage lockedPage(hDib);
     if (!lockedPage.IsValid())
         return { false, DTWAIN_ERR_DIB };
 
@@ -35,7 +35,11 @@ static std::pair<bool, int> SaveBMPRLE(LPCTSTR szFile, HANDLE hDib)
     if (!writer.Open(filename))
         return { false, DTWAIN_ERR_FILEOPEN };
 
-    if (!writer.SetPageInfo(lockedPage.GetPage()))
+	auto pageInfo = BmpRle8Writer::MakePreparedBmpRle8Page(lockedPage.GetView());
+	if (!pageInfo.has_value())
+        return { false, DTWAIN_ERR_DIB };
+
+    if (!writer.SetPageInfo(pageInfo.value()))
         return { false, DTWAIN_ERR_FILEWRITE };
 
     if (!writer.WriteCurrentPage())

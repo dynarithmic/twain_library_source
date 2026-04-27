@@ -28,7 +28,7 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToWbmp(const std::wstring& filename, const WbmpSessionOptions& options, HANDLE hDib)
 {
-	LockedWbmpDibPage lockedPage(hDib);
+	LockedDibPage lockedPage(hDib);
 	if (!lockedPage.IsValid())
 		return false;
 
@@ -36,7 +36,11 @@ static bool WriteOneDibHandleToWbmp(const std::wstring& filename, const WbmpSess
 	if (!writer.Open(filename, options))
 		return false;
 
-	if (!writer.SetPageInfo(lockedPage.GetPage()))
+	auto pageInfo = WbmpSessionWriter::MakePreparedWbmpDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+	if (!writer.SetPageInfo(pageInfo.value()))
 		return false;
 
 	if (!writer.WriteCurrentPage())

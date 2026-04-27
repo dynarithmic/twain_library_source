@@ -20,39 +20,34 @@
  */
 
 #include "jpegwriter.h"
+#include "imagefilewriterbase.h"
 
- // ============================================================
- // Locked page wrapper
- // ============================================================
-LockedJpegDibPage::LockedJpegDibPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedJpegDibPage> JpegSessionWriter::MakePreparedJpegPage(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
-
-	const auto* bih = dib_.Header();
-	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
-		return;
+	if (!view.bits)
+		return std::nullopt;
 
 	PreparedJpegDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = dib_.BitsPerPixel();
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
+
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
 
 	switch (page.bitsPerPixel)
 	{
 		case 8:
 		{
-			const RGBQUAD* pal = dib_.Palette();
-			const uint32_t palEntries = dib_.PaletteEntries();
+			const RGBQUAD* pal = view.palette;
+			const uint32_t palEntries = view.paletteEntries;
 
 			// If an 8-bpp palette exists, require it to be grayscale.
 			if (pal && palEntries > 0 &&
 				!dynarithmic::dib::is_grayscale_palette(pal, palEntries))
 			{
-				return;
+				return std::nullopt;
 			}
 
 			page.pixelFlavor = JpegPixelFlavor::Gray8;
@@ -68,21 +63,10 @@ LockedJpegDibPage::LockedJpegDibPage(HANDLE hDib) : dib_(hDib)
 			break;
 
 		default:
-			return;
+			return page;
 	}
 
-	page_ = page;
-	valid_ = true;
-}
-
-bool LockedJpegDibPage::IsValid() const noexcept
-{
-	return valid_;
-}
-
-const PreparedJpegDibPage& LockedJpegDibPage::GetPage() const noexcept
-{
-	return page_;
+	return page;
 }
 
 // ============================================================

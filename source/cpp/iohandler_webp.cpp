@@ -27,7 +27,7 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToWebP(const std::wstring& filename, const WebPSessionOptions& options, HANDLE hDib)
 {
-	LockedWebPDibPage lockedPage(hDib);
+	LockedDibPage lockedPage(hDib);
 	if (!lockedPage.IsValid())
 		return false;
 
@@ -35,7 +35,11 @@ static bool WriteOneDibHandleToWebP(const std::wstring& filename, const WebPSess
 	if (!writer.Open(filename, options))
 		return false;
 
-	if (!writer.SetPageInfo(lockedPage.GetPage()))
+	auto pageInfo = WebPSessionWriter::MakePreparedWebPDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+	if (!writer.SetPageInfo(pageInfo.value()))
 		return false;
 
 	if (!writer.WriteCurrentPage())

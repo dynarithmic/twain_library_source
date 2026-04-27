@@ -48,53 +48,32 @@ static WORD ComputePlaceableChecksum(const AldusPlaceableHeader& h)
 	return sum;
 }
 
-LockedMetafileDibPage::LockedMetafileDibPage(HANDLE hDib) : hDib_(static_cast<HGLOBAL>(hDib))
+std::optional<PreparedMetafileDibPage> MetafileSessionWriter::MakePreparedMetafileDibPage(const dynarithmic::DibPageView& view)
 {
-	if (!hDib_)
-		return;
+	if (!view.bits)
+		return std::nullopt;
 
-	ptr_ = GlobalLock(hDib_);
-	if (!ptr_)
-		return;
+	PreparedMetafileDibPage page{};
+	page.width = view.width;
+	page.height = view.height;
 
-	auto* bih = static_cast<BITMAPINFOHEADER*>(ptr_);
+	auto bih = view.bih;
 	if (!bih || bih->biSize < sizeof(BITMAPINFOHEADER))
-		return;
+		return std::nullopt;
 
-	page_.bih = bih;
-	page_.width = static_cast<uint32_t>(bih->biWidth);
-	page_.height = static_cast<uint32_t>(bih->biHeight > 0 ? bih->biHeight : -bih->biHeight);
-	page_.bpp = static_cast<uint16_t>(bih->biBitCount);
-	page_.bottomUp = bih->biHeight > 0;
+	page.bih = view.bih;
+	page.bpp = view.bitsPerPixel;
+	page.bottomUp = view.height > 0;
 
 	if (bih->biXPelsPerMeter > 0)
-		page_.xDpi = bih->biXPelsPerMeter * 0.0254;
+		page.xDpi = bih->biXPelsPerMeter * 0.0254;
 	if (bih->biYPelsPerMeter > 0)
-		page_.yDpi = bih->biYPelsPerMeter * 0.0254;
+		page.yDpi = bih->biYPelsPerMeter * 0.0254; 
 
-	auto* p = reinterpret_cast<const uint8_t*>(bih) + bih->biSize;
-
-	if (bih->biBitCount <= 8)
-	{
-		uint32_t colors = bih->biClrUsed ? bih->biClrUsed : (1u << bih->biBitCount);
-		p += colors * sizeof(RGBQUAD);
-	}
-
-	page_.bits = p;
-	valid_ = true;
+	page.bits = view.bits;
+	return page;
 }
 
-LockedMetafileDibPage::~LockedMetafileDibPage()
-{
-	if (ptr_)
-		GlobalUnlock(hDib_);
-}
-
-bool LockedMetafileDibPage::IsValid() const noexcept { return valid_; }
-const PreparedMetafileDibPage& LockedMetafileDibPage::GetPage() const noexcept
-{
-	return page_;
-}
 ///////////////////////////////////////////////////////////////////////////
 bool MetafileSessionWriter::Open(const std::wstring& filename, const MetafileSessionOptions& options)
 {

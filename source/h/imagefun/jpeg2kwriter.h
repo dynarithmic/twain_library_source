@@ -26,6 +26,7 @@ OF THIRD PARTY RIGHTS.
 #include <memory>
 #include <openjpeg.h>
 #include "dibutil.h"
+#include "imagefilewriterbase.h"
 
 enum class Jpeg2000PixelFlavor
 {
@@ -65,21 +66,6 @@ struct PreparedJpeg2000DibPage
 	const uint8_t* bits = nullptr;
 };
 
-class LockedJpeg2000DibPage
-{
-	public:
-		explicit LockedJpeg2000DibPage(HANDLE hDib);
-		bool IsValid() const noexcept { return valid_; }
-		const PreparedJpeg2000DibPage& GetPage() const noexcept
-		{
-			return page_;
-		}
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedJpeg2000DibPage page_{};
-		bool valid_ = false;
-};
 
 class Jpeg2000SessionWriter
 {
@@ -94,6 +80,7 @@ class Jpeg2000SessionWriter
 		bool WriteCurrentPage();
 		void Close();
 		bool IsOpen() const noexcept;
+		static std::optional<PreparedJpeg2000DibPage> MakePreparedJpeg2000Page(const dynarithmic::DibPageView& view);
 
 	private:
 		static bool ValidatePage(const PreparedJpeg2000DibPage& page);

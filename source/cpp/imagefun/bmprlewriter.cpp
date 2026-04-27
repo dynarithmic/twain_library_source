@@ -20,39 +20,26 @@
  */
 #include "bmprlewriter.h"
 
- // ============================================================
- // HANDLE-based DIB lock helper
- // Assumes the DIB is 8-bpp and already suitable for BMP-RLE8.
- // ============================================================
-LockedBmpRle8Page::LockedBmpRle8Page(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedBmpRle8Page> BmpRle8Writer::MakePreparedBmpRle8Page(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
-
-	if (dib_.BitsPerPixel() != 8 || !dib_.Palette() || dib_.PaletteEntries() == 0)
-		return;
+	if (view.bitsPerPixel != 8 || !view.palette || view.paletteEntries == 0)
+		return std::nullopt;
 
 	PreparedBmpRle8Page page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
+	page.width = view.width;
+	page.height = view.height;
 	page.bitsPerPixel = 8;
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
-	page.palette = dib_.Palette();
-	page.paletteEntries = dib_.PaletteEntries();
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
+	page.palette = view.palette;
+	page.paletteEntries = view.paletteEntries;
 
-	const auto* bih = dib_.Header();
+	const auto bih = view.bih;
 	page.xPelsPerMeter = bih ? bih->biXPelsPerMeter : 0;
 	page.yPelsPerMeter = bih ? bih->biYPelsPerMeter : 0;
-
-	page_ = page;
-	valid_ = true;
+	return page;
 }
-
-bool LockedBmpRle8Page::IsValid() const noexcept { return valid_; }
-const PreparedBmpRle8Page& LockedBmpRle8Page::GetPage() const noexcept { return page_; }
-
 
 BmpRle8Writer::~BmpRle8Writer()
 {

@@ -21,10 +21,12 @@ OF THIRD PARTY RIGHTS.
 #ifndef PSDWRITER_H
 #define PSDWRITER_H
 
-#include "dibutil.h"
 #include <memory>
 #include <cstdio>
 #include <cstdint>
+#include "dibutil.h"
+#include "imagefilewriterbase.h"
+
 // ============================================================
 // PSD model
 // DTWAIN contract:
@@ -49,22 +51,6 @@ struct PsdSessionOptions
 
 	// Optional PSD image-resource comment/caption.
 	std::string comment;
-};
-
-// ============================================================
-// Locked page wrapper
-// ============================================================
-class LockedPsdDibPage
-{
-	public:
-		explicit LockedPsdDibPage(HANDLE hDib);
-		bool IsValid() const noexcept;
-		const PreparedPsdDibPage& GetPage() const noexcept;
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedPsdDibPage page_{};
-		bool valid_ = false;
 };
 
 // ============================================================
@@ -111,6 +97,7 @@ class PsdSessionWriter
 		bool WriteCurrentPage();
 		void Close();
 		bool IsOpen() const noexcept;
+		static std::optional<PreparedPsdDibPage> MakePreparedPsdDibPage(const dynarithmic::DibPageView& view);
 
 	private:
 		static bool ValidatePage(const PreparedPsdDibPage& page);

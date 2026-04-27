@@ -32,25 +32,18 @@ static int WebPWriterCallback(const uint8_t* data, size_t data_size, const WebPP
 	return 1;
 }
 
- // ============================================================
- // Locked page wrapper
- // ============================================================
-LockedWebPDibPage::LockedWebPDibPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedWebPDibPage> WebPSessionWriter::MakePreparedWebPDibPage(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
-
-	const auto* bih = dib_.Header();
-	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
-		return;
+	if (!view.bits)
+		return std::nullopt;
 
 	PreparedWebPDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = dib_.BitsPerPixel();
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
 
 	switch (page.bitsPerPixel)
 	{
@@ -63,21 +56,10 @@ LockedWebPDibPage::LockedWebPDibPage(HANDLE hDib) : dib_(hDib)
 			break;
 
 		default:
-			return;
+			return std::nullopt;
 	}
 
-	page_ = page;
-	valid_ = true;
-}
-
-bool LockedWebPDibPage::IsValid() const noexcept
-{
-	return valid_;
-}
-
-const PreparedWebPDibPage& LockedWebPDibPage::GetPage() const noexcept
-{
-	return page_;
+	return page;
 }
 
 ////////////////////////////////////////////////////////////////

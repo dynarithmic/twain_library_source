@@ -21,8 +21,9 @@ OF THIRD PARTY RIGHTS.
 #ifndef WBMPWRITER_H
 #define WBMPWRITER_H
 
-#include "dibutil.h"
 #include <memory>
+#include "dibutil.h"
+#include "imagefilewriterbase.h"
 
 // ============================================================
 // WBMP model
@@ -49,22 +50,6 @@ struct WbmpSessionOptions
 };
 
 // ============================================================
-// Locked page wrapper
-// ============================================================
-class LockedWbmpDibPage
-{
-	public:
-		explicit LockedWbmpDibPage(HANDLE hDib);
-		bool IsValid() const noexcept;
-		const PreparedWbmpDibPage& GetPage() const noexcept;
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedWbmpDibPage page_{};
-		bool valid_ = false;
-};
-
-// ============================================================
 // WBMP writer
 // Type 0 WBMP:
 //   byte 0 = TypeField = 0
@@ -85,6 +70,8 @@ public:
 	bool WriteCurrentPage();
 	void Close();
 	bool IsOpen() const noexcept;
+	static std::optional<PreparedWbmpDibPage> MakePreparedWbmpDibPage(const dynarithmic::DibPageView& view);
+
 
 private:
 	static bool ValidatePage(const PreparedWbmpDibPage& page);

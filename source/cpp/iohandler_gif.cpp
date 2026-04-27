@@ -36,13 +36,14 @@ int CTL_GifIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
 	opts.text.software = commentStr;
 
-	LockedGifDibPage locked(m_pDib->GetHandle());
+	LockedDibPage locked(m_pDib->GetHandle());
     if (!locked.IsValid())
         return DTWAIN_ERR_DIB;
 
     std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 	DTWAINGifOutput output;
-	if (!output.OnFirstPage(fName, opts, locked.GetPage()))
+    auto pageData = GifSessionWriter::MakePreparedGifPage(locked.GetView());
+	if (!output.OnFirstPage(fName, opts, pageData.value()))
 		return DTWAIN_ERR_FILEWRITE;
 
 	if (!output.OnLastPage())

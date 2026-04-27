@@ -20,43 +20,25 @@
  */
 #include "psdwriter.h"
 
- // ============================================================
- // Locked page wrapper
- // ============================================================
-LockedPsdDibPage::LockedPsdDibPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedPsdDibPage> PsdSessionWriter::MakePreparedPsdDibPage(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
+	if (!view.bits)
+		return std::nullopt;
 
-	const auto* bih = dib_.Header();
-	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
-		return;
-
-	if (dib_.BitsPerPixel() != 24)
-		return;
+	if (view.bitsPerPixel != 24)
+		return std::nullopt;
 
 	PreparedPsdDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = 24;
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
-
-	page_ = page;
-	valid_ = true;
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
+	return page;
 }
 
-bool LockedPsdDibPage::IsValid() const noexcept
-{
-	return valid_;
-}
-
-const PreparedPsdDibPage& LockedPsdDibPage::GetPage() const noexcept
-{
-	return page_;
-}
-
+ 
 ///////////////////////////////////////////////////////////////
 PsdSessionWriter::~PsdSessionWriter()
 {

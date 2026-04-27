@@ -50,25 +50,33 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
     if ( bIsFirstPage )
     {
-		LockedPcxDibPage locked(hDib);
+		LockedDibPage locked(hDib);
 		if (!locked.IsValid())
 			return DTWAIN_ERR_FILEWRITE;
 
 		PcxSessionOptions opts{};
 		opts.writeDcx = isDCX;
 
-		if (!output.OnFirstPage(filename, opts, locked.GetPage()))
+		auto pageInfo = PcxSessionWriter::MakePreparedPcxDibPage(locked.GetView());
+		if (!pageInfo.has_value())
+			return false;
+
+		if (!output.OnFirstPage(filename, opts, pageInfo.value()))
 			return DTWAIN_ERR_FILEWRITE;
         return DTWAIN_NO_ERROR;
 	}
     else
     if ( !bIsLastPage && isDCX)
     {
-		LockedPcxDibPage locked(hDib);
+		LockedDibPage locked(hDib);
 		if (!locked.IsValid())
 			return DTWAIN_ERR_FILEWRITE;
 
-		if (!output.OnNextPage(locked.GetPage()))
+		auto pageInfo = PcxSessionWriter::MakePreparedPcxDibPage(locked.GetView());
+		if (!pageInfo.has_value())
+			return false;
+
+		if (!output.OnNextPage(pageInfo.value()))
 			return DTWAIN_ERR_FILEWRITE;
         return DTWAIN_NO_ERROR;
     }

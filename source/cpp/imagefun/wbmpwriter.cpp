@@ -20,43 +20,21 @@
  */
 #include "wbmpwriter.h"
 
- // ============================================================
- // Locked page wrapper
- // ============================================================
-LockedWbmpDibPage::LockedWbmpDibPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedWbmpDibPage> WbmpSessionWriter::MakePreparedWbmpDibPage(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
 
-	const auto* bih = dib_.Header();
-	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
-		return;
-
-	if (dib_.BitsPerPixel() != 1)
-		return;
-
+	if (view.bitsPerPixel != 1)
+		return std::nullopt;
 	PreparedWbmpDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
+	page.width = view.width;
+	page.height = view.height;
 	page.bitsPerPixel = 1;
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
-
-	page_ = page;
-	valid_ = true;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
+	return page;
 }
-
-bool LockedWbmpDibPage::IsValid() const noexcept
-{
-	return valid_;
-}
-
-const PreparedWbmpDibPage& LockedWbmpDibPage::GetPage() const noexcept
-{
-	return page_;
-}
-
+ 
 // ============================================================
 // WBMP writer
 // Type 0 WBMP:

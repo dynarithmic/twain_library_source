@@ -29,7 +29,7 @@ using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static bool WriteOneDibHandleToJxr(const std::wstring& filename, const JxrSessionOptions& options, HANDLE hDib)
 {
-	LockedJxrDibPage lockedPage(hDib);
+	LockedDibPage lockedPage(hDib);
 	if (!lockedPage.IsValid())
 		return false;
 
@@ -37,7 +37,7 @@ static bool WriteOneDibHandleToJxr(const std::wstring& filename, const JxrSessio
 	if (!writer.Open(filename, options))
 		return false;
 
-	if (!writer.SetPageInfo(lockedPage.GetPage()))
+	if (!writer.SetPageInfo(JxrSessionWriter::MakePreparedJxrPage(lockedPage.GetView()).value()))
 		return false;
 
 	if (!writer.WriteCurrentPage())

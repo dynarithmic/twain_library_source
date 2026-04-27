@@ -21,10 +21,12 @@ OF THIRD PARTY RIGHTS.
 #ifndef ICOWRITER_H
 #define ICOWRITER_H
 
-#include "dibutil.h"
 #include <vector>
 #include <windows.h>
 #include <png.h>
+#include "dibutil.h"
+#include "imagefilewriterbase.h"
+
 // ============================================================
 // ICO prepared page
 // ============================================================
@@ -134,22 +136,6 @@ class IcoMemoryPngEncoder
 };
 
 // ============================================================
-// Locked page using dynarithmic::dib
-// ============================================================
-class LockedIcoDibPage
-{
-	public:
-		explicit LockedIcoDibPage(HANDLE hDib);
-		bool IsValid() const noexcept;
-		const PreparedIcoDibPage& GetPage() const noexcept;
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedIcoDibPage page_{};
-		bool valid_ = false;
-};
-
-// ============================================================
 // ICO writer
 // ============================================================
 class IcoSessionWriter
@@ -163,6 +149,7 @@ public:
 	bool SetPageInfo(const PreparedIcoDibPage& page);
 	bool WriteCurrentPage();
 	void Close();
+	static std::optional<PreparedIcoDibPage> MakePreparedIcoDibPage(const dynarithmic::DibPageView& view);
 
 private:
 	static bool ValidatePage(const PreparedIcoDibPage& page);

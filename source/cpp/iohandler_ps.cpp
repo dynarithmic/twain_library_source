@@ -46,7 +46,7 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
         if (!IsValidBitDepth(DTWAIN_PS_ENCAPSULATED, bitdepth))
             return DTWAIN_ERR_INVALID_BITDEPTH;
 
-		LockedPsDibPage page(m_pDib->GetHandle());
+		LockedDibPage page(m_pDib->GetHandle());
 		if (!page.IsValid())
 			return DTWAIN_ERR_FILEWRITE;
 
@@ -82,17 +82,25 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
 		if (!m_psSessionWriter.Open(fName, opts))
 			return DTWAIN_ERR_FILEWRITE;
 
-		auto retVal = m_psSessionWriter.WritePage(page.GetPage());
+		auto pageInfo = PsSessionWriter::MakePreparedPsDibPage(page.GetView());
+		if (!pageInfo.has_value())
+			return DTWAIN_ERR_FILEWRITE; 
+
+		auto retVal = m_psSessionWriter.WritePage(pageInfo.value());
         return retVal ? DTWAIN_NO_ERROR : DTWAIN_ERR_FILEWRITE;
     }
     else
     if ( isNextPage )
     {
-		LockedPsDibPage page(m_pDib->GetHandle());
+		LockedDibPage page(m_pDib->GetHandle());
 		if (!page.IsValid())
 			return DTWAIN_ERR_FILEWRITE;
 
-		auto retVal = m_psSessionWriter.WritePage(page.GetPage());
+		auto pageInfo = PsSessionWriter::MakePreparedPsDibPage(page.GetView());
+		if (!pageInfo.has_value())
+			return DTWAIN_ERR_FILEWRITE;
+
+		auto retVal = m_psSessionWriter.WritePage(pageInfo.value());
 		return retVal ? DTWAIN_NO_ERROR : DTWAIN_ERR_FILEWRITE;
     }
     else

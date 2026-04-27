@@ -21,10 +21,11 @@ OF THIRD PARTY RIGHTS.
 #ifndef PNMWRITER_H
 #define PNMWRITER_H
 
-#include "dibutil.h"
 #include <memory>
 #include <cstdio>
 #include <cstdint>
+#include "imagefilewriterbase.h"
+#include "dibutil.h"
 
 // ============================================================
 // PNM model
@@ -65,22 +66,6 @@ struct PnmSessionOptions
 };
 
 // ============================================================
-// Locked page wrapper
-// ============================================================
-class LockedPnmDibPage
-{
-	public:
-		explicit LockedPnmDibPage(HANDLE hDib);
-		bool IsValid() const noexcept;
-		const PreparedPnmDibPage& GetPage() const noexcept;
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedPnmDibPage page_{};
-		bool valid_ = false;
-};
-
-// ============================================================
 // PNM writer
 // ============================================================
 
@@ -96,6 +81,7 @@ class PnmSessionWriter
 		bool WriteCurrentPage();
 		void Close();
 		bool IsOpen() const noexcept;
+		static std::optional<PreparedPnmDibPage> MakePreparedPnmDibPage(const dynarithmic::DibPageView& view);
 
 	private:
 		static bool ValidatePage(const PreparedPnmDibPage& page);
@@ -135,7 +121,6 @@ class PnmSessionWriter
 //   FirstPage = open + write image
 //   LastPage  = close
 // ============================================================
-
 class DTWAINPnmOutput
 {
 	public:

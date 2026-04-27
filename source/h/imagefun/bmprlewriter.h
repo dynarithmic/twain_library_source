@@ -31,6 +31,7 @@ OF THIRD PARTY RIGHTS.
 #include <utility>
 #include <vector>
 #include "dibutil.h"
+#include "imagefilewriterbase.h"
 
 // ============================================================
 // Prepared 8-bpp DIB page for BMP-RLE8 output
@@ -53,19 +54,6 @@ struct PreparedBmpRle8Page
     int32_t yPelsPerMeter = 0;
 };
 
-class LockedBmpRle8Page
-{
-    public:
-        explicit LockedBmpRle8Page(HANDLE hDib);
-        bool IsValid() const noexcept;
-        const PreparedBmpRle8Page& GetPage() const noexcept;
-
-    private:
-		dynarithmic::dib::LockedDib dib_;
-        PreparedBmpRle8Page page_{};
-        bool valid_ = false;
-};
-
 // ============================================================
 // BMP RLE8 encoder
 // ============================================================
@@ -82,6 +70,7 @@ public:
     bool SetPageInfo(const PreparedBmpRle8Page& page);
     bool WriteCurrentPage();
     void Close();
+    static std::optional<PreparedBmpRle8Page> MakePreparedBmpRle8Page(const dynarithmic::DibPageView& view);
 
 private:
     static bool ValidatePage(const PreparedBmpRle8Page& page);

@@ -34,6 +34,7 @@ OF THIRD PARTY RIGHTS.
 #include <vector>
 #include "dtwaindefs.h"
 #include "dibutil.h"
+#include "imagefilewriterbase.h"
 
 // ============================================================
 // Prepared page (already resampled by DTWAIN before reaching PNG)
@@ -84,27 +85,6 @@ struct PngSessionOptions
 	int compressionLevel = PNG_Z_DEFAULT_COMPRESSION;
 };
 
-// ============================================================
-// RAII view for HANDLE-based DIBs
-//
-// The DIB remains GlobalLocked() for the lifetime of this object.
-// That ensures PreparedPngDibPage pointers remain valid through
-// SetPageInfo() + WriteCurrentPage().
-// ============================================================
-class LockedPngDibPage
-{
-	public:
-		explicit LockedPngDibPage(HANDLE hDib);
-		bool IsValid() const noexcept;
-		const PreparedPngDibPage& GetPage() const noexcept;
-		PreparedPngDibPage& GetPageRef() { return page_; }
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedPngDibPage page_{};
-		bool valid_ = false;
-};
-
 class PngSessionWriter
 {
 	public:
@@ -117,6 +97,7 @@ class PngSessionWriter
 		std::pair<bool,int> WriteCurrentPage();
 		void Close();
 		bool IsOpen() const noexcept;
+		static std::optional<PreparedPngDibPage> MakePreparedPngDibPage(const dynarithmic::DibPageView& view);
 
 	private:
 		bool ValidateCurrentPage() const;

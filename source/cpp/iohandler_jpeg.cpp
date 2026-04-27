@@ -26,7 +26,7 @@ using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static bool WriteOneDibHandleToJpeg(const std::wstring& filename,const JpegSessionOptions& options, HANDLE hDib)
 {
-	LockedJpegDibPage lockedPage(hDib);
+	LockedDibPage lockedPage(hDib);
 	if (!lockedPage.IsValid())
 		return false;
 
@@ -34,7 +34,11 @@ static bool WriteOneDibHandleToJpeg(const std::wstring& filename,const JpegSessi
 	if (!writer.Open(filename, options))
 		return false;
 
-	if (!writer.SetPageInfo(lockedPage.GetPage()))
+    auto preparedPage = JpegSessionWriter::MakePreparedJpegPage(lockedPage.GetView());
+    if (!preparedPage.has_value())
+        return false;
+
+	if (!writer.SetPageInfo(preparedPage.value()))
 		return false;
 
 	if (!writer.WriteCurrentPage())

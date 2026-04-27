@@ -27,6 +27,8 @@ OF THIRD PARTY RIGHTS.
 #include <memory>
 #include <webp/encode.h>
 #include "dibutil.h"
+#include "imagefilewriterbase.h"
+
 // ============================================================
 // WebP model
 // DTWAIN contract:
@@ -72,22 +74,6 @@ struct WebPSessionOptions
 };
 
 // ============================================================
-// Locked page wrapper
-// ============================================================
-class LockedWebPDibPage
-{
-	public:
-		explicit LockedWebPDibPage(HANDLE hDib);
-		bool IsValid() const noexcept;
-		const PreparedWebPDibPage& GetPage() const noexcept;
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedWebPDibPage page_{};
-		bool valid_ = false;
-};
-
-// ============================================================
 // WebP memory sink
 // ============================================================
 struct WebPMemoryWriterContext
@@ -110,6 +96,8 @@ class WebPSessionWriter
 		bool WriteCurrentPage();
 		void Close();
 		bool IsOpen() const noexcept;
+		static std::optional<PreparedWebPDibPage> WebPSessionWriter::MakePreparedWebPDibPage(const dynarithmic::DibPageView& view);
+
 
 	private:
 		static bool ValidatePage(const PreparedWebPDibPage& page);

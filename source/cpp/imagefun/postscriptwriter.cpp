@@ -77,29 +77,25 @@ static void PsRunLengthEncode(std::string_view input, std::string& output)
 	output.push_back(static_cast<char>(128));
 }
 
-LockedPsDibPage::LockedPsDibPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedPsDibPage> PsSessionWriter::MakePreparedPsDibPage(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
-
-	const auto* bih = dib_.Header();
-	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
-		return;
+	if (!view.bits)
+		return std::nullopt;
 
 	PreparedPsDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = dib_.BitsPerPixel();
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
-	page.palette = dib_.Palette();
-	page.paletteEntries = dib_.PaletteEntries();
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
+	page.palette = view.palette;
+	page.paletteEntries = view.paletteEntries;
 
-	if (bih->biXPelsPerMeter > 0)
-		page.xDpi = bih->biXPelsPerMeter * 0.0254;
-	if (bih->biYPelsPerMeter > 0)
-		page.yDpi = bih->biYPelsPerMeter * 0.0254;
+	if (view.xDPI > 0)
+		page.xDpi = view.xDPI * 0.0254;
+	if (view.yDPI > 0)
+		page.yDpi = view.yDPI * 0.0254;
 
 	switch (page.bitsPerPixel)
 	{
@@ -111,7 +107,7 @@ LockedPsDibPage::LockedPsDibPage(HANDLE hDib) : dib_(hDib)
 			break;
 		case 16:
 			page.pixelFlavor = PsPixelFlavor::Gray16;
-		break;
+			break;
 		case 24:
 			page.pixelFlavor = PsPixelFlavor::Bgr24;
 			break;
@@ -119,15 +115,10 @@ LockedPsDibPage::LockedPsDibPage(HANDLE hDib) : dib_(hDib)
 			page.pixelFlavor = PsPixelFlavor::Bgra32;
 			break;
 		default:
-			return;
+			return page;
 	}
-
-	page_ = page;
-	valid_ = true;
+	return page;
 }
-
-bool LockedPsDibPage::IsValid() const noexcept { return valid_; }
-const PreparedPsDibPage& LockedPsDibPage::GetPage() const noexcept { return page_; }
 
 ////////////////////////////////////////////////////////////////
 PsSessionWriter::~PsSessionWriter()

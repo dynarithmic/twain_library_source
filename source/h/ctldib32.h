@@ -26,7 +26,7 @@ OF THIRD PARTY RIGHTS.
 #include "imagefun/imgfunc.h"
 #include <vector>
 #include <utility>
-#include <boost/optional.hpp>
+#include <optional>
 #include <boost/container/flat_map.hpp>
 #include "dibmulti.h"
 #include "dibinfox.h"
@@ -226,7 +226,7 @@ namespace dynarithmic
             int         GetNumColors() const;
             int         GetResolution() const;
             int         GetBitsPerPixel() const;
-            boost::optional<DWORD> GetBitsOffset() const;
+            std::optional<DWORD> GetBitsOffset() const;
             bool        IsGrayScale() const;
             CDibInterface::BlankDIBInfo IsBlankDIB(double threshold) const;
             void        Delete();

@@ -1501,6 +1501,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\imagefun\ctldibblank.cpp" />
     <ClCompile Include="cpp\imagefun\gifwriter.cpp" />
     <ClCompile Include="cpp\imagefun\icowriter.cpp" />
+    <ClCompile Include="cpp\imagefun\imagefilewriterbase.cpp" />
     <ClCompile Include="cpp\imagefun\jpeg2kwriter.cpp" />
     <ClCompile Include="cpp\imagefun\jpegwriter.cpp" />
     <ClCompile Include="cpp\imagefun\jpegxrwriter.cpp">
@@ -10080,8 +10081,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="cpp\pdflib32\pdflib32.h" />
     <ClInclude Include="cximage\ximacfg.h" />
     <ClInclude Include="cximage\ximage.h" />
-    <ClInclude Include="FreeImage\Source\FreeImage.h" />
-    <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h" />
     <ClInclude Include="h\ansiwideconverter_generic.h" />
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />
@@ -10141,6 +10140,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />
     <ClInclude Include="h\imagefun\gifwriter.h" />
     <ClInclude Include="h\imagefun\icowriter.h" />
+    <ClInclude Include="h\imagefun\imagefilewriterbase.h" />
     <ClInclude Include="h\imagefun\jpeg2kwriter.h" />
     <ClInclude Include="h\imagefun\jpegwriter.h" />
     <ClInclude Include="h\imagefun\jpegxrwriter.h" />

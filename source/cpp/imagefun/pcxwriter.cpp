@@ -20,33 +20,25 @@
  */
 #include "pcxwriter.h"
 
- // ============================================================
- // Locked page wrapper
- // ============================================================
-
-LockedPcxDibPage::LockedPcxDibPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedPcxDibPage> PcxSessionWriter::MakePreparedPcxDibPage(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
-
-	const auto* bih = dib_.Header();
-	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
-		return;
+	if (!view.bits)
+		return std::nullopt;
 
 	PreparedPcxDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = dib_.BitsPerPixel();
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
-	page.palette = dib_.Palette();
-	page.paletteEntries = dib_.PaletteEntries();
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
+	page.palette = view.palette;
+	page.paletteEntries = view.paletteEntries;
 
-	if (bih->biXPelsPerMeter > 0)
-		page.xDpi = static_cast<uint16_t>(bih->biXPelsPerMeter * 0.0254 + 0.5);
-	if (bih->biYPelsPerMeter > 0)
-		page.yDpi = static_cast<uint16_t>(bih->biYPelsPerMeter * 0.0254 + 0.5);
+	if (page.xDpi > 0)
+		page.xDpi = static_cast<uint16_t>(page.xDpi * 0.0254 + 0.5);
+	if (page.yDpi > 0)
+		page.yDpi = static_cast<uint16_t>(page.yDpi * 0.0254 + 0.5);
 
 	switch (page.bitsPerPixel)
 	{
@@ -60,15 +52,10 @@ LockedPcxDibPage::LockedPcxDibPage(HANDLE hDib) : dib_(hDib)
 			page.pixelFlavor = PcxPixelFlavor::Bgr24;
 			break;
 		default:
-			return;
+			return page;
 	}
-
-	page_ = page;
-	valid_ = true;
+	return page;
 }
-
-bool LockedPcxDibPage::IsValid() const noexcept { return valid_; }
-const PreparedPcxDibPage& LockedPcxDibPage::GetPage() const noexcept { return page_; }
 
 ////////////////////////////////////////////////////////////////////////
 // ============================================================

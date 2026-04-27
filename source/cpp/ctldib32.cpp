@@ -24,7 +24,7 @@
 #include <cstring>
 #include <algorithm>
 #include <memory>
-#include <boost/optional.hpp>
+#include <optional>
 #include "winconst.h"
 #include "winbit32.h"
 #include "ctltwainmanager.h"
@@ -662,19 +662,17 @@ int CTL_TwainDib::DibNumColors(void *pv)
     return nColors;
 }
 
-boost::optional<DWORD> CTL_TwainDib::GetBitsOffset() const
+std::optional<DWORD> CTL_TwainDib::GetBitsOffset() const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if ( hDib )
     {
-        BYTE* pDib = static_cast<BYTE*>(ImageMemoryHandler::GlobalLock(hDib));
-        DTWAINGlobalHandle_RAII hDibHandler(hDib);
-        const auto pdib = reinterpret_cast<LPBITMAPINFO>(pDib);
-        DWORD offset = sizeof(BITMAPINFOHEADER);
-        offset += pdib->bmiHeader.biClrUsed * sizeof(RGBQUAD);
+        dynarithmic::dib::LockedDib dibHandle(hDib);
+        auto ptr_bits = dibHandle.Bits();
+        DWORD offset = static_cast<BYTE*>(ptr_bits) - reinterpret_cast<BYTE*>(dibHandle.HeaderMutable());
         return offset;
     }
-    return boost::none;
+    return std::nullopt;
 }
 
 int CTL_TwainDib::CropDib(const FloatRect& ActualRect, const FloatRect& RequestedRect,

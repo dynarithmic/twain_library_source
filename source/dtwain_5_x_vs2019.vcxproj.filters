@@ -601,15 +601,6 @@
     <ClCompile Include="cpp\imagefun\ctldibblank.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpp\imagefun\tiffwriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\pngwriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\bmprlewriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="LibGIF\dgif_lib.c">
       <Filter>LibGIF</Filter>
     </ClCompile>
@@ -639,39 +630,6 @@
     </ClCompile>
     <ClCompile Include="LibGIF\quantize.c">
       <Filter>LibGIF</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\gifwriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\icowriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\jpegwriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\tgawriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\wbmpwriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\jpeg2kwriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\webpwriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\jpegxrwriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\psdwriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\pnmwriter.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\imagefun\pcxwriter.cpp">
-      <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="LibTIFF4\tif_aux.c">
       <Filter>LibTIFF4</Filter>
@@ -1549,11 +1507,56 @@
     <ClCompile Include="ZLib\zutil.c">
       <Filter>ZLib</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\imagefun\bmprlewriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\imagefilewriterbase.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\tiffwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\wbmpwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\webpwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
     <ClCompile Include="cpp\imagefun\postscriptwriter.cpp">
-      <Filter>C++ Files</Filter>
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\pnmwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\pngwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\pcxwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\tgawriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\jpegxrwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\jpegwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\jpeg2kwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
     </ClCompile>
     <ClCompile Include="cpp\imagefun\metafilewriter.cpp">
-      <Filter>C++ Files</Filter>
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\gifwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\icowriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\psdwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1818,9 +1821,6 @@
     <ClInclude Include="cpp\pdflib32\flateencode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeImage\Source\FreeImage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include=".\h\funcmac.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1894,9 +1894,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include=".\h\dtwaindefs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cximage\ximage.h">
@@ -2061,31 +2058,13 @@
     <ClInclude Include="h\imagefun\icowriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\imagefun\jpegwriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="h\imagefun\tgawriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\imagefun\wbmpwriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="h\imagefun\jpeg2kwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\imagefun\webpwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\imagefun\jpegxrwriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\ctlstringconversion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="h\imagefun\psdwriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="h\imagefun\pnmwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\imagefun\pcxwriter.h">
@@ -2439,9 +2418,6 @@
     <ClInclude Include="LibOpenJPEG\tgt.h">
       <Filter>LibOpenJPEG</Filter>
     </ClInclude>
-    <ClInclude Include="h\imagefun\postscriptwriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\iohandler_ps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2499,7 +2475,31 @@
     <ClInclude Include="h\iohandler_svg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\imagefun\imagefilewriterbase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="h\imagefun\metafilewriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\pnmwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\postscriptwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\psdwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\jpeg2kwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\jpegwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\jpegxrwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\tgawriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2744,6 +2744,9 @@
     </Filter>
     <Filter Include="ZLib">
       <UniqueIdentifier>{16570209-eb26-4d0f-afb4-b5a4be576852}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="C++ Files\Image File Writers">
+      <UniqueIdentifier>{f3a516f4-d39f-4d76-ac4d-f0fb31f0a35e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

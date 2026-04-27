@@ -53,10 +53,10 @@ int CTL_SVGIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!IsValidBitDepth(DTWAIN_SVG, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-	DTWAINGlobalHandle_RAII handler(hDib);
-	auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hDib));
-	auto bitsOffsetVal = (BYTE *)pbi + m_pDib->GetBitsOffset().get();
-	auto ret = SaveDIBAsSVG(*pbi, bitsOffsetVal, StringConversion::Convert_NativePtr_To_Ansi(szFile).c_str(), m_isSVGZ);
+	dynarithmic::dib::LockedDib dibHandle(hDib);
+	auto header = dibHandle.HeaderMutable();
+	auto bitsOffsetVal = reinterpret_cast<BYTE *>(header) + m_pDib->GetBitsOffset().value();
+	auto ret = SaveDIBAsSVG(*header, bitsOffsetVal, StringConversion::Convert_NativePtr_To_Ansi(szFile).c_str(), m_isSVGZ);
 	return ret.second;
 }
 

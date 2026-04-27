@@ -26,6 +26,7 @@ OF THIRD PARTY RIGHTS.
 #include <vector>
 #include "tiffio.h"
 #include "dibutil.h"
+#include "imagefilewriterbase.h"
 
 enum class TiffContainerFormat
 {
@@ -135,20 +136,6 @@ struct PageTagInfo
 	bool writeColorMap = false;
 };
 
-class LockedTiffPage
-{
-	public:
-		explicit LockedTiffPage(HANDLE hDib);
-		bool IsValid() const noexcept { return valid_; }
-		const PreparedDibPage& GetPage() const noexcept { return page_; }
-		PreparedDibPage& GetPageRef() { return page_; }
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedDibPage page_{};
-		bool valid_ = false;
-};
-
 class TiffSessionWriter
 {
 	public:
@@ -164,6 +151,8 @@ class TiffSessionWriter
 		void Close();
 		bool IsOpen() const noexcept;
 		std::size_t GetPageIndex() const noexcept;
+		static std::optional<PreparedDibPage> MakePreparedDibPage(const dynarithmic::DibPageView& view);
+
 
 	private:
 		bool ValidateCurrentPage() const;

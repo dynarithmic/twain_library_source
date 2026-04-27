@@ -25,6 +25,7 @@ OF THIRD PARTY RIGHTS.
 #include <memory>
 #include <vector>
 #include "dibutil.h"
+#include "imagefilewriterbase.h"
 
 // ============================================================
 // PostScript writer
@@ -89,19 +90,6 @@ struct PsSessionOptions
 	std::string creator;
 };
 
-class LockedPsDibPage
-{
-	public:
-		explicit LockedPsDibPage(HANDLE hDib);
-		bool IsValid() const noexcept;
-		const PreparedPsDibPage& GetPage() const noexcept;
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedPsDibPage page_{};
-		bool valid_ = false;
-};
-
 class PsSessionWriter
 {
 	public:
@@ -113,6 +101,7 @@ class PsSessionWriter
 		bool Open(const std::wstring& filename, const PsSessionOptions& options);
 		bool WritePage(const PreparedPsDibPage& page);
 		bool Close();
+		static std::optional<PreparedPsDibPage> MakePreparedPsDibPage(const dynarithmic::DibPageView& view);
 
 	private:
 		static bool ValidatePage(const PreparedPsDibPage& page);

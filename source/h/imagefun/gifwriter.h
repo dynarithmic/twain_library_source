@@ -31,7 +31,9 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <utility>
 #include <vector>
+#include <optional>
 #include "dibutil.h"
+#include "imagefilewriterbase.h"
 
 // ============================================================
 // Prepared page
@@ -76,19 +78,6 @@ struct GifSessionOptions
 	GifTextMetadata text;
 };
 
-class LockedGifDibPage
-{
-public:
-	explicit LockedGifDibPage(HANDLE hDib);
-	bool IsValid() const noexcept;
-	const PreparedGifDibPage& GetPage() const noexcept;
-
-private:
-	dynarithmic::dib::LockedDib dib_;
-	PreparedGifDibPage page_{};
-	bool valid_ = false;
-};
-
 // ============================================================
 // GIF writer
 // Single-image writer for DTWAIN-style first/last-page workflow
@@ -96,37 +85,38 @@ private:
 
 class GifSessionWriter
 {
-public:
-	GifSessionWriter() = default;
-	~GifSessionWriter();
-	GifSessionWriter(const GifSessionWriter&) = delete;
-	GifSessionWriter& operator=(const GifSessionWriter&) = delete;
+	public:
+		GifSessionWriter() = default;
+		~GifSessionWriter();
+		GifSessionWriter(const GifSessionWriter&) = delete;
+		GifSessionWriter& operator=(const GifSessionWriter&) = delete;
 
-	bool Open(const std::wstring& filename, const GifSessionOptions& sessionOptions);
-	bool SetPageInfo(const PreparedGifDibPage& page);
-	bool WriteCurrentPage();
-	void Close();
-	bool IsOpen() const noexcept;
+		bool Open(const std::wstring& filename, const GifSessionOptions& sessionOptions);
+		bool SetPageInfo(const PreparedGifDibPage& page);
+		bool WriteCurrentPage();
+		void Close();
+		bool IsOpen() const noexcept;
+		static std::optional<PreparedGifDibPage> MakePreparedGifPage(const dynarithmic::DibPageView& view);
 
-private:
-	static int gif_write_callback(GifFileType* gif, const GifByteType* data, int length);
-	static bool ValidatePage(const PreparedGifDibPage& page);
-	void prepare_color_map();
-	std::string build_comment_text() const;
-	bool write_comment_extensions();
+	private:
+		static int gif_write_callback(GifFileType* gif, const GifByteType* data, int length);
+		static bool ValidatePage(const PreparedGifDibPage& page);
+		void prepare_color_map();
+		std::string build_comment_text() const;
+		bool write_comment_extensions();
 
-private:
-	FILE* file_ = nullptr;
-	GifFileType* gif_ = nullptr;
-	ColorMapObject* colorMap_ = nullptr;
+	private:
+		FILE* file_ = nullptr;
+		GifFileType* gif_ = nullptr;
+		ColorMapObject* colorMap_ = nullptr;
 
-	std::wstring filename_;
-	GifSessionOptions sessionOptions_{};
+		std::wstring filename_;
+		GifSessionOptions sessionOptions_{};
 
-	PreparedGifDibPage currentPage_{};
-	bool hasCurrentPage_ = false;
+		PreparedGifDibPage currentPage_{};
+		bool hasCurrentPage_ = false;
 
-	std::vector<uint8_t> rowBuffer_;
+		std::vector<uint8_t> rowBuffer_;
 };
 
 class DTWAINGifOutput

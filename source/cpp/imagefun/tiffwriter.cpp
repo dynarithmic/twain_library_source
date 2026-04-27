@@ -564,26 +564,23 @@ bool TiffSessionWriter::WritePixels(const PageTagInfo& tagInfo)
 	return true;
 }
 
-LockedTiffPage::LockedTiffPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedDibPage> TiffSessionWriter::MakePreparedDibPage(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
-
-	const auto* bih = dib_.Header();
-	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
-		return;
+	if (!view.bits)
+		return std::nullopt;
 
 	PreparedDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = dib_.BitsPerPixel();
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
-	page.palette = dib_.Palette();
-	page.paletteEntries = dib_.PaletteEntries();
-	page.xDpi = dib_.XDpi() > 0.0 ? dib_.XDpi() : 200.0;
-	page.yDpi = dib_.YDpi() > 0.0 ? dib_.YDpi() : 200.0;
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
+	page.palette = view.palette;
+	page.paletteEntries = view.paletteEntries;
+
+	page.xDpi = view.xDPI > 0.0 ? view.xDPI : 200.0;
+	page.yDpi = view.yDPI > 0.0 ? view.yDPI : 200.0;
 
 	switch (page.bitsPerPixel)
 	{
@@ -592,11 +589,9 @@ LockedTiffPage::LockedTiffPage(HANDLE hDib) : dib_(hDib)
 		case 16: page.pixelFlavor = PixelFlavor::Gray16; break;
 		case 24: page.pixelFlavor = PixelFlavor::Bgr24; break;
 		case 32: page.pixelFlavor = PixelFlavor::Bgra32; break;
-		default: return;
+		default: return std::nullopt;
 	}
-
-	page_ = page;
-	valid_ = true;
+	return page;
 }
 
 std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedDibPage& page,

@@ -27,6 +27,7 @@ OF THIRD PARTY RIGHTS.
 #include <cstdio>
 #include <windows.h>
 #include "dibutil.h"
+#include "imagefilewriterbase.h"
 
 // ============================================================
 // TGA model
@@ -86,23 +87,6 @@ struct TgaHeader
 static_assert(sizeof(TgaHeader) == 18, "TgaHeader must be 18 bytes");
 
 // ============================================================
-// Locked page wrapper
-// ============================================================
-
-class LockedTgaDibPage
-{
-	public:
-		explicit LockedTgaDibPage(HANDLE hDib);
-		bool IsValid() const noexcept { return valid_; }
-		const PreparedTgaDibPage& GetPage() const noexcept { return page_; }
-
-	private:
-		dynarithmic::dib::LockedDib dib_;
-		PreparedTgaDibPage page_{};
-		bool valid_ = false;
-};
-
-// ============================================================
 // TGA writer
 // ============================================================
 class TgaSessionWriter
@@ -118,6 +102,7 @@ public:
 	bool WriteCurrentPage();
 	void Close();
 	bool IsOpen() const noexcept;
+	static std::optional<PreparedTgaDibPage> MakePreparedTgaDibPage(const dynarithmic::DibPageView& view);
 
 private:
 	static bool ValidatePage(const PreparedTgaDibPage& page);

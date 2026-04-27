@@ -28,7 +28,7 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToIco(const std::wstring& filename, const IcoSessionOptions& options, HANDLE hDib)
 {
-	LockedIcoDibPage lockedPage(hDib);
+	LockedDibPage lockedPage(hDib);
 	if (!lockedPage.IsValid())
 		return false;
 
@@ -36,7 +36,11 @@ static bool WriteOneDibHandleToIco(const std::wstring& filename, const IcoSessio
 	if (!writer.Open(filename, options))
 		return false;
 
-	if (!writer.SetPageInfo(lockedPage.GetPage()))
+	auto pageInfo = IcoSessionWriter::MakePreparedIcoDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+	if (!writer.SetPageInfo(pageInfo.value()))
 		return false;
 
 	if (!writer.WriteCurrentPage())

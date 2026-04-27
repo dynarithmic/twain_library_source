@@ -21,43 +21,37 @@
 #include "gifwriter.h"
 
  // ============================================================
- // HANDLE-based DIB lock helper
+ // GIF writer
+ // Single-image writer for DTWAIN-style first/last-page workflow
  // ============================================================
-LockedGifDibPage::LockedGifDibPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedGifDibPage> GifSessionWriter::MakePreparedGifPage(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
-
-	if (dib_.BitsPerPixel() != 8)
-		return;
+	if (view.bitsPerPixel != 8 || !view.bits)
+		return std::nullopt;
 
 	PreparedGifDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = 8;
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
-	page.palette = dib_.Palette();
-	page.paletteEntries = dib_.PaletteEntries();
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
+	page.palette = view.palette;
+	page.paletteEntries = view.paletteEntries;
 
-	// For GIF: preserve palette whenever one exists.
-	if (page.palette && page.paletteEntries > 0)
-		page.pixelFlavor = GifPixelFlavor::Indexed8;
-	else
+	if (view.palette && view.paletteEntries > 0 &&
+		dynarithmic::dib::is_grayscale_palette(view.palette, view.paletteEntries))
+	{
 		page.pixelFlavor = GifPixelFlavor::Gray8;
+	}
+	else
+	{
+		page.pixelFlavor = GifPixelFlavor::Indexed8;
+	}
 
-	page_ = page;
-	valid_ = true;
+	return page;
 }
-bool LockedGifDibPage::IsValid() const noexcept { return valid_; }
-const PreparedGifDibPage& LockedGifDibPage::GetPage() const noexcept { return page_; }
-
-// ============================================================
-// GIF writer
-// Single-image writer for DTWAIN-style first/last-page workflow
-// ============================================================
-
+ 
 GifSessionWriter::~GifSessionWriter()
 {
 	Close();

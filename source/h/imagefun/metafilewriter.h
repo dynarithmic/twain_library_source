@@ -25,6 +25,7 @@ OF THIRD PARTY RIGHTS.
 #include <memory>
 #include <windows.h>
 #include "dibutil.h"
+#include "imagefilewriterbase.h"
 
 enum class MetafileType
 {
@@ -60,27 +61,13 @@ struct PreparedMetafileDibPage
 	double yDpi = 300.0;
 };
 
-class LockedMetafileDibPage
-{
-	public:
-		explicit LockedMetafileDibPage(HANDLE hDib);
-		~LockedMetafileDibPage();
-		bool IsValid() const noexcept;
-		const PreparedMetafileDibPage& GetPage() const noexcept;
-
-	private:
-		HGLOBAL hDib_ = nullptr;
-		void* ptr_ = nullptr;
-		PreparedMetafileDibPage page_{};
-		bool valid_ = false;
-};
-
 class MetafileSessionWriter
 {
 	public:
 		bool Open(const std::wstring& filename, const MetafileSessionOptions& options);
 		bool WritePage(const PreparedMetafileDibPage& page);
 		bool Close();
+		static std::optional<PreparedMetafileDibPage> MakePreparedMetafileDibPage(const dynarithmic::DibPageView& view);
 
 	private:
 		static int To01mm(double pixels, double dpi);
@@ -89,6 +76,7 @@ class MetafileSessionWriter
 		bool WritePlaceableWmfFile(const std::wstring& filename, const PreparedMetafileDibPage& page,
 			                       const std::vector<BYTE>& wmfBits);
 		HENHMETAFILE CreateRasterEmfInMemory(const PreparedMetafileDibPage& page);
+
 
 	private:
 		std::wstring filename_;

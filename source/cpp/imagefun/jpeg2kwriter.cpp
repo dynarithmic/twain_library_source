@@ -25,22 +25,18 @@
 	#pragma warning (disable : 4244)
 #endif
 
-LockedJpeg2000DibPage::LockedJpeg2000DibPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedJpeg2000DibPage> Jpeg2000SessionWriter::MakePreparedJpeg2000Page(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
-
-	const auto* bih = dib_.Header();
-	if (!bih || bih->biWidth <= 0 || bih->biHeight == 0)
-		return;
+	if (!view.bits)
+		return std::nullopt;
 
 	PreparedJpeg2000DibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = dib_.BitsPerPixel();
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
 
 	switch (page.bitsPerPixel)
 	{
@@ -61,18 +57,16 @@ LockedJpeg2000DibPage::LockedJpeg2000DibPage(HANDLE hDib) : dib_(hDib)
 			break;
 
 		default:
-			return;
+			return page;
 	}
 
-	page_ = page;
-	valid_ = true;
+	return page;
 }
 
 Jpeg2000SessionWriter::~Jpeg2000SessionWriter()
 {
 	Close();
 }
-
 
 bool Jpeg2000SessionWriter::Open(const std::wstring& filename, const Jpeg2000SessionOptions& options)
 {

@@ -33,22 +33,19 @@
 	#pragma warning (disable : 4611)
 #endif
 
-LockedPngDibPage::LockedPngDibPage(HANDLE hDib) : dib_(hDib)
+std::optional<PreparedPngDibPage> PngSessionWriter::MakePreparedPngDibPage(const dynarithmic::DibPageView& view)
 {
-	if (!dib_.IsValid())
-		return;
+	if (!view.bits)
+		return std::nullopt;
 
 	PreparedPngDibPage page{};
-	page.width = dib_.Width();
-	page.height = dib_.Height();
-	page.bitsPerPixel = dib_.BitsPerPixel();
-	page.strideBytes = dib_.StrideBytes();
-	page.bottomUp = dib_.BottomUp();
-	page.bits = dib_.Bits();
-	page.palette = dib_.Palette();
-	page.paletteEntries = dib_.PaletteEntries();
-	page.xDpi = dib_.XDpi() > 0.0 ? dib_.XDpi() : 96.0;
-	page.yDpi = dib_.YDpi() > 0.0 ? dib_.YDpi() : 96.0;
+
+	page.width = view.width;
+	page.height = view.height;
+	page.bitsPerPixel = view.bitsPerPixel;
+	page.strideBytes = view.strideBytes;
+	page.bottomUp = view.bottomUp;
+	page.bits = view.bits;
 
 	switch (page.bitsPerPixel)
 	{
@@ -69,15 +66,14 @@ LockedPngDibPage::LockedPngDibPage(HANDLE hDib) : dib_(hDib)
 			break;
 
 		default:
-			return;
+			return page;
 	}
 
-	page_ = page;
-	valid_ = true;
-}
+	page.xDpi = view.xDPI > 0.0 ? view.xDPI : 96.0;
+	page.yDpi = view.yDPI > 0.0 ? view.yDPI : 96.0;
 
-bool LockedPngDibPage::IsValid() const noexcept { return valid_; }
-const PreparedPngDibPage& LockedPngDibPage::GetPage() const noexcept { return page_; }
+	return page;
+}
 
 PngSessionWriter::~PngSessionWriter()
 {
