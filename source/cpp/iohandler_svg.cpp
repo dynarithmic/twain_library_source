@@ -34,6 +34,7 @@ OF THIRD PARTY RIGHTS.
 #include "ctliface.h"
 #include "base64encode.h"
 #include "iohandler_svg.h"
+#include "ctldib32ex.h"
 
 extern "C" {
 #include "miniz.h"

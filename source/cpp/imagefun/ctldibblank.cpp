@@ -583,7 +583,7 @@ namespace
 		return mask;
 	}
 
-	CDibInterface::BlankDIBInfo IsDibBlankImpl(const BITMAPINFOHEADER* bih, double threshold)
+	BlankDIBInfo IsDibBlankImpl(const BITMAPINFOHEADER* bih, double threshold)
 	{
 		DibContext ctx;
 		if (!MakeDibContext(bih, ctx))
@@ -632,7 +632,7 @@ namespace
 }
 
 
-CDibInterface::BlankDIBInfo CDibInterface::IsBlankDIBEx(HANDLE hDib, double threshold)
+BlankDIBInfo CDibInterface::IsBlankDIBEx(HANDLE hDib, double threshold)
 {
 	if (!hDib)
 		return { false, {-1, -1} };

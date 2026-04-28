@@ -29,6 +29,7 @@
 #include "iohandler_pdf.h"
 #include "iohandler_bmp.h"
 #include "pdffun32.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

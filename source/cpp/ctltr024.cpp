@@ -20,6 +20,7 @@
  */
 #include "ctltr024.h"
 #include "ctltwainmanager.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

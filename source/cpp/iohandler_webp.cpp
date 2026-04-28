@@ -22,6 +22,7 @@ OF THIRD PARTY RIGHTS.
 #include "ctliface.h"
 #include "webpwriter.h"
 #include "iohandler_webp.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

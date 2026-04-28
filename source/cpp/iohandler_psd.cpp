@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "psdwriter.h"
 #include "iohandler_psd.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

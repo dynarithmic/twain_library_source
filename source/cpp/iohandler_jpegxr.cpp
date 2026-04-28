@@ -23,6 +23,7 @@
 #include "ctliface.h"
 #include "jpegxrwriter.h"
 #include "iohandler_jpegxr.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

@@ -39,6 +39,7 @@
 #include "ctlfileutils.h"
 #include "tiff.h"
 #include "ctlclosesource.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

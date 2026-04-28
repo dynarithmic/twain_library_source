@@ -83,7 +83,7 @@ namespace dynarithmic
             static bool ChangeBpp(CTL_ITwainSession* pSession,
                                   const CTL_ITwainSource* pSource,
                                   const CTL_TwainDibPtr& CurDib);
-            static CDibInterface::BlankDIBInfo IsPageBlank(CTL_ITwainSession* pSession,
+            static      BlankDIBInfo IsPageBlank(CTL_ITwainSession* pSession,
                                     const CTL_ITwainSource* pSource,
                                     bool resampled,
                                     const CTL_TwainDibPtr& CurDib);

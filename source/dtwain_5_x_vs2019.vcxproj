@@ -10087,6 +10087,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ansiwideconverter_generic.h" />
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />
+    <ClInclude Include="h\blankpage.h" />
     <ClInclude Include="h\capinfomap.h" />
     <ClInclude Include="h\ctlbimap.h" />
     <ClInclude Include="h\ctlclosesource.h" />
@@ -10094,6 +10095,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctlconstexprutils.h" />
     <ClInclude Include="h\ctldefsource.h" />
     <ClInclude Include="h\ctldib32.h" />
+    <ClInclude Include="h\ctldib32ex.h" />
     <ClInclude Include="h\ctlfilesave.h" />
     <ClInclude Include="h\ctlfileutils.h" />
     <ClInclude Include="h\ctlguiddef.h" />

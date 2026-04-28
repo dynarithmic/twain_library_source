@@ -29,6 +29,7 @@
 #include "winbit32.h"
 #include "ctltwainmanager.h"
 #include "ctldib.h"
+#include "ctldib32ex.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
 #include "iohandler_bmp.h"
@@ -813,7 +814,7 @@ int CTL_TwainDib::NormalizeDib()
     return 0;
 }
 
-CDibInterface::BlankDIBInfo CTL_TwainDib::IsBlankDIB(double threshold) const
+BlankDIBInfo CTL_TwainDib::IsBlankDIB(double threshold) const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if (hDib)

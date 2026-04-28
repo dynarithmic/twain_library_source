@@ -28,6 +28,7 @@
 #include "ctlobstr.h"
 #include "dtwain_raii.h"
 #include "dtwain_filesystem.h"
+#include "blankpage.h"
 
 class CxImage;
 
@@ -330,12 +331,6 @@ namespace dynarithmic
             {    return byte & 15;  }
 
             static LPSTR GetMonoPalette(LPSTR palette);
-
-            struct BlankDIBInfo
-            {
-                bool m_bIsBlank = false;
-                std::pair<double, double> PercentBlankAndThreshold = {};
-            };
 
             LONG    GetLastError() { return m_lasterror; }
             static bool    IsGrayScale(HANDLE hDib, int bpp);

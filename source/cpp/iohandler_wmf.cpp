@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "iohandler_wmf.h"
 #include "metafilewriter.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

@@ -62,6 +62,12 @@ namespace dynarithmic
     class CTL_ExtImageInfoTriplet;
     using CTL_ITwainSessionPtr = std::unique_ptr<CTL_ITwainSession>;
 
+	class CTL_TwainDib;
+	typedef std::shared_ptr<CTL_TwainDib> CTL_TwainDibPtr;
+
+	class CTL_ImageIOHandler;
+    typedef std::shared_ptr<CTL_ImageIOHandler> CTL_ImageIOHandlerPtr;
+
     enum SourceState {SOURCE_STATE_CLOSED=3,
                       SOURCE_STATE_OPENED=4,
                       SOURCE_STATE_UIENABLED=5,

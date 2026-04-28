@@ -26,6 +26,8 @@
 #include "dtwain.h"
 #include "winbit32.h"
 #include "logwriterutils.h"
+#include "ctldib32ex.h"
+
 using namespace dynarithmic;
 
 CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,

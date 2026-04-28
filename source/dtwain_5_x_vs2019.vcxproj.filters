@@ -2502,6 +2502,12 @@
     <ClInclude Include="h\imagefun\tgawriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\ctldib32ex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\blankpage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">

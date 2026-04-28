@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "jpeg2kwriter.h"
 #include "iohandler_jpeg2k.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

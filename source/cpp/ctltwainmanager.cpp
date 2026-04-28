@@ -48,6 +48,7 @@
 #include "ctlconstexprutils.h"
 #include "ctlstringutils.h"
 #include "ctlsetgetcaps.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

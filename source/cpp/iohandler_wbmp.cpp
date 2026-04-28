@@ -23,6 +23,7 @@
 #include "ctlfileutils.h"
 #include "wbmpwriter.h"
 #include "iohandler_wbmp.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

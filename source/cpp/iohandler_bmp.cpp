@@ -21,6 +21,7 @@
 #include "iohandler_bmp.h"
 #include "bmprlewriter.h"
 #include "ctliface.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

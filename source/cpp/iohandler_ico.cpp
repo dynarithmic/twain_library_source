@@ -23,6 +23,7 @@
 #include "ctlfileutils.h"
 #include "icowriter.h"
 #include "iohandler_ico.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

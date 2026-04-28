@@ -38,6 +38,7 @@
 #include "ctlfilesave.h"
 #include "cppfunc.h"
 #include "ctlsetgetcaps.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 
@@ -1368,7 +1369,7 @@ int CTL_ImageXferTriplet::ProcessBlankPage(CTL_ITwainSession *pSession,
 }
 
 
-CDibInterface::BlankDIBInfo CTL_ImageXferTriplet::IsPageBlank(CTL_ITwainSession*,
+BlankDIBInfo CTL_ImageXferTriplet::IsPageBlank(CTL_ITwainSession*,
                                        const CTL_ITwainSource* pSource,
                                        bool resampled,
                                        const CTL_TwainDibPtr& CurDib)

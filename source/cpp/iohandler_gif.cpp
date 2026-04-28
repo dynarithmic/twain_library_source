@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "gifwriter.h"
 #include "iohandler_gif.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 

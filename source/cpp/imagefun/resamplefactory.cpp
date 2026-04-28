@@ -24,6 +24,7 @@
 #include "../cximage/ximage.h"
 #include "resamplefactory.h"
 #include "cppfunc.h"
+#include "ctldib32ex.h"
 
 namespace dynarithmic
 {

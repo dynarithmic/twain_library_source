@@ -30,6 +30,7 @@
 #include "ctltwainmanager.h"
 #include "tiff.h"
 #include "iohandler_tiff.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 
