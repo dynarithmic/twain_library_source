@@ -366,7 +366,7 @@ bool SvgSessionWriter::WritePage()
 	if (!ValidatePage(currentPage_))
 		return false;
 
-	const std::string filenameA = StringConversion::Convert_Wide_To_Ansi(filename_.c_str());
+	const std::string filenameA = StringConversion::Convert_Wide_To_Ansi(filename_);
 
 	LPBITMAPINFOHEADER header = currentPage_.header;
 
