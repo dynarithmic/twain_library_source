@@ -1529,6 +1529,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\imagefun\postscriptwriter.cpp" />
     <ClCompile Include="cpp\imagefun\psdwriter.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
+    <ClCompile Include="cpp\imagefun\svgwriter.cpp" />
     <ClCompile Include="cpp\imagefun\tgawriter.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
     <ClCompile Include="cpp\imagefun\tiffwriter.cpp" />
@@ -10156,6 +10157,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\imagefun\psdwriter.h" />
     <ClInclude Include="h\imagefun\resample24to8.h" />
     <ClInclude Include="h\imagefun\resamplefactory.h" />
+    <ClInclude Include="h\imagefun\svgwriter.h" />
     <ClInclude Include="h\imagefun\tgawriter.h" />
     <ClInclude Include="h\imagefun\tiffun32.h" />
     <ClInclude Include="h\imagefun\tiffwriter.h" />

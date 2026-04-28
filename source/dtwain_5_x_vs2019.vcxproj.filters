@@ -1558,6 +1558,9 @@
     <ClCompile Include="cpp\imagefun\psdwriter.cpp">
       <Filter>C++ Files\Image File Writers</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\imagefun\svgwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -2506,6 +2509,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\blankpage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\svgwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
