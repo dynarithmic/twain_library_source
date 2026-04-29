@@ -41,10 +41,12 @@ bool CTextImageHandler::OpenOutputFile(LPCTSTR pFileName)
 {
     if (m_MultiPageStruct.Stage == DIB_MULTI_FIRST || m_MultiPageStruct.Stage == 0)
     {
-        m_hFile = std::make_unique<std::ofstream>(StringConversion::Convert_NativePtr_To_Ansi(pFileName).c_str(), std::ios::binary);
+        m_fileName = StringConversion::Convert_NativePtr_To_Ansi(pFileName);
+        m_hFile = std::make_unique<std::ofstream>(m_fileName, std::ios::binary);
         if (m_hFile.get())
             return true;
     }
+    m_fileName.clear();
     return false;
 }
 
@@ -211,5 +213,5 @@ void CTextImageHandler::DestroyAllObjects()
     if (m_hFile && *m_hFile.get())
         m_hFile->close();
     if (!m_bWriteOk)
-        filesys::remove(GetOutputFileName().c_str());
+        filesys::remove(m_fileName);
 }

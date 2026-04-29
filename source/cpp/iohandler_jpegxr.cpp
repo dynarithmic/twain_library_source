@@ -52,7 +52,6 @@ static bool WriteOneDibHandleToJxr(const std::wstring& filename, const JxrSessio
 CTL_JpegXRIOHandler::CTL_JpegXRIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx)
 : CTL_ImageIOHandler( pDib ), m_nFormat(0), m_ImageInfoEx(ImageInfoEx)
 { 
-    m_SaveParams.commentKey = "Software";
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -40,7 +40,6 @@ namespace dynarithmic
 			DTWAINImageInfoEx m_ImageInfoEx;
 			void SetSaveArgs()
 			{
-				m_SaveParams.multiplier_pr = { 0.01, 0.01, 0, 0 };
 			}
 	};
 }

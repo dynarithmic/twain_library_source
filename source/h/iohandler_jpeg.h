@@ -45,7 +45,6 @@ namespace dynarithmic
 
 			void SetSaveArgs()
 			{
-				m_SaveParams.multiplier_pr = { 0.01, 0.01, 0, 0 };
 			}
 
 			int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;

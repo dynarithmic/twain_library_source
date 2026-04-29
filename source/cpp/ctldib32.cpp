@@ -843,7 +843,7 @@ HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
     fileheader.bfReserved1 = 0;
     fileheader.bfReserved2 = 0;
     fileheader.bfOffBits = static_cast<DWORD>(sizeof(BITMAPFILEHEADER)) +
-        lpbi->biSize + CDibInterface::CalculateUsedPaletteEntries(bpp) * sizeof(RGBQUAD);
+        lpbi->biSize + dynarithmic::dib::effective_palette_entries(bpp) * sizeof(RGBQUAD);
 
     // we need to attach the bitmap header info onto the data
     const size_t totalSize = ImageMemoryHandler::GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);

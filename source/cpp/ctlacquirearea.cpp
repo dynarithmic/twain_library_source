@@ -53,16 +53,6 @@ static bool SetImageSize2(CTL_ITwainSource *p,
     LONG Unit,
     LONG flags);
 
-static constexpr bool IsValidUnit(LONG Unit)
-{
-    return Unit == DTWAIN_INCHES ||
-        Unit == DTWAIN_CENTIMETERS ||
-        Unit == DTWAIN_PICAS ||
-        Unit == DTWAIN_POINTS ||
-        Unit == DTWAIN_TWIPS ||
-        Unit == DTWAIN_PIXELS;
-}
-
 ///////////////////////////////////////////////////////////////////////
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquireAreaEx(DTWAIN_SOURCE Source, LONG lGetType)
 {
@@ -108,7 +98,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLO
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !IsValidUnit(Unit); },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !IsValidMeasureUnit(Unit); },
                                     DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = SetImageSize2(pSource, left, top, right, bottom, Unit, flags);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)

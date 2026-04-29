@@ -26,14 +26,12 @@ using namespace dynarithmic;
 
 boost::container::flat_map<LONG, std::vector<uint16_t>> CTL_ImageIOHandler::s_supportedBitDepths;
 
-CTL_ImageIOHandler::CTL_ImageIOHandler() : bytesleft(0), nextbyte(0),
-bytebuffer{}, bittable{}, masktable{}, pMultiDibData(nullptr), m_nPage(0), m_bAllWritten(true), m_bOnePageWritten(false)
+CTL_ImageIOHandler::CTL_ImageIOHandler() : pMultiDibData(nullptr), m_nPage(0), m_bOnePageWritten(false)
 {
     m_pDib = nullptr;
 }
 
-CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): bytesleft(0), nextbyte(0),
-bytebuffer{}, bittable{}, masktable{}, pMultiDibData(nullptr), m_nPage(0), m_bAllWritten(true), m_bOnePageWritten(false)
+CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): pMultiDibData(nullptr), m_nPage(0), m_bOnePageWritten(false)
 {
     m_pDib = pDib;
 }
@@ -46,11 +44,6 @@ void CTL_ImageIOHandler::SetMultiDibInfo(const DibMultiPageStruct &s)
 DibMultiPageStruct CTL_ImageIOHandler::GetMultiDibInfo() const
 {
     return m_DibMultiPageStruct;
-}
-
-void CTL_ImageIOHandler::resetbuffer()
-{
-    bytesleft=0;
 }
 
 bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)

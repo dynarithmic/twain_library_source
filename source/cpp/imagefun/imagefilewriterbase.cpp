@@ -36,8 +36,8 @@ LockedDibPage::LockedDibPage(HANDLE hDib) : dib_(hDib)
 	view_.palette = dib_.Palette();
 	view_.paletteEntries = dib_.PaletteEntries();
 	view_.bih = dib_.Header();
-    view_.xDPI = dib_.XDpi();
-    view_.yDPI = dib_.YDpi();
+    view_.xDPI = static_cast<uint16_t>(dib_.XDpi());
+    view_.yDPI = static_cast<uint16_t>(dib_.YDpi());
 	valid_ = true;
 }
 

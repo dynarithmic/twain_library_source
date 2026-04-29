@@ -137,13 +137,7 @@ namespace
 		return 1 << bih->biBitCount;
 	}
 
-	const RGBQUAD* GetPalettePtr(const BITMAPINFOHEADER* bih)
-	{
-		return reinterpret_cast<const RGBQUAD*>(
-			reinterpret_cast<const BYTE*>(bih) + bih->biSize);
-	}
-
-	const BYTE* GetBitsPtr(const BITMAPINFOHEADER* bih)
+	/*const BYTE* GetBitsPtr(const BITMAPINFOHEADER* bih)
 	{
 		const int paletteEntries = GetAllPaletteEntries(bih);
 		const BYTE* p = reinterpret_cast<const BYTE*>(bih) + bih->biSize;
@@ -155,7 +149,7 @@ namespace
 	{
 		return reinterpret_cast<const DWORD*>(
 			reinterpret_cast<const BYTE*>(bih) + bih->biSize);
-	}
+	}*/
 
 	bool MakeDibContext(const BITMAPINFOHEADER* bih, DibContext& ctx)
 	{
@@ -167,14 +161,14 @@ namespace
 		ctx.height = static_cast<int>(std::abs(bih->biHeight));
 		ctx.topDown = (bih->biHeight < 0);
 		ctx.bpp = bih->biBitCount;
-		ctx.stride = ComputeStride(ctx.width, ctx.bpp);
+		ctx.stride = dynarithmic::dib::effective_width(ctx.width, static_cast<uint16_t>(ctx.bpp)); // ComputeStride(ctx.width, ctx.bpp);
 		ctx.bytesPerPixel = (ctx.bpp >= 8) ? (ctx.bpp / 8) : 0;
-		ctx.palette = GetPalettePtr(bih);
-		ctx.bits = GetBitsPtr(bih);
+		ctx.palette = dynarithmic::dib::palette_ptr(bih); 
+		ctx.bits = dynarithmic::dib::bits_ptr(bih); 
 
 		if (ctx.bpp == 16 && bih->biCompression == BI_BITFIELDS)
 		{
-			const DWORD* masks = GetBitfieldsPtr(bih);
+			const DWORD* masks = reinterpret_cast<const DWORD*>(dynarithmic::dib::bits_ptr(bih)); // GetBitfieldsPtr(bih);
 			ctx.useBitfields16 = true;
 			ctx.redMask = masks[0];
 			ctx.greenMask = masks[1];

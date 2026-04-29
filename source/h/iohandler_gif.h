@@ -30,8 +30,6 @@ namespace dynarithmic
 		public:
 			CTL_GifIOHandler(CTL_TwainDib* pDib) : CTL_ImageIOHandler(pDib)
 			{
-				m_SaveParams.flags = 0;
-				m_SaveParams.unitOfMeasure = DTWAIN_INCHES;
 			}
 
 			int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;

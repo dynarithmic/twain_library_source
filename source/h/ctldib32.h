@@ -51,17 +51,6 @@ namespace dynarithmic
     class CTL_ImageIOHandler
     {
         public:
-            struct IOSaveParams
-            {
-                HANDLE hDib = nullptr;
-                LPCTSTR szFile = nullptr;
-                int flags = 0;
-                UINT unitOfMeasure = DTWAIN_INCHES;
-                std::pair<LONG, LONG> res = { 0, 0};
-                std::tuple<double, double, double, double> multiplier_pr = { 1,1, 0.5, 0.5 };
-                LPCSTR commentKey = "Comment";
-            };
-
             CTL_ImageIOHandler();
             CTL_ImageIOHandler( CTL_TwainDib *pDib );
             virtual ~CTL_ImageIOHandler() = default;
@@ -71,9 +60,7 @@ namespace dynarithmic
             void SetMultiDibData(std::shared_ptr<DibMultiPageData> pData) { pMultiDibData = std::move(pData);  }
             void SetMultiDibInfo(const DibMultiPageStruct &s);
             DibMultiPageStruct GetMultiDibInfo() const;
-            bool AllPagesOK() const { return m_bAllWritten; }
             unsigned int GetNumPagesWritten() const { return m_nPage; }
-            void SetPagesOK(bool bSet) { m_bAllWritten = bSet; }
             void SetNumPagesWritten(unsigned nPages) { m_nPage = nPages; }
             void SetOnePageWritten(bool bSet) { m_bOnePageWritten = bSet; }
             bool IsOnePageWritten() const { return m_bOnePageWritten; }
@@ -87,17 +74,10 @@ namespace dynarithmic
         protected:
             CTL_TwainDib *m_pDib;
             DTWAINImageInfoEx m_ImageInfo;
-            unsigned int bytesleft,nextbyte;
-            char bytebuffer[BYTEBUFFERSIZE];
-            void resetbuffer();
-            char bittable[8];
-            char masktable[8];
             std::shared_ptr<DibMultiPageData> pMultiDibData;
             DibMultiPageStruct m_DibMultiPageStruct;
             unsigned m_nPage;
-            bool m_bAllWritten;
             bool m_bOnePageWritten;
-            IOSaveParams m_SaveParams;
             static boost::container::flat_map<LONG, std::vector<uint16_t>> s_supportedBitDepths;
     };
 }

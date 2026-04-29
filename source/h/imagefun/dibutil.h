@@ -38,7 +38,7 @@ namespace dynarithmic::dib
 
 	using unique_dib = std::unique_ptr<std::remove_pointer_t<HGLOBAL>, DibHandleDeleter>;
 
-	inline uint32_t calc_stride_bytes(uint32_t width, uint16_t bitsPerPixel)
+	static constexpr uint32_t calc_stride_bytes(uint32_t width, uint16_t bitsPerPixel)
 	{
 		const uint64_t bitsPerRow = static_cast<uint64_t>(width) * bitsPerPixel;
 		const uint64_t alignedBits = (bitsPerRow + 31ULL) & ~31ULL;
@@ -56,7 +56,15 @@ namespace dynarithmic::dib
 		return 0;
 	}
 
-	inline uint32_t effective_width(uint32_t width, uint16_t bpp)
+	static constexpr uint32_t effective_palette_entries(uint16_t bpp)
+	{
+		if (bpp >= 1 && bpp <= 8)
+			return 1 << bpp;
+		return 0;
+	}
+
+
+	static constexpr uint32_t effective_width(uint32_t width, uint16_t bpp)
 	{
 		return (width * bpp + 31) / 32 * 4;
 	}

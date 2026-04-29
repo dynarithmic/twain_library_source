@@ -687,6 +687,32 @@ namespace dynarithmic
         }
         return false;
 	}
+
+	static constexpr bool IsValidMeasureUnit(LONG Unit)
+	{
+		return Unit == DTWAIN_INCHES ||
+			Unit == DTWAIN_CENTIMETERS ||
+			Unit == DTWAIN_PICAS ||
+			Unit == DTWAIN_POINTS ||
+			Unit == DTWAIN_TWIPS ||
+			Unit == DTWAIN_PIXELS;
+	}
+
+	static constexpr double GetScaleFactorPerInch(LONG Unit)
+	{
+		switch (Unit)
+		{
+		    case DTWAIN_TWIPS:
+			    return 1440.0;
+		    case DTWAIN_POINTS:
+			    return 72.0;
+		    case DTWAIN_PICAS:
+			    return 6.0;
+		    case DTWAIN_CENTIMETERS:
+			    return 2.54;
+		}
+		return 1.0;
+	}
 };
 
 #endif
