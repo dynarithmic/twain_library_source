@@ -81,6 +81,7 @@ namespace dynarithmic
             std::unique_ptr<std::ofstream> m_hFile;
             std::shared_ptr<CTextPageInfo> m_pTextPageInfo;
             CTL_StringType szTempFile;
+            std::string m_fileName;
     };
 }
 #endif

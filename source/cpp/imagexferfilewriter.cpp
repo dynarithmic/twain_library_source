@@ -28,6 +28,7 @@
 #include "ctltr026.h"
 #include "ctltwainmanager.h"
 #include "ctlfilesave.h"
+#include "ctldib32ex.h"
 
 #define DTWAIN_PAGEMISSINGSTR _T("<missing_page>")
 
@@ -166,7 +167,7 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
     ImageInfo.ResolutionX = 300;
     ImageInfo.ResolutionY = 300;
     ImageInfo.theSession = m_pSession;
-    if (!DTWAIN_GetSourceUnit(m_pSource, &ImageInfo.UnitOfMeasure))
+    if (!DTWAIN_GetSourceUnit(reinterpret_cast<DTWAIN_SOURCE>(m_pSource), &ImageInfo.UnitOfMeasure))
         ImageInfo.UnitOfMeasure = DTWAIN_INCHES;
 
     CTL_ImageXferTriplet::ResolveImageResolution(m_pSource, &ImageInfo);

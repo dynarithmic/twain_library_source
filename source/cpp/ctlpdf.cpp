@@ -166,7 +166,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageSizeString(DTWAIN_SOURCE Source, LONG 
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PageSize, CustomWidth, CustomHeight))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !CustomWidth || !CustomHeight; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !CustomWidth || !CustomHeight; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = SetPDFStringFunc(Source, PageSize, CustomWidth, CustomHeight, &DTWAIN_SetPDFPageSize);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -177,7 +177,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageScaleString(DTWAIN_SOURCE Source, LONG
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nOptions,xScale, yScale))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return !xScale|| !yScale; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return !xScale|| !yScale; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = SetPDFStringFunc(Source, nOptions, xScale, yScale, &DTWAIN_SetPDFPageScale);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -227,7 +227,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFAESEncryption(DTWAIN_SOURCE Source, LONG n
     bool goodParam = (nWhichEncryption == DTWAIN_PDF_AES128 ||
                       nWhichEncryption == DTWAIN_PDF_AES256);
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !goodParam; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !goodParam; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     if (nWhichEncryption == DTWAIN_PDF_AES128)
     {
@@ -433,7 +433,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_P
     auto [pHandle, pSource] = VerifyHandles(Source);
     PDFTextElement* pElement = static_cast<PDFTextElement*>(TextElement);
     auto validElement = CheckGlobalPDFTextElement(TextElement);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return !validElement.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return !validElement.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     GenericAddPDFText(pSource,
                         StringConversion::Convert_Ansi_To_Native(pElement->m_text).c_str(),
                         static_cast<LONG>(pElement->xpos),
@@ -538,7 +538,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RemovePDFTextElement(DTWAIN_SOURCE Source, DTWAI
     auto [pHandle, pSource] = VerifyHandles(Source);
 	PDFTextElement* pElement = static_cast<PDFTextElement*>(TextElement);
 	auto validElement = CheckGlobalPDFTextElement(TextElement);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return !validElement.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return !validElement.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
 
     pSource->ClearOnePDFTextElement(pElement);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -588,7 +588,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyPDFTextElement(DTWAIN_PDFTEXTELEMENT Text
     LOG_FUNC_ENTRY_PARAMS((TextElement))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto itGeneric = CheckGlobalPDFTextElement(TextElement);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return !itGeneric.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return !itGeneric.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
 
         // Remove the raw pointers from any sources that have this text element
         for (auto& pr : pHandle->m_mapPDFTextElement)
@@ -617,10 +617,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT Tex
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, val2, Flags))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto it = CheckGlobalPDFTextElement(TextElement);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
 
     auto itFound = generic_array_finder(aPDFFloatTypes, Flags);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     auto* pPtr = static_cast<PDFTextElement*>(TextElement);
 
@@ -683,10 +683,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, val2, Flags))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto it = CheckGlobalPDFTextElement(TextElement);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{ return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
 
 	auto itFound = generic_array_finder(aPDFLongTypes, Flags);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     auto pPtr = static_cast<PDFTextElement*>(TextElement);
 
@@ -724,12 +724,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementString(DTWAIN_PDFTEXTELEMENT Te
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, Flags))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return !val1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return !val1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const auto it = CheckGlobalPDFTextElement(TextElement);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !it.first;}, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !it.first;}, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
 
 	auto itFound = generic_array_finder(aPDFStringTypes, Flags);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     auto* pPtr = static_cast<PDFTextElement*>(TextElement);
 
@@ -755,10 +755,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT Tex
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, val2, Flags))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto it = CheckGlobalPDFTextElement(TextElement);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
 
 	auto itFound = generic_array_finder(aPDFFloatTypes, Flags);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     const PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
 
@@ -821,10 +821,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, val2, Flags))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto it = CheckGlobalPDFTextElement(TextElement);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
 
 	auto itFound = generic_array_finder(aPDFLongTypes, Flags);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     const PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
 
@@ -870,10 +870,10 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextEleme
     LOG_FUNC_ENTRY_PARAMS((TextElement, lpszStr, maxLen, Flags))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto it = CheckGlobalPDFTextElement(TextElement);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
 
 	auto itFound = generic_array_finder(aPDFStringTypes, Flags);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !itFound.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     const PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
 
@@ -902,7 +902,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ResetPDFTextElement(DTWAIN_PDFTEXTELEMENT TextEl
     LOG_FUNC_ENTRY_PARAMS((TextElement))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto it = CheckGlobalPDFTextElement(TextElement);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
 
     const auto pPtr = static_cast<PDFTextElement*>(TextElement);
     *pPtr = {};
@@ -915,13 +915,13 @@ DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElementCopy(DTWAIN_PDFTEX
 	LOG_FUNC_ENTRY_PARAMS((TextElement))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if ( !TextElement )
-		DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+		DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 	PDFTextElementPtr pPtr = std::make_shared<PDFTextElement>();
 	auto& guidMap = pHandle->GetGUIDMap(GUID_PDFTEXTELEMENTS);
 	guidMap.Insert(StringWrapperA::GetGUIDNoCurlyBrace(), pPtr.get());
 
     auto it = CheckGlobalPDFTextElement(TextElement);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
 	auto* pText = pPtr.get();
     auto* srcElement = static_cast<PDFTextElement*>(TextElement);
     *pText = *srcElement;

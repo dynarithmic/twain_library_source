@@ -24,12 +24,30 @@
 #include "errorcheck.h"
 using namespace dynarithmic;
 
+
 template <typename T>
 struct StreamerImpl
 {
-    static void streamMe(OutputBaseStreamA* strm, size_t* pCur, T& val)
+    static void streamMe(OutputBaseStreamA* strm, size_t* pCur, T& val, bool makeUnsigned)
     {
-        *strm << "Array[" << *pCur << "] = " << val << "\n";
+		using D = std::decay_t<T>;
+
+        if constexpr (std::is_integral_v<T> && std::is_signed_v<T>)
+		{
+			if (makeUnsigned)
+			{
+				using U = std::make_unsigned_t<D>;
+                *strm << "Array[" << *pCur << "] = " << static_cast<U>(val) << "\n";
+			}
+			else
+			{
+				*strm << "Array[" << *pCur << "] = " << val << "\n";
+			}
+		}
+		else
+		{
+			*strm << "Array[" << *pCur << "] = " << val << "\n";
+		}
     }
 };
 
@@ -84,16 +102,18 @@ struct oStreamer
 
     OutputBaseStreamA* m_pStrm;
     size_t* m_pCurItem;
-    oStreamer(OutputBaseStreamA* strm, size_t* curItem) : m_pStrm(strm), m_pCurItem(curItem) { *curItem = 0; }
+    bool m_bMakeUnsigned;
+    oStreamer(OutputBaseStreamA* strm, size_t* curItem, bool makeUnsigned = false) : 
+        m_pStrm(strm), m_pCurItem(curItem), m_bMakeUnsigned(makeUnsigned) { *curItem = 0; }
     void operator()(T& n)
     {
-        StreamFn::streamMe(m_pStrm, m_pCurItem, n);
+        StreamFn::streamMe(m_pStrm, m_pCurItem, n, m_bMakeUnsigned);
         ++*m_pCurItem;
     }
 };
 
 template <typename T>
-static void genericDumper(DTWAIN_ARRAY Array)
+static void genericDumper(DTWAIN_ARRAY Array, bool makeUnsigned = false)
 {
     // Get the array contents as a vector
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
@@ -102,7 +122,7 @@ static void genericDumper(DTWAIN_ARRAY Array)
     StringStreamA strm;
     size_t n;
 
-    std::for_each(vCaps.begin(), vCaps.end(), oStreamer<typename T::value_type>(&strm, &n));
+    std::for_each(vCaps.begin(), vCaps.end(), oStreamer<typename T::value_type>(&strm, &n, makeUnsigned));
     LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
 }
 
@@ -133,13 +153,13 @@ static void CapDumper(DTWAIN_ARRAY Array)
 
 static void DumpArrayULONG(DTWAIN_ARRAY Array)
 {
-    genericDumper<CTL_ArrayFactory::tagged_array_uint32>(Array);
+    genericDumper<CTL_ArrayFactory::tagged_array_long>(Array, true);
 }
 
-static void DumpArrayLONG(DTWAIN_ARRAY Array, LONG lCap)
+static void DumpArrayLONG(DTWAIN_ARRAY Array, LONG lCap, bool bAsUnsigned)
 {
     if ( lCap != CAP_SUPPORTEDCAPS )
-        genericDumper<CTL_ArrayFactory::tagged_array_long>(Array);
+        genericDumper<CTL_ArrayFactory::tagged_array_long>(Array, bAsUnsigned);
     else
         CapDumper<LONG>(Array);
 }
@@ -220,7 +240,7 @@ static void DumpSourceNames(DTWAIN_ARRAY Array)
 	LogWriterUtils::WriteMultiLineInfoIndented(strm.str(), _T("\n"));
 }
 
-void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFlags)
+void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFlags, bool bAsUnsigned)
 {
     auto logFlags = CTL_StaticData::GetLogFilterFlags();
     bool doArrayDump = false;
@@ -266,7 +286,7 @@ void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFl
     switch (nType)
     {
         case DTWAIN_ARRAYLONG:
-            DumpArrayLONG(Array, lCap);
+            DumpArrayLONG(Array, lCap, bAsUnsigned);
             break;
 
 		case DTWAIN_ARRAYUINT32:

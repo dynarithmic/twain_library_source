@@ -23,6 +23,8 @@
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "logwriterutils.h"
+#include "iohandler_bmp.h"
+#include "iohandler_tiff.h"
 
 using namespace dynarithmic;
 std::string CTextImageHandler::GetFileExtension() const
@@ -39,10 +41,12 @@ bool CTextImageHandler::OpenOutputFile(LPCTSTR pFileName)
 {
     if (m_MultiPageStruct.Stage == DIB_MULTI_FIRST || m_MultiPageStruct.Stage == 0)
     {
-        m_hFile = std::make_unique<std::ofstream>(StringConversion::Convert_NativePtr_To_Ansi(pFileName).c_str(), std::ios::binary);
+        m_fileName = StringConversion::Convert_NativePtr_To_Ansi(pFileName);
+        m_hFile = std::make_unique<std::ofstream>(m_fileName, std::ios::binary);
         if (m_hFile.get())
             return true;
     }
+    m_fileName.clear();
     return false;
 }
 
@@ -53,7 +57,7 @@ bool CTextImageHandler::CloseOutputFile()
 
 int CTextImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo/*=NULL*/)
 {
-    return CDibInterface::WriteGraphicFile(ptrHandler, path, bitmap, pUserInfo);
+    return WriteImage(ptrHandler, 0, 0, 0, 0, 0, nullptr, const_cast<LPTSTR>(path)); 
 }
 
 void CTextImageHandler::SetMultiPageStatus(DibMultiPageStruct *pStruct)
@@ -68,7 +72,7 @@ void CTextImageHandler::GetMultiPageStatus(DibMultiPageStruct *pStruct)
 }
 
 int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImage2*/, UINT32 /*wid*/, UINT32 /*ht*/,
-                                  UINT32 /*bpp*/, UINT32 /*nColors*/, RGBQUAD * /*pPal*/, void * /*pUserInfo*/)
+                                  UINT32 /*bpp*/, UINT32 /*nColors*/, RGBQUAD * /*pPal*/, void * path)
 {
     struct DestroyObjectHandler
     {
@@ -80,12 +84,12 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         void setTextPageInfo(const std::shared_ptr<CTextPageInfo>& ptr) { m_pTextPageInfo = ptr; }
         ~DestroyObjectHandler()
         {
-            // Always delete the temporary file
-            if ( m_pTextPageInfo && !m_pTextPageInfo->szTempFile.empty())
-                delete_file(m_pTextPageInfo->szTempFile.c_str());
-
             if (doDestroy)
             {
+				// Always delete the temporary file
+				if (m_pTextPageInfo && !m_pTextPageInfo->szTempFile.empty())
+					delete_file(m_pTextPageInfo->szTempFile.c_str());
+
                 m_pTextPageInfo.reset();
                 try
                 {
@@ -104,6 +108,14 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
     {
         m_bWriteOk = false;
         m_pTextPageInfo = std::make_shared<CTextPageInfo>(0);
+
+        // Open the file
+		LPCTSTR fileName = reinterpret_cast<LPCTSTR>(path);
+		std::string fNameStr = StringConversion::Convert_NativePtr_To_Ansi(fileName);
+        auto isOk = OpenOutputFile(fileName);
+        if (!isOk)
+            return DTWAIN_ERR_FILEOPEN;
+
         destroyHandler.setTextPageInfo(m_pTextPageInfo);
         m_MultiPageStruct.pUserData = m_pTextPageInfo;
         m_pTextPageInfo->fh = std::move(m_hFile);
@@ -168,10 +180,10 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         m_bWriteOk = true;
         if (m_MultiPageStruct.pUserData)
         {
-            const auto pTextPageInfo = std::dynamic_pointer_cast<CTextPageInfo>(m_MultiPageStruct.pUserData);
-            destroyHandler.setTextPageInfo(pTextPageInfo);
-            szTempFile = pTextPageInfo->szTempFile;
-            m_hFile = std::move(pTextPageInfo->fh);
+            m_pTextPageInfo = std::dynamic_pointer_cast<CTextPageInfo>(m_MultiPageStruct.pUserData); 
+            destroyHandler.setTextPageInfo(m_pTextPageInfo);
+            szTempFile = m_pTextPageInfo->szTempFile;
+            m_hFile = std::move(m_pTextPageInfo->fh);
         }
     }
     return 0; 
@@ -201,5 +213,5 @@ void CTextImageHandler::DestroyAllObjects()
     if (m_hFile && *m_hFile.get())
         m_hFile->close();
     if (!m_bWriteOk)
-        filesys::remove(GetOutputFileName().c_str());
+        filesys::remove(m_fileName);
 }

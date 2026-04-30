@@ -29,7 +29,6 @@
 #include "ctlobstr.h"
 #include "dtwain_filetypes.h"
 #include "dtwaindefs.h"
-#include "dibinfox.h"
 
 namespace dynarithmic
 {

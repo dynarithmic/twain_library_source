@@ -35,6 +35,9 @@ typedef std::vector<TW_UINT16>      CTL_TwainCapArray;
 typedef std::vector<double>         CTL_RealArray;
 typedef std::vector<HANDLE>         CTL_HDIBArray;
 
+#define DTWAIN_ARRAY_TO_VOID(p)   ((void*)(p))
+#define VOID_TO_DTWAIN_ARRAY(p)   ((DTWAIN_ARRAY)(p))
+
 namespace dynarithmic
 {
     class CTL_TwainDLLHandle;

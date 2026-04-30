@@ -53,16 +53,6 @@ static bool SetImageSize2(CTL_ITwainSource *p,
     LONG Unit,
     LONG flags);
 
-static constexpr bool IsValidUnit(LONG Unit)
-{
-    return Unit == DTWAIN_INCHES ||
-        Unit == DTWAIN_CENTIMETERS ||
-        Unit == DTWAIN_PICAS ||
-        Unit == DTWAIN_POINTS ||
-        Unit == DTWAIN_TWIPS ||
-        Unit == DTWAIN_PIXELS;
-}
-
 ///////////////////////////////////////////////////////////////////////
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquireAreaEx(DTWAIN_SOURCE Source, LONG lGetType)
 {
@@ -77,7 +67,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetTy
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !FloatArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !FloatArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<TW_UINT16>(lGetType));
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -108,7 +98,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLO
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !IsValidUnit(Unit); },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !IsValidMeasureUnit(Unit); },
                                     DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = SetImageSize2(pSource, left, top, right, bottom, Unit, flags);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -153,7 +143,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_F
 
 static bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType)
 {
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
     DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, 4).second;
     if (!FloatArrayOut)
         return false;
@@ -179,7 +169,7 @@ static bool FillActualArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ActualArra
     if (ActualArray != nullptr)
     {
         auto& vActual = pHandle->m_ArrayFactory->underlying_container_t<double>(ActualArray);
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle,
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
             [&] {return !pHandle->m_ArrayFactory->is_valid(ActualArray, CTL_ArrayFactory::arrayTag::DoubleType); },
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
         vActual.clear();
@@ -192,7 +182,7 @@ static bool FillActualArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ActualArra
 static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray, TW_UINT16 SetType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, FloatArray, ActualArray, SetType))
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = p->GetDTWAINHandle();
     if (SetType == MSG_RESET)
     {
@@ -204,12 +194,12 @@ static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_A
     }
 
     const DTWAIN_ARRAY pArray = FloatArray;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle,
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
         [&] { return !pHandle->m_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::DoubleType); },
         DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     static const size_t minValue = 4;
     const auto& vFloat = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArray);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle,
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
         [&] { return vFloat.size() < minValue; },
         DTWAIN_ERR_AREA_ARRAY_TOO_SMALL, false, FUNC_MACRO);
 

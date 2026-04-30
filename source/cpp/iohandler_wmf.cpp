@@ -20,8 +20,31 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "iohandler_wmf.h"
+#include "metafilewriter.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
+
+static bool WriteOneDibHandleToMetafile(const std::wstring& filename, HANDLE hDib, const MetafileSessionOptions& options)
+{
+    LockedDibPage locked(hDib);
+    if (!locked.IsValid())
+        return false;
+
+    MetafileSessionWriter writer;
+    if (!writer.Open(filename, options))
+        return false;
+
+	auto pageInfo = MetafileSessionWriter::MakePreparedMetafileDibPage(locked.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+    if (!writer.WritePage(pageInfo.value()))
+        return false;
+
+    return writer.Close();
+}
 
 int CTL_WmfIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
@@ -32,6 +55,20 @@ int CTL_WmfIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!IsValidBitDepth(DTWAIN_WMF, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    const int nWhichType = m_nFormat == CTL_TwainDib::WmfFormat?0:1;
-    return CWMFImageHandler(nWhichType).WriteGraphicFile(this, szFile, hDib);
+    MetafileSessionOptions opts;
+    if (m_nFormat == CTL_TwainDib::WmfFormat)
+        opts.type = MetafileType::Wmf;
+    else
+        opts.type = MetafileType::Emf;
+
+	// Get the comment string (copyright information)
+	char commentStr[256] = {};
+	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+
+    opts.description = StringConversion::Convert_AnsiPtr_To_Wide(commentStr);
+    std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    auto retval = WriteOneDibHandleToMetafile(sFileName, m_pDib->GetHandle(), opts);
+    if (!retval)
+        return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }

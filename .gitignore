@@ -31,7 +31,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
-!/source/FreeImage/Source/LibJXR/image/x86/
+!/source/LibJXR/image/x86/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

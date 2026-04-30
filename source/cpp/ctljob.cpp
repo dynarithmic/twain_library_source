@@ -41,7 +41,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
         JobControl = TWJC_NONE;
     }
     auto retVal = CreateArrayFromCap(pHandle, nullptr, CAP_JOBCONTROL, 1);
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
     auto Array = retVal.second;
     DTWAINArrayLowLevel_RAII a(pSource->GetDTWAINHandle(), Array);
 
@@ -66,7 +66,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, LONG
     DTWAIN_BOOL bRet = FALSE;
     if ( DTWAIN_EnumJobControls(Source, &Array) )
     {
-        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+        const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         DTWAINArrayLowLevel_RAII raii(pHandle, Array);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         const LONG lCount = static_cast<LONG>(vValues.size());

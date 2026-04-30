@@ -38,6 +38,7 @@
 #include "ctlfilesave.h"
 #include "cppfunc.h"
 #include "ctlsetgetcaps.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 
@@ -185,7 +186,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 // Get the current job control if the user may have changed it
                 // in the UI of the TWAIN driver
                 DTWAINScopedLogControllerExclude sLogerr(DTWAIN_LOG_ERRORMSGBOX);
-                if ( DTWAIN_GetJobControl(pSource,&JobControl, TRUE) != FALSE )
+                if ( DTWAIN_GetJobControl(reinterpret_cast<DTWAIN_SOURCE>(pSource),&JobControl, TRUE) != FALSE )
                     pSource->SetCurrentJobControl( static_cast<TW_UINT16>(JobControl) );
             }
 
@@ -211,7 +212,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     {
                         CTL_TwainDib theDib;
                         theDib.SetHandle(m_hDataHandle);
-                        bEndOfJobDetected = theDib.IsBlankDIB(pSource->GetBlankPageThreshold());
+                        bEndOfJobDetected = theDib.IsBlankDIB(pSource->GetBlankPageThreshold()).m_bIsBlank;
                     }
                     bSuccess = true;
                 }
@@ -1094,7 +1095,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
             ImageInfo.ResolutionX = 300;
             ImageInfo.ResolutionY = 300;
 
-            if (!DTWAIN_GetSourceUnit(pSource, &ImageInfo.UnitOfMeasure))
+            if (!DTWAIN_GetSourceUnit(reinterpret_cast<DTWAIN_SOURCE>(pSource), &ImageInfo.UnitOfMeasure))
                 ImageInfo.UnitOfMeasure = DTWAIN_INCHES;
 
             ResolveImageResolution( pSource, &ImageInfo );
@@ -1258,11 +1259,11 @@ bool CTL_ImageXferTriplet::CropDib(CTL_ITwainSession *pSession,
         }
 
         // Now get the unit of measure
-        if ( DTWAIN_GetSourceUnit(const_cast<CTL_ITwainSource*>(pSource), &SourceUnit) )
+        if ( DTWAIN_GetSourceUnit(reinterpret_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource*>(pSource)), &SourceUnit) )
         {
             // Get the image resolution
             double Resolution;
-            DTWAIN_GetResolution(const_cast<CTL_ITwainSource*>(pSource), &Resolution);
+            DTWAIN_GetResolution(reinterpret_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource*>(pSource)), &Resolution);
 
             // Crop the dib here
             if (CurDib->CropDib(Actual, Requested, SourceUnit, DestUnit, static_cast<int>(Resolution),
@@ -1330,7 +1331,8 @@ int CTL_ImageXferTriplet::ProcessBlankPage(CTL_ITwainSession *pSession,
 {
     if (GetDAT() == DAT_AUDIONATIVEXFER)
         return 1;
-    const bool bIsBlankPage = IsPageBlank(pSession, pSource, resampled, CurDib)?true:false;
+    auto retval = IsPageBlank(pSession, pSource, resampled, CurDib);
+    bool bIsBlankPage = retval.m_bIsBlank;
     if (bIsBlankPage)
     {
         LONG bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, static_cast<WPARAM>(message_to_send1), reinterpret_cast<LPARAM>(pSource));
@@ -1342,6 +1344,20 @@ int CTL_ImageXferTriplet::ProcessBlankPage(CTL_ITwainSession *pSession,
         }
         if ( !bKeepPage )
         {
+			auto logFlags = CTL_StaticData::GetLogFilterFlags();
+			if (logFlags)
+			{
+				std::string sPercentages = "Blank page processing returning ";
+				if (retval.m_bIsBlank)
+					sPercentages += "true ";
+				else
+					sPercentages += "false ";
+				sPercentages += "with the following computed percentages (blank, threshold): ";
+				sPercentages += "(" + std::to_string(retval.PercentBlankAndThreshold.first) + ", " +
+					std::to_string(retval.PercentBlankAndThreshold.second) + ")";
+				LogWriterUtils::WriteLogInfoIndentedA(sPercentages);
+			}
+
             // remove dib from array and delete the memory for the DIB
             CurDib->SetAutoDelete(true);
             pSource->GetDibArray()->RemoveDib(m_hDataHandle);
@@ -1353,18 +1369,18 @@ int CTL_ImageXferTriplet::ProcessBlankPage(CTL_ITwainSession *pSession,
 }
 
 
-bool CTL_ImageXferTriplet::IsPageBlank(CTL_ITwainSession*,
+BlankDIBInfo CTL_ImageXferTriplet::IsPageBlank(CTL_ITwainSession*,
                                        const CTL_ITwainSource* pSource,
                                        bool resampled,
                                        const CTL_TwainDibPtr& CurDib)
 {
-    if ( pSource->IsBlankPageDetectionOn() )
+    if (pSource->IsBlankPageDetectionOn())
     {
-        if ( resampled && pSource->IsBlankPageDetectionSampleOn() ||
+        if (resampled && pSource->IsBlankPageDetectionSampleOn() ||
             !resampled && pSource->IsBlankPageDetectionNoSampleOn())
             return CurDib->IsBlankDIB(pSource->GetBlankPageThreshold());
     }
-    return false;
+    return { false, {-1, -1} };
 }
 
 CTL_TwainFileFormatEnum CTL_ImageXferTriplet::GetFileTypeFromCompression(int nCompression)
@@ -1432,7 +1448,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
     char szOutBuf[1024];
     if ( IsState7InfoNeeded(pSource) )
     {
-      if ( DTWAIN_GetImageInfo(pSource,
+      if ( DTWAIN_GetImageInfo(reinterpret_cast<DTWAIN_SOURCE>(pSource),
                               &ResolutionX,
                               &ResolutionY,
                               nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr))
@@ -1483,7 +1499,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
     {
         bool bWriteMisc = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS;
         // Try TWAIN driver setting
-        if ( DTWAIN_GetResolution(pSource, &Resolution) )
+        if ( DTWAIN_GetResolution(reinterpret_cast<DTWAIN_SOURCE>(pSource), &Resolution) )
         {
             if ( bWriteMisc )
             {
@@ -1621,7 +1637,7 @@ HANDLE CTL_ImageXferTriplet::ProcessUserUpdatingDIB(size_t nLastDib, int notific
         if (notification == 0)
         {
             if (sessionHandle->m_pDibUpdateProc != nullptr)
-                hRetDib = (sessionHandle->m_pDibUpdateProc)(pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
+                hRetDib = (sessionHandle->m_pDibUpdateProc)(reinterpret_cast<DTWAIN_SOURCE>(pSource), static_cast<LONG>(nLastDib), m_hDataHandle);
         }
         else
         {

@@ -48,6 +48,7 @@
 #include "ctlconstexprutils.h"
 #include "ctlstringutils.h"
 #include "ctlsetgetcaps.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 
@@ -766,7 +767,7 @@ void CTL_TwainAppMgr::NotifyFeederStatus()
 
     while (it != it2)
     {
-        const auto pSource = static_cast<CTL_ITwainSource*>(*it);
+        const auto pSource = reinterpret_cast<CTL_ITwainSource*>(*it);
         const auto sourceState = pSource->GetState();
         if (sourceState != SOURCE_STATE_XFERREADY &&
             sourceState != SOURCE_STATE_TRANSFERRING)
@@ -2046,7 +2047,7 @@ int CTL_TwainAppMgr::GetDataTypeFromCap( TW_UINT16 Cap, CTL_ITwainSource *pSourc
     {
         if (!pSource)
             return DTWAIN_FAILURE1;
-        return GetCustomCapDataType(pSource, nThisCap);
+        return GetCustomCapDataType(reinterpret_cast<DTWAIN_SOURCE>(pSource), nThisCap);
     }
     const CTL_CapStruct cStruct = GetGeneralCapInfo(Cap);
     if ( static_cast<std::string>(cStruct).length() == 0 )

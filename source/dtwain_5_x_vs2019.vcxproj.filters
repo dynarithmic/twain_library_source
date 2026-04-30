@@ -301,31 +301,7 @@
     <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwainpdf.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwgetopt.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\dtwinver\Dtwinver.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwtiff2ps.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipImage.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMemoryIO.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMetadataFind.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMultiPage.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipTag.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipWinImage.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\pdflib32\flateencode.cpp">
@@ -403,9 +379,6 @@
     <ClCompile Include=".\cpp\ocrengine\ocrinterface_internal.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\imagefun\pcxfun32.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\pdflib32\pdfencrypt.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -413,9 +386,6 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\pdflib32\pdflib32.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\pdflib32\pslib32.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp">
@@ -427,9 +397,6 @@
     <ClCompile Include=".\cpp\ocrengine\transym_ocrinterface.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpp\twainframe.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\imagefun\txtfun32.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -437,9 +404,6 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\windows_versioninfo.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\imagefun\wmffun32.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="c\imagefun\dtwpdf\md5c.c">
@@ -630,6 +594,972 @@
     </ClCompile>
     <ClCompile Include="cpp\ctltwaindecoder.cpp">
       <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltwainidentity.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\ctldibblank.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\dgif_lib.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\egif_lib.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\getarg.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\gif_err.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\gif_font.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\gif_hash.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\gifalloc.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\openbsd-reallocarray.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\qprintf.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGIF\quantize.c">
+      <Filter>LibGIF</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_aux.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_close.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_codec.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_color.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_compress.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_dir.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_dirinfo.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_dirread.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_dirwrite.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_dumpmode.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_error.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_extension.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_fax3.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_fax3sm.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_flush.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_getimage.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_hash_set.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_jbig.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_jpeg.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_lerc.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_luv.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_lzma.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_lzw.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_next.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_ojpeg.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_open.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_packbits.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_pixarlog.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_predict.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_print.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_read.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_strip.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_swab.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_thunder.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_tile.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_unix.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_version.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_warning.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_webp.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_win32.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_write.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibTIFF4\tif_zip.c">
+      <Filter>LibTIFF4</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\png.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngerror.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngget.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngmem.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngpread.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngread.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngrio.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngrtran.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngrutil.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngset.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngtest.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngtrans.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngwio.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngwrite.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngwtran.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibPNG\pngwutil.c">
+      <Filter>LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\sharpyuv\sharpyuv.c">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\sharpyuv\sharpyuv_cpu.c">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\sharpyuv\sharpyuv_csp.c">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\sharpyuv\sharpyuv_dsp.c">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\sharpyuv\sharpyuv_gamma.c">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\sharpyuv\sharpyuv_neon.c">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\sharpyuv\sharpyuv_sse2.c">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dec\alpha_dec.c">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dec\buffer_dec.c">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dec\frame_dec.c">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dec\idec_dec.c">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dec\io_dec.c">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dec\quant_dec.c">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dec\tree_dec.c">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dec\vp8_dec.c">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dec\vp8l_dec.c">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dec\webp_dec.c">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\demux\anim_decode.c">
+      <Filter>LibWebP\src\demux</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\demux\demux.c">
+      <Filter>LibWebP\src\demux</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\alpha_processing.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\alpha_processing_mips_dsp_r2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\alpha_processing_neon.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\alpha_processing_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\alpha_processing_sse41.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\cost.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\cost_mips_dsp_r2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\cost_mips32.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\cost_neon.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\cost_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\cpu.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\dec.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\dec_clip_tables.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\dec_mips_dsp_r2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\dec_mips32.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\dec_msa.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\dec_neon.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\dec_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\dec_sse41.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\enc.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\enc_mips_dsp_r2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\enc_mips32.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\enc_msa.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\enc_neon.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\enc_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\enc_sse41.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\filters.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\filters_mips_dsp_r2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\filters_msa.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\filters_neon.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\filters_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_avx2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_enc.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_enc_avx2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_enc_mips_dsp_r2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_enc_mips32.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_enc_msa.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_enc_neon.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_enc_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_enc_sse41.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_mips_dsp_r2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_msa.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_neon.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\lossless_sse41.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\rescaler.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\rescaler_mips_dsp_r2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\rescaler_mips32.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\rescaler_msa.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\rescaler_neon.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\rescaler_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\ssim.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\ssim_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\upsampling.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\upsampling_mips_dsp_r2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\upsampling_msa.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\upsampling_neon.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\upsampling_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\upsampling_sse41.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\yuv.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\yuv_mips_dsp_r2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\yuv_mips32.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\yuv_neon.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\yuv_sse2.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\dsp\yuv_sse41.c">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\alpha_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\analysis_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\backward_references_cost_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\backward_references_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\config_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\cost_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\filter_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\frame_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\histogram_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\iterator_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\near_lossless_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\picture_csp_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\picture_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\picture_psnr_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\picture_rescale_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\picture_tools_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\predictor_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\quant_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\syntax_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\token_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\tree_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\vp8l_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\enc\webp_enc.c">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\mux\anim_encode.c">
+      <Filter>LibWebP\src\mux</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\mux\muxedit.c">
+      <Filter>LibWebP\src\mux</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\mux\muxinternal.c">
+      <Filter>LibWebP\src\mux</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\mux\muxread.c">
+      <Filter>LibWebP\src\mux</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\bit_reader_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\bit_writer_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\color_cache_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\filters_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\huffman_encode_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\huffman_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\palette.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\quant_levels_dec_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\quant_levels_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\random_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\rescaler_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\thread_utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibWebP\src\utils\utils.c">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\decode\decode.c">
+      <Filter>LibJXR\Source Files\image\decode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\decode\JXRTranscode.c">
+      <Filter>LibJXR\Source Files\image\decode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\decode\postprocess.c">
+      <Filter>LibJXR\Source Files\image\decode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\decode\segdec.c">
+      <Filter>LibJXR\Source Files\image\decode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\decode\strdec.c">
+      <Filter>LibJXR\Source Files\image\decode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\decode\strdec_x86.c">
+      <Filter>LibJXR\Source Files\image\decode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\decode\strInvTransform.c">
+      <Filter>LibJXR\Source Files\image\decode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\decode\strPredQuantDec.c">
+      <Filter>LibJXR\Source Files\image\decode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\encode\encode.c">
+      <Filter>LibJXR\Source Files\image\encode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\encode\segenc.c">
+      <Filter>LibJXR\Source Files\image\encode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\encode\strenc.c">
+      <Filter>LibJXR\Source Files\image\encode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\encode\strenc_x86.c">
+      <Filter>LibJXR\Source Files\image\encode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\encode\strFwdTransform.c">
+      <Filter>LibJXR\Source Files\image\encode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\encode\strPredQuantEnc.c">
+      <Filter>LibJXR\Source Files\image\encode</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\sys\adapthuff.c">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\sys\image_jxr.c">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\sys\perfTimerANSI.c">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\sys\strcodec.c">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\sys\strPredQuant.c">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\image\sys\strTransform.c">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\jxrgluelib\JXRGlue.c">
+      <Filter>LibJXR\Source Files\jxrgluelib</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\jxrgluelib\JXRGlueJxr.c">
+      <Filter>LibJXR\Source Files\jxrgluelib</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\jxrgluelib\JXRGluePFC.c">
+      <Filter>LibJXR\Source Files\jxrgluelib</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJXR\jxrgluelib\JXRMeta.c">
+      <Filter>LibJXR\Source Files\jxrgluelib</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\bio.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\cio.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\dwt.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\event.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\function_list.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\ht_dec.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\image.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\invert.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\j2k.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\jp2.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\mct.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\mqc.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\openjpeg.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\opj_clock.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\opj_malloc.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\pi.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\raw.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\thread.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\sparse_array.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\t1.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\t2.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\tcd.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOpenJPEG\tgt.c">
+      <Filter>LibOpenJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jaricom.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcapimin.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcapistd.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcarith.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jccoefct.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jccolor.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcdctmgr.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jchuff.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcinit.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcmainct.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcmarker.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcmaster.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcomapi.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcparam.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcprepct.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jcsample.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jctrans.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdapimin.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdapistd.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdarith.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdatadst.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdatasrc.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdcoefct.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdcolor.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jddctmgr.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdhuff.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdinput.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdmainct.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdmarker.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdmaster.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdmerge.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdpostct.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdsample.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jdtrans.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jerror.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jfdctflt.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jfdctfst.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jfdctint.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jidctflt.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jidctfst.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jidctint.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jmemmgr.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jmemnobs.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jquant1.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jquant2.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\jutils.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="LibJPEG\transupp.c">
+      <Filter>LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\adler32.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\compress.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\crc32.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\deflate.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\gzclose.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\gzlib.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\gzread.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\gzwrite.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\infback.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\inffast.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\inflate.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\inftrees.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\trees.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\uncompr.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLib\zutil.c">
+      <Filter>ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\bmprlewriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\imagefilewriterbase.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\tiffwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\wbmpwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\webpwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\postscriptwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\pnmwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\pngwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\pcxwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\tgawriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\jpegxrwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\jpegwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\jpeg2kwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\metafilewriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\gifwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\icowriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\psdwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\svgwriter.cpp">
+      <Filter>C++ Files\Image File Writers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -894,9 +1824,6 @@
     <ClInclude Include="cpp\pdflib32\flateencode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeImage\Source\FreeImage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include=".\h\funcmac.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -951,9 +1878,6 @@
     <ClInclude Include=".\h\winconst.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\imagefun\wmffun32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\imagefun\txtfun32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -973,9 +1897,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include=".\h\dtwaindefs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cximage\ximage.h">
@@ -1108,6 +2029,489 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\ctlsourcedibs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\tiffwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\pngwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\bmprlewriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LibGIF\getarg.h">
+      <Filter>LibGIF</Filter>
+    </ClInclude>
+    <ClInclude Include="LibGIF\gif_hash.h">
+      <Filter>LibGIF</Filter>
+    </ClInclude>
+    <ClInclude Include="LibGIF\gif_lib.h">
+      <Filter>LibGIF</Filter>
+    </ClInclude>
+    <ClInclude Include="LibGIF\gif_lib_private.h">
+      <Filter>LibGIF</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\gifwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\dibutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\icowriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\wbmpwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\webpwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlstringconversion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\pcxwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\resample24to8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\t4.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\tif_config.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\tif_dir.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\tif_fax3.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\tif_hash_set.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\tif_predict.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\tiff.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\tiffconf.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\tiffio.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\tiffiop.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibTIFF4\tiffvers.h">
+      <Filter>LibTIFF4</Filter>
+    </ClInclude>
+    <ClInclude Include="LibPNG\png.h">
+      <Filter>LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibPNG\pngconf.h">
+      <Filter>LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibPNG\pngdebug.h">
+      <Filter>LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibPNG\pnginfo.h">
+      <Filter>LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibPNG\pnglibconf.h">
+      <Filter>LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibPNG\pngpriv.h">
+      <Filter>LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibPNG\pngstruct.h">
+      <Filter>LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\sharpyuv\sharpyuv.h">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\sharpyuv\sharpyuv_cpu.h">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\sharpyuv\sharpyuv_csp.h">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\sharpyuv\sharpyuv_dsp.h">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\sharpyuv\sharpyuv_gamma.h">
+      <Filter>LibWebP\sharpyuv</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dec\alphai_dec.h">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dec\common_dec.h">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dec\vp8_dec.h">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dec\vp8i_dec.h">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dec\vp8li_dec.h">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dec\webpi_dec.h">
+      <Filter>LibWebP\src\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\common_sse2.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\common_sse41.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\cpu.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\dsp.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\lossless.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\lossless_common.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\mips_macro.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\msa_macro.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\neon.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\quant.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\dsp\yuv.h">
+      <Filter>LibWebP\src\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\enc\backward_references_enc.h">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\enc\cost_enc.h">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\enc\histogram_enc.h">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\enc\vp8i_enc.h">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\enc\vp8li_enc.h">
+      <Filter>LibWebP\src\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\mux\animi.h">
+      <Filter>LibWebP\src\mux</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\mux\muxi.h">
+      <Filter>LibWebP\src\mux</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\bit_reader_inl_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\bit_reader_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\bit_writer_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\bounds_safety.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\color_cache_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\endian_inl_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\filters_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\huffman_encode_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\huffman_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\palette.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\quant_levels_dec_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\quant_levels_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\random_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\rescaler_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\thread_utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\utils\utils.h">
+      <Filter>LibWebP\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\webp\decode.h">
+      <Filter>LibWebP\src\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\webp\demux.h">
+      <Filter>LibWebP\src\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\webp\encode.h">
+      <Filter>LibWebP\src\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\webp\format_constants.h">
+      <Filter>LibWebP\src\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\webp\mux.h">
+      <Filter>LibWebP\src\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\webp\mux_types.h">
+      <Filter>LibWebP\src\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibWebP\src\webp\types.h">
+      <Filter>LibWebP\src\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\image\decode\decode.h">
+      <Filter>LibJXR\Source Files\image\decode</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\image\encode\encode.h">
+      <Filter>LibJXR\Source Files\image\encode</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\image\sys\ansi.h">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\image\sys\common.h">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\image\sys\perfTimer.h">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\image\sys\strcodec.h">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\image\sys\strTransform.h">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\image\sys\windowsmediaphoto.h">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\image\sys\xplatform_image.h">
+      <Filter>LibJXR\Source Files\image\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\jxrgluelib\JXRGlue.h">
+      <Filter>LibJXR\Source Files\jxrgluelib</Filter>
+    </ClInclude>
+    <ClInclude Include="LibJXR\jxrgluelib\JXRMeta.h">
+      <Filter>LibJXR\Source Files\jxrgluelib</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\bio.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\cio.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\dwt.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\event.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\function_list.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\image.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\indexbox_manager.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\invert.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\j2k.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\jp2.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\mct.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\mqc.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\mqc_inl.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\openjpeg.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\opj_clock.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\opj_codec.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\opj_common.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\opj_config.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\opj_config_private.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\opj_includes.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\opj_intmath.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\opj_inttypes.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\opj_malloc.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\opj_stdint.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\pi.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\raw.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\thread.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\tls_keys.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\sparse_array.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\t1.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\t1_luts.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\t2.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\tcd.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="LibOpenJPEG\tgt.h">
+      <Filter>LibOpenJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_ps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_bmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_jpeg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_pdf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_tiff.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_jpeg2k.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_png.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_pcx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_tga.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_wmf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_psd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_jpegxr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_gif.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_ico.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_pbm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_wbmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_webp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\iohandler_svg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\imagefilewriterbase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\metafilewriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\pnmwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\postscriptwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\psdwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\jpeg2kwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\jpegwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\jpegxrwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\tgawriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctldib32ex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\blankpage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\svgwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1246,6 +2650,9 @@
     <Text Include="txt\twainresourcestrings_greek.txt">
       <Filter>Resource Text Files</Filter>
     </Text>
+    <Text Include="txt\twainresourcestrings_turkish.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -1278,10 +2685,90 @@
     <Filter Include="miniz">
       <UniqueIdentifier>{4fce70b8-1277-454a-a982-e3f1de3ea842}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Natvis">
+      <UniqueIdentifier>{7b688719-c9a6-40b3-9705-5cd9b3bedee0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibGIF">
+      <UniqueIdentifier>{70f1f93a-6e5d-4f36-b101-0de3f3deb9cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibTIFF4">
+      <UniqueIdentifier>{9e4dd531-0d8a-4767-a817-8bddaac83b5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibPNG">
+      <UniqueIdentifier>{50d32ad6-1f34-4f2f-b2c9-c70c742db59d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibWebP">
+      <UniqueIdentifier>{b8c43630-7ea7-4c21-98f6-18d6cd650e79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibWebP\sharpyuv">
+      <UniqueIdentifier>{8156706d-bc54-4b56-93d6-711e8334d7b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibWebP\src">
+      <UniqueIdentifier>{573f05c5-9e0c-44bb-a772-990202e3ee53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibWebP\src\dec">
+      <UniqueIdentifier>{83a863d7-c340-414c-aeb1-2a472f8d9267}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibWebP\src\demux">
+      <UniqueIdentifier>{a61f29ba-3e1d-4823-a346-8be609ad06df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibWebP\src\dsp">
+      <UniqueIdentifier>{88708671-4fca-410a-943b-b4c07912fdfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibWebP\src\enc">
+      <UniqueIdentifier>{bd3e5047-a6b5-4669-8989-207f7cff12ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibWebP\src\mux">
+      <UniqueIdentifier>{53930f47-1af8-4be7-9d96-ac7c7a052f9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibWebP\src\utils">
+      <UniqueIdentifier>{d01b5cb1-8bc5-4ff6-81cd-c7f43ee69da1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibWebP\src\webp">
+      <UniqueIdentifier>{6905a898-de39-4c1a-b807-c2c3b2932cb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibJXR">
+      <UniqueIdentifier>{5ccfddff-3d88-43db-9f6a-d96a96cffbc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibJXR\Source Files">
+      <UniqueIdentifier>{fe3fab52-e2d8-4b30-9875-9d9cb47870f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibJXR\Source Files\image">
+      <UniqueIdentifier>{77eacd47-d796-4105-82ee-59babdd78a78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibJXR\Source Files\image\decode">
+      <UniqueIdentifier>{fd27212b-c34e-4764-8abb-b7dbee9b7766}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibJXR\Source Files\image\encode">
+      <UniqueIdentifier>{632c848c-b38a-4f45-baa0-a5b4f35a7aae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibJXR\Source Files\image\sys">
+      <UniqueIdentifier>{4ddd3038-3980-4f36-a0e5-d6f7f550de63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibJXR\Source Files\jxrgluelib">
+      <UniqueIdentifier>{52a577d1-3c06-45d8-9247-c21260370117}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibOpenJPEG">
+      <UniqueIdentifier>{6f7ef40b-f57f-4f46-9842-61bec4623616}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibJPEG">
+      <UniqueIdentifier>{bb04dcbb-716c-4287-b28b-a40f9710b82c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ZLib">
+      <UniqueIdentifier>{16570209-eb26-4d0f-afb4-b5a4be576852}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="C++ Files\Image File Writers">
+      <UniqueIdentifier>{f3a516f4-d39f-4d76-ac4d-f0fb31f0a35e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\rc\twil32.rc">
       <Filter>RC Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="natvis\dtwain.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

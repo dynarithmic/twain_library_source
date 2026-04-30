@@ -142,7 +142,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBufferedTileMode(DTWAIN_SOURCE Source, DTWAIN
     LOG_FUNC_ENTRY_PARAMS((Source, bTileMode))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto bRet = CheckTiledBufferedSupport(pSource);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
     pSource->SetTileMode(bTileMode);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -161,7 +161,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBufferedTileModeSupported(DTWAIN_SOURCE Source
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
     auto bRet = CheckTiledBufferedSupport(pSource);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -170,33 +170,33 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
     const DTWAIN_SOURCE Source = opts.getSource();
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
 
     if (pSource->IsTileModeOn())
     {
         // Set the ICAP_TILES capability on here
         auto retValue = dynarithmic::CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
-		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retValue.second; }, retValue.first, -1, FUNC_MACRO);
+		DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retValue.second; }, retValue.first, -1, FUNC_MACRO);
         auto arr = retValue.second;
         DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arr);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         vValues[0] = 1;
         bool bTilesSet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, -1, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, -1, FUNC_MACRO);
     }
 
     LONG compressionType;
 
     if (!DTWAIN_GetCompressionType(Source, &compressionType, TRUE))
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, -1, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, -1, FUNC_MACRO);
 
     pSource->SetCompressionType(compressionType);
     opts.setActualAcquireType(TWAINAcquireType_Buffer);
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
-    auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
-	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] 
+    auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
+	DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] 
         { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
     if (pr.first != DTWAIN_NO_ERROR)
     {

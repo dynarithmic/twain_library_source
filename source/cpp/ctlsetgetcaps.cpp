@@ -104,6 +104,7 @@ static std::pair<int, DTWAIN_ARRAY> PerformGetCap(CTL_ITwainSource* pSource,
 		pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     else
 	    pHandle = pSource->GetDTWAINHandle();
+    auto pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
     int errorVal = 0;
     if (overrideDataType == 0xFFFF)
     {
@@ -132,7 +133,7 @@ static std::pair<int, DTWAIN_ARRAY> PerformGetCap(CTL_ITwainSource* pSource,
     if (lContainerType == DTWAIN_CONTONEVALUE)
     {
         retValue = GetOneCapValue<DataType>(pHandle,
-                                       pSource,
+                                       pActualSource,
                                        static_cast<UINT>(lCap),
                                        static_cast<TW_UINT16>(lGetType),
                                        oneCapFlag,
@@ -148,7 +149,7 @@ static std::pair<int, DTWAIN_ARRAY> PerformGetCap(CTL_ITwainSource* pSource,
     else
     {
         bOk = GetMultiCapValues(pHandle,
-                                pSource,
+                                pActualSource,
                                 pDTWAINArray,
                                 eType,
                                 static_cast<UINT>(lCap),
@@ -176,7 +177,7 @@ static bool performSetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT
 {
     bool bOk = false;
     DTWAIN_ARRAY pDTWAINArray = pArray;
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     if (lSetType != DTWAIN_CAPRESET && lSetType != DTWAIN_CAPRESETALL)
     {
         auto tagType = pHandle->m_ArrayFactory->tag_type(pArray);
@@ -290,7 +291,7 @@ bool dynarithmic::GetCapValuesEx2_Internal( CTL_ITwainSource* pSource,
     if (nDataType == DTWAIN_DEFAULT)
     {
         nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<TW_UINT16 >(lCap), pSource);
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0 || nDataType == (std::numeric_limits<int>::min)(); }, nDataType, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return nDataType < 0 || nDataType == (std::numeric_limits<int>::min)(); }, nDataType, false, FUNC_MACRO);
         overrideDataType = false;
     }
     return bRet = GetCapValuesEx_Internal(pSource, static_cast<TW_UINT16>(lCap), lGetType, lContainerType, nDataType, pArray, overrideDataType);
@@ -303,13 +304,13 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
 
     const auto pHandle = pSource->GetDTWAINHandle();
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pArray == nullptr; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pArray == nullptr; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 	switch (lGetType)
 	{
     	case DTWAIN_CAPGETHELP:
 	    case DTWAIN_CAPGETLABEL:
 	    case DTWAIN_CAPGETLABELENUM:
-			DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+			DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 		break;
 	}
 
@@ -328,9 +329,9 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
         overrideDataType = 0xFFFF;
 
     if( !pSource->IsCapNegotiableInState(static_cast<TW_UINT16>(lCap), pSource->GetState()) )
-		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return true;}, DTWAIN_ERR_CAP_INVALIDSTATE, false, FUNC_MACRO);
+		DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return true;}, DTWAIN_ERR_CAP_INVALIDSTATE, false, FUNC_MACRO);
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN || nDataType == 0xFFFF;},
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN || nDataType == 0xFFFF;},
                                         DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
 
 	DTWAIN_ARRAY ThisArray = nullptr;
@@ -357,10 +358,10 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
         lContainerType = GetCapContainer(pSource, lCap, lGetType);
     }
 
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN || nDataType == 0xFFFF; },
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN || nDataType == 0xFFFF; },
 		DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
 
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !IsValidContainerType(static_cast<TW_UINT16>(lContainerType)); },DTWAIN_ERR_BAD_CONTAINER, 
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !IsValidContainerType(static_cast<TW_UINT16>(lContainerType)); },DTWAIN_ERR_BAD_CONTAINER, 
         false, FUNC_MACRO);
 
     std::pair<int, DTWAIN_ARRAY> retVal;
@@ -404,13 +405,13 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
     }
     else
     {
-		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return true;}, DTWAIN_ERR_INVALID_PARAM,false, FUNC_MACRO);
+		DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return true;}, DTWAIN_ERR_INVALID_PARAM,false, FUNC_MACRO);
     }
 
     ThisArray = retVal.second;
     if (!ThisArray)
     {
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return true; }, retVal.first, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return true; }, retVal.first, false, FUNC_MACRO);
     }
 
     if (lCap >= CAP_CUSTOMBASE)
@@ -420,26 +421,26 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
         switch (lGetType)
         {
             case DTWAIN_CAPGET:
-                SetCapabilityInfo<CAPINFO_IDX_GETCONTAINER>(pHandle, pSource, lContainerType, lCap);
+                SetCapabilityInfo<CAPINFO_IDX_GETCONTAINER>(pHandle, reinterpret_cast<DTWAIN_SOURCE>(pSource), lContainerType, lCap);
             break;
             case DTWAIN_CAPGETCURRENT:
-                SetCapabilityInfo<CAPINFO_IDX_GETCURRENTCONTAINER>(pHandle, pSource, lContainerType, lCap);
+                SetCapabilityInfo<CAPINFO_IDX_GETCURRENTCONTAINER>(pHandle, reinterpret_cast<DTWAIN_SOURCE>(pSource), lContainerType, lCap);
             break;
             case DTWAIN_CAPGETDEFAULT:
-                SetCapabilityInfo<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, pSource, lContainerType, lCap);
+                SetCapabilityInfo<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, reinterpret_cast<DTWAIN_SOURCE>(pSource), lContainerType, lCap);
             break;
         }
 
         // Set the data type used
-        SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, pSource, nDataType, lCap);
+        SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, reinterpret_cast<DTWAIN_SOURCE>(pSource), nDataType, lCap);
     }
 
 	// Set the MSG_SETCONSTRAINT to the same container type if using MSG_GET, and the return was successful
     if ( lGetType == MSG_GET )
-	    SetCapabilityInfo<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(pHandle, pSource, lContainerType, lCap);
+	    SetCapabilityInfo<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(pHandle, reinterpret_cast<DTWAIN_SOURCE>(pSource), lContainerType, lCap);
 
     dynarithmic::MoveArray(pHandle, pArray, &ThisArray); 
-    dynarithmic::DumpArrayContents(*pArray, lCap);
+    dynarithmic::DumpArrayContents(*pArray, lCap, false, dynarithmic::IsTwainUIntegralType(static_cast<TW_UINT16>(nDataType)));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -453,6 +454,7 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
 {
     LOG_FUNC_ENTRY_PARAMS((pSource, lCap, lSetType, lContainerType, nDataType, pArray))
     auto pHandle = pSource->GetDTWAINHandle();
+    auto pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
 
 	pHandle->m_lLastError = 0; // Reset the error code here
     bool bOk = false;
@@ -460,8 +462,8 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
 
     if (nDataType == DTWAIN_DEFAULT)
     {
-        nDataType = DTWAIN_GetCapDataType(pSource, static_cast<TW_UINT16 >(lCap));
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0; }, nDataType, false, FUNC_MACRO);
+        nDataType = DTWAIN_GetCapDataType(pActualSource, static_cast<TW_UINT16 >(lCap));
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return nDataType < 0; }, nDataType, false, FUNC_MACRO);
     }
 
     if ( !CTL_CapabilityTriplet::IsCapOperationReset(lSetType) )
@@ -486,7 +488,7 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
         bool isEmpty = false;
         if (isValid)
             isEmpty = (pHandle->m_ArrayFactory->size(pArray) == 0);
-		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !isValid || isEmpty; }, isEmpty?DTWAIN_ERR_EMPTY_ARRAY:DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
+		DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !isValid || isEmpty; }, isEmpty?DTWAIN_ERR_EMPTY_ARRAY:DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
 
         bool bFoundType = false;
 
@@ -502,12 +504,12 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
             if ( it2 != it1->second.end())
                 bFoundType = true;
         }
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bFoundType;}, DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !bFoundType;}, DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
     }
     if( nDataType == 0xFFFF )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN;}, DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN;}, DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
 
     LONG TestContainer;
 
@@ -516,7 +518,7 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
     else
         TestContainer = lContainerType;
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return TestContainer == 0 && !CTL_CapabilityTriplet::IsCapOperationReset(lSetType);}, DTWAIN_ERR_CAPSET_NOSUPPORT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return TestContainer == 0 && !CTL_CapabilityTriplet::IsCapOperationReset(lSetType);}, DTWAIN_ERR_CAPSET_NOSUPPORT, false, FUNC_MACRO);
 
     if( lContainerType == DTWAIN_CONTDEFAULT )
         lContainerType = TestContainer;
@@ -527,9 +529,9 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
     if (lSetType == DTWAIN_CAPSETCONSTRAINT)
         lSetType = MSG_SETCONSTRAINT;
 
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !IsValidContainerType(static_cast<TW_UINT16>(lContainerType)); }, DTWAIN_ERR_BAD_CONTAINER, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !IsValidContainerType(static_cast<TW_UINT16>(lContainerType)); }, DTWAIN_ERR_BAD_CONTAINER, false, FUNC_MACRO);
 
-    DumpArrayContents(pArray, lCap);
+    DumpArrayContents(pArray, lCap, false, dynarithmic::IsTwainUIntegralType(static_cast<TW_UINT16>(nDataType)));
 
     // If the container type has multiple options, we will try each container until we get an ok or we get a failure of all attempts of setting the
     // capability.
@@ -537,19 +539,19 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
     for (auto& containerType : allContainers)
     {
         if (dynarithmic::IsTwainIntegralType(static_cast<TW_UINT16>(nDataType)))
-            bOk = performSetCap<LONG, TW_UINT32>(pHandle, pSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::LongType, CTL_ArrayIntType, nDataType);
+            bOk = performSetCap<LONG, TW_UINT32>(pHandle, pActualSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::LongType, CTL_ArrayIntType, nDataType);
         else
         if (dynarithmic::IsTwainFix32Type(static_cast<TW_UINT16>(nDataType)))
-            bOk = performSetCap<double, double>(pHandle, pSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::DoubleType, CTL_ArrayDoubleType, nDataType);
+            bOk = performSetCap<double, double>(pHandle, pActualSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::DoubleType, CTL_ArrayDoubleType, nDataType);
         else
         if (dynarithmic::IsTwainStringType(static_cast<TW_UINT16>(nDataType)))
             bOk = performSetCap<std::string, std::string, std::string, StringSetCapConverterA>
-                            (pHandle, pSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::StringType, CTL_ArrayANSIStringType, nDataType);
+                            (pHandle, pActualSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::StringType, CTL_ArrayANSIStringType, nDataType);
         else
         if (dynarithmic::IsTwainFrameType(static_cast<TW_UINT16>(nDataType)))
         {
             bOk = performSetCap<TW_FRAME, TW_FRAME, TwainFrameInternal, FrameSetCapConverter>
-            (pHandle, pSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::FrameSingleType, CTL_ArrayDTWAINFrameType /*CTL_ArrayTWFrameType*/, nDataType);
+            (pHandle, pActualSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::FrameSingleType, CTL_ArrayDTWAINFrameType /*CTL_ArrayTWFrameType*/, nDataType);
         }
         if (bOk)
         {
@@ -561,20 +563,20 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
                 {
                     case DTWAIN_CAPSET:
                     case DTWAIN_CAPSETCURRENT:
-                        SetCapabilityInfo<CAPINFO_IDX_SETCONTAINER>(pHandle, pSource, containerType, lCap);
+                        SetCapabilityInfo<CAPINFO_IDX_SETCONTAINER>(pHandle, pActualSource, containerType, lCap);
                     break;
                     case DTWAIN_CAPSETAVAILABLE:
                     case DTWAIN_CAPSETCONSTRAINT:
-                        SetCapabilityInfo<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(pHandle, pSource, containerType, lCap);
+                        SetCapabilityInfo<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(pHandle, pActualSource, containerType, lCap);
                     break;
                 }
-                SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, pSource, nDataType, lCap);
+                SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, pActualSource, nDataType, lCap);
             }
             break; // get out now
         }
     }
 	// Something happened to return FALSE.  Let's make the last TWAIN condition code the last error
-	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] {return !bOk; },
+	DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] {return !bOk; },
         (pHandle->m_lLastError != 0)?pHandle->m_lLastError:DTWAIN_ERR_SETCAP_FAILED, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
     CATCH_BLOCK(false)
@@ -606,7 +608,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap,
     DTWAIN_BOOL bRet = FALSE;
     auto nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<TW_UINT16 >(lCap), pSource);
     if ( nDataType < 0)
-        DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] { return true;} , DTWAIN_ERR_BAD_CAP, false, FUNC_MACRO, false);
+        DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return true;} , DTWAIN_ERR_BAD_CAP, false, FUNC_MACRO, false);
     else
         bRet = dynarithmic::SetCapValuesEx2_Internal(pSource, lCap, lSetType, lContainerType, nDataType, pArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)

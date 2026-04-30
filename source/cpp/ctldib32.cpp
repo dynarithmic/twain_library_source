@@ -24,14 +24,34 @@
 #include <cstring>
 #include <algorithm>
 #include <memory>
-#include <boost/optional.hpp>
+#include <optional>
 #include "winconst.h"
 #include "winbit32.h"
 #include "ctltwainmanager.h"
 #include "ctldib.h"
+#include "ctldib32ex.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
-/* Header signatures for various resources */
+#include "iohandler_bmp.h"
+#include "iohandler_jpeg.h"
+#include "iohandler_jpeg2k.h"
+#include "iohandler_pdf.h"
+#include "iohandler_ps.h"
+#include "iohandler_jpegxr.h"
+#include "iohandler_png.h"
+#include "iohandler_pcx.h"
+#include "iohandler_tga.h"
+#include "iohandler_wmf.h"
+#include "iohandler_psd.h"
+#include "iohandler_gif.h"
+#include "iohandler_ico.h"
+#include "iohandler_wbmp.h"
+#include "iohandler_webp.h"
+#include "iohandler_pbm.h"
+#include "iohandler_text.h"
+#include "iohandler_svg.h"
+
+ /* Header signatures for various resources */
 constexpr auto BFT_ICON = 0x4349   /* 'IC' */;
 constexpr auto BFT_BITMAP = 0x4d42   /* 'BM' */;
 constexpr auto BFT_CURSOR = 0x5450   /* 'PT' */;
@@ -189,7 +209,6 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
 {
     std::unique_ptr<CTL_ImageIOHandler> pHandler;
     ImageInfo.IsPDF = false;
-    ResolvePostscriptOptions(ImageInfo, nFormat);
     ImageInfo.IsBigTiff = dynarithmic::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
     switch (nFormat )
     {
@@ -243,13 +262,15 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         case BigTiffFormatGROUP3:
         case BigTiffFormatGROUP4:
         case BigTiffFormatJPEG:
-        case PSFormatLevel1:
-        case PSFormatLevel2:
-        case PSFormatLevel3:
-            if ( nFormat == PSFormatLevel1 || nFormat == PSFormatLevel2 || nFormat == PSFormatLevel3 )
-                ImageInfo.IsPostscript = true;
             pHandler = std::make_unique<CTL_TiffIOHandler>( this, nFormat, ImageInfo );
         break;
+
+		case PSFormatLevel1:
+		case PSFormatLevel2:
+		case PSFormatLevel3:
+			pHandler = std::make_unique<CTL_PSIOHandler>(this, nFormat, ImageInfo);
+        break;
+
         case TgaFormat:
         case TgaFormatRLE:
             ImageInfo.IsRLE = (nFormat == TWAINFileFormat_TGARLE);
@@ -298,7 +319,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
             DTWAIN_ARRAY a = nullptr;
             const auto pHandle = ImageInfo.theSource->GetDTWAINHandle();
             auto& factory = pHandle->m_ArrayFactory;
-            DTWAIN_GetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
+            DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                                     DTWAIN_CAPGETCURRENT, &a);
             DTWAINArrayLowLevelPtr_RAII raii(pHandle, &a);
             if ( a )
@@ -351,7 +372,6 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
 {
     CTL_ImageIOHandlerPtr pHandler;
     ImageInfo.IsPDF = false;
-    ResolvePostscriptOptions(ImageInfo, nFormat);
     ImageInfo.IsBigTiff = dynarithmic::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
     nStatus = DTWAIN_NO_ERROR;
     switch (nFormat)
@@ -370,12 +390,15 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
         case BigTiffFormatGROUP3MULTI:
         case BigTiffFormatGROUP4MULTI:
         case BigTiffFormatJPEGMULTI:
-        case PSFormatLevel1Multi:
-        case PSFormatLevel2Multi:
-        case PSFormatLevel3Multi:
         case TiffFormatPIXARLOGMULTI:
             pHandler = std::make_shared<CTL_TiffIOHandler>( this, nFormat, ImageInfo );
         break;
+
+		case PSFormatLevel1Multi:
+		case PSFormatLevel2Multi:
+		case PSFormatLevel3Multi:
+			pHandler = std::make_shared<CTL_PSIOHandler>(this, nFormat, ImageInfo);
+		break;
 
         case DcxFormat:
             pHandler = std::make_shared<CTL_PcxIOHandler>( this, nFormat, ImageInfo );
@@ -391,7 +414,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
             // Get the current OCR engine's input format
             DTWAIN_ARRAY a = nullptr;
             const auto pHandle = ImageInfo.theSource->GetDTWAINHandle();
-            DTWAIN_GetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
+            DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                                     DTWAIN_CAPGETCURRENT, &a);
             DTWAINArrayLowLevelPtr_RAII raii(pHandle, &a);
             if ( a )
@@ -515,19 +538,6 @@ int CTL_TwainDib::WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int 
     return nStatus;
 }
 
-void CTL_TwainDib::ResolvePostscriptOptions(const DTWAINImageInfoEx& Info, int &nFormat )
-{
-    if ( !Info.IsPostscript )
-        return;
-
-    if ( Info.IsPostscriptMultipage )
-        nFormat = TiffFormatPACKBITSMULTI;
-    else
-        nFormat = TiffFormatPACKBITS;
-}
-
-
-
 /****************************************************************************
  *                                                                          *
  *  FUNCTION   :  PaletteSize(void * pv)                                *
@@ -583,45 +593,30 @@ int CTL_TwainDib::GetDepth() const
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if ( !hDib )
         return -1;
-    DTWAINGlobalHandle_RAII handler(hDib);
-    const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hDib));
-    const int nDepth = pbi->biBitCount;
-    return nDepth;
+	dynarithmic::dib::LockedDib dibHandle(hDib);
+    return dibHandle.BitsPerPixel();
 }
 
 int CTL_TwainDib::GetBitsPerPixel() const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
-    if (!hDib)
-        return 0;
-    DTWAINGlobalHandle_RAII handler(hDib);
-    const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hDib));
-
-    if (pbi->biSize != sizeof(BITMAPINFOHEADER))
-        return 0;
-
-    return pbi->biBitCount;
+    dynarithmic::dib::LockedDib dibHandle(hDib);
+    return dibHandle.BitsPerPixel();
 }
 
 int CTL_TwainDib::GetWidth() const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
-    if ( !hDib )
-        return -1;
-    DTWAINGlobalHandle_RAII handler(hDib);
-    const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hDib));
-    const int nWid = static_cast<int>(pbi->biWidth);
-   return nWid;
+	dynarithmic::dib::LockedDib dibHandle(hDib);
+	return dibHandle.Width();
 }
 
 
 int CTL_TwainDib::GetHeight() const
 {
    const HANDLE hDib = m_TwainDibInfo.GetDib();
-   DTWAINGlobalHandle_RAII handler(hDib);
-   const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hDib));
-   const int nHeight = static_cast<int>(pbi->biHeight);
-   return nHeight;
+   dynarithmic::dib::LockedDib dibHandle(hDib);
+   return dibHandle.Height();
 }
 
 int CTL_TwainDib::GetResolution() const
@@ -635,6 +630,7 @@ int CTL_TwainDib::GetNumColors()  const
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if ( !hDib )
         return -1;
+	dynarithmic::dib::LockedDib dibHandle(hDib);
     DTWAINGlobalHandle_RAII handler(hDib);
     void  *pv = ImageMemoryHandler::GlobalLock(hDib);
     const int nColors = DibNumColors(pv);
@@ -667,19 +663,17 @@ int CTL_TwainDib::DibNumColors(void *pv)
     return nColors;
 }
 
-boost::optional<DWORD> CTL_TwainDib::GetBitsOffset() const
+std::optional<DWORD> CTL_TwainDib::GetBitsOffset() const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if ( hDib )
     {
-        BYTE* pDib = static_cast<BYTE*>(ImageMemoryHandler::GlobalLock(hDib));
-        DTWAINGlobalHandle_RAII hDibHandler(hDib);
-        const auto pdib = reinterpret_cast<LPBITMAPINFO>(pDib);
-        DWORD offset = sizeof(BITMAPINFOHEADER);
-        offset += pdib->bmiHeader.biClrUsed * sizeof(RGBQUAD);
+        dynarithmic::dib::LockedDib dibHandle(hDib);
+        auto ptr_bits = dibHandle.Bits();
+        DWORD offset = static_cast<DWORD>(static_cast<BYTE*>(ptr_bits) - reinterpret_cast<BYTE*>(dibHandle.HeaderMutable()));
         return offset;
     }
-    return boost::none;
+    return std::nullopt;
 }
 
 int CTL_TwainDib::CropDib(const FloatRect& ActualRect, const FloatRect& RequestedRect,
@@ -820,12 +814,12 @@ int CTL_TwainDib::NormalizeDib()
     return 0;
 }
 
-bool CTL_TwainDib::IsBlankDIB(double threshold) const
+BlankDIBInfo CTL_TwainDib::IsBlankDIB(double threshold) const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if (hDib)
-        return CDibInterface::IsBlankDIB(hDib, threshold) ? true : false;
-    return false;
+        return CDibInterface::IsBlankDIBEx(hDib, threshold);
+    return { false, {-1, -1 } };
 }
 
 HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
@@ -845,11 +839,11 @@ HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
     fileheader.bfType = 'MB';
     const auto lpbi = reinterpret_cast<LPBITMAPINFOHEADER>(pDibData);
     const unsigned int bpp = lpbi->biBitCount;
-    fileheader.bfSize = GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
+    fileheader.bfSize = static_cast<uint32_t>(GlobalSize(hDib) + sizeof(BITMAPFILEHEADER));
     fileheader.bfReserved1 = 0;
     fileheader.bfReserved2 = 0;
     fileheader.bfOffBits = static_cast<DWORD>(sizeof(BITMAPFILEHEADER)) +
-        lpbi->biSize + CDibInterface::CalculateUsedPaletteEntries(bpp) * sizeof(RGBQUAD);
+        lpbi->biSize + dynarithmic::dib::effective_palette_entries(static_cast<uint16_t>(bpp)) * sizeof(RGBQUAD);
 
     // we need to attach the bitmap header info onto the data
     const size_t totalSize = ImageMemoryHandler::GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);

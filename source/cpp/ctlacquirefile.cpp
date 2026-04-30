@@ -92,7 +92,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     // Check for null aFileNames
     if (!aFileNames)
     {
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
     }
 
     // Check if the file format is valid
@@ -119,7 +119,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
 
     const LONG Type = factory->tagtype_to_arraytype(factory->tag_type(aFileNames));
     const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     const auto idx = std::distance(validTypes.begin(), itArrType);
 
     if ( idx > 0 )
@@ -139,7 +139,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     }
 
     // Return error if array is empty or if there are blank entries
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return bRetval != DTWAIN_NO_ERROR; }, bRetval, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return bRetval != DTWAIN_NO_ERROR; }, bRetval, false, FUNC_MACRO);
 
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setFileType(lFileType).setFileFlags(lFileFlags | DTWAIN_USELIST).
                 setFileList(arrayToUse).setPixelType(PixelType).setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).
@@ -174,12 +174,12 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
     // Check for null filename
     if (!lpszFile)
     {
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     }
 
     if (StringWrapper::IsAllSpace(lpszFile))
     {
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BLANKNAMEDETECTED, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BLANKNAMEDETECTED, false, FUNC_MACRO);
     }
 
     // Check if the file format is valid
@@ -244,14 +244,15 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
         opts.setFileFlags(opts.getFileFlags() | DTWAIN_USELIST);
     if ( opts.getAcquireType() != TWAINAcquireType_AudioFile)
         opts.setActualAcquireType(TWAINAcquireType_File);
-    const auto pHandle = static_cast<CTL_ITwainSource*>(opts.getSource())->GetDTWAINHandle();
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+    const auto pHandle = pSource->GetDTWAINHandle();
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
-    auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
-	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
+    auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
+	DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
 	if (pr.first != DTWAIN_NO_ERROR)
 	{
-		CTL_TwainAppMgr::DisableUserInterface(static_cast<CTL_ITwainSource*>(opts.getSource()));
+		CTL_TwainAppMgr::DisableUserInterface(pSource);
 		LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
 	}
     LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
@@ -281,9 +282,9 @@ static std::string GetDirectoryCreationError(CTL_StringViewType fileName)
 bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
-    CTL_ITwainSource *pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
+    CTL_ITwainSource *pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
 
-    DumpArrayContents(opts.getFileList(), 0);
+    DumpArrayContents(opts.getFileList(), 0, false, false);
     #ifdef _UNICODE
         auto vTest = FileListToVector<std::wstring>(opts);
     #else
@@ -316,7 +317,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
                 if (!dynarithmic::directory_writeable(fileName.c_str()))
                 {
                     LogWriterUtils::WriteLogInfoIndentedA(GetDirectoryCreationError(dynarithmic::get_parent_directory(fileName.c_str(), false)));
-                    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return true; }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
+                    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{ return true; }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
                 }
             }
             else
@@ -332,7 +333,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
                     {
                         // directory creation failed for one of the files.  
                         LogWriterUtils::WriteLogInfoIndentedA(GetDirectoryCreationError(testDir));
-                        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
+                        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]
                             { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
                     }
                 }

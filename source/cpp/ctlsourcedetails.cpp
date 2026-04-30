@@ -127,7 +127,7 @@ struct CameraSystemStringFnGetter
 template <typename Fn>
 static void create_stream_from_strings(std::ostringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
 {
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     std::vector<std::string> imageVals;
     DTWAIN_ARRAY arr = Fn::GetAllStringValues(Source, capValue);
     DTWAINArrayPtr_RAII raii(pHandle, &arr);
@@ -152,7 +152,7 @@ static void create_stream_from_strings(std::ostringstream& strm, DTWAIN_SOURCE S
 static std::string get_source_file_types(DTWAIN_SOURCE Source)
 {
     // get all the image file formats
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAIN_ARRAY aFileFormats = nullptr;
     auto bOk = DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aFileFormats);
     if (!bOk || !aFileFormats)
@@ -177,9 +177,10 @@ using pixelMap = std::map<LONG, std::vector<LONG>>;
 static pixelMap get_pixel_bitdepth_info(CTL_ITwainSource* pSource)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
+    DTWAIN_SOURCE pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
     // Get the pixel information
     DTWAIN_ARRAY aPixelTypes = nullptr;
-    DTWAIN_EnumPixelTypes(pSource, &aPixelTypes);
+    DTWAIN_EnumPixelTypes(pActualSource, &aPixelTypes);
     DTWAINArrayPtr_RAII raii(pHandle, &aPixelTypes);
     auto& pixInfo = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aPixelTypes);
     pixelMap pMap;
@@ -188,8 +189,8 @@ static pixelMap get_pixel_bitdepth_info(CTL_ITwainSource* pSource)
         auto iter = pMap.insert({ curPixInfo, {} }).first;
         DTWAIN_ARRAY aBitDepthInfo = nullptr;
         DTWAINArrayPtr_RAII raii2(pHandle, &aBitDepthInfo);
-        DTWAIN_SetPixelType(pSource, curPixInfo, DTWAIN_DEFAULT, TRUE);
-        DTWAIN_EnumBitDepths(pSource, &aBitDepthInfo);
+        DTWAIN_SetPixelType(pActualSource, curPixInfo, DTWAIN_DEFAULT, TRUE);
+        DTWAIN_EnumBitDepths(pActualSource, &aBitDepthInfo);
         if (aBitDepthInfo)
         {
             auto& aBitDepthInfoPtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepthInfo);
@@ -205,7 +206,7 @@ static std::vector<std::string> getNamesFromConstants(CTL_ITwainSource *pSource,
 {
     DTWAIN_ARRAY arr = nullptr;
     const auto pHandle = pSource->GetDTWAINHandle();
-    BOOL bRet = DTWAIN_GetCapValuesEx2(pSource, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+    BOOL bRet = DTWAIN_GetCapValuesEx2(reinterpret_cast<DTWAIN_SOURCE>(pSource), capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
     std::vector<std::string> allNames;
     if (bRet)
     {
@@ -224,7 +225,7 @@ static std::vector<std::string> getDGDATNamesFromConstants(CTL_ITwainSource* pSo
 {
     DTWAIN_ARRAY arr = nullptr;
     const auto pHandle = pSource->GetDTWAINHandle();
-    BOOL bRet = DTWAIN_GetCapValuesEx2(pSource, CAP_SUPPORTEDDATS, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+    BOOL bRet = DTWAIN_GetCapValuesEx2(reinterpret_cast<DTWAIN_SOURCE>(pSource), CAP_SUPPORTEDDATS, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
     std::vector<std::string> allNames;
     if (bRet)
     {
@@ -245,10 +246,11 @@ static std::vector<std::string> getDGDATNamesFromConstants(CTL_ITwainSource* pSo
 static std::vector<std::string> getCompressionNames(CTL_ITwainSource* pSource)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
+    auto pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
     std::set<LONG> compressionSets;
 
     // Enumerate all the file types available for file transfer
-    DTWAIN_ARRAY aFileTypes = DTWAIN_EnumFileXferFormatsEx(pSource);
+    DTWAIN_ARRAY aFileTypes = DTWAIN_EnumFileXferFormatsEx(pActualSource);
     if (!aFileTypes)
         return {};
 
@@ -263,7 +265,7 @@ static std::vector<std::string> getCompressionNames(CTL_ITwainSource* pSource)
     for (auto& fileType : vValues)
     {
         // Call function to enumerate the compressions types for the fileType image type
-        auto allCompressionTypes = DTWAIN_EnumCompressionTypesEx2(pSource, fileType, false);
+        auto allCompressionTypes = DTWAIN_EnumCompressionTypesEx2(pActualSource, fileType, false);
         if (!allCompressionTypes)
             continue;
         DTWAINArrayLowLevel_RAII raii2(pHandle, allCompressionTypes);
@@ -294,7 +296,7 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
     ResInfoMap resMap;
 
     // get units of measure
-    DTWAIN_ARRAY aUnits = DTWAIN_EnumSourceUnitsEx(pSource);
+    DTWAIN_ARRAY aUnits = DTWAIN_EnumSourceUnitsEx(reinterpret_cast<DTWAIN_SOURCE>(pSource));
     DTWAINArrayPtr_RAII raii(pHandle, &aUnits);
     if ( aUnits )
     {
@@ -366,21 +368,22 @@ struct AllCapInfo
 static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
+    auto pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
     AllCapInfo allCapInfo;
     AllCapInfoMap& capInfo = allCapInfo.m_infoMap;
 
     // get the capabilities
-    DTWAIN_ARRAY aAllCaps = DTWAIN_EnumSupportedCapsEx2(pSource);
+    DTWAIN_ARRAY aAllCaps = DTWAIN_EnumSupportedCapsEx2(pActualSource);
     DTWAINArrayPtr_RAII aAllCapsraii(pHandle, &aAllCaps);
     auto& vCapBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aAllCaps);
 
-    DTWAIN_ARRAY aExtendedCaps = DTWAIN_EnumExtendedCapsEx(pSource);
+    DTWAIN_ARRAY aExtendedCaps = DTWAIN_EnumExtendedCapsEx(pActualSource);
     DTWAINArrayPtr_RAII aExtendedraii(pHandle, &aExtendedCaps);
     std::vector<LONG> vExtBuf;
     if ( aExtendedCaps )
         vExtBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aExtendedCaps);
 
-    DTWAIN_ARRAY aCustomCaps = DTWAIN_EnumCustomCapsEx(pSource);
+    DTWAIN_ARRAY aCustomCaps = DTWAIN_EnumCustomCapsEx(pActualSource);
     DTWAINArrayPtr_RAII aCustomraii(pHandle, &aCustomCaps);
     std::vector<LONG> vCustomBuf;
     if ( aCustomCaps)
@@ -520,7 +523,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                 DTWAIN_SOURCE tempSource = DTWAIN_SelectSourceByNameA(curSource.c_str());
                 if (tempSource)
                 {
-                    pCurrentSourcePtr = (CTL_ITwainSource*)tempSource;
+                    pCurrentSourcePtr = reinterpret_cast<CTL_ITwainSource*>(tempSource);
                     bMustClose = true;
                     DTWAIN_OpenSource(tempSource);
                 }
@@ -528,8 +531,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
             else
             {
                 // Source already opened
-                DTWAIN_SOURCE openedSource = iter->second.GetSourceHandle();
-                pCurrentSourcePtr = (CTL_ITwainSource*)openedSource;
+                DTWAIN_SOURCE openedSource = reinterpret_cast<DTWAIN_SOURCE>(iter->second.GetSourceHandle());
+                pCurrentSourcePtr = reinterpret_cast<CTL_ITwainSource*>(openedSource);
             }
         }
 
@@ -686,25 +689,26 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     static constexpr std::array<std::string_view, 11> imageInfoCapsStr = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
                         "\"highlight-values\":", "\"shadow-values\":", "\"threshold-values\":",
                         "\"rotation-values\":", "\"orientation-values\":", "\"overscan-values\":", "\"halftone-values\":", "\"filesystem-camera-values\":" };
+                    DTWAIN_SOURCE pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pCurrentSourcePtr);
                     for (size_t curImageCap = 0; curImageCap < imageInfoCaps.size(); ++curImageCap)
                     {
                         strm.str("");
                         strm << imageInfoCapsStr[curImageCap];
                         if (imageInfoCaps[curImageCap] == ICAP_ORIENTATION)
-                            create_stream<LONG>(strm, pCurrentSourcePtr, ICAP_ORIENTATION, DTWAIN_CONSTANT_TWOR, true);
+                            create_stream<LONG>(strm, pActualSource, ICAP_ORIENTATION, DTWAIN_CONSTANT_TWOR, true);
                         else
                         if (imageInfoCaps[curImageCap] == ICAP_OVERSCAN)
-                            create_stream<LONG>(strm, pCurrentSourcePtr, ICAP_OVERSCAN, DTWAIN_CONSTANT_TWOV, true);
+                            create_stream<LONG>(strm, pActualSource, ICAP_OVERSCAN, DTWAIN_CONSTANT_TWOV, true);
                         else
                         if (imageInfoCaps[curImageCap] == ICAP_HALFTONES)
-                            create_stream_from_strings<DefaultStringFnGetter>(strm, pCurrentSourcePtr, ICAP_HALFTONES);
+                            create_stream_from_strings<DefaultStringFnGetter>(strm, pActualSource, ICAP_HALFTONES);
                         else
                         if ( imageInfoCaps[curImageCap] == SPECIAL_FILESYSTEM)
                         {
-                            create_stream_from_strings<CameraSystemStringFnGetter>(strm, pCurrentSourcePtr, 0);
+                            create_stream_from_strings<CameraSystemStringFnGetter>(strm, pActualSource, 0);
                         }
                         else
-                            create_stream<double>(strm, pCurrentSourcePtr, imageInfoCaps[curImageCap], 0);
+                            create_stream<double>(strm, pActualSource, imageInfoCaps[curImageCap], 0);
                         imageInfoString[curImageCap] = strm.str();
                     }
 
@@ -763,7 +767,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     std::string allFileTypes;
                     for (auto s : fileTypes)
                         allFileTypes += s.data();
-                    std::string customTypes = get_source_file_types(pCurrentSourcePtr); 
+                    std::string customTypes = get_source_file_types(pActualSource); 
                     if (!customTypes.empty())
                     {
                         allFileTypes += "," + customTypes;
@@ -789,18 +793,18 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                             strm << ",";
                         bool value = false;
                         if (deviceInfoCaps[curDevice] == ICAP_EXTIMAGEINFO)
-                            value = DTWAIN_IsExtImageInfoSupported(pCurrentSourcePtr) ? true : false;
+                            value = DTWAIN_IsExtImageInfoSupported(pActualSource) ? true : false;
                         else
                         if (deviceInfoCaps[curDevice] == CAP_FEEDERENABLED)
-                            value = DTWAIN_IsFeederSupported(pCurrentSourcePtr) ? true : false;
+                            value = DTWAIN_IsFeederSupported(pActualSource) ? true : false;
                         else
                         if (deviceInfoCaps[curDevice] == CAP_UICONTROLLABLE)
-                            value = DTWAIN_IsUIControllable(pCurrentSourcePtr) ? true : false;
+                            value = DTWAIN_IsUIControllable(pActualSource) ? true : false;
                         else
                         if (deviceInfoCaps[curDevice] == CAP_PRINTER)
                         {
                             DTWAIN_ARRAY aPrinter = nullptr;
-                            DTWAIN_GetCapValuesEx2(pCurrentSourcePtr, CAP_PRINTER, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aPrinter);
+                            DTWAIN_GetCapValuesEx2(pActualSource, CAP_PRINTER, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aPrinter);
                             DTWAINArrayPtr_RAII aPrinterRaii(pHandle, &aPrinter);
                             if ( aPrinter )
                             {
@@ -811,7 +815,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         else
                         if (deviceInfoCaps[curDevice] == CAP_JOBCONTROL)
                         {
-                            auto vValue = DTWAIN_EnumJobControlsEx(pCurrentSourcePtr);
+                            auto vValue = DTWAIN_EnumJobControlsEx(pActualSource);
                             DTWAINArrayPtr_RAII aJob(pHandle, &vValue);
                             if (vValue)
                             {
@@ -823,10 +827,10 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         if ( deviceInfoCaps[curDevice] == 0)
                         {
                             // This is a place holder for file system support
-                            value = DTWAIN_IsFileSystemSupported(pCurrentSourcePtr);
+                            value = DTWAIN_IsFileSystemSupported(pActualSource);
                         }
                         else
-                            value = DTWAIN_IsCapSupported(pCurrentSourcePtr, deviceInfoCaps[curDevice]) ? true : false;
+                            value = DTWAIN_IsCapSupported(pActualSource, deviceInfoCaps[curDevice]) ? true : false;
                         strm << deviceInfoCapsStr[curDevice] << (value ? "true" : "false");
                         deviceInfoString[curDevice] = strm.str();
                     }

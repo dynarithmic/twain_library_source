@@ -80,7 +80,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePeekMessageLoop(DTWAIN_SOURCE Source, BOOL
     auto pS = pSource;
 
     // Cannot change TWAIN message loop implementation while acquiring images
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pS->IsTwainLoopStarted(); },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pS->IsTwainLoopStarted(); },
                                         DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
     pSource->SetUsePeekMessage(bSet);
@@ -117,13 +117,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source)
 }
 
 
-std::pair<int, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts)
+std::pair<int, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(CTL_ITwainSource* pSource, SourceAcquireOptions& opts)
 {
-    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
     if (!pSource)
         return { false, -1 };
 
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    const auto pHandle = pSource->GetDTWAINHandle();
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return { true, 0 };
 

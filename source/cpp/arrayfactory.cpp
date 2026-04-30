@@ -42,8 +42,8 @@ namespace dynarithmic
             return;
         if (!(TypeDest == CTL_ArrayFactory::arrayTag::StringType || TypeDest == CTL_ArrayFactory::arrayTag::WStringType))
             return;
-        const auto theSourceTag = static_cast<CTL_ArrayFactory::arrayTag*>(ArraySource);
-        const auto theDestTag = static_cast<CTL_ArrayFactory::arrayTag*>(ArrayDest);
+        const auto theSourceTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArraySource));
+        const auto theDestTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArrayDest));
         auto& vSource = factory->underlying_container_t<typename ArraySourceT::value_type>(theSourceTag);
         for (auto& str : vSource)
         {
