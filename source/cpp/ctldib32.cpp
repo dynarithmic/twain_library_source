@@ -670,7 +670,7 @@ std::optional<DWORD> CTL_TwainDib::GetBitsOffset() const
     {
         dynarithmic::dib::LockedDib dibHandle(hDib);
         auto ptr_bits = dibHandle.Bits();
-        DWORD offset = static_cast<BYTE*>(ptr_bits) - reinterpret_cast<BYTE*>(dibHandle.HeaderMutable());
+        DWORD offset = static_cast<DWORD>(static_cast<BYTE*>(ptr_bits) - reinterpret_cast<BYTE*>(dibHandle.HeaderMutable()));
         return offset;
     }
     return std::nullopt;
@@ -839,11 +839,11 @@ HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
     fileheader.bfType = 'MB';
     const auto lpbi = reinterpret_cast<LPBITMAPINFOHEADER>(pDibData);
     const unsigned int bpp = lpbi->biBitCount;
-    fileheader.bfSize = GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
+    fileheader.bfSize = static_cast<uint32_t>(GlobalSize(hDib) + sizeof(BITMAPFILEHEADER));
     fileheader.bfReserved1 = 0;
     fileheader.bfReserved2 = 0;
     fileheader.bfOffBits = static_cast<DWORD>(sizeof(BITMAPFILEHEADER)) +
-        lpbi->biSize + dynarithmic::dib::effective_palette_entries(bpp) * sizeof(RGBQUAD);
+        lpbi->biSize + dynarithmic::dib::effective_palette_entries(static_cast<uint16_t>(bpp)) * sizeof(RGBQUAD);
 
     // we need to attach the bitmap header info onto the data
     const size_t totalSize = ImageMemoryHandler::GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
