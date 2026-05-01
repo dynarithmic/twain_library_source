@@ -36,7 +36,8 @@ CTL_ImageIOHandler::CTL_ImageIOHandler() :
 {
 }
 
-CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): pMultiDibData(nullptr), m_nPage(0), m_bOnePageWritten(false)
+CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): pMultiDibData(nullptr), m_nPage(0), m_bOnePageWritten(false),
+                                        m_sCopyright(GetResourceStringFromMap(IDS_DTWAIN_APPTITLE))
 {
     m_pDib = pDib;
 }
