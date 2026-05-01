@@ -391,7 +391,6 @@ bool WebPSessionWriter::AddMetadataWithMux(const std::vector<uint8_t>& encodedIm
 /////////////////////////////////////////////////////////////
 // ============================================================
 // DTWAIN-style wrapper
-// Model B for WebP:
 //   FirstPage = open + write image
 //   LastPage  = close
 // ============================================================

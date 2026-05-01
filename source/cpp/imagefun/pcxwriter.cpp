@@ -52,7 +52,7 @@ std::optional<PreparedPcxDibPage> PcxSessionWriter::MakePreparedPcxDibPage(const
 			page.pixelFlavor = PcxPixelFlavor::Bgr24;
 			break;
 		default:
-			return page;
+			return std::nullopt;
 	}
 	return page;
 }

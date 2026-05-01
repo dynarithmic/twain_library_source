@@ -129,7 +129,6 @@ class PsdSessionWriter
 
 // ============================================================
 // DTWAIN-style wrapper
-// Model B for PSD:
 //   FirstPage = open + write image
 //   LastPage  = close
 // ============================================================

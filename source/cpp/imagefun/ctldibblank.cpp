@@ -137,20 +137,6 @@ namespace
 		return 1 << bih->biBitCount;
 	}
 
-	/*const BYTE* GetBitsPtr(const BITMAPINFOHEADER* bih)
-	{
-		const int paletteEntries = GetAllPaletteEntries(bih);
-		const BYTE* p = reinterpret_cast<const BYTE*>(bih) + bih->biSize;
-		p += paletteEntries * sizeof(RGBQUAD);
-		return p;
-	}
-
-	const DWORD* GetBitfieldsPtr(const BITMAPINFOHEADER* bih)
-	{
-		return reinterpret_cast<const DWORD*>(
-			reinterpret_cast<const BYTE*>(bih) + bih->biSize);
-	}*/
-
 	bool MakeDibContext(const BITMAPINFOHEADER* bih, DibContext& ctx)
 	{
 		if (!IsSupportedHeader(bih))

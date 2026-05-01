@@ -136,7 +136,6 @@ private:
 
 // ============================================================
 // DTWAIN-style wrapper
-// Model B for TGA:
 //   FirstPage = open + write image
 //   LastPage  = close
 // ============================================================

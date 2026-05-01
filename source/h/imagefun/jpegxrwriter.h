@@ -82,12 +82,6 @@ struct JxrSessionOptions
 
 // ============================================================
 // Small RAII helpers for jxrlib glue objects
-//
-// NOTE:
-// The exact object / function names in your local jxrlib snapshot may differ
-// slightly. The adapter below is written for the common JXRGlue-style API.
-// If your build uses slightly different helpers, changes should stay localized
-// to this section.
 // ============================================================
 namespace dynarithmic::jxr_adapter
 {
@@ -199,7 +193,6 @@ class JxrSessionWriter
 
 // ============================================================
 // DTWAIN-style wrapper
-// Model B for JPEG-XR:
 //   FirstPage = open + write image
 //   LastPage  = close
 // ============================================================

@@ -123,7 +123,6 @@ class WebPSessionWriter
 
 // ============================================================
 // DTWAIN-style wrapper
-// Model B for WebP:
 //   FirstPage = open + write image
 //   LastPage  = close
 // ============================================================

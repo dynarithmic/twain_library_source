@@ -93,7 +93,6 @@ private:
 
 // ============================================================
 // Optional DTWAIN-style wrapper
-// Model B for BMP:
 //   FirstPage = open + write image
 //   LastPage  = close
 // ============================================================
