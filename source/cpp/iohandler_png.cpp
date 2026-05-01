@@ -57,10 +57,7 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
     PngSessionOptions sessionOptions;
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-    sessionOptions.text.copyright = commentStr;
+    sessionOptions.text.copyright = GetCopyrightString();
 
 	PngSessionWriter writer;
 

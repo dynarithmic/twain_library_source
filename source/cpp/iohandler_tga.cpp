@@ -68,10 +68,7 @@ int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 	TgaSessionOptions opts{};
     opts.useRle = m_ImageInfoEx.IsRLE;
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-	opts.comment = commentStr;
+	opts.comment = GetCopyrightString();
 
 	if (!WriteOneDibHandleToTga(fName, opts, hDib))
 		return DTWAIN_ERR_FILEWRITE;

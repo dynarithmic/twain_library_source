@@ -162,10 +162,7 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
         // If first page or if single page TIFF, write first page
         const std::wstring fnameW = StringConversion::Convert_NativePtr_To_Wide(path);
 
-        // Get the comment string (copyright information)
-    	char commentStr[256] = {};
-		GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-        tiffOptions.software = commentStr;
+        tiffOptions.software = ptrTiffHandler->GetCopyrightString();
 
         // These on handlers should return a pair {true/false, error_return_code}
         auto writeRetValue = outputHandler.OnFirstPage(fnameW, tiffOptions, theDibPage, tiffPageSettings);

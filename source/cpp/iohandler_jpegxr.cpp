@@ -64,13 +64,10 @@ int CTL_JpegXRIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
     if (!IsValidBitDepth(DTWAIN_JPEGXR, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
 	JxrSessionOptions opts{};
 	opts.lossless = false;
 	opts.quality = (std::max)(0.0f, (std::min)(1.0f, m_ImageInfoEx.nJpegXRQuality / 100.0f));
-    opts.text.comment = commentStr;
+    opts.text.comment = GetCopyrightString();
 	opts.progressive = m_ImageInfoEx.bProgressiveJpegXR;
 
 	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);

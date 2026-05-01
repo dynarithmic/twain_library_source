@@ -43,9 +43,9 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (pMultiPageStruct && pMultiPageStruct->Stage != DIB_MULTI_LAST && !IsValidBitDepth(DTWAIN_PCX, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    bool bIsFirstPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_FIRST);
-    bool bIsLastPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
-    bool isDCX = (m_nFormat == DTWAIN_DCX);
+    const bool bIsFirstPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_FIRST);
+    const bool bIsLastPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
+    const bool isDCX = (m_nFormat == DTWAIN_DCX);
 
     std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
 

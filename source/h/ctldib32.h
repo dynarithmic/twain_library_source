@@ -70,12 +70,14 @@ namespace dynarithmic
             CTL_TwainDib* GetDib() const { return m_pDib; }
             static bool IsValidBitDepth(LONG FileType, LONG bitDepth);
             static auto& GetSupportedBPPMap() { return s_supportedBitDepths; }
+            const std::string& GetCopyrightString() const { return m_sCopyright; }
 
         protected:
             CTL_TwainDib *m_pDib;
             DTWAINImageInfoEx m_ImageInfo;
             std::shared_ptr<DibMultiPageData> pMultiDibData;
             DibMultiPageStruct m_DibMultiPageStruct;
+            std::string m_sCopyright;
             unsigned m_nPage;
             bool m_bOnePageWritten;
             static boost::container::flat_map<LONG, std::vector<uint16_t>> s_supportedBitDepths;

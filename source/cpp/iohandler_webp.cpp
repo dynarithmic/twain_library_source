@@ -65,10 +65,7 @@ int CTL_WebpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 	opts.method = 4;
 	opts.exact = false;
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-	opts.text.copyright = commentStr;
+	opts.text.copyright = GetCopyrightString();
 
 	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 

@@ -61,11 +61,7 @@ int CTL_WmfIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     else
         opts.type = MetafileType::Emf;
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-
-    opts.description = StringConversion::Convert_AnsiPtr_To_Wide(commentStr);
+    opts.description = StringConversion::Convert_Ansi_To_Wide(GetCopyrightString());
     std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
     auto retval = WriteOneDibHandleToMetafile(sFileName, m_pDib->GetHandle(), opts);
     if (!retval)

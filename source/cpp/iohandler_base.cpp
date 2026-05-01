@@ -21,14 +21,19 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "ctlloadresources.h"
 
 using namespace dynarithmic;
 
 boost::container::flat_map<LONG, std::vector<uint16_t>> CTL_ImageIOHandler::s_supportedBitDepths;
 
-CTL_ImageIOHandler::CTL_ImageIOHandler() : pMultiDibData(nullptr), m_nPage(0), m_bOnePageWritten(false)
+CTL_ImageIOHandler::CTL_ImageIOHandler() : 
+    pMultiDibData(nullptr), 
+    m_nPage(0), 
+    m_bOnePageWritten(false), 
+    m_pDib(nullptr),
+    m_sCopyright(GetResourceStringFromMap(IDS_DTWAIN_APPTITLE))
 {
-    m_pDib = nullptr;
 }
 
 CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): pMultiDibData(nullptr), m_nPage(0), m_bOnePageWritten(false)
