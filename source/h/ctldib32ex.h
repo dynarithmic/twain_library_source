@@ -193,7 +193,6 @@ namespace dynarithmic
                         LONG SourceUnit, LONG DestUnit, int dpi,
                         int flags);
 
-            int ResampleDib(const FloatRect& ResampleRect, int flags);
             int ResampleDib(double xscale, double yscale);
 
             // Increase bpp
@@ -229,6 +228,8 @@ namespace dynarithmic
             static int         DibNumColors(void* pv);
             void        Init();
             void        SetEqual(const CTL_TwainDib& rDib);
+            bool        IncreaseBppImpl(unsigned long bpp, bool bIncrease);
+
 
         private:
             CTL_TwainDibInfo m_TwainDibInfo;

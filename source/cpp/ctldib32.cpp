@@ -709,62 +709,34 @@ bool CTL_TwainDib::IsGrayScale() const
     return false;
 }
 
+bool CTL_TwainDib::IncreaseBppImpl(unsigned long bpp, bool bIncrease)
+{
+	if (bpp == static_cast<unsigned long>(GetDepth()))
+		return true;
+
+	const HANDLE hDib = m_TwainDibInfo.GetDib();
+	if (hDib)
+	{
+		HANDLE hNewDib = CDibInterface::IncreaseDecreaseBpp(hDib, bpp, bIncrease);
+		if (hNewDib)
+		{
+			m_TwainDibInfo.DeleteDib();
+			m_TwainDibInfo.SetDib(hNewDib);
+			return true;
+		}
+	}
+	return false;
+}
+
 bool CTL_TwainDib::IncreaseBpp(unsigned long bpp)
 {
-    if ( bpp == static_cast<unsigned long>(GetDepth()))
-        return true;
-
-    const HANDLE hDib = m_TwainDibInfo.GetDib();
-    if (hDib)
-    {
-        HANDLE hNewDib = CDibInterface::IncreaseBpp(hDib, bpp);
-        if ( hNewDib )
-        {
-            m_TwainDibInfo.DeleteDib();
-            m_TwainDibInfo.SetDib(hNewDib);
-            return true;
-        }
-    }
-    return false;
+    return IncreaseBppImpl(bpp, true);
 }
 
 bool CTL_TwainDib::DecreaseBpp(unsigned long bpp)
 {
-    if ( bpp == static_cast<unsigned long>(GetDepth()))
-        return true;
-
-    const HANDLE hDib = m_TwainDibInfo.GetDib();
-    if (hDib)
-    {
-        HANDLE hNewDib = CDibInterface::DecreaseBpp(hDib, bpp);
-        if ( hNewDib )
-        {
-            m_TwainDibInfo.DeleteDib();
-            m_TwainDibInfo.SetDib(hNewDib);
-            return true;
-        }
-    }
-    return false;
+	return IncreaseBppImpl(bpp, false);
 }
-
-int CTL_TwainDib::ResampleDib(const FloatRect& ResampleRect, int flags)
-{
-    const HANDLE hDib = m_TwainDibInfo.GetDib();
-    if (hDib)
-    {
-        HANDLE hNewDib= nullptr;
-        if ( flags & CTL_ITwainSource::RESIZE_FLAG)
-            hNewDib = CDibInterface::ResampleDIB(hDib, static_cast<long>(ResampleRect.left), static_cast<long>(ResampleRect.top));
-        if ( hNewDib )
-        {
-            m_TwainDibInfo.DeleteDib();
-            m_TwainDibInfo.SetDib(hNewDib);
-            return 1;
-        }
-    }
-    return 0;
-}
-
 
 int CTL_TwainDib::ResampleDib(double xscale, double yscale)
 {
