@@ -71,6 +71,7 @@ namespace dynarithmic
             static bool IsValidBitDepth(LONG FileType, LONG bitDepth);
             static auto& GetSupportedBPPMap() { return s_supportedBitDepths; }
             const std::string& GetCopyrightString() const { return m_sCopyright; }
+            int WriteBitmapImpl(LPCTSTR szFile, int nFormat, bool bOpenFile, int fh, DibMultiPageStruct* pMultiDibStruct = nullptr);
 
         protected:
             CTL_TwainDib *m_pDib;

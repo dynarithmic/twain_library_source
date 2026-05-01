@@ -57,13 +57,7 @@ CTL_JpegXRIOHandler::CTL_JpegXRIOHandler(CTL_TwainDib* pDib, const DTWAINImageIn
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CTL_JpegXRIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_JPEGXR, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
-
+    HANDLE hDib = m_pDib->GetHandle();
 	JxrSessionOptions opts{};
 	opts.lossless = false;
 	opts.quality = (std::max)(0.0f, (std::min)(1.0f, m_ImageInfoEx.nJpegXRQuality / 100.0f));

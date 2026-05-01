@@ -52,12 +52,7 @@ static std::pair<bool, int> SaveBMPRLE(LPCTSTR szFile, HANDLE hDib)
 
 int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if ( !IsValidBitDepth(DTWAIN_BMP, m_pDib->GetBitsPerPixel()))
-            return DTWAIN_ERR_INVALID_BITDEPTH;
+    HANDLE hDib = m_pDib->GetHandle();
 
     if (m_ImageInfoEx.IsRLE)
     {

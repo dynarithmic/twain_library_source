@@ -211,7 +211,7 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
                                                     false, 0, nStatus);
     else
     if ( MultipageOption == DIB_MULTI_NEXT)
-        pCurDib->WriteNextPageDibMulti(pHandler, nStatus, ImageInfo);
+        pCurDib->WriteNextPageDibMulti(pHandler, acquireFileStatus.GetAcquireFileFormat(), nStatus, ImageInfo);
     if ( nStatus != 0 )
     {
         SendFileAcquireError(m_pSource, m_pSession,

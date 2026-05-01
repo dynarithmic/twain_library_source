@@ -43,12 +43,7 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
         }
     };
 
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_PNG, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
+    HANDLE hDib = m_pDib->GetHandle();
 
 	LockedDibPage lockedPage(hDib);
 	if (!lockedPage.IsValid())

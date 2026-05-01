@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlloadresources.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 
@@ -33,14 +34,12 @@ CTL_ImageIOHandler::CTL_ImageIOHandler() :
     m_bOnePageWritten(false), 
     m_pDib(nullptr),
     m_sCopyright(GetResourceStringFromMap(IDS_DTWAIN_APPTITLE))
-{
-}
+{}
 
-CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): pMultiDibData(nullptr), m_nPage(0), m_bOnePageWritten(false),
+CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): pMultiDibData(nullptr), m_nPage(0), m_bOnePageWritten(false), 
+                                        m_pDib(pDib),
                                         m_sCopyright(GetResourceStringFromMap(IDS_DTWAIN_APPTITLE))
-{
-    m_pDib = pDib;
-}
+{}
 
 void CTL_ImageIOHandler::SetMultiDibInfo(const DibMultiPageStruct &s)
 {
@@ -62,4 +61,15 @@ bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
             return false;
     }
     return true;
+}
+
+int CTL_ImageIOHandler::WriteBitmapImpl(LPCTSTR szFile, int nFormat, bool bOpenFile, int fh, DibMultiPageStruct* pMultiDibStruct/* = nullptr*/)
+{
+	if (!m_pDib || !m_pDib->GetHandle())
+		return DTWAIN_ERR_DIB;
+
+	if (!IsValidBitDepth(nFormat, m_pDib->GetBitsPerPixel()))
+		return DTWAIN_ERR_INVALID_BITDEPTH;
+
+    return WriteBitmap(szFile, bOpenFile, fh, pMultiDibStruct);
 }

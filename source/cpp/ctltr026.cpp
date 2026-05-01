@@ -1130,7 +1130,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
                     pHandler = CurDib->WriteFirstPageDibMulti(ImageInfo, strTempFile.c_str(),
                                                                acquireFileStatus.GetAcquireFileFormat(), false, 0, retval);
                 else
-                    CurDib->WriteNextPageDibMulti(pHandler, retval, ImageInfo);
+                    CurDib->WriteNextPageDibMulti(pHandler, acquireFileStatus.GetAcquireFileFormat(), retval, ImageInfo);
             }
 
             if ( retval != 0)

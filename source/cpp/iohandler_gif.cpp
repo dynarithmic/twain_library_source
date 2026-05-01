@@ -28,9 +28,6 @@ using namespace dynarithmic;
 
 int CTL_GifIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-    if (!IsValidBitDepth(DTWAIN_GIF, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
-
     GifSessionOptions opts;
 	opts.text.software = GetCopyrightString();
 

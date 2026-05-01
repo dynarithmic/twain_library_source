@@ -42,11 +42,6 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
 
     if ( isFirstPage )
     {
-        const int bitdepth = m_pDib->GetDepth();
-
-        if (!IsValidBitDepth(DTWAIN_PS_ENCAPSULATED, bitdepth))
-            return DTWAIN_ERR_INVALID_BITDEPTH;
-
 		LockedDibPage page(m_pDib->GetHandle());
 		if (!page.IsValid())
 			return DTWAIN_ERR_FILEWRITE;

@@ -51,13 +51,7 @@ static bool WriteOneDibHandleToJpeg(const std::wstring& filename,const JpegSessi
 
 int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-    HANDLE hDib = {};
-    if ( !m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if ( !IsValidBitDepth(DTWAIN_JPEG, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
-
+    HANDLE hDib = m_pDib->GetHandle();
     JpegSessionOptions opts{};
     opts.quality = m_ImageInfoEx.IsPDF ? m_ImageInfoEx.nPDFJpegQuality : m_ImageInfoEx.nJpegQuality;
 	opts.progressive = m_ImageInfoEx.bProgressiveJpeg;

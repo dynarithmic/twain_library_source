@@ -181,8 +181,7 @@ namespace dynarithmic
             // Write a multi-page DIB file
             CTL_ImageIOHandlerPtr WriteFirstPageDibMulti(DTWAINImageInfoEx& ImageInfo, LPCTSTR szFile, int nFormat,
                                                         bool bOpenFile, int fhFile, int &nStatus);
-            int WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus,
-                                      const DTWAINImageInfoEx& ImageInfo);
+            int WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int nFormat, int &nStatus, const DTWAINImageInfoEx& ImageInfo);
             static int WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus, bool bSaveFile=true);
 
 

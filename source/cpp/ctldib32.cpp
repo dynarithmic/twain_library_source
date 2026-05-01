@@ -349,7 +349,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
     try
     {
         pHandler->SetBaseImageInfo(ImageInfo);
-        bRet = pHandler->WriteBitmap( szFile, bOpenFile, fhFile );
+        bRet = pHandler->WriteBitmapImpl( szFile, nFormat, bOpenFile, fhFile );
     }
     catch(...)
     {
@@ -446,7 +446,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
 
     try
     {
-        nStatus = pHandler->WriteBitmap( szFile, bOpenFile, fhFile, &s );
+        nStatus = pHandler->WriteBitmapImpl( szFile, nFormat, bOpenFile, fhFile, &s );
     }
     catch(...)
     {
@@ -464,7 +464,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
 }
 
 
-int CTL_TwainDib::WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus,
+int CTL_TwainDib::WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int nFormat, int &nStatus,
                                         const DTWAINImageInfoEx& ImageInfo)
 {
     nStatus = DTWAIN_ERR_BADPARAM;
@@ -478,7 +478,7 @@ int CTL_TwainDib::WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int 
         pImgHandler->SetImageInfo(ImageInfo);
         try
         {
-            nStatus = pImgHandler->WriteBitmap(s2.strName.c_str(), false, 0, &s2);
+            nStatus = pImgHandler->WriteBitmapImpl(s2.strName.c_str(), nFormat, false, 0, &s2);
         }
         catch(...)
         {

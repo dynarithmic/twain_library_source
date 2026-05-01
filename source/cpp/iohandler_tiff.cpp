@@ -43,9 +43,9 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     bool isLastPage =  (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
     bool isWriteablePage = isFirstPage || !isLastPage;
 
-	if (isWriteablePage && m_pDib && !IsValidBitDepth(m_nFormat, m_pDib->GetBitsPerPixel()))
+/*	if (isWriteablePage && m_pDib && !IsValidBitDepth(m_nFormat, m_pDib->GetBitsPerPixel()))
 		return DTWAIN_ERR_INVALID_BITDEPTH;
-
+        */
     sActualFileName = szFile;
     if (isFirstPage)
     {
