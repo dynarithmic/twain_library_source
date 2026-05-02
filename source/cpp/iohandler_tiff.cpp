@@ -26,11 +26,179 @@
 #include "tiff.h"
 #include "logwriterutils.h"
 #include "iohandler_tiff.h"
-#include "tiffun32.h"
 #include "ctldib32ex.h"
 
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static constexpr TiffCompression TranslateCompression(int nCompression)
+{
+	switch (nCompression)
+	{
+		case COMPRESSION_NONE: return TiffCompression::None;
+		case COMPRESSION_CCITTFAX3: return TiffCompression::Group3;
+		case COMPRESSION_CCITTFAX4: return TiffCompression::Group4;
+		case COMPRESSION_LZW: return TiffCompression::Lzw;
+		case COMPRESSION_ADOBE_DEFLATE: return TiffCompression::Flate;
+		case COMPRESSION_PACKBITS: return TiffCompression::PackBits;
+		case COMPRESSION_JPEG:     return TiffCompression::Jpeg;
+	}
+	return TiffCompression::None;
+}
+
+static constexpr std::pair<int, int> ProcessCompressionType(int nFormat)
+{
+	switch (nFormat)
+	{
+	    case CTL_TwainDib::TiffFormatLZW:
+	    case CTL_TwainDib::TiffFormatLZWMULTI:
+	    case CTL_TwainDib::BigTiffFormatLZW:
+	    case CTL_TwainDib::BigTiffFormatLZWMULTI:
+            return { true, COMPRESSION_LZW };
+
+	    case CTL_TwainDib::TiffFormatNONE:
+	    case CTL_TwainDib::TiffFormatNONEMULTI:
+	    case CTL_TwainDib::BigTiffFormatNONE:
+	    case CTL_TwainDib::BigTiffFormatNONEMULTI:
+            return { true, COMPRESSION_NONE };
+
+	    case CTL_TwainDib::TiffFormatGROUP3:
+	    case CTL_TwainDib::TiffFormatGROUP3MULTI:
+	    case CTL_TwainDib::BigTiffFormatGROUP3:
+	    case CTL_TwainDib::BigTiffFormatGROUP3MULTI:
+    		return { true, COMPRESSION_CCITTFAX3 };
+
+	    case CTL_TwainDib::TiffFormatGROUP4:
+	    case CTL_TwainDib::TiffFormatGROUP4MULTI:
+	    case CTL_TwainDib::BigTiffFormatGROUP4:
+	    case CTL_TwainDib::BigTiffFormatGROUP4MULTI:
+            return { true, COMPRESSION_CCITTFAX4 };
+
+	    case CTL_TwainDib::TiffFormatPACKBITS:
+	    case CTL_TwainDib::TiffFormatPACKBITSMULTI:
+	    case CTL_TwainDib::BigTiffFormatPACKBITS:
+	    case CTL_TwainDib::BigTiffFormatPACKBITSMULTI:
+            return { true, COMPRESSION_PACKBITS };
+
+	    case CTL_TwainDib::TiffFormatDEFLATE:
+	    case CTL_TwainDib::TiffFormatDEFLATEMULTI:
+	    case CTL_TwainDib::BigTiffFormatDEFLATE:
+	    case CTL_TwainDib::BigTiffFormatDEFLATEMULTI:
+            return { true, COMPRESSION_ADOBE_DEFLATE };
+
+	    case CTL_TwainDib::TiffFormatJPEG:
+	    case CTL_TwainDib::TiffFormatJPEGMULTI:
+	    case CTL_TwainDib::BigTiffFormatJPEG:
+	    case CTL_TwainDib::BigTiffFormatJPEGMULTI:
+            return { true, COMPRESSION_JPEG };
+
+	    case CTL_TwainDib::TiffFormatPIXARLOG:
+	    case CTL_TwainDib::TiffFormatPIXARLOGMULTI:
+            return { true, COMPRESSION_PIXARLOG };
+	}
+    return { false, DTWAIN_ERR_INVALID_BITDEPTH };
+}
+
+int CTL_TiffIOHandler::WriteOneTiffPage(LPCTSTR path, HANDLE bitmap, const DibMultiPageStruct* multiPageStruct)
+{
+	auto& outputHandler = GetOutputHandler();
+
+	// Check if this is first page of multi-page TIFF or
+	// if only a single page TIFF
+
+	// Last page, which only signals that TIFF file is to be closed
+	if (multiPageStruct && multiPageStruct->Stage == DIB_MULTI_LAST)
+	{
+		outputHandler.OnLastPage();
+		return DTWAIN_NO_ERROR;
+	}
+
+	SetPageWriteStatus(m_nFormat, multiPageStruct ? multiPageStruct->Stage : 0);
+
+	// If we get here, then a TIFF page will be produced and appended
+	TiffSessionOptions tiffOptions;
+
+	// Set the big tiff option if this is a big TIFF file
+	if (dynarithmic::IsFileTypeBigTiff(static_cast<CTL_TwainFileFormatEnum>(GetTiffFormat())))
+		tiffOptions.containerFormat = TiffContainerFormat::BigTiff;
+
+	// Get the DIB
+	LockedDibPage lockedPage(bitmap);
+
+	// Get a reference to the DIB
+	auto pageInfo = TiffSessionWriter::MakePreparedTiffDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+	auto& theDibPage = pageInfo.value();
+
+	// Get the bits-per-pixel
+	auto bpp = theDibPage.bitsPerPixel;
+
+	// Get the page settings
+	TiffPageSettings tiffPageSettings;
+
+	// Check if the compression is supported (this should always work)
+	auto retVal = ProcessCompressionType(m_nFormat);
+	if (!retVal.first)
+		return retVal.second;
+
+	// Convert the compression to one the TiffWriter knows about
+	tiffPageSettings.compression = TranslateCompression(retVal.second);
+
+	// Now go through the special Group 3/4 options
+	bool isGroup3Or4Compression = (tiffPageSettings.compression == TiffCompression::Group3 ||
+		tiffPageSettings.compression == TiffCompression::Group4);
+
+	if (bpp == 1)
+	{
+		if (!isGroup3Or4Compression)
+		{
+			tiffPageSettings.bilevelPhotometric = static_cast<uint16_t>(m_ImageInfoEx.PhotoMetric);
+			tiffPageSettings.forceFillOrder = true;
+			tiffPageSettings.forcedFillOrder = FILLORDER_MSB2LSB;
+		}
+		else
+		{
+			tiffPageSettings.bilevelPhotometric = PHOTOMETRIC_MINISWHITE;
+			tiffPageSettings.forceFillOrder = true;
+			tiffPageSettings.forcedFillOrder = FILLORDER_MSB2LSB;
+		}
+	}
+
+	tiffPageSettings.invertImage = (m_ImageInfoEx.PhotoMetric == PHOTOMETRIC_MINISWHITE) ? true : false;
+
+	// Set the JPEG quality
+	tiffPageSettings.jpegQuality = m_ImageInfoEx.nJpegQuality;
+
+	if (!multiPageStruct || multiPageStruct->Stage == 0 || multiPageStruct->Stage == DIB_MULTI_FIRST)
+	{
+		// If first page or if single page TIFF, write first page
+		const std::wstring fnameW = StringConversion::Convert_NativePtr_To_Wide(path);
+
+		tiffOptions.software = GetCopyrightString();
+
+		// These on handlers should return a pair {true/false, error_return_code}
+		auto writeRetValue = outputHandler.OnFirstPage(fnameW, tiffOptions, theDibPage, tiffPageSettings);
+		if (!writeRetValue.first)
+			return writeRetValue.second;
+
+		if (!multiPageStruct || multiPageStruct->Stage == 0)
+		{
+			// These on handlers should return a pair {true/false, error_return_code}
+			writeRetValue = outputHandler.OnLastPage();
+			return writeRetValue.second;
+		}
+	}
+	else
+	{
+		// Write subsequent page
+		// These on handlers should return a pair {true/false, error_return_code}
+		auto writeRetValue = outputHandler.OnNextPage(theDibPage, tiffPageSettings);
+		return writeRetValue.second;
+	}
+	return DTWAIN_NO_ERROR;
+}
+
 int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {
     // Get the current TIFF type from the Source
@@ -40,11 +208,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
         m_nFormat = m_ImageInfoEx.theSource->GetAcquireFileStatusRef().GetAcquireFileFormat();
 
     bool isFirstPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_FIRST);
-    bool isLastPage =  (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
 
-/*	if (isWriteablePage && m_pDib && !IsValidBitDepth(m_nFormat, m_pDib->GetBitsPerPixel()))
-		return DTWAIN_ERR_INVALID_BITDEPTH;
-        */
     sActualFileName = szFile;
     if (isFirstPage)
     {
@@ -53,16 +217,6 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
             LogWriterUtils::WriteLogInfoIndentedA("Could not delete existing file " + StringConversion::Convert_Native_To_Ansi(sActualFileName));
     }
 
-    if (isFirstPage)
-		LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF file");
-
-    CTIFFImageHandler imgHandler(m_nFormat, m_ImageInfoEx);
-    imgHandler.SetMultiPageStatus(pMultiPageStruct);
-	if (!isLastPage)
-	{
-		SetNumPagesWritten(GetNumPagesWritten() + 1);
-		LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF page");
-	}
-    auto retVal = imgHandler.WriteGraphicFile(this, sActualFileName.c_str(), m_pDib->GetHandle());
+	auto retVal = WriteOneTiffPage(sActualFileName.c_str(), m_pDib->GetHandle(), pMultiPageStruct);
     return retVal;
 }

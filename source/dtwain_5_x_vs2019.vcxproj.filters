@@ -391,9 +391,6 @@
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpp\imagefun\tiffun32.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ocrengine\transym_ocrinterface.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -1852,9 +1849,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\imagefun\resamplefactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="h\imagefun\tiffun32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="simpleini\SimpleIni.h">

@@ -40,6 +40,8 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
     bool isLastPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
     bool isNextPage = (pMultiPageStruct && pMultiPageStruct->Stage == DIB_MULTI_NEXT);
 
+	SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
+
     if ( isFirstPage )
     {
 		LockedDibPage page(m_pDib->GetHandle());

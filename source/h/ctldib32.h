@@ -74,6 +74,7 @@ namespace dynarithmic
             int WriteBitmapImpl(LPCTSTR szFile, int nFormat, bool bOpenFile, int fh, DibMultiPageStruct* pMultiDibStruct = nullptr);
 
         protected:
+            void SetPageWriteStatus(int nFormat, int Stage);
             CTL_TwainDib *m_pDib;
             DTWAINImageInfoEx m_ImageInfo;
             std::shared_ptr<DibMultiPageData> pMultiDibData;
