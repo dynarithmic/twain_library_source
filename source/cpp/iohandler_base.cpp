@@ -23,6 +23,7 @@
 #include "ctltwainmanager.h"
 #include "ctlloadresources.h"
 #include "ctldib32ex.h"
+#include "logwriterutils.h"
 
 using namespace dynarithmic;
 
