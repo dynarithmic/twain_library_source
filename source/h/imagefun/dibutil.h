@@ -284,6 +284,11 @@ namespace dynarithmic::dib
 			return bih_ ? static_cast<uint16_t>(bih_->biBitCount) : 0;
 		}
 
+		uint32_t Pitch() const noexcept
+		{
+			return effective_width(Width(), BitsPerPixel()) + 3 & ~3;
+		}
+
 		uint32_t StrideBytes() const noexcept
 		{
 			return bih_ ? calc_stride_bytes(Width(), BitsPerPixel()) : 0;

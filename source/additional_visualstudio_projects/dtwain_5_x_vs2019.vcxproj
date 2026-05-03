@@ -10147,7 +10147,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\imagefun\jpegwriter.h" />
     <ClInclude Include="h\imagefun\jpegxrwriter.h" />
     <ClInclude Include="h\imagefun\metafilewriter.h" />
-    <ClInclude Include="h\imagefun\pcxfun32.h" />
     <ClInclude Include="h\imagefun\pcxwriter.h" />
     <ClInclude Include="h\imagefun\pdffun32.h" />
     <ClInclude Include="h\imagefun\pngwriter.h" />

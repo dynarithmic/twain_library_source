@@ -30,8 +30,6 @@
 #include "dtwain_filesystem.h"
 #include "blankpage.h"
 
-class CxImage;
-
 #ifdef _MSC_VER
 #pragma warning (disable:4100)
 #endif
@@ -240,38 +238,6 @@ namespace dynarithmic
     #define RGB_BLUE        2
     #define RGB_SIZE        3
 
-#if 0
-    class CDibInterfaceStream
-    {
-        public:
-            bool OpenOutputFile(LPCTSTR pFileName)
-            {
-                m_outFileName = pFileName;
-                m_outStream.open(StringConversion::Convert_NativePtr_To_Ansi(pFileName), std::ios::binary);
-                if (m_outStream)
-                    return true;
-                return false;
-            }
-
-            bool CloseOutputFile()
-            {
-                if (m_outStream)
-                {
-                    m_outStream.close();
-                    if (filesys::exists(m_outFileName.c_str()))
-                        return true;
-                }
-                return false;
-            }
-
-            std::ofstream& getStream() { return m_outStream; }
-            CTL_StringType getOutputFileName() const { return m_outFileName; }
-
-        protected:
-            CTL_StringType m_outFileName;
-            std::ofstream m_outStream;
-    };
-#endif
     class CDibInterface
     {
         public:
@@ -279,8 +245,6 @@ namespace dynarithmic
             virtual ~CDibInterface() = default;
 
             // Virtual interface
-            virtual std::string GetFileExtension() const = 0;
-            virtual HANDLE  GetFileInformation(LPCSTR path) = 0;
             virtual int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImage2*/, UINT32 /*wid*/, UINT32 /*ht*/, UINT32 /*bpp*/, UINT32 /*nColors*/, RGBQUAD * /*pPal*/,
                                        void * /*pUserInfo*/ = nullptr) { return TRUE; }
 
@@ -288,8 +252,6 @@ namespace dynarithmic
             virtual void GetMultiPageStatus(DibMultiPageStruct * /*pStruct*/) { }
             virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, void * /*pUserInfo*/ = nullptr) = 0;
             static HANDLE CreateDIB(int width, int height, int bpp, LPSTR palette= nullptr);
-
-            static unsigned GetPitch(CxImage& pDib);
 
             LONG    GetLastError() { return m_lasterror; }
             static bool    IsGrayScale(HANDLE hDib, int bpp);
@@ -322,9 +284,7 @@ namespace dynarithmic
         protected:
             void SetError(LONG nError) { m_lasterror = nError; }
             virtual void DestroyAllObjects() { }
-            // Lower level routines
-			static FloatRect Normalize(CxImage& pImage, const FloatRect& ActualRect, const FloatRect& RequestedRect,
-                        			   int sourceunit, int destunit, int dpi);
+
             DibMultiPageStruct m_MultiPageStruct;
 
         private:

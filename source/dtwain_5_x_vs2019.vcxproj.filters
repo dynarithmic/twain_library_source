@@ -1836,9 +1836,6 @@
     <ClInclude Include=".\h\ocrengine\ocrinterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\imagefun\pcxfun32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="cpp\pdflib32\pdfencrypt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
