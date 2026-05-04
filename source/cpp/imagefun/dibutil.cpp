@@ -414,15 +414,10 @@ static uint8_t GetPixelGray(const uint8_t* row, uint32_t x, uint16_t srcBpp, con
         }
 
         case 24:
+		case 32:
         {
-            const uint8_t* p = row + x * 3;
+            const uint8_t* p = row + x * (srcBpp/8);
             return GrayFromRGB(p[2], p[1], p[0]); // BGR
-        }
-
-        case 32:
-        {
-            const uint8_t* p = row + x * 4;
-            return GrayFromRGB(p[2], p[1], p[0]); // BGRA, ignore alpha
         }
     }
 
@@ -684,22 +679,6 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
 		}
 
 		case 24:
-		{
-			for (uint32_t y = 0; y < height; ++y)
-			{
-				uint8_t* row = bits + static_cast<size_t>(y) * stride;
-
-				for (uint32_t x = 0; x < width; ++x)
-				{
-					uint8_t* p = row + x * 3;
-					p[0] = static_cast<uint8_t>(255 - p[0]); // B
-					p[1] = static_cast<uint8_t>(255 - p[1]); // G
-					p[2] = static_cast<uint8_t>(255 - p[2]); // R
-				}
-			}
-			break;
-		}
-
 		case 32:
 		{
 			for (uint32_t y = 0; y < height; ++y)
@@ -708,11 +687,10 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
 
 				for (uint32_t x = 0; x < width; ++x)
 				{
-					uint8_t* p = row + x * 4;
+					uint8_t* p = row + x * (bpp/8);
 					p[0] = static_cast<uint8_t>(255 - p[0]); // B
 					p[1] = static_cast<uint8_t>(255 - p[1]); // G
 					p[2] = static_cast<uint8_t>(255 - p[2]); // R
-					// Preserve alpha / reserved byte.
 				}
 			}
 			break;
@@ -904,18 +882,11 @@ HANDLE dynarithmic::dib::CropDib(HANDLE hDib, int left, int top, int right, int 
 			}
 
 			case 24:
-			{
-				std::memcpy(dstRow,
-					srcRow + static_cast<size_t>(left) * 3,
-					static_cast<size_t>(cropWidth) * 3);
-				break;
-			}
-
 			case 32:
 			{
 				std::memcpy(dstRow,
-					srcRow + static_cast<size_t>(left) * 4,
-					static_cast<size_t>(cropWidth) * 4);
+					srcRow + static_cast<size_t>(left) * (bpp/8),
+					static_cast<size_t>(cropWidth) * (bpp/8) );
 				break;
 			}
 		}
@@ -1307,16 +1278,12 @@ static void CopyOnePixel(const dynarithmic::dib::LockedDib& src, uint32_t sx, ui
             break;
 
         case 16:
-            reinterpret_cast<uint16_t*>(drow)[dx] =
-                reinterpret_cast<const uint16_t*>(srow)[sx];
+            reinterpret_cast<uint16_t*>(drow)[dx] = reinterpret_cast<const uint16_t*>(srow)[sx];
             break;
 
         case 24:
-            std::memcpy(drow + dx * 3, srow + sx * 3, 3);
-            break;
-
-        case 32:
-            std::memcpy(drow + dx * 4, srow + sx * 4, 4);
+		case 32:
+            std::memcpy(drow + dx * (bpp / 8), srow + sx * (bpp / 8),  bpp / 8);
             break;
     }
 }
@@ -1549,6 +1516,7 @@ static void SampleBicubicToDst(const dynarithmic::dib::LockedDib& src, double sx
 	if (bpp == 32)
 		p[3] = ClampU8(weight ? acc[3] / weight : acc[3]);
 }
+
 static HANDLE RotateArbitrary(const dynarithmic::dib::LockedDib& src, float angleDeg)
 {
 	const uint32_t sw = src.Width();
