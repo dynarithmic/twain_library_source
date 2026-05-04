@@ -24,7 +24,6 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
-#include "../cximage/ximage.h"
 #include "logwriterutils.h"
 #include "ctlconstexprfind.h"
 #include <ctlutils.h>
@@ -230,22 +229,12 @@ HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=
 
 HANDLE CDibInterface::NegateDIB(HANDLE hDib)
 {
-    dynarithmic::dib::LockedDib dibHandle(hDib);
-    CxImage ImageHandler(reinterpret_cast<BYTE*>(dibHandle.HeaderMutable()), GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
-    ImageHandler.Negative();
-    return hDib;
+    return dynarithmic::dib::NegateDib(hDib);
 }
 
 HANDLE CDibInterface::ResampleDIB(HANDLE hDib, long newx, long newy)
 {
-    HANDLE hNewDib = nullptr;
-    {
-        dynarithmic::dib::LockedDib dibHandle(hDib);
-        CxImage ImageHandler(reinterpret_cast<BYTE*>(dibHandle.HeaderMutable()), GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
-        ImageHandler.Resample(newx, newy, 2);
-        hNewDib = ImageHandler.CopyToHandle();
-    }
-    return hNewDib;
+    return dynarithmic::dib::ResizeDib(hDib, newx, newy);
 }
 
 HANDLE CDibInterface::ResampleDIB(HANDLE hDib, double xscale, double yscale)
@@ -276,24 +265,16 @@ HANDLE CDibInterface::IncreaseDecreaseBpp(HANDLE hDib, long newbpp, bool bIncrea
         return newDib;
     }
 
-    // Use CxImage resampler
-    CxImage ImageHandler(reinterpret_cast<uint8_t * >(dibHandle.HeaderMutable()), GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
     if (bIncrease)
-        ImageHandler.IncreaseBpp((DWORD)newbpp);
-    else
-        ImageHandler.DecreaseBpp((DWORD)newbpp, 0); 
-    return ImageHandler.CopyToHandle();
+        return dynarithmic::dib::IncreaseDibBpp(hDib, newbpp);
+    return dynarithmic::dib::DecreaseDibBpp(hDib, newbpp);
 }
 
 HANDLE CDibInterface::RotateDIB(HANDLE hDib, float angle)
 {
     if (!hDib)
         return nullptr;
-    dynarithmic::dib::LockedDib dibHandle(hDib);
-    // Use CxImage rotate
-    CxImage ImageHandler(reinterpret_cast<uint8_t*>(dibHandle.HeaderMutable()), GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
-    ImageHandler.Rotate(static_cast<double>(angle));
-    return ImageHandler.CopyToHandle();
+    return dynarithmic::dib::Rotate(hDib, angle);
 }
 
 HANDLE CDibInterface::IncreaseBpp(HANDLE hDib, long newbpp)
@@ -360,12 +341,7 @@ HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const 
 		endy = tmp;
 	}
 
-	// Use CxImage crop
-	BYTE* pImage = const_cast<BYTE*>(dibHandle.HeaderAsBytePtr());
-	CxImage ImageHandler(pImage, GlobalSize(handle), CXIMAGE_FORMAT_BMP);
-    if (ImageHandler.Crop(startx, starty, endx, endy))
-        return ImageHandler.CopyToHandle();
-	return nullptr;
+    return dynarithmic::dib::CropDib(handle, startx, starty, endx, endy);
 }
 
 // Test for blank page here

@@ -71,7 +71,7 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
         {
             height = 255;
             width = 255;
-            m_pDib->ResampleDib(static_cast<double>(width), static_cast<double>(height));
+            m_pDib->ResampleDib(static_cast<long>(width), static_cast<long>(height));
             hDib = m_pDib->GetHandle();
         }
         else

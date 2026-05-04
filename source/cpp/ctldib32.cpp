@@ -654,20 +654,31 @@ bool CTL_TwainDib::DecreaseBpp(unsigned long bpp)
 	return IncreaseBppImpl(bpp, false);
 }
 
+template <typename T>
+static int ResampleImpl(CTL_TwainDibInfo& info, T newx, T newy)
+{
+	const HANDLE hDib = info.GetDib();
+	if (hDib)
+	{
+		HANDLE hNewDib = CDibInterface::ResampleDIB(hDib, newx, newy);
+		if (hNewDib)
+		{
+			info.DeleteDib();
+			info.SetDib(hNewDib);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int CTL_TwainDib::ResampleDib(long newx, long newy)
+{
+	return ResampleImpl(m_TwainDibInfo, newx, newy);
+}
+
 int CTL_TwainDib::ResampleDib(double xscale, double yscale)
 {
-    const HANDLE hDib = m_TwainDibInfo.GetDib();
-    if (hDib)
-    {
-        HANDLE hNewDib = CDibInterface::ResampleDIB(hDib, xscale, yscale);
-        if ( hNewDib )
-        {
-            m_TwainDibInfo.DeleteDib();
-            m_TwainDibInfo.SetDib(hNewDib);
-            return 1;
-        }
-    }
-    return 0;
+	return ResampleImpl(m_TwainDibInfo, xscale, yscale);
 }
 
 int CTL_TwainDib::NegateDib()

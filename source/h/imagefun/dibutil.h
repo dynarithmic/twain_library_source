@@ -325,5 +325,24 @@ namespace dynarithmic::dib
 		const BITMAPINFOHEADER* bih_ = nullptr;
 		bool valid_ = false;
 	};
+
+	inline bool IsSupportedBpp(uint16_t bpp) noexcept
+	{
+		return bpp == 1 || bpp == 4 || bpp == 8 || bpp == 16 || bpp == 24 || bpp == 32;
+	}
+
+	HANDLE IncreaseDibBpp(HANDLE hDib, uint16_t dstBpp);
+	HGLOBAL CreateDibLike(const BITMAPINFOHEADER& src, uint16_t dstBpp, uint32_t paletteEntries);
+	void FillGrayPalette(RGBQUAD* pal, uint32_t entries);
+	RGBQUAD GetPixelAsRgb(const uint8_t* row, uint32_t x, uint16_t srcBpp, const RGBQUAD* srcPal, uint32_t srcPalEntries);
+	uint8_t GetIndexedPixel(const uint8_t* row, uint32_t x, uint16_t bpp);
+	uint8_t NearestPaletteIndex(const RGBQUAD* pal, uint32_t count, const RGBQUAD& c);
+	void SetIndexedPixel(uint8_t* row, uint32_t x, uint16_t dstBpp, uint8_t idx);
+	HANDLE DecreaseDibBpp(HANDLE hDib, uint16_t dstBpp);
+	HGLOBAL CloneDibHandle(HANDLE hDib);
+	HANDLE NegateDib(HANDLE hDib);
+	HANDLE CropDib(HANDLE hDib, int left, int top, int right, int bottom);
+	HANDLE ResizeDib(HANDLE hDib, int32_t newx, int32_t newy);
+	HANDLE Rotate(HANDLE src, float angle);
 }
 #endif

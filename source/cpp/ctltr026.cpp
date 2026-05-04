@@ -1216,9 +1216,7 @@ bool CTL_ImageXferTriplet::CopyDibToClipboard(CTL_ITwainSession * /*pSession*/, 
     return false;
 }
 
-bool CTL_ImageXferTriplet::CropDib(CTL_ITwainSession *pSession,
-                                   const CTL_ITwainSource *pSource,
-                                   const CTL_TwainDibPtr &CurDib)
+bool CTL_ImageXferTriplet::CropDib(CTL_ITwainSession *pSession, const CTL_ITwainSource *pSource, const CTL_TwainDibPtr &CurDib)
 {
     // Possibly crop the DIB
     LONG SourceUnit;

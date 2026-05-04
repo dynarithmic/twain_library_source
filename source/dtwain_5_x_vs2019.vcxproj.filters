@@ -412,99 +412,6 @@
     <ClCompile Include="cpp\stdafx.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="cximage\ximabmp.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximadsp.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximaenc.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximaexif.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximage.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximagif.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximahist.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximaico.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximainfo.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximaint.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximajas.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximajbg.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximajpg.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximalpha.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximalyr.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximamng.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximapal.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximapcx.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximapng.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximapsd.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximaraw.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximasel.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximaska.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximatga.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximath.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximatif.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximatran.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximawbmp.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximawmf.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\ximawnd.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cximage\xmemfile.cpp">
-      <Filter>CXImage Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\ctltwainfilesystem.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -1558,6 +1465,9 @@
     <ClCompile Include="cpp\imagefun\svgwriter.cpp">
       <Filter>C++ Files\Image File Writers</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\imagefun\dibutil.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1890,9 +1800,6 @@
     <ClInclude Include=".\h\dtwaindefs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cximage\ximage.h">
-      <Filter>CXImage Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\dtwain_filetypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1952,9 +1859,6 @@
     </ClInclude>
     <ClInclude Include="h\ctltr044.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cximage\ximacfg.h">
-      <Filter>CXImage Files</Filter>
     </ClInclude>
     <ClInclude Include="h\ctllogfunctioncall.h">
       <Filter>Header Files</Filter>
@@ -2666,9 +2570,6 @@
     </Filter>
     <Filter Include="Resource Text Files">
       <UniqueIdentifier>{3002b771-4293-4f50-83e4-5b3d3ec18c43}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CXImage Files">
-      <UniqueIdentifier>{65e5fb4a-3fd2-42d8-a860-64e1e4f61e0f}</UniqueIdentifier>
     </Filter>
     <Filter Include="AES Encryption">
       <UniqueIdentifier>{5e54c952-71bb-44a5-b77d-b24c098fd813}</UniqueIdentifier>

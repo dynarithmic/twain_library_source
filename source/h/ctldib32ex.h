@@ -188,6 +188,7 @@ namespace dynarithmic
                         int flags);
 
             int ResampleDib(double xscale, double yscale);
+            int ResampleDib(long newx, long newy);
 
             // Increase bpp
             bool IncreaseBpp(unsigned long bpp);
