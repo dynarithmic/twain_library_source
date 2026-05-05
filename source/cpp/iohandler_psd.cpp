@@ -53,20 +53,12 @@ static bool WriteOneDibHandleToPsd(const std::wstring& filename, const PsdSessio
 
 int CTL_PsdIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_PSD, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
+    HANDLE hDib = hDib = m_pDib->GetHandle();
 
 	PsdSessionOptions opts{};
 	opts.useRle = true; // raw only in this implementation
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-	opts.comment = commentStr;
+	opts.comment = GetCopyrightString();
 
     std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 

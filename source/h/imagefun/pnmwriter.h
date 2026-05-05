@@ -117,7 +117,6 @@ class PnmSessionWriter
 
 // ============================================================
 // DTWAIN-style wrapper
-// Model B for PNM:
 //   FirstPage = open + write image
 //   LastPage  = close
 // ============================================================

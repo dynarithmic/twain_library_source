@@ -63,7 +63,7 @@ std::optional<PreparedJpegDibPage> JpegSessionWriter::MakePreparedJpegPage(const
 			break;
 
 		default:
-			return page;
+			return std::nullopt;
 	}
 
 	return page;

@@ -56,22 +56,14 @@ static bool WriteOneDibHandleToTga(const std::wstring& filename, const TgaSessio
 
 int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_TGA, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
+    HANDLE hDib = hDib = m_pDib->GetHandle();
 
 	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
 	TgaSessionOptions opts{};
     opts.useRle = m_ImageInfoEx.IsRLE;
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-	opts.comment = commentStr;
+	opts.comment = GetCopyrightString();
 
 	if (!WriteOneDibHandleToTga(fName, opts, hDib))
 		return DTWAIN_ERR_FILEWRITE;

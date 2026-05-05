@@ -40,13 +40,10 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
     bool isLastPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
     bool isNextPage = (pMultiPageStruct && pMultiPageStruct->Stage == DIB_MULTI_NEXT);
 
+	SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
+
     if ( isFirstPage )
     {
-        const int bitdepth = m_pDib->GetDepth();
-
-        if (!IsValidBitDepth(DTWAIN_PS_ENCAPSULATED, bitdepth))
-            return DTWAIN_ERR_INVALID_BITDEPTH;
-
 		LockedDibPage page(m_pDib->GetHandle());
 		if (!page.IsValid())
 			return DTWAIN_ERR_FILEWRITE;
@@ -75,10 +72,7 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
 
 		std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-		// Get the comment string (copyright information)
-		char commentStr[256] = {};
-		GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-		opts.creator = commentStr;
+		opts.creator = GetCopyrightString();
 
 		if (!m_psSessionWriter.Open(fName, opts))
 			return DTWAIN_ERR_FILEWRITE;

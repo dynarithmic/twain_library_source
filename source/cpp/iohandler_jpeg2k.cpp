@@ -75,10 +75,7 @@ int CTL_Jpeg2KIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
 
     std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-	opts.text.copyright = commentStr;
+	opts.text.copyright = GetCopyrightString();
 
     if (!WriteOneDibHandleToJpeg2000(fName, opts, hDib))
 		return DTWAIN_ERR_FILEWRITE;

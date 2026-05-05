@@ -40,6 +40,7 @@ namespace dynarithmic
 			DTWAINTiffOutput& GetOutputHandler() { return m_TiffOutputHandler; }
 
 		private:
+			int WriteOneTiffPage(LPCTSTR path, HANDLE bitmap, const DibMultiPageStruct* multiPageStruct);
 			int m_nFormat;
 			DTWAINImageInfoEx m_ImageInfoEx;
 			CTL_StringType sActualFileName;

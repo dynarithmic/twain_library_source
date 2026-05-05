@@ -27,16 +27,6 @@
 #include "iohandler_tiff.h"
 
 using namespace dynarithmic;
-std::string CTextImageHandler::GetFileExtension() const
-{
-    return "TXT";
-}
-
-HANDLE CTextImageHandler::GetFileInformation(LPCSTR /*path*/)
-{
-    return nullptr;
-}
-
 bool CTextImageHandler::OpenOutputFile(LPCTSTR pFileName)
 {
     if (m_MultiPageStruct.Stage == DIB_MULTI_FIRST || m_MultiPageStruct.Stage == 0)

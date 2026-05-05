@@ -70,7 +70,7 @@ static std::string build_tiff_open_mode(const TiffSessionOptions& opt)
 	return mode;
 }
 
-static PageTagInfo describe_page_tags(const PreparedDibPage& page, const TiffPageSettings& settings)
+static PageTagInfo describe_page_tags(const PreparedTiffDibPage& page, const TiffPageSettings& settings)
 {
     PageTagInfo info{};
 
@@ -116,7 +116,7 @@ static PageTagInfo describe_page_tags(const PreparedDibPage& page, const TiffPag
     return info;
 }
 
-static size_t calc_output_row_size(const PreparedDibPage& page, const PageTagInfo& tagInfo)
+static size_t calc_output_row_size(const PreparedTiffDibPage& page, const PageTagInfo& tagInfo)
 {
 	if (tagInfo.bitsPerSample == 1 && tagInfo.samplesPerPixel == 1)
 		return static_cast<size_t>((page.width + 7) / 8);
@@ -126,7 +126,7 @@ static size_t calc_output_row_size(const PreparedDibPage& page, const PageTagInf
 		static_cast<size_t>(tagInfo.bitsPerSample / 8);
 }
 
-static bool convert_row(const PreparedDibPage& page,
+static bool convert_row(const PreparedTiffDibPage& page,
                         const TiffPageSettings& settings,
                         const uint8_t* src,
                         uint8_t* dst,
@@ -274,7 +274,7 @@ bool TiffSessionWriter::Open(const std::wstring& filename, const TiffSessionOpti
 	return true;
 }
 
-bool TiffSessionWriter::SetPageInfo(const PreparedDibPage& page, const TiffPageSettings& pageSettings)
+bool TiffSessionWriter::SetPageInfo(const PreparedTiffDibPage& page, const TiffPageSettings& pageSettings)
 {
 	if (!tif_)
 		return false;
@@ -564,12 +564,12 @@ bool TiffSessionWriter::WritePixels(const PageTagInfo& tagInfo)
 	return true;
 }
 
-std::optional<PreparedDibPage> TiffSessionWriter::MakePreparedDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedTiffDibPage> TiffSessionWriter::MakePreparedTiffDibPage(const dynarithmic::DibPageView& view)
 {
 	if (!view.bits)
 		return std::nullopt;
 
-	PreparedDibPage page{};
+	PreparedTiffDibPage page{};
 	page.width = view.width;
 	page.height = view.height;
 	page.bitsPerPixel = view.bitsPerPixel;
@@ -594,7 +594,7 @@ std::optional<PreparedDibPage> TiffSessionWriter::MakePreparedDibPage(const dyna
 	return page;
 }
 
-std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedDibPage& page,
+std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedTiffDibPage& page,
 		TiffPageSettings settings)
 {
 	if (writer_)
@@ -611,7 +611,7 @@ std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename,
 	return write_page(page, settings);
 }
 
-std::pair<bool, int> DTWAINTiffOutput::OnNextPage(const PreparedDibPage& page, TiffPageSettings settings)
+std::pair<bool, int> DTWAINTiffOutput::OnNextPage(const PreparedTiffDibPage& page, TiffPageSettings settings)
 {
 	if (!writer_)
 		return { false, DTWAIN_ERR_FILEWRITE };
@@ -634,7 +634,7 @@ bool DTWAINTiffOutput::IsOpen() const noexcept
 	return writer_ != nullptr && writer_->IsOpen();
 }
 
-std::pair<bool, int> DTWAINTiffOutput::write_page(const PreparedDibPage& page, TiffPageSettings settings)
+std::pair<bool, int> DTWAINTiffOutput::write_page(const PreparedTiffDibPage& page, TiffPageSettings settings)
 {
 	settings.pageIndex = static_cast<uint16_t>(pageIndex_);
 

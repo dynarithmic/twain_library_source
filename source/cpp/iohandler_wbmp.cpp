@@ -53,13 +53,7 @@ static bool WriteOneDibHandleToWbmp(const std::wstring& filename, const WbmpSess
 
 int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_WBMP, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
-
+    HANDLE hDib = hDib = m_pDib->GetHandle();
 	dynarithmic::dib::LockedDib dibHandle(m_pDib->GetHandle());
 	int height = dibHandle.Height();
 	int width = dibHandle.Width();
@@ -68,7 +62,7 @@ int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     {
         height = 255;
         width = 255;
-        m_pDib->ResampleDib({static_cast<double>(width), static_cast<double>(height)}, CTL_ITwainSource::RESIZE_FLAG);
+        m_pDib->ResampleDib(static_cast<long>(width), static_cast<long>(height));
         hDib = m_pDib->GetHandle();
     }
     else

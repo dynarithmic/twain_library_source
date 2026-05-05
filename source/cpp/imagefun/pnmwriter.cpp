@@ -51,7 +51,7 @@ std::optional<PreparedPnmDibPage> PnmSessionWriter::MakePreparedPnmDibPage(const
 			page.pixelFlavor = PnmPixelFlavor::Bgra32;
 			break;
 		default:
-			return page;
+			return std::nullopt;
 	}
 	return page;
 }
@@ -561,7 +561,6 @@ bool PnmSessionWriter::WriteRgba32AsRgbRaw()
 ///////////////////////////////////////////////
 // ============================================================
 // DTWAIN-style wrapper
-// Model B for PNM:
 //   FirstPage = open + write image
 //   LastPage  = close
 // ============================================================

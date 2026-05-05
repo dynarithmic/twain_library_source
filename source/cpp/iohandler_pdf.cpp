@@ -117,9 +117,8 @@ struct AllPDFDimensions
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CTL_PDFIOHandler::CTL_PDFIOHandler(CTL_TwainDib* pDib, int /*nFormat*/, const DTWAINImageInfoEx &ImageInfoEx)
-: CTL_ImageIOHandler( pDib ), m_nFormat(0),
-        m_ImageInfoEx(ImageInfoEx),
+CTL_PDFIOHandler::CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx &ImageInfoEx)
+        : CTL_ImageIOHandler( pDib ), m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx),
         m_JpegHandler(pDib, m_ImageInfoEx), m_TiffHandler(pDib, CTL_TwainDib::TiffFormatNONE, m_ImageInfoEx)
 {
     // Create a JPEG and TIFF handler locally
@@ -192,6 +191,8 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
     CPDFImageHandler PDFHandler(szFile, m_ImageInfoEx);
     CTL_StringType szTempFile;
     const auto pHandle = m_ImageInfoEx.theSource->GetDTWAINHandle();
+
+    SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
 
     if (!pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_FIRST)
     {
@@ -354,9 +355,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
         }
     }
 
-    LogWriterUtils::WriteLogInfoIndentedA("Writing 1 page of PDF file...");
     bRet = PDFHandler.WriteGraphicFile(this, szTempFile.c_str(), m_pDib?m_pDib->GetHandle(): nullptr, &m_ImageInfoEx);
-    LogWriterUtils::WriteLogInfoIndentedA("Finished writing 1 page of PDF file...");
 
     // Destroy the local text elements
     if (nCount > 0 )

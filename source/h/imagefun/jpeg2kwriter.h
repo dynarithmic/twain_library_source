@@ -84,7 +84,6 @@ class Jpeg2000SessionWriter
 
 	private:
 		static bool ValidatePage(const PreparedJpeg2000DibPage& page);
-		static std::string NarrowFilename(const std::wstring& ws);
 		opj_image_t* CreateOpenJpegImage() const;
 		void FillOpenJpegImage(opj_image_t* image) const;
 		std::string BuildJpeg2000Comment() const;

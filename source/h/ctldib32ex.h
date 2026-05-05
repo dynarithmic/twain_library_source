@@ -172,8 +172,6 @@ namespace dynarithmic
             bool        IsAutoDelete() const { return m_bAutoDelete; }
             bool        IsAutoDeletePalette() const { return m_bAutoDeletePalette; }
 
-            // Read an image file
-            static HANDLE      ReadDibBitmap(LPCSTR lpszFileName);
             // Write an image file
             int         WriteDibBitmap(DTWAINImageInfoEx& ImageInfo, LPCTSTR szFile, 
                                        int nFormat=BmpFormat, bool bOpenFile=true, int fh=0);
@@ -181,21 +179,16 @@ namespace dynarithmic
             // Write a multi-page DIB file
             CTL_ImageIOHandlerPtr WriteFirstPageDibMulti(DTWAINImageInfoEx& ImageInfo, LPCTSTR szFile, int nFormat,
                                                         bool bOpenFile, int fhFile, int &nStatus);
-            int WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus,
-                                      const DTWAINImageInfoEx& ImageInfo);
+            int WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int nFormat, int &nStatus, const DTWAINImageInfoEx& ImageInfo);
             static int WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus, bool bSaveFile=true);
-
-
-            // Special JPEG stuff
-            void SetJpegValues(int nQuality, bool bProgressive);
 
             // Crop a DIB
             int CropDib(const FloatRect& ActualRect, const FloatRect& RequestedRect,
                         LONG SourceUnit, LONG DestUnit, int dpi,
                         int flags);
 
-            int ResampleDib(const FloatRect& ResampleRect, int flags);
             int ResampleDib(double xscale, double yscale);
+            int ResampleDib(long newx, long newy);
 
             // Increase bpp
             bool IncreaseBpp(unsigned long bpp);
@@ -213,7 +206,6 @@ namespace dynarithmic
 
             CTL_TwainDib();
             CTL_TwainDib(HANDLE hDib, HWND hWnd= nullptr);
-            CTL_TwainDib(LPCSTR lpszFileName, HWND hWnd= nullptr);
             CTL_TwainDib(const CTL_TwainDib& rDib);
             void swap(CTL_TwainDib& left, CTL_TwainDib& rt) noexcept;
 
@@ -227,17 +219,16 @@ namespace dynarithmic
             ~CTL_TwainDib();
 
         protected:
-            static int         DibNumColors(void* pv);
             void        Init();
             void        SetEqual(const CTL_TwainDib& rDib);
+            bool        IncreaseBppImpl(unsigned long bpp, bool bIncrease);
+
 
         private:
             CTL_TwainDibInfo m_TwainDibInfo;
             bool        m_bAutoDelete;
             bool        m_bAutoDeletePalette;
             bool        m_bIsValid;
-            bool        m_bJpegProgressive;
-            int         m_nJpegQuality;
     };
 
     typedef std::shared_ptr<CTL_TwainDib> CTL_TwainDibPtr;
@@ -251,7 +242,6 @@ namespace dynarithmic
             // Dib page creation
             CTL_TwainDibPtr CreateDib();
             CTL_TwainDibPtr CreateDib(HANDLE hDib, HWND hWnd= nullptr);
-            CTL_TwainDibPtr CreateDib(LPCSTR lpszFileName, HWND hWnd= nullptr);
             CTL_TwainDibPtr CreateDib(const CTL_TwainDib& rDib);
 
             // Dib page deletion

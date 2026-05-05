@@ -53,7 +53,7 @@ std::optional<PreparedJxrDibPage> JxrSessionWriter::MakePreparedJxrPage(const dy
 			page.pixelFlavor = JxrPixelFlavor::Bgra32;
 			break;
 		default:
-			return page;
+			return std::nullopt;
 	}
 	return page;
 }
@@ -298,7 +298,6 @@ void JxrSessionWriter::PrepareRow(const uint8_t* src, uint8_t* dst, uint32_t row
 
 // ============================================================
 // DTWAIN-style wrapper
-// Model B for JPEG-XR:
 //   FirstPage = open + write image
 //   LastPage  = close
 // ============================================================

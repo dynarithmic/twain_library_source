@@ -66,7 +66,7 @@ std::optional<PreparedPngDibPage> PngSessionWriter::MakePreparedPngDibPage(const
 			break;
 
 		default:
-			return page;
+			return std::nullopt;
 	}
 
 	page.xDpi = view.xDPI > 0.0 ? view.xDPI : 96.0;

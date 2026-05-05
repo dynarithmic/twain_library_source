@@ -52,22 +52,12 @@ static bool WriteOneDibHandleToPnm(const std::wstring& filename, const PnmSessio
 
 int CTL_PBMIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_PBM, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
-
+    HANDLE hDib = m_pDib->GetHandle();
 	PnmSessionOptions opts{};
 	opts.useRaw = true;
 	opts.fixBilevelPolarity = true;
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-	opts.comment = commentStr;
-
+	opts.comment = GetCopyrightString();
 	std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
 	if (!WriteOneDibHandleToPnm(filename, opts, hDib))

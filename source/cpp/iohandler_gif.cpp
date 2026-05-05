@@ -28,14 +28,8 @@ using namespace dynarithmic;
 
 int CTL_GifIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-    if (!IsValidBitDepth(DTWAIN_GIF, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
-
     GifSessionOptions opts;
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-	opts.text.software = commentStr;
+	opts.text.software = GetCopyrightString();
 
 	LockedDibPage locked(m_pDib->GetHandle());
     if (!locked.IsValid())

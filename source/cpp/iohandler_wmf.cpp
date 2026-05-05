@@ -48,24 +48,13 @@ static bool WriteOneDibHandleToMetafile(const std::wstring& filename, HANDLE hDi
 
 int CTL_WmfIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_WMF, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
-
     MetafileSessionOptions opts;
     if (m_nFormat == CTL_TwainDib::WmfFormat)
         opts.type = MetafileType::Wmf;
     else
         opts.type = MetafileType::Emf;
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-
-    opts.description = StringConversion::Convert_AnsiPtr_To_Wide(commentStr);
+    opts.description = StringConversion::Convert_Ansi_To_Wide(GetCopyrightString());
     std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
     auto retval = WriteOneDibHandleToMetafile(sFileName, m_pDib->GetHandle(), opts);
     if (!retval)

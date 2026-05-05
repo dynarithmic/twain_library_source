@@ -107,7 +107,7 @@ struct TiffPageSettings
 	bool invertImage = false;
 };
 
-struct PreparedDibPage
+struct PreparedTiffDibPage
 {
 	uint32_t width = 0;
 	uint32_t height = 0;
@@ -146,12 +146,12 @@ class TiffSessionWriter
 		TiffSessionWriter(TiffSessionWriter&& other) noexcept;
 		TiffSessionWriter& operator=(TiffSessionWriter&& other) noexcept;
 		bool Open(const std::wstring& filename, const TiffSessionOptions& sessionOptions);
-		bool SetPageInfo(const PreparedDibPage& page, const TiffPageSettings& pageSettings);
+		bool SetPageInfo(const PreparedTiffDibPage& page, const TiffPageSettings& pageSettings);
 		bool WriteCurrentPage();
 		void Close();
 		bool IsOpen() const noexcept;
 		std::size_t GetPageIndex() const noexcept;
-		static std::optional<PreparedDibPage> MakePreparedDibPage(const dynarithmic::DibPageView& view);
+		static std::optional<PreparedTiffDibPage> MakePreparedTiffDibPage(const dynarithmic::DibPageView& view);
 
 
 	private:
@@ -168,7 +168,7 @@ class TiffSessionWriter
 		TiffSessionOptions sessionOptions_{};
 		std::size_t pageIndex_ = 0;
 
-		PreparedDibPage currentPage_{};
+		PreparedTiffDibPage currentPage_{};
 		TiffPageSettings currentPageSettings_{};
 		bool hasCurrentPage_ = false;
 		std::vector<uint8_t> rowBuffer_;
@@ -177,13 +177,13 @@ class TiffSessionWriter
 class DTWAINTiffOutput
 {
 	public:
-		std::pair<bool, int> OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedDibPage& page,
+		std::pair<bool, int> OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedTiffDibPage& page,
 										 TiffPageSettings settings);
-		std::pair<bool, int> OnNextPage(const PreparedDibPage& page, TiffPageSettings settings);
+		std::pair<bool, int> OnNextPage(const PreparedTiffDibPage& page, TiffPageSettings settings);
 		std::pair<bool, int> OnLastPage();
 		bool IsOpen() const noexcept;
 	private:
-		std::pair<bool, int> write_page(const PreparedDibPage& page, TiffPageSettings settings);
+		std::pair<bool, int> write_page(const PreparedTiffDibPage& page, TiffPageSettings settings);
 
 	private:
 		std::unique_ptr<TiffSessionWriter> writer_;

@@ -115,7 +115,7 @@ std::optional<PreparedPsDibPage> PsSessionWriter::MakePreparedPsDibPage(const dy
 			page.pixelFlavor = PsPixelFlavor::Bgra32;
 			break;
 		default:
-			return page;
+			return std::nullopt;
 	}
 	return page;
 }

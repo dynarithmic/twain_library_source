@@ -57,20 +57,11 @@ CTL_JpegXRIOHandler::CTL_JpegXRIOHandler(CTL_TwainDib* pDib, const DTWAINImageIn
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CTL_JpegXRIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_JPEGXR, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
-
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+    HANDLE hDib = m_pDib->GetHandle();
 	JxrSessionOptions opts{};
 	opts.lossless = false;
 	opts.quality = (std::max)(0.0f, (std::min)(1.0f, m_ImageInfoEx.nJpegXRQuality / 100.0f));
-    opts.text.comment = commentStr;
+    opts.text.comment = GetCopyrightString();
 	opts.progressive = m_ImageInfoEx.bProgressiveJpegXR;
 
 	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);

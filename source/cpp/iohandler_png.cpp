@@ -43,12 +43,7 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
         }
     };
 
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_PNG, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
+    HANDLE hDib = m_pDib->GetHandle();
 
 	LockedDibPage lockedPage(hDib);
 	if (!lockedPage.IsValid())
@@ -57,10 +52,7 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
     PngSessionOptions sessionOptions;
 
-	// Get the comment string (copyright information)
-	char commentStr[256] = {};
-	GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-    sessionOptions.text.copyright = commentStr;
+    sessionOptions.text.copyright = GetCopyrightString();
 
 	PngSessionWriter writer;
 
@@ -71,7 +63,7 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
 	auto pageInfo = PngSessionWriter::MakePreparedPngDibPage(lockedPage.GetView());
 	if (!pageInfo.has_value())
-		return false;
+		return DTWAIN_ERR_FILEWRITE;
 
 	if (!writer.SetPageInfo(pageInfo.value()))
 		return DTWAIN_ERR_FILEWRITE; 

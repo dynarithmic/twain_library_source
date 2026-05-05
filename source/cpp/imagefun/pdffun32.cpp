@@ -57,18 +57,6 @@ bool CPDFImageHandler::LoadPDFLibrary()
     return true;
 }
 
-
-
-std::string CPDFImageHandler::GetFileExtension() const
-{
-    return "PDF";
-}
-
-HANDLE CPDFImageHandler::GetFileInformation(LPCSTR /*path*/)
-{
-    return nullptr;
-}
-
 bool CPDFImageHandler::OpenOutputFile(LPCTSTR /*pFileName*/)
 {
     return true;

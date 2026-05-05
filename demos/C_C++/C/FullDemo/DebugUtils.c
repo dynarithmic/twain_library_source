@@ -18,10 +18,9 @@
 	DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 	OF THIRD PARTY RIGHTS.
  */
-#if defined(_MSC_VER)
-	#define _CRT_SECURE_NO_WARNINGS
+#ifdef _MSC_VER
+    #define _CRT_SECURE_NO_WARNINGS
 #endif
-
 #include <wchar.h>
 #include "DebugUtils.h"
 #include "dtwain.h"

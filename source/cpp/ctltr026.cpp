@@ -1130,7 +1130,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
                     pHandler = CurDib->WriteFirstPageDibMulti(ImageInfo, strTempFile.c_str(),
                                                                acquireFileStatus.GetAcquireFileFormat(), false, 0, retval);
                 else
-                    CurDib->WriteNextPageDibMulti(pHandler, retval, ImageInfo);
+                    CurDib->WriteNextPageDibMulti(pHandler, acquireFileStatus.GetAcquireFileFormat(), retval, ImageInfo);
             }
 
             if ( retval != 0)
@@ -1216,9 +1216,7 @@ bool CTL_ImageXferTriplet::CopyDibToClipboard(CTL_ITwainSession * /*pSession*/, 
     return false;
 }
 
-bool CTL_ImageXferTriplet::CropDib(CTL_ITwainSession *pSession,
-                                   const CTL_ITwainSource *pSource,
-                                   const CTL_TwainDibPtr &CurDib)
+bool CTL_ImageXferTriplet::CropDib(CTL_ITwainSession *pSession, const CTL_ITwainSource *pSource, const CTL_TwainDibPtr &CurDib)
 {
     // Possibly crop the DIB
     LONG SourceUnit;

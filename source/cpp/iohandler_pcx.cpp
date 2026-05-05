@@ -28,24 +28,13 @@
 using namespace dynarithmic;
 int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {
-    HANDLE hDib = nullptr;
+	HANDLE hDib = m_pDib->GetHandle();
 
-    if ( !pMultiPageStruct || pMultiPageStruct->Stage != DIB_MULTI_LAST )
-    {
-        if ( !m_pDib )
-            return DTWAIN_ERR_DIB;
+    const bool bIsFirstPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_FIRST);
+    const bool bIsLastPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
+    const bool isDCX = (m_nFormat == DTWAIN_DCX);
 
-        hDib = m_pDib->GetHandle();
-        if ( !hDib )
-            return DTWAIN_ERR_DIB;
-    }
-
-    if (pMultiPageStruct && pMultiPageStruct->Stage != DIB_MULTI_LAST && !IsValidBitDepth(DTWAIN_PCX, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
-
-    bool bIsFirstPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_FIRST);
-    bool bIsLastPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
-    bool isDCX = (m_nFormat == DTWAIN_DCX);
+	SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
 
     std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
@@ -60,7 +49,7 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
 		auto pageInfo = PcxSessionWriter::MakePreparedPcxDibPage(locked.GetView());
 		if (!pageInfo.has_value())
-			return false;
+			return DTWAIN_ERR_FILEWRITE;
 
 		if (!output.OnFirstPage(filename, opts, pageInfo.value()))
 			return DTWAIN_ERR_FILEWRITE;
@@ -75,7 +64,7 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
 		auto pageInfo = PcxSessionWriter::MakePreparedPcxDibPage(locked.GetView());
 		if (!pageInfo.has_value())
-			return false;
+			return DTWAIN_ERR_FILEWRITE;
 
 		if (!output.OnNextPage(pageInfo.value()))
 			return DTWAIN_ERR_FILEWRITE;

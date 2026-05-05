@@ -82,7 +82,7 @@ std::optional<PreparedIcoDibPage> IcoSessionWriter::MakePreparedIcoDibPage(const
 			break;
 
 		default:
-			return page;
+			return std::nullopt;
 	}
 	return page;
 }
