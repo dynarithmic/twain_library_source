@@ -63,7 +63,7 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
 	auto pageInfo = PngSessionWriter::MakePreparedPngDibPage(lockedPage.GetView());
 	if (!pageInfo.has_value())
-		return false;
+		return DTWAIN_ERR_FILEWRITE;
 
 	if (!writer.SetPageInfo(pageInfo.value()))
 		return DTWAIN_ERR_FILEWRITE; 

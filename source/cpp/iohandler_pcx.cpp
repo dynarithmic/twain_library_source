@@ -49,7 +49,7 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
 		auto pageInfo = PcxSessionWriter::MakePreparedPcxDibPage(locked.GetView());
 		if (!pageInfo.has_value())
-			return false;
+			return DTWAIN_ERR_FILEWRITE;
 
 		if (!output.OnFirstPage(filename, opts, pageInfo.value()))
 			return DTWAIN_ERR_FILEWRITE;
@@ -64,7 +64,7 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
 		auto pageInfo = PcxSessionWriter::MakePreparedPcxDibPage(locked.GetView());
 		if (!pageInfo.has_value())
-			return false;
+			return DTWAIN_ERR_FILEWRITE;
 
 		if (!output.OnNextPage(pageInfo.value()))
 			return DTWAIN_ERR_FILEWRITE;

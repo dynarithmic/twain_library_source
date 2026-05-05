@@ -127,7 +127,7 @@ int CTL_TiffIOHandler::WriteOneTiffPage(LPCTSTR path, HANDLE bitmap, const DibMu
 	// Get a reference to the DIB
 	auto pageInfo = TiffSessionWriter::MakePreparedTiffDibPage(lockedPage.GetView());
 	if (!pageInfo.has_value())
-		return false;
+		return DTWAIN_ERR_FILEWRITE;
 
 	auto& theDibPage = pageInfo.value();
 
