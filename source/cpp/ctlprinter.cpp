@@ -43,10 +43,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
     if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTER) )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    auto* pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
 	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 32);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
     auto Array = retVal.second;
 
     // Destroys array when out of scope
@@ -82,10 +82,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG nPrinter
     LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
     if (!DTWAIN_IsCapSupported(Source, CAP_PRINTER))
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    auto* pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
 	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
     auto Array = retVal.second;
     DTWAINArrayLowLevel_RAII a(pHandle, Array);
 
@@ -122,11 +122,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
     if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTERSTRING) )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    auto* pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
     auto& factory = pHandle->m_ArrayFactory;
     // Check if array is of the correct type
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle,
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
                     [&]{ return !factory->is_valid(ArrayString, CTL_ArrayFactory::arrayTag::StringType);},
                         DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     const size_t nStrings = factory->size(ArrayString);
@@ -189,7 +189,7 @@ DTWAIN_ARRAY GetPrinterMode(DTWAIN_SOURCE Source, LONG GetType)
 {
     if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTERMODE) )
         return nullptr;
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     DTWAIN_ARRAY Array = nullptr;
     const DTWAIN_BOOL bRet = GetCapValuesEx2_Internal(pSource, CAP_PRINTERMODE, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
     if ( bRet )

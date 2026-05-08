@@ -21,26 +21,48 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctlfileutils.h"
+#include "wbmpwriter.h"
+#include "iohandler_wbmp.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 
+static bool WriteOneDibHandleToWbmp(const std::wstring& filename, const WbmpSessionOptions& options, HANDLE hDib)
+{
+	LockedDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	WbmpSessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+	auto pageInfo = WbmpSessionWriter::MakePreparedWbmpDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+	if (!writer.SetPageInfo(pageInfo.value()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
+
 int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_WBMP, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
-
-    int height = m_pDib->GetHeight();
-    int width = m_pDib->GetWidth();
+    HANDLE hDib = hDib = m_pDib->GetHandle();
+	dynarithmic::dib::LockedDib dibHandle(m_pDib->GetHandle());
+	int height = dibHandle.Height();
+	int width = dibHandle.Width();
 
     if (m_ImageInfoEx.IsWBMPResized && (height > 255 || width > 255))
     {
         height = 255;
         width = 255;
-        m_pDib->ResampleDib({static_cast<double>(width), static_cast<double>(height)}, CTL_ITwainSource::RESIZE_FLAG);
+        m_pDib->ResampleDib(static_cast<long>(width), static_cast<long>(height));
         hDib = m_pDib->GetHandle();
     }
     else
@@ -49,8 +71,12 @@ int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if (!parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
-       
-    return SaveToFile();
+	WbmpSessionOptions opts{};
+	opts.reverseBitOrder = false; // set true only if your 1-bpp DIB rows are LSB-first
+
+	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+
+    if (!WriteOneDibHandleToWbmp(fName, opts, hDib))
+        return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }

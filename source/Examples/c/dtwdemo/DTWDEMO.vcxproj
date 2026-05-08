@@ -397,6 +397,7 @@
     <ClCompile Include="..\DibView\DIB.c" />
     <ClCompile Include="..\DibView\ERRORS.c" />
     <ClCompile Include="..\DibView\PAINT.c" />
+    <ClCompile Include="DebugUtils.c" />
     <ClCompile Include="dibdisplay.c" />
     <ClCompile Include="dtwdemo.c" />
     <ClCompile Include="SourceProperties.c" />
@@ -409,6 +410,7 @@
     <Image Include="DTWDEMO.ICO" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DebugUtils.h" />
     <ClInclude Include="DTWDEMO.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SourceProperties.h" />

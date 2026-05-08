@@ -21,6 +21,7 @@
 #include "cppfunc.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -67,14 +68,25 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceProductName(DTWAIN_SOURCE Source,LPTSTR szPr
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR szVInfo, LONG nMaxLen)
+LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR lpszOut, LONG nSize)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, szVInfo, nMaxLen))
+    LOG_FUNC_ENTRY_PARAMS((Source, lpszOut, nSize))
     auto [pHandle, pSource] = VerifyHandles(Source);
     const TW_VERSION *pV = pSource->GetVersion();
     CTL_StringType pName = StringConversion::Convert_AnsiPtr_To_Native(pV->Info);
-    auto nLen = StringWrapper::CopyInfoToCString(pName, szVInfo, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szVInfo))
+    auto nLen = StringWrapper::CopyInfoToCString(pName, lpszOut, nSize);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, LPTSTR szSourceInfo, LONG indentFactor, LONG nMaxLen)
+{
+	LOG_FUNC_ENTRY_PARAMS((Source, szSourceInfo, nMaxLen))
+	auto [pHandle, pSource] = VerifyHandles(Source);
+    auto sAllInfo = StringConversion::Convert_Ansi_To_Native(pSource->GetSourceInfoFormatted(indentFactor));
+	auto nLen = StringWrapper::CopyInfoToCString(sAllInfo, szSourceInfo, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szSourceInfo))
     LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
 }

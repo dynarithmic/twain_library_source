@@ -18,31 +18,48 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
+#include "iohandler_jpeg.h"
 #include "ctliface.h"
-#include "FreeImage.h"
+#include "jpegwriter.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static bool WriteOneDibHandleToJpeg(const std::wstring& filename,const JpegSessionOptions& options, HANDLE hDib)
+{
+	LockedDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	JpegSessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+    auto preparedPage = JpegSessionWriter::MakePreparedJpegPage(lockedPage.GetView());
+    if (!preparedPage.has_value())
+        return false;
+
+	if (!writer.SetPageInfo(preparedPage.value()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
+
 int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-    HANDLE hDib = {};
-    if ( !m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
+    HANDLE hDib = m_pDib->GetHandle();
+    JpegSessionOptions opts{};
+    opts.quality = m_ImageInfoEx.IsPDF ? m_ImageInfoEx.nPDFJpegQuality : m_ImageInfoEx.nJpegQuality;
+	opts.progressive = m_ImageInfoEx.bProgressiveJpeg;
+	opts.text.copyright = GetCopyrightString();
+	std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-    if ( !IsValidBitDepth(DTWAIN_JPEG, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
+    if (!WriteOneDibHandleToJpeg(sFileName, opts, hDib))
+        return DTWAIN_ERR_FILEWRITE;
 
-    int flags = 0;
-    if (m_ImageInfoEx.bProgressiveJpeg)
-        flags |= JPEG_PROGRESSIVE;
-    flags += m_ImageInfoEx.IsPDF ? m_ImageInfoEx.nPDFJpegQuality : m_ImageInfoEx.nJpegQuality;
-
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
-    m_SaveParams.flags = flags;
-    m_SaveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
-    m_SaveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
-
-    return SaveToFile();
+    return DTWAIN_NO_ERROR;
 }

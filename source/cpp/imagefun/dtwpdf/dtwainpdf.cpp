@@ -100,6 +100,20 @@ static int EncodeVectorStream(const std::vector<char>& InputStream,
 
 typedef std::array<std::array<double, 3>, 3> Matrix3_3;
 
+static uint8_t ReverseBits(uint8_t v)
+{
+	v = static_cast<uint8_t>(((v & 0xF0) >> 4) | ((v & 0x0F) << 4));
+	v = static_cast<uint8_t>(((v & 0xCC) >> 2) | ((v & 0x33) << 2));
+	v = static_cast<uint8_t>(((v & 0xAA) >> 1) | ((v & 0x55) << 1));
+	return v;
+}
+
+static void ReverseBitsInRow(uint8_t* row, uint32 rowBytes)
+{
+	for (uint32 i = 0; i < rowBytes; ++i)
+		row[i] = ReverseBits(row[i]);
+}
+
 static Matrix3_3 MultiplyMatrix33(const Matrix3_3 & A, const Matrix3_3 & B)
 {
     Matrix3_3 C;
@@ -125,69 +139,8 @@ static Matrix3_3 MultiplyMatrix33(const Matrix3_3 & A, const Matrix3_3 & B)
     return C;
 }
 
-
-tsize_t ImageObject::libtiffReadProc (thandle_t /*fd*/, tdata_t /*buf*/, tsize_t /*size*/)
-{
-  // Return the amount of data read, which we will always set as 0 because
-  // we only need to be able to write to these in-memory tiffs
-  return 0;
-}
-
-
 std::vector<char> ImageObject::m_vImgStream;
 unsigned int ImageObject::m_sTiffOffset;
-tsize_t ImageObject::libtiffWriteProc (thandle_t /*fd*/, tdata_t buf, tsize_t nsize)
-{
-    // libtiff will try to write an 8 byte header into the tiff file. We need
-    // to ignore this because PDF does not use it...
-    if (nsize == 8 && static_cast<char*>(buf)[0] == 'I' && static_cast<char*>(buf)[1] == 'I'
-      && static_cast<char*>(buf)[2] == 42)
-    {
-      // Skip the header -- little endian
-    }
-    else if (nsize == 8 && static_cast<char*>(buf)[0] == 'M' &&
-       static_cast<char*>(buf)[1] == 'M' && static_cast<char*>(buf)[2] == 42)
-    {
-      // Skip the header -- big endian
-    }
-    else
-    {
-
-        // Have we done anything yet?
-        if ( m_vImgStream.empty() )
-            m_vImgStream.resize( nsize );
-
-        // Otherwise, we need to grow the memory buffer
-        else
-        {
-            m_vImgStream.resize( nsize + m_sTiffOffset );
-        }
-
-        // Now move the image data into the buffer
-        memcpy (&m_vImgStream[m_sTiffOffset], buf, nsize);
-        m_sTiffOffset += static_cast<unsigned>(nsize);
-    }
-    return nsize;
-}
-
-
-toff_t ImageObject::libtiffSeekProc (thandle_t /*fd*/, toff_t off, int /*i*/)
-{
-  // This appears to return the location that it went to
-  return off;
-}
-
-int ImageObject::libtiffCloseProc (thandle_t /*fd*/)
-{
-  // Return a zero meaning all is well
-  return 0;
-}
-
-toff_t ImageObject::libtiffSizeProc (thandle_t /*fd*/)
-{
-    // Return a zero meaning all is well
-    return 0;
-}
 
 std::string HexString(unsigned char *input, int length/*=-1*/)
 {
@@ -1745,389 +1698,90 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
     return true;
 }
 
-
-bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb*/, int& dpix, int& dpiy)
-{
-  /**************************************************************************
-    Some notes about TIFF support inside PDF files.
-
-     - MSB2LSB is the only byte fillorder that is supported.
-     - The images must be converted to single strip
-     - G3 and G4 are supported
-  **************************************************************************/
-
-    TIFF *image, *conv = nullptr;
-    int stripCount;
-    tsize_t stripSize;
-    unsigned long imageOffset;
-    std::vector<char> stripBuffer;
-    uint16 tiffResponse16, compression, fillorder;
-
-  // Open the file and make sure that it exists and is a TIFF file
-    if ((image = TIFFOpen(StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "r")) == nullptr)
-    {
-        return false;
-    }
-
-
-    // Bits per component is per colour component, not per sample. Does this
-    // matter?
-    if (TIFFGetField (image, TIFFTAG_BITSPERSAMPLE, &tiffResponse16) != 0)
-      m_bpp = bpp = tiffResponse16;
-
-    // The colour device will change based on the number of samples per pixel
-    if (TIFFGetField (image, TIFFTAG_SAMPLESPERPIXEL, &tiffResponse16) == 0)
-    {
-        return false;
-    }
-
-    switch (tiffResponse16)
-    {
-        case 1:
-            m_sColorSpace = "DeviceGray";
-        break;
-
-        default:
-            m_sColorSpace = "DeviceRGB";
-        break;
-    }
-
-    /****************************************************************************
-    We need to add a sub-dictionary with the parameters for the compression
-    filter in it.
-    ****************************************************************************/
-
-    // K will be minus one for g4 fax, and zero for g3 fax
-    TIFFGetField (image, TIFFTAG_COMPRESSION, &compression);
-    switch (compression)
-    {
-        case COMPRESSION_CCITTFAX3:
-            m_nTiffKValue = 0;
-        break;
-
-        case COMPRESSION_CCITTFAX4:
-            m_nTiffKValue = -1;
-        break;
-
-    }
-
-    // Get the width and height of the image
-    TIFFGetField (image, TIFFTAG_IMAGEWIDTH, &width);
-    TIFFGetField (image, TIFFTAG_IMAGELENGTH, &height);
-
-    // Get the resolution of the image
-    float xres;
-    float yres;
-
-    TIFFGetField (image, TIFFTAG_XRESOLUTION, &xres);
-    TIFFGetField (image, TIFFTAG_YRESOLUTION, &yres);
-
-    dpix = static_cast<int>(xres);
-    dpiy = static_cast<int>(yres);
-
-    m_Width = m_nTiffColumns = width;
-    m_Height = m_nTiffRows = height;
-
-  // Fillorder determines whether we convert on the fly or not, although
-  // multistrip images also need to be converted
-    TIFFGetField (image, TIFFTAG_FILLORDER, &fillorder);
-
-    if ( fillorder == FILLORDER_LSB2MSB || TIFFNumberOfStrips (image) > 1)
-    {
-    /*************************************************************************
-      Convert the image
-    *************************************************************************/
-
-      m_vImgStream.resize(0);
-      m_sTiffOffset = 0;
-
-      // Open the dummy document (which actually only exists in memory)
-      conv =
-        TIFFClientOpen ("dummy", "w", (thandle_t) - 1,
-            libtiffReadProc,
-            libtiffWriteProc,
-            libtiffSeekProc,
-            libtiffCloseProc,
-            libtiffSizeProc,
-            nullptr,
-        nullptr);
-
-      // Copy the image information ready for conversion
-      stripSize = TIFFStripSize (image);
-    const int stripMax = TIFFNumberOfStrips(image);
-      imageOffset = 0;
-
-      stripBuffer.resize(TIFFNumberOfStrips (image) * stripSize);
-
-      for (stripCount = 0; stripCount < stripMax; stripCount++)
-      {
-         imageOffset += static_cast<unsigned long>(TIFFReadEncodedStrip (image, stripCount,
-                                                    &stripBuffer[imageOffset],
-                                                static_cast<tmsize_t>(stripSize)));
-      }
-
-      // We also need to copy some of the attributes of the tiff image
-      // Bits per sample has to be 1 because this is going to be a G4/G3 image
-      // (and all other image formats were stripped out above).
-    const uint32 twidth = width;
-
-    const uint32 theight = height;
-      TIFFSetField (conv, TIFFTAG_IMAGEWIDTH, twidth);
-      TIFFSetField (conv, TIFFTAG_IMAGELENGTH, theight);
-      TIFFSetField (conv, TIFFTAG_BITSPERSAMPLE, 1);
-      TIFFSetField (conv, TIFFTAG_COMPRESSION, compression);
-      TIFFSetField (conv, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-      TIFFSetField (conv, TIFFTAG_ROWSPERSTRIP, height + 1);
-//      TIFFSetField (conv, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISWHITE);
-      TIFFSetField (conv, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
-      TIFFSetField (conv, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
-      TIFFSetField (conv, TIFFTAG_SAMPLESPERPIXEL, 1);
-      TIFFSetField (conv, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
-      TIFFSetField (conv, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
-      TIFFSetField (conv, TIFFTAG_XRESOLUTION, 300);
-      TIFFSetField (conv, TIFFTAG_YRESOLUTION, 300);
-
-      std::string version = "Dynarithmic TWAIN Library ";
-      const auto len = version.length();
-      version.resize(50);
-      DTWAIN_GetShortVersionStringA(&version[len], 50);
-      TIFFSetField (conv, TIFFTAG_SOFTWARE, version.c_str());
-
-      if (compression == COMPRESSION_CCITTFAX4)
-            TIFFSetField (conv, TIFFTAG_GROUP4OPTIONS, 0);
-
-      // Actually do the conversion
-      TIFFWriteEncodedStrip (conv, 0, stripBuffer.data(), imageOffset);
-
-      // Finish up
-      m_imgLengthInBytes = m_sTiffOffset;
-    }
-
-  else
-    {
-    /**************************************************************************
-       Insert the image
-    **************************************************************************/
-      // We also need to add a binary stream to the object and put the image
-      // data into this stream
-      stripSize = TIFFStripSize (image);
-      imageOffset = 0;
-
-    const int nStrips = TIFFNumberOfStrips(image);
-      m_vImgStream.resize( nStrips * stripSize );
-
-      for (stripCount = 0; stripCount < nStrips;  stripCount++)
-      {
-         imageOffset += static_cast<unsigned long>(TIFFReadRawStrip (image, stripCount,
-                            &m_vImgStream[imageOffset], stripSize));
-      }
-
-      // We might have too much memory, truncate to the size we have actually
-      // read
-      m_vImgStream.resize(imageOffset);
-      m_imgLengthInBytes = imageOffset;
-    }
-
-  const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
-
-    m_nCurCRCVal = crcVal;
-    TIFFClose (image);
-    TIFFClose (conv);
-    return true;
-}
-
-
 bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*/, int& dpix, int& dpiy)
 {
-    TIFF *image, *conv = nullptr;
-    tsize_t stripSize;
-    unsigned long imageOffset;
-    std::vector<char> stripBuffer;
-    uint16 tiffResponse16, compression, fillorder = 0;
+	TIFF* image = TIFFOpen(StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb");
+	if (!image)
+		return false;
 
-    // Open the file and make sure that it exists and is a TIFF file
-    if ((image = TIFFOpen (StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb")) == nullptr)
-    {
-        return false;
-    }
+	uint16 bitsPerSample = 0;
+	uint16 samplesPerPixel = 0;
+	uint16 compression = COMPRESSION_NONE;
+	uint16 fillorder = FILLORDER_MSB2LSB;
 
+	if (TIFFGetField(image, TIFFTAG_BITSPERSAMPLE, &bitsPerSample) != 0)
+		m_bpp = bpp = bitsPerSample;
 
-    // Bits per component is per color component, not per sample. Does this
-    // matter?
-    if (TIFFGetField (image, TIFFTAG_BITSPERSAMPLE, &tiffResponse16) != 0)
-      m_bpp = bpp = tiffResponse16;
+	if (TIFFGetField(image, TIFFTAG_SAMPLESPERPIXEL, &samplesPerPixel) == 0)
+	{
+		TIFFClose(image);
+		return false;
+	}
 
-    // The colour device will change based on the number of samples per pixel
-    if (TIFFGetField (image, TIFFTAG_SAMPLESPERPIXEL, &tiffResponse16) == 0)
-    {
-        return false;
-    }
+	switch (samplesPerPixel)
+	{
+	case 1:  m_sColorSpace = "DeviceGray"; break;
+	default: m_sColorSpace = "DeviceRGB";  break;
+	}
 
-    switch (tiffResponse16)
-    {
-        case 1:
-            m_sColorSpace = "DeviceGray";
-        break;
+	TIFFGetField(image, TIFFTAG_IMAGEWIDTH, &width);
+	TIFFGetField(image, TIFFTAG_IMAGELENGTH, &height);
 
-        default:
-            m_sColorSpace = "DeviceRGB";
-        break;
-    }
+	float xres = 0.0f, yres = 0.0f;
+	TIFFGetField(image, TIFFTAG_XRESOLUTION, &xres);
+	TIFFGetField(image, TIFFTAG_YRESOLUTION, &yres);
 
-    /****************************************************************************
-    We need to add a sub-dictionary with the parameters for the compression
-    filter in it.
-    ****************************************************************************/
+	dpix = static_cast<int>(xres);
+	dpiy = static_cast<int>(yres);
 
-    // K will be minus one for g4 fax, and zero for g3 fax
-    TIFFGetField (image, TIFFTAG_COMPRESSION, &compression);
-    switch (compression)
-    {
-        case COMPRESSION_CCITTFAX3:
-            m_nTiffKValue = 0;
-        break;
+	m_Width = m_nTiffColumns = width;
+	m_Height = m_nTiffRows = height;
 
-        case COMPRESSION_CCITTFAX4:
-            m_nTiffKValue = -1;
-        break;
+	TIFFGetField(image, TIFFTAG_COMPRESSION, &compression);
+	TIFFGetField(image, TIFFTAG_FILLORDER, &fillorder);
 
-    }
+	// This replacement path is for uncompressed 1-bpp TIFF only.
+	if (bitsPerSample != 1 || samplesPerPixel != 1 || compression != COMPRESSION_NONE)
+	{
+		TIFFClose(image);
+		return false;
+	}
 
-    // Get the width and height of the image
-    TIFFGetField (image, TIFFTAG_IMAGEWIDTH, &width);
-    TIFFGetField (image, TIFFTAG_IMAGELENGTH, &height);
+	const uint32 rowBytes = static_cast<uint32>((width + 7) / 8);
 
-    // Get the resoulution of the image
-    float xres;
-    float yres;
+	m_vImgStream.assign(static_cast<size_t>(rowBytes) * static_cast<size_t>(height), 0);
+	std::vector<uint8_t> rowBuffer(rowBytes);
 
-    TIFFGetField (image, TIFFTAG_XRESOLUTION, &xres);
-    TIFFGetField (image, TIFFTAG_YRESOLUTION, &yres);
+	for (int row = 0; row < height; ++row)
+	{
+		if (TIFFReadScanline(image, rowBuffer.data(), static_cast<uint32>(row), 0) < 0)
+		{
+			TIFFClose(image);
+			return false;
+		}
 
-    dpix = static_cast<int>(xres);
-    dpiy = static_cast<int>(yres);
+		if (fillorder == FILLORDER_LSB2MSB)
+			ReverseBitsInRow(rowBuffer.data(), rowBytes);
 
-    m_Width = m_nTiffColumns = width;
-    m_Height = m_nTiffRows = height;
+		std::memcpy(&m_vImgStream[static_cast<size_t>(row) * rowBytes],
+			rowBuffer.data(),
+			rowBytes);
+	}
 
-    // Fillorder determines whether we convert on the fly or not, although
-  // multistrip images also need to be converted
-    TIFFGetField (image, TIFFTAG_FILLORDER, &fillorder);
+	m_imgLengthInBytes = static_cast<unsigned long>(m_vImgStream.size());
 
-    if ( fillorder == FILLORDER_LSB2MSB || TIFFNumberOfStrips (image) > 1)
-    {
-    /*************************************************************************
-      Convert the image
-    *************************************************************************/
+	const std::vector<char> tempRealData = m_vImgStream;
+	EncodeVectorStream(tempRealData,
+		m_imgLengthInBytes,
+		m_vImgStream,
+		PdfDocument::FLATE_COMPRESS);
 
-      //  OutputDebugString("Conversion of the image in-memory will occur.\n");
-
-      // Because of the way this is implemented to integrate with the tiff lib
-      // we need to ensure that we are the only thread that is performing this
-      // operation at the moment. This is not a well coded piece of the library,
-      // but I am at a loss as to how to do it better... We don't check if we
-      // have already used global tiff buffer, because we are still using it's
-      // old contents...
-      m_vImgStream.resize(0);
-      m_sTiffOffset = 0;
-
-      // Open the dummy document (which actually only exists in memory)
-      conv =
-        TIFFClientOpen ("dummy", "w", (thandle_t) - 1,
-            libtiffReadProc,
-            libtiffWriteProc,
-            libtiffSeekProc,
-            libtiffCloseProc,
-            libtiffSizeProc,
-            nullptr,
-        nullptr);
-
-      // Copy the image information ready for conversion
-      stripSize = TIFFStripSize (image);
-    const int stripMax = TIFFNumberOfStrips(image);
-      imageOffset = 0;
-
-      stripBuffer.resize(TIFFNumberOfStrips (image) * stripSize);
-
-      for (int stripCount = 0; stripCount < stripMax; stripCount++)
-      {
-         imageOffset += static_cast<unsigned long>(TIFFReadEncodedStrip (image, stripCount,
-                                              &stripBuffer[imageOffset],stripSize));
-      }
-
-      // We also need to copy some of the attributes of the tiff image
-      // Bits per sample has to be 1 because this is going to be a G4/G3 image
-      // (and all other image formats were stripped out above).
-    const uint32 twidth = width;
-
-    const uint32 theight = height;
-      TIFFSetField (conv, TIFFTAG_IMAGEWIDTH, twidth);
-      TIFFSetField (conv, TIFFTAG_IMAGELENGTH, theight);
-      TIFFSetField (conv, TIFFTAG_BITSPERSAMPLE, 1);
-      TIFFSetField (conv, TIFFTAG_COMPRESSION, compression);
-      TIFFSetField (conv, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-      TIFFSetField (conv, TIFFTAG_ROWSPERSTRIP, height + 1);
-//      TIFFSetField (conv, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISWHITE);
-      TIFFSetField (conv, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
-      TIFFSetField (conv, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
-      TIFFSetField (conv, TIFFTAG_SAMPLESPERPIXEL, 1);
-      TIFFSetField (conv, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
-      TIFFSetField (conv, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
-      TIFFSetField (conv, TIFFTAG_XRESOLUTION, static_cast<double>(dpix));
-      TIFFSetField (conv, TIFFTAG_YRESOLUTION, static_cast<double>(dpiy));
-
-        std::string version = "Dynarithmic TWAIN Library ";
-      const auto len = version.length();
-      version.resize(50);
-      DTWAIN_GetShortVersionStringA(&version[len], 50);
-      TIFFSetField(conv, TIFFTAG_SOFTWARE, version.c_str());
-
-      if (compression == COMPRESSION_CCITTFAX4)
-            TIFFSetField (conv, TIFFTAG_GROUP4OPTIONS, 0);
-
-      // Actually do the conversion
-      TIFFWriteEncodedStrip (conv, 0, stripBuffer.data(), imageOffset);
-
-      // Finish up
-      m_imgLengthInBytes = m_sTiffOffset;
-    }
-
-  else
-    {
-        //OutputDebugString("Image is not being converted internally\n");
-    /**************************************************************************
-       Insert the image
-    **************************************************************************/
-
-#if defined DEBUG
-      printf ("Image is not being converted internally.\n");
-#endif
-
-      // We also need to add a binary stream to the object and put the image
-      // data into this stream
-      stripSize = TIFFStripSize (image);
-      imageOffset = 0;
-
-        const int nStrips = TIFFNumberOfStrips(image);
-      m_vImgStream.resize( nStrips * stripSize );
-    }
-
-    // Flate encode this stuff
-    const std::vector<char> tempRealData = m_vImgStream;
-    EncodeVectorStream(tempRealData,
-                       m_imgLengthInBytes,
-                       m_vImgStream,
-                       PdfDocument::FLATE_COMPRESS);
-
-    m_imgLengthInBytes = m_vImgStream.size();
-    const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
-
-    m_nCurCRCVal = crcVal;
-    TIFFClose (image);
-    TIFFClose (conv);
-    return true;
+	m_imgLengthInBytes = static_cast<unsigned long>(m_vImgStream.size());
+	const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
+	m_nCurCRCVal = crcVal;
+	TIFFClose(image);
+	return true;
 }
-
 void ImageObject::ComposeObject()
 {
 
@@ -2188,9 +1842,9 @@ void ImageObject::ComposeObject()
     {
         const int polarity =pParent->GetPolarity();
         if (polarity == DTWAIN_PDFPOLARITY_POSITIVE )
-            sprintf(szBuf,"/ImageMask true /Decode [0 1] ");
-        else
             sprintf(szBuf,"/ImageMask true /Decode [1 0] ");
+        else
+            sprintf(szBuf,"/ImageMask true /Decode [0 1] ");
         AppendContents(szBuf);
     }
     AppendContents("\n>>\nstream\n");

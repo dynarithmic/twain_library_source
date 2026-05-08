@@ -48,7 +48,7 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG 
         const LONG nCount = static_cast<LONG>(vValues.size());
         for (LONG i = 0; i < nCount; i++)
         {
-            DTWAIN_ARRAY aDibHandle = vValues[i];
+            DTWAIN_ARRAY aDibHandle = VOID_TO_DTWAIN_ARRAY(vValues[i]);
             DTWAINArrayLowLevel_RAII arr(pHandle, aDibHandle);
             const auto& vDibs = factory->underlying_container_t<HANDLE>(aDibHandle);
 
@@ -79,7 +79,7 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG 
     if (!bDiscardDibs)
         LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
 
-    aDibs = reinterpret_cast<HANDLE>(1);
+    aDibs = VOID_TO_DTWAIN_ARRAY(reinterpret_cast<HANDLE>(1));
     if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
         CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
     else

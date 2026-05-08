@@ -26,6 +26,10 @@
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "logwriterutils.h"
+#include "iohandler_pdf.h"
+#include "iohandler_bmp.h"
+#include "pdffun32.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 
@@ -113,9 +117,8 @@ struct AllPDFDimensions
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CTL_PDFIOHandler::CTL_PDFIOHandler(CTL_TwainDib* pDib, int /*nFormat*/, const DTWAINImageInfoEx &ImageInfoEx)
-: CTL_ImageIOHandler( pDib ), m_nFormat(0),
-        m_ImageInfoEx(ImageInfoEx),
+CTL_PDFIOHandler::CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx &ImageInfoEx)
+        : CTL_ImageIOHandler( pDib ), m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx),
         m_JpegHandler(pDib, m_ImageInfoEx), m_TiffHandler(pDib, CTL_TwainDib::TiffFormatNONE, m_ImageInfoEx)
 {
     // Create a JPEG and TIFF handler locally
@@ -188,6 +191,8 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
     CPDFImageHandler PDFHandler(szFile, m_ImageInfoEx);
     CTL_StringType szTempFile;
     const auto pHandle = m_ImageInfoEx.theSource->GetDTWAINHandle();
+
+    SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
 
     if (!pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_FIRST)
     {
@@ -329,7 +334,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                 DTWAIN_PDFTEXTELEMENT SourceElement = static_cast<void*>(&(*itStart));
                 DTWAIN_PDFTEXTELEMENT TextElement = DTWAIN_CreatePDFTextElementCopy(SourceElement); // add to Source array of elements
                 DTWAIN_SetPDFTextElementLong(TextElement, DTWAIN_PDFTEXT_CURRENTPAGE, 0, DTWAIN_PDFTEXTELEMENT_DISPLAYFLAGS);
-                DTWAIN_AddPDFTextElement(TextElement, m_ImageInfoEx.theSource);
+                DTWAIN_AddPDFTextElement(reinterpret_cast<DTWAIN_SOURCE>(m_ImageInfoEx.theSource), TextElement);
                 auto pElement = static_cast<PDFTextElement *>(TextElement);
                 *pElement = *itStart;
                 if ( itStart == pElMap.begin())
@@ -350,9 +355,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
         }
     }
 
-    LogWriterUtils::WriteLogInfoIndentedA("Writing 1 page of PDF file...");
     bRet = PDFHandler.WriteGraphicFile(this, szTempFile.c_str(), m_pDib?m_pDib->GetHandle(): nullptr, &m_ImageInfoEx);
-    LogWriterUtils::WriteLogInfoIndentedA("Finished writing 1 page of PDF file...");
 
     // Destroy the local text elements
     if (nCount > 0 )
@@ -502,22 +505,22 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
     {
         DTWAINArrayLowLevel_RAII a(pHandle, aValues);
         DTWAIN_ArraySetAtLong(aValues, 0, fileType );
-        const LONG bRet1 = DTWAIN_SetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pEngine), DTWAIN_OCRCV_IMAGEFILEFORMAT, DTWAIN_CAPSET, aValues);
+        const LONG bRet1 = DTWAIN_SetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pEngine), DTWAIN_OCRCV_IMAGEFILEFORMAT, DTWAIN_CAPSET, aValues);
         if ( bRet1 )
         {
-            const LONG bRet = DTWAIN_ExecuteOCR(static_cast<DTWAIN_OCRENGINE>(pEngine), sFileToUse.c_str(), 0, 0);
+            const LONG bRet = DTWAIN_ExecuteOCR(reinterpret_cast<DTWAIN_OCRENGINE>(pEngine), sFileToUse.c_str(), 0, 0);
             if ( bRet )
             {
                 // OCRed the text.  Now retrieve it and return it
                 LONG dataSize;
-                DTWAIN_GetOCRText(static_cast<DTWAIN_OCRENGINE>(pEngine), 0, nullptr, 0, &dataSize, DTWAINOCR_COPYDATA);
+                DTWAIN_GetOCRText(reinterpret_cast<DTWAIN_OCRENGINE>(pEngine), 0, nullptr, 0, &dataSize, DTWAINOCR_COPYDATA);
                 if ( dataSize <= 0 )
                 {
                     sText = {};
                     return 0;
                 }
                 std::vector<TCHAR> charBuffer(dataSize);
-                DTWAIN_GetOCRText(static_cast<DTWAIN_OCRENGINE>(pEngine), 0, &charBuffer[0], dataSize, &dataSize, DTWAINOCR_COPYDATA);
+                DTWAIN_GetOCRText(reinterpret_cast<DTWAIN_OCRENGINE>(pEngine), 0, &charBuffer[0], dataSize, &dataSize, DTWAINOCR_COPYDATA);
 
                 // Now send a notification to the application
                 const auto pSession = m_ImageInfoEx.theSource->GetTwainSession();
@@ -559,13 +562,13 @@ bool CTL_PDFIOHandler::CheckValidConvertType(int fileType, int pageType)
 
 bool GetOCRCharacterInformation( OCREngine* pEngine, OCRTextInfo& tInfo, HANDLE hBitmap, const DTWAINImageInfoEx& imageInfoEx )
 {
-    const DTWAIN_OCRTEXTINFOHANDLE tInfoHandle = DTWAIN_GetOCRTextInfoHandle(static_cast<DTWAIN_OCRENGINE>(pEngine), 0);
+    const DTWAIN_OCRTEXTINFOHANDLE tInfoHandle = DTWAIN_GetOCRTextInfoHandle(reinterpret_cast<DTWAIN_OCRENGINE>(pEngine), 0);
     if ( !tInfoHandle )
         return false;
 
     // Get the text info length
     LONG bufSize;
-    DTWAIN_GetOCRText( static_cast<DTWAIN_OCRENGINE>(pEngine), 0, nullptr, 0, &bufSize, DTWAINOCR_COPYDATA ); // first get the buffer size
+    DTWAIN_GetOCRText( reinterpret_cast<DTWAIN_OCRENGINE>(pEngine), 0, nullptr, 0, &bufSize, DTWAINOCR_COPYDATA ); // first get the buffer size
 
     // size the components in the struct
     tInfo.xDim.resize(bufSize);

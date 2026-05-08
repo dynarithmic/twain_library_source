@@ -20,21 +20,52 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "tgawriter.h"
+#include "iohandler_tga.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 
+// ============================================================
+// Example HANDLE-based helper
+// ============================================================
+
+static bool WriteOneDibHandleToTga(const std::wstring& filename, const TgaSessionOptions& options, HANDLE hDib)
+{
+	LockedDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	TgaSessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+	auto pageInfo = TgaSessionWriter::MakePreparedTgaDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+	if (!writer.SetPageInfo(pageInfo.value()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
+
 int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
+    HANDLE hDib = hDib = m_pDib->GetHandle();
 
-    if (!IsValidBitDepth(DTWAIN_TGA, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
+	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
-    m_SaveParams.flags = m_ImageInfoEx.IsRLE ? TARGA_SAVE_RLE : 0;
+	TgaSessionOptions opts{};
+    opts.useRle = m_ImageInfoEx.IsRLE;
 
-    return SaveToFile();
+	opts.comment = GetCopyrightString();
+
+	if (!WriteOneDibHandleToTga(fName, opts, hDib))
+		return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }

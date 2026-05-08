@@ -18,27 +18,50 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
+#include "iohandler_bmp.h"
+#include "bmprlewriter.h"
 #include "ctliface.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
+
+static std::pair<bool, int> SaveBMPRLE(LPCTSTR szFile, HANDLE hDib)
+{
+    std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    LockedDibPage lockedPage(hDib);
+    if (!lockedPage.IsValid())
+        return { false, DTWAIN_ERR_DIB };
+
+    BmpRle8Writer writer;
+    if (!writer.Open(filename))
+        return { false, DTWAIN_ERR_FILEOPEN };
+
+	auto pageInfo = BmpRle8Writer::MakePreparedBmpRle8Page(lockedPage.GetView());
+	if (!pageInfo.has_value())
+        return { false, DTWAIN_ERR_DIB };
+
+    if (!writer.SetPageInfo(pageInfo.value()))
+        return { false, DTWAIN_ERR_FILEWRITE };
+
+    if (!writer.WriteCurrentPage())
+        return { false, DTWAIN_ERR_FILEWRITE };
+
+    writer.Close();
+    return { true, DTWAIN_NO_ERROR };
+}
+
 int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
-
-    if ( !IsValidBitDepth(DTWAIN_BMP, m_pDib->GetBitsPerPixel()))
-            return DTWAIN_ERR_INVALID_BITDEPTH;
+    HANDLE hDib = m_pDib->GetHandle();
 
     if (m_ImageInfoEx.IsRLE)
     {
-        m_SaveParams.hDib = hDib;
-        m_SaveParams.szFile = szFile;
-        m_SaveParams.flags = BMP_SAVE_RLE;
-        return SaveToFile();
+        // Save as a BMP-RLE file
+        auto bOk = SaveBMPRLE(szFile, hDib);
+        return bOk.second;
     }
 
+    // "Regular" BMP file
     HANDLE hHandleToWrite = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
     if (hHandleToWrite)
     {

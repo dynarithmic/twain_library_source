@@ -76,7 +76,7 @@ namespace dynarithmic
 
         if (!CTL_StaticData::IsCheckHandles())
         {
-            pSource = static_cast<CTL_ITwainSource*>(Source);
+            pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
             return { static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal()), pSource };
         }
         else
@@ -106,7 +106,7 @@ namespace dynarithmic
                     return { nullptr, nullptr };
                 }
 
-                pSource = static_cast<CTL_ITwainSource*>(Source);
+                pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
                 if (!pSource || !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, pSource))
                     return ThrowSourceError(pHandle, setLastError, doThrow);
 

@@ -658,7 +658,7 @@ namespace dynarithmic
             CTL_TwainDLLHandle();
             ~CTL_TwainDLLHandle() = default;
             static void    NotifyWindows( UINT nMsg, WPARAM wParam, LPARAM lParam );
-            void    RemoveAllEnumerators();
+            void    RemoveAllArrays();
             void    RemoveAllSourceCapInfo();
             void    RemoveAllSourceMaps();
             void    RemoveAllPDFTextElements();
@@ -807,7 +807,7 @@ namespace dynarithmic
     template <int CapInfoIdx>
     void SetCapabilityInfo(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LONG value, LONG lCap)
     {
-        auto pSource = static_cast<CTL_ITwainSource*>(Source);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
         const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, pSource);
 
         // Get the cap array values
@@ -878,7 +878,7 @@ namespace dynarithmic
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize);
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize);
     std::string GetErrorString_Internal(int nError);
-    void DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFlags = false);
+    void DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFlags/* = false*/, bool bAsUnsigned /* = false*/);
     std::string LogWin32Error(DWORD lastError);
     void LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
     void UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle);

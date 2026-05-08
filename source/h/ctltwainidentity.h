@@ -21,13 +21,13 @@
 #ifndef CTLTWAINIDENTITY_H
 #define CTLTWAINIDENTITY_H
 
-#include "ctliface.h"
 #include <algorithm>
 #include <vector>
 #include <string>
 #include <sstream>
 #include <numeric>
 #include <string_view>
+#include "twain.h"
 
 namespace dynarithmic
 {
@@ -44,6 +44,8 @@ namespace dynarithmic
 
         TW_IDENTITY m_identity;
         static constexpr unsigned maxCharSize = 32;
+        mutable std::string m_JsonCached;
+
     public:
         explicit CTL_TwainIdentity(TW_IDENTITY& t) : m_identity(t) {}
         explicit CTL_TwainIdentity(TW_IDENTITY* t) : m_identity(t ? *t : TW_IDENTITY()) {}
@@ -118,8 +120,12 @@ namespace dynarithmic
             return &m_identity;
         }
 
+        std::string to_json_formatted(int indentFactor) const;
+
         std::string to_json() const
         {
+            if (!m_JsonCached.empty())
+                return m_JsonCached;
             std::stringstream jstrm;
             if (m_identity.SupportedGroups == 0)
                 jstrm << "{\"device-name\":\"" << m_identity.ProductName << "\", \"twain-identity\":\"<not available>\"}";
@@ -170,7 +176,8 @@ namespace dynarithmic
                 jstrm.str("");
                 jstrm << "{\"device-name\":\"" << m_identity.ProductName << "\", \"twain-identity\":{" << s1 << "}";
             }
-            return jstrm.str();
+            m_JsonCached = jstrm.str();
+            return m_JsonCached;
         }
     };
 }

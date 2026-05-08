@@ -1,17 +1,35 @@
 # twain_library_source
 Dynarithmic TWAIN library source and development repository.
 
-This repository contains the source code and development versions of the Dynarithmic TWAIN Library DLL.  
-
-The Microsoft PDB files for the debug versions of the DTWAIN library can be found [here](https://github.com/dynarithmic/dtwain-pdb).
+This repository contains the source code and development versions of the Dynarithmic TWAIN Library DLL (DTWAIN).  
 
 ----
-
+##### [Obtaining the latest development binaries](#obtain-dev-libraries)
 ##### [Rebuilding DTWAIN from source](#rebuild-source)
 ##### [Starting Visual Studio](#visual-studio-details)
 ##### [Building the Demo Programs](#build-demo)  
 ##### [Contributing updates](#contribute-updates)
 ##### [Source Code Analysis Tools used](#tools-we-use)
+
+----
+
+### <a name="obtain-dev-libraries"></a> Obtaining the latest development binaries ###
+
+To obtain the latest development binaries (DLL's, PDB files, import libraries, etc.):<br>
+For 32-bit: 
+[DTWAIN-Binaries-x86.zip](https://github.com/dynarithmic/twain_library_source/releases/download/development-latest/DTWAIN-Binaries-x86.zip)
+
+
+For 64-bit:
+[DTWAIN-Binaries-x64.zip](https://github.com/dynarithmic/twain_library_source/releases/download/development-latest/DTWAIN-Binaries-x64.zip)
+
+The development binaries are built from the latest source code found in the [development branch](https://github.com/dynarithmic/twain_library_source/tree/development).  
+
+1) To run DTWAIN using the development libraries will also require you to use the [text resources](https://github.com/dynarithmic/twain_library_source/tree/development/source/txt) found in the development branch, and not the text resources found in the main branch.  
+
+2) The code found in the main branch reflects the current release version of DTWAIN.<br> If you want to debug the current release version of DTWAIN, the code in the main branch is the code you should retrieve.  
+
+3) Please note that whenever new code is pushed to the development branch, new development binaries will also be created.  
 
 ----
 
@@ -95,7 +113,6 @@ If the environment variable is not set, the library files will be built, but the
 The final hashes of the files are stored as text in the **binaries\32bit** and **binaries\64bit** folders (the names of the files will look something like **xxxxxxhash.txt**).
 
 ---- 
-----------
 ### <a name="visual-studio-details"></a>Starting Visual Studio ###
 
 * Start the Microsoft Visual Studio, and open the DTWAIN solution file found in the [source](https://github.com/dynarithmic/twain_library_source/tree/master/source) directory named **dtwain_5_x_vs2019.sln**.
@@ -131,7 +148,6 @@ The **DTWAIN_BUILD_LOGPOINTERS** denotes whether the libraries will be built wit
 
 * When all the configurations are built, there should be multiple DTWDEMO*.exe programs residing in the **binaries** subdirectory, where the suffix used in the program name matches the DTWAIN DLL that will be loaded.  For example, DTWDEMO32U.exe will load the dtwain32u.dll library when run. The easiest way to get started is to debug DTWDEMO.EXE and single step through the program using the debugger to get a feel of the flow of the program.  You should get a good idea of how DTWAIN works if you step into one or more of the DTWAIN functions (such as DTWAIN_SysInitialize or DTWAIN_SelectSource).
 
-----
 ----
 ### <a name="build-demo"></a> Building the demo applications
 ##### C++

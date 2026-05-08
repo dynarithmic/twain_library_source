@@ -34,11 +34,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
     LOG_FUNC_ENTRY_PARAMS((ArrayBuffer))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !ArrayBuffer; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !ArrayBuffer; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     const size_t nEntries = (std::min)(static_cast<size_t>(pHandle->m_nErrorBufferThreshold), pHandle->m_vErrorBuffer.size());
 	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
 
 	auto theArray =  retVal.second;
 	DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);

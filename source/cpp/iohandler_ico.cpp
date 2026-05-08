@@ -21,29 +21,57 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctlfileutils.h"
+#include "icowriter.h"
+#include "iohandler_ico.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 
+static bool WriteOneDibHandleToIco(const std::wstring& filename, const IcoSessionOptions& options, HANDLE hDib)
+{
+	LockedDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	IcoSessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+	auto pageInfo = IcoSessionWriter::MakePreparedIcoDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+	if (!writer.SetPageInfo(pageInfo.value()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
+
 int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-    if ( !m_pDib )
+    if (!m_pDib)
         return DTWAIN_ERR_DIB;
 
     HANDLE hDib = m_pDib->GetHandle();
-    if ( !hDib )
+    if (!hDib)
         return DTWAIN_ERR_DIB;
 
-    int height = m_pDib->GetHeight();
-    int width = m_pDib->GetWidth();
+    dynarithmic::dib::LockedDib dibHandle(m_pDib->GetHandle());
+    int height = dibHandle.Height();
+    int width = dibHandle.Width();
 
-    if ( !m_ImageInfoEx.IsVistaIcon )
+    if (!m_ImageInfoEx.IsVistaIcon)
     {
-        
+
         if (m_ImageInfoEx.IsIcoResized && (height > 255 || width > 255))
         {
             height = 255;
             width = 255;
-            m_pDib->ResampleDib({ static_cast<double>(width), static_cast<double>(height) }, CTL_ITwainSource::RESIZE_FLAG);
+            m_pDib->ResampleDib(static_cast<long>(width), static_cast<long>(height));
             hDib = m_pDib->GetHandle();
         }
         else
@@ -53,14 +81,22 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-    auto retVal = SaveToFile(); 
-    if (retVal != 0)
+    if (!m_ImageInfoEx.IsVistaIcon)
     {
-        // Remove the file if it existed
-        delete_file(szFile);
+        IcoSessionOptions opts{};
+        opts.mode = IcoMode::Classic;
+        if (!WriteOneDibHandleToIco(fName, opts, hDib))
+            return DTWAIN_ERR_FILEWRITE;
     }
-    return retVal;
+    else
+    {
+        IcoSessionOptions opts{};
+        opts.mode = IcoMode::VistaPng;
+
+        if (!WriteOneDibHandleToIco(fName, opts, hDib))
+            return DTWAIN_ERR_FILEWRITE;
+    }
+    return DTWAIN_NO_ERROR;
 }

@@ -65,7 +65,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
                 LOG_FUNC_EXIT_NONAME_PARAMS(true)
             }
             else
-                DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] { return false; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
+                DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [] { return false; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
         }
     }
     else
@@ -81,7 +81,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
                 std::string sMessage = GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " + StringWrapperA::QuoteString(dirCreated.second);
                 LogWriterUtils::WriteLogInfoIndentedA(sMessage);
             }
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
         }
         pHandle->m_sTempFilePath = StringWrapper::AddBackslashToDirectory(sTemp);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)

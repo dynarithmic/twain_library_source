@@ -24,6 +24,7 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "errorcheck.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionExString(DTWAIN_SOURCE Source, LPCTSTR threshold,
@@ -61,12 +62,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DT
 {
     LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, detectOpts, bSet))
     auto [pHandle, pSource] = VerifyHandles(Source);
+	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return threshold < 0.0 || threshold > 100.0; }, DTWAIN_ERR_INVALID_PARAM, 
+                                      FALSE, FUNC_MACRO);
     if (detectOpts & DTWAIN_BP_DETECTORIGINAL )
         pSource->SetBlankPageDetectionNoSampleOn(bSet ? true : false);
     if (detectOpts & DTWAIN_BP_DETECTADJUSTED)
         pSource->SetBlankPageDetectionSampleOn(bSet ? true : false);
     pSource->SetBlankPageDetectionOn(pSource->IsBlankPageDetectionNoSampleOn() || pSource->IsBlankPageDetectionSampleOn());
-    pSource->SetBlankPageThreshold(threshold / 100.0);
+	pSource->SetBlankPageThreshold(threshold);
     if (autodetect > DTWAIN_BP_AUTODISCARD_ANY || autodetect < DTWAIN_BP_AUTODISCARD_NONE)
         autodetect = DTWAIN_BP_AUTODISCARD_NONE;
     pSource->SetBlankPageAutoDetect(autodetect);
@@ -105,7 +108,7 @@ LONG DLLENTRY_DEF DTWAIN_IsDIBBlankString(HANDLE hDib, LPCTSTR threshold)
 LONG DLLENTRY_DEF DTWAIN_IsDIBBlank(HANDLE hDib, DTWAIN_FLOAT threshold)
 {
     LOG_FUNC_ENTRY_PARAMS((hDib, threshold))
-    const LONG retval = CDibInterface::IsBlankDIB(hDib, threshold/100.0)?1:0;
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+    auto retval = CDibInterface::IsBlankDIBEx(hDib, threshold);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retval.m_bIsBlank)
     CATCH_BLOCK(0)
 }

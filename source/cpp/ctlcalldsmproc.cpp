@@ -72,7 +72,7 @@ LONG DLLENTRY_DEF DTWAIN_CallDSMProc(TWAIN_IDENTITY AppID, TWAIN_IDENTITY Source
     LOG_FUNC_ENTRY_PARAMS((AppID, SourceId, lDG, lDAT, lMSG, pData))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto pH = pHandle;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
     const LONG Ret = CTL_TwainAppMgr::CallDSMEntryProc(static_cast<TW_IDENTITY*>(AppID),
                                                        static_cast<TW_IDENTITY*>(SourceId),
                                                        static_cast<TW_UINT32>(lDG),
@@ -89,7 +89,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCurrentTwainTriplet(TW_IDENTITY* pAppID, TW_I
     LOG_FUNC_ENTRY_PARAMS((pAppID, pSourceID, lpDAT, lpDG, lpMsg, lpMemRef))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto pH = pHandle;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
     const CTL_TwainTriplet* currentTriplet = CTL_TwainAppMgr::GetInstance()->GetCurrentTriplet();
     if (currentTriplet)
     {

@@ -24,11 +24,11 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
-#include "FreeImagePlus.h"
-#include "../cximage/ximage.h"
 #include "logwriterutils.h"
 #include "ctlconstexprfind.h"
 #include <ctlutils.h>
+#include "resample24to8.h"
+#include "dibutil.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
@@ -38,165 +38,95 @@
 #pragma warning (disable:4244)
 #endif
 
-//#define ISOURCE_INIT_STRING "{98F28E51-C24B-B1B4-9232-0080C8DA7A5E}"
 #define GetAValue(rgb)      ((BYTE)((rgb)>>24))
 
 using namespace dynarithmic;
 
-char CDibInterface::masktable[]={static_cast<signed char>(0x80),0x40,0x20,0x10,0x08,0x04,0x02,0x01};
-char CDibInterface::bittable[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,static_cast<signed char>(0x80)};
-char CDibInterface::bayerPattern[8][8] = {
-      { 0,32, 8,40, 2,34,10,42,  },
-      { 48,16,56,24,50,18,58,26, },
-      { 12,44, 4,36,14,46, 6,38, },
-      { 60,28,52,20,62,30,54,22, },
-      {  3,35,11,43, 1,33, 9,41, },
-      { 51,19,59,27,49,17,57,25, },
-      { 15,47, 7,39,13,45, 5,37, },
-      { 63,31,55,23,61,29,53,21  },
-    };
 
-CDibInterface::CDibInterface() : bytesleft(0), nextbyte(0), bytebuffer{}, m_lasterror(0) {}
-
-int  CDibInterface::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE handle, void *pUserInfo)
+// Lower level routines
+static FloatRect Normalize(const dynarithmic::dib::LockedDib& hDib, const FloatRect& ActualRect, const FloatRect& RequestedRect,
+						   int sourceunit, int destunit, int dpi)
 {
-    UINT32 wid, ht;
-    UINT32 bpp;
+	static constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
+																	  {DTWAIN_TWIPS, 1440.0},
+																	  {DTWAIN_POINTS, 72.0},
+																	  {DTWAIN_PICAS, 6.0},
+																	  {DTWAIN_CENTIMETERS, 2.54}} };
+	const UINT32 width = hDib.Width();
 
-    // Get a lock to the DIB
-    BYTE *pImage = static_cast<BYTE*>(ImageMemoryHandler::GlobalLock(handle));
-    DTWAINGlobalHandle_RAII dibHandle(handle);
-    if ( !pImage )
-        return IS_ERR_INVALIDBMP;
+	// Set up a return rect
+	FloatRect fRect = RequestedRect;
 
-    // Get the BPP
-    GetBitsPerPixel(pImage, &bpp);
+	// Check dimensions
+	if (fabs(ActualRect.right - ActualRect.left) < 1.0)
+		return fRect;
 
-    // Get Width
-    GetWidth(pImage, &wid);
+    const UINT32 pitch = hDib.Pitch(); 
+	if (pitch == 0)
+		return fRect;
 
-    // Get Height
-    GetHeight(pImage, &ht);
+	const auto iterSourceUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == sourceunit; });
+	const auto iterDestUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == destunit; });
 
-    BYTE *pImage2 = pImage;
+	// If not found return the original rect
+	if (!iterSourceUnit.first || !iterDestUnit.first)
+		return fRect;
 
-    // Open a file destination
-    OpenOutputFile(path);
+	auto actualSourceUnit = Measurement[iterSourceUnit.second].second;
+	auto actualDestUnit = Measurement[iterDestUnit.second].second;
 
-    // Check if any error occurred
-    LONG err = GetLastError();
-    if (err == IS_ERR_OK)
-    {
-        const int nUsedColors = CalculateUsedPaletteEntries(bpp);
-        const LPBITMAPINFOHEADER bi = reinterpret_cast<LPBITMAPINFOHEADER>(pImage2);
-        bi->biClrUsed = nUsedColors;
-        StringStreamA strm;
-        strm << nUsedColors;
-        LogWriterUtils::WriteLogInfoA("Image has " + strm.str() + " colors\n");
+	// Convert Actual rect to pixels
+	double PixelsPerInch = dpi;
+	switch (sourceunit)
+	{
+	    case DTWAIN_PIXELS:
+		    break;
 
-        err = WriteImage(ptrHandler,
-            pImage2,
-            wid,
-            ht,
-            bpp,
-            nUsedColors,
-            GetPalettePtr(pImage2, nUsedColors),
-            pUserInfo);
-        const bool goodClose = CloseOutputFile();
-        if (err != 0 || !goodClose)
-        {
-            if (!goodClose)
-                err = DTWAIN_ERR_FILEWRITE;
-            err = DTWAIN_ERR_FILEXFERSTART - static_cast<int>(err);
-            delete_file(path);
-        }
-    }
-    else
-        CloseOutputFile(true);
-    return err;
+	    case DTWAIN_INCHES:
+	    case DTWAIN_TWIPS:
+	    case DTWAIN_CENTIMETERS:
+	    case DTWAIN_POINTS:
+	    case DTWAIN_PICAS:
+	    {
+		    const double NumInches = (ActualRect.right - ActualRect.left) / actualSourceUnit;
+		    PixelsPerInch = static_cast<double>(width) / NumInches;
+	    }
+	    break;
+	}
+
+	switch (destunit)
+	{
+	    case DTWAIN_PIXELS:
+		    break;
+
+	    case DTWAIN_INCHES:
+	    case DTWAIN_TWIPS:
+	    case DTWAIN_CENTIMETERS:
+	    case DTWAIN_POINTS:
+	    case DTWAIN_PICAS:
+	    {
+		    if (sourceunit == DTWAIN_PIXELS)
+		    {
+			    fRect.left = RequestedRect.left / PixelsPerInch;
+			    fRect.right = RequestedRect.right / PixelsPerInch;
+			    fRect.top = RequestedRect.top / PixelsPerInch;
+			    fRect.bottom = RequestedRect.bottom / PixelsPerInch;
+		    }
+		    else
+		    {
+			    fRect.left = RequestedRect.left / actualDestUnit * PixelsPerInch;
+			    fRect.right = RequestedRect.right / actualDestUnit * PixelsPerInch;
+			    fRect.top = RequestedRect.top / actualDestUnit * PixelsPerInch;
+			    fRect.bottom = RequestedRect.bottom / actualDestUnit * PixelsPerInch;
+		    }
+	    }
+	    break;
+	}
+	return fRect;
+
 }
 
-RGBQUAD* CDibInterface::GetPalettePtr(BYTE *pDibData, int bpp)
-{
-  if ( pDibData && bpp < 16)
-  {
-      BYTE *pPalette = pDibData + sizeof(BITMAPINFOHEADER);
-      return reinterpret_cast<RGBQUAD *>(pPalette);
-  }
-  return nullptr;
-}
-
-unsigned char * CDibInterface::GetScanLine(BYTE *pDib, int scanline)
-{
-    if ( pDib )
-    {
-        return CalculateScanLine(GetDibBits(pDib), GetPitch(pDib), scanline);
-    }
-    return nullptr;
-}
-
-unsigned CDibInterface::GetLine(BYTE *pDib)
-{
-    if ( pDib )
-    {
-        UINT32 width;
-        UINT32 bpp;
-        GetWidth(pDib, &width);
-        GetBitsPerPixel(pDib, &bpp);
-        return (width * bpp + 7) / 8;
-    }
-    return 0;
-}
-
-unsigned CDibInterface::GetLine(BYTE *pDib, BYTE *pDest, int nWhichLine)
-{
-    const auto bi = reinterpret_cast<LPBITMAPINFOHEADER>(pDib);
-    UINT32 ht;
-    GetHeight(pDib, &ht);
-    const int nLineWidth = LPBlinewidth(bi);
-
-    memcpy(pDest, GetDibBits(pDib) + nLineWidth * (ht - nWhichLine -1), nLineWidth);
-    return nLineWidth;
-}
-
-unsigned CDibInterface::GetPitch(BYTE *pDib)
-{
-    if ( pDib )
-        return GetLine(pDib) + 3 & ~3;
-    return 0;
-}
-
-unsigned CDibInterface::GetPitch(fipImage& pDib)
-{
-    return pDib.getScanWidth() + 3 & ~3;
-}
-
-BYTE * CDibInterface::GetDibBits(BYTE *pDib)
-{
-    if ( pDib )
-    {
-        const LPBITMAPINFOHEADER pBi = reinterpret_cast<LPBITMAPINFOHEADER>(pDib);
-        const int nColors = pBi->biClrUsed;
-        BYTE *p = (BYTE *)pBi;
-        return p + sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * nColors;
-    }
-    return nullptr;
-}
-
-int CDibInterface::GetDibPalette(fipImage& lpbi,LPSTR palette)
-{
-    const BITMAPINFO* header = lpbi.getInfo();
-    const unsigned int j = (std::min)(1 << header->bmiHeader.biBitCount, 256);
-
-    for (unsigned int i = 0; i < j; i++)
-    {
-        palette[i*RGB_SIZE + RGB_RED] = header->bmiColors[i].rgbRed;
-        palette[i*RGB_SIZE + RGB_GREEN] = header->bmiColors[i].rgbGreen;
-        palette[i*RGB_SIZE + RGB_BLUE] = header->bmiColors[i].rgbBlue;
-    }
-
-    return j;
-}
+CDibInterface::CDibInterface() : m_lasterror(0) {}
 
 // Function to ensure that DIB data is on DWORD boundaries
 HANDLE CDibInterface::CopyDib(HANDLE hDib)
@@ -213,40 +143,35 @@ HANDLE CDibInterface::NormalizeDib(HANDLE hDib, bool bReturnCopy /* = false */ )
     HANDLE hNewDib = nullptr;
     if (!hDib)
         return nullptr;
-    BYTE *pImage = static_cast<BYTE*>(ImageMemoryHandler::GlobalLock(hDib));
     {
-        DTWAINGlobalHandle_RAII dibHandle(hDib);
+        dynarithmic::dib::LockedDib dibHandle(hDib);
 
+        BYTE* pImage = const_cast<BYTE*>(dibHandle.HeaderAsBytePtr());
         UINT32 width, height, bpp;
-        GetWidth(pImage, &width);
-        GetHeight(pImage, &height);
-        GetBitsPerPixel( pImage, &bpp );
-
+        width = dibHandle.Width();
+        height = dibHandle.Height();
+        bpp = dibHandle.BitsPerPixel();
+        auto palettePtr = dibHandle.PalettePtrMutable();
         // Create another DIB based on this DIB's data
-        hNewDib = CreateDIB(width, height, bpp, reinterpret_cast<LPSTR>(GetPalettePtr(pImage, bpp)));
-
+        hNewDib = CreateDIB(width, height, bpp, reinterpret_cast<LPSTR>(palettePtr));
         if (!hNewDib)
             return hDib;
 
-        BYTE *pNewImage = static_cast<BYTE*>(ImageMemoryHandler::GlobalLock(hNewDib));
-        DTWAINGlobalHandle_RAII dibHandle2(hNewDib);
-
-        // Copy bits from old to new
+        dynarithmic::dib::LockedDib dibHandle2(hNewDib);
 
         // Compute the stride for the old bitmap
-        const LONG OldStride = CalculateLine(width, bpp);
+        const LONG OldStride = dibHandle.StrideBytes();
 
         // This is always DWORD aligned
-        const LONG NewStride = CalculateEffWidth(width,bpp);
+        const LONG NewStride = dibHandle.EffectiveWidth();
 
         // Point to the DIB data
-        pImage = GetDibBits(pImage);
-        pNewImage = GetDibBits(pNewImage);
+        BYTE* pNewImage = const_cast<BYTE*>(dibHandle2.HeaderAsBytePtr());
 
         // Loop through the data, copying from old to new
         if (pImage && pNewImage)
         {
-            for ( UINT32 i = 0; i < height; ++i)
+            for (UINT32 i = 0; i < height; ++i)
             {
                 memcpy(pNewImage, pImage, OldStride);
                 pImage += OldStride;
@@ -254,6 +179,7 @@ HANDLE CDibInterface::NormalizeDib(HANDLE hDib, bool bReturnCopy /* = false */ )
             }
         }
     }
+
     if ( !bReturnCopy )
         ImageMemoryHandler::GlobalFree(hDib);
     return hNewDib;
@@ -264,8 +190,8 @@ HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=
     height = abs(height);
 
     int dib_size = sizeof(BITMAPINFOHEADER);
-    dib_size += sizeof(RGBQUAD) * CalculateUsedPaletteEntries(bpp);
-    dib_size += CalculateEffWidth(width, bpp) * height;
+    dib_size += sizeof(RGBQUAD) * dynarithmic::dib::effective_palette_entries(bpp);
+    dib_size += dynarithmic::dib::effective_width(width, bpp) * height;
 
     const HANDLE hDib = ImageMemoryHandler::GlobalAlloc (GHND | GMEM_ZEROINIT, dib_size);
 
@@ -281,7 +207,7 @@ HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=
         bih->biPlanes           = 1;
         bih->biCompression      = 0;
         bih->biBitCount         = static_cast<WORD>(bpp);
-        bih->biClrUsed          = CalculateUsedPaletteEntries(bpp);
+        bih->biClrUsed          = dynarithmic::dib::effective_palette_entries(bpp);
         bih->biClrImportant     = bih->biClrUsed;
 
         if(palette != nullptr)
@@ -303,37 +229,24 @@ HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=
 
 HANDLE CDibInterface::NegateDIB(HANDLE hDib)
 {
-    BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
-    DTWAINGlobalHandle_RAII raii(hDib);
-    CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
-    ImageHandler.Negative();
-    return hDib;
+    return dynarithmic::dib::NegateDib(hDib);
 }
 
 HANDLE CDibInterface::ResampleDIB(HANDLE hDib, long newx, long newy)
 {
-    HANDLE hNewDib = nullptr;
-    {
-        BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
-        DTWAINGlobalHandle_RAII raii(hDib);
-        CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
-        ImageHandler.Resample(newx, newy, 2);
-        hNewDib = ImageHandler.CopyToHandle();
-    }
-    return hNewDib;
+    return dynarithmic::dib::ResizeDib(hDib, newx, newy);
 }
 
 HANDLE CDibInterface::ResampleDIB(HANDLE hDib, double xscale, double yscale)
 {
-    BYTE *pImage = static_cast<BYTE*>(ImageMemoryHandler::GlobalLock(hDib));
-    DTWAINGlobalHandle_RAII dibHandler(hDib);
+    dynarithmic::dib::LockedDib dibHandle(hDib);
     UINT32 wid, ht;
 
     // Get Width
-    GetWidth(pImage, &wid);
+    wid = dibHandle.Width();
 
     // Get Height
-    GetHeight(pImage, &ht);
+    ht = dibHandle.Height();
 
     const long newx = static_cast<long>(xscale * static_cast<double>(wid));
     const long newy = static_cast<long>(yscale * static_cast<double>(ht));
@@ -342,39 +255,26 @@ HANDLE CDibInterface::ResampleDIB(HANDLE hDib, double xscale, double yscale)
 
 HANDLE CDibInterface::IncreaseDecreaseBpp(HANDLE hDib, long newbpp, bool bIncrease)
 {
-    BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
-    DTWAINGlobalHandle_RAII raii(hDib);
-    uint32_t bpp;
-    GetBitsPerPixel(pImage, &bpp);
-    // FreeImage has better resampling down to gray than CXImage from 24 -> 8
+    dynarithmic::dib::LockedDib dibHandle(hDib);
+    uint32_t bpp = dibHandle.BitsPerPixel();
+
+    // RGB to Gray (24 -> 8) special routine
     if (bpp == 24 && newbpp == 8)
     {
-        fipImage im;
-        fipImageUtility::copyFromHandle(im, hDib);
-        fipWinImage_RAII raiiImg(&im);
-        im.convertTo8Bits();
-        return fipImageUtility::copyToHandle(im);
+        HANDLE newDib = Convert24bppDibTo8bppGray(hDib);
+        return newDib;
     }
 
-    // Use CxImage resampler
-    CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
     if (bIncrease)
-        ImageHandler.IncreaseBpp((DWORD)newbpp);
-    else
-        ImageHandler.DecreaseBpp((DWORD)newbpp, 0); 
-    return ImageHandler.CopyToHandle();
+        return dynarithmic::dib::IncreaseDibBpp(hDib, newbpp);
+    return dynarithmic::dib::DecreaseDibBpp(hDib, newbpp);
 }
 
 HANDLE CDibInterface::RotateDIB(HANDLE hDib, float angle)
 {
     if (!hDib)
         return nullptr;
-    BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
-    DTWAINGlobalHandle_RAII raii(hDib);
-    // Use CxImage rotate
-    CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
-    ImageHandler.Rotate(static_cast<double>(angle));
-    return ImageHandler.CopyToHandle();
+    return dynarithmic::dib::Rotate(hDib, angle);
 }
 
 HANDLE CDibInterface::IncreaseBpp(HANDLE hDib, long newbpp)
@@ -387,437 +287,84 @@ HANDLE CDibInterface::DecreaseBpp(HANDLE hDib, long newbpp)
     return IncreaseDecreaseBpp(hDib, newbpp, false);
 }
 
-HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const FloatRect& RequestedRect,int sourceunit,
+HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const FloatRect& RequestedRect, int sourceunit,
                               int destunit, int dpi, bool bConvertActual, int& retval)
 {
-    retval = IS_ERR_OK;
+	retval = IS_ERR_OK;
 
-    fipImage fw;
-    if (!fipImageUtility::copyFromHandle(fw, handle))
-        return nullptr;
-    fipWinImage_RAII raii(&fw);
+    dynarithmic::dib::LockedDib dibHandle(handle);
 
-    const UINT32 width = fw.getWidth();
-    const UINT32 height = fw.getHeight();
+    const UINT32 width = dibHandle.Width();
+	const UINT32 height = dibHandle.Height();
 
-    // Convert the actual rectangle first if necessary
-    // This assumes that the actual rect is in pixels, but
-    // the source unit does not match up correctly
-    FloatRect TempActual = ActualRect;
-    if ( bConvertActual )
-        TempActual = Normalize(fw, ActualRect, ActualRect, DTWAIN_PIXELS, sourceunit, dpi);
+	// Convert the actual rectangle first if necessary
+	// This assumes that the actual rect is in pixels, but
+	// the source unit does not match up correctly
+	FloatRect TempActual = ActualRect;
+	if (bConvertActual)
+		TempActual = Normalize(dibHandle, ActualRect, ActualRect, DTWAIN_PIXELS, sourceunit, dpi);
 
-    // Now return a normalized rectangle from the actual and requested rectangles
-    const FloatRect NormalizedRect = Normalize(fw, TempActual, RequestedRect, sourceunit, destunit, dpi);
+	// Now return a normalized rectangle from the actual and requested rectangles
+	const FloatRect NormalizedRect = Normalize(dibHandle, TempActual, RequestedRect, sourceunit, destunit, dpi);
 
-    const double left = NormalizedRect.left;
-    const double top = NormalizedRect.top;
-    const double right = NormalizedRect.right;
-    const double bottom = NormalizedRect.bottom;
+	const double left = NormalizedRect.left;
+	const double top = NormalizedRect.top;
+	const double right = NormalizedRect.right;
+	const double bottom = NormalizedRect.bottom;
 
-    // DIBs are stored upside down, so adjust coordinates here
-    const int newbottom = height - static_cast<UINT32>(top);
-    const int newtop = height - static_cast<UINT32>(bottom);
+	// DIBs are stored upside down, so adjust coordinates here
+	const int newbottom = height - static_cast<UINT32>(top);
+	const int newtop = height - static_cast<UINT32>(bottom);
 
-    long startx = (std::max)(0L, (std::min<long>)(left, width));
-    long endx = (std::max)(0L, (std::min<long>)(right, width));
+	long startx = (std::max)(0L, (std::min<long>)(left, width));
+	long endx = (std::max)(0L, (std::min<long>)(right, width));
 
-    long starty = (std::max)(0L,(std::min<long>)(newtop, height));
-    long endy =   (std::max)(0L,(std::min<long>)(newbottom, height));
+	long starty = (std::max)(0L, (std::min<long>)(newtop, height));
+	long endy = (std::max)(0L, (std::min<long>)(newbottom, height));
 
-    if (startx==endx || starty==endy)
-    {
-        retval = IS_ERR_BADPARAM;
-        return nullptr;
-    }
+	if (startx == endx || starty == endy)
+	{
+		retval = IS_ERR_BADPARAM;
+		return nullptr;
+	}
 
-    if (startx>endx)
-    {
-        const long tmp=startx;
-        startx=endx;
-        endx=tmp;
-    }
-    if (starty>endy)
-    {
-        const long tmp=starty;
-        starty=endy;
-        endy=tmp;
-    }
+	if (startx > endx)
+	{
+		const long tmp = startx;
+		startx = endx;
+		endx = tmp;
+	}
+	if (starty > endy)
+	{
+		const long tmp = starty;
+		starty = endy;
+		endy = tmp;
+	}
 
-    if ( fw.crop(startx, starty, endx, endy) )
-        return fipImageUtility::copyToHandle(fw);
-    return nullptr;
-}
-
-FloatRect CDibInterface::Normalize(fipImage& pImage, const FloatRect& ActualRect, const FloatRect& RequestedRect,
-                                   int sourceunit, int destunit, int dpi)
-{
-    static constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
-                                                                      {DTWAIN_TWIPS, 1440.0},
-                                                                      {DTWAIN_POINTS, 72.0},
-                                                                      {DTWAIN_PICAS, 6.0},
-                                                                      {DTWAIN_CENTIMETERS, 2.54}} };
-
-    const UINT32 width = pImage.getWidth();
-
-    // Set up a return rect
-    FloatRect fRect = RequestedRect;
-
-    // Check dimensions
-    if (fabs(ActualRect.right - ActualRect.left) < 1.0 )
-        return fRect;
-
-    const UINT32 pitch = GetPitch(pImage);
-    if ( pitch == 0 )
-        return fRect;
-
-    const auto iterSourceUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == sourceunit; });
-    const auto iterDestUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == destunit; });
-
-    // If not found return the original rect
-    if (!iterSourceUnit.first || !iterDestUnit.first)
-        return fRect;
-
-    auto actualSourceUnit = Measurement[iterSourceUnit.second].second;
-    auto actualDestUnit = Measurement[iterDestUnit.second].second;
-
-    // Convert Actual rect to pixels
-    double PixelsPerInch = dpi;
-    switch(sourceunit)
-    {
-        case DTWAIN_PIXELS:
-            break;
-
-        case DTWAIN_INCHES:
-        case DTWAIN_TWIPS:
-        case DTWAIN_CENTIMETERS:
-        case DTWAIN_POINTS:
-        case DTWAIN_PICAS:
-        {
-            const double NumInches = (ActualRect.right - ActualRect.left) / actualSourceUnit;
-            PixelsPerInch = static_cast<double>(width) / NumInches;
-        }
-        break;
-    }
-
-    switch(destunit)
-    {
-        case DTWAIN_PIXELS:
-            break;
-
-        case DTWAIN_INCHES:
-        case DTWAIN_TWIPS:
-        case DTWAIN_CENTIMETERS:
-        case DTWAIN_POINTS:
-        case DTWAIN_PICAS:
-        {
-            if ( sourceunit == DTWAIN_PIXELS )
-            {
-                fRect.left   = RequestedRect.left / PixelsPerInch;
-                fRect.right  = RequestedRect.right  /  PixelsPerInch;
-                fRect.top    = RequestedRect.top   /  PixelsPerInch;
-                fRect.bottom = RequestedRect.bottom  / PixelsPerInch;
-            }
-            else
-            {
-                fRect.left   = RequestedRect.left / actualDestUnit * PixelsPerInch;
-                fRect.right  = RequestedRect.right  / actualDestUnit * PixelsPerInch;
-                fRect.top    = RequestedRect.top   / actualDestUnit * PixelsPerInch;
-                fRect.bottom = RequestedRect.bottom  / actualDestUnit * PixelsPerInch;
-            }
-        }
-        break;
-
-    }
-    return fRect;
+    return dynarithmic::dib::CropDib(handle, startx, starty, endx, endy);
 }
 
 // Test for blank page here
 bool CDibInterface::IsBlankDIB(HANDLE hDib, double threshold)
 {
-    if ( !hDib )
-        return false;
-
-    CTL_TwainDib dibHandler(hDib);
-    dibHandler.SetAutoDelete(false);
-    const auto bpp = dibHandler.GetBitsPerPixel();
-    switch (bpp)
-    {
-        case 1:
-        {
-            // Just count up the white pixels and black pixels
-            auto bitsOffsetVal = dibHandler.GetBitsOffset();
-            if (!bitsOffsetVal)
-                return false;
-            DWORD bitsOffset = *bitsOffsetVal;
-            BYTE* pDib = static_cast<BYTE*>(ImageMemoryHandler::GlobalLock(hDib));
-            DTWAINGlobalHandle_RAII hDibHandler(hDib);
-            const DWORD totalSize = ImageMemoryHandler::GlobalSize(hDib);
-            uint64_t numBlack = 0;
-            uint64_t numWhite = 0;
-            while (bitsOffset < totalSize)
-            {
-                const auto countWhite = countOneBits(*(pDib + bitsOffset));
-                numWhite += countWhite;
-                numBlack += 8 - countWhite;
-                ++bitsOffset;
-            }
-            const double pctwhite = static_cast<double>(numWhite) / static_cast<double>(numWhite + numBlack);
-            return pctwhite >= threshold;
-        }
-        case 8:
-        {
-            // 8 BPP must use a palette
-            auto bitsOffsetVal = dibHandler.GetBitsOffset();
-            if (!bitsOffsetVal)
-                return false;
-            DWORD bitsOffset = *bitsOffsetVal;
-            const auto numColors = dibHandler.GetNumColors();
-
-            // Build a histogram of the colors from palette that have been detected
-            std::vector<unsigned int> histogram(numColors);
-            BYTE* pDib = static_cast<BYTE*>(ImageMemoryHandler::GlobalLock(hDib));
-            DTWAINGlobalHandle_RAII hDibHandler(hDib);
-            const DWORD totalSize = ImageMemoryHandler::GlobalSize(hDib);
-            DWORD componentTotal = 0;
-
-            // tally up the count for each color found
-            while (bitsOffset < totalSize)
-            {
-                if ( *(pDib + bitsOffset) < numColors )
-                    ++histogram[*(pDib + bitsOffset)];
-                ++bitsOffset;
-                ++componentTotal;
-            }
-
-            // Search for first color that goes over the blank threshold
-            const auto iter = std::find_if(histogram.begin(), histogram.end(), [&](unsigned int n)
-                                                              { return static_cast<double>(n) / static_cast<double>(componentTotal) >= threshold;});
-            return iter != histogram.end();
-        }
-        default:
-            // higher bit counts get sent out to the helper function
-            return IsBlankDIBHelper(hDib, threshold);
-    }
-    return false;
-}
-
-bool CDibInterface::IsBlankDIBHelper(HANDLE hDib, double threshold)
-{
-    fipImage fw;
-    if (!fipImageUtility::copyFromHandle(fw, hDib))
-        return NULL;
-    fipWinImage_RAII raii(&fw);
-
-    if (hDib)
-    {
-        // do a simple test here
-        const UINT32 width = fw.getWidth();
-        const UINT32 height = fw.getHeight();
-
-        // loop for all pixels
-        RGBQUAD rgb;
-        UINT32 numwhite = 0;
-        UINT32 totalcomponents = 0;
-        for (UINT32 row = 0; row < height; ++row)
-        {
-            for (UINT32 col = 0; col < width; ++col)
-            {
-                fw.getPixelColor(col, row, &rgb);
-				numwhite += countOneBits(rgb.rgbRed) + countOneBits(rgb.rgbGreen) + countOneBits(rgb.rgbBlue);
-                totalcomponents += 24;
-            }
-        }
-
-        const double pctwhite = static_cast<double>(numwhite) / static_cast<double>(totalcomponents);
-        return pctwhite >= threshold;
-    }
-    return false;
-}
-
-LPSTR CDibInterface::GetMonoPalette(LPSTR palette)
-{
-    static char pal[]="\000\000\000\377\377\377";
-    if(palette != nullptr)
-        memcpy(palette,pal,6);
-    return static_cast<LPSTR>(pal);
+    return IsBlankDIBEx(hDib, threshold / 100.0).m_bIsBlank;
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-bool CDibInterface::GetWidth(BYTE *pDIB, UINT32 *puWidth)
-{
-    if (pDIB== nullptr)
-    {
-        *puWidth = 0;
-        return false;
-    }
-
-    if (((BITMAPINFOHEADER *)pDIB)->biSize!=sizeof(BITMAPINFOHEADER))
-    {
-        *puWidth = 0;
-        return false;
-    }
-
-    *puWidth = ((BITMAPINFOHEADER *)pDIB)->biWidth;
-    return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool CDibInterface::GetHeight(BYTE *pDIB, UINT32 *piHeight)
-{
-    if (pDIB== nullptr)
-    {
-        *piHeight = 0;
-        return false;
-    }
-
-    if (((BITMAPINFOHEADER *)pDIB)->biSize!=sizeof(BITMAPINFOHEADER))
-    {
-        *piHeight = 0;
-        return false;
-    }
-
-    *piHeight = ((BITMAPINFOHEADER *)pDIB)->biHeight;
-    return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool CDibInterface::GetBitsPerPixel(BYTE *pDIB, UINT32 *puBitCount)
-{
-    if (pDIB== nullptr)
-    {
-        *puBitCount = 0;
-        return false;
-    }
-
-    if (((BITMAPINFOHEADER *)pDIB)->biSize!=sizeof(BITMAPINFOHEADER))
-    {
-        *puBitCount = 0;
-        return false;
-    }
-
-    *puBitCount = ((BITMAPINFOHEADER *)pDIB)->biBitCount;
-    return true;
-}
-
 bool CDibInterface::OpenOutputFile(LPCTSTR pFileName)
 {
-    if (!pFileName)
-    {
-        SetError(DTWAIN_ERR_FILEOPEN);
-        return false;
-    }
-
-    if (pFileName[0] == 0)
-    {
-        SetError(DTWAIN_ERR_FILEOPEN);
-        return false;
-    }
-
-    const auto result = m_fStream.OpenOutputFile(pFileName);
-    if (!result)
-    {
-        SetError(DTWAIN_ERR_FILEOPEN);
-        return false;
-    }
-    SetError(0);
     return true;
 }
 
 bool CDibInterface::CloseOutputFile()
 {
-    const auto retVal = m_fStream.CloseOutputFile();
-    if ( retVal )
-    {
-        SetError(0);
-        return true;
-    }
-    SetError(DTWAIN_ERR_FILEWRITE);
-    return false;
-}
-
-bool CDibInterface::IsGrayScale(BYTE *pImage, int bpp)
-{
-#ifdef _WIN32
-    const LPBITMAPINFOHEADER pHeader = (LPBITMAPINFOHEADER)pImage;
-    RGBQUAD* ppal=GetPalettePtr(pImage, bpp);
-    if(!ppal || pHeader->biClrUsed == 0 )
-        return false;
-
-    for(DWORD i=0; i<pHeader->biClrUsed;i++)
-    {
-        if (ppal[i].rgbBlue!=i || ppal[i].rgbGreen!=i || ppal[i].rgbRed!=i)
-            return false;
-    }
     return true;
-#else
-    return false;
-#endif
 }
 
 bool CDibInterface::IsGrayScale(HANDLE hDib, int bpp)
 {
-#ifdef _WIN32
-    bool bRetval = false;
-    BYTE *pImageTemp = static_cast<BYTE*>(GlobalLock(hDib));
-    DTWAINGlobalHandle_RAII dibHandle(hDib);
-    if ( pImageTemp )
-        bRetval = IsGrayScale(pImageTemp, bpp);
-    return bRetval;
-#else
-    fipImage fw;
-    if (fipImageUtility::copyFromHandle(fw, hDib))
-        return false;
-    fipWinImage_RAII raii(&fw);
-    return fw.isGrayscale();
-#endif
-}
-
-int CDibInterface::putbufferedbyte(WORD byte, std::ofstream& fh, bool bRealEOF, int *pStatus/*=NULL*/)
-{
-    if ( pStatus )
-        *pStatus = 0;
-    if(byte==static_cast<WORD>(EOF) && bRealEOF)
-    {
-        fh.write(reinterpret_cast<char*>(bytebuffer), bytesleft);
-        bytesleft=0;
-        return byte;
-    }
-    else
-    {
-        if(bytesleft >= BYTEBUFFERSIZE)
-        {
-            fh.write(reinterpret_cast<char*>(bytebuffer), bytesleft);
-            bytesleft=0;
-        }
-        bytebuffer[bytesleft++]=static_cast<char>(byte);
-        return byte;
-    }
-}
-
-int CDibInterface::putbyte(WORD byte, std::ofstream& fh)
-{
-    fh.write(reinterpret_cast<char*>(&byte), 1);
-    return byte;
-}
-
-double CDibInterface::GetScaleFactorPerInch(LONG Unit)
-{
-    switch( Unit )
-    {
-        case DTWAIN_TWIPS:
-            return 1440.0;
-        case DTWAIN_POINTS:
-            return 72.0;
-        case DTWAIN_PICAS:
-            return 6.0;
-        case DTWAIN_CENTIMETERS:
-            return 2.54;
-    }
-    return 1.0;
+    dynarithmic::dib::LockedDib dibHandle(hDib);
+    return dynarithmic::dib::is_grayscale_palette(dibHandle.Palette(), dibHandle.PaletteEntries());
 }
 
 HBITMAP CDibInterface::DIBToBitmap(HANDLE hDIB, HPALETTE hPal)
@@ -826,11 +373,8 @@ HBITMAP CDibInterface::DIBToBitmap(HANDLE hDIB, HPALETTE hPal)
 
     if (!hDIB)
         return nullptr;
-
-    BYTE* lpDIBHdr = static_cast<BYTE*>(GlobalLock(hDIB));
-
-    DTWAINGlobalHandle_RAII dibHandle(hDIB);
-    const BYTE* lpDIBBits = GetDibBits(lpDIBHdr);
+    dynarithmic::dib::LockedDib dibHandle(hDIB);
+    const BYTE* lpDIBBits = dibHandle.Bits();
     HDC hDC = GetDC(nullptr);
 
     if (!hDC)
@@ -844,10 +388,10 @@ HBITMAP CDibInterface::DIBToBitmap(HANDLE hDIB, HPALETTE hPal)
     RealizePalette(hDC);
 
     const HBITMAP hBitmap = CreateDIBitmap(hDC,
-                                           reinterpret_cast<LPBITMAPINFOHEADER>(lpDIBHdr),
+                                           dibHandle.Header(),
                                            CBM_INIT,
                                            lpDIBBits,
-                                           reinterpret_cast<LPBITMAPINFO>(lpDIBHdr),
+                                           reinterpret_cast<LPBITMAPINFO>(dibHandle.HeaderMutable()), 
                                            DIB_RGB_COLORS);
 
     if (!hBitmap)

@@ -26,9 +26,10 @@
 #include "fltrect.h"
 #include "dibmulti.h"
 #include "ctlobstr.h"
-#include "FreeImagePlus.h"
 #include "dtwain_raii.h"
 #include "dtwain_filesystem.h"
+#include "blankpage.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4100)
 #endif
@@ -156,27 +157,6 @@ namespace dynarithmic
         static SIZE_T  GlobalSize(HGLOBAL h) { return ::GlobalSize(h); }
     };
 #endif
-    struct FIBITMAP_DestroyTraits
-    {
-        static void Destroy(FIBITMAP* b)
-        {
-            if (b)
-                FreeImage_Unload(b);
-        }
-    };
-
-    struct fipImage_DestroyTraits
-    {
-        static void Destroy(fipImage* fw)
-        {
-            if (fw)
-                fw->clear();
-        }
-    };
-
-    typedef DTWAIN_RAII<FIBITMAP*, FIBITMAP_DestroyTraits> FIBITMAP_RAII;
-    typedef DTWAIN_RAII<fipImage*, fipImage_DestroyTraits> fipWinImage_RAII;
-
     class CTL_ImageIOHandler;
     enum {
         FIC_MINISWHITE = 0,             // min value is white
@@ -258,37 +238,6 @@ namespace dynarithmic
     #define RGB_BLUE        2
     #define RGB_SIZE        3
 
-    class CDibInterfaceStream
-    {
-        public:
-            bool OpenOutputFile(LPCTSTR pFileName)
-            {
-                m_outFileName = pFileName;
-                m_outStream.open(StringConversion::Convert_NativePtr_To_Ansi(pFileName), std::ios::binary);
-                if (m_outStream)
-                    return true;
-                return false;
-            }
-
-            bool CloseOutputFile()
-            {
-                if (m_outStream)
-                {
-                    m_outStream.close();
-                    if (filesys::exists(m_outFileName.c_str()))
-                        return true;
-                }
-                return false;
-            }
-
-            std::ofstream& getStream() { return m_outStream; }
-            CTL_StringType getOutputFileName() const { return m_outFileName; }
-
-        protected:
-            CTL_StringType m_outFileName;
-            std::ofstream m_outStream;
-    };
-
     class CDibInterface
     {
         public:
@@ -296,66 +245,18 @@ namespace dynarithmic
             virtual ~CDibInterface() = default;
 
             // Virtual interface
-            virtual std::string GetFileExtension() const = 0;
-            virtual HANDLE  GetFileInformation(LPCSTR path) = 0;
             virtual int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImage2*/, UINT32 /*wid*/, UINT32 /*ht*/, UINT32 /*bpp*/, UINT32 /*nColors*/, RGBQUAD * /*pPal*/,
                                        void * /*pUserInfo*/ = nullptr) { return TRUE; }
 
             virtual void SetMultiPageStatus(DibMultiPageStruct * /*pStruct*/) { }
             virtual void GetMultiPageStatus(DibMultiPageStruct * /*pStruct*/) { }
-            virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, void * /*pUserInfo*/ = nullptr);
+            virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, void * /*pUserInfo*/ = nullptr) = 0;
             static HANDLE CreateDIB(int width, int height, int bpp, LPSTR palette= nullptr);
 
-            static int CalculateLine(int width, int bitdepth) {
-                return (width * bitdepth + 7) / 8;
-            }
-
-            static int CalculatePitch(int line) {
-                return line + 3 & ~3;
-            }
-
-            static int CalculateUsedPaletteEntries(int bit_count) {
-                if (bit_count >= 1 && bit_count <= 8)
-                    return 1 << bit_count;
-                return 0;
-            }
-
-            static int CalculateEffWidth(int width, int bpp) {
-                return (width * bpp + 31) / 32 * 4;
-            }
-
-            static unsigned GetLine(BYTE *pDib);
-
-            static unsigned char * CalculateScanLine(unsigned char *bits, unsigned pitch, int scanline)
-            {
-                return bits + pitch * scanline;
-            }
-
-            static unsigned char * GetScanLine(BYTE *pDib, int scanline);
-
-            static BYTE *   GetDibBits(BYTE *pDib);
-            static unsigned GetPitch(BYTE *pDib);
-            static unsigned GetPitch(fipImage& pDib);
-
-
-            static RGBQUAD* GetPalettePtr(BYTE *pDibData, int bpp);
-            static int GetDibPalette(fipImage& lpbi,LPSTR palette);
-
-            static bool GetWidth(BYTE *pDIB, UINT32 *puWidth);
-            static bool GetHeight(BYTE *pDIB, UINT32 *piHeight);
-            static bool GetBitsPerPixel(BYTE *pDIB, UINT32 *puBitCount);
-            static unsigned char HINIBBLE (unsigned char byte)
-            {    return byte & 240;  }
-
-            static unsigned char LOWNIBBLE (unsigned char byte)
-            {    return byte & 15;  }
-
-            static LPSTR GetMonoPalette(LPSTR palette);
-
             LONG    GetLastError() { return m_lasterror; }
-            static bool    IsGrayScale(BYTE *pImage, int bpp);
             static bool    IsGrayScale(HANDLE hDib, int bpp);
             static bool    IsBlankDIB(HANDLE hDib, double threshold=0.99);
+            static BlankDIBInfo IsBlankDIBEx(HANDLE hDib, double threshold = 99.0);
 
             // Crop functions
             static HANDLE ResampleDIB(HANDLE hDib, long newx, long newy);
@@ -377,39 +278,19 @@ namespace dynarithmic
             // Convert Dib to HBITMAP
             static HBITMAP DIBToBitmap(HANDLE hDib, HPALETTE hPal = nullptr);
 
-            static double GetScaleFactorPerInch(LONG Unit);
             virtual bool OpenOutputFile(LPCTSTR pFileName);
             virtual bool CloseOutputFile();
-            void CloseOutputFile(bool) {}
-            auto& GetOutputFileHandle() { return m_fStream.getStream(); }
-            CTL_StringType GetOutputFileName() const { return m_fStream.getOutputFileName(); }
 
         protected:
             void SetError(LONG nError) { m_lasterror = nError; }
-            static bool IsBlankDIBHelper(HANDLE hDib, double threshold);
-
             virtual void DestroyAllObjects() { }
-            static unsigned GetLine(BYTE *pDib, BYTE *pDest, int nWhichLine);
-            // Lower level routines
-            void resetbuffer() { bytesleft=0; }
-            int      putbufferedbyte(WORD byte, std::ofstream& fh, bool bRealEOF=false, int *pStatus= nullptr);
 
-            static FloatRect Normalize(fipImage& pImage, const FloatRect& ActualRect, const FloatRect& RequestedRect,
-                                int sourceunit, int destunit, int dpi);
-            static int      putbyte(WORD byte, std::ofstream& fh);
-
-            static char masktable[8];
-            static char bittable[8];
-            static char bayerPattern[8][8];
-            unsigned short int bytesleft,nextbyte;
-            char        bytebuffer[BYTEBUFFERSIZE];
             DibMultiPageStruct m_MultiPageStruct;
 
         private:
-            CDibInterfaceStream m_fStream;
             LONG m_lasterror;
             CTL_StringType m_sFileName;
     };
 }
 #endif
-
+    

@@ -96,13 +96,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederLoaded(DTWAIN_SOURCE Source)
     LOG_FUNC_ENTRY_PARAMS((Source))
     if ( DTWAIN_IsFeederSupported(Source) )
     {
-        CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
         const auto pHandle = pSource->GetDTWAINHandle();
         DTWAIN_ARRAY a = nullptr;
         const DTWAIN_BOOL bReturn = GetCapValuesEx2_Internal(pSource, CAP_FEEDERLOADED, 
                                                              DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &a);
         DTWAINArrayLowLevelPtr_RAII arr(pHandle, &a);
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bReturn || !a;}, DTWAIN_ERR_NO_FEEDER_QUERY, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !bReturn || !a;}, DTWAIN_ERR_NO_FEEDER_QUERY, false, FUNC_MACRO);
         auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(a);
         LONG Val = 0;
         if ( !vFeeder.empty() )
@@ -140,7 +140,7 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsAutoFeedEnabled(DTWAIN_SOURCE Source)
 
 bool IsFeederEnabledFunc(DTWAIN_SOURCE Source, IsEnabledFunc Func)
 {
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
     return (p->*Func)();
 }
 //*********************************************************************************************
@@ -151,7 +151,7 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL 
     if ( !DTWAIN_IsFeederSupported(Source))
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
 
     // Call general function to enable feeder
@@ -191,7 +191,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableAutoFeed(DTWAIN_SOURCE Source, DTWAIN_BOOL
     if (!DTWAIN_IsAutoFeedSupported(Source))
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
     const bool bRet = EnableFeederFunc(Source, CAP_AUTOFEED, p,
                                        &CTL_ITwainSource::SetAutoFeedMode, bSet ? true : false);
     // Call general function to enable feeder
@@ -204,8 +204,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFeederWaitTime(DTWAIN_SOURCE Source, LONG wai
     LOG_FUNC_ENTRY_PARAMS((Source, waitTime, flags))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto isSensitive = DTWAIN_IsFeederSensitive(Source);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !isSensitive; }, DTWAIN_ERR_FEEDER_NOPAPERSENSOR, false, FUNC_MACRO);
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !isSensitive; }, DTWAIN_ERR_FEEDER_NOPAPERSENSOR, false, FUNC_MACRO);
+    CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
     p->SetFeederWaitTime(std::max(DTWAIN_WAIT_INFINITE, static_cast<int>(waitTime)));
     p->SetFeederWaitTimeOption(std::max(flags, static_cast<LONG>(DTWAIN_FEEDER_TERMINATE)));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -339,7 +339,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFeederFuncs(DTWAIN_SOURCE Source)
 
 bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
 {
-    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     if (!pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCap)))
         return false;
 

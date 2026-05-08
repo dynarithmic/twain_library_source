@@ -20,21 +20,50 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
+#include "psdwriter.h"
+#include "iohandler_psd.h"
+#include "ctldib32ex.h"
 
 using namespace dynarithmic;
 
+static bool WriteOneDibHandleToPsd(const std::wstring& filename, const PsdSessionOptions& options, HANDLE hDib)
+{
+	LockedDibPage lockedPage(hDib);
+	if (!lockedPage.IsValid())
+		return false;
+
+	PsdSessionWriter writer;
+	if (!writer.Open(filename, options))
+		return false;
+
+	auto pageInfo = PsdSessionWriter::MakePreparedPsdDibPage(lockedPage.GetView());
+	if (!pageInfo.has_value())
+		return false;
+
+	if (!writer.SetPageInfo(pageInfo.value()))
+		return false;
+
+	if (!writer.WriteCurrentPage())
+		return false;
+
+	writer.Close();
+	return true;
+}
+
+
 int CTL_PsdIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
-        return DTWAIN_ERR_DIB;
+    HANDLE hDib = hDib = m_pDib->GetHandle();
 
-    if (!IsValidBitDepth(DTWAIN_PSD, m_pDib->GetBitsPerPixel()))
-        return DTWAIN_ERR_INVALID_BITDEPTH;
+	PsdSessionOptions opts{};
+	opts.useRle = true; // raw only in this implementation
 
-    m_SaveParams.hDib = hDib;
-    m_SaveParams.szFile = szFile;
+	opts.comment = GetCopyrightString();
 
-    return SaveToFile();
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+
+	if (!WriteOneDibHandleToPsd(fName, opts, hDib))
+		return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }
 

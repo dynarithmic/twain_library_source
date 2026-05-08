@@ -23,11 +23,6 @@ OF THIRD PARTY RIGHTS.
 
 #ifndef IMGFUNC_IGNORE
     #include "winbit32.h"
-    #include "tiffun32.h"
-    #include "pcxfun32.h"
-    #include "wmffun32.h"
-    #include "pdffun32.h"
-    #include "txtfun32.h"
 #endif
 #endif
 

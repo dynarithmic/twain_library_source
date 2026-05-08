@@ -21,9 +21,9 @@
 #include "winbit32.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
-#include "../cximage/ximage.h"
 #include "resamplefactory.h"
 #include "cppfunc.h"
+#include "ctldib32ex.h"
 
 namespace dynarithmic
 {

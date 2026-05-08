@@ -21,22 +21,26 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "ctlloadresources.h"
+#include "ctldib32ex.h"
+#include "logwriterutils.h"
 
 using namespace dynarithmic;
 
 boost::container::flat_map<LONG, std::vector<uint16_t>> CTL_ImageIOHandler::s_supportedBitDepths;
 
-CTL_ImageIOHandler::CTL_ImageIOHandler() : bytesleft(0), nextbyte(0),
-bytebuffer{}, bittable{}, masktable{}, pMultiDibData(nullptr), m_nPage(0), m_bAllWritten(true), m_bOnePageWritten(false)
-{
-    m_pDib = nullptr;
-}
+CTL_ImageIOHandler::CTL_ImageIOHandler() : 
+    pMultiDibData(nullptr), 
+    m_nPage(0), 
+    m_bOnePageWritten(false), 
+    m_pDib(nullptr),
+    m_sCopyright(GetResourceStringFromMap(IDS_DTWAIN_APPTITLE))
+{}
 
-CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): bytesleft(0), nextbyte(0),
-bytebuffer{}, bittable{}, masktable{}, pMultiDibData(nullptr), m_nPage(0), m_bAllWritten(true), m_bOnePageWritten(false)
-{
-    m_pDib = pDib;
-}
+CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): pMultiDibData(nullptr), m_nPage(0), m_bOnePageWritten(false), 
+                                        m_pDib(pDib),
+                                        m_sCopyright(GetResourceStringFromMap(IDS_DTWAIN_APPTITLE))
+{}
 
 void CTL_ImageIOHandler::SetMultiDibInfo(const DibMultiPageStruct &s)
 {
@@ -46,11 +50,6 @@ void CTL_ImageIOHandler::SetMultiDibInfo(const DibMultiPageStruct &s)
 DibMultiPageStruct CTL_ImageIOHandler::GetMultiDibInfo() const
 {
     return m_DibMultiPageStruct;
-}
-
-void CTL_ImageIOHandler::resetbuffer()
-{
-    bytesleft=0;
 }
 
 bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
@@ -65,29 +64,39 @@ bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
     return true;
 }
 
-int CTL_ImageIOHandler::SaveToFile() const
+int CTL_ImageIOHandler::WriteBitmapImpl(LPCTSTR szFile, int nFormat, bool bOpenFile, int fh, DibMultiPageStruct* pMultiDibStruct/* = nullptr*/)
 {
-    #ifdef _WIN32
-    fipImage fw;
-    if (!fipImageUtility::copyFromHandle(fw, m_SaveParams.hDib))
-        return 1;
-    fipWinImage_RAII raii(&fw);
-    #else
-        fipImage fw;
-        fipMemoryIO memIO((BYTE *)hDib, 0);
-    fw.loadFromMemory(FIF_TIFF, memIO, flags);
-    #endif
+	if (!m_pDib || !m_pDib->GetHandle())
+		return DTWAIN_ERR_DIB;
 
-    double multiplier = 39.37 * std::get<0>(m_SaveParams.multiplier_pr);
-    if (m_SaveParams.unitOfMeasure == DTWAIN_CENTIMETERS)
-        multiplier = 100.0 * std::get<1>(m_SaveParams.multiplier_pr);
+	if (!IsValidBitDepth(nFormat, m_pDib->GetBitsPerPixel()))
+		return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    fw.setHorizontalResolution(m_SaveParams.res.first * multiplier + std::get<2>(m_SaveParams.multiplier_pr));
-    fw.setVerticalResolution(m_SaveParams.res.second * multiplier + std::get<3>(m_SaveParams.multiplier_pr));
+    return WriteBitmap(szFile, bOpenFile, fh, pMultiDibStruct);
+}
 
-    fipTag fp;
-    fp.setKeyValue(m_SaveParams.commentKey, CTL_StaticData::GetAppTitle().c_str());
-    fw.setMetadata(m_SaveParams.metaDataTag, m_SaveParams.commentKey, fp);
-    return fw.save(m_SaveParams.fmt, StringConversion::Convert_NativePtr_To_Ansi(m_SaveParams.szFile).c_str(),
-                   m_SaveParams.flags) ? 0 : 1;
+void CTL_ImageIOHandler::SetPageWriteStatus(int nFormat, int Stage)
+{
+    if (CTL_StaticData::GetLogFilterFlags() != 0)
+    {
+        bool isFirstPage = (Stage == 0 || Stage == DIB_MULTI_FIRST);
+        bool isLastPage = (Stage == 0 || Stage == DIB_MULTI_LAST);
+
+        auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
+        auto iter = availableFileTypes.find(nFormat);
+        std::string fileFormat = iter->second.m_formatName;
+
+        if (isFirstPage)
+        {
+            LogWriterUtils::WriteLogInfoIndentedA("Writing " + fileFormat + " file");
+            SetNumPagesWritten(1);
+        }
+        else
+        if (!isLastPage)
+        {
+            auto numPages = GetNumPagesWritten();
+            SetNumPagesWritten(numPages + 1);
+            LogWriterUtils::WriteLogInfoIndentedA("Writing " + fileFormat + " page " + std::to_string(numPages + 1));
+        }
+    }
 }

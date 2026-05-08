@@ -24,6 +24,7 @@ OF THIRD PARTY RIGHTS.
 #include <pdflib32.h>
 #include <dtwainpdf.h>
 #include <pdfconst.h>
+#include "pdffun32.h"
 
 namespace dynarithmic
 {
