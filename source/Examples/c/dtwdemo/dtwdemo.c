@@ -703,7 +703,7 @@ void GenericAcquire(LONG nWhichOne)
         return;
     }
     RetrieveAndDisplayDibs(g_hInstance, g_AcquireArray, IDD_dlgDib, g_hWnd);
-    DTWAIN_DestroyAcquisitionArray( g_AcquireArray, FALSE );
+    DTWAIN_DestroyAcquisitionArray( g_AcquireArray, TRUE );
 }
 
 void AcquireNative()
