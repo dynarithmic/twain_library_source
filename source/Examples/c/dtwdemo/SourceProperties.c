@@ -796,27 +796,27 @@ void TestSetCap(HWND hWnd, LONG capValue)
     int arrayType = DTWAIN_ARRAYLONG;
     switch (nDataType)
     {
-    case TWTY_STR32:
-    case TWTY_STR64:
-    case TWTY_STR128:
-    case TWTY_STR255:
-    case TWTY_STR1024:
-    {
-        arrayType = DTWAIN_ARRAYANSISTRING;
-    }
-    break;
+        case TWTY_STR32:
+        case TWTY_STR64:
+        case TWTY_STR128:
+        case TWTY_STR255:
+        case TWTY_STR1024:
+        {
+            arrayType = DTWAIN_ARRAYANSISTRING;
+        }
+        break;
 
-    case TWTY_FIX32:
-    {
-        arrayType = DTWAIN_ARRAYFLOAT;
-    }
-    break;
+        case TWTY_FIX32:
+        {
+            arrayType = DTWAIN_ARRAYFLOAT;
+        }
+        break;
 
-    case TWTY_FRAME:
-    {
-        arrayType = DTWAIN_ARRAYFRAME;
-    }
-    break;
+        case TWTY_FRAME:
+        {
+            arrayType = DTWAIN_ARRAYFRAME;
+        }
+        break;
     }
 
     PARSERINFO pInfo;

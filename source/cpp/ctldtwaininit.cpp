@@ -2332,8 +2332,7 @@ CTL_StringType GetDTWAINDLLVersionInfoStr()
     auto& versionString = CTL_StaticData::GetShortVersionString();
     if (!versionString.empty())
         return versionString;
-    versionString = StringConversion::Convert_AnsiPtr_To_Native(DTWAIN_VERINFO_FILEVERSION);
-    return versionString;
+    return StringConversion::Convert_AnsiPtr_To_Native(DTWAIN_SHORT_VERSION);
 }
 
 CTL_StringType GetDTWAINInternalBuildNumber()
