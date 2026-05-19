@@ -30,9 +30,6 @@
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/hex.hpp>
 #include <assert.h>
@@ -42,6 +39,7 @@
 #include <locale>
 #include <iostream>
 #include <string_view>
+#include <random>
 #include <boost/lexical_cast.hpp>
 #include <dtwain_filesystem.h>
 #include "dtwain_standard_defs.h"
@@ -136,9 +134,6 @@ namespace dynarithmic
 
         template <typename T>
         static std::string PathGenericString(const T& x) { return x.generic_string(); }
-
-        template <typename T>
-        static std::string ConvertToBoostUUIDString(const T& x)  { return boost::uuids::to_string(x); }
 
         template <typename T, typename std::enable_if<std::is_arithmetic_v<T>,bool>::type = true>
         static std::string ToString(const T& value)
@@ -287,9 +282,6 @@ namespace dynarithmic
 
         template <typename T>
         static std::wstring PathGenericString(const T& x) { return x.generic_wstring(); }
-
-        template <typename T>
-        static std::wstring ConvertToBoostUUIDString(const T& x) { return boost::uuids::to_wstring(x); }
 
         template <typename T, typename std::enable_if<std::is_arithmetic_v<T>, bool>::type = true>
         static std::wstring ToString(const T& value)
@@ -918,17 +910,62 @@ namespace dynarithmic
             return pathName;
         }
 
-		static StringType GetGUIDNoCurlyBrace()
+		static StringType GenerateUUIDv4()
 		{
-			const boost::uuids::uuid u = boost::uuids::random_generator()();
-            return StringTraits::ConvertToBoostUUIDString(u);
+			using char_type = typename StringType::value_type;
+
+			static_assert(std::is_same_v<StringType, std::string> ||std::is_same_v<StringType, std::wstring>,
+                          "StringType must be std::string or std::wstring");
+
+			std::array<std::uint8_t, 16> bytes{};
+
+			std::random_device rd;
+			std::mt19937_64 gen(rd());
+
+			for (std::size_t i = 0; i < bytes.size(); i += 8)
+			{
+				const auto value = gen();
+
+				for (std::size_t j = 0; j < 8 && i + j < bytes.size(); ++j)
+				{
+					bytes[i + j] =
+						static_cast<std::uint8_t>((value >> (j * 8)) & 0xFF);
+				}
+			}
+
+			// UUID version 4
+			bytes[6] = static_cast<std::uint8_t>((bytes[6] & 0x0F) | 0x40);
+
+			// RFC 4122 variant
+			bytes[8] = static_cast<std::uint8_t>((bytes[8] & 0x3F) | 0x80);
+
+			constexpr char_type hex[] =
+			{
+				char_type('0'), char_type('1'), char_type('2'), char_type('3'),
+				char_type('4'), char_type('5'), char_type('6'), char_type('7'),
+				char_type('8'), char_type('9'), char_type('a'), char_type('b'),
+				char_type('c'), char_type('d'), char_type('e'), char_type('f')
+			};
+
+			std::array<char_type, 37> out{};
+			std::size_t pos = 0;
+
+			for (std::size_t i = 0; i < bytes.size(); ++i)
+			{
+				if (i == 4 || i == 6 || i == 8 || i == 10)
+					out[pos++] = char_type('-');
+
+				out[pos++] = hex[(bytes[i] >> 4) & 0x0F];
+				out[pos++] = hex[bytes[i] & 0x0F];
+			}
+
+			out[pos] = char_type('\0');
+			return StringType(out.data());
 		}
 
         static StringType GetGUID()
         {
-            return StringTraits::GetLeftCurlyBrace() +
-                   GetGUIDNoCurlyBrace() +
-                   StringTraits::GetRightCurlyBrace();
+            return StringTraits::GetLeftCurlyBrace() + GenerateUUIDv4() + StringTraits::GetRightCurlyBrace();
         }
 
         static StringType GetModuleFileName(HMODULE hModule)

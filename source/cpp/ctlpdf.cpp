@@ -401,7 +401,7 @@ static std::shared_ptr<PDFTextElement> GenericAddPDFText(CTL_ITwainSource *pSour
         PDFTextElementPtr pPtr = std::make_shared<PDFTextElement>();
 
 		auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_PDFTEXTELEMENTS);
-        guidMap.Insert(StringWrapperA::GetGUIDNoCurlyBrace(), pPtr.get());
+        guidMap.Insert(StringWrapperA::GenerateUUIDv4(), pPtr.get());
 
         *pPtr = element;
         // Add to the global list
@@ -918,7 +918,7 @@ DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElementCopy(DTWAIN_PDFTEX
 		DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 	PDFTextElementPtr pPtr = std::make_shared<PDFTextElement>();
 	auto& guidMap = pHandle->GetGUIDMap(GUID_PDFTEXTELEMENTS);
-	guidMap.Insert(StringWrapperA::GetGUIDNoCurlyBrace(), pPtr.get());
+	guidMap.Insert(StringWrapperA::GenerateUUIDv4(), pPtr.get());
 
     auto it = CheckGlobalPDFTextElement(TextElement);
 	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);
