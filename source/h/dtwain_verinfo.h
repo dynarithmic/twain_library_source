@@ -24,22 +24,6 @@
 #include "dtwain_config.h"
 #include "dtwain_version.h"
 
-#if DTWAIN_BUILD_LOGCALLSTACK == 1
-    #if DTWAIN_BUILD_LOGPOINTERS == 1
-        #define DTWAIN_BUILD_LOGGINGNAME  " [Logging+]\0"
-    #else
-        #define DTWAIN_BUILD_LOGGINGNAME  " [Logging-]\0"
-    #endif
-#else
-    #define DTWAIN_BUILD_LOGGINGNAME  "\0"
-#endif
-
-#if DTWAIN_BUILD_NEEDVCRUNTIME == 1
-    #define DTWAIN_VCRUNTIME_BUILDNAME " [VC++]\0"
-#else
-    #define DTWAIN_VCRUNTIME_BUILDNAME "\0"
-#endif
-
 #define DTWAIN_VERINFO_COMMENTS             DTWAIN_VERINFO_FILEVERSION " Build " DTWAIN_BUILDVERSION "\0"
 #define DTWAIN_VERINFO_COMPANYNAME          "Dynarithmic Software\0"
 #define DTWAIN_VERINFO_LEGALCOPYRIGHT       "Copyright © 2020-2026\0"
@@ -58,5 +42,4 @@
 #define PDF_STRING_VERSION "PDF "
 #define DEVELOP_DLL_VERSION ""
 
-#define DTWAIN_VERINFO_PRODUCTVERSION       DTWAIN_VERINFO_FILEVERSION " Build " DTWAIN_BUILDVERSION DTWAIN_BUILD_LOGGINGNAME DTWAIN_VCRUNTIME_BUILDNAME "\0"
 #endif

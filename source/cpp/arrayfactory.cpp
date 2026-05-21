@@ -317,7 +317,7 @@ namespace dynarithmic
         if (pNewArray)
         {
             auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
-            guidMap.Insert(StringWrapperA::GetGUIDNoCurlyBrace(), pNewArray);
+            guidMap.Insert(StringWrapperA::GenerateUUIDv4(), pNewArray);
         }
         return pNewArray;
     }
