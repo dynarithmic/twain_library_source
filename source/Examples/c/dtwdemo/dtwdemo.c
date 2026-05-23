@@ -212,10 +212,7 @@ int g_BlankThresholdPct = 98;
 
 #include "DebugUtils.h"
 
-int APIENTRY WinMain(HINSTANCE hInstance,
-                     HINSTANCE hPrevInstance,
-                     LPSTR     lpCmdLine,
-                     int       nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     MSG msg;
     HACCEL hAccelTable;
