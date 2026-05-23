@@ -10,11 +10,11 @@ rem
 rem Edit the values below if desired.
 rem ============================================================
 
-rem If using automatic Boost download:
-set BOOST_CACHE_ROOT=D:/BoostDeps
-set EXISTING_BOOST_ROOT=D:/BoostDeps/boost_1_91_0
+rem If using automatic Boost download (you can use any directory name other than D:/BoostDeps):
+set "BOOST_CACHE_ROOT=D:/BoostDeps"
+set "EXISTING_BOOST_ROOT="
 
-rem If using an existing Boost install, set this instead:
+rem If using an existing Boost install, use this instead:
 rem set "EXISTING_BOOST_ROOT=D:/boost_1_90_0"
 
 set "SOURCE_DIR=%~dp0."
