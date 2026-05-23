@@ -25,6 +25,7 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <memory>
 #include <openjpeg.h>
+#include <optional>
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 

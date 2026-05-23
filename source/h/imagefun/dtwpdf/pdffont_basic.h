@@ -27,6 +27,7 @@
 #include <unordered_map>
 #include <memory>
 #include <utility>
+#include <set>
 #include "dtwpdft.h"
 #include "ctlobstr.h"
 namespace dynarithmic

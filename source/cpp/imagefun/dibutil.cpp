@@ -20,6 +20,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 #include "dibutil.h"
 
 /* These DIB utilities replace the previous CxImage functions */

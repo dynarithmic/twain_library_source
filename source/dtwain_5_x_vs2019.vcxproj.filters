@@ -403,12 +403,6 @@
     <ClCompile Include="cpp\windows_versioninfo.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="c\imagefun\dtwpdf\md5c.c">
-      <Filter>C Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\c\imagefun\dtwpdf\crc32_aux.c">
-      <Filter>C Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\stdafx.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -471,9 +465,6 @@
     </ClCompile>
     <ClCompile Include="cpp\ctlhashutils.cpp">
       <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="aeslib\AES.cpp">
-      <Filter>AES Encryption</Filter>
     </ClCompile>
     <ClCompile Include="cpp\iohandler_jpegxr.cpp">
       <Filter>C++ Files</Filter>
@@ -689,9 +680,6 @@
       <Filter>LibPNG</Filter>
     </ClCompile>
     <ClCompile Include="LibPNG\pngset.c">
-      <Filter>LibPNG</Filter>
-    </ClCompile>
-    <ClCompile Include="LibPNG\pngtest.c">
       <Filter>LibPNG</Filter>
     </ClCompile>
     <ClCompile Include="LibPNG\pngtrans.c">
@@ -1468,14 +1456,11 @@
     <ClCompile Include="cpp\imagefun\dibutil.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\aeslib\AES.cpp">
+      <Filter>AES Encryption</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cpp\pdflib32\a85encode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp\pdflib32\ahexencode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\arrayfactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1728,9 +1713,6 @@
     <ClInclude Include=".\h\errorcheck.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpp\pdflib32\flateencode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include=".\h\funcmac.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1746,13 +1728,7 @@
     <ClInclude Include=".\h\ocrengine\ocrinterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpp\pdflib32\pdfencrypt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\imagefun\pdffun32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp\pdflib32\pdflib32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\imagefun\resamplefactory.h">
@@ -1878,9 +1854,6 @@
     <ClInclude Include="h\ctlrandnumutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="aeslib\AES.h">
-      <Filter>AES Encryption</Filter>
-    </ClInclude>
     <ClInclude Include="h\ctlclosesource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1894,9 +1867,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\ctlguiddef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp\pdflib32\base64encode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="miniz\miniz.h">
@@ -2409,6 +2379,27 @@
     <ClInclude Include="h\imagefun\svgwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\pdflib32\a85encode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\pdflib32\ahexencode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\pdflib32\base64encode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\pdflib32\flateencode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\pdflib32\pdfencrypt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\pdflib32\pdflib32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\aeslib\AES.h">
+      <Filter>AES Encryption</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">
@@ -2555,9 +2546,6 @@
     </Filter>
     <Filter Include="C++ Files">
       <UniqueIdentifier>{ba170b71-6dbf-4e32-9922-1895be88174d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="C Files">
-      <UniqueIdentifier>{3ce19879-49bb-4ac9-9fb5-50d7736d8015}</UniqueIdentifier>
     </Filter>
     <Filter Include="Module Definition Files">
       <UniqueIdentifier>{9f23cfc6-05f2-418a-85d8-7a6a75182eb4}</UniqueIdentifier>

@@ -21,6 +21,7 @@
 #include <windows.h>
 #include <cstdint>
 #include <cstring>
+#include <array>
 #include "tgawriter.h"
 
 std::optional<PreparedTgaDibPage> TgaSessionWriter::MakePreparedTgaDibPage(const dynarithmic::DibPageView& view)

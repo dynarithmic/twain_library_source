@@ -227,7 +227,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\h\aeslib;$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\h\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;OPJ_STATIC;DISABLE_PERF_MEASUREMENT;USE_DTWAIN_DEBUG_LIB;_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;DTWAIN_DLL;DTWAIN_SUPPORT_AES</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -380,7 +380,7 @@ copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     <ClCompile>
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\h\aeslib;$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\h\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;OPJ_STATIC;DISABLE_PERF_MEASUREMENT;FREEIMAGE_CPP_LIB;_UNICODE;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -530,7 +530,7 @@ copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     <ClCompile>
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\LibJPEG;.\Zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\h\aeslib;$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\h\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\LibJPEG;.\Zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;OPJ_STATIC;DISABLE_PERF_MEASUREMENT;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -684,7 +684,7 @@ copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\LibJPEG;.\Zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\h\aeslib;$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\h\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\LibJPEG;.\Zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;OPJ_STATIC;DISABLE_PERF_MEASUREMENT;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -819,7 +819,7 @@ copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\h\aeslib;$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\h\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;OPJ_STATIC;DISABLE_PERF_MEASUREMENT;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
@@ -847,7 +847,7 @@ copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);_WIN64</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
@@ -942,7 +942,7 @@ copy $(TargetDir)$(TargetName).lib .
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\h\aeslib;$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\h\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MinSpace</Optimization>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;OPJ_STATIC;DISABLE_PERF_MEASUREMENT;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
@@ -969,7 +969,7 @@ copy $(TargetDir)$(TargetName).lib .
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);_WIN64</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
@@ -1063,7 +1063,7 @@ copy $(TargetDir)$(TargetName).lib .
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\h\aeslib;$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\h\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MinSpace</Optimization>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;OPJ_STATIC;DISABLE_PERF_MEASUREMENT;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;_DEBUGNDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
@@ -1094,7 +1094,7 @@ copy $(TargetDir)$(TargetName).lib .
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);_WIN64</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
@@ -1188,7 +1188,7 @@ copy $(TargetDir)$(TargetName).lib .
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\h\aeslib;$(BOOST_INCLUDE_DIR);.\date-master\include;.\h;.\matrix;.\dtwinver;.\inl;.\crypt;.\h\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\miniz;.\LibGIF;.\LibTIFF4;.\LibPNG;.\LibWebP;.\LibWebP\src;.\LibOpenJPEG;.\LibJXR\jxrgluelib;.\LibJXR\image\sys;.\ZLib;.\LibJPEG;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;DTWAIN_SUPPORT_AES;OPJ_STATIC;DISABLE_PERF_MEASUREMENT;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
@@ -1215,7 +1215,7 @@ copy $(TargetDir)$(TargetName).lib .
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);_WIN64</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
@@ -1405,18 +1405,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include=".\cpp\ocrengine\ocrinterface.cpp" />
     <ClCompile Include=".\cpp\ocrengine\ocrinterface_internal.cpp" />
     <ClCompile Include=".\cpp\ocrengine\transym_ocrinterface.cpp" />
-    <ClCompile Include=".\c\imagefun\dtwpdf\crc32_aux.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">true</ExcludedFromBuild>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">true</DeploymentContent>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include=".\cpp\ctljpeg.cpp" />
     <ClCompile Include=".\cpp\ctltiff.cpp" />
     <ClCompile Include=".\cpp\ctldib32.cpp" />
@@ -1463,7 +1451,7 @@ copy $(TargetDir)$(TargetName).lib .
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
       </ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="aeslib\AES.cpp" />
+    <ClCompile Include="cpp\aeslib\AES.cpp" />
     <ClCompile Include="cpp\arrayfactory.cpp" />
     <ClCompile Include="cpp\ctlacquireaudio.cpp" />
     <ClCompile Include="cpp\ctlarraydumper.cpp" />
@@ -1582,17 +1570,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\windows_versioninfo.cpp" />
     <ClCompile Include="c\imagefun\dtwpdf\crc32_aux.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="c\imagefun\dtwpdf\md5c.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="LibGIF\dgif_lib.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
@@ -4627,32 +4604,6 @@ copy $(TargetDir)$(TargetName).lib .
       </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="LibPNG\pngset.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
-      </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
-      </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
-      </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
-      </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
-      </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
-      </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
-      </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
-      </ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="LibPNG\pngtest.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
@@ -10045,13 +9996,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include=".\h\ctltr005.h" />
     <ClInclude Include=".\h\ctltr006.h" />
     <ClInclude Include=".\h\ctltr039.h" />
-    <ClInclude Include="aeslib\AES.h" />
-    <ClInclude Include="cpp\pdflib32\a85encode.h" />
-    <ClInclude Include="cpp\pdflib32\ahexencode.h" />
-    <ClInclude Include="cpp\pdflib32\base64encode.h" />
-    <ClInclude Include="cpp\pdflib32\flateencode.h" />
-    <ClInclude Include="cpp\pdflib32\pdfencrypt.h" />
-    <ClInclude Include="cpp\pdflib32\pdflib32.h" />
+    <ClInclude Include="h\aeslib\AES.h" />
     <ClInclude Include="h\ansiwideconverter_generic.h" />
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />
@@ -10156,6 +10101,12 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\logmsg.h" />
     <ClInclude Include="h\logwriterutils.h" />
     <ClInclude Include="h\notimpl.h" />
+    <ClInclude Include="h\pdflib32\a85encode.h" />
+    <ClInclude Include="h\pdflib32\ahexencode.h" />
+    <ClInclude Include="h\pdflib32\base64encode.h" />
+    <ClInclude Include="h\pdflib32\flateencode.h" />
+    <ClInclude Include="h\pdflib32\pdfencrypt.h" />
+    <ClInclude Include="h\pdflib32\pdflib32.h" />
     <ClInclude Include="h\sourceacquireopts.h" />
     <ClInclude Include="h\sourceselectopts.h" />
     <ClInclude Include="h\twainfix32.h" />

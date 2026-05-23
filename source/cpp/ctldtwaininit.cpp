@@ -62,20 +62,6 @@
 #endif
 #endif
 
-#ifdef WIN64
-    #ifndef UNICODE
-        #define DTWAINSTUB _T("dtwain_stub64")
-    #else
-        #define DTWAINSTUB _T("dtwainu_stub64")
-    #endif
-#else
-    #ifndef UNICODE
-        #define DTWAINSTUB _T("dtwain_stub")
-    #else
-        #define DTWAINSTUB _T("dtwainu_stub")
-    #endif
-#endif
-
 using namespace dynarithmic;
 
 static DTWAIN_HANDLE SysInitializeHelper(bool noblock, bool bMinimalSetup = false);
@@ -1891,7 +1877,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainDSM(LONG DSMType)
 {
     LOG_FUNC_ENTRY_PARAMS((DSMType))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    #ifndef WIN64
+    #ifndef _WIN64
     if ( DSMType == DTWAIN_TWAINDSM_LEGACY || DSMType == DTWAIN_TWAINDSM_LATESTVERSION)
     {
         pHandle->m_SessionStruct.nSessionType = DSMType;

@@ -26,6 +26,7 @@
 #include <boost/logic/tribool.hpp>
 #include <utility>
 #include <algorithm>
+#include <vector>
 #include "dtwaindefs.h"
 
 namespace dynarithmic

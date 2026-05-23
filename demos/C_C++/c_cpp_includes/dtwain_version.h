@@ -77,7 +77,7 @@
     #endif
 
     #define DTWAIN_BASE_NAME "dtwain"
-	#if defined (WIN64) || (_WIN64)
+	#ifdef _WIN64
 		#define DTWAIN_OSPLATFORM "64"
         #define DTWAIN_OSPLATFORMEX " 64-Bit "
     #else

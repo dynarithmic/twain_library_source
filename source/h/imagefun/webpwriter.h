@@ -26,6 +26,7 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <memory>
 #include <webp/encode.h>
+#include <optional>
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 

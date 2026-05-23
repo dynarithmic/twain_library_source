@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2019 Dynarithmic Software.
+Copyright (c) 2002-2026 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,16 +17,12 @@ limitations under the License.
 FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
-
-For more information, the license file named LICENSE that is located in the root
-directory of the DTWAIN installation covers the restrictions under the LGPL license.
-Please read this file before deploying or distributing any application using DTWAIN.
 */
-#include <j2klib32.h>
-#include <jasper/jasper.h>
+#ifndef A85ENCODE_H
+#define A85ENCODE_H
 
-LONG FUNCCONVENTION DTWLIB_J2KWriteFile(LPCTSTR /* szFileIn*/,  // This is a JPEG file
-                                       LPCTSTR /* szFileOut*/ ) // This is a JPEG-2000 file
-{
-     return 0;
-}
+#include <string>
+#include <string_view>
+int ASCII85Encode(std::string_view inData, std::string& outData);
+
+#endif

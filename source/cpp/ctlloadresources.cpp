@@ -21,6 +21,7 @@
 #include <sstream>
 #include <boost/format.hpp>
 #include <string_view>
+#include <queue>
 #include "ctliface.h"
 #include "ctlloadresources.h"
 

@@ -22,6 +22,8 @@ OF THIRD PARTY RIGHTS.
 #define ICOWRITER_H
 
 #include <vector>
+#include <string>
+#include <optional>
 #include <windows.h>
 #include <png.h>
 #include "dibutil.h"

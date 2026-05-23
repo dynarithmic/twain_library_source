@@ -21,7 +21,6 @@
 #define WIN32
 #include "..\h\dtwain_verinfo.h"
 #include "..\h\twain.h"
-#include "..\h\cfmtwain.h"
 #include "winuser.h"
 #include "winver.h"
 #include "..\h\dtwain_resource_constants.h"

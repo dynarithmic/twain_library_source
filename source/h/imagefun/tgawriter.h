@@ -25,6 +25,7 @@ OF THIRD PARTY RIGHTS.
 #include <vector>
 #include <memory>
 #include <cstdio>
+#include <optional>
 #include <windows.h>
 #include "dibutil.h"
 #include "imagefilewriterbase.h"

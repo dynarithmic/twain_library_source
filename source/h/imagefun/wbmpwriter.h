@@ -22,6 +22,9 @@ OF THIRD PARTY RIGHTS.
 #define WBMPWRITER_H
 
 #include <memory>
+#include <string>
+#include <optional>
+#include <vector>
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 
