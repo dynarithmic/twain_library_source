@@ -247,7 +247,7 @@ Generated Visual Studio solutions continue to support debugging, natvis visualiz
 
 A build will create two directories, **MinSizeRel** and **Debug**, within the output folder of the build (the name of the output folder will match the name of the batch file that was used to compile the source code.)
 
-The **MinSizeRel** contains the release, non-debug versions of the DLL's, PDB files and import libraries that have been built.  The **Debug** directory contains the debug version o the DLL's, PDB files and import libraries.
+The **MinSizeRel** contains the release, non-debug versions of the DLL's, PDB files and import libraries that have been built.  The **Debug** directory contains the debug version of the DLL's, PDB files and import libraries.
 
 ----
 ----
