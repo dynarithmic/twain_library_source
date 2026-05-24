@@ -1,0 +1,490 @@
+{
+  "version": 3,
+
+  "configurePresets": [
+
+   {
+      "name": "vs2022-x64-crt-unicode",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build-vs2022-x64-crt_unicode",
+
+      "cacheVariables": {
+        "DTWAIN_BUILD_UNICODE": "ON",
+        "DTWAIN_USE_DYNAMIC_CRT": "ON",
+        "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+        "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+        "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+        "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+        "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+        "TWAIN_EXISTING_BOOST_ROOT" : ""
+      }
+    },
+
+    {
+      "name": "vs2022-x64-nocrt-unicode",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build-vs2022-x64-nocrt_unicode",
+
+      "cacheVariables": {
+        "DTWAIN_BUILD_UNICODE": "ON",
+        "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+        "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+        "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+        "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+        "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+        "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+        "TWAIN_EXISTING_BOOST_ROOT" : ""
+      }
+    },
+
+    {
+      "name": "vs2022-x64-crt-ansi",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build-vs2022-x64-crt_ansi",
+
+      "cacheVariables": {
+        "DTWAIN_BUILD_UNICODE": "OFF",
+        "DTWAIN_USE_DYNAMIC_CRT": "ON",
+        "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+        "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+        "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+        "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+        "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+        "TWAIN_EXISTING_BOOST_ROOT" : ""
+      }
+    },
+
+    {
+      "name": "vs2022-x64-nocrt-ansi",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build-vs2022-x64-nocrt_ansi",
+
+      "cacheVariables": {
+        "DTWAIN_BUILD_UNICODE": "OFF",
+        "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+        "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+        "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+        "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+        "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+        "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+        "TWAIN_EXISTING_BOOST_ROOT" : ""
+        }
+      },
+
+      {
+         "name": "vs2022-x32-crt-unicode",
+         "generator": "Visual Studio 17 2022",
+         "architecture": "Win32",
+         "binaryDir": "${sourceDir}/build-vs2022-x32-crt_unicode",
+
+         "cacheVariables": {
+           "DTWAIN_BUILD_UNICODE": "ON",
+           "DTWAIN_USE_DYNAMIC_CRT": "ON",
+           "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+           "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+           "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+           "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+           "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+           "TWAIN_EXISTING_BOOST_ROOT" : ""
+         }
+       },
+
+       {
+         "name": "vs2022-x32-nocrt-unicode",
+         "generator": "Visual Studio 17 2022",
+         "architecture": "Win32",
+         "binaryDir": "${sourceDir}/build-vs2022-x32-nocrt_unicode",
+
+         "cacheVariables": {
+           "DTWAIN_BUILD_UNICODE": "ON",
+           "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+           "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+           "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+           "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+           "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+           "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+           "TWAIN_EXISTING_BOOST_ROOT" : ""
+         }
+       },
+
+       {
+         "name": "vs2022-x32-crt-ansi",
+         "generator": "Visual Studio 17 2022",
+         "architecture": "Win32",
+         "binaryDir": "${sourceDir}/build-vs2022-x32-crt_ansi",
+
+         "cacheVariables": {
+           "DTWAIN_BUILD_UNICODE": "OFF",
+           "DTWAIN_USE_DYNAMIC_CRT": "ON",
+           "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+           "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+           "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+           "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+           "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+           "TWAIN_EXISTING_BOOST_ROOT" : ""
+         }
+       },
+
+       {
+         "name": "vs2022-x32-nocrt-ansi",
+         "generator": "Visual Studio 17 2022",
+         "architecture": "Win32",
+         "binaryDir": "${sourceDir}/build-vs2022-x32-nocrt_ansi",
+
+         "cacheVariables": {
+           "DTWAIN_BUILD_UNICODE": "OFF",
+           "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+           "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+           "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+           "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+           "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+           "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+           "TWAIN_EXISTING_BOOST_ROOT" : ""
+         }
+    },
+
+    {
+       "name": "vs2019-x64-crt-unicode",
+       "generator": "Visual Studio 16 2019",
+       "architecture": "x64",
+       "binaryDir": "${sourceDir}/build-vs2019-x64-crt_unicode",
+
+       "cacheVariables": {
+         "DTWAIN_BUILD_UNICODE": "ON",
+         "DTWAIN_USE_DYNAMIC_CRT": "ON",
+         "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+         "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+         "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+         "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+         "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+         "TWAIN_EXISTING_BOOST_ROOT" : ""
+       }
+     },
+
+     {
+       "name": "vs2019-x64-nocrt-unicode",
+       "generator": "Visual Studio 16 2019",
+       "architecture": "x64",
+       "binaryDir": "${sourceDir}/build-vs2019-x64-nocrt_unicode",
+
+       "cacheVariables": {
+         "DTWAIN_BUILD_UNICODE": "ON",
+         "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+         "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+         "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+         "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+         "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+         "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+         "TWAIN_EXISTING_BOOST_ROOT" : ""
+       }
+     },
+
+     {
+       "name": "vs2019-x64-crt-ansi",
+       "generator": "Visual Studio 16 2019",
+       "architecture": "x64",
+       "binaryDir": "${sourceDir}/build-vs2019-x64-crt_ansi",
+
+       "cacheVariables": {
+         "DTWAIN_BUILD_UNICODE": "OFF",
+         "DTWAIN_USE_DYNAMIC_CRT": "ON",
+         "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+         "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+         "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+         "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+         "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+         "TWAIN_EXISTING_BOOST_ROOT" : ""
+       }
+     },
+
+     {
+       "name": "vs2019-x64-nocrt-ansi",
+       "generator": "Visual Studio 16 2019",
+       "architecture": "x64",
+       "binaryDir": "${sourceDir}/build-vs2019-x64-nocrt_ansi",
+
+       "cacheVariables": {
+         "DTWAIN_BUILD_UNICODE": "OFF",
+         "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+         "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+         "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+         "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+         "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+         "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+         "TWAIN_EXISTING_BOOST_ROOT" : ""
+         }
+       },
+
+      {
+         "name": "vs2019-x32-crt-unicode",
+         "generator": "Visual Studio 16 2019",
+         "architecture": "Win32",
+         "binaryDir": "${sourceDir}/build-vs2019-x32-crt_unicode",
+
+         "cacheVariables": {
+           "DTWAIN_BUILD_UNICODE": "ON",
+           "DTWAIN_USE_DYNAMIC_CRT": "ON",
+           "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+           "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+           "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+           "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+           "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+           "TWAIN_EXISTING_BOOST_ROOT" : ""
+         }
+       },
+
+       {
+         "name": "vs2019-x32-nocrt-unicode",
+         "generator": "Visual Studio 16 2019",
+         "architecture": "Win32",
+         "binaryDir": "${sourceDir}/build-vs2019-x32-nocrt_unicode",
+
+         "cacheVariables": {
+           "DTWAIN_BUILD_UNICODE": "ON",
+           "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+           "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+           "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+           "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+           "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+           "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+           "TWAIN_EXISTING_BOOST_ROOT" : ""
+         }
+       },
+
+       {
+         "name": "vs2019-x32-crt-ansi",
+         "generator": "Visual Studio 16 2019",
+         "architecture": "Win32",
+         "binaryDir": "${sourceDir}/build-vs2019-x32-crt_ansi",
+
+         "cacheVariables": {
+           "DTWAIN_BUILD_UNICODE": "OFF",
+           "DTWAIN_USE_DYNAMIC_CRT": "ON",
+           "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+           "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+           "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+           "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+           "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+           "TWAIN_EXISTING_BOOST_ROOT" : ""
+         }
+       },
+
+       {
+         "name": "vs2019-x32-nocrt-ansi",
+         "generator": "Visual Studio 16 2019",
+         "architecture": "Win32",
+         "binaryDir": "${sourceDir}/build-vs2019-x32-nocrt_ansi",
+
+         "cacheVariables": {
+           "DTWAIN_BUILD_UNICODE": "OFF",
+           "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+           "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+           "TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+           "TWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+           "TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+           "TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+           "TWAIN_EXISTING_BOOST_ROOT" : ""
+         }
+    }
+  ],
+
+  "buildPresets": [
+
+    {
+      "name": "vs2022-x64-crt-unicode-release",
+      "configurePreset": "vs2022-x64-crt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2022-x64-crt-unicode-debug",
+      "configurePreset": "vs2022-x64-crt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2022-x64-nocrt-unicode-release",
+      "configurePreset": "vs2022-x64-nocrt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2022-x64-nocrt-unicode-debug",
+      "configurePreset": "vs2022-x64-nocrt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2022-x64-crt-ansi-release",
+      "configurePreset": "vs2022-x64-crt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2022-x64-crt-ansi-debug",
+      "configurePreset": "vs2022-x64-crt-ansi",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2022-x64-nocrt-ansi-release",
+      "configurePreset": "vs2022-x64-nocrt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2022-x64-nocrt-ansi-debug",
+      "configurePreset": "vs2022-x64-nocrt-ansi",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2022-x32-crt-unicode-release",
+      "configurePreset": "vs2022-x32-crt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2022-x32-crt-unicode-debug",
+      "configurePreset": "vs2022-x32-crt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2022-x32-nocrt-unicode-release",
+      "configurePreset": "vs2022-x32-nocrt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2022-x32-nocrt-unicode-debug",
+      "configurePreset": "vs2022-x32-nocrt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2022-x32-crt-ansi-release",
+      "configurePreset": "vs2022-x32-crt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2022-x32-crt-ansi-debug",
+      "configurePreset": "vs2022-x32-crt-ansi",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2022-x32-nocrt-ansi-release",
+      "configurePreset": "vs2022-x32-nocrt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2022-x32-nocrt-ansi-debug",
+      "configurePreset": "vs2022-x32-nocrt-ansi",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2019-x64-crt-unicode-release",
+      "configurePreset": "vs2019-x64-crt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2019-x64-crt-unicode-debug",
+      "configurePreset": "vs2019-x64-crt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2019-x64-nocrt-unicode-release",
+      "configurePreset": "vs2019-x64-nocrt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2019-x64-nocrt-unicode-debug",
+      "configurePreset": "vs2019-x64-nocrt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2019-x64-crt-ansi-release",
+      "configurePreset": "vs2019-x64-crt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2019-x64-crt-ansi-debug",
+      "configurePreset": "vs2019-x64-crt-ansi",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2019-x64-nocrt-ansi-release",
+      "configurePreset": "vs2019-x64-nocrt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2019-x64-nocrt-ansi-debug",
+      "configurePreset": "vs2019-x64-nocrt-ansi",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2019-x32-crt-unicode-release",
+      "configurePreset": "vs2019-x32-crt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2019-x32-crt-unicode-debug",
+      "configurePreset": "vs2019-x32-crt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2019-x32-nocrt-unicode-release",
+      "configurePreset": "vs2019-x32-nocrt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2019-x32-nocrt-unicode-debug",
+      "configurePreset": "vs2019-x32-nocrt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2019-x32-crt-ansi-release",
+      "configurePreset": "vs2019-x32-crt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2019-x32-crt-ansi-debug",
+      "configurePreset": "vs2019-x32-crt-ansi",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2019-x32-nocrt-ansi-release",
+      "configurePreset": "vs2019-x32-nocrt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2019-x32-nocrt-ansi-debug",
+      "configurePreset": "vs2019-x32-nocrt-ansi",
+      "configuration": "Debug"
+    }
+
+  ]
+}

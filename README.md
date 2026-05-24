@@ -6,7 +6,7 @@ The DTWAIN library is written in C++ with a few modules written in C (mostly the
 
 ----
 ##### [Obtaining the latest development binaries](#obtain-dev-libraries)
-##### [Rebuilding DTWAIN from source](#rebuild-source)
+##### [Building DTWAIN from source](#rebuild-source)
 ##### [Building the Demo Programs](#build-demo)  
 ##### [Contributing updates](#contribute-updates)
 ##### [Source Code Analysis Tools used](#tools-we-use)
@@ -33,7 +33,7 @@ The development binaries are built from the latest source code found in the [dev
 
 ----
 
-## <a name="rebuild-source"></a> Rebuilding the Dynarithmic TWAIN Library from Source
+## <a name="rebuild-source"></a> Building the Dynarithmic TWAIN Library from Source
 
 Beginning with **DTWAIN 5.9.1**, rebuilding DTWAIN from source has transitioned from pre-generated Visual Studio solution files to a **CMake-based build system**.
 
@@ -60,7 +60,6 @@ Before rebuilding DTWAIN from source:
 
 * Visual Studio 2019 or later (see below for the exact Visual Studio requirements)
 * [CMake 3.25 or later (including CMake 4.x)](https://cmake.org/download/)
-
 #### Optional
 
 * Existing Boost library installation
@@ -68,6 +67,22 @@ Before rebuilding DTWAIN from source:
 or
 
 * Enable automatic Boost library download during configuration
+
+#### Disk Space Requirements
+
+Building DTWAIN from source requires additional disk space for generated build files, intermediate objects, debug symbols, and optional Boost installation.
+
+Recommended minimum free space:
+
+- ~10 GB free for building a single compiler / architecture configuration with automatic Boost installation enabled
+- Additional space may be required when building multiple configurations simultaneously
+
+Examples of increased usage:
+
+- Building Debug and MinSizeRel
+- Installing Boost automatically
+- Building both x86 and x64 variants
+- Building multiple Visual Studio versions
 
 ----
 
@@ -127,17 +142,20 @@ Debug builds are generated separately and are intended primarily for developers 
 
 ### Building Using Batch Files (Recommended)
 
-The repository contains build scripts which generate the Visual Studio solution and build DTWAIN automatically.
+The repository contains batch files which act as wrappers around CMake presets.
 
-Example:
+Each batch file configures and builds a specific DTWAIN configuration (Visual Studio version, architecture, Unicode/ANSI, CRT/No CRT).
+
+Examples:
 
 ```text
 build_vs2019_x64_crt_unicode.bat
-```
+build_vs2022_x32_nocrt_ansi.bat
+````
 
-Running the script performs:
+Running a batch file performs the following steps:
 
-1. Configure CMake
+1. Configure CMake using a preset
 2. Generate Visual Studio solution files
 3. Locate or install Boost (if enabled)
 4. Build DTWAIN
@@ -146,32 +164,43 @@ Running the script performs:
 Example:
 
 ```bat
-build_vs2019_x64_crt_unicode.bat
+build_vs2022_x64_crt_unicode.bat
 ```
 
-Generated output appears under:
+Generated output appears under the build directory associated with the selected preset.
+
+Example:
 
 ```text
-build-vs2019-x64-crt_unicode\
+build-vs2022-x64-crt_unicode\
 ```
 
----
+Successful builds generate:
+
+```text
+MinSizeRel\
+Debug\
+```
+
+containing DLLs, import libraries, PDB files, and demo programs.
+
+----
 
 ### Using an Existing Boost Installation
 
-If Boost is already installed:
+Build options are controlled through:
 
-Edit the batch file:
+```text
+CMakePresets.json
+````
 
-```bat
-set "BOOST_CACHE_ROOT="
-set "EXISTING_BOOST_ROOT=D:/boost_1_90_0"
-```
+To use an existing Boost installation:
 
-and disable automatic download:
+Edit the appropriate preset and set:
 
-```bat
--DTWAIN_AUTO_DOWNLOAD_BOOST=OFF
+```json
+"TWAIN_EXISTING_BOOST_ROOT": "D:/boost_1_90_0",
+"TWAIN_AUTO_DOWNLOAD_BOOST": "OFF"
 ```
 
 The existing Boost installation must follow the directory layout expected by DTWAIN.
@@ -185,65 +214,131 @@ boost_1_xx_x/
     lib64-msvc-14.x/
 ```
 
----
-
-### Automatic Boost Download
-
-If automatic Boost download is enabled:
-
-```text
--DTWAIN_AUTO_DOWNLOAD_BOOST=ON
-```
-
-DTWAIN will:
-
-* Download Boost binaries (if needed)
-* Install Boost locally
-* Configure include and library paths automatically
-
-Installed Boost binaries may be reused by later builds.
-
----
-
-### Manual CMake Usage
-
-Advanced users may invoke CMake directly.
-
-Example:
-
-```bat
-cmake -S . ^
-      -B build-vs2019-x64-crt_unicode ^
-      -G "Visual Studio 16 2019" ^
-      -A x64 ^
-      -DDTWAIN_BUILD_UNICODE=ON ^
-      -DDTWAIN_USE_DYNAMIC_CRT=ON ^
-      -DTWAIN_AUTO_DOWNLOAD_BOOST=ON
-
-cmake --build build-vs2019-x64-crt_unicode --config MinSizeRel
-cmake --build build-vs2019-x64-crt_unicode --config Debug
-```
-
----
-
-### Notes for Existing Users
-
-If you previously rebuilt DTWAIN by opening `.sln` files directly:
-
-```text
-Old:
-Open solution → Build
-
-New:
-Run batch file → Open generated solution → Build
-```
-
-Generated Visual Studio solutions continue to support debugging, natvis visualizers, and standard Visual Studio workflows.
-
+At minimum, the installation must contain the library directory corresponding to the architecture(s) being built.
 
 ----
 
-### Generated files generated on successful build
+### Automatic Boost Download
+
+To automatically download and install Boost:
+
+Edit the appropriate preset in:
+
+```text
+CMakePresets.json
+````
+
+Example:
+
+```json
+"TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+"TWAIN_BOOST_CACHE_ROOT": "C:/BoostDeps"
+```
+
+If Boost is not already installed, DTWAIN will:
+
+* Download Boost binaries
+* Install Boost locally
+* Configure include and library paths automatically
+
+The Boost installation directory should be a relatively short path due to long internal Boost directory names.
+
+Example locations:
+
+```text
+C:/BoostDeps
+D:/BoostDeps
+E:/Libraries/BoostDeps
+```
+
+Installed Boost binaries may be reused by future builds.
+
+---
+
+### Advanced Usage — CMake Command Line
+
+Advanced users may invoke CMake directly without using the batch files.
+
+List available presets:
+
+```bat
+cmake --list-presets
+````
+
+Configure:
+
+```bat
+cmake --preset vs2022-x64-crt-unicode
+```
+
+Build:
+
+```bat
+cmake --build --preset vs2022-x64-crt-unicode-release
+cmake --build --preset vs2022-x64-crt-unicode-debug
+```
+
+Users familiar with CMake may also edit `CMakePresets.json` directly to customize build behavior.
+
+----
+
+### Using CMake-GUI
+
+Users who prefer a graphical interface may use CMake-GUI instead of the command line.
+
+1. Start CMake-GUI
+2. Set:
+   * Source directory ? DTWAIN source root
+   * Build directory ? desired output directory
+3. Click **Configure**
+4. Select the desired Visual Studio generator
+5. Optionally choose a preset from `CMakePresets.json`
+6. Modify cache values if desired
+7. Click **Generate**
+8. Open the generated Visual Studio solution
+
+Users familiar with CMake-GUI may override values from `CMakePresets.json` before generating.
+
+Typical values that may be customized:
+
+```text
+DTWAIN_BUILD_UNICODE
+DTWAIN_USE_DYNAMIC_CRT
+DTWAIN_ENABLE_LOGCALLSTACK
+TWAIN_AUTO_DOWNLOAD_BOOST
+TWAIN_BOOST_CACHE_ROOT
+TWAIN_EXISTING_BOOST_ROOT
+````
+----
+
+### Notes for Existing Users
+
+Previous DTWAIN versions distributed pre-generated Visual Studio solution files.
+
+DTWAIN now uses generated Visual Studio solutions via CMake.
+
+Old workflow:
+
+```text
+Open .sln
+Build
+````
+
+New workflow:
+
+```text
+Run batch file
+(or configure via CMake / CMake-GUI)
+
+Open generated .sln
+Build
+```
+
+Generated solutions retain normal Visual Studio functionality including debugging, natvis visualizers, and standard project navigation.
+
+----
+
+### Generated files on successful build
 
 A build will create two directories, **MinSizeRel** and **Debug**, within the output folder of the build (the name of the output folder will match the name of the batch file that was used to compile the source code.)
 
