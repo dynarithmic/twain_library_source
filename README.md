@@ -5,11 +5,23 @@ This repository contains the source code and development versions of the Dynarit
 The DTWAIN library is written in C++ with a few modules written in C (mostly the third-party imaging libraries are written in C).
 
 ----
-##### [Obtaining the latest development binaries](#obtain-dev-libraries)
-##### [Building DTWAIN from source](#rebuild-source)
-##### [Building the Demo Programs](#build-demo)  
-##### [Contributing updates](#contribute-updates)
-##### [Source Code Analysis Tools used](#tools-we-use)
+# Table of Contents
+1. [Obtaining the latest development binaries](#obtain-dev-libraries)
+2. [Building DTWAIN from source](#rebuild-source)
+    * [Requirements](#rebuild-requirements)
+    * [Disk space requirements](#rebuild-disk-space)
+    * [Visual Studio requirements](#rebuild-vs-requirements)
+    * [Build Configurations](#build-configurations)
+    * [Build Using Batch Files](#build-using-batchfiles)
+        * [Boost Library Configuration](#boost-library-configuration)
+            * [Automatic Boost Download](#download-boost)
+            * [Use Existing Boost Installation](#use-existing-boost)
+    * [Advanced Usage — CMake Command Line](#advanced-cmake)
+    * [Using CMake-GUI](#cmake-gui)
+    * [Notes for existing users](#notes-existing-users)
+3. [Building the Demo Programs](#build-demo)  
+4. [Contributing updates](#contribute-updates)
+5. [Source Code Analysis Tools used](#tools-we-use)
 
 ----
 
@@ -52,7 +64,7 @@ Users who only consume the prebuilt DTWAIN binaries are unaffected.
 
 ---
 
-### Requirements
+## <a name="rebuild-requirements"></a> Requirements
 
 Before rebuilding DTWAIN from source:
 
@@ -68,7 +80,7 @@ or
 
 * Enable automatic Boost library download during configuration
 
-#### Disk Space Requirements
+#### <a name="rebuild-disk-space"></a>Disk Space Requirements
 
 Building DTWAIN from source requires additional disk space for generated build files, intermediate objects, debug symbols, and optional Boost installation.
 
@@ -86,7 +98,7 @@ Examples of increased usage:
 
 ----
 
-### Visual Studio Requirements
+#### <a name="rebuild-vs-requirements"></a>Visual Studio Requirements
 
 Building DTWAIN from source requires a Visual Studio installation with C/C++ development tools.
 
@@ -121,7 +133,7 @@ If CMake configuration reports that no suitable compiler is found, re-run the Vi
 
 ---
 
-### Build Configurations
+#### <a name="build-configurations"></a>Build Configurations
 
 DTWAIN supports the following release build variants:
 
@@ -140,9 +152,15 @@ Debug builds are generated separately and are intended primarily for developers 
 
 ---
 
-### Building Using Batch Files (Recommended)
+### <a name="build-using-batchfiles"></a>Build Using Batch Files (Recommended)
 
 The repository contains batch files which act as wrappers around CMake presets.
+
+By default, running the batch file will create two directories, **MinSizeRel** and **Debug**, within the output folder of the build (the name of the output folder will match the name of the batch file that was used to compile the source code.)  
+
+After a successful build, the **MinSizeRel** directory will contain the release, non-debug versions of the DLL's, PDB files and import libraries that have been built.  The **Debug** directory will contain the debug version of the DLL's, PDB files and import libraries.
+
+----
 
 Each batch file configures and builds a specific DTWAIN configuration (Visual Studio version, architecture, Unicode/ANSI, CRT/No CRT).
 
@@ -186,39 +204,10 @@ containing DLLs, import libraries, PDB files, and demo programs.
 
 ----
 
-### Using an Existing Boost Installation
+### <a name="boost-library-configuration"></a> Boost Library Configuration
+When building the source code, you have an option of automatically downloading the Boost Library components, or use an existing Boost library installation.
 
-Build options are controlled through:
-
-```text
-CMakePresets.json
-````
-
-To use an existing Boost installation:
-
-Edit the appropriate preset and set:
-
-```json
-"TWAIN_EXISTING_BOOST_ROOT": "D:/boost_1_90_0",
-"TWAIN_AUTO_DOWNLOAD_BOOST": "OFF"
-```
-
-The existing Boost installation must follow the directory layout expected by DTWAIN.
-
-Example:
-
-```text
-boost_1_xx_x/
-    boost/
-    lib32-msvc-14.x/
-    lib64-msvc-14.x/
-```
-
-At minimum, the installation must contain the library directory corresponding to the architecture(s) being built.
-
-----
-
-### Automatic Boost Download
+#### <a name="download-boost"></a> Automatic Boost Download
 
 To automatically download and install Boost:
 
@@ -253,10 +242,40 @@ E:/Libraries/BoostDeps
 
 Installed Boost binaries may be reused by future builds.
 
----
+#### <a name="use-existing-boost"></a> Using an Existing Boost Installation
 
-### Advanced Usage — CMake Command Line
+Build options are controlled through:
 
+```text
+CMakePresets.json
+````
+
+To use an existing Boost installation:
+
+Edit the appropriate preset and set:
+
+```json
+"TWAIN_EXISTING_BOOST_ROOT": "D:/boost_1_90_0",
+"TWAIN_AUTO_DOWNLOAD_BOOST": "OFF"
+```
+
+The existing Boost installation must follow the directory layout expected by DTWAIN.
+
+Example:
+
+```text
+boost_1_xx_x/
+    boost/
+    lib32-msvc-14.x/
+    lib64-msvc-14.x/
+```
+
+At minimum, the installation must contain the library directory corresponding to the architecture(s) being built.
+
+----
+----
+
+#### <a name="advanced-cmake"></a> Advanced Usage — CMake Command Line
 Advanced users may invoke CMake directly without using the batch files.
 
 List available presets:
@@ -282,8 +301,7 @@ Users familiar with CMake may also edit `CMakePresets.json` directly to customiz
 
 ----
 
-### Using CMake-GUI
-
+#### <a name="cmake-gui"></a> Using CMake-GUI
 Users who prefer a graphical interface may use CMake-GUI instead of the command line.
 
 1. Start CMake-GUI
@@ -310,8 +328,8 @@ TWAIN_BOOST_CACHE_ROOT
 TWAIN_EXISTING_BOOST_ROOT
 ````
 ----
-
-### Notes for Existing Users
+----
+#### <a name="notes-existing-users"></a> Notes for Existing Users
 
 Previous DTWAIN versions distributed pre-generated Visual Studio solution files.
 
@@ -337,16 +355,10 @@ Build
 Generated solutions retain normal Visual Studio functionality including debugging, natvis visualizers, and standard project navigation.
 
 ----
-
-### Generated files on successful build
-
-A build will create two directories, **MinSizeRel** and **Debug**, within the output folder of the build (the name of the output folder will match the name of the batch file that was used to compile the source code.)
-
-The **MinSizeRel** contains the release, non-debug versions of the DLL's, PDB files and import libraries that have been built.  The **Debug** directory contains the debug version of the DLL's, PDB files and import libraries.
-
-----
 ----
 ## <a name="build-demo"></a> Building the demo applications
+The demo programs have not been migrated to CMake projects.  Instead they will remain as Visual Studio solutions that need to be loaded explicitly into Visual Studio.
+
 ##### C++
 
 If you wish to build the C and C++ demo applications, the **demos\AllDemos.sln** file can be loaded into Visual Studio 2019 or 2022.  Please note that you must build the base libraries first.  The demos consist of C and C++ language demos, plus C++ demos based on an experimental C++ wrapper library that is currently being developed.
@@ -409,9 +421,6 @@ dtwain32ud.vb    (this will use dtwain32ud.dll at runtime)
 dtwain64d.vb     (this will use dtwain64d.dll at runtime)
 dtwain64ud.vb    (this will use dtwain64ud.dll at runtime)
 ```
-
-
-
 ----
 ----
 
