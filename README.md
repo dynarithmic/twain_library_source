@@ -122,7 +122,7 @@ Required components:
 - Windows 10 SDK or Windows 11 SDK
 - C++ CMake tools for Windows
 
-The default Visual Studio installation may not include C/C++ support.
+The default Visual Studio installation may not include C/C++ support.  Thus you must ensure that the C/C++ support defined above has been selected during installation of Visual Studio.
 
 Optional:
 
