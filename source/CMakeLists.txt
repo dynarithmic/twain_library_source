@@ -1258,6 +1258,17 @@ target_compile_definitions(dtwain_libpng PRIVATE
 
 set_target_properties(dtwain_libpng PROPERTIES
     POSITION_INDEPENDENT_CODE ON
+    ARCHIVE_OUTPUT_DIRECTORY_DEBUG
+        "${CMAKE_BINARY_DIR}/intermediate/libpng/Debug"
+
+    ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL
+        "${CMAKE_BINARY_DIR}/intermediate/libpng/MinSizeRel"
+
+    ARCHIVE_OUTPUT_DIRECTORY_RELEASE
+        "${CMAKE_BINARY_DIR}/intermediate/libpng/Release"
+
+    ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO
+        "${CMAKE_BINARY_DIR}/intermediate/libpng/RelWithDebInfo"
 )
 
 add_library(dtwain SHARED
@@ -1409,7 +1420,17 @@ if(MSVC)
         $<$<CONFIG:MinSizeRel>:/DEBUG>
         $<$<CONFIG:MinSizeRel>:/OPT:REF>
         $<$<CONFIG:MinSizeRel>:/OPT:ICF>
-)
+     )
+
+    target_compile_options(dtwdemo PRIVATE
+        $<$<CONFIG:MinSizeRel>:/GL>
+        $<$<CONFIG:Release>:/GL>
+    )
+
+    target_link_options(dtwdemo PRIVATE
+        $<$<CONFIG:MinSizeRel>:/LTCG>
+        $<$<CONFIG:Release>:/LTCG>
+    )
 
 endif()
 
@@ -1521,6 +1542,9 @@ if(MSVC)
 
     set_property(TARGET dtwain_libpng PROPERTY
         MSVC_RUNTIME_LIBRARY "${DTWAIN_MSVC_RUNTIME_LIBRARY}")
+
+    set_property(TARGET dtwdemo PROPERTY
+        MSVC_RUNTIME_LIBRARY "$<$<CONFIG:MinSizeRel>:MultiThreaded>")
 endif()
 
 set(DTWAIN_NATVIS_FILES
