@@ -2,7 +2,7 @@
 
 This repository contains the source code and development versions of the Dynarithmic TWAIN Library DLL (DTWAIN).  
 
-The DTWAIN library is written in C++ (C++ 17 as the standard that's used) with a few modules written in C (mostly the third-party imaging libraries are written in C).
+The DTWAIN library is written in C++ with a few modules written in C (mostly the third-party imaging libraries are written in C).
 
 ----
 # Table of Contents
@@ -74,7 +74,7 @@ Before rebuilding DTWAIN from source:
 * [CMake 3.25 or later (including CMake 4.x)](https://cmake.org/download/)
 #### Optional
 
-* Existing Boost library installation
+* Existing Boost library installation (version 1.89 or greater)
 
 or
 
@@ -130,6 +130,23 @@ Optional:
 - C++ AddressSanitizer (developer use)
 
 If CMake configuration reports that no suitable compiler is found, re-run the Visual Studio Installer and add the C++ workload.
+
+----
+
+#### Visual Studio 2026
+
+Visual Studio 2026 support is experimental.
+
+DTWAIN is officially built and tested with Visual Studio 2019 and Visual Studio 2022.
+
+Developers who want to experiment with Visual Studio 2026 may use the Visual Studio 2022 CMake presets as a starting point, generate the Visual Studio solution files, and then open the generated solution in Visual Studio 2026.
+
+Boost library compatibility may require either:
+
+- [using an existing Boost installation](#use-existing-boost) known to work with the VS2026 compiler, or
+- [overriding the Boost MSVC binary tag manually](#advanced-cmake)
+
+At this time, Visual Studio 2026 is not part of the official DTWAIN release build matrix.
 
 ---
 
@@ -207,6 +224,11 @@ containing DLLs, import libraries, PDB files, and demo programs.
 ### <a name="boost-library-configuration"></a> Boost Library Configuration
 When building the source code, you have an option of automatically downloading the Boost Library components, or use an existing Boost library installation.
 
+The default tested Boost version used by the CMake presets is Boost 1.91.0. Advanced users may change `DTWAIN_BOOST_VERSION` in `CMakePresets.json`, provided the matching Boost binary package exists for their Visual Studio compiler.
+
+Please note that the minimum version of Boost that can be used to build DTWAIN is **1.89**.  Using a version earlier than 1.89 will result in compilation errors.
+
+----
 #### <a name="download-boost"></a> Automatic Boost Download
 
 To automatically download and install Boost:
@@ -220,8 +242,8 @@ CMakePresets.json
 Example:
 
 ```json
-"TWAIN_AUTO_DOWNLOAD_BOOST": "ON",
-"TWAIN_BOOST_CACHE_ROOT": "C:/BoostDeps"
+"DTWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+"DTWAIN_BOOST_CACHE_ROOT": "C:/BoostDeps"
 ```
 
 If Boost is not already installed, DTWAIN will:
@@ -242,7 +264,10 @@ E:/Libraries/BoostDeps
 
 Installed Boost binaries may be reused by future builds.
 
+----
 #### <a name="use-existing-boost"></a> Using an Existing Boost Installation
+
+DTWAIN requires Boost 1.89.0 or later.
 
 Build options are controlled through:
 
@@ -255,8 +280,8 @@ To use an existing Boost installation:
 Edit the appropriate preset and set:
 
 ```json
-"TWAIN_EXISTING_BOOST_ROOT": "D:/boost_1_90_0",
-"TWAIN_AUTO_DOWNLOAD_BOOST": "OFF"
+"DTWAIN_EXISTING_BOOST_ROOT": "D:/boost_1_90_0",
+"DTWAIN_AUTO_DOWNLOAD_BOOST": "OFF"
 ```
 
 The existing Boost installation must follow the directory layout expected by DTWAIN.
@@ -323,9 +348,9 @@ Typical values that may be customized:
 DTWAIN_BUILD_UNICODE
 DTWAIN_USE_DYNAMIC_CRT
 DTWAIN_ENABLE_LOGCALLSTACK
-TWAIN_AUTO_DOWNLOAD_BOOST
-TWAIN_BOOST_CACHE_ROOT
-TWAIN_EXISTING_BOOST_ROOT
+DTWAIN_AUTO_DOWNLOAD_BOOST
+DTWAIN_BOOST_CACHE_ROOT
+DTWAIN_EXISTING_BOOST_ROOT
 ````
 ----
 ----
