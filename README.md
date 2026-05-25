@@ -224,9 +224,13 @@ containing DLLs, import libraries, PDB files, and demo programs.
 ### <a name="boost-library-configuration"></a> Boost Library Configuration
 When building the source code, you have an option of automatically downloading the Boost Library components, or use an existing Boost library installation.
 
-The default tested Boost version used by the CMake presets is Boost 1.91.0. Advanced users may change `DTWAIN_BOOST_VERSION` in `CMakePresets.json`, provided the matching Boost binary package exists for their Visual Studio compiler.
+The default tested Boost version used by the CMake presets is `1.91.0`. 
 
-Please note that the minimum version of Boost that can be used to build DTWAIN is **1.89**.  Using a version earlier than 1.89 will result in compilation errors.
+Advanced users may change `DTWAIN_BOOST_VERSION` in `CMakePresets.json`, provided the matching Boost binary package exists for their Visual Studio compiler.  For example:
+
+`"DTWAIN_BOOST_VERSION" : "1.90.0"`
+
+Please note that the minimum version of Boost that can be used to build DTWAIN is **1.89.0**.  Using a version earlier than 1.89.0 will result in compilation errors.
 
 ----
 #### <a name="download-boost"></a> Automatic Boost Download
