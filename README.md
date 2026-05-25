@@ -2,7 +2,7 @@
 
 This repository contains the source code and development versions of the Dynarithmic TWAIN Library DLL (DTWAIN).  
 
-The DTWAIN library is written in C++ with a few modules written in C (mostly the third-party imaging libraries are written in C).
+The DTWAIN library is written in C++ (using language standard C++ 17) with a few modules written in C (mostly the third-party imaging libraries are written in C).
 
 ----
 # Table of Contents
