@@ -42,8 +42,8 @@ option(DTWAIN_USE_DYNAMIC_CRT
 #
 # CMake-Gui workflow:
 #   1. Press Configure once.
-#   2. Set TWAIN_BOOST_CACHE_ROOT if you do not want the default C:/BoostDeps.
-#   3. Set TWAIN_AUTO_DOWNLOAD_BOOST=ON.
+#   2. Set DTWAIN_BOOST_CACHE_ROOT if you do not want the default C:/BoostDeps.
+#   3. Set DTWAIN_AUTO_DOWNLOAD_BOOST=ON.
 #   4. Press Configure again, then Generate.
 #
 # The Boost install root is shared by Visual Studio toolset and bitness, for example:
@@ -57,27 +57,35 @@ option(DTWAIN_USE_DYNAMIC_CRT
 # This avoids installing duplicate Boost headers/docs for Win32/x64 and VS2019/VS2022.
 # Do not run multiple Boost installers into the same root concurrently.
 
-set(TWAIN_BOOST_VERSION "1.91.0" CACHE STRING "Boost version to use")
-set(TWAIN_BOOST_VERSION_UNDERSCORE "1_91_0")
+set(DTWAIN_BOOST_VERSION "1.91.0" CACHE STRING
+    "Boost version to download/use. DTWAIN requires Boost 1.89.0 or later.")
 
-set(TWAIN_BOOST_CACHE_ROOT
+if(DTWAIN_BOOST_VERSION VERSION_LESS "1.89.0")
+    message(FATAL_ERROR
+        "DTWAIN requires Boost 1.89.0 or later. "
+        "Requested Boost version: ${DTWAIN_BOOST_VERSION}")
+endif()
+
+string(REPLACE "." "_" DTWAIN_BOOST_VERSION_UNDERSCORE "${DTWAIN_BOOST_VERSION}")
+
+set(DTWAIN_BOOST_CACHE_ROOT
     "C:/BoostDeps"
     CACHE PATH
     "Short directory where Boost installers and binaries are stored")
 
-option(TWAIN_AUTO_DOWNLOAD_BOOST
+option(DTWAIN_AUTO_DOWNLOAD_BOOST
        "Automatically download/install the required Boost binary package if missing"
        OFF)
 
-option(TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL
+option(DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL
        "Delete the downloaded Boost installer after a successful automatic install"
        OFF)
 
-option(TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL
+option(DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL
        "Delete the Boost installer log after a successful automatic install"
        OFF)
 
-set(TWAIN_EXISTING_BOOST_ROOT
+set(DTWAIN_EXISTING_BOOST_ROOT
     ""
     CACHE PATH
     "Optional existing Boost root folder. If set, no Boost download/install is performed.")
@@ -91,110 +99,118 @@ endif()
 # Visual Studio / MSVC Boost binary mapping:
 #   VS 2019 v142 => msvc-14.2
 #   VS 2022 v143 => msvc-14.3
-if(MSVC_TOOLSET_VERSION MATCHES "^143")
-    set(TWAIN_BOOST_MSVC "14.3")
-elseif(MSVC_TOOLSET_VERSION MATCHES "^142")
-    set(TWAIN_BOOST_MSVC "14.2")
+#   Experimental -- For boost version < 1.91 -- VS 2026 v143 => msvc-14.3
+set(DTWAIN_BOOST_MSVC_OVERRIDE "" CACHE STRING
+"Override Boost binary MSVC tag, e.g. 14.3, 14.5")
+
+if(DTWAIN_BOOST_MSVC_OVERRIDE)
+    set(DTWAIN_BOOST_MSVC "${DTWAIN_BOOST_MSVC_OVERRIDE}")
 else()
-    message(FATAL_ERROR
-        "Unsupported MSVC toolset version '${MSVC_TOOLSET_VERSION}'. "
-        "Expected v142 or v143.")
+    if(MSVC_TOOLSET_VERSION MATCHES "^145")
+        set(DTWAIN_BOOST_MSVC "14.5")
+    elseif(MSVC_TOOLSET_VERSION MATCHES "^143")
+        set(DTWAIN_BOOST_MSVC "14.3")
+    elseif(MSVC_TOOLSET_VERSION MATCHES "^142")
+        set(DTWAIN_BOOST_MSVC "14.2")
+    else()
+        message(FATAL_ERROR "Unsupported MSVC toolset: ${MSVC_TOOLSET_VERSION}")
+    endif()
 endif()
 
 # Platform mapping. CMAKE_SIZEOF_VOID_P is valid after project() enables C/CXX.
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(TWAIN_BOOST_BITS "64")
+    set(DTWAIN_BOOST_BITS "64")
 else()
-    set(TWAIN_BOOST_BITS "32")
+    set(DTWAIN_BOOST_BITS "32")
 endif()
 
-if(TWAIN_EXISTING_BOOST_ROOT)
+if(DTWAIN_EXISTING_BOOST_ROOT)
     file(TO_CMAKE_PATH
-         "${TWAIN_EXISTING_BOOST_ROOT}"
-         TWAIN_EFFECTIVE_BOOST_ROOT)
+         "${DTWAIN_EXISTING_BOOST_ROOT}"
+         DTWAIN_EFFECTIVE_BOOST_ROOT)
 else()
-    set(TWAIN_EFFECTIVE_BOOST_ROOT
-        "${TWAIN_BOOST_CACHE_ROOT}/boost_${TWAIN_BOOST_VERSION_UNDERSCORE}")
+    set(DTWAIN_EFFECTIVE_BOOST_ROOT
+        "${DTWAIN_BOOST_CACHE_ROOT}/boost_${DTWAIN_BOOST_VERSION_UNDERSCORE}")
 endif()
 
-set(TWAIN_REQUIRED_BOOST_LIBRARY_DIR
-    "${TWAIN_EFFECTIVE_BOOST_ROOT}/lib${TWAIN_BOOST_BITS}-msvc-${TWAIN_BOOST_MSVC}")
+set(DTWAIN_REQUIRED_BOOST_LIBRARY_DIR
+    "${DTWAIN_EFFECTIVE_BOOST_ROOT}/lib${DTWAIN_BOOST_BITS}-msvc-${DTWAIN_BOOST_MSVC}")
 
-if(TWAIN_EXISTING_BOOST_ROOT)
-    if(NOT EXISTS "${TWAIN_EFFECTIVE_BOOST_ROOT}/boost")
+if(DTWAIN_EXISTING_BOOST_ROOT)
+    if(NOT EXISTS "${DTWAIN_EFFECTIVE_BOOST_ROOT}/boost")
         message(FATAL_ERROR
             "Existing Boost root does not contain the Boost header directory:\n"
-            "  ${TWAIN_EFFECTIVE_BOOST_ROOT}/boost")
+            "  ${DTWAIN_EFFECTIVE_BOOST_ROOT}/boost")
     endif()
 
-    if(NOT EXISTS "${TWAIN_REQUIRED_BOOST_LIBRARY_DIR}")
+    if(NOT EXISTS "${DTWAIN_REQUIRED_BOOST_LIBRARY_DIR}")
         message(FATAL_ERROR
             "Existing Boost root does not contain the required library directory for this build:\n"
-            "  ${TWAIN_REQUIRED_BOOST_LIBRARY_DIR}\n\n"
+            "  ${DTWAIN_REQUIRED_BOOST_LIBRARY_DIR}\n\n"
             "Install the matching Boost binary package or choose automatic Boost download.")
     endif()
 endif()
 
-if(TWAIN_EXISTING_BOOST_ROOT)
+if(DTWAIN_EXISTING_BOOST_ROOT)
     # User-supplied Boost installation. Expected layout:
     #   <root>/boost/version.hpp
     #   <root>/lib32-msvc-14.x  or  <root>/lib64-msvc-14.x
-    set(TWAIN_EFFECTIVE_BOOST_ROOT "${TWAIN_EXISTING_BOOST_ROOT}")
+    set(DTWAIN_EFFECTIVE_BOOST_ROOT "${DTWAIN_EXISTING_BOOST_ROOT}")
 else()
-    file(MAKE_DIRECTORY "${TWAIN_BOOST_CACHE_ROOT}")
+    file(MAKE_DIRECTORY "${DTWAIN_BOOST_CACHE_ROOT}")
 
     # Shared Boost root for this Boost version.
     # VS toolset and bitness are represented only by the library directory name:
     #   lib32-msvc-14.2, lib64-msvc-14.2, lib32-msvc-14.3, lib64-msvc-14.3, etc.
-    set(TWAIN_EFFECTIVE_BOOST_ROOT
-        "${TWAIN_BOOST_CACHE_ROOT}/boost_${TWAIN_BOOST_VERSION_UNDERSCORE}")
+    set(DTWAIN_EFFECTIVE_BOOST_ROOT
+        "${DTWAIN_BOOST_CACHE_ROOT}/boost_${DTWAIN_BOOST_VERSION_UNDERSCORE}")
 endif()
 
-set(TWAIN_BOOST_INCLUDE_DIR "${TWAIN_EFFECTIVE_BOOST_ROOT}")
-set(TWAIN_BOOST_LIBRARY_DIR
-    "${TWAIN_EFFECTIVE_BOOST_ROOT}/lib${TWAIN_BOOST_BITS}-msvc-${TWAIN_BOOST_MSVC}")
+set(DTWAIN_BOOST_INCLUDE_DIR "${DTWAIN_EFFECTIVE_BOOST_ROOT}")
+set(DTWAIN_BOOST_LIBRARY_DIR
+    "${DTWAIN_EFFECTIVE_BOOST_ROOT}/lib${DTWAIN_BOOST_BITS}-msvc-${DTWAIN_BOOST_MSVC}")
 
-set(TWAIN_BOOST_INSTALLER
-    "boost_${TWAIN_BOOST_VERSION_UNDERSCORE}-msvc-${TWAIN_BOOST_MSVC}-${TWAIN_BOOST_BITS}.exe")
+set(DTWAIN_BOOST_INSTALLER
+    "boost_${DTWAIN_BOOST_VERSION_UNDERSCORE}-msvc-${DTWAIN_BOOST_MSVC}-${DTWAIN_BOOST_BITS}.exe")
 
-set(TWAIN_BOOST_URL
-    "https://sourceforge.net/projects/boost/files/boost-binaries/${TWAIN_BOOST_VERSION}/${TWAIN_BOOST_INSTALLER}/download")
+set(DTWAIN_BOOST_URL
+    "https://sourceforge.net/projects/boost/files/boost-binaries/${DTWAIN_BOOST_VERSION}/${DTWAIN_BOOST_INSTALLER}/download")
 
-set(TWAIN_BOOST_DOWNLOADED_EXE
-    "${TWAIN_BOOST_CACHE_ROOT}/${TWAIN_BOOST_INSTALLER}")
+set(DTWAIN_BOOST_DOWNLOADED_EXE
+    "${DTWAIN_BOOST_CACHE_ROOT}/${DTWAIN_BOOST_INSTALLER}")
 
-set(TWAIN_BOOST_INSTALL_LOG
-    "${TWAIN_BOOST_CACHE_ROOT}/${TWAIN_BOOST_INSTALLER}.install.log")
+set(DTWAIN_BOOST_INSTALL_LOG
+    "${DTWAIN_BOOST_CACHE_ROOT}/${DTWAIN_BOOST_INSTALLER}.install.log")
 
-set(TWAIN_BOOST_HEADERS_FOUND FALSE)
-if(EXISTS "${TWAIN_BOOST_INCLUDE_DIR}/boost/version.hpp")
-    set(TWAIN_BOOST_HEADERS_FOUND TRUE)
+set(DTWAIN_BOOST_HEADERS_FOUND FALSE)
+if(EXISTS "${DTWAIN_BOOST_INCLUDE_DIR}/boost/version.hpp")
+    set(DTWAIN_BOOST_HEADERS_FOUND TRUE)
 endif()
 
-set(TWAIN_BOOST_LIBDIR_FOUND FALSE)
-if(EXISTS "${TWAIN_BOOST_LIBRARY_DIR}")
-    set(TWAIN_BOOST_LIBDIR_FOUND TRUE)
+set(DTWAIN_BOOST_LIBDIR_FOUND FALSE)
+if(EXISTS "${DTWAIN_BOOST_LIBRARY_DIR}")
+    set(DTWAIN_BOOST_LIBDIR_FOUND TRUE)
 endif()
 
-if(NOT TWAIN_EXISTING_BOOST_ROOT AND
-   (NOT TWAIN_BOOST_HEADERS_FOUND OR NOT TWAIN_BOOST_LIBDIR_FOUND))
+if(NOT DTWAIN_EXISTING_BOOST_ROOT AND
+   (NOT DTWAIN_BOOST_HEADERS_FOUND OR NOT DTWAIN_BOOST_LIBDIR_FOUND))
 
-    if(NOT TWAIN_AUTO_DOWNLOAD_BOOST)
+    if(NOT DTWAIN_AUTO_DOWNLOAD_BOOST)
         message(STATUS "")
         message(STATUS "Boost is not installed for this configuration yet.")
         message(STATUS "")
         message(STATUS "Expected Boost root:")
-        message(STATUS "  ${TWAIN_EFFECTIVE_BOOST_ROOT}")
+        message(STATUS "  ${DTWAIN_EFFECTIVE_BOOST_ROOT}")
         message(STATUS "Expected Boost library directory:")
-        message(STATUS "  ${TWAIN_BOOST_LIBRARY_DIR}")
+        message(STATUS "  ${DTWAIN_BOOST_LIBRARY_DIR}")
         message(STATUS "")
         message(STATUS "For CMake-Gui:")
-        message(STATUS "  Option A: set TWAIN_EXISTING_BOOST_ROOT to an existing Boost root")
+        message(STATUS "  Option A: set DTWAIN_EXISTING_BOOST_ROOT to an existing Boost root")
         message(STATUS "  Option B:")
-        message(STATUS "    1. Set TWAIN_BOOST_CACHE_ROOT if desired, for example D:/BoostDeps")
-        message(STATUS "    2. Set TWAIN_AUTO_DOWNLOAD_BOOST=ON")
-        message(STATUS "    3. Optionally set TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL=ON")
-        message(STATUS "    4. Optionally set TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL=ON")
+        message(STATUS "    1. Set DTWAIN_BOOST_CACHE_ROOT if desired, for example D:/BoostDeps")
+        message(STATUS "    2. Set DTWAIN_AUTO_DOWNLOAD_BOOST=ON")
+        message(STATUS "    3. Optionally set DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL=ON")
+        message(STATUS "    4. Optionally set DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL=ON")
         message(STATUS "    5. Press Configure again")
         message(STATUS "")
         message(STATUS "For command-line CMake, add:")
@@ -207,93 +223,93 @@ if(NOT TWAIN_EXISTING_BOOST_ROOT AND
         return()
     endif()
 
-    if(NOT EXISTS "${TWAIN_BOOST_DOWNLOADED_EXE}")
-        message(STATUS "Downloading ${TWAIN_BOOST_INSTALLER}")
+    if(NOT EXISTS "${DTWAIN_BOOST_DOWNLOADED_EXE}")
+        message(STATUS "Downloading ${DTWAIN_BOOST_INSTALLER}")
         file(DOWNLOAD
-            "${TWAIN_BOOST_URL}"
-            "${TWAIN_BOOST_DOWNLOADED_EXE}"
+            "${DTWAIN_BOOST_URL}"
+            "${DTWAIN_BOOST_DOWNLOADED_EXE}"
             SHOW_PROGRESS
-            STATUS TWAIN_BOOST_DOWNLOAD_STATUS
+            STATUS DTWAIN_BOOST_DOWNLOAD_STATUS
             TLS_VERIFY ON)
 
-        list(GET TWAIN_BOOST_DOWNLOAD_STATUS 0 TWAIN_BOOST_DOWNLOAD_RESULT)
-        list(GET TWAIN_BOOST_DOWNLOAD_STATUS 1 TWAIN_BOOST_DOWNLOAD_MESSAGE)
-        if(NOT TWAIN_BOOST_DOWNLOAD_RESULT EQUAL 0)
+        list(GET DTWAIN_BOOST_DOWNLOAD_STATUS 0 DTWAIN_BOOST_DOWNLOAD_RESULT)
+        list(GET DTWAIN_BOOST_DOWNLOAD_STATUS 1 DTWAIN_BOOST_DOWNLOAD_MESSAGE)
+        if(NOT DTWAIN_BOOST_DOWNLOAD_RESULT EQUAL 0)
             message(FATAL_ERROR
-                "Boost download failed: ${TWAIN_BOOST_DOWNLOAD_MESSAGE}\n"
-                "URL: ${TWAIN_BOOST_URL}\n"
-                "Destination: ${TWAIN_BOOST_DOWNLOADED_EXE}")
+                "Boost download failed: ${DTWAIN_BOOST_DOWNLOAD_MESSAGE}\n"
+                "URL: ${DTWAIN_BOOST_URL}\n"
+                "Destination: ${DTWAIN_BOOST_DOWNLOADED_EXE}")
         endif()
     else()
-        message(STATUS "Using existing downloaded Boost installer: ${TWAIN_BOOST_DOWNLOADED_EXE}")
+        message(STATUS "Using existing downloaded Boost installer: ${DTWAIN_BOOST_DOWNLOADED_EXE}")
     endif()
 
-    message(STATUS "Installing Boost to ${TWAIN_EFFECTIVE_BOOST_ROOT}")
+    message(STATUS "Installing Boost to ${DTWAIN_EFFECTIVE_BOOST_ROOT}")
     execute_process(
-        COMMAND "${TWAIN_BOOST_DOWNLOADED_EXE}"
+        COMMAND "${DTWAIN_BOOST_DOWNLOADED_EXE}"
                 /VERYSILENT
                 /SUPPRESSMSGBOXES
                 /NORESTART
                 /NOCANCEL
                 /SP-
-                "/DIR=${TWAIN_EFFECTIVE_BOOST_ROOT}"
-                "/LOG=${TWAIN_BOOST_INSTALL_LOG}"
-        RESULT_VARIABLE TWAIN_BOOST_INSTALL_RESULT)
+                "/DIR=${DTWAIN_EFFECTIVE_BOOST_ROOT}"
+                "/LOG=${DTWAIN_BOOST_INSTALL_LOG}"
+        RESULT_VARIABLE DTWAIN_BOOST_INSTALL_RESULT)
 
-    if(NOT TWAIN_BOOST_INSTALL_RESULT EQUAL 0)
+    if(NOT DTWAIN_BOOST_INSTALL_RESULT EQUAL 0)
         message(FATAL_ERROR
-            "Boost installer failed with exit code ${TWAIN_BOOST_INSTALL_RESULT}.\n"
-            "Installer: ${TWAIN_BOOST_DOWNLOADED_EXE}\n"
-            "Log: ${TWAIN_BOOST_INSTALL_LOG}")
+            "Boost installer failed with exit code ${DTWAIN_BOOST_INSTALL_RESULT}.\n"
+            "Installer: ${DTWAIN_BOOST_DOWNLOADED_EXE}\n"
+            "Log: ${DTWAIN_BOOST_INSTALL_LOG}")
     endif()
 
     # Optional cleanup after a successful install.  These are OFF by default so
     # the installer and log remain available for troubleshooting unless the user
     # explicitly chooses to remove them.
-    if(TWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL AND
-       EXISTS "${TWAIN_BOOST_DOWNLOADED_EXE}")
-        file(REMOVE "${TWAIN_BOOST_DOWNLOADED_EXE}")
-        message(STATUS "Deleted Boost installer: ${TWAIN_BOOST_DOWNLOADED_EXE}")
+    if(DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL AND
+       EXISTS "${DTWAIN_BOOST_DOWNLOADED_EXE}")
+        file(REMOVE "${DTWAIN_BOOST_DOWNLOADED_EXE}")
+        message(STATUS "Deleted Boost installer: ${DTWAIN_BOOST_DOWNLOADED_EXE}")
     endif()
 
-    if(TWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL AND
-       EXISTS "${TWAIN_BOOST_INSTALL_LOG}")
-        file(REMOVE "${TWAIN_BOOST_INSTALL_LOG}")
-        message(STATUS "Deleted Boost installer log: ${TWAIN_BOOST_INSTALL_LOG}")
+    if(DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL AND
+       EXISTS "${DTWAIN_BOOST_INSTALL_LOG}")
+        file(REMOVE "${DTWAIN_BOOST_INSTALL_LOG}")
+        message(STATUS "Deleted Boost installer log: ${DTWAIN_BOOST_INSTALL_LOG}")
     endif()
 
     # Make a later CMake-Gui Configure less likely to re-run installers accidentally.
-    set(TWAIN_AUTO_DOWNLOAD_BOOST OFF CACHE BOOL
+    set(DTWAIN_AUTO_DOWNLOAD_BOOST OFF CACHE BOOL
         "Automatically download/install the required Boost binary package if missing"
         FORCE)
 endif()
 
-if(NOT EXISTS "${TWAIN_BOOST_INCLUDE_DIR}/boost/version.hpp")
-    message(FATAL_ERROR "Boost headers were not found at: ${TWAIN_BOOST_INCLUDE_DIR}")
+if(NOT EXISTS "${DTWAIN_BOOST_INCLUDE_DIR}/boost/version.hpp")
+    message(FATAL_ERROR "Boost headers were not found at: ${DTWAIN_BOOST_INCLUDE_DIR}")
 endif()
 
-if(NOT EXISTS "${TWAIN_BOOST_LIBRARY_DIR}")
-    message(FATAL_ERROR "Boost library directory was not found at: ${TWAIN_BOOST_LIBRARY_DIR}")
+if(NOT EXISTS "${DTWAIN_BOOST_LIBRARY_DIR}")
+    message(FATAL_ERROR "Boost library directory was not found at: ${DTWAIN_BOOST_LIBRARY_DIR}")
 endif()
 
 # These are CMake variables, not machine-wide environment variables. CMake writes
 # the resulting include/library paths into the generated Visual Studio project.
-set(BOOST_ROOT "${TWAIN_EFFECTIVE_BOOST_ROOT}")
-set(BOOST_INCLUDEDIR "${TWAIN_BOOST_INCLUDE_DIR}")
-set(BOOST_LIBRARYDIR "${TWAIN_BOOST_LIBRARY_DIR}")
+set(BOOST_ROOT "${DTWAIN_EFFECTIVE_BOOST_ROOT}")
+set(BOOST_INCLUDEDIR "${DTWAIN_BOOST_INCLUDE_DIR}")
+set(BOOST_LIBRARYDIR "${DTWAIN_BOOST_LIBRARY_DIR}")
 
-message(STATUS "Boost root: ${TWAIN_EFFECTIVE_BOOST_ROOT}")
-message(STATUS "Boost include dir: ${TWAIN_BOOST_INCLUDE_DIR}")
-message(STATUS "Boost library dir: ${TWAIN_BOOST_LIBRARY_DIR}")
-if(TWAIN_EXISTING_BOOST_ROOT)
+message(STATUS "Boost root: ${DTWAIN_EFFECTIVE_BOOST_ROOT}")
+message(STATUS "Boost include dir: ${DTWAIN_BOOST_INCLUDE_DIR}")
+message(STATUS "Boost library dir: ${DTWAIN_BOOST_LIBRARY_DIR}")
+if(DTWAIN_EXISTING_BOOST_ROOT)
     message(STATUS "Boost mode: existing user-supplied installation")
 else()
     message(STATUS "Boost mode: DTWAIN cache / auto-download")
-    if(EXISTS "${TWAIN_BOOST_DOWNLOADED_EXE}")
-        message(STATUS "Boost installer: ${TWAIN_BOOST_DOWNLOADED_EXE}")
+    if(EXISTS "${DTWAIN_BOOST_DOWNLOADED_EXE}")
+        message(STATUS "Boost installer: ${DTWAIN_BOOST_DOWNLOADED_EXE}")
     endif()
-    if(EXISTS "${TWAIN_BOOST_INSTALL_LOG}")
-        message(STATUS "Boost installer log: ${TWAIN_BOOST_INSTALL_LOG}")
+    if(EXISTS "${DTWAIN_BOOST_INSTALL_LOG}")
+        message(STATUS "Boost installer log: ${DTWAIN_BOOST_INSTALL_LOG}")
     endif()
 endif()
 
@@ -1226,6 +1242,24 @@ target_compile_definitions(dtwdemo PRIVATE
     $<$<CONFIG:Debug>:USE_DTWAIN_DEBUG_LIB>
 )
 
+add_library(dtwain_libpng STATIC
+    ${LIBPNG_SOURCES}
+)
+
+target_include_directories(dtwain_libpng PRIVATE
+    ${PROJECT_SOURCE_DIR}/LibPNG
+    ${PROJECT_SOURCE_DIR}/ZLib
+)
+
+target_compile_definitions(dtwain_libpng PRIVATE
+    PNG_USE_READ_MACROS
+    _CRT_SECURE_NO_WARNINGS
+)
+
+set_target_properties(dtwain_libpng PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
+
 add_library(dtwain SHARED
     ${MAIN_INL}
     ${MAIN_HEADERS}
@@ -1234,13 +1268,16 @@ add_library(dtwain SHARED
     ${LIBJPEG_SOURCES}
     ${LIBJXR_SOURCES}
     ${LIBOPENJPEG_SOURCES}
-    ${LIBPNG_SOURCES}
     ${LIBTIFF_SOURCES}
     ${LIBWEBP_SOURCES}
     ${ZLIB_SOURCES}
     ${MINIZ_SOURCES}
     ${SIMPLEINI_SOURCES}
     ${DATEMASTER_SOURCES}
+)
+
+target_link_libraries(dtwain PRIVATE
+    dtwain_libpng
 )
 
 #
@@ -1348,6 +1385,11 @@ target_compile_definitions(dtwain PRIVATE
     $<$<CONFIG:Release>:NDEBUG>
 )
 
+target_compile_definitions(dtwain PRIVATE
+    PNG_STATIC
+    DTWAIN_LIBPNG_PRIVATE
+)
+
 if(MSVC)
     target_compile_options(dtwain PRIVATE
         $<$<CONFIG:Debug>:/Od>
@@ -1400,7 +1442,7 @@ target_include_directories(dtwain PRIVATE
     ${PROJECT_SOURCE_DIR}/ZLib
     ${PROJECT_SOURCE_DIR}/miniz
     ${PROJECT_SOURCE_DIR}/simpleini
-    ${TWAIN_BOOST_INCLUDE_DIR}
+    ${DTWAIN_BOOST_INCLUDE_DIR}
 )
 
 set_target_properties(dtwain PROPERTIES
@@ -1437,7 +1479,7 @@ target_compile_definitions(dtwain PRIVATE
 )
 
 target_link_directories(dtwain PRIVATE
-    ${TWAIN_BOOST_LIBRARY_DIR}
+    ${DTWAIN_BOOST_LIBRARY_DIR}
 )
 
 source_group(
@@ -1467,12 +1509,18 @@ source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${DATEMASTER_SOURCES})
 
 if(MSVC)
     if(DTWAIN_USE_DYNAMIC_CRT)
-        set_property(TARGET dtwain PROPERTY
-            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+        set(DTWAIN_MSVC_RUNTIME_LIBRARY
+            "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
     else()
-        set_property(TARGET dtwain PROPERTY
-            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+        set(DTWAIN_MSVC_RUNTIME_LIBRARY
+            "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     endif()
+
+    set_property(TARGET dtwain PROPERTY
+        MSVC_RUNTIME_LIBRARY "${DTWAIN_MSVC_RUNTIME_LIBRARY}")
+
+    set_property(TARGET dtwain_libpng PROPERTY
+        MSVC_RUNTIME_LIBRARY "${DTWAIN_MSVC_RUNTIME_LIBRARY}")
 endif()
 
 set(DTWAIN_NATVIS_FILES
