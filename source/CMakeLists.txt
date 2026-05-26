@@ -420,7 +420,6 @@ set(MAIN_HEADERS
 	${PROJECT_SOURCE_DIR}/h/dibmulti.h
 	${PROJECT_SOURCE_DIR}/h/dtwain.h
 	${PROJECT_SOURCE_DIR}/h/dtwain_anyutils.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_config.h
 	${PROJECT_SOURCE_DIR}/h/dtwain_exception.h
 	${PROJECT_SOURCE_DIR}/h/dtwain_filesystem.h
 	${PROJECT_SOURCE_DIR}/h/dtwain_filetypes.h
