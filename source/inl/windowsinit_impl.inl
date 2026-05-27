@@ -270,7 +270,7 @@ std::string dynarithmic::LogWin32Error(DWORD lastError)
             break;
     }
     StringStreamA strm;
-    strm << boost::format("Win32 Error: %1% (%2%)") % lastError % sError;
+	strm << "Win32 Error: " << lastError << " (" << sError << ")";
     LogWriterUtils::WriteLogInfoIndentedA(strm.str());
 
     // Free the buffer.

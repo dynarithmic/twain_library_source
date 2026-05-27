@@ -107,13 +107,18 @@ if(DTWAIN_BOOST_MSVC_OVERRIDE)
     set(DTWAIN_BOOST_MSVC "${DTWAIN_BOOST_MSVC_OVERRIDE}")
 else()
     if(MSVC_TOOLSET_VERSION MATCHES "^145")
-        set(DTWAIN_BOOST_MSVC "14.5")
+        if(DTWAIN_BOOST_VERSION VERSION_LESS "1.91.0")
+            set(DTWAIN_BOOST_MSVC "14.3")
+        else()
+            set(DTWAIN_BOOST_MSVC "14.5")
+        endif()
     elseif(MSVC_TOOLSET_VERSION MATCHES "^143")
         set(DTWAIN_BOOST_MSVC "14.3")
     elseif(MSVC_TOOLSET_VERSION MATCHES "^142")
         set(DTWAIN_BOOST_MSVC "14.2")
     else()
-        message(FATAL_ERROR "Unsupported MSVC toolset: ${MSVC_TOOLSET_VERSION}")
+        message(FATAL_ERROR
+            "Unsupported MSVC toolset: ${MSVC_TOOLSET_VERSION}")
     endif()
 endif()
 
@@ -420,7 +425,6 @@ set(MAIN_HEADERS
 	${PROJECT_SOURCE_DIR}/h/dibmulti.h
 	${PROJECT_SOURCE_DIR}/h/dtwain.h
 	${PROJECT_SOURCE_DIR}/h/dtwain_anyutils.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_config.h
 	${PROJECT_SOURCE_DIR}/h/dtwain_exception.h
 	${PROJECT_SOURCE_DIR}/h/dtwain_filesystem.h
 	${PROJECT_SOURCE_DIR}/h/dtwain_filetypes.h

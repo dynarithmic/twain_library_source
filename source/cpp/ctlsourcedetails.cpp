@@ -20,13 +20,11 @@
  */
 
 #include "../nlohmann/json.hpp"
-#include <boost/range/adaptor/transformed.hpp>
-#include <string_view>
-#include "ctltwainmanager.h"
+#include <string>
+#include <sstream>
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
-#include "ctlclosesource.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -430,7 +428,6 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     static constexpr int numImageInfoString = 13;
     const auto pHandle = ts.GetTwainDLLHandle();
     using boost::algorithm::join;
-    using boost::adaptors::transformed;
     using json = nlohmann::ordered_json;
 
     struct capabilityInfo
