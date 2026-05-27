@@ -289,7 +289,168 @@
            "DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
            "DTWAIN_EXISTING_BOOST_ROOT" : ""
          }
-    }
+    },
+
+
+    {
+       "name": "vs2026-x64-crt-unicode",
+       "generator": "Visual Studio 18 2026",
+       "architecture": "x64",
+       "binaryDir": "${sourceDir}/build-vs2026-x64-crt_unicode",
+
+       "cacheVariables": {
+         "DTWAIN_BUILD_UNICODE": "ON",
+         "DTWAIN_USE_DYNAMIC_CRT": "ON",
+         "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+         "DTWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+         "DTWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+         "DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+         "DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+         "DTWAIN_EXISTING_BOOST_ROOT" : "",
+         "DTWAIN_BOOST_VERSION": "1.91.0",
+         "DTWAIN_BOOST_MSVC_OVERRIDE": "14.5"
+       }
+     },
+
+     {
+       "name": "vs2026-x64-nocrt-unicode",
+       "generator": "Visual Studio 18 2026",
+       "architecture": "x64",
+       "binaryDir": "${sourceDir}/build-vs2026-x64-nocrt_unicode",
+
+       "cacheVariables": {
+         "DTWAIN_BUILD_UNICODE": "ON",
+         "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+         "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+         "DTWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+         "DTWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+         "DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+         "DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+         "DTWAIN_EXISTING_BOOST_ROOT" : "",
+         "DTWAIN_BOOST_VERSION": "1.91.0",
+         "DTWAIN_BOOST_MSVC_OVERRIDE": "14.5"
+       }
+     },
+
+     {
+       "name": "vs2026-x64-crt-ansi",
+       "generator": "Visual Studio 18 2026",
+       "architecture": "x64",
+       "binaryDir": "${sourceDir}/build-vs2026-x64-crt_ansi",
+
+       "cacheVariables": {
+         "DTWAIN_BUILD_UNICODE": "OFF",
+         "DTWAIN_USE_DYNAMIC_CRT": "ON",
+         "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+         "DTWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+         "DTWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+         "DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+         "DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+         "DTWAIN_EXISTING_BOOST_ROOT" : "",
+         "DTWAIN_BOOST_VERSION": "1.91.0",
+         "DTWAIN_BOOST_MSVC_OVERRIDE": "14.5"
+       }
+     },
+
+     {
+       "name": "vs2026-x64-nocrt-ansi",
+       "generator": "Visual Studio 18 2026",
+       "architecture": "x64",
+       "binaryDir": "${sourceDir}/build-vs2026-x64-nocrt_ansi",
+
+       "cacheVariables": {
+         "DTWAIN_BUILD_UNICODE": "OFF",
+         "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+         "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+         "DTWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+         "DTWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+         "DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+         "DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+         "DTWAIN_EXISTING_BOOST_ROOT" : "",
+         "DTWAIN_BOOST_VERSION": "1.91.0",
+         "DTWAIN_BOOST_MSVC_OVERRIDE": "14.5"
+         }
+       },
+
+       {
+          "name": "vs2026-x32-crt-unicode",
+          "generator": "Visual Studio 18 2026",
+          "architecture": "Win32",
+          "binaryDir": "${sourceDir}/build-vs2026-x32-crt_unicode",
+
+          "cacheVariables": {
+            "DTWAIN_BUILD_UNICODE": "ON",
+            "DTWAIN_USE_DYNAMIC_CRT": "ON",
+            "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+            "DTWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+            "DTWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+            "DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+            "DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+            "DTWAIN_EXISTING_BOOST_ROOT" : "",
+            "DTWAIN_BOOST_VERSION": "1.91.0",
+            "DTWAIN_BOOST_MSVC_OVERRIDE": "14.5"
+          }
+        },
+
+        {
+          "name": "vs2026-x32-nocrt-unicode",
+          "generator": "Visual Studio 18 2026",
+          "architecture": "Win32",
+          "binaryDir": "${sourceDir}/build-vs2026-x32-nocrt_unicode",
+
+          "cacheVariables": {
+            "DTWAIN_BUILD_UNICODE": "ON",
+            "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+            "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+            "DTWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+            "DTWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+            "DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+            "DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+            "DTWAIN_EXISTING_BOOST_ROOT" : "",
+            "DTWAIN_BOOST_VERSION": "1.91.0",
+            "DTWAIN_BOOST_MSVC_OVERRIDE": "14.5"
+          }
+        },
+
+        {
+          "name": "vs2026-x32-crt-ansi",
+          "generator": "Visual Studio 18 2026",
+          "architecture": "Win32",
+          "binaryDir": "${sourceDir}/build-vs2026-x32-crt_ansi",
+
+          "cacheVariables": {
+            "DTWAIN_BUILD_UNICODE": "OFF",
+            "DTWAIN_USE_DYNAMIC_CRT": "ON",
+            "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+            "DTWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+            "DTWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+            "DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+            "DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+            "DTWAIN_EXISTING_BOOST_ROOT" : "",
+            "DTWAIN_BOOST_VERSION": "1.91.0",
+            "DTWAIN_BOOST_MSVC_OVERRIDE": "14.5"
+          }
+        },
+
+        {
+          "name": "vs2026-x32-nocrt-ansi",
+          "generator": "Visual Studio 18 2026",
+          "architecture": "Win32",
+          "binaryDir": "${sourceDir}/build-vs2026-x32-nocrt_ansi",
+
+          "cacheVariables": {
+            "DTWAIN_BUILD_UNICODE": "OFF",
+            "DTWAIN_USE_DYNAMIC_CRT": "OFF",
+            "DTWAIN_ENABLE_LOGCALLSTACK": "ON",
+            "DTWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+            "DTWAIN_BOOST_CACHE_ROOT": "$env{SystemDrive}/BoostDeps",
+            "DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL": "ON",
+            "DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL": "OFF",
+            "DTWAIN_EXISTING_BOOST_ROOT" : "",
+            "DTWAIN_BOOST_VERSION": "1.91.0",
+            "DTWAIN_BOOST_MSVC_OVERRIDE": "14.5"
+          }
+     }
   ],
 
   "buildPresets": [
@@ -484,7 +645,102 @@
       "name": "vs2019-x32-nocrt-ansi-debug",
       "configurePreset": "vs2019-x32-nocrt-ansi",
       "configuration": "Debug"
-    }
+    },
 
+    {
+      "name": "vs2026-x64-crt-unicode-release",
+      "configurePreset": "vs2026-x64-crt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2026-x64-crt-unicode-debug",
+      "configurePreset": "vs2026-x64-crt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2026-x64-nocrt-unicode-release",
+      "configurePreset": "vs2026-x64-nocrt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2026-x64-nocrt-unicode-debug",
+      "configurePreset": "vs2026-x64-nocrt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2026-x64-crt-ansi-release",
+      "configurePreset": "vs2026-x64-crt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2026-x64-crt-ansi-debug",
+      "configurePreset": "vs2026-x64-crt-ansi",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2026-x64-nocrt-ansi-release",
+      "configurePreset": "vs2026-x64-nocrt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2026-x64-nocrt-ansi-debug",
+      "configurePreset": "vs2026-x64-nocrt-ansi",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2026-x32-crt-unicode-release",
+      "configurePreset": "vs2026-x32-crt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2026-x32-crt-unicode-debug",
+      "configurePreset": "vs2026-x32-crt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2026-x32-nocrt-unicode-release",
+      "configurePreset": "vs2026-x32-nocrt-unicode",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2026-x32-nocrt-unicode-debug",
+      "configurePreset": "vs2026-x32-nocrt-unicode",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2026-x32-crt-ansi-release",
+      "configurePreset": "vs2026-x32-crt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2026-x32-crt-ansi-debug",
+      "configurePreset": "vs2026-x32-crt-ansi",
+      "configuration": "Debug"
+    },
+
+    {
+      "name": "vs2026-x32-nocrt-ansi-release",
+      "configurePreset": "vs2026-x32-nocrt-ansi",
+      "configuration": "MinSizeRel"
+    },
+
+    {
+      "name": "vs2026-x32-nocrt-ansi-debug",
+      "configurePreset": "vs2026-x32-nocrt-ansi",
+      "configuration": "Debug"
+    }
   ]
 }
