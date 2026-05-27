@@ -71,7 +71,8 @@ Before rebuilding DTWAIN from source:
 #### Required
 
 * Visual Studio 2019 or later (see below for the exact Visual Studio requirements)
-* [CMake 3.25 or later (including CMake 4.x)](https://cmake.org/download/)
+* [CMake 3.25 or later (including CMake 4.x)](https://cmake.org/download/).  
+   *  Note: For Visual Studio 2026, CMake 4.2 or later is required.
 #### Optional
 
 * Existing Boost library installation (version 1.89 or greater)
@@ -117,8 +118,10 @@ Required workload:
 - Desktop development with C++
 
 Required components:
-- MSVC C++ compiler
-- MSVC v142 (Visual Studio 2019) or MSVC v143 (Visual Studio 2022)
+- MSVC C++ compiler:
+  * MSVC v142 (Visual Studio 2019) or 
+  * MSVC v143 (Visual Studio 2022) or 
+  * MSVC v145 (Visual Studio 2026)
 - Windows 10 SDK or Windows 11 SDK
 - C++ CMake tools for Windows
 
@@ -132,23 +135,6 @@ Optional:
 If CMake configuration reports that no suitable compiler is found, re-run the Visual Studio Installer and add the C++ workload.
 
 ----
-
-#### Visual Studio 2026
-
-Visual Studio 2026 support is experimental.
-
-DTWAIN is officially built and tested with Visual Studio 2019 and Visual Studio 2022.
-
-Developers who want to experiment with Visual Studio 2026 may use the Visual Studio 2022 CMake presets as a starting point, generate the Visual Studio solution files, and then open the generated solution in Visual Studio 2026.
-
-Boost library compatibility may require either:
-
-- [using an existing Boost installation](#use-existing-boost) known to work with the VS2026 compiler, or
-- [overriding the Boost MSVC binary tag manually](#advanced-cmake)
-
-At this time, Visual Studio 2026 is not part of the official DTWAIN release build matrix.
-
----
 
 #### <a name="build-configurations"></a>Build Configurations
 
