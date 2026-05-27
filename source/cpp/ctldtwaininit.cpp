@@ -25,10 +25,7 @@
 #include <string>
 #include <string_view>
 #include <sstream>
-#include <boost/format.hpp>
 #include <boost/dll/runtime_symbol_info.hpp>
-#include <boost/lexical_cast.hpp>
-#include <thread>
 #include <set>
 #include <vector>
 
@@ -36,14 +33,11 @@
 #include "ctltwainmanager.h"
 #include "ctlloadresources.h"
 #include "../dtwinver/dtwinverex.h"
-#include "dtwain_verinfo.h"
-#include "dtwain_resource_constants.h"
 #include "errorcheck.h"
 #include "dtwstrfn.h"
 #include "ctlfileutils.h"
 #include "ctlthreadutils.h"
 #include "arrayfactory.h"
-#include "dtwain_library_selector.h"
 #include "ctltwainmsgloop.h"
 #include "ctldefsource.h"
 #include "ctlstringutils.h"

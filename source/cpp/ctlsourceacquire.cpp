@@ -18,8 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <boost/format.hpp>
-
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "sourceacquireopts.h"

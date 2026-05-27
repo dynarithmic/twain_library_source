@@ -29,7 +29,6 @@
 #include <type_traits>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
 #include <boost/algorithm/hex.hpp>
 #include <assert.h>
 #include <algorithm>
@@ -130,7 +129,6 @@ namespace dynarithmic
         using baseoutputstream_type = std::ostream;
         using baseinputstream_type = std::istream;
 
-        using BOOST_FORMAT = boost::format;
         using FILESYSTEM_PATHTYPE = filesys::path;
 
         template <typename T>
@@ -278,7 +276,6 @@ namespace dynarithmic
         using baseoutputstream_type = std::wostream;
         using baseinputstream_type = std::wistream;
 
-        using BOOST_FORMAT = boost::wformat;
         using FILESYSTEM_PATHTYPE = filesys::path;
 
         template <typename T>
