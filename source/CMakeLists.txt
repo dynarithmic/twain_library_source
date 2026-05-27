@@ -659,7 +659,6 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctltr042.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr043.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltripletbase.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltsstub.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwaincompliancy.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwaindecoder.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainfilesystem.cpp
