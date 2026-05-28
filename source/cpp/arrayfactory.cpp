@@ -22,9 +22,7 @@
 #include "arrayfactory.h"
 #include "dtwaindefs.h"
 #include "dtwtype.h"
-#include "ctlobstr.h"
 #include "ctliface.h"
-#include "ctlguiddef.h"
 
 namespace dynarithmic
 {

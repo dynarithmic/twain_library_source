@@ -30,13 +30,6 @@
 #include "dtwstrfn.h"
 #include "crc32_aux.h"
 
-using namespace dynarithmic;
-
-#ifdef TWAINSAVE_STATIC
-LONG  TS_Command(LPCTSTR lpCommand);
-#endif
-
-
 namespace dynarithmic
 {
     static std::string LoadResourceFromRC(unsigned resNum)

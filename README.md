@@ -13,6 +13,7 @@ The DTWAIN library is written in C++ (using language standard C++ 17) with a few
     * [Visual Studio requirements](#rebuild-vs-requirements)
     * [Build Configurations](#build-configurations)
     * [Build Using Batch Files](#build-using-batchfiles)
+        * [Building all configurations of DTWAIN using a single batch file](#build-all)
         * [Boost Library Configuration](#boost-library-configuration)
             * [Automatic Boost Download](#download-boost)
             * [Use Existing Boost Installation](#use-existing-boost)
@@ -206,6 +207,17 @@ Debug\
 containing DLLs, import libraries, PDB files, and demo programs.
 
 ----
+### <a name="build-all"></a> Building all configurations of DTWAIN using a single batch file
+
+To build [all configurations](#build-configurations) of the DTWAIN DLL's using a single batch file, the following batch files can be used:
+
+* To build all configurations using Visual Studio 2019: `compile_all_vs2019.bat`
+* To build all configurations using Visual Studio 2022: `compile_all_vs2022.bat`
+* To build all configurations using Visual Studio 2026: `compile_all_vs2026.bat`
+
+Running one (or more) of the batch files will compile all the configurations of DTWAIN (x86/x64, ANSI/Unicode, CRT/NoCRT).
+
+----
 
 ### <a name="boost-library-configuration"></a> Boost Library Configuration
 When building the source code, you have an option of automatically downloading the Boost Library components, or use an existing Boost library installation.
@@ -360,11 +372,12 @@ Build
 New workflow:
 
 ```text
-Run batch file
-(or configure via CMake / CMake-GUI)
+Run batch file (which will also perform a full build)
+(or configure/generate via CMake / CMake-GUI)
 
-Open generated .sln
-Build
+The steps above will create dtwain.vcxproj and related files, which can be opened in Visual Studio for building or debugging
+If build did not occur, perform build within Visual Studio on the generated project.
+
 ```
 
 Generated solutions retain normal Visual Studio functionality including debugging, natvis visualizers, and standard project navigation.

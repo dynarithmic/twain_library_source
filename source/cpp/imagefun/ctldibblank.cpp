@@ -28,6 +28,7 @@
 #include <sstream>
 #include "winbit32.h"
 #include "ctliface.h"
+#include "dibutil.h"
 
 using namespace dynarithmic;
 
@@ -147,14 +148,14 @@ namespace
 		ctx.height = static_cast<int>(std::abs(bih->biHeight));
 		ctx.topDown = (bih->biHeight < 0);
 		ctx.bpp = bih->biBitCount;
-		ctx.stride = dynarithmic::dib::effective_width(ctx.width, static_cast<uint16_t>(ctx.bpp)); // ComputeStride(ctx.width, ctx.bpp);
+		ctx.stride = dynarithmic::dib::effective_width(ctx.width, static_cast<uint16_t>(ctx.bpp)); 
 		ctx.bytesPerPixel = (ctx.bpp >= 8) ? (ctx.bpp / 8) : 0;
 		ctx.palette = dynarithmic::dib::palette_ptr(bih); 
 		ctx.bits = dynarithmic::dib::bits_ptr(bih); 
 
 		if (ctx.bpp == 16 && bih->biCompression == BI_BITFIELDS)
 		{
-			const DWORD* masks = reinterpret_cast<const DWORD*>(dynarithmic::dib::bits_ptr(bih)); // GetBitfieldsPtr(bih);
+			const DWORD* masks = reinterpret_cast<const DWORD*>(dynarithmic::dib::bits_ptr(bih)); 
 			ctx.useBitfields16 = true;
 			ctx.redMask = masks[0];
 			ctx.greenMask = masks[1];

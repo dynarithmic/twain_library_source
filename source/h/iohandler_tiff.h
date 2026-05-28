@@ -22,6 +22,7 @@ OF THIRD PARTY RIGHTS.
 #define IOHANDLERTIFF_H
 
 #include "ctldib32.h"
+#include "tiffwriter.h"
 
 namespace dynarithmic
 {

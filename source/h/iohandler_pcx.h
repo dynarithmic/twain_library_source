@@ -22,6 +22,7 @@ OF THIRD PARTY RIGHTS.
 #define IOHANDLERPCX_H
 
 #include "ctldib32.h"
+#include <imagefun/pcxwriter.h>
 
 namespace dynarithmic
 {
