@@ -26,16 +26,11 @@ OF THIRD PARTY RIGHTS.
 #include "imagefun/imgfunc.h"
 #include <vector>
 #include <utility>
-#include <optional>
+#include <memory>
+#include <string>
 #include <boost/container/flat_map.hpp>
 #include "dibmulti.h"
 #include "dibinfox.h"
-#include "fltrect.h"
-#include <unordered_map>
-#include "dtwain_filetypes.h"
-#include "tiffwriter.h"
-#include "pcxwriter.h"
-#include "postscriptwriter.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4100)

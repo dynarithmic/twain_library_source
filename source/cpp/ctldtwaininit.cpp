@@ -25,10 +25,7 @@
 #include <string>
 #include <string_view>
 #include <sstream>
-#include <boost/format.hpp>
 #include <boost/dll/runtime_symbol_info.hpp>
-#include <boost/lexical_cast.hpp>
-#include <thread>
 #include <set>
 #include <vector>
 
@@ -36,14 +33,11 @@
 #include "ctltwainmanager.h"
 #include "ctlloadresources.h"
 #include "../dtwinver/dtwinverex.h"
-#include "dtwain_verinfo.h"
-#include "dtwain_resource_constants.h"
 #include "errorcheck.h"
 #include "dtwstrfn.h"
 #include "ctlfileutils.h"
 #include "ctlthreadutils.h"
 #include "arrayfactory.h"
-#include "dtwain_library_selector.h"
 #include "ctltwainmsgloop.h"
 #include "ctldefsource.h"
 #include "ctlstringutils.h"
@@ -60,20 +54,6 @@
 #ifdef WIN32
     #pragma message ("Compiling 32-bit DTWAIN")
 #endif
-#endif
-
-#ifdef WIN64
-    #ifndef UNICODE
-        #define DTWAINSTUB _T("dtwain_stub64")
-    #else
-        #define DTWAINSTUB _T("dtwainu_stub64")
-    #endif
-#else
-    #ifndef UNICODE
-        #define DTWAINSTUB _T("dtwain_stub")
-    #else
-        #define DTWAINSTUB _T("dtwainu_stub")
-    #endif
 #endif
 
 using namespace dynarithmic;
@@ -1891,7 +1871,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainDSM(LONG DSMType)
 {
     LOG_FUNC_ENTRY_PARAMS((DSMType))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    #ifndef WIN64
+    #ifndef _WIN64
     if ( DSMType == DTWAIN_TWAINDSM_LEGACY || DSMType == DTWAIN_TWAINDSM_LATESTVERSION)
     {
         pHandle->m_SessionStruct.nSessionType = DSMType;

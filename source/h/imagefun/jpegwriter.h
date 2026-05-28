@@ -27,6 +27,7 @@ OF THIRD PARTY RIGHTS.
 #include <cstdio>
 #include <windows.h>
 #include <jpeglib.h>
+#include <optional>
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 

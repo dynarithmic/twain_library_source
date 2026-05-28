@@ -19,8 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <sstream>
-#include <boost/format.hpp>
 #include <string_view>
+#include <queue>
 #include "ctliface.h"
 #include "ctlloadresources.h"
 
@@ -29,13 +29,6 @@
 #include "dtwain_verinfo.h"
 #include "dtwstrfn.h"
 #include "crc32_aux.h"
-
-using namespace dynarithmic;
-
-#ifdef TWAINSAVE_STATIC
-LONG  TS_Command(LPCTSTR lpCommand);
-#endif
-
 
 namespace dynarithmic
 {

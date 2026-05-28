@@ -1,5 +1,17 @@
 DTWAIN Version changes
 
+5.9.1
+
+- Upgraded following internal image libraries:
+
+      libpng --> 1.6.58
+
+- Fix issue with DTWAIN DLL's showing incomplete resource information.
+
+- Significant reduction in size of the DTWAIN DLL's due to new internal
+  build system.  
+
+
 5.9.0
 
 - Removed usage of the FreeImage and CxImage libraries to generate image files.  Removal of FreeImage

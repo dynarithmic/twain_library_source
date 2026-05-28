@@ -20,18 +20,14 @@
  */
 #include "capconst.h"
  #ifdef _WIN32
-#include <unordered_map>
 #include <string>
-#include <algorithm>
 #include <cstdio>
 #include <tchar.h>
 #include "transym_ocrinterface.h"
-#include "ctlobstr.h"
 #include "versioninfo.h"
 #include "ctlfileutils.h"
 #include "errorcheck.h"
 #include "ctliface.h"
-#include "../simpleini/simpleini.h"
 
 #ifdef VERSINFO_STANDALONE
 using namespace VersionInformation;

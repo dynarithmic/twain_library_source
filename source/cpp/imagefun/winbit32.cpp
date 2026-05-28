@@ -18,15 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <math.h>
-#include <sstream>
+#include <cmath>
 #include "winbit32.h"
 #include "ctliface.h"
-#include "ctltwainmanager.h"
-#include "ctlfileutils.h"
-#include "logwriterutils.h"
 #include "ctlconstexprfind.h"
-#include <ctlutils.h>
 #include "resample24to8.h"
 #include "dibutil.h"
 

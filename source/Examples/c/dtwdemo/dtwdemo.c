@@ -60,6 +60,7 @@ void DisplayCustomLangDlg();
 void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable);
 void SetUpAcquire();
 void DisplayBlankThresholdOptions();
+void DisableFileXFerSubItems();
 
 INT_PTR DisplayGetFileNameDlg();
 
@@ -212,10 +213,7 @@ int g_BlankThresholdPct = 98;
 
 #include "DebugUtils.h"
 
-int APIENTRY WinMain(HINSTANCE hInstance,
-                     HINSTANCE hPrevInstance,
-                     LPSTR     lpCmdLine,
-                     int       nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     MSG msg;
     HACCEL hAccelTable;
@@ -604,7 +602,10 @@ void SelectTheSource(int nWhich)
     }
     else
     {
-        LONG lastError = DTWAIN_GetLastError();
+		EnableFileXFerMenuItems(NULL, FALSE);
+		DisableFileXFerSubItems();
+
+		LONG lastError = DTWAIN_GetLastError();
         wchar_t szCancelMsg[256];
 
         // We will use the wide version, to ensure we get the proper UTF-8 string

@@ -24,6 +24,7 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <memory>
 #include <vector>
+#include <optional>
 #include "tiffio.h"
 #include "dibutil.h"
 #include "imagefilewriterbase.h"

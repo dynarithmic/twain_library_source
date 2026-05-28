@@ -25,6 +25,7 @@
 #include <vector>
 #include <memory>
 #include <utility>
+#include <sstream>
 #include "svgwriter.h"
 #include "dtwaindefs.h"
 #include "ctlstringconversion.h"

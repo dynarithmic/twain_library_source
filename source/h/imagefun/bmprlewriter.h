@@ -30,6 +30,7 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <utility>
 #include <vector>
+#include <optional>
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 

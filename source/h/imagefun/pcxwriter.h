@@ -27,6 +27,7 @@ OF THIRD PARTY RIGHTS.
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <optional>
 #include <windows.h>
 #include "imagefilewriterbase.h"
 

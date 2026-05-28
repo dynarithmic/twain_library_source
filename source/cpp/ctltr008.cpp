@@ -306,7 +306,7 @@ void CTL_ProcessEventTriplet::DeviceEvent()
         {
             const UINT uMsg = CTL_StaticData::GetRegisteredMessage();
             LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
-            #ifdef WIN64
+            #ifdef _WIN64
                 (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
             #else
                 (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG>(pSource));

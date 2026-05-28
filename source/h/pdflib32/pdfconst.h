@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2019 Dynarithmic Software.
+Copyright (c) 2002-2026 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,20 +17,18 @@ limitations under the License.
 FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
-
-For more information, the license file named LICENSE that is located in the root
-directory of the DTWAIN installation covers the restrictions under the LGPL license.
-Please read this file before deploying or distributing any application using DTWAIN.
 */
-#include <png.h>
-#include <pngconf.h>
-#include <pnglib32.h>
-#include <tchar.h>
-#include <stdio.h>
-#include <fstream>
+#ifndef PDFCONST_H
+#define PDFCONST_H
 
-LONG FUNCCONVENTION DTWLIB_PNGWriteFile(LPCTSTR szFile, BYTE *pImage2, UINT32 wid, UINT32 ht,
-    UINT32 bpp, UINT32 /*nColors*/, RGBQUAD * /*pPal*/)
-{
-    return 1;
-}
+#define PDF_AUTHOR      0
+#define PDF_PRODUCER    1
+#define PDF_TITLE       2
+#define PDF_KEYWORDS    3
+#define PDF_SUBJECT     4
+#define PDF_ORIENTATION 5
+#define PDF_MEDIABOX    6
+#define PDF_SCALETYPE   7
+#define PDF_CREATOR     8
+
+#endif

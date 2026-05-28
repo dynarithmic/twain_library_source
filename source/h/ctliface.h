@@ -1134,8 +1134,6 @@ namespace dynarithmic
 
     void  DTWAIN_InternalThrowException() THIS_FUNCTION_PROTO_THROWS
 
-    LONG  TS_Command(LPCTSTR lpCommand);
-
     #define IDS_DTWAIN_APPTITLE       9700
     #define IDS_DTWAIN_APPTITLE_HTML  9701
 

@@ -22,6 +22,7 @@ OF THIRD PARTY RIGHTS.
 #define IOHANDLERPS_H
 
 #include "ctldib32.h"
+#include <imagefun/postscriptwriter.h>
 
 namespace dynarithmic
 {

@@ -24,6 +24,7 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include "dibutil.h"
 #include "JXRGlue.h"
 #include "ctlstringconversion.h"

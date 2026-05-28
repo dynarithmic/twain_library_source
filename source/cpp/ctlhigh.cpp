@@ -26,10 +26,6 @@
      The macros basically create the boilerplate DLL export header for each function, along
      with the arguments to the function.
   *****************************************************************************************/
-#include <boost/format.hpp>
-#include <type_traits>
-#include <string_view>
-
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"

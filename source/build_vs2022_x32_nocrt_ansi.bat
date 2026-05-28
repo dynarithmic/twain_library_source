@@ -1,0 +1,17 @@
+echo Using:
+cmake --version
+echo.
+
+@echo off
+
+cmake --preset vs2022-x32-nocrt-ansi
+if errorlevel 1 exit /b 1
+
+cmake --build --preset vs2022-x32-nocrt-ansi-release -- /m
+if errorlevel 1 exit /b 1
+
+cmake --build --preset vs2022-x32-nocrt-ansi-debug -- /m
+if errorlevel 1 exit /b 1
+
+endlocal
+

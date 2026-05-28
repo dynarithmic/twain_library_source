@@ -20,7 +20,6 @@
  */
 #include "cppfunc.h"
 #include "dtwain.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 using namespace dynarithmic;
 

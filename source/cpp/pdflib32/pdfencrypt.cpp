@@ -33,7 +33,6 @@ OF THIRD PARTY RIGHTS.
 #undef min
 #undef max
 #include "pdfencrypt.h"
-//#include "../hashlib/md5.h"
 #include "ctlhashutils.h"
 #include "ctlstringutils.h"
 #include "ctlobstr.h"
@@ -158,7 +157,7 @@ class ARCFOUREncryption
             }
     };
 
-static unsigned char ConvertToHex(unsigned char hi, unsigned char lo)
+unsigned char ConvertToHex(unsigned char hi, unsigned char lo)
 {
     char retval;
     int temp = toupper(hi);

@@ -27,10 +27,8 @@
 #include <cctype>
 #include <numeric>
 #include <type_traits>
-#include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
 #include <boost/algorithm/hex.hpp>
 #include <assert.h>
 #include <algorithm>
@@ -39,6 +37,8 @@
 #include <locale>
 #include <iostream>
 #include <string_view>
+#include <cctype>
+#include <cwctype>
 #include <random>
 #include <boost/lexical_cast.hpp>
 #include <dtwain_filesystem.h>
@@ -129,7 +129,6 @@ namespace dynarithmic
         using baseoutputstream_type = std::ostream;
         using baseinputstream_type = std::istream;
 
-        using BOOST_FORMAT = boost::format;
         using FILESYSTEM_PATHTYPE = filesys::path;
 
         template <typename T>
@@ -277,7 +276,6 @@ namespace dynarithmic
         using baseoutputstream_type = std::wostream;
         using baseinputstream_type = std::wistream;
 
-        using BOOST_FORMAT = boost::wformat;
         using FILESYSTEM_PATHTYPE = filesys::path;
 
         template <typename T>
@@ -1002,72 +1000,171 @@ namespace dynarithmic
             return NULL;
         }
 
-        static int TokenizeEx(const StringType& str,
-                              const CharType *lpszTokStr,
-                              StringArrayType &rArray,
-                              bool bGetNullTokens,
-                              std::vector<unsigned>* positionArray= nullptr)
-        {
-            rArray.clear();
-            if (!lpszTokStr)
-                return 0;
-            typedef boost::tokenizer<boost::char_separator<CharType>,
-                                     typename StringType::const_iterator,
-                                     StringType> tokenizer;
-            boost::empty_token_policy tokenPolicy = bGetNullTokens?boost::keep_empty_tokens : boost::drop_empty_tokens;
-            boost::char_separator<CharType> sepr(lpszTokStr, StringTraits::GetEmptyString(), tokenPolicy);
-            tokenizer tokens(str, sepr);
-            for (typename tokenizer::const_iterator tok_iter = tokens.begin();
-                tok_iter != tokens.end(); ++tok_iter)
-            {
-                rArray.push_back(*tok_iter);
-                if ( positionArray )
-                {
-                    const std::ptrdiff_t offset = tok_iter.base() - str.begin() - tok_iter->size();
-                    positionArray->push_back(static_cast<unsigned>(offset));
-                }
-            }
-            return static_cast<int>(rArray.size());
-        }
+		static int TokenizeEx(const StringType& str,
+                              const typename StringType::value_type* lpszTokStr,
+			                  StringArrayType& rArray,
+			                  bool bGetNullTokens,
+			                  std::vector<unsigned>* positionArray = nullptr)
+		{
+			using size_type = typename StringType::size_type;
+
+			rArray.clear();
+			if (positionArray)
+				positionArray->clear();
+
+			if (!lpszTokStr || !*lpszTokStr)
+			{
+				if (!str.empty() || bGetNullTokens)
+				{
+					rArray.push_back(str);
+					if (positionArray)
+						positionArray->push_back(0);
+				}
+				return static_cast<int>(rArray.size());
+			}
+
+			size_type start = 0;
+
+			while (start <= str.size())
+			{
+				const size_type pos = str.find_first_of(lpszTokStr, start);
+
+				const size_type end =
+					(pos == StringType::npos) ? str.size() : pos;
+
+				if (end != start || bGetNullTokens)
+				{
+					rArray.emplace_back(str.substr(start, end - start));
+
+					if (positionArray)
+						positionArray->push_back(static_cast<unsigned>(start));
+				}
+
+				if (pos == StringType::npos)
+					break;
+
+				start = pos + 1;
+			}
+
+			return static_cast<int>(rArray.size());
+		}
 
         static int TokenizeQuotedEx(const StringType& str,
-                                    const CharType *lpszTokStr,
-                                    StringArrayType &rArray,
+                                    const typename StringType::value_type* lpszTokStr,
+                                    StringArrayType& rArray,
                                     bool bGetNullTokens,
                                     std::vector<unsigned>* positionArray = nullptr)
         {
+            using CharT = typename StringType::value_type;
+            using size_type = typename StringType::size_type;
+
             rArray.clear();
-            typedef boost::tokenizer<boost::escaped_list_separator<CharType>,
-                                    typename StringType::const_iterator,
-                                    StringType> tokenizer;
+            if (positionArray)
+                positionArray->clear();
 
-            boost::escaped_list_separator<CharType> sepr(StringTraits::GetEmptyString(), lpszTokStr, StringTraits::AllQuoteString());
-            tokenizer tokens(str, sepr);
-            for (auto tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
+            auto is_delimiter = [lpszTokStr](CharT ch) -> bool
             {
-                rArray.push_back(*tok_iter);
-                if (positionArray)
+                if (!lpszTokStr)
+                    return false;
+
+                for (const CharT* p = lpszTokStr; *p; ++p)
                 {
-                    const std::ptrdiff_t offset = tok_iter.base() - str.begin() - tok_iter->size();
-                    positionArray->push_back(static_cast<unsigned>(offset));
+                    if (*p == ch)
+                        return true;
+                }
+                return false;
+            };
+
+            auto is_quote = [](CharT ch) -> bool
+            {
+                return ch == static_cast<CharT>('\'') ||
+                    ch == static_cast<CharT>('"');
+            };
+
+            auto add_token = [&](size_type tokenStart,
+                size_type tokenEnd,
+                size_type reportedPosition)
+            {
+                if (tokenEnd < tokenStart)
+                    tokenEnd = tokenStart;
+
+                if (tokenEnd != tokenStart || bGetNullTokens)
+                {
+                    rArray.emplace_back(str.substr(tokenStart, tokenEnd - tokenStart));
+
+                    if (positionArray)
+                        positionArray->push_back(static_cast<unsigned>(reportedPosition));
+                }
+            };
+
+            const size_type n = str.size();
+            size_type tokenStart = 0;
+            size_type tokenContentStart = 0;
+            bool inQuote = false;
+            CharT quoteChar = 0;
+            bool tokenStarted = false;
+            bool quotedToken = false;
+
+            for (size_type i = 0; i <= n; ++i)
+            {
+                const bool atEnd = (i == n);
+                const CharT ch = atEnd ? CharT{} : str[i];
+
+                if (!atEnd && !tokenStarted)
+                {
+                    tokenStarted = true;
+                    tokenStart = i;
+                    tokenContentStart = i;
+
+                    if (is_quote(ch))
+                    {
+                        quotedToken = true;
+                        inQuote = true;
+                        quoteChar = ch;
+                        tokenContentStart = i + 1;
+                        continue;
+                    }
+                }
+
+                if (!atEnd && inQuote)
+                {
+                    if (ch == quoteChar)
+                    {
+                        inQuote = false;
+                        continue;
+                    }
+
+                    continue;
+                }
+
+                if (atEnd || (!inQuote && is_delimiter(ch)))
+                {
+                    size_type tokenEnd = i;
+
+                    if (quotedToken)
+                    {
+                        // Strip trailing quote if the token ended after a quote.
+                        tokenEnd = i;
+
+                        if (tokenEnd > tokenContentStart &&
+                            is_quote(str[tokenEnd - 1]))
+                        {
+                            --tokenEnd;
+                        }
+                    }
+
+                    add_token(tokenContentStart, tokenEnd, tokenStart);
+
+                    tokenStarted = false;
+                    quotedToken = false;
+                    inQuote = false;
+                    quoteChar = 0;
+
+                    tokenStart = i + 1;
+                    tokenContentStart = i + 1;
                 }
             }
-            if ( !bGetNullTokens )
-            {
-                std::vector<size_t> removed_pos;
-                for (size_t idx = 0; idx < rArray.size(); ++idx)
-                {
-                    if ( rArray[idx].empty() )
-                        removed_pos.push_back(idx);
-                }
 
-                for (auto i : removed_pos)
-                {
-                    rArray.erase(rArray.begin() + i);
-                    if ( positionArray )
-                        positionArray->erase(positionArray->begin() + i);
-                }
-            }
             return static_cast<int>(rArray.size());
         }
 

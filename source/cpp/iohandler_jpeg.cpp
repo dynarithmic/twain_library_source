@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "iohandler_jpeg.h"
-#include "ctliface.h"
 #include "jpegwriter.h"
 #include "ctldib32ex.h"
 
