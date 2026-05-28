@@ -372,11 +372,12 @@ Build
 New workflow:
 
 ```text
-Run batch file
-(or configure via CMake / CMake-GUI)
+Run batch file (which will also perform a full build)
+(or configure/generate via CMake / CMake-GUI)
 
-Open generated .sln
-Build
+The steps above will create dtwain.vcxproj and related files, which can be opened in Visual Studio for building or debugging
+If build did not occur, perform build within Visual Studio on the generated project.
+
 ```
 
 Generated solutions retain normal Visual Studio functionality including debugging, natvis visualizers, and standard project navigation.
