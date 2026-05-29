@@ -85,6 +85,16 @@ option(DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL
        "Delete the Boost installer log after a successful automatic install"
        OFF)
 
+option(DTWAIN_ALLOW_INSECURE_BOOST_DOWNLOAD
+       "Allow Boost download without TLS certificate verification"
+       OFF)
+
+set(DTWAIN_TLS_VERIFY ON)
+
+if(DTWAIN_ALLOW_INSECURE_BOOST_DOWNLOAD)
+    set(DTWAIN_TLS_VERIFY OFF)
+endif()
+
 set(DTWAIN_EXISTING_BOOST_ROOT
     ""
     CACHE PATH
@@ -235,19 +245,34 @@ if(NOT DTWAIN_EXISTING_BOOST_ROOT AND
             "${DTWAIN_BOOST_DOWNLOADED_EXE}"
             SHOW_PROGRESS
             STATUS DTWAIN_BOOST_DOWNLOAD_STATUS
-            TLS_VERIFY ON)
+            TLS_VERIFY ${DTWAIN_TLS_VERIFY})
 
         list(GET DTWAIN_BOOST_DOWNLOAD_STATUS 0 DTWAIN_BOOST_DOWNLOAD_RESULT)
         list(GET DTWAIN_BOOST_DOWNLOAD_STATUS 1 DTWAIN_BOOST_DOWNLOAD_MESSAGE)
         if(NOT DTWAIN_BOOST_DOWNLOAD_RESULT EQUAL 0)
-            message(FATAL_ERROR
-                "Boost download failed: ${DTWAIN_BOOST_DOWNLOAD_MESSAGE}\n"
-                "URL: ${DTWAIN_BOOST_URL}\n"
-                "Destination: ${DTWAIN_BOOST_DOWNLOADED_EXE}")
+          message(FATAL_ERROR
+              "Boost download failed: \"${DTWAIN_BOOST_DOWNLOAD_MESSAGE}\"\n\n"
+              "URL:\n"
+              "  ${BOOST_DOWNLOAD_URL}\n\n"
+              "Possible causes:\n"
+              "  * Temporary SourceForge outage\n"
+              "  * TLS/SSL certificate issue\n"
+              "  * Corporate proxy/firewall\n"
+              "  * Antivirus HTTPS inspection\n\n"
+              "Try running CMake again.\n\n"
+              "If the problem persists:\n"
+              "  1) Download the installer manually from the URL above.\n"
+              "  2) Save it to:\n"
+              "     ${BOOST_INSTALLER}\n"
+              "  3) Re-run CMake.\n\n"
+              "Advanced users may also configure:\n"
+              "  DTWAIN_ALLOW_INSECURE_BOOST_DOWNLOAD=ON"
+          )
         endif()
     else()
         message(STATUS "Using existing downloaded Boost installer: ${DTWAIN_BOOST_DOWNLOADED_EXE}")
     endif()
+
 
     message(STATUS "Installing Boost to ${DTWAIN_EFFECTIVE_BOOST_ROOT}")
     execute_process(
