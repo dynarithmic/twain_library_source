@@ -6,10 +6,11 @@ DTWAIN Version changes
 
       libpng --> 1.6.58
 
-- Fix issue with DTWAIN DLL's showing incomplete resource information.
+- Fix issue with DTWAIN DLL's showing incomplete resource information when
+  viewing Properties of the DLL.
 
-- Significant reduction in size of the DTWAIN DLL's due to new internal
-  build system.  
+- Significant reduction in size of the DTWAIN DLLs due to new internal
+  build system being used to generate the DLLs.  
 
 
 5.9.0
