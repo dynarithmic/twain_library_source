@@ -1436,6 +1436,7 @@ if(MSVC)
         $<$<CONFIG:Debug>:/DNDEBUG>
         $<$<CONFIG:MinSizeRel>:/Zi>
         /Zc:__cplusplus
+        /EHa
     )
 
     target_link_options(dtwain PRIVATE
@@ -1573,6 +1574,20 @@ if(MSVC)
 
     set_property(TARGET dtwdemo PROPERTY
         MSVC_RUNTIME_LIBRARY "$<$<CONFIG:MinSizeRel>:MultiThreaded>")
+endif()
+
+if(MSVC)
+    if(DTWAIN_USE_DYNAMIC_CRT)
+        set_property(TARGET dtwain PROPERTY
+            DTWAIN_MSVC_RUNTIME_LIBRARY
+            "$<$<CONFIG:Debug>:MultiThreadedDebug>$<$<NOT:$<CONFIG:Debug>>:MultiThreadedDLL>"
+        )
+    else()
+        set_property(TARGET dtwain PROPERTY
+            DTWAIN_MSVC_RUNTIME_LIBRARY
+            "$<$<CONFIG:Debug>:MultiThreadedDebug>$<$<NOT:$<CONFIG:Debug>>:MultiThreaded>"
+        )
+    endif()
 endif()
 
 set(DTWAIN_NATVIS_FILES
