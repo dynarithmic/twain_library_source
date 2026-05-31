@@ -934,9 +934,11 @@ DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElementCopy(DTWAIN_PDFTEX
 std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckGlobalPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement)
 {
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_NOTHROW | DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_SETLASTERROR);
-
     // Get the list of created text elements from global list
     auto& textElementList = CTL_StaticData::GetPDFTextElementList();
+
+    if (!TextElement)
+        return { false, textElementList.end() };
 
     // First check if DLL handle is valid
     if (!pHandle)
