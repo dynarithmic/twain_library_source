@@ -27,19 +27,19 @@ using namespace dynarithmic;
 int CTL_GifIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
     GifSessionOptions opts;
-	opts.text.software = GetCopyrightString();
+    opts.text.software = GetCopyrightString();
 
-	LockedDibPage locked(m_pDib->GetHandle());
+    LockedDibPage locked(m_pDib->GetHandle());
     if (!locked.IsValid())
         return DTWAIN_ERR_DIB;
 
     std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
-	DTWAINGifOutput output;
+    DTWAINGifOutput output;
     auto pageData = GifSessionWriter::MakePreparedGifPage(locked.GetView());
-	if (!output.OnFirstPage(fName, opts, pageData.value()))
-		return DTWAIN_ERR_FILEWRITE;
+    if (!output.OnFirstPage(fName, opts, pageData.value()))
+        return DTWAIN_ERR_FILEWRITE;
 
-	if (!output.OnLastPage())
-		return DTWAIN_ERR_FILEWRITE;
+    if (!output.OnLastPage())
+        return DTWAIN_ERR_FILEWRITE;
     return DTWAIN_NO_ERROR;
 }

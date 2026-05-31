@@ -288,7 +288,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 }
 
                 // See if the user wants to change the original DIB now
-				ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBORIG);
+                ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBORIG);
 
                 // Here we can do a check for blank page.
                 if (ProcessBlankPage(pSession, pSource, CurDib, false, DTWAIN_TN_BLANKPAGEDETECTED1, DTWAIN_TN_BLANKPAGEDISCARDED1, DTWAIN_BP_AUTODISCARD_IMMEDIATE) == 0)
@@ -304,8 +304,8 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 if (bProcessDibEx && GetDAT() != DAT_AUDIONATIVEXFER)
                     ModifyAcquiredDib();
 
-				ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBRESAMPLED);
-				
+                ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBRESAMPLED);
+                
                 WPARAM wParamToUse[] = { DTWAIN_TN_PROCESSEDDIBFINAL, DTWAIN_TN_PROCESSDIBFINALACCEPTED };
                 if ( GetDAT() == DAT_AUDIONATIVEXFER )
                 {
@@ -539,7 +539,7 @@ void CTL_ImageXferTriplet::StopAcquisitions(int errfile)
 {
     auto pSession = GetSessionPtr();
     auto pSource = GetSourcePtr();
-	CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_ACQUIREPAGESSTOPPING, reinterpret_cast<LPARAM>(pSource));
+    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_ACQUIREPAGESSTOPPING, reinterpret_cast<LPARAM>(pSource));
     // Clean up since the acquisitions are stopped
     // End the transfer
     auto pending = ResetTransfer(MSG_ENDXFER);
@@ -553,12 +553,12 @@ void CTL_ImageXferTriplet::StopAcquisitions(int errfile)
     // Now stop the feeder, if possible
     if (pendingCount != 0)
     {
-		ResetTransfer(MSG_STOPFEEDER);
-		ResetTransfer(MSG_RESET);
-	}
-	// Set the scan pending to false
-	m_bScanPending = false;
-	CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_ACQUIREPAGESSTOPPED, reinterpret_cast<LPARAM>(pSource));
+        ResetTransfer(MSG_STOPFEEDER);
+        ResetTransfer(MSG_RESET);
+    }
+    // Set the scan pending to false
+    m_bScanPending = false;
+    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_ACQUIREPAGESSTOPPED, reinterpret_cast<LPARAM>(pSource));
 }
 
 TW_UINT16 CTL_ImageXferTriplet::GetPendingCount() 
@@ -1342,19 +1342,19 @@ int CTL_ImageXferTriplet::ProcessBlankPage(CTL_ITwainSession *pSession,
         }
         if ( !bKeepPage )
         {
-			auto logFlags = CTL_StaticData::GetLogFilterFlags();
-			if (logFlags)
-			{
-				std::string sPercentages = "Blank page processing returning ";
-				if (retval.m_bIsBlank)
-					sPercentages += "true ";
-				else
-					sPercentages += "false ";
-				sPercentages += "with the following computed percentages (blank, threshold): ";
-				sPercentages += "(" + std::to_string(retval.PercentBlankAndThreshold.first) + ", " +
-					std::to_string(retval.PercentBlankAndThreshold.second) + ")";
-				LogWriterUtils::WriteLogInfoIndentedA(sPercentages);
-			}
+            auto logFlags = CTL_StaticData::GetLogFilterFlags();
+            if (logFlags)
+            {
+                std::string sPercentages = "Blank page processing returning ";
+                if (retval.m_bIsBlank)
+                    sPercentages += "true ";
+                else
+                    sPercentages += "false ";
+                sPercentages += "with the following computed percentages (blank, threshold): ";
+                sPercentages += "(" + std::to_string(retval.PercentBlankAndThreshold.first) + ", " +
+                    std::to_string(retval.PercentBlankAndThreshold.second) + ")";
+                LogWriterUtils::WriteLogInfoIndentedA(sPercentages);
+            }
 
             // remove dib from array and delete the memory for the DIB
             CurDib->SetAutoDelete(true);
@@ -1640,7 +1640,7 @@ HANDLE CTL_ImageXferTriplet::ProcessUserUpdatingDIB(size_t nLastDib, int notific
         else
         {
             pSource->SetUpdatedDIB(nullptr);
-			CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, notification, reinterpret_cast<LPARAM>(pSource));
+            CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, notification, reinterpret_cast<LPARAM>(pSource));
             hRetDib = pSource->GetUpdatedDIB();
         }
 

@@ -54,7 +54,7 @@ TW_UINT16 CTL_CapabilitySetRangeTriplet<T>::GetContainerType()
 template <class T>
 bool CTL_CapabilitySetRangeTriplet<T>::Encode(const std::vector<T>& rArray, void *pMemBlock)
 {
-	T Data1, Data2, Data3;
+    T Data1, Data2, Data3;
 
     // Get a TW_RANGE structure
     const pTW_RANGE pVal = static_cast<pTW_RANGE>(pMemBlock);

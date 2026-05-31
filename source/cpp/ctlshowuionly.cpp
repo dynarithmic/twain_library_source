@@ -73,7 +73,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
         SourceAcquireOptions opts;
         opts.setIsUIIOnly(true);
         auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
-		DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, false, FUNC_MACRO);
     }
 
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

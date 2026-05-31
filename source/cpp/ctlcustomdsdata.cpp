@@ -123,7 +123,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     }
 
     // return TRUE or FALSE depending on return code of TWAIN
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return nTwainRet != TWRC_SUCCESS; },
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return nTwainRet != TWRC_SUCCESS; },
                                         -(IDS_TWRC_ERRORSTART + nTwainRet), false, FUNC_MACRO );
 
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

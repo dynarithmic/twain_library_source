@@ -29,45 +29,45 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToSvg(const std::wstring& filename, const SvgSessionOptions& options, HANDLE hDib)
 {
-	LockedDibPage lockedPage(hDib);
-	if (!lockedPage.IsValid())
-		return false;
+    LockedDibPage lockedPage(hDib);
+    if (!lockedPage.IsValid())
+        return false;
 
-	SvgSessionWriter writer;
-	if (!writer.Open(filename, options))
-		return false;
+    SvgSessionWriter writer;
+    if (!writer.Open(filename, options))
+        return false;
 
-	auto pageInfo = SvgSessionWriter::MakePreparedSvgPage(lockedPage.GetView());
-	if (!pageInfo.has_value())
-		return false;
+    auto pageInfo = SvgSessionWriter::MakePreparedSvgPage(lockedPage.GetView());
+    if (!pageInfo.has_value())
+        return false;
 
-	if (!writer.SetPageInfo(pageInfo.value()))
-		return false;
+    if (!writer.SetPageInfo(pageInfo.value()))
+        return false;
 
-	if (!writer.WritePage())
-		return false;
+    if (!writer.WritePage())
+        return false;
 
-	writer.Close();
-	return true;
+    writer.Close();
+    return true;
 }
 
 
 int CTL_SVGIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-	HANDLE hDib = hDib = m_pDib->GetHandle();
+    HANDLE hDib = hDib = m_pDib->GetHandle();
 
-	SvgSessionOptions opts{};
-	if (m_isSVGZ)
-		opts.type = SvgOutputType::Svgz;
-	else
-		opts.type = SvgOutputType::Svg;
+    SvgSessionOptions opts{};
+    if (m_isSVGZ)
+        opts.type = SvgOutputType::Svgz;
+    else
+        opts.type = SvgOutputType::Svg;
 
-	// Get the comment string (copyright information)
-	opts.comment = CTL_StaticData::GetAppTitleHTML(); 
+    // Get the comment string (copyright information)
+    opts.comment = CTL_StaticData::GetAppTitleHTML(); 
 
-	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-	if (!WriteOneDibHandleToSvg(fName, opts, hDib))
-		return DTWAIN_ERR_FILEWRITE;
-	return DTWAIN_NO_ERROR;
+    if (!WriteOneDibHandleToSvg(fName, opts, hDib))
+        return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }

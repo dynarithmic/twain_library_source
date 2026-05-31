@@ -88,10 +88,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAllSourceDibsEx(DTWAIN_SOURCE Source, LPDTWAI
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source)
 {
-	LOG_FUNC_ENTRY_PARAMS((Source))
+    LOG_FUNC_ENTRY_PARAMS((Source))
     DTWAIN_ARRAY dibs = {};
-	DTWAIN_GetAllSourceDibsEx(Source, &dibs);
-	LOG_FUNC_EXIT_NONAME_PARAMS(dibs)
+    DTWAIN_GetAllSourceDibsEx(Source, &dibs);
+    LOG_FUNC_EXIT_NONAME_PARAMS(dibs)
     CATCH_BLOCK(nullptr)
 }
 
@@ -119,8 +119,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
+    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second)
     CATCH_BLOCK(nullptr)
 }
@@ -190,7 +190,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAI
     LOG_FUNC_ENTRY_PARAMS((aAcq))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto retVal = DestroyAcquisitionArray(pHandle, aAcq, bDestroyDibs);
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.first; }, retVal.second, nullptr, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.first; }, retVal.second, nullptr, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first)
     CATCH_BLOCK(false)
 }

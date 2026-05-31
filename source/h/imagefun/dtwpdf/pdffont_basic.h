@@ -84,11 +84,11 @@ namespace dynarithmic
 
     typedef std::shared_ptr<PDFTextElement> PDFTextElementPtr;
     typedef std::list<PDFTextElementPtr> CTL_TEXTELEMENTPTRLIST;
-	typedef std::list<PDFTextElement*> CTL_TEXTELEMENTNAKEDPTRLIST;
-	typedef std::pair<std::unordered_set<PDFTextElement*>, std::list<PDFTextElement*>> CTL_TEXTELEMENTNAKEDPTRSETLIST;
+    typedef std::list<PDFTextElement*> CTL_TEXTELEMENTNAKEDPTRLIST;
+    typedef std::pair<std::unordered_set<PDFTextElement*>, std::list<PDFTextElement*>> CTL_TEXTELEMENTNAKEDPTRSETLIST;
     typedef std::unordered_map<CTL_ITwainSource*, CTL_TEXTELEMENTNAKEDPTRSETLIST> CTL_TEXTELEMENTMAP;
     typedef std::pair<CTL_TEXTELEMENTNAKEDPTRLIST::iterator,
                                     CTL_TEXTELEMENTNAKEDPTRLIST::iterator> CTL_SEARCHABLENAKEDTEXTRANGE;
-	using CTL_SEARCHABLETEXTRANGE = CTL_SEARCHABLENAKEDTEXTRANGE;
+    using CTL_SEARCHABLETEXTRANGE = CTL_SEARCHABLENAKEDTEXTRANGE;
 }
 #endif

@@ -24,10 +24,10 @@ Copyright (c) 2002-2022 Dynarithmic Software.
 
 namespace dynarithmic
 {
-	struct BlankDIBInfo
-	{
-		bool m_bIsBlank = false;
-		std::pair<double, double> PercentBlankAndThreshold = {};
-	};
+    struct BlankDIBInfo
+    {
+        bool m_bIsBlank = false;
+        std::pair<double, double> PercentBlankAndThreshold = {};
+    };
 }
 #endif

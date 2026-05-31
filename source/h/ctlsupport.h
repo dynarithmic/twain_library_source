@@ -43,7 +43,7 @@ namespace dynarithmic
             DTWAINArrayLowLevel_RAII raii(pHandle, Array);
             if (GetCapContainer(pSource, Cap, DTWAIN_CAPGET) == DTWAIN_CONTRANGE)
             {
-				DTWAIN_ARRAY tempArray = {};
+                DTWAIN_ARRAY tempArray = {};
                 DTWAINArrayLowLevelPtr_RAII raii2(pHandle, &tempArray);
                 // expand range if we find that the underlying values are in a range
                 try

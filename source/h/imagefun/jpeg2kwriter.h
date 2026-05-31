@@ -31,82 +31,82 @@ OF THIRD PARTY RIGHTS.
 
 enum class Jpeg2000PixelFlavor
 {
-	Gray8,
-	Gray16,
-	Bgr24,
-	Bgra32
+    Gray8,
+    Gray16,
+    Bgr24,
+    Bgra32
 };
 
 struct Jpeg2000TextMetadata
 {
-	std::string software;
-	std::string copyright;
-	std::string author;
-	std::string description;
-	std::string comment;
+    std::string software;
+    std::string copyright;
+    std::string author;
+    std::string description;
+    std::string comment;
 };
 
 struct Jpeg2000SessionOptions
 {
-	bool useJP2Container = true;  // true = .jp2, false = raw codestream .j2k/.j2c
-	float compressionRate = 0.0f; // 0.0 = lossless
-	int numResolutions = 6;
-	int numThreads = 0;           // 0 = default
-	Jpeg2000TextMetadata text;
+    bool useJP2Container = true;  // true = .jp2, false = raw codestream .j2k/.j2c
+    float compressionRate = 0.0f; // 0.0 = lossless
+    int numResolutions = 6;
+    int numThreads = 0;           // 0 = default
+    Jpeg2000TextMetadata text;
 };
 
 struct PreparedJpeg2000DibPage
 {
-	uint32_t width = 0;
-	uint32_t height = 0;
-	uint16_t bitsPerPixel = 0;
-	uint32_t strideBytes = 0;
-	bool bottomUp = true;
+    uint32_t width = 0;
+    uint32_t height = 0;
+    uint16_t bitsPerPixel = 0;
+    uint32_t strideBytes = 0;
+    bool bottomUp = true;
 
-	Jpeg2000PixelFlavor pixelFlavor = Jpeg2000PixelFlavor::Gray8;
-	const uint8_t* bits = nullptr;
+    Jpeg2000PixelFlavor pixelFlavor = Jpeg2000PixelFlavor::Gray8;
+    const uint8_t* bits = nullptr;
 };
 
 
 class Jpeg2000SessionWriter
 {
-	public:
-		Jpeg2000SessionWriter() = default;
-		~Jpeg2000SessionWriter();
-		Jpeg2000SessionWriter(const Jpeg2000SessionWriter&) = delete;
-		Jpeg2000SessionWriter& operator=(const Jpeg2000SessionWriter&) = delete;
+    public:
+        Jpeg2000SessionWriter() = default;
+        ~Jpeg2000SessionWriter();
+        Jpeg2000SessionWriter(const Jpeg2000SessionWriter&) = delete;
+        Jpeg2000SessionWriter& operator=(const Jpeg2000SessionWriter&) = delete;
 
-		bool Open(const std::wstring& filename, const Jpeg2000SessionOptions& options);
-		bool SetPageInfo(const PreparedJpeg2000DibPage& page);
-		bool WriteCurrentPage();
-		void Close();
-		bool IsOpen() const noexcept;
-		static std::optional<PreparedJpeg2000DibPage> MakePreparedJpeg2000Page(const dynarithmic::DibPageView& view);
+        bool Open(const std::wstring& filename, const Jpeg2000SessionOptions& options);
+        bool SetPageInfo(const PreparedJpeg2000DibPage& page);
+        bool WriteCurrentPage();
+        void Close();
+        bool IsOpen() const noexcept;
+        static std::optional<PreparedJpeg2000DibPage> MakePreparedJpeg2000Page(const dynarithmic::DibPageView& view);
 
-	private:
-		static bool ValidatePage(const PreparedJpeg2000DibPage& page);
-		opj_image_t* CreateOpenJpegImage() const;
-		void FillOpenJpegImage(opj_image_t* image) const;
-		std::string BuildJpeg2000Comment() const;
+    private:
+        static bool ValidatePage(const PreparedJpeg2000DibPage& page);
+        opj_image_t* CreateOpenJpegImage() const;
+        void FillOpenJpegImage(opj_image_t* image) const;
+        std::string BuildJpeg2000Comment() const;
 
-	private:
-		std::wstring filename_;
-		Jpeg2000SessionOptions options_{};
+    private:
+        std::wstring filename_;
+        Jpeg2000SessionOptions options_{};
 
-		PreparedJpeg2000DibPage currentPage_{};
-		bool hasCurrentPage_ = false;
-		bool isOpen_ = false;
+        PreparedJpeg2000DibPage currentPage_{};
+        bool hasCurrentPage_ = false;
+        bool isOpen_ = false;
 };
 
 class DTWAINJpeg2000Output
 {
-	public:
-		bool OnFirstPage(const std::wstring& filename, const Jpeg2000SessionOptions& options, const PreparedJpeg2000DibPage& page);
-		bool OnLastPage();
-		bool IsOpen() const noexcept;
+    public:
+        bool OnFirstPage(const std::wstring& filename, const Jpeg2000SessionOptions& options, const PreparedJpeg2000DibPage& page);
+        bool OnLastPage();
+        bool IsOpen() const noexcept;
 
-	private:
-		std::unique_ptr<Jpeg2000SessionWriter> writer_;
+    private:
+        std::unique_ptr<Jpeg2000SessionWriter> writer_;
 };
 
 #endif

@@ -82,14 +82,14 @@ private:
     bool write_bmp_file();
 
 private:
-	FILE* file_ = nullptr;
-	std::wstring filename_;
+    FILE* file_ = nullptr;
+    std::wstring filename_;
 
-	PreparedBmpRle8Page currentPage_{};
-	bool hasPage_ = false;
+    PreparedBmpRle8Page currentPage_{};
+    bool hasPage_ = false;
 
-	std::vector<uint8_t> encodedData_;
-	std::vector<uint8_t> lineEncodeBuffer_;
+    std::vector<uint8_t> encodedData_;
+    std::vector<uint8_t> lineEncodeBuffer_;
 };
 
 // ============================================================

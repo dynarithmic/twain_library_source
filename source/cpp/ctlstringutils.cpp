@@ -168,16 +168,16 @@ namespace dynarithmic
     }
 
     // Replace string that contains %1, %2, etc. with string replacements
-	std::string& ReplacePlaceHolders(std::string& sOrigString, const std::vector<std::string>& vReplacements)
-	{
-		int i = 1;
-		std::string placeHolder;
-		for (auto& s : vReplacements)
-		{
-			placeHolder = "%" + std::to_string(i);
-			boost::algorithm::replace_all(sOrigString, placeHolder, s);
-			++i;
-		}
-		return sOrigString;
-	}
+    std::string& ReplacePlaceHolders(std::string& sOrigString, const std::vector<std::string>& vReplacements)
+    {
+        int i = 1;
+        std::string placeHolder;
+        for (auto& s : vReplacements)
+        {
+            placeHolder = "%" + std::to_string(i);
+            boost::algorithm::replace_all(sOrigString, placeHolder, s);
+            ++i;
+        }
+        return sOrigString;
+    }
 }

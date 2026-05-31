@@ -49,7 +49,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
 
     // Create a DTWAIN_ARRAY consisting of pointers to the source objects.
     auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSOURCE, 0);
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
 
     DTWAIN_ARRAY pDTWAINArray = retVal.second;
     DTWAINArrayLowLevelPtr_RAII raii(pHandle, &pDTWAINArray);

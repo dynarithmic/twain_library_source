@@ -56,7 +56,7 @@ static int CheckValidNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aFileNames,
     {
         if (!CheckForAnyBlankNames<StringArrayType, StringWrapperType>(vect))
         {
-			auto retVal = dynarithmic::CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
+            auto retVal = dynarithmic::CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
             if (!retVal.second)
                 bRetval = retVal.first;
             else
@@ -249,12 +249,12 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
     auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
-	DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
-	if (pr.first != DTWAIN_NO_ERROR)
-	{
-		CTL_TwainAppMgr::DisableUserInterface(pSource);
-		LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
-	}
+    DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
+    if (pr.first != DTWAIN_NO_ERROR)
+    {
+        CTL_TwainAppMgr::DisableUserInterface(pSource);
+        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+    }
     LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
@@ -363,7 +363,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
                 pSource->SetAcquisitionAttempts(nullptr);
             }
         }
-		bRetval = true;
+        bRetval = true;
     }
 
     if (pHandle->m_lAcquireMode == DTWAIN_MODAL)

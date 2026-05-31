@@ -53,21 +53,21 @@ static uint16_t to_libtiff_compression(TiffCompression c)
 
 static std::string build_tiff_open_mode(const TiffSessionOptions& opt)
 {
-	std::string mode = "w";
+    std::string mode = "w";
 
-	// ClassicTIFF vs BigTIFF
-	mode += (opt.containerFormat == TiffContainerFormat::BigTiff) ? '8' : '4';
+    // ClassicTIFF vs BigTIFF
+    mode += (opt.containerFormat == TiffContainerFormat::BigTiff) ? '8' : '4';
 
-	// Optional endianness
-	if (opt.littleEndian)
-		mode += 'l';
-	else if (opt.bigEndian)
-		mode += 'b';
+    // Optional endianness
+    if (opt.littleEndian)
+        mode += 'l';
+    else if (opt.bigEndian)
+        mode += 'b';
 
-	// Fill-order mode flag
-	mode += opt.fillOrderLsbToMsb ? 'L' : 'B';
+    // Fill-order mode flag
+    mode += opt.fillOrderLsbToMsb ? 'L' : 'B';
 
-	return mode;
+    return mode;
 }
 
 static PageTagInfo describe_page_tags(const PreparedTiffDibPage& page, const TiffPageSettings& settings)
@@ -79,7 +79,7 @@ static PageTagInfo describe_page_tags(const PreparedTiffDibPage& page, const Tif
         case PixelFlavor::BW1:
             info.samplesPerPixel = 1;
             info.bitsPerSample = 1;
-			info.photometric = PHOTOMETRIC_MINISWHITE;
+            info.photometric = PHOTOMETRIC_MINISWHITE;
             info.writeColorMap = false;
             break;
 
@@ -118,12 +118,12 @@ static PageTagInfo describe_page_tags(const PreparedTiffDibPage& page, const Tif
 
 static size_t calc_output_row_size(const PreparedTiffDibPage& page, const PageTagInfo& tagInfo)
 {
-	if (tagInfo.bitsPerSample == 1 && tagInfo.samplesPerPixel == 1)
-		return static_cast<size_t>((page.width + 7) / 8);
+    if (tagInfo.bitsPerSample == 1 && tagInfo.samplesPerPixel == 1)
+        return static_cast<size_t>((page.width + 7) / 8);
 
-	return static_cast<size_t>(page.width) *
-		static_cast<size_t>(tagInfo.samplesPerPixel) *
-		static_cast<size_t>(tagInfo.bitsPerSample / 8);
+    return static_cast<size_t>(page.width) *
+        static_cast<size_t>(tagInfo.samplesPerPixel) *
+        static_cast<size_t>(tagInfo.bitsPerSample / 8);
 }
 
 static bool convert_row(const PreparedTiffDibPage& page,
@@ -219,432 +219,432 @@ static bool convert_row(const PreparedTiffDibPage& page,
 
 TiffSessionWriter::~TiffSessionWriter()
 {
-	Close();
+    Close();
 }
 
 TiffSessionWriter::TiffSessionWriter(TiffSessionWriter&& other) noexcept
-		: tif_(other.tif_),
-		filename_(std::move(other.filename_)),
-		sessionOptions_(std::move(other.sessionOptions_)),
-		pageIndex_(other.pageIndex_),
-		currentPage_(other.currentPage_),
-		currentPageSettings_(other.currentPageSettings_),
-		hasCurrentPage_(other.hasCurrentPage_)
+        : tif_(other.tif_),
+        filename_(std::move(other.filename_)),
+        sessionOptions_(std::move(other.sessionOptions_)),
+        pageIndex_(other.pageIndex_),
+        currentPage_(other.currentPage_),
+        currentPageSettings_(other.currentPageSettings_),
+        hasCurrentPage_(other.hasCurrentPage_)
 {
-	other.tif_ = nullptr;
-	other.pageIndex_ = 0;
-	other.hasCurrentPage_ = false;
+    other.tif_ = nullptr;
+    other.pageIndex_ = 0;
+    other.hasCurrentPage_ = false;
 }
 
 TiffSessionWriter& TiffSessionWriter::operator=(TiffSessionWriter&& other) noexcept
 {
-	if (this != &other)
-	{
-		Close();
+    if (this != &other)
+    {
+        Close();
 
-		tif_ = other.tif_;
-		filename_ = std::move(other.filename_);
-		sessionOptions_ = std::move(other.sessionOptions_);
-		pageIndex_ = other.pageIndex_;
-		currentPage_ = other.currentPage_;
-		currentPageSettings_ = other.currentPageSettings_;
-		hasCurrentPage_ = other.hasCurrentPage_;
+        tif_ = other.tif_;
+        filename_ = std::move(other.filename_);
+        sessionOptions_ = std::move(other.sessionOptions_);
+        pageIndex_ = other.pageIndex_;
+        currentPage_ = other.currentPage_;
+        currentPageSettings_ = other.currentPageSettings_;
+        hasCurrentPage_ = other.hasCurrentPage_;
 
-		other.tif_ = nullptr;
-		other.pageIndex_ = 0;
-		other.hasCurrentPage_ = false;
-	}
-	return *this;
+        other.tif_ = nullptr;
+        other.pageIndex_ = 0;
+        other.hasCurrentPage_ = false;
+    }
+    return *this;
 }
 
 bool TiffSessionWriter::Open(const std::wstring& filename, const TiffSessionOptions& sessionOptions)
 {
-	if (tif_)
-		return false;
+    if (tif_)
+        return false;
 
-	const std::string mode = build_tiff_open_mode(sessionOptions);
-	tif_ = TIFFOpenW(filename.c_str(), mode.c_str());
-	if (!tif_)
-		return false;
+    const std::string mode = build_tiff_open_mode(sessionOptions);
+    tif_ = TIFFOpenW(filename.c_str(), mode.c_str());
+    if (!tif_)
+        return false;
 
-	filename_ = filename;
-	sessionOptions_ = sessionOptions;
-	pageIndex_ = 0;
-	hasCurrentPage_ = false;
-	return true;
+    filename_ = filename;
+    sessionOptions_ = sessionOptions;
+    pageIndex_ = 0;
+    hasCurrentPage_ = false;
+    return true;
 }
 
 bool TiffSessionWriter::SetPageInfo(const PreparedTiffDibPage& page, const TiffPageSettings& pageSettings)
 {
-	if (!tif_)
-		return false;
+    if (!tif_)
+        return false;
 
-	currentPage_ = page;
-	currentPageSettings_ = pageSettings;
-	currentPageSettings_.pageIndex = static_cast<uint16_t>(pageIndex_);
+    currentPage_ = page;
+    currentPageSettings_ = pageSettings;
+    currentPageSettings_.pageIndex = static_cast<uint16_t>(pageIndex_);
 
-	if (currentPage_.pixelFlavor == PixelFlavor::BW1)
-	{
-		currentPageSettings_.invertBilevelBits = currentPageSettings_.invertImage;
-	}
+    if (currentPage_.pixelFlavor == PixelFlavor::BW1)
+    {
+        currentPageSettings_.invertBilevelBits = currentPageSettings_.invertImage;
+    }
 
-	hasCurrentPage_ = true;
-	return true;
+    hasCurrentPage_ = true;
+    return true;
 }
 
 bool TiffSessionWriter::WriteCurrentPage()
 {
-	if (!tif_ || !hasCurrentPage_)
-		return false;
+    if (!tif_ || !hasCurrentPage_)
+        return false;
 
-	if (!ValidateCurrentPage())
-		return false;
+    if (!ValidateCurrentPage())
+        return false;
 
-	const PageTagInfo tagInfo = describe_page_tags(currentPage_, currentPageSettings_);
+    const PageTagInfo tagInfo = describe_page_tags(currentPage_, currentPageSettings_);
 
-	if (!SetCommonTags(tagInfo))
-		return false;
+    if (!SetCommonTags(tagInfo))
+        return false;
 
-	if (!SetCompressionTags(tagInfo))
-		return false;
+    if (!SetCompressionTags(tagInfo))
+        return false;
 
-	if (tagInfo.writeColorMap)
-	{
-		if (!SetPaletteTags(tagInfo.bitsPerSample))
-			return false;
-	}
+    if (tagInfo.writeColorMap)
+    {
+        if (!SetPaletteTags(tagInfo.bitsPerSample))
+            return false;
+    }
 
-	if (!WritePixels(tagInfo))
-		return false;
+    if (!WritePixels(tagInfo))
+        return false;
 
-	if (TIFFWriteDirectory(tif_) != 1)
-		return false;
+    if (TIFFWriteDirectory(tif_) != 1)
+        return false;
 
-	++pageIndex_;
-	hasCurrentPage_ = false;
-	return true;
+    ++pageIndex_;
+    hasCurrentPage_ = false;
+    return true;
 }
 
 void TiffSessionWriter::Close()
 {
-	if (tif_)
-	{
-		TIFFClose(tif_);
-		tif_ = nullptr;
-	}
+    if (tif_)
+    {
+        TIFFClose(tif_);
+        tif_ = nullptr;
+    }
 
-	filename_.clear();
-	pageIndex_ = 0;
-	hasCurrentPage_ = false;
+    filename_.clear();
+    pageIndex_ = 0;
+    hasCurrentPage_ = false;
 }
 
 bool TiffSessionWriter::IsOpen() const noexcept
 {
-	return tif_ != nullptr;
+    return tif_ != nullptr;
 }
 
 std::size_t TiffSessionWriter::GetPageIndex() const noexcept
 {
-	return pageIndex_;
+    return pageIndex_;
 }
 
 bool TiffSessionWriter::ValidateCurrentPage() const
 {
-	if (!currentPage_.bits)
-		return false;
-	if (currentPage_.width == 0 || currentPage_.height == 0)
-		return false;
-	if (currentPage_.strideBytes == 0)
-		return false;
+    if (!currentPage_.bits)
+        return false;
+    if (currentPage_.width == 0 || currentPage_.height == 0)
+        return false;
+    if (currentPage_.strideBytes == 0)
+        return false;
 
-	switch (currentPage_.pixelFlavor)
-	{
-	case PixelFlavor::BW1:
-		return currentPage_.bitsPerPixel == 1;
+    switch (currentPage_.pixelFlavor)
+    {
+    case PixelFlavor::BW1:
+        return currentPage_.bitsPerPixel == 1;
 
-	case PixelFlavor::Gray8:
-		return currentPage_.bitsPerPixel == 8;
+    case PixelFlavor::Gray8:
+        return currentPage_.bitsPerPixel == 8;
 
-	case PixelFlavor::Palette8:
-		return currentPage_.bitsPerPixel == 8 &&
-			currentPage_.palette != nullptr &&
-			currentPage_.paletteEntries > 0;
+    case PixelFlavor::Palette8:
+        return currentPage_.bitsPerPixel == 8 &&
+            currentPage_.palette != nullptr &&
+            currentPage_.paletteEntries > 0;
 
-	case PixelFlavor::Gray16:
-		return currentPage_.bitsPerPixel == 16;
+    case PixelFlavor::Gray16:
+        return currentPage_.bitsPerPixel == 16;
 
-	case PixelFlavor::Bgr24:
-		return currentPage_.bitsPerPixel == 24;
+    case PixelFlavor::Bgr24:
+        return currentPage_.bitsPerPixel == 24;
 
-	case PixelFlavor::Bgra32:
-		return currentPage_.bitsPerPixel == 32;
-	}
+    case PixelFlavor::Bgra32:
+        return currentPage_.bitsPerPixel == 32;
+    }
 
-	return false;
+    return false;
 }
 
 bool TiffSessionWriter::SetCommonTags(const PageTagInfo& tagInfo)
 {
-	uint16_t photometric = tagInfo.photometric;
+    uint16_t photometric = tagInfo.photometric;
 
-	TIFFSetField(tif_, TIFFTAG_IMAGEWIDTH, currentPage_.width);
-	TIFFSetField(tif_, TIFFTAG_IMAGELENGTH, currentPage_.height);
-	TIFFSetField(tif_, TIFFTAG_SAMPLESPERPIXEL, tagInfo.samplesPerPixel);
-	TIFFSetField(tif_, TIFFTAG_BITSPERSAMPLE, tagInfo.bitsPerSample);
-	TIFFSetField(tif_, TIFFTAG_PHOTOMETRIC, photometric);
-	TIFFSetField(tif_, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-	TIFFSetField(tif_, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+    TIFFSetField(tif_, TIFFTAG_IMAGEWIDTH, currentPage_.width);
+    TIFFSetField(tif_, TIFFTAG_IMAGELENGTH, currentPage_.height);
+    TIFFSetField(tif_, TIFFTAG_SAMPLESPERPIXEL, tagInfo.samplesPerPixel);
+    TIFFSetField(tif_, TIFFTAG_BITSPERSAMPLE, tagInfo.bitsPerSample);
+    TIFFSetField(tif_, TIFFTAG_PHOTOMETRIC, photometric);
+    TIFFSetField(tif_, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    TIFFSetField(tif_, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
 
-	TIFFSetField(tif_, TIFFTAG_XRESOLUTION, static_cast<float>(currentPage_.xDpi));
-	TIFFSetField(tif_, TIFFTAG_YRESOLUTION, static_cast<float>(currentPage_.yDpi));
-	TIFFSetField(tif_, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
+    TIFFSetField(tif_, TIFFTAG_XRESOLUTION, static_cast<float>(currentPage_.xDpi));
+    TIFFSetField(tif_, TIFFTAG_YRESOLUTION, static_cast<float>(currentPage_.yDpi));
+    TIFFSetField(tif_, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
 
-	// JPEG overrides this later.
-	TIFFSetField(tif_, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tif_, 0));
+    // JPEG overrides this later.
+    TIFFSetField(tif_, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tif_, 0));
 
-	if (!sessionOptions_.software.empty())
-		TIFFSetField(tif_, TIFFTAG_SOFTWARE, sessionOptions_.software.c_str());
+    if (!sessionOptions_.software.empty())
+        TIFFSetField(tif_, TIFFTAG_SOFTWARE, sessionOptions_.software.c_str());
 
-	if (!sessionOptions_.copyright.empty())
-		TIFFSetField(tif_, TIFFTAG_COPYRIGHT, sessionOptions_.copyright.c_str());
+    if (!sessionOptions_.copyright.empty())
+        TIFFSetField(tif_, TIFFTAG_COPYRIGHT, sessionOptions_.copyright.c_str());
 
-	if (currentPageSettings_.setPageNumber)
-	{
-		TIFFSetField(tif_, TIFFTAG_PAGENUMBER,
-			currentPageSettings_.pageIndex,
-			currentPageSettings_.pageCount);
-	}
+    if (currentPageSettings_.setPageNumber)
+    {
+        TIFFSetField(tif_, TIFFTAG_PAGENUMBER,
+            currentPageSettings_.pageIndex,
+            currentPageSettings_.pageCount);
+    }
 
-	if (currentPage_.pixelFlavor == PixelFlavor::BW1)
-	{
-		uint16_t fillOrder =
-			sessionOptions_.fillOrderLsbToMsb ? FILLORDER_LSB2MSB
-			: FILLORDER_MSB2LSB;
+    if (currentPage_.pixelFlavor == PixelFlavor::BW1)
+    {
+        uint16_t fillOrder =
+            sessionOptions_.fillOrderLsbToMsb ? FILLORDER_LSB2MSB
+            : FILLORDER_MSB2LSB;
 
-		if (currentPageSettings_.forceFillOrder)
-			fillOrder = currentPageSettings_.forcedFillOrder;
+        if (currentPageSettings_.forceFillOrder)
+            fillOrder = currentPageSettings_.forcedFillOrder;
 
-		TIFFSetField(tif_, TIFFTAG_FILLORDER, fillOrder);
-	}
+        TIFFSetField(tif_, TIFFTAG_FILLORDER, fillOrder);
+    }
 
-	return true;
+    return true;
 }
 
 bool TiffSessionWriter::SetCompressionTags(const PageTagInfo& tagInfo)
 {
-	TIFFSetField(tif_, TIFFTAG_COMPRESSION,
-		to_libtiff_compression(currentPageSettings_.compression));
+    TIFFSetField(tif_, TIFFTAG_COMPRESSION,
+        to_libtiff_compression(currentPageSettings_.compression));
 
-	switch (currentPageSettings_.compression)
-	{
-	case TiffCompression::Group3:
-		TIFFSetField(tif_, TIFFTAG_GROUP3OPTIONS, currentPageSettings_.group3Options);
-		break;
+    switch (currentPageSettings_.compression)
+    {
+    case TiffCompression::Group3:
+        TIFFSetField(tif_, TIFFTAG_GROUP3OPTIONS, currentPageSettings_.group3Options);
+        break;
 
-	case TiffCompression::Group4:
-		TIFFSetField(tif_, TIFFTAG_GROUP4OPTIONS, currentPageSettings_.group4Options);
-		break;
+    case TiffCompression::Group4:
+        TIFFSetField(tif_, TIFFTAG_GROUP4OPTIONS, currentPageSettings_.group4Options);
+        break;
 
-	case TiffCompression::Lzw:
-	{
-		if (tagInfo.bitsPerSample == 1)
-		{
-			TIFFSetField(tif_, TIFFTAG_PREDICTOR, 1);
-		}
-		else if (!tagInfo.writeColorMap &&
-			(tagInfo.photometric == PHOTOMETRIC_MINISBLACK ||
-				tagInfo.photometric == PHOTOMETRIC_RGB) &&
-			tagInfo.bitsPerSample >= 8)
-		{
-			TIFFSetField(tif_, TIFFTAG_PREDICTOR, 2);
-		}
-		else
-		{
-			TIFFSetField(tif_, TIFFTAG_PREDICTOR, 1);
-		}
-		break;
-	}
+    case TiffCompression::Lzw:
+    {
+        if (tagInfo.bitsPerSample == 1)
+        {
+            TIFFSetField(tif_, TIFFTAG_PREDICTOR, 1);
+        }
+        else if (!tagInfo.writeColorMap &&
+            (tagInfo.photometric == PHOTOMETRIC_MINISBLACK ||
+                tagInfo.photometric == PHOTOMETRIC_RGB) &&
+            tagInfo.bitsPerSample >= 8)
+        {
+            TIFFSetField(tif_, TIFFTAG_PREDICTOR, 2);
+        }
+        else
+        {
+            TIFFSetField(tif_, TIFFTAG_PREDICTOR, 1);
+        }
+        break;
+    }
 
-	case TiffCompression::Flate:
-	{
-		if (!tagInfo.writeColorMap &&
-			(tagInfo.photometric == PHOTOMETRIC_MINISBLACK ||
-				tagInfo.photometric == PHOTOMETRIC_RGB) &&
-			tagInfo.bitsPerSample >= 8)
-		{
-			TIFFSetField(tif_, TIFFTAG_PREDICTOR, 2);
-		}
-		else
-		{
-			TIFFSetField(tif_, TIFFTAG_PREDICTOR, 1);
-		}
-		break;
-	}
+    case TiffCompression::Flate:
+    {
+        if (!tagInfo.writeColorMap &&
+            (tagInfo.photometric == PHOTOMETRIC_MINISBLACK ||
+                tagInfo.photometric == PHOTOMETRIC_RGB) &&
+            tagInfo.bitsPerSample >= 8)
+        {
+            TIFFSetField(tif_, TIFFTAG_PREDICTOR, 2);
+        }
+        else
+        {
+            TIFFSetField(tif_, TIFFTAG_PREDICTOR, 1);
+        }
+        break;
+    }
 
-	case TiffCompression::Jpeg:
-	{
-		TIFFSetField(tif_, TIFFTAG_JPEGQUALITY, currentPageSettings_.jpegQuality);
+    case TiffCompression::Jpeg:
+    {
+        TIFFSetField(tif_, TIFFTAG_JPEGQUALITY, currentPageSettings_.jpegQuality);
 
-		uint32_t rowsperstrip = static_cast<uint32_t>(-1);
-		rowsperstrip = TIFFDefaultStripSize(tif_, rowsperstrip);
+        uint32_t rowsperstrip = static_cast<uint32_t>(-1);
+        rowsperstrip = TIFFDefaultStripSize(tif_, rowsperstrip);
 
-		const uint32_t rem = rowsperstrip % 8;
-		if (rem != 0)
-			rowsperstrip += (8 - rem);
+        const uint32_t rem = rowsperstrip % 8;
+        if (rem != 0)
+            rowsperstrip += (8 - rem);
 
-		TIFFSetField(tif_, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
-		break;
-	}
+        TIFFSetField(tif_, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+        break;
+    }
 
-	case TiffCompression::None:
-	case TiffCompression::PackBits:
-		break;
-	}
+    case TiffCompression::None:
+    case TiffCompression::PackBits:
+        break;
+    }
 
-	return true;
+    return true;
 }
 
 bool TiffSessionWriter::SetPaletteTags(uint16_t bitsPerSample)
 {
-	if (!currentPage_.palette || currentPage_.paletteEntries == 0)
-		return false;
+    if (!currentPage_.palette || currentPage_.paletteEntries == 0)
+        return false;
 
-	const uint32_t mapEntries = 1u << bitsPerSample;
-	std::vector<uint16_t> red(mapEntries, 0);
-	std::vector<uint16_t> green(mapEntries, 0);
-	std::vector<uint16_t> blue(mapEntries, 0);
+    const uint32_t mapEntries = 1u << bitsPerSample;
+    std::vector<uint16_t> red(mapEntries, 0);
+    std::vector<uint16_t> green(mapEntries, 0);
+    std::vector<uint16_t> blue(mapEntries, 0);
 
-	const uint32_t n = (currentPage_.paletteEntries < mapEntries)
-		? currentPage_.paletteEntries
-		: mapEntries;
+    const uint32_t n = (currentPage_.paletteEntries < mapEntries)
+        ? currentPage_.paletteEntries
+        : mapEntries;
 
-	for (uint32_t i = 0; i < n; ++i)
-	{
-		red[i] = static_cast<uint16_t>(currentPage_.palette[i].rgbRed) * 257u;
-		green[i] = static_cast<uint16_t>(currentPage_.palette[i].rgbGreen) * 257u;
-		blue[i] = static_cast<uint16_t>(currentPage_.palette[i].rgbBlue) * 257u;
-	}
+    for (uint32_t i = 0; i < n; ++i)
+    {
+        red[i] = static_cast<uint16_t>(currentPage_.palette[i].rgbRed) * 257u;
+        green[i] = static_cast<uint16_t>(currentPage_.palette[i].rgbGreen) * 257u;
+        blue[i] = static_cast<uint16_t>(currentPage_.palette[i].rgbBlue) * 257u;
+    }
 
-	TIFFSetField(tif_, TIFFTAG_COLORMAP, red.data(), green.data(), blue.data());
-	return true;
+    TIFFSetField(tif_, TIFFTAG_COLORMAP, red.data(), green.data(), blue.data());
+    return true;
 }
 
 bool TiffSessionWriter::EnsureRowBufferSize(size_t sizeNeeded)
 {
-	if (rowBuffer_.size() < sizeNeeded)
-		rowBuffer_.resize(sizeNeeded);
-	return true;
+    if (rowBuffer_.size() < sizeNeeded)
+        rowBuffer_.resize(sizeNeeded);
+    return true;
 }
 
 bool TiffSessionWriter::WritePixels(const PageTagInfo& tagInfo)
 {
-	const size_t outRowSize = calc_output_row_size(currentPage_, tagInfo);
+    const size_t outRowSize = calc_output_row_size(currentPage_, tagInfo);
 
-	if (!EnsureRowBufferSize(outRowSize))
-		return false;
+    if (!EnsureRowBufferSize(outRowSize))
+        return false;
 
-	for (uint32_t y = 0; y < currentPage_.height; ++y)
-	{
-		const uint32_t srcY = currentPage_.bottomUp
-			? (currentPage_.height - 1 - y)
-			: y;
+    for (uint32_t y = 0; y < currentPage_.height; ++y)
+    {
+        const uint32_t srcY = currentPage_.bottomUp
+            ? (currentPage_.height - 1 - y)
+            : y;
 
-		const uint8_t* src =
-			currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
+        const uint8_t* src =
+            currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
 
-		if (!convert_row(currentPage_, currentPageSettings_, src, rowBuffer_.data(), outRowSize))
-		{
-			return false;
-		}
+        if (!convert_row(currentPage_, currentPageSettings_, src, rowBuffer_.data(), outRowSize))
+        {
+            return false;
+        }
 
-		if (TIFFWriteScanline(tif_, rowBuffer_.data(), y, 0) < 0)
-			return false;
-	}
+        if (TIFFWriteScanline(tif_, rowBuffer_.data(), y, 0) < 0)
+            return false;
+    }
 
-	return true;
+    return true;
 }
 
 std::optional<PreparedTiffDibPage> TiffSessionWriter::MakePreparedTiffDibPage(const dynarithmic::DibPageView& view)
 {
-	if (!view.bits)
-		return std::nullopt;
+    if (!view.bits)
+        return std::nullopt;
 
-	PreparedTiffDibPage page{};
-	page.width = view.width;
-	page.height = view.height;
-	page.bitsPerPixel = view.bitsPerPixel;
-	page.strideBytes = view.strideBytes;
-	page.bottomUp = view.bottomUp;
-	page.bits = view.bits;
-	page.palette = view.palette;
-	page.paletteEntries = view.paletteEntries;
+    PreparedTiffDibPage page{};
+    page.width = view.width;
+    page.height = view.height;
+    page.bitsPerPixel = view.bitsPerPixel;
+    page.strideBytes = view.strideBytes;
+    page.bottomUp = view.bottomUp;
+    page.bits = view.bits;
+    page.palette = view.palette;
+    page.paletteEntries = view.paletteEntries;
 
-	page.xDpi = view.xDPI > 0.0 ? view.xDPI : 200.0;
-	page.yDpi = view.yDPI > 0.0 ? view.yDPI : 200.0;
+    page.xDpi = view.xDPI > 0.0 ? view.xDPI : 200.0;
+    page.yDpi = view.yDPI > 0.0 ? view.yDPI : 200.0;
 
-	switch (page.bitsPerPixel)
-	{
-		case 1:  page.pixelFlavor = PixelFlavor::BW1; break;
-		case 8:  page.pixelFlavor = page.palette ? PixelFlavor::Palette8 : PixelFlavor::Gray8; break;
-		case 16: page.pixelFlavor = PixelFlavor::Gray16; break;
-		case 24: page.pixelFlavor = PixelFlavor::Bgr24; break;
-		case 32: page.pixelFlavor = PixelFlavor::Bgra32; break;
-		default: return std::nullopt;
-	}
-	return page;
+    switch (page.bitsPerPixel)
+    {
+        case 1:  page.pixelFlavor = PixelFlavor::BW1; break;
+        case 8:  page.pixelFlavor = page.palette ? PixelFlavor::Palette8 : PixelFlavor::Gray8; break;
+        case 16: page.pixelFlavor = PixelFlavor::Gray16; break;
+        case 24: page.pixelFlavor = PixelFlavor::Bgr24; break;
+        case 32: page.pixelFlavor = PixelFlavor::Bgra32; break;
+        default: return std::nullopt;
+    }
+    return page;
 }
 
 std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedTiffDibPage& page,
-		TiffPageSettings settings)
+        TiffPageSettings settings)
 {
-	if (writer_)
-		return { false, DTWAIN_ERR_FILEWRITE };
+    if (writer_)
+        return { false, DTWAIN_ERR_FILEWRITE };
 
-	writer_ = std::make_unique<TiffSessionWriter>();
-	if (!writer_->Open(filename, sessionOptions))
-	{
-		writer_.reset();
-		return { false, DTWAIN_ERR_FILEOPEN };
-	}
+    writer_ = std::make_unique<TiffSessionWriter>();
+    if (!writer_->Open(filename, sessionOptions))
+    {
+        writer_.reset();
+        return { false, DTWAIN_ERR_FILEOPEN };
+    }
 
-	pageIndex_ = 0;
-	return write_page(page, settings);
+    pageIndex_ = 0;
+    return write_page(page, settings);
 }
 
 std::pair<bool, int> DTWAINTiffOutput::OnNextPage(const PreparedTiffDibPage& page, TiffPageSettings settings)
 {
-	if (!writer_)
-		return { false, DTWAIN_ERR_FILEWRITE };
+    if (!writer_)
+        return { false, DTWAIN_ERR_FILEWRITE };
 
-	return write_page(page, settings);
+    return write_page(page, settings);
 }
 
 std::pair<bool, int> DTWAINTiffOutput::OnLastPage()
 {
-	if (!writer_)
-		return { false, DTWAIN_ERR_FILEWRITE };
+    if (!writer_)
+        return { false, DTWAIN_ERR_FILEWRITE };
 
-	writer_.reset(); // closes TIFF
-	pageIndex_ = 0;
-	return { true, DTWAIN_NO_ERROR };
+    writer_.reset(); // closes TIFF
+    pageIndex_ = 0;
+    return { true, DTWAIN_NO_ERROR };
 }
 
 bool DTWAINTiffOutput::IsOpen() const noexcept
 {
-	return writer_ != nullptr && writer_->IsOpen();
+    return writer_ != nullptr && writer_->IsOpen();
 }
 
 std::pair<bool, int> DTWAINTiffOutput::write_page(const PreparedTiffDibPage& page, TiffPageSettings settings)
 {
-	settings.pageIndex = static_cast<uint16_t>(pageIndex_);
+    settings.pageIndex = static_cast<uint16_t>(pageIndex_);
 
-	if (!writer_->SetPageInfo(page, settings))
-		return { false, DTWAIN_ERR_FILEWRITE };
+    if (!writer_->SetPageInfo(page, settings))
+        return { false, DTWAIN_ERR_FILEWRITE };
 
-	if (!writer_->WriteCurrentPage())
-		return { false, DTWAIN_ERR_FILEWRITE };
+    if (!writer_->WriteCurrentPage())
+        return { false, DTWAIN_ERR_FILEWRITE };
 
-	++pageIndex_;
-	return { true, DTWAIN_NO_ERROR };
+    ++pageIndex_;
+    return { true, DTWAIN_NO_ERROR };
 }
 

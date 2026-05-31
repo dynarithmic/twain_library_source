@@ -109,12 +109,12 @@ void CTL_ImageMemXferTriplet::InitXferBuffer()
     m_ImageMemXferBuffer.YOffset =
     m_ImageMemXferBuffer.BytesWritten = TWON_DONTCARE32;
 
-	if (GetSourcePtr()->IsTileModeOn())
-	{
-		m_ImageMemXferBuffer.Memory.Flags = TWMF_DSOWNS;
-		m_ImageMemXferBuffer.Memory.Length = TWON_DONTCARE32;
-		m_ImageMemXferBuffer.Memory.TheMem = NULL;
-	}
+    if (GetSourcePtr()->IsTileModeOn())
+    {
+        m_ImageMemXferBuffer.Memory.Flags = TWMF_DSOWNS;
+        m_ImageMemXferBuffer.Memory.Length = TWON_DONTCARE32;
+        m_ImageMemXferBuffer.Memory.TheMem = NULL;
+    }
 
     if ( m_nCompression != TWCP_NONE )
     {
@@ -156,7 +156,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
         {
             case TWRC_SUCCESS:
                 // Send message that a strip or tile has been transferred successfully
-				pSource->GetBufferedXFerInfo() = m_ImageMemXferBuffer;
+                pSource->GetBufferedXFerInfo() = m_ImageMemXferBuffer;
                 if (pSource->IsTileModeOn())
                 {
                     // The application is informed that a tile has been transferred.  The application is responsible for
@@ -164,8 +164,8 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                     // handle the information
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_TRANSFERTILEDONE, reinterpret_cast<LPARAM>(pSource));
                     // Deallocate the buffer
-					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->UnlockMemory(m_ImageMemXferBuffer.Memory.TheMem);
-					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->FreeMemory(m_ImageMemXferBuffer.Memory.TheMem);
+                    pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->UnlockMemory(m_ImageMemXferBuffer.Memory.TheMem);
+                    pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->FreeMemory(m_ImageMemXferBuffer.Memory.TheMem);
                     InitXferBuffer();
                     break;
                 }
@@ -243,8 +243,8 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
             case TWRC_FAILURE:
             {
-				if (!pSource->IsTileModeOn())
-					ImageMemoryHandler::GlobalUnlock(m_DibStrip);
+                if (!pSource->IsTileModeOn())
+                    ImageMemoryHandler::GlobalUnlock(m_DibStrip);
                 FailAcquisition();
                 return rc;
             }
@@ -310,11 +310,11 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
                 // Don't do anything, since the application is responsible to get the tiled
                 // data.
-				pSource->GetBufferedXFerInfo() = m_ImageMemXferBuffer;
+                pSource->GetBufferedXFerInfo() = m_ImageMemXferBuffer;
                 if (pSource->IsTileModeOn())
                 {
-					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->UnlockMemory(m_ImageMemXferBuffer.Memory.TheMem);
-					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->FreeMemory(m_ImageMemXferBuffer.Memory.TheMem);
+                    pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->UnlockMemory(m_ImageMemXferBuffer.Memory.TheMem);
+                    pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->FreeMemory(m_ImageMemXferBuffer.Memory.TheMem);
                     pSource->SetTransferDone(true);
                 }
                 else
@@ -359,12 +359,12 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                         // This may be a compressed image instead of a DIB.  Don't flip if this is an image
                         if ( m_nCompression == TWCP_NONE )
                         {
-							m_hDataHandle = CurDib->GetHandle();
-							HANDLE oldHandle = m_hDataHandle;
+                            m_hDataHandle = CurDib->GetHandle();
+                            HANDLE oldHandle = m_hDataHandle;
 
-							// See if the user wants to change the original DIB now
-							CurDib->SetHandle(ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBORIG));
-							m_hDataHandle = CurDib->GetHandle();
+                            // See if the user wants to change the original DIB now
+                            CurDib->SetHandle(ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBORIG));
+                            m_hDataHandle = CurDib->GetHandle();
 
                             // Here we can do a check for blank page.  
                             if ( ProcessBlankPage(pSession, pSource, CurDib, false, DTWAIN_TN_BLANKPAGEDETECTED1,
@@ -398,16 +398,16 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             {
                                 if (ModifyAcquiredDib())
                                     m_ptrOrig = nullptr;
-								oldHandle = m_hDataHandle;
-								ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBRESAMPLED);
+                                oldHandle = m_hDataHandle;
+                                ProcessUserUpdatingDIB(nLastDib, DTWAIN_TN_QUERYUPDATEDIBRESAMPLED);
                             }
 
-							auto pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(m_hDataHandle));
-							m_nCurDibSize = static_cast<TW_UINT32>(ImageMemoryHandler::GlobalSize(m_hDataHandle));
-							m_ptrDib = reinterpret_cast<unsigned char*>(pDibInfo);
-							m_ptrOrig = m_ptrDib;
-							CurDib->SetHandle(m_hDataHandle);
-							(*pArray)[nLastDib] = CurDib;
+                            auto pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(m_hDataHandle));
+                            m_nCurDibSize = static_cast<TW_UINT32>(ImageMemoryHandler::GlobalSize(m_hDataHandle));
+                            m_ptrDib = reinterpret_cast<unsigned char*>(pDibInfo);
+                            m_ptrOrig = m_ptrDib;
+                            CurDib->SetHandle(m_hDataHandle);
+                            (*pArray)[nLastDib] = CurDib;
 
                             if ( CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSEDDIBFINAL, reinterpret_cast<LPARAM>(pSource)) == 0 )
                             {
@@ -532,7 +532,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                                           static_cast<LPARAM>(pSource->GetAcquireNum()));
                 if ( errfile != 0 )
                 {
-				   CTL_TwainAppMgr::SetAndLogError(errfile, "", false);
+                   CTL_TwainAppMgr::SetAndLogError(errfile, "", false);
                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                          nullptr, DTWAIN_TN_INVALIDIMAGEFORMAT,
                                                          reinterpret_cast<LPARAM>(pSource));
@@ -582,18 +582,18 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     else
         bForceClose = true;
 
-	// Determine if user requests that acquisitions should be stopped
-	if (rc == TWRC_XFERDONE)
-	{
-		auto keepAcquiringPages = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYACQUIREPAGES, 
+    // Determine if user requests that acquisitions should be stopped
+    if (rc == TWRC_XFERDONE)
+    {
+        auto keepAcquiringPages = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYACQUIREPAGES, 
                                                                         reinterpret_cast<LPARAM>(pSource));
 
-		if (keepAcquiringPages == 0)
-		{
-			StopAcquisitions(errfile);
-			return rc;
-		}
-	}
+        if (keepAcquiringPages == 0)
+        {
+            StopAcquisitions(errfile);
+            return rc;
+        }
+    }
 
     AbortTransfer({ bForceClose, false }, errfile);
     return rc;

@@ -66,17 +66,17 @@ namespace dynarithmic
         DTWAIN_Check_Error_Condition_0_Impl<Func,RetType,true>(Handle,f,Err, "", retErr,fnName,logError);
     }
 
-	template <typename Func, typename RetType>
-	void DTWAIN_Check_Error_Condition_WithThrow_Ex_WithParams(CTL_TwainDLLHandle* Handle,
-		                                                Func f,
-		                                                int32_t Err,
-		                                                RetType retErr,
-		                                                const std::string::value_type* fnName,
-		                                                bool logError,
+    template <typename Func, typename RetType>
+    void DTWAIN_Check_Error_Condition_WithThrow_Ex_WithParams(CTL_TwainDLLHandle* Handle,
+                                                        Func f,
+                                                        int32_t Err,
+                                                        RetType retErr,
+                                                        const std::string::value_type* fnName,
+                                                        bool logError,
                                                         const std::vector<std::string>& replacementArgs)
-	{
-		DTWAIN_Check_Error_Condition_0_Impl<Func, RetType, true>(Handle, f, Err, "", retErr, fnName, logError, replacementArgs);
-	}
+    {
+        DTWAIN_Check_Error_Condition_0_Impl<Func, RetType, true>(Handle, f, Err, "", retErr, fnName, logError, replacementArgs);
+    }
 
     template <typename Func, typename RetType>
     void DTWAIN_Check_Error_Condition_Throw_Ex(CTL_TwainDLLHandle* Handle,
@@ -93,13 +93,13 @@ namespace dynarithmic
         DTWAIN_Check_Error_Condition_0_Impl<Func, RetType, false>(Handle, f, Err, "", retErr, fnName, logError, {});
     }
 
-	template <typename Func, typename RetType>
-	void DTWAIN_Check_Error_Condition_NoThrow_Ex_WithParams(CTL_TwainDLLHandle* Handle, Func f, int32_t Err, RetType retErr,
-		                                             const std::string::value_type* fnName, bool logError,
+    template <typename Func, typename RetType>
+    void DTWAIN_Check_Error_Condition_NoThrow_Ex_WithParams(CTL_TwainDLLHandle* Handle, Func f, int32_t Err, RetType retErr,
+                                                     const std::string::value_type* fnName, bool logError,
                                                      const std::vector<std::string>& replacementArgs)       
-	{
-		DTWAIN_Check_Error_Condition_0_Impl<Func, RetType, false>(Handle, f, Err, "", retErr, fnName, logError, replacementArgs);
-	}
+    {
+        DTWAIN_Check_Error_Condition_0_Impl<Func, RetType, false>(Handle, f, Err, "", retErr, fnName, logError, replacementArgs);
+    }
 
     template <typename Func, typename RetType>
     void DTWAIN_Check_Error_Condition_NoLogError_WithThrow(CTL_TwainDLLHandle* Handle,

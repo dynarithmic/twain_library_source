@@ -26,26 +26,26 @@ using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static bool WriteOneDibHandleToJpeg(const std::wstring& filename,const JpegSessionOptions& options, HANDLE hDib)
 {
-	LockedDibPage lockedPage(hDib);
-	if (!lockedPage.IsValid())
-		return false;
+    LockedDibPage lockedPage(hDib);
+    if (!lockedPage.IsValid())
+        return false;
 
-	JpegSessionWriter writer;
-	if (!writer.Open(filename, options))
-		return false;
+    JpegSessionWriter writer;
+    if (!writer.Open(filename, options))
+        return false;
 
     auto preparedPage = JpegSessionWriter::MakePreparedJpegPage(lockedPage.GetView());
     if (!preparedPage.has_value())
         return false;
 
-	if (!writer.SetPageInfo(preparedPage.value()))
-		return false;
+    if (!writer.SetPageInfo(preparedPage.value()))
+        return false;
 
-	if (!writer.WriteCurrentPage())
-		return false;
+    if (!writer.WriteCurrentPage())
+        return false;
 
-	writer.Close();
-	return true;
+    writer.Close();
+    return true;
 }
 
 int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
@@ -53,9 +53,9 @@ int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     HANDLE hDib = m_pDib->GetHandle();
     JpegSessionOptions opts{};
     opts.quality = m_ImageInfoEx.IsPDF ? m_ImageInfoEx.nPDFJpegQuality : m_ImageInfoEx.nJpegQuality;
-	opts.progressive = m_ImageInfoEx.bProgressiveJpeg;
-	opts.text.copyright = GetCopyrightString();
-	std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    opts.progressive = m_ImageInfoEx.bProgressiveJpeg;
+    opts.text.copyright = GetCopyrightString();
+    std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToJpeg(sFileName, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

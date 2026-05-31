@@ -683,10 +683,10 @@ CTL_StringType dynarithmic::GetWinVersion()
                     else if (os.IsWindows11Version22H2(&osvi, FALSE))
                         sText <<  _T(", (version 22H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                     else if (os.IsWindows11Version23H2(&osvi, FALSE))
-			            sText << _T(", (version 23H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-			        else if (os.IsWindows11Version24H2(&osvi, FALSE))
+                        sText << _T(", (version 23H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+                    else if (os.IsWindows11Version24H2(&osvi, FALSE))
                         sText << _T(", (version 24H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-			        else if (os.IsWindows11Version25H2(&osvi, FALSE))
+                    else if (os.IsWindows11Version25H2(&osvi, FALSE))
                         sText << _T(", (version 25H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                     else if (os.IsWindows11Version26H1(&osvi, FALSE))
                         sText << _T(", (version 26H1)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
@@ -1356,7 +1356,7 @@ CTL_StringType dynarithmic::GetWinVersion()
                     sText <<  _T("Windows Server 2022"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                 if (os.IsWindowsServerVersion23H2(&osvi, TRUE))
                     sText << _T(", (version 23H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-			    else if (os.IsWindowsServer2022ActiveDevelopmentBranch(&osvi, TRUE))
+                else if (os.IsWindowsServer2022ActiveDevelopmentBranch(&osvi, TRUE))
                     sText << _T(", (vNext aka Active Development Branch)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                 if (os.IsWindowsServer2022Datacenter(&osvi, TRUE))
                     sText << _T(", (Datacenter Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
@@ -1502,13 +1502,13 @@ CTL_StringType dynarithmic::GetWinVersion()
             sBuf << std::setfill(_T('0')) << std::setw(1) << (int)(osvi.dwUnderlyingMinorVersion / 10);
         sText << sBuf.str(); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         sBuf.str(_T(""));
-		if (osvi.UnderlyingPlatform == COSVersion::ReactOS)
-		{
-			sBuf << std::setfill(_T('0')) << std::setw(2) << static_cast<int>(osvi.dwUnderlyingBuildNumber);
-			sText << sBuf.str(); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-		}
+        if (osvi.UnderlyingPlatform == COSVersion::ReactOS)
+        {
+            sBuf << std::setfill(_T('0')) << std::setw(2) << static_cast<int>(osvi.dwUnderlyingBuildNumber);
+            sText << sBuf.str(); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        }
 
-		if (osvi.dwUnderlyingBuildNumber && (osvi.UnderlyingPlatform != COSVersion::ReactOS))
+        if (osvi.dwUnderlyingBuildNumber && (osvi.UnderlyingPlatform != COSVersion::ReactOS))
         {
             //Report the UBR on Windows 10 / Server 2016 and later
             if (os.IsWindows10OrWindowsServer2016(&osvi, TRUE) || os.IsWindowsServer2019(&osvi, TRUE))
@@ -2086,22 +2086,22 @@ CTL_StringType dynarithmic::GetWinVersion()
             sText << _T(", (Windows CPC)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsUnlicensed(&osvi))
             sText << _T(", (Unlicensed)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-		if (os.IsHyperVNotIncluded(&osvi))
-			sText << _T(", (Hyper-V not included)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-		if (osvi.bSemiAnnual)
-			sText, _T(", (Semi-Annual Channel)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-		sText << _T("\n"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        if (os.IsHyperVNotIncluded(&osvi))
+            sText << _T(", (Hyper-V not included)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        if (osvi.bSemiAnnual)
+            sText, _T(", (Semi-Annual Channel)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        sText << _T("\n"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
 
-		if (_tcslen(osvi.szBuildLab))
-		{
-			sText << _T("BuildLab: "); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-			sText << osvi.szBuildLab; //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-		}
-		if (_tcslen(osvi.szBuildLabEx))
-		{
-			sText << _T("\nBuildLabEx: "); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-			sText << osvi.szBuildLabEx; //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-		}
+        if (_tcslen(osvi.szBuildLab))
+        {
+            sText << _T("BuildLab: "); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+            sText << osvi.szBuildLab; //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        }
+        if (_tcslen(osvi.szBuildLabEx))
+        {
+            sText << _T("\nBuildLabEx: "); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+            sText << osvi.szBuildLabEx; //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        }
 
 
         sText <<  _T("\n"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)

@@ -66,11 +66,11 @@ bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
 
 int CTL_ImageIOHandler::WriteBitmapImpl(LPCTSTR szFile, int nFormat, bool bOpenFile, int fh, DibMultiPageStruct* pMultiDibStruct/* = nullptr*/)
 {
-	if (!m_pDib || !m_pDib->GetHandle())
-		return DTWAIN_ERR_DIB;
+    if (!m_pDib || !m_pDib->GetHandle())
+        return DTWAIN_ERR_DIB;
 
-	if (!IsValidBitDepth(nFormat, m_pDib->GetBitsPerPixel()))
-		return DTWAIN_ERR_INVALID_BITDEPTH;
+    if (!IsValidBitDepth(nFormat, m_pDib->GetBitsPerPixel()))
+        return DTWAIN_ERR_INVALID_BITDEPTH;
 
     return WriteBitmap(szFile, bOpenFile, fh, pMultiDibStruct);
 }

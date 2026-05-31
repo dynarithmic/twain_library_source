@@ -32,25 +32,25 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToJpeg2000(const std::wstring& filename, const Jpeg2000SessionOptions& options, HANDLE hDib)
 {
-	LockedDibPage lockedPage(hDib);
-	if (!lockedPage.IsValid())
-		return false;
+    LockedDibPage lockedPage(hDib);
+    if (!lockedPage.IsValid())
+        return false;
 
-	Jpeg2000SessionWriter writer;
-	if (!writer.Open(filename, options))
-		return false;
+    Jpeg2000SessionWriter writer;
+    if (!writer.Open(filename, options))
+        return false;
 
     auto pageInfo = Jpeg2000SessionWriter::MakePreparedJpeg2000Page(lockedPage.GetView());
     if (!pageInfo.has_value())
         return false;
-	if (!writer.SetPageInfo(pageInfo.value()))
-		return false;
+    if (!writer.SetPageInfo(pageInfo.value()))
+        return false;
 
-	if (!writer.WriteCurrentPage())
-		return false;
+    if (!writer.WriteCurrentPage())
+        return false;
 
-	writer.Close();
-	return true;
+    writer.Close();
+    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,15 +69,15 @@ int CTL_Jpeg2KIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
     if (!IsValidBitDepth(DTWAIN_JPEG2000, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-	Jpeg2000SessionOptions opts{};
-	opts.useJP2Container = false;   // J2K codestream
-	opts.compressionRate = 16.0f;   // match FreeImage default
+    Jpeg2000SessionOptions opts{};
+    opts.useJP2Container = false;   // J2K codestream
+    opts.compressionRate = 16.0f;   // match FreeImage default
 
     std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-	opts.text.copyright = GetCopyrightString();
+    opts.text.copyright = GetCopyrightString();
 
     if (!WriteOneDibHandleToJpeg2000(fName, opts, hDib))
-		return DTWAIN_ERR_FILEWRITE;
+        return DTWAIN_ERR_FILEWRITE;
     return DTWAIN_NO_ERROR;
 }

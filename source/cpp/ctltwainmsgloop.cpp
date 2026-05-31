@@ -37,37 +37,37 @@ static bool DTWAIN_ShouldUseGetMessage()
     if (!CTL_StaticData::IsTestForGetMessage())
         return false;
 
-	MSG msg;
+    MSG msg;
 
     // 1) If no window belongs to this thread, likely script host
-	DWORD thisThread = GetCurrentThreadId();
-	bool hasWindow = false;
+    DWORD thisThread = GetCurrentThreadId();
+    bool hasWindow = false;
 
-	EnumThreadWindows(thisThread,
-		[](HWND, LPARAM lParam) -> BOOL
-		{
-			*reinterpret_cast<bool*>(lParam) = true;
-			return FALSE;
-		},
-		reinterpret_cast<LPARAM>(&hasWindow));
+    EnumThreadWindows(thisThread,
+        [](HWND, LPARAM lParam) -> BOOL
+        {
+            *reinterpret_cast<bool*>(lParam) = true;
+            return FALSE;
+        },
+        reinterpret_cast<LPARAM>(&hasWindow));
 
-	if (!hasWindow)
-		return true; // safer to block
+    if (!hasWindow)
+        return true; // safer to block
 
 
     // 2) Probe message responsiveness WITHOUT timing
-	constexpr int kProbeCount = 3;  // small, deterministic
+    constexpr int kProbeCount = 3;  // small, deterministic
 
-	for (int i = 0; i < kProbeCount; ++i)
-	{
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
-			return false; // messages are flowing, so PeekMessage loop OK
+    for (int i = 0; i < kProbeCount; ++i)
+    {
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
+            return false; // messages are flowing, so PeekMessage loop OK
 
-		WaitMessage(); // cooperative yield (debugger-safe)
-	}
+        WaitMessage(); // cooperative yield (debugger-safe)
+    }
 
-	// No messages after several real waits, so prefer GetMessage
-	return true;
+    // No messages after several real waits, so prefer GetMessage
+    return true;
 }
 
 
@@ -92,8 +92,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableGetMessageLoop(DTWAIN_SOURCE Source, BOOL 
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSet))
     auto bRet = DTWAIN_EnablePeekMessageLoop(Source, FALSE);
-	LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-	CATCH_BLOCK_LOG_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 
@@ -203,12 +203,12 @@ struct ContinueLoopTraits
         auto& sOpts = pImpl->GetAcquireOptions();
         bool bInitializeAcquisitionProcess = false;
 
-		struct TwainWatchdog
-		{
-			DWORD lastProgressTick;
-			DWORD timeoutMs;
-			bool  triggered;
-		};
+        struct TwainWatchdog
+        {
+            DWORD lastProgressTick;
+            DWORD timeoutMs;
+            bool  triggered;
+        };
 
         TwainWatchdog wd{ GetTickCount(), 3000, false };
 
@@ -230,7 +230,7 @@ struct ContinueLoopTraits
             {
                 if (isUIOnly)
                     pSource->SetUIOnly(false);
-				lastTwainProgressTick = GetTickCount();
+                lastTwainProgressTick = GetTickCount();
                 break;
             }
 
@@ -242,35 +242,35 @@ struct ContinueLoopTraits
             {
                 acquireRef = LLAcquireImage(sOpts);
                 bInitializeAcquisitionProcess = true;
-				lastTwainProgressTick = GetTickCount();
+                lastTwainProgressTick = GetTickCount();
 
                 // Didn't get an acquisition number, so something failed
                 if (acquireRef == -1L)
                     break;
             }
 
-			// This will test for TWAIN messages, Data Source messages or application messages.
-			if (pImpl->CanEnterDispatch(&msg))
-			{
-				TranslateMessage(&msg);
-				::DispatchMessage(&msg);
-			}
+            // This will test for TWAIN messages, Data Source messages or application messages.
+            if (pImpl->CanEnterDispatch(&msg))
+            {
+                TranslateMessage(&msg);
+                ::DispatchMessage(&msg);
+            }
 
 #if 0 // Note that this has not been implemented
-			// PeekMessage watchdog
-			if (LoopTraits::isPeekMsg)
-			{
-				const DWORD timeoutMs = 3000;
-				if (GetTickCount() - lastTwainProgressTick > timeoutMs)
-				{
-					// no progress for timeout, exit loop
+            // PeekMessage watchdog
+            if (LoopTraits::isPeekMsg)
+            {
+                const DWORD timeoutMs = 3000;
+                if (GetTickCount() - lastTwainProgressTick > timeoutMs)
+                {
+                    // no progress for timeout, exit loop
                     wd.triggered = true;
                     break;
-				}
-			}
+                }
+            }
 #endif
-			// Optional throttle to avoid CPU spin 
-			Sleep(1);
+            // Optional throttle to avoid CPU spin 
+            Sleep(1);
         }
         return wd.triggered;
     }
@@ -300,19 +300,19 @@ int TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, b
     // has explicitly stated to use GetMessage() by either calling 
     // DTWAIN_EnablePeekMessageLoop() to FALSE, or the DTWAIN32/64.INI
     // has the Source listed as one that must use GetMessage(), then we use GetMessage().
-	auto isGetMessageRequired = !pSource->IsUsePeekMessage() || DTWAIN_ShouldUseGetMessage();
+    auto isGetMessageRequired = !pSource->IsUsePeekMessage() || DTWAIN_ShouldUseGetMessage();
     if (isGetMessageRequired)
         pSource->SetUsePeekMessage(false);
 
-	bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
+    bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
 
-	if (bLogMessages)
-	{
+    if (bLogMessages)
+    {
         std::string msg = "Using PeekMessage() for TWAIN acquisitions ...";
         if (!pSource->IsUsePeekMessage())
             msg = "Using GetMessage() for TWAIN acquisitions ...";
-    	LogWriterUtils::WriteLogInfoIndentedA(msg);
-	}
+        LogWriterUtils::WriteLogInfoIndentedA(msg);
+    }
 
 #ifdef _WIN32
     // Make sure message loop is not empty.  Post a WM_NULL message to the

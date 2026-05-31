@@ -58,7 +58,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
 
         auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, nBits);
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retValue.second; },
-			                              retValue.first, false, FUNC_MACRO);
+                                          retValue.first, false, FUNC_MACRO);
 
         Array = retValue.second;
         DTWAINArrayLowLevelPtr_RAII raii(pHandle, &Array);
@@ -131,7 +131,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
 
     CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     auto pHandle = pSource->GetDTWAINHandle();
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     DTWAIN_ARRAY arr = {};

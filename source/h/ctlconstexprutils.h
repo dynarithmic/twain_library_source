@@ -103,58 +103,58 @@ namespace dynarithmic
 
     static constexpr bool IsTwain32BitIntegralType(TW_UINT16 nDataType)
     {
-		switch (nDataType)
-		{
-    		case TWTY_INT32:
-    			return true;
-		}
-		return false;
+        switch (nDataType)
+        {
+            case TWTY_INT32:
+                return true;
+        }
+        return false;
     }
 
-	static constexpr bool IsTwain32BitUIntegralType(TW_UINT16 nDataType)
-	{
-		switch (nDataType)
-		{
-		    case TWTY_UINT32:
-			    return true;
-		}
-		return false;
-	}
+    static constexpr bool IsTwain32BitUIntegralType(TW_UINT16 nDataType)
+    {
+        switch (nDataType)
+        {
+            case TWTY_UINT32:
+                return true;
+        }
+        return false;
+    }
 
-	static constexpr bool IsTwain16BitIntegralType(TW_UINT16 nItemType)
-	{
+    static constexpr bool IsTwain16BitIntegralType(TW_UINT16 nItemType)
+    {
         switch (nItemType)
         {
             case TWTY_INT16:
                 return TRUE;
         }
         return false;
-	}
+    }
 
-	static constexpr bool IsTwain16BitUIntegralType(TW_UINT16 nItemType)
-	{
-		switch (nItemType)
-		{
-    		case TWTY_UINT16:
-	    		return TRUE;
-		}
-		return false;
-	}
+    static constexpr bool IsTwain16BitUIntegralType(TW_UINT16 nItemType)
+    {
+        switch (nItemType)
+        {
+            case TWTY_UINT16:
+                return TRUE;
+        }
+        return false;
+    }
 
     static constexpr bool IsTwainUIntegralType(TW_UINT16 nItemType)
     {
         return IsTwain16BitUIntegralType(nItemType) || IsTwain32BitUIntegralType(nItemType);
     }
 
-	static constexpr bool IsTwain8BitIntegralType(TW_UINT16 nItemType)
-	{
-		switch (nItemType)
-		{
-		    case TWTY_INT8:
-			    return TRUE;
-		}
-		return false;
-	}
+    static constexpr bool IsTwain8BitIntegralType(TW_UINT16 nItemType)
+    {
+        switch (nItemType)
+        {
+            case TWTY_INT8:
+                return TRUE;
+        }
+        return false;
+    }
 
     static constexpr bool IsTwainHandleType(TW_UINT16 nItemType)
     {
@@ -621,8 +621,8 @@ namespace dynarithmic
         return  (value + (upto - 1)) / upto * upto;
     }
 
-	static constexpr int GetDTWAINContainerFromTWAINContainer(int containerType) noexcept
-	{
+    static constexpr int GetDTWAINContainerFromTWAINContainer(int containerType) noexcept
+    {
         switch (containerType)
         {
             case TWON_ONEVALUE:
@@ -633,46 +633,46 @@ namespace dynarithmic
             case DTWAIN_CONTRANGE:
                 return DTWAIN_CONTRANGE;
 
-			case TWON_ARRAY:
-			case DTWAIN_CONTARRAY:
-				return DTWAIN_CONTARRAY;
+            case TWON_ARRAY:
+            case DTWAIN_CONTARRAY:
+                return DTWAIN_CONTARRAY;
 
-			case TWON_ENUMERATION:
-			case DTWAIN_CONTENUMERATION:
-				return DTWAIN_CONTENUMERATION;
+            case TWON_ENUMERATION:
+            case DTWAIN_CONTENUMERATION:
+                return DTWAIN_CONTENUMERATION;
         }
         return containerType;
-	}
+    }
 
-	static constexpr int GetTWAINContainerFromDTWAINContainer(int containerType) noexcept
-	{
-		switch (containerType)
-		{
-		    case DTWAIN_CONTONEVALUE:
+    static constexpr int GetTWAINContainerFromDTWAINContainer(int containerType) noexcept
+    {
+        switch (containerType)
+        {
+            case DTWAIN_CONTONEVALUE:
                 return TWON_ONEVALUE;
 
-		    case DTWAIN_CONTRANGE:
+            case DTWAIN_CONTRANGE:
                 return TWON_RANGE;
 
-		    case DTWAIN_CONTARRAY:
+            case DTWAIN_CONTARRAY:
                 return TWON_ARRAY;
 
-		    case DTWAIN_CONTENUMERATION:
-			    return TWON_ENUMERATION;
-		}
-		return containerType;
-	}
+            case DTWAIN_CONTENUMERATION:
+                return TWON_ENUMERATION;
+        }
+        return containerType;
+    }
 
-	static constexpr bool IsValidContainerType(TW_UINT16 containerType, bool testDTWAINType = true)
-	{
-		switch (containerType)
-		{
+    static constexpr bool IsValidContainerType(TW_UINT16 containerType, bool testDTWAINType = true)
+    {
+        switch (containerType)
+        {
             case TWON_ONEVALUE:
             case TWON_RANGE:
             case TWON_ARRAY:
             case TWON_ENUMERATION:
                 return true;
-		}
+        }
         if (testDTWAINType)
         {
             switch (containerType)
@@ -686,33 +686,33 @@ namespace dynarithmic
             }
         }
         return false;
-	}
+    }
 
-	static constexpr bool IsValidMeasureUnit(LONG Unit)
-	{
-		return Unit == DTWAIN_INCHES ||
-			Unit == DTWAIN_CENTIMETERS ||
-			Unit == DTWAIN_PICAS ||
-			Unit == DTWAIN_POINTS ||
-			Unit == DTWAIN_TWIPS ||
-			Unit == DTWAIN_PIXELS;
-	}
+    static constexpr bool IsValidMeasureUnit(LONG Unit)
+    {
+        return Unit == DTWAIN_INCHES ||
+            Unit == DTWAIN_CENTIMETERS ||
+            Unit == DTWAIN_PICAS ||
+            Unit == DTWAIN_POINTS ||
+            Unit == DTWAIN_TWIPS ||
+            Unit == DTWAIN_PIXELS;
+    }
 
-	static constexpr double GetScaleFactorPerInch(LONG Unit)
-	{
-		switch (Unit)
-		{
-		    case DTWAIN_TWIPS:
-			    return 1440.0;
-		    case DTWAIN_POINTS:
-			    return 72.0;
-		    case DTWAIN_PICAS:
-			    return 6.0;
-		    case DTWAIN_CENTIMETERS:
-			    return 2.54;
-		}
-		return 1.0;
-	}
+    static constexpr double GetScaleFactorPerInch(LONG Unit)
+    {
+        switch (Unit)
+        {
+            case DTWAIN_TWIPS:
+                return 1440.0;
+            case DTWAIN_POINTS:
+                return 72.0;
+            case DTWAIN_PICAS:
+                return 6.0;
+            case DTWAIN_CENTIMETERS:
+                return 2.54;
+        }
+        return 1.0;
+    }
 };
 
 #endif

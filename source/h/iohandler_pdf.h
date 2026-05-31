@@ -27,25 +27,25 @@ OF THIRD PARTY RIGHTS.
 
 namespace dynarithmic
 {
-	class CTL_PDFIOHandler final : public CTL_ImageIOHandler
-	{
-		public:
-			CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx& ImageInfoEx);
-			int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
-			~CTL_PDFIOHandler() override = default;
+    class CTL_PDFIOHandler final : public CTL_ImageIOHandler
+    {
+        public:
+            CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx& ImageInfoEx);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+            ~CTL_PDFIOHandler() override = default;
 
-			void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
-			{
-				m_ImageInfoEx = ImageInfo;
-			}
+            void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
+            {
+                m_ImageInfoEx = ImageInfo;
+            }
 
-		private:
-			int GetOCRText(LPCTSTR szFileName, int pageType, std::string& sText);
-			static bool CheckValidConvertType(int fileType, int pageType);
-			int m_nFormat;
-			DTWAINImageInfoEx m_ImageInfoEx;
-			CTL_JpegIOHandler m_JpegHandler;
-			CTL_TiffIOHandler m_TiffHandler;
-	};
+        private:
+            int GetOCRText(LPCTSTR szFileName, int pageType, std::string& sText);
+            static bool CheckValidConvertType(int fileType, int pageType);
+            int m_nFormat;
+            DTWAINImageInfoEx m_ImageInfoEx;
+            CTL_JpegIOHandler m_JpegHandler;
+            CTL_TiffIOHandler m_TiffHandler;
+    };
 }
 #endif

@@ -136,26 +136,26 @@ namespace dynarithmic
                 if (m_ostr.is_open())
                     m_ostr.close();
 
-				if (m_ostr.fail()) 
+                if (m_ostr.fail()) 
                 {
                     std::ostringstream strm;
                     strm << "Error closing log file " << m_fileName;
                     OutputDebugStringA(strm.str().c_str());
-				}
+                }
                 else
                     m_ostr.open(m_fileName, std::ios::app);
             }
         }
     }
 
-	void File_Logger::setAutoSaveThreshold(int64_t count)
-	{
+    void File_Logger::setAutoSaveThreshold(int64_t count)
+    {
 
-		m_autoSaveThreshold = count < 0 ? -1LL : count;
-		m_currentLineCount = 0;
-	}
+        m_autoSaveThreshold = count < 0 ? -1LL : count;
+        m_currentLineCount = 0;
+    }
 
-	void File_Logger::trace(std::string_view msg)
+    void File_Logger::trace(std::string_view msg)
     {
         // Bump up the line count
         ++m_currentLineCount;
@@ -169,18 +169,18 @@ namespace dynarithmic
 
     BOOL StdCout_Logger::ConsoleCtrlHandler(DWORD dwCtrlType)
     {
-		switch (dwCtrlType) 
+        switch (dwCtrlType) 
         {
-		    case CTRL_C_EVENT:
-		    case CTRL_BREAK_EVENT:
-		    case CTRL_CLOSE_EVENT:
-		    case CTRL_LOGOFF_EVENT:
-		    case CTRL_SHUTDOWN_EVENT:
+            case CTRL_C_EVENT:
+            case CTRL_BREAK_EVENT:
+            case CTRL_CLOSE_EVENT:
+            case CTRL_LOGOFF_EVENT:
+            case CTRL_SHUTDOWN_EVENT:
                 dynarithmic::SysDestroyNoCheck();
-			    return TRUE;
-		    default:
-			    return FALSE;
-		}
+                return TRUE;
+            default:
+                return FALSE;
+        }
     }
 
     StdCout_Logger::StdCout_Logger(const LoggingTraits& lTraits)
@@ -339,9 +339,9 @@ void CLogSystem::PrintBanner(bool bStarted)
 {
     std::string LogMsg;
     if (bStarted)
-		LogMsg = "****** " + GetResourceStringFromMap(IDS_LOGMSG_LOGSTARTED) + " ******\n";
+        LogMsg = "****** " + GetResourceStringFromMap(IDS_LOGMSG_LOGSTARTED) + " ******\n";
     else
-		LogMsg = "****** " + GetResourceStringFromMap(IDS_LOGMSG_LOGENDED) + " ******\n";
+        LogMsg = "****** " + GetResourceStringFromMap(IDS_LOGMSG_LOGENDED) + " ******\n";
     StatusOutFast(LogMsg.c_str());
 }
 
