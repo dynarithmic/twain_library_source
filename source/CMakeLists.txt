@@ -1435,8 +1435,8 @@ if(MSVC)
         $<$<CONFIG:Debug>:/Zi>
         $<$<CONFIG:Debug>:/DNDEBUG>
         $<$<CONFIG:MinSizeRel>:/Zi>
+        $<$<COMPILE_LANGUAGE:CXX>:/EHsc>
         /Zc:__cplusplus
-        /EHa
     )
 
     target_link_options(dtwain PRIVATE

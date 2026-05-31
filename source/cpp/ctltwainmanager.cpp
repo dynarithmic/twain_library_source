@@ -1690,21 +1690,21 @@ int CTL_TwainAppMgr::SetTransferCount( CTL_ITwainSource *pSource, int nCount )
         LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
     }
 
-	// Check if duplex is on
-	int duplexOn = 0;
+    // Check if duplex is on
+    int duplexOn = 0;
     GetOneTwainCapValue(pSource, &duplexOn, CAP_DUPLEXENABLED, MSG_GETCURRENT, TWTY_BOOL);
 
     // If the device supports the CAP_SHEETCOUNT capability, use that to set the number of
     // pages to acquire
-	auto useSheets = pSource->IsUseSheetCountAsSheets().value;
+    auto useSheets = pSource->IsUseSheetCountAsSheets().value;
     if (useSheets != boost::tribool::indeterminate_value && 
         useSheets && 
         IsCapabilitySupported(pSource, CAP_SHEETCOUNT))
     {
-		if (loggingOn)
-		{
-			LogWriterUtils::WriteLogInfoIndentedA("Using CAP_SHEETCOUNT for sheet count support...");
-		}
+        if (loggingOn)
+        {
+            LogWriterUtils::WriteLogInfoIndentedA("Using CAP_SHEETCOUNT for sheet count support...");
+        }
         SetOneCapValue(pSource, CAP_XFERCOUNT, MSG_SET, -1, TWTY_INT16);
 
         if ( nCount == -1 )
@@ -1739,16 +1739,16 @@ int CTL_TwainAppMgr::SetTransferCount( CTL_ITwainSource *pSource, int nCount )
                     // double the page count, since CAP_SHEETCOUNT doesn't work correctly
                 }
                 nCount *= 2; // double the number of images that may be received
-				numActualPages = nCount * 2;
+                numActualPages = nCount * 2;
             }
         }
-		if (loggingOn)
-		{
-			char szOutBuf[100];
-			DTWAIN_SPRINTF_FUNC(szOutBuf, "Setting actual transfer count.  Actual Transfer Count = %d", nCount);
-			LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
-		}
-		SetOneCapValue(pSource, CAP_XFERCOUNT, MSG_SET, nCount, TWTY_INT16);
+        if (loggingOn)
+        {
+            char szOutBuf[100];
+            DTWAIN_SPRINTF_FUNC(szOutBuf, "Setting actual transfer count.  Actual Transfer Count = %d", nCount);
+            LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
+        }
+        SetOneCapValue(pSource, CAP_XFERCOUNT, MSG_SET, nCount, TWTY_INT16);
     }
     return numActualPages;
 }
@@ -1934,14 +1934,14 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
 
 CTL_CapabilityLabelTriplet CTL_TwainAppMgr::GetCapabilityLabel(int nCap)
 {
-	const auto pSession = static_cast<CTL_ITwainSession*>(GetDTWAINHandle_Internal());
+    const auto pSession = static_cast<CTL_ITwainSession*>(GetDTWAINHandle_Internal());
 
-	if (!IsValidTwainSession(pSession))
-		return { nullptr, 0 };
+    if (!IsValidTwainSession(pSession))
+        return { nullptr, 0 };
 
-	CTL_CapabilityLabelTriplet LabelTrip(pSession, static_cast<TW_UINT16>(nCap));
-	LabelTrip.Execute();
-	return LabelTrip;
+    CTL_CapabilityLabelTriplet LabelTrip(pSession, static_cast<TW_UINT16>(nCap));
+    LabelTrip.Execute();
+    return LabelTrip;
 }
 
 ////////////////// End Capabilities that should be supported /////////////////
@@ -2431,6 +2431,32 @@ struct TripletSaveRestore
     }
 };
 
+
+struct DSMCallResult
+{
+    TW_UINT16 retcode = TWRC_FAILURE;
+    DWORD exceptionCode = 0;
+    bool sehException = false;
+};
+
+static DSMCallResult SafeDSMEntryCall( DSMENTRYPROC lpDSMEntry, pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, 
+                                       TW_UINT32 nDG,TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF pData)
+{
+    DSMCallResult result;
+
+    __try
+    {
+        result.retcode = (*lpDSMEntry)( pOrigin, pDest, nDG, nDAT, nMSG, pData);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        result.retcode = TWRC_FAILURE;
+        result.exceptionCode = GetExceptionCode();
+        result.sehException = true;
+    }
+    return result;
+}
+
 TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 {
     if (!m_lpDSMEntry)
@@ -2492,12 +2518,28 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 
     try
     {
-        // This is the actual low-level call to the TWAIN Data Source Manager 
-        // (TWAIN_32.DLL or TWAINDSM.DLL)
-        retcode = (*m_lpDSMEntry)( pOrigin, pDest, nDG, nDAT, nMSG, pData );
+        auto dsmResult = SafeDSMEntryCall( m_lpDSMEntry, pOrigin, pDest, nDG, nDAT, nMSG, pData);
+        retcode = dsmResult.retcode;
+        if (dsmResult.sehException)
+        {
+            // Minimal reporting only if an SEH exception occurred
+            char buffer[128]{};
+            wsprintfA(buffer, "DTWAIN: SEH exception 0x%08lX occurred while calling TWAIN DSM/Data Source.\r\n", dsmResult.exceptionCode);
+            OutputDebugStringA(buffer);
+            return TWRC_FAILURE;
+        }
     }
-    catch(...)
+    catch (...)
     {
+        if (m_pDLLHandle->m_bNotificationsUsed)
+        {
+            // Send out that we have ended processing the TWAIN triplet
+            SendTwainMsgToWindow(pTriplet.GetSessionPtr(), nullptr, DTWAIN_TN_TWAINTRIPLETEND, 0);
+        }
+        // An exception occurred.  This is bad!
+        // Check what to do when this happens (possibly close DSM and start over?)
+        // To do later...
+        retcode = -DTWAIN_ERR_EXCEPTION_ERROR;
         if (m_pDLLHandle->m_bNotificationsUsed)
         {
             // Send out that we have ended processing the TWAIN triplet
@@ -2518,6 +2560,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         }
         return retcode;
     }
+
     if (m_pDLLHandle->m_bNotifyTripletsUsed)
     {
         // Send out that we have ended processing the TWAIN triplet
