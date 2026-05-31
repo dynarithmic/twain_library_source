@@ -52,8 +52,8 @@ LONG DLLENTRY_DEF DTWAIN_GetDuplexTypeEx(DTWAIN_SOURCE Source)
     LOG_FUNC_ENTRY_PARAMS((Source))
     LONG val = 0;
     auto bRet = DTWAIN_GetDuplexType(Source, &val);
-	LOG_FUNC_EXIT_NONAME_PARAMS(bRet?val:-1)
-	CATCH_BLOCK(-1)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet?val:-1)
+    CATCH_BLOCK(-1)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDupType)

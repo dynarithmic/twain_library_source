@@ -28,26 +28,26 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToWebP(const std::wstring& filename, const WebPSessionOptions& options, HANDLE hDib)
 {
-	LockedDibPage lockedPage(hDib);
-	if (!lockedPage.IsValid())
-		return false;
+    LockedDibPage lockedPage(hDib);
+    if (!lockedPage.IsValid())
+        return false;
 
-	WebPSessionWriter writer;
-	if (!writer.Open(filename, options))
-		return false;
+    WebPSessionWriter writer;
+    if (!writer.Open(filename, options))
+        return false;
 
-	auto pageInfo = WebPSessionWriter::MakePreparedWebPDibPage(lockedPage.GetView());
-	if (!pageInfo.has_value())
-		return false;
+    auto pageInfo = WebPSessionWriter::MakePreparedWebPDibPage(lockedPage.GetView());
+    if (!pageInfo.has_value())
+        return false;
 
-	if (!writer.SetPageInfo(pageInfo.value()))
-		return false;
+    if (!writer.SetPageInfo(pageInfo.value()))
+        return false;
 
-	if (!writer.WriteCurrentPage())
-		return false;
+    if (!writer.WriteCurrentPage())
+        return false;
 
-	writer.Close();
-	return true;
+    writer.Close();
+    return true;
 }
 
 int CTL_WebpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
@@ -59,18 +59,18 @@ int CTL_WebpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if (!IsValidBitDepth(DTWAIN_WEBP, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-	WebPSessionOptions opts{};
-	opts.lossless = false;
-	opts.quality = 75.0f;
-	opts.method = 4;
-	opts.exact = false;
+    WebPSessionOptions opts{};
+    opts.lossless = false;
+    opts.quality = 75.0f;
+    opts.method = 4;
+    opts.exact = false;
 
-	opts.text.copyright = GetCopyrightString();
+    opts.text.copyright = GetCopyrightString();
 
-	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-	if (!WriteOneDibHandleToWebP(fName, opts, hDib))
-		return DTWAIN_ERR_FILEWRITE;
-	return DTWAIN_NO_ERROR;
+    if (!WriteOneDibHandleToWebP(fName, opts, hDib))
+        return DTWAIN_ERR_FILEWRITE;
+    return DTWAIN_NO_ERROR;
 }
 

@@ -41,7 +41,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
         JobControl = TWJC_NONE;
     }
     auto retVal = CreateArrayFromCap(pHandle, nullptr, CAP_JOBCONTROL, 1);
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
     auto Array = retVal.second;
     DTWAINArrayLowLevel_RAII a(pSource->GetDTWAINHandle(), Array);
 

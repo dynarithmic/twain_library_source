@@ -25,22 +25,22 @@ OF THIRD PARTY RIGHTS.
 
 namespace dynarithmic
 {
-	class CTL_PngIOHandler : public CTL_ImageIOHandler
-	{
-		public:
-			CTL_PngIOHandler() : CTL_ImageIOHandler() { SetSaveArgs(); };
-			CTL_PngIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib), m_ImageInfoEx(ImageInfoEx)
-			{
-				SetSaveArgs();
-			}
+    class CTL_PngIOHandler : public CTL_ImageIOHandler
+    {
+        public:
+            CTL_PngIOHandler() : CTL_ImageIOHandler() { SetSaveArgs(); };
+            CTL_PngIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib), m_ImageInfoEx(ImageInfoEx)
+            {
+                SetSaveArgs();
+            }
 
-			int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
-		private:
-			DTWAINImageInfoEx m_ImageInfoEx;
-			void SetSaveArgs()
-			{
-			}
-	};
+        private:
+            DTWAINImageInfoEx m_ImageInfoEx;
+            void SetSaveArgs()
+            {
+            }
+    };
 }
 #endif

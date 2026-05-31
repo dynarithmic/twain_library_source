@@ -345,17 +345,17 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         }
     }
 
-	// Send notification to application
-	bool bStartAcquire = CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_PREACQUIRESTART,
+    // Send notification to application
+    bool bStartAcquire = CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_PREACQUIRESTART,
         reinterpret_cast<LPARAM>(pSource));
 
     // If callback returned 0, stop the acquisition.
     if (!bStartAcquire)
     {
-		// Stop the acquisition due to user app requesting the stop
-		opts.setStatus(DTWAIN_TN_ACQUIREDONE);
-		// return with no acquisitions being processed
-		DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [] {return true; }, NULL, NULL, FUNC_MACRO);
+        // Stop the acquisition due to user app requesting the stop
+        opts.setStatus(DTWAIN_TN_ACQUIREDONE);
+        // return with no acquisitions being processed
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [] {return true; }, NULL, NULL, FUNC_MACRO);
     }
 
     DTWAIN_ARRAY aAcquisitionArray = SourceAcquireWorkerThread(opts);
@@ -394,7 +394,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     pSource->SetLastAcquireError(0);
     pSource->ResetAcquisitionAttempts(nullptr);
 
-	auto retVal = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
+    auto retVal = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
     if (!retVal.second)
     {
         opts.setStatus(retVal.first);

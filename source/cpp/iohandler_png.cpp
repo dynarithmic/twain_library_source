@@ -45,28 +45,28 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
     HANDLE hDib = m_pDib->GetHandle();
 
-	LockedDibPage lockedPage(hDib);
-	if (!lockedPage.IsValid())
-		return DTWAIN_ERR_FILEWRITE;
+    LockedDibPage lockedPage(hDib);
+    if (!lockedPage.IsValid())
+        return DTWAIN_ERR_FILEWRITE;
     std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     PngSessionOptions sessionOptions;
 
     sessionOptions.text.copyright = GetCopyrightString();
 
-	PngSessionWriter writer;
+    PngSessionWriter writer;
 
     if (!writer.Open(sFileName, sessionOptions))
         return DTWAIN_ERR_FILEWRITE;
 
-	PngWriterRAII raii(&writer);
+    PngWriterRAII raii(&writer);
 
-	auto pageInfo = PngSessionWriter::MakePreparedPngDibPage(lockedPage.GetView());
-	if (!pageInfo.has_value())
-		return DTWAIN_ERR_FILEWRITE;
+    auto pageInfo = PngSessionWriter::MakePreparedPngDibPage(lockedPage.GetView());
+    if (!pageInfo.has_value())
+        return DTWAIN_ERR_FILEWRITE;
 
-	if (!writer.SetPageInfo(pageInfo.value()))
-		return DTWAIN_ERR_FILEWRITE; 
+    if (!writer.SetPageInfo(pageInfo.value()))
+        return DTWAIN_ERR_FILEWRITE; 
 
     auto retVal = writer.WriteCurrentPage();
     return retVal.second;

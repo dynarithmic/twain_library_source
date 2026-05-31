@@ -968,15 +968,15 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
 
 static void ClearPDFTextInternal(CTL_TEXTELEMENTMAP::iterator it, PDFTextElement* pElement)
 {
-	// See if text element is in set
-	auto& theSet = it->second.first;
-	if (theSet.count(pElement))
-	{
-		auto& theList = it->second.second;
-		theList.erase(std::remove(theList.begin(), theList.end(), pElement), theList.end());
-	}
-	theSet.erase(pElement);
-	pElement->vptrTwainSource.erase(it->first);
+    // See if text element is in set
+    auto& theSet = it->second.first;
+    if (theSet.count(pElement))
+    {
+        auto& theList = it->second.second;
+        theList.erase(std::remove(theList.begin(), theList.end(), pElement), theList.end());
+    }
+    theSet.erase(pElement);
+    pElement->vptrTwainSource.erase(it->first);
 }
 
 void CTL_ITwainSource::ClearPDFTextElements()
@@ -984,7 +984,7 @@ void CTL_ITwainSource::ClearPDFTextElements()
     const auto it = m_pDLLHandle->m_mapPDFTextElement.find(this);
     if (it != m_pDLLHandle->m_mapPDFTextElement.end())
     {
-		auto& theSet = it->second.first;
+        auto& theSet = it->second.first;
         while (!theSet.empty())
             ClearPDFTextInternal(it, *theSet.begin());
     }
@@ -992,8 +992,8 @@ void CTL_ITwainSource::ClearPDFTextElements()
 
 void CTL_ITwainSource::ClearOnePDFTextElement(PDFTextElement* pElement)
 {
-	const auto it = m_pDLLHandle->m_mapPDFTextElement.find(this);
-	if (it != m_pDLLHandle->m_mapPDFTextElement.end())
+    const auto it = m_pDLLHandle->m_mapPDFTextElement.find(this);
+    if (it != m_pDLLHandle->m_mapPDFTextElement.end())
         ClearPDFTextInternal(it, pElement);
 }
 

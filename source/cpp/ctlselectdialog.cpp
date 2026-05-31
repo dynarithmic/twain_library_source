@@ -31,18 +31,18 @@ using namespace boost::logic;
 
 static HWND GetEffectiveConsoleWindow()
 {
-	// 1) Already attached?
-	HWND hwnd = GetConsoleWindow();
-	if (hwnd)
-		return hwnd;
+    // 1) Already attached?
+    HWND hwnd = GetConsoleWindow();
+    if (hwnd)
+        return hwnd;
 
-	// 2) Try attaching to parent console
-	if (AttachConsole(ATTACH_PARENT_PROCESS))
-	{
-		hwnd = GetConsoleWindow();
-		if (hwnd)
-			return hwnd;
-	}
+    // 2) Try attaching to parent console
+    if (AttachConsole(ATTACH_PARENT_PROCESS))
+    {
+        hwnd = GetConsoleWindow();
+        if (hwnd)
+            return hwnd;
+    }
     return NULL;
 }
 
@@ -289,7 +289,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
                 if (lastPos.first != std::numeric_limits<int32_t>::max() ||
                     lastPos.second != lastPos.first)
                     bUseLastScreenPos = true;
-				SetWindowPos(hWnd, nullptr, lastPos.first, lastPos.second, 0, 0, SWP_NOSIZE);
+                SetWindowPos(hWnd, nullptr, lastPos.first, lastPos.second, 0, 0, SWP_NOSIZE);
             }
             if ( !bUseLastScreenPos )
             {
@@ -301,9 +301,9 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
                 else
                 if (pS->CS.nOptions & DTWAIN_DLG_CENTER)
                 {
-					HWND hWndParent = pS->CS.hWndParent;
-					if (pS->CS.nOptions & DTWAIN_DLG_CONSOLEASPARENT)
-						hWndParent = GetEffectiveConsoleWindow();
+                    HWND hWndParent = pS->CS.hWndParent;
+                    if (pS->CS.nOptions & DTWAIN_DLG_CONSOLEASPARENT)
+                        hWndParent = GetEffectiveConsoleWindow();
                     CenterWindow(hWnd, hWndParent ? hWndParent : GetParent(hWnd));
                 }
                 else
@@ -472,7 +472,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
         else
         if (LOWORD(wParam) == IDCANCEL)
         {
-			SetLastSavePos(hWnd, pS);
+            SetLastSavePos(hWnd, pS);
             pS->SourceName.clear();
             EndDialog(hWnd, LOWORD(wParam));
             return TRUE;

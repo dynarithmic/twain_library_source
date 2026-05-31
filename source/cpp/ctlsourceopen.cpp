@@ -297,23 +297,23 @@ void DetermineIfPaperDetectable(CTL_ITwainSource* p)
 
 void DetermineSheetcountDefs(CTL_ITwainSource* p)
 {
-	using wildcards::match;
-	auto& sheetcount_map = CTL_TwainAppMgr::GetSourceSheetcountMap();
-	std::string sourceName = p->GetProductNameA();
+    using wildcards::match;
+    auto& sheetcount_map = CTL_TwainAppMgr::GetSourceSheetcountMap();
+    std::string sourceName = p->GetProductNameA();
 
-	// Search map for a matching name
-	auto iterSearch = sheetcount_map.begin();
-	while (iterSearch != sheetcount_map.end())
-	{
-		bool matches = match(sourceName, iterSearch->first);
-		if (matches)
-		{
+    // Search map for a matching name
+    auto iterSearch = sheetcount_map.begin();
+    while (iterSearch != sheetcount_map.end())
+    {
+        bool matches = match(sourceName, iterSearch->first);
+        if (matches)
+        {
             bool usesSheets = (iterSearch->second == "SHEETS");
             p->SetUseSheetCountAsSheets(usesSheets);
-			return;
-		}
-		++iterSearch;
-	}
+            return;
+        }
+        ++iterSearch;
+    }
     p->SetUseSheetCountAsSheets(true);
 }
 

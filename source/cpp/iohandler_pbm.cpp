@@ -28,39 +28,39 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToPnm(const std::wstring& filename, const PnmSessionOptions& options, HANDLE hDib)
 {
-	LockedDibPage lockedPage(hDib);
-	if (!lockedPage.IsValid())
-		return false;
+    LockedDibPage lockedPage(hDib);
+    if (!lockedPage.IsValid())
+        return false;
 
-	PnmSessionWriter writer;
-	if (!writer.Open(filename, options))
-		return false;
+    PnmSessionWriter writer;
+    if (!writer.Open(filename, options))
+        return false;
 
-	auto pageInfo = PnmSessionWriter::MakePreparedPnmDibPage(lockedPage.GetView());
-	if (!pageInfo.has_value())
-		return false;
+    auto pageInfo = PnmSessionWriter::MakePreparedPnmDibPage(lockedPage.GetView());
+    if (!pageInfo.has_value())
+        return false;
 
-	if (!writer.SetPageInfo(pageInfo.value()))
-		return false;
+    if (!writer.SetPageInfo(pageInfo.value()))
+        return false;
 
-	if (!writer.WriteCurrentPage())
-		return false;
+    if (!writer.WriteCurrentPage())
+        return false;
 
-	writer.Close();
-	return true;
+    writer.Close();
+    return true;
 }
 
 int CTL_PBMIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
     HANDLE hDib = m_pDib->GetHandle();
-	PnmSessionOptions opts{};
-	opts.useRaw = true;
-	opts.fixBilevelPolarity = true;
+    PnmSessionOptions opts{};
+    opts.useRaw = true;
+    opts.fixBilevelPolarity = true;
 
-	opts.comment = GetCopyrightString();
-	std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    opts.comment = GetCopyrightString();
+    std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-	if (!WriteOneDibHandleToPnm(filename, opts, hDib))
-		return DTWAIN_ERR_FILEWRITE;
+    if (!WriteOneDibHandleToPnm(filename, opts, hDib))
+        return DTWAIN_ERR_FILEWRITE;
     return DTWAIN_NO_ERROR;
 }

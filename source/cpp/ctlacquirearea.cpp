@@ -65,7 +65,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetTy
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !FloatArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !FloatArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<TW_UINT16>(lGetType));
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -134,8 +134,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_F
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const DTWAIN_BOOL bRet = GetImageSize2(pSource, left, top, right, bottom, Unit);
-	LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
-	LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 

@@ -36,8 +36,8 @@ static std::pair<bool, int> SaveBMPRLE(LPCTSTR szFile, HANDLE hDib)
     if (!writer.Open(filename))
         return { false, DTWAIN_ERR_FILEOPEN };
 
-	auto pageInfo = BmpRle8Writer::MakePreparedBmpRle8Page(lockedPage.GetView());
-	if (!pageInfo.has_value())
+    auto pageInfo = BmpRle8Writer::MakePreparedBmpRle8Page(lockedPage.GetView());
+    if (!pageInfo.has_value())
         return { false, DTWAIN_ERR_DIB };
 
     if (!writer.SetPageInfo(pageInfo.value()))

@@ -132,7 +132,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source,
                                                    LPDWORD BytesWritten,
                                                    LPDWORD MemoryLength)
 {
-	LOG_FUNC_ENTRY_PARAMS((Source, Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
+    LOG_FUNC_ENTRY_PARAMS((Source, Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto& memxferInfo = pSource->GetBufferedXFerInfo();
     std::array<LPDWORD, 9> userVals = { Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength };

@@ -115,9 +115,9 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(const char *pFuncName, int nW
     else 
     if ( nWhich == LOG_INDENT_OUT )
     {
-		const auto* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-		char buffer[1024] = {};
-		CTL_TwainAppMgr::GetErrorString(-pHandle->m_lLastError, buffer, 1023);
+        const auto* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        char buffer[1024] = {};
+        CTL_TwainAppMgr::GetErrorString(-pHandle->m_lLastError, buffer, 1023);
         std::ostringstream strm;
         auto errorName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_ERROR_NAMES, pHandle->m_lLastError).second;
         strm << " -- " 

@@ -41,71 +41,71 @@ namespace dynarithmic
 
         static constexpr bool IsValidComponent(int nWhich)
         {
-			return nWhich == FRAMETOP ||
-				nWhich == FRAMELEFT ||
-				nWhich == FRAMERIGHT ||
-				nWhich == FRAMEBOTTOM;
+            return nWhich == FRAMETOP ||
+                nWhich == FRAMELEFT ||
+                nWhich == FRAMERIGHT ||
+                nWhich == FRAMEBOTTOM;
         }
 
         constexpr TwainFrameInternal(double left = 0, double top = 0, double right = 0, double bottom = 0) : m_FrameComponent{}
         {
-			SetFrame(left, top, right, bottom);
+            SetFrame(left, top, right, bottom);
         }
 
         constexpr TwainFrameInternal(TW_FRAME frame)
         {
-			SetFrame(static_cast<double>(Fix32ToFloat(frame.Left)),
-				static_cast<double>(Fix32ToFloat(frame.Top)),
-				static_cast<double>(Fix32ToFloat(frame.Right)),
-				static_cast<double>(Fix32ToFloat(frame.Bottom)));
+            SetFrame(static_cast<double>(Fix32ToFloat(frame.Left)),
+                static_cast<double>(Fix32ToFloat(frame.Top)),
+                static_cast<double>(Fix32ToFloat(frame.Right)),
+                static_cast<double>(Fix32ToFloat(frame.Bottom)));
         }
 
-		constexpr TwainFrameInternal& operator=(TW_FRAME frame) { From_TWFRAME(frame); return *this; }
+        constexpr TwainFrameInternal& operator=(TW_FRAME frame) { From_TWFRAME(frame); return *this; }
 
         constexpr TW_FRAME To_TWFRAME() const
         {
-			TW_FRAME ret = {};
-			ret.Top = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMETOP]));
-			ret.Left = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMELEFT]));
-			ret.Right = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMERIGHT]));
-			ret.Bottom = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMEBOTTOM]));
-			return ret;
+            TW_FRAME ret = {};
+            ret.Top = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMETOP]));
+            ret.Left = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMELEFT]));
+            ret.Right = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMERIGHT]));
+            ret.Bottom = FloatToFix32(static_cast<float>(m_FrameComponent[FRAMEBOTTOM]));
+            return ret;
         }
 
         constexpr void From_TWFRAME(TW_FRAME frame)
         {
-			SetFrame(static_cast<double>(Fix32ToFloat(frame.Left)),
-				static_cast<double>(Fix32ToFloat(frame.Top)),
-				static_cast<double>(Fix32ToFloat(frame.Right)),
-				static_cast<double>(Fix32ToFloat(frame.Bottom)));
+            SetFrame(static_cast<double>(Fix32ToFloat(frame.Left)),
+                static_cast<double>(Fix32ToFloat(frame.Top)),
+                static_cast<double>(Fix32ToFloat(frame.Right)),
+                static_cast<double>(Fix32ToFloat(frame.Bottom)));
         }
 
-		constexpr double Left() const
-		{
-			return m_FrameComponent[FRAMELEFT];
-		}
+        constexpr double Left() const
+        {
+            return m_FrameComponent[FRAMELEFT];
+        }
 
-		constexpr double Top() const
-		{
-			return m_FrameComponent[FRAMETOP];
-		}
+        constexpr double Top() const
+        {
+            return m_FrameComponent[FRAMETOP];
+        }
 
-		constexpr double Right() const
-		{
-			return m_FrameComponent[FRAMERIGHT];
-		}
+        constexpr double Right() const
+        {
+            return m_FrameComponent[FRAMERIGHT];
+        }
 
-		constexpr double Bottom() const
-		{
-			return m_FrameComponent[FRAMEBOTTOM];
-		}
+        constexpr double Bottom() const
+        {
+            return m_FrameComponent[FRAMEBOTTOM];
+        }
 
         constexpr void SetFrame(double left, double top, double right, double bottom)
         {
-			m_FrameComponent[FRAMELEFT] = left;
-			m_FrameComponent[FRAMETOP] = top;
-			m_FrameComponent[FRAMERIGHT] = right;
-			m_FrameComponent[FRAMEBOTTOM] = bottom;
+            m_FrameComponent[FRAMELEFT] = left;
+            m_FrameComponent[FRAMETOP] = top;
+            m_FrameComponent[FRAMERIGHT] = right;
+            m_FrameComponent[FRAMEBOTTOM] = bottom;
         }
     };
 }

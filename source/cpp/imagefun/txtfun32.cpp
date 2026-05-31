@@ -76,9 +76,9 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         {
             if (doDestroy)
             {
-				// Always delete the temporary file
-				if (m_pTextPageInfo && !m_pTextPageInfo->szTempFile.empty())
-					delete_file(m_pTextPageInfo->szTempFile.c_str());
+                // Always delete the temporary file
+                if (m_pTextPageInfo && !m_pTextPageInfo->szTempFile.empty())
+                    delete_file(m_pTextPageInfo->szTempFile.c_str());
 
                 m_pTextPageInfo.reset();
                 try
@@ -100,8 +100,8 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         m_pTextPageInfo = std::make_shared<CTextPageInfo>(0);
 
         // Open the file
-		LPCTSTR fileName = reinterpret_cast<LPCTSTR>(path);
-		std::string fNameStr = StringConversion::Convert_NativePtr_To_Ansi(fileName);
+        LPCTSTR fileName = reinterpret_cast<LPCTSTR>(path);
+        std::string fNameStr = StringConversion::Convert_NativePtr_To_Ansi(fileName);
         auto isOk = OpenOutputFile(fileName);
         if (!isOk)
             return DTWAIN_ERR_FILEOPEN;

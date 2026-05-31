@@ -32,9 +32,9 @@ using namespace dynarithmic;
 // BAR and PATCH differences in the name.
 static bool IsCapInList(CTL_ITwainSource* pSource, const std::array<LONG, 7>& capList)
 {
-	const auto iter = std::find_if(std::begin(capList), std::end(capList), [&](LONG val)
-		{ return pSource->IsCapInSupportedList(static_cast<TW_UINT16>(val)) ? true : false; });
-	const bool bRet = iter != std::end(capList);
+    const auto iter = std::find_if(std::begin(capList), std::end(capList), [&](LONG val)
+        { return pSource->IsCapInSupportedList(static_cast<TW_UINT16>(val)) ? true : false; });
+    const bool bRet = iter != std::end(capList);
     return bRet;
 }
 
@@ -72,8 +72,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBarcodeCapsSupported(DTWAIN_SOURCE Source)
     };
 
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-	auto bRet = IsCapInList(pSource, nCapToTest);
-	LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    auto bRet = IsCapInList(pSource, nCapToTest);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 

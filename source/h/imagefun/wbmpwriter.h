@@ -35,21 +35,21 @@ OF THIRD PARTY RIGHTS.
 
 struct PreparedWbmpDibPage
 {
-	uint32_t width = 0;
-	uint32_t height = 0;
-	uint16_t bitsPerPixel = 1;
-	uint32_t strideBytes = 0;
-	bool bottomUp = true;
+    uint32_t width = 0;
+    uint32_t height = 0;
+    uint16_t bitsPerPixel = 1;
+    uint32_t strideBytes = 0;
+    bool bottomUp = true;
 
-	const uint8_t* bits = nullptr;
+    const uint8_t* bits = nullptr;
 };
 
 struct WbmpSessionOptions
 {
-	// WBMP Type 0 only
-	// If true, reverse bits in each byte before writing.
-	// Use this only if your incoming 1-bpp DIB rows are LSB-first.
-	bool reverseBitOrder = false;
+    // WBMP Type 0 only
+    // If true, reverse bits in each byte before writing.
+    // Use this only if your incoming 1-bpp DIB rows are LSB-first.
+    bool reverseBitOrder = false;
 };
 
 // ============================================================
@@ -64,46 +64,46 @@ struct WbmpSessionOptions
 class WbmpSessionWriter
 {
 public:
-	WbmpSessionWriter() = default;
-	~WbmpSessionWriter();
-	WbmpSessionWriter(const WbmpSessionWriter&) = delete;
-	WbmpSessionWriter& operator=(const WbmpSessionWriter&) = delete;
-	bool Open(const std::wstring& filename, const WbmpSessionOptions& options);
-	bool SetPageInfo(const PreparedWbmpDibPage& page);
-	bool WriteCurrentPage();
-	void Close();
-	bool IsOpen() const noexcept;
-	static std::optional<PreparedWbmpDibPage> MakePreparedWbmpDibPage(const dynarithmic::DibPageView& view);
+    WbmpSessionWriter() = default;
+    ~WbmpSessionWriter();
+    WbmpSessionWriter(const WbmpSessionWriter&) = delete;
+    WbmpSessionWriter& operator=(const WbmpSessionWriter&) = delete;
+    bool Open(const std::wstring& filename, const WbmpSessionOptions& options);
+    bool SetPageInfo(const PreparedWbmpDibPage& page);
+    bool WriteCurrentPage();
+    void Close();
+    bool IsOpen() const noexcept;
+    static std::optional<PreparedWbmpDibPage> MakePreparedWbmpDibPage(const dynarithmic::DibPageView& view);
 
 
 private:
-	static bool ValidatePage(const PreparedWbmpDibPage& page);
-	static uint8_t ReverseBits(uint8_t v);
-	bool WriteByte(uint8_t b);
-	bool WriteMultiByteUInt(uint32_t value);
-	bool WriteHeader();
-	bool WriteBitmapData();
+    static bool ValidatePage(const PreparedWbmpDibPage& page);
+    static uint8_t ReverseBits(uint8_t v);
+    bool WriteByte(uint8_t b);
+    bool WriteMultiByteUInt(uint32_t value);
+    bool WriteHeader();
+    bool WriteBitmapData();
 
 private:
-	FILE* file_ = nullptr;
-	std::wstring filename_;
-	WbmpSessionOptions options_{};
+    FILE* file_ = nullptr;
+    std::wstring filename_;
+    WbmpSessionOptions options_{};
 
-	PreparedWbmpDibPage currentPage_{};
-	bool hasCurrentPage_ = false;
+    PreparedWbmpDibPage currentPage_{};
+    bool hasCurrentPage_ = false;
 
-	std::vector<uint8_t> rowBuffer_;
+    std::vector<uint8_t> rowBuffer_;
 };
 
 class DTWAINWbmpOutput
 {
-	public:
-		bool OnFirstPage(const std::wstring& filename, const WbmpSessionOptions& options, const PreparedWbmpDibPage& page);
-		bool OnLastPage();
-		bool IsOpen() const noexcept;
+    public:
+        bool OnFirstPage(const std::wstring& filename, const WbmpSessionOptions& options, const PreparedWbmpDibPage& page);
+        bool OnLastPage();
+        bool IsOpen() const noexcept;
 
-	private:
-		std::unique_ptr<WbmpSessionWriter> writer_;
+    private:
+        std::unique_ptr<WbmpSessionWriter> writer_;
 };
 
 #endif

@@ -32,40 +32,40 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToTga(const std::wstring& filename, const TgaSessionOptions& options, HANDLE hDib)
 {
-	LockedDibPage lockedPage(hDib);
-	if (!lockedPage.IsValid())
-		return false;
+    LockedDibPage lockedPage(hDib);
+    if (!lockedPage.IsValid())
+        return false;
 
-	TgaSessionWriter writer;
-	if (!writer.Open(filename, options))
-		return false;
+    TgaSessionWriter writer;
+    if (!writer.Open(filename, options))
+        return false;
 
-	auto pageInfo = TgaSessionWriter::MakePreparedTgaDibPage(lockedPage.GetView());
-	if (!pageInfo.has_value())
-		return false;
+    auto pageInfo = TgaSessionWriter::MakePreparedTgaDibPage(lockedPage.GetView());
+    if (!pageInfo.has_value())
+        return false;
 
-	if (!writer.SetPageInfo(pageInfo.value()))
-		return false;
+    if (!writer.SetPageInfo(pageInfo.value()))
+        return false;
 
-	if (!writer.WriteCurrentPage())
-		return false;
+    if (!writer.WriteCurrentPage())
+        return false;
 
-	writer.Close();
-	return true;
+    writer.Close();
+    return true;
 }
 
 int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
     HANDLE hDib = hDib = m_pDib->GetHandle();
 
-	std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-	TgaSessionOptions opts{};
+    TgaSessionOptions opts{};
     opts.useRle = m_ImageInfoEx.IsRLE;
 
-	opts.comment = GetCopyrightString();
+    opts.comment = GetCopyrightString();
 
-	if (!WriteOneDibHandleToTga(fName, opts, hDib))
-		return DTWAIN_ERR_FILEWRITE;
+    if (!WriteOneDibHandleToTga(fName, opts, hDib))
+        return DTWAIN_ERR_FILEWRITE;
     return DTWAIN_NO_ERROR;
 }

@@ -162,8 +162,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
             if (vValues)
             {
                 // Already resolved, so just create an array, copy, and return
-				auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vValues->size()));
-				DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
+                auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vValues->size()));
+                DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
                 auto aValues = retVal.second;
                 auto& vCurrentValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
                 std::copy(vValues->begin(), vValues->end(), vCurrentValues.begin());
@@ -241,9 +241,9 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
     }
 
 
-	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(setAllTypes.size()));
+    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(setAllTypes.size()));
 
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
     auto aRetValue = retVal.second;
     auto& vAll = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aRetValue);
     std::transform(setAllTypes.begin(), setAllTypes.end(), vAll.begin(), [&](LONG n) { return n; });

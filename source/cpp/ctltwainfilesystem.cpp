@@ -271,37 +271,37 @@ struct CameraStruct {
 
 static DTWAIN_ARRAY GenericEnumCameras(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
 {
-	auto retVal = DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
-	if (retVal)
-	{
-		CTL_TwainDLLHandle* pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-		MoveArray(pHandle, Cameras, &retVal);
+    auto retVal = DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
+    if (retVal)
+    {
+        CTL_TwainDLLHandle* pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+        MoveArray(pHandle, Cameras, &retVal);
         return *Cameras;
-	}
+    }
     return nullptr;
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
-	auto retVal = GenericEnumCameras(Source, DTWAIN_FT_ALLCAMERAS, Cameras);
-	LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
+    auto retVal = GenericEnumCameras(Source, DTWAIN_FT_ALLCAMERAS, Cameras);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumTopCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
-	auto retVal = GenericEnumCameras(Source, DTWAIN_FT_CAMERATOP, Cameras);
-	LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
+    auto retVal = GenericEnumCameras(Source, DTWAIN_FT_CAMERATOP, Cameras);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBottomCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
-	auto retVal = GenericEnumCameras(Source, DTWAIN_FT_CAMERABOTTOM, Cameras);
-	LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
+    auto retVal = GenericEnumCameras(Source, DTWAIN_FT_CAMERABOTTOM, Cameras);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 

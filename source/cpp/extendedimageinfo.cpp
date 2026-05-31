@@ -1244,13 +1244,13 @@ std::pair<bool, int> dynarithmic::GetExtImageInfoDataInternal(CTL_ITwainSource* 
     {
         // Get the info 
         TW_INFO Info = pTheSource->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
-		// Log the current information
-		if (CTL_StaticData::GetLogFilterFlags())
-		{
-			std::string sTWInfo = CTL_TWAINTypeDecoder::DecodeTW_INFO(&Info, nullptr);
-			sTWInfo = "TW_Info: " + sTWInfo;
-			LogWriterUtils::WriteLogInfoIndentedA(sTWInfo);
-		}
+        // Log the current information
+        if (CTL_StaticData::GetLogFilterFlags())
+        {
+            std::string sTWInfo = CTL_TWAINTypeDecoder::DecodeTW_INFO(&Info, nullptr);
+            sTWInfo = "TW_Info: " + sTWInfo;
+            LogWriterUtils::WriteLogInfoIndentedA(sTWInfo);
+        }
 
         // Check if the info type is supported
         bool bNotSupported = false;
@@ -1298,8 +1298,8 @@ std::pair<bool, int> dynarithmic::GetExtImageInfoDataInternal(CTL_ITwainSource* 
             auto iter = std::find(aRequiredTypeMatches.begin(), aRequiredTypeMatches.end(), nWhich);
             if (iter != aRequiredTypeMatches.end())
             {
-				std::string msg = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, Info.InfoID).second;
-				LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(-DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH) + " " + msg);
+                std::string msg = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, Info.InfoID).second;
+                LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(-DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH) + " " + msg);
                 return { false, DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH };
             }
 
@@ -1381,7 +1381,7 @@ std::pair<bool, int> dynarithmic::GetExtImageInfoDataInternal(CTL_ITwainSource* 
         auto pr = GetCachedExtImageInfoData(pHandle, pTheSource, nWhich, Data);
         if (!pr.first)
         {
-			LogWriterUtils::WriteLogInfoIndentedA("Could not get cached ExtImageInfo");
+            LogWriterUtils::WriteLogInfoIndentedA("Could not get cached ExtImageInfo");
             return { pr.second, false };
         }
     }

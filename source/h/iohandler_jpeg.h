@@ -25,34 +25,34 @@ OF THIRD PARTY RIGHTS.
 
 namespace dynarithmic
 {
-	class CTL_JpegIOHandler : public CTL_ImageIOHandler
-	{
-		public:
-			CTL_JpegIOHandler(int Quality = 75, BOOL bJpegProgressive = FALSE) :
-				CTL_ImageIOHandler(),
-				m_nJpegQuality(Quality),
-				m_bJpegProgressive(bJpegProgressive) {
-				SetSaveArgs();
-			}
+    class CTL_JpegIOHandler : public CTL_ImageIOHandler
+    {
+        public:
+            CTL_JpegIOHandler(int Quality = 75, BOOL bJpegProgressive = FALSE) :
+                CTL_ImageIOHandler(),
+                m_nJpegQuality(Quality),
+                m_bJpegProgressive(bJpegProgressive) {
+                SetSaveArgs();
+            }
 
-			CTL_JpegIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx)
-				: CTL_ImageIOHandler(pDib),
-				m_nJpegQuality(75),
-				m_bJpegProgressive(false),
-				m_ImageInfoEx(ImageInfoEx) {
-				SetSaveArgs();
-			}
+            CTL_JpegIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx)
+                : CTL_ImageIOHandler(pDib),
+                m_nJpegQuality(75),
+                m_bJpegProgressive(false),
+                m_ImageInfoEx(ImageInfoEx) {
+                SetSaveArgs();
+            }
 
-			void SetSaveArgs()
-			{
-			}
+            void SetSaveArgs()
+            {
+            }
 
-			int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
-		private:
-			int     m_nJpegQuality;
-			BOOL    m_bJpegProgressive;
-			DTWAINImageInfoEx m_ImageInfoEx;
-	};
+        private:
+            int     m_nJpegQuality;
+            BOOL    m_bJpegProgressive;
+            DTWAINImageInfoEx m_ImageInfoEx;
+    };
 }
 #endif

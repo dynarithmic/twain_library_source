@@ -25,78 +25,78 @@ OF THIRD PARTY RIGHTS.
 
 namespace dynarithmic
 {
-	enum class DibPixelFlavor
-	{
-		BW1,
-		Indexed4,
-		Indexed8,
-		Gray8,
-		Gray16,
-		RGB24,
-		RGBA32,
-		Unknown
-	};
+    enum class DibPixelFlavor
+    {
+        BW1,
+        Indexed4,
+        Indexed8,
+        Gray8,
+        Gray16,
+        RGB24,
+        RGBA32,
+        Unknown
+    };
 
-	struct DibPageView
-	{
-		uint32_t width = 0;
-		uint32_t height = 0;
-		uint16_t bitsPerPixel = 0;
-		uint32_t strideBytes = 0;
-		uint16_t xDPI = 0;
-		uint16_t yDPI = 0;
-		bool bottomUp = true;
+    struct DibPageView
+    {
+        uint32_t width = 0;
+        uint32_t height = 0;
+        uint16_t bitsPerPixel = 0;
+        uint32_t strideBytes = 0;
+        uint16_t xDPI = 0;
+        uint16_t yDPI = 0;
+        bool bottomUp = true;
 
-		const uint8_t* bits = nullptr;
-		const RGBQUAD* palette = nullptr;
-		uint32_t paletteEntries = 0;
+        const uint8_t* bits = nullptr;
+        const RGBQUAD* palette = nullptr;
+        uint32_t paletteEntries = 0;
 
-		const BITMAPINFOHEADER* bih = nullptr;
-	};
+        const BITMAPINFOHEADER* bih = nullptr;
+    };
 
-	class LockedDibPage
-	{
-		public:
-			explicit LockedDibPage(HANDLE hDib);
-			bool IsValid() const noexcept { return valid_; }
-			const DibPageView& GetView() const noexcept { return view_; }
+    class LockedDibPage
+    {
+        public:
+            explicit LockedDibPage(HANDLE hDib);
+            bool IsValid() const noexcept { return valid_; }
+            const DibPageView& GetView() const noexcept { return view_; }
 
-		private:
-			dib::LockedDib dib_;
-			DibPageView view_{};
-			bool valid_ = false;
-	};
+        private:
+            dib::LockedDib dib_;
+            DibPageView view_{};
+            bool valid_ = false;
+    };
 
-	inline DibPixelFlavor ClassifyPixelFlavor(const LockedDibPage& page)
-	{
-		const auto& theView = page.GetView();
-		switch (theView.bitsPerPixel)
-		{
-			case 1:
-				return DibPixelFlavor::BW1;
+    inline DibPixelFlavor ClassifyPixelFlavor(const LockedDibPage& page)
+    {
+        const auto& theView = page.GetView();
+        switch (theView.bitsPerPixel)
+        {
+            case 1:
+                return DibPixelFlavor::BW1;
 
-			case 4:
-				return DibPixelFlavor::Indexed4;
+            case 4:
+                return DibPixelFlavor::Indexed4;
 
-			case 8:
-			{
-				if (theView.palette && dynarithmic::dib::is_grayscale_palette( theView.palette, theView.paletteEntries))
-					return DibPixelFlavor::Gray8;
-				return DibPixelFlavor::Indexed8;
-			}
+            case 8:
+            {
+                if (theView.palette && dynarithmic::dib::is_grayscale_palette( theView.palette, theView.paletteEntries))
+                    return DibPixelFlavor::Gray8;
+                return DibPixelFlavor::Indexed8;
+            }
 
-			case 16:
-				return DibPixelFlavor::Gray16;
+            case 16:
+                return DibPixelFlavor::Gray16;
 
-			case 24:
-				return DibPixelFlavor::RGB24;
+            case 24:
+                return DibPixelFlavor::RGB24;
 
-			case 32:
-				return DibPixelFlavor::RGBA32;
+            case 32:
+                return DibPixelFlavor::RGBA32;
 
-			default:
-				return DibPixelFlavor::Unknown;
-		}
-	}
+            default:
+                return DibPixelFlavor::Unknown;
+        }
+    }
 }
 #endif

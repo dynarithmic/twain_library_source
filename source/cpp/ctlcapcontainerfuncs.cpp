@@ -35,7 +35,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetCapContainerEx2(LONG nCap, DTWAIN_BOOL bSetC
     LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer))
     DTWAIN_ARRAY theArray = {};
     DTWAIN_GetCapContainerEx(nCap, bSetContainer, &theArray);
-	LOG_FUNC_EXIT_NONAME_PARAMS(theArray)
+    LOG_FUNC_EXIT_NONAME_PARAMS(theArray)
     CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
@@ -43,9 +43,9 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
 {
     LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer, pArray))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, 0L, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, 0L, FUNC_MACRO);
     DTWAIN_ARRAY pDTWAINArray = retVal.second;
     DTWAINArrayLowLevelPtr_RAII raii(pHandle, &pDTWAINArray);
 
@@ -132,8 +132,8 @@ LONG dynarithmic::GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCa
         {
             case DTWAIN_CAPGET:
             // We need to match up the MSG_GET container with the MSG_SETCONSTRAINT container
-			case DTWAIN_CAPSETAVAILABLE:
-			case DTWAIN_CAPSETCONSTRAINT:
+            case DTWAIN_CAPSETAVAILABLE:
+            case DTWAIN_CAPSETCONSTRAINT:
             {
                 return PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, pSource, nCap, MSG_GET, CapInfo);
             }
@@ -157,7 +157,7 @@ LONG dynarithmic::GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCa
                 if (nCap >= CAP_CUSTOMBASE)
                 {
                     // We need to use the MSG_GET container type
-					return PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, pSource, nCap, MSG_GET, CapInfo);
+                    return PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, pSource, nCap, MSG_GET, CapInfo);
                 }
                 return static_cast<LONG>(std::get<CAPINFO_IDX_SETCONTAINER>(*CapInfo));
             }

@@ -35,7 +35,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
     auto pS = pSource;
-	DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pS->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pS->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
     auto bRetval = CloseSourceInternal(pHandle, pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)

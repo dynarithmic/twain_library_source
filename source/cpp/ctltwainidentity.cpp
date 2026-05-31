@@ -28,7 +28,7 @@ namespace dynarithmic
     std::string CTL_TwainIdentity::to_json_formatted(int indentFactor) const
     {
         auto sJsonString = to_json();
-		json array_twain_identity;
+        json array_twain_identity;
         array_twain_identity.push_back(json::parse(sJsonString));
         auto sOut = array_twain_identity.dump(indentFactor);
         // remove beginning and ending square brackets

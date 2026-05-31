@@ -101,8 +101,8 @@ static DTWAIN_SOURCE SelectAndOpenSource(CTL_TwainDLLHandle* pHandle, SourceSele
     {
         auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
 
-		// Set this as the default source
-		SetDefaultSource_Internal(pSource, opts);
+        // Set this as the default source
+        SetDefaultSource_Internal(pSource, opts);
 
         auto iter = sourcemap.insert({ pSource->GetProductNameA(), {} }).first;
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, true);
