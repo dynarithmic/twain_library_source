@@ -937,12 +937,13 @@ std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckGlobalPDFTextElement(DTWA
     // Get the list of created text elements from global list
     auto& textElementList = CTL_StaticData::GetPDFTextElementList();
 
-    if (!TextElement)
-        return { false, textElementList.end() };
-
     // First check if DLL handle is valid
     if (!pHandle)
         return { false, textElementList.end() };
+
+	// Return immediately if the TextElement is nullptr
+	if (!TextElement)
+		return { false, textElementList.end() };
 
     auto foundIt = 
         std::find_if(textElementList.begin(), textElementList.end(), [&](auto& spTheList) { return spTheList.get() == TextElement; });
