@@ -36,9 +36,9 @@ static bool WriteOneDibHandleToMetafile(const std::wstring& filename, HANDLE hDi
     if (!writer.Open(filename, options))
         return false;
 
-	auto pageInfo = MetafileSessionWriter::MakePreparedMetafileDibPage(locked.GetView());
-	if (!pageInfo.has_value())
-		return false;
+    auto pageInfo = MetafileSessionWriter::MakePreparedMetafileDibPage(locked.GetView());
+    if (!pageInfo.has_value())
+        return false;
 
     if (!writer.WritePage(pageInfo.value()))
         return false;

@@ -82,7 +82,7 @@ void CTL_TwainDLLHandle::RemoveAllSourceMaps()
 void CTL_TwainDLLHandle::RemoveAllPDFTextElements()
 {
     auto& textElementList = CTL_StaticData::GetPDFTextElementList();
-	auto& guidMap = GetGUIDMap(GUID_PDFTEXTELEMENTS);
+    auto& guidMap = GetGUIDMap(GUID_PDFTEXTELEMENTS);
     auto& righttoleftmap = guidMap.GetRightToLeftMap();
     for (const auto& mapEl : righttoleftmap)
     {
@@ -152,12 +152,12 @@ CTL_StaticDataStruct::CTL_StaticDataStruct() :
                 {INI_SOURCES_KEY,                "Sources",              },
                 {INI_DSMERRORLOGGING_KEY,        "DSMErrorLogging"       },
                 {INI_ALLOWDUP_RESOURCE,          "allowduplicateresource"},
-				{INI_SOURCE_SAVEDEFAULT,         "savedefault"},
+                {INI_SOURCE_SAVEDEFAULT,         "savedefault"},
                 {INI_SELECTSOURCEPOS_KEY,        "selectsourcepos"},
                 {INI_SAVESELECTSOURCEPOS_KEY,    "saveselectsourcepos"},
                 {INI_TWAINLOOPGETMSG_KEY,        "TwainLoopGetMsg"},
                 {INI_SHEETCOUNT_KEY,             "SheetCount"},
-				{INI_TESTGET_ITEM,               "Testget"},
+                {INI_TESTGET_ITEM,               "Testget"},
              } }, s_SavedSelectSourcePos{ std::numeric_limits<int32_t>::max(), std::numeric_limits<int32_t>::max() } {}
 
 std::pair<bool, std::string> CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)

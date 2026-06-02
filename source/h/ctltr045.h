@@ -34,24 +34,24 @@ namespace dynarithmic
             CTL_CapabilityLabelHelpTriplet(CTL_ITwainSession *pSession,
                                            TW_UINT16 gCap,
                                            TW_UINT16 TwainType=0xFFFF) :
-			CTL_CapabilityGetOneValTriplet(pSession, nullptr, msgType, gCap, TwainType)
-			{
-				TW_CAPABILITY* pCap = GetCapabilityBuffer();
-				pCap->Cap = static_cast<TW_UINT16>(gCap);
-				pCap->ConType = TWON_ONEVALUE;
-				pCap->hContainer = nullptr;
-				m_bIsSupported = false;
-			}
+            CTL_CapabilityGetOneValTriplet(pSession, nullptr, msgType, gCap, TwainType)
+            {
+                TW_CAPABILITY* pCap = GetCapabilityBuffer();
+                pCap->Cap = static_cast<TW_UINT16>(gCap);
+                pCap->ConType = TWON_ONEVALUE;
+                pCap->hContainer = nullptr;
+                m_bIsSupported = false;
+            }
 
             TW_UINT16  Execute() override
             {
-				const TW_UINT16 rc = CTL_CapabilityGetOneValTriplet::Execute();
-				if (rc == TWRC_SUCCESS)
-				{
-					m_bIsSupported = true;
-					GetValue(nullptr);
-				}
-				return rc;
+                const TW_UINT16 rc = CTL_CapabilityGetOneValTriplet::Execute();
+                if (rc == TWRC_SUCCESS)
+                {
+                    m_bIsSupported = true;
+                    GetValue(nullptr);
+                }
+                return rc;
             }
 
             bool            IsSupported() const noexcept { return m_bIsSupported; }
@@ -61,25 +61,25 @@ namespace dynarithmic
             bool  GetValue(void* pData, size_t nWhere = 0) override {return true;}
             bool  EnumCapValues(void* pCapData) override
             {
-				const bool bRetVal = CTL_CapabilityGetOneValTriplet::EnumCapValues(pCapData);
-				if (bRetVal)
-				{
-					// dereference to a TW_ONEVALUE structure
-					pTW_ONEVALUE pValOne = static_cast<pTW_ONEVALUE>(pCapData);
-					HANDLE hStr = (HANDLE)(uintptr_t)pValOne->Item;
+                const bool bRetVal = CTL_CapabilityGetOneValTriplet::EnumCapValues(pCapData);
+                if (bRetVal)
+                {
+                    // dereference to a TW_ONEVALUE structure
+                    pTW_ONEVALUE pValOne = static_cast<pTW_ONEVALUE>(pCapData);
+                    HANDLE hStr = (HANDLE)(uintptr_t)pValOne->Item;
 
-					// Get the string 
-					LPSTR label = (LPSTR)GlobalLock(hStr);
-					if (label)
-					{
-						std::string s = label;
-						GlobalUnlock(hStr);
-					}
+                    // Get the string 
+                    LPSTR label = (LPSTR)GlobalLock(hStr);
+                    if (label)
+                    {
+                        std::string s = label;
+                        GlobalUnlock(hStr);
+                    }
 
-					if (GlobalFlags(hStr) != GMEM_INVALID_HANDLE)
-						GlobalFree(hStr);
-				}
-				return bRetVal;
+                    if (GlobalFlags(hStr) != GMEM_INVALID_HANDLE)
+                        GlobalFree(hStr);
+                }
+                return bRetVal;
             }
 
         private:
@@ -109,6 +109,6 @@ namespace dynarithmic
     };
 
     using CTL_CapabilityLabelTriplet = CTL_CapabilityLabelHelpTriplet<MSG_GETLABEL>;
-	using CTL_CapabilityHelpTriplet = CTL_CapabilityLabelHelpTriplet<MSG_GETHELP>;
+    using CTL_CapabilityHelpTriplet = CTL_CapabilityLabelHelpTriplet<MSG_GETHELP>;
 }
 #endif

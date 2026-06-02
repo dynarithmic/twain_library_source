@@ -18,11 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <boost/format.hpp>
-
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
-#include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctltr025.h"
 #ifdef _MSC_VER
@@ -135,7 +132,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source,
                                                    LPDWORD BytesWritten,
                                                    LPDWORD MemoryLength)
 {
-	LOG_FUNC_ENTRY_PARAMS((Source, Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
+    LOG_FUNC_ENTRY_PARAMS((Source, Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto& memxferInfo = pSource->GetBufferedXFerInfo();
     std::array<LPDWORD, 9> userVals = { Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength };

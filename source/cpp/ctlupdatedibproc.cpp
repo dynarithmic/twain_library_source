@@ -20,7 +20,6 @@
  */
 #include "cppfunc.h"
 #include "dtwain.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 using namespace dynarithmic;
 
@@ -37,26 +36,26 @@ DTWAIN_DIBUPDATE_PROC DLLENTRY_DEF DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DeleteDIB(HANDLE Dib)
 {
     LOG_FUNC_ENTRY_PARAMS((Dib))
-	if (!Dib)
-		LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-	UINT flags = GlobalFlags(Dib);
-	if (flags == GMEM_INVALID_HANDLE)
-		LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-	UINT lockCount = flags & GMEM_LOCKCOUNT;
-	for (UINT i = 0; i < lockCount; ++i)
+    if (!Dib)
+        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+    UINT flags = GlobalFlags(Dib);
+    if (flags == GMEM_INVALID_HANDLE)
+        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+    UINT lockCount = flags & GMEM_LOCKCOUNT;
+    for (UINT i = 0; i < lockCount; ++i)
         ImageMemoryHandler::GlobalUnlock(Dib);
     auto ret = ImageMemoryHandler::GlobalFree(Dib);
     if ( ret != NULL )
-		dynarithmic::LogWin32Error(ImageMemoryHandler::GetLastError());
-	LOG_FUNC_EXIT_NONAME_PARAMS(ret == NULL?TRUE:FALSE)
+        dynarithmic::LogWin32Error(ImageMemoryHandler::GetLastError());
+    LOG_FUNC_EXIT_NONAME_PARAMS(ret == NULL?TRUE:FALSE)
     CATCH_BLOCK(FALSE)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib)
 {
-	LOG_FUNC_ENTRY_PARAMS((Source, hNewDib))
-	auto [pHandle, pSource] = VerifyHandles(Source);
+    LOG_FUNC_ENTRY_PARAMS((Source, hNewDib))
+    auto [pHandle, pSource] = VerifyHandles(Source);
     pSource->SetUpdatedDIB(hNewDib);
-	LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
     CATCH_BLOCK(FALSE)
 }

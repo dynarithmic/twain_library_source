@@ -45,25 +45,25 @@ static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM /*w*/, L
 bool dynarithmic::CenterWindow(HWND hWnd, HWND hParent)
 {
 
-	if (!hParent)
-		hParent = GetDesktopWindow();
+    if (!hParent)
+        hParent = GetDesktopWindow();
 
-	RECT rcChild;
-	RECT rcParent;
+    RECT rcChild;
+    RECT rcParent;
 
-	GetWindowRect(hWnd, &rcChild);     // SCREEN coords
-	GetWindowRect(hParent, &rcParent); // SCREEN coords
+    GetWindowRect(hWnd, &rcChild);     // SCREEN coords
+    GetWindowRect(hParent, &rcParent); // SCREEN coords
 
-	int childW = rcChild.right - rcChild.left;
-	int childH = rcChild.bottom - rcChild.top;
+    int childW = rcChild.right - rcChild.left;
+    int childH = rcChild.bottom - rcChild.top;
 
-	int parentW = rcParent.right - rcParent.left;
-	int parentH = rcParent.bottom - rcParent.top;
+    int parentW = rcParent.right - rcParent.left;
+    int parentH = rcParent.bottom - rcParent.top;
 
-	int x = rcParent.left + (parentW - childW) / 2;
-	int y = rcParent.top + (parentH - childH) / 2;
+    int x = rcParent.left + (parentW - childW) / 2;
+    int y = rcParent.top + (parentH - childH) / 2;
 
-	SetWindowPos(hWnd,NULL,x,y,0,0,SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+    SetWindowPos(hWnd,NULL,x,y,0,0,SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
     return true;
 }
 
@@ -78,7 +78,7 @@ static HMONITOR GetPreferredMonitor(HWND hDialog, int options)
         }
     }
 
-	return MonitorFromWindow(hDialog,MONITOR_DEFAULTTONEAREST);
+    return MonitorFromWindow(hDialog,MONITOR_DEFAULTTONEAREST);
 }
 
 static void CenterWindowOnMonitor(HWND hWnd, HMONITOR hMonitor)
@@ -105,8 +105,8 @@ static void CenterWindowOnMonitor(HWND hWnd, HMONITOR hMonitor)
 
 void dynarithmic::CenterWindowSmart(HWND hWnd, int options)
 {
-	HMONITOR hMonitor = GetPreferredMonitor(hWnd, options);
-	CenterWindowOnMonitor(hWnd, hMonitor);
+    HMONITOR hMonitor = GetPreferredMonitor(hWnd, options);
+    CenterWindowOnMonitor(hWnd, hMonitor);
 }
 
 ////////// Function to subclass the window ////////////////////////
@@ -270,7 +270,7 @@ std::string dynarithmic::LogWin32Error(DWORD lastError)
             break;
     }
     StringStreamA strm;
-    strm << boost::format("Win32 Error: %1% (%2%)") % lastError % sError;
+    strm << "Win32 Error: " << lastError << " (" << sError << ")";
     LogWriterUtils::WriteLogInfoIndentedA(strm.str());
 
     // Free the buffer.
@@ -359,8 +359,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomFileSave(OPENFILENAME* lpOpenFileName)
     // See if DLL Handle exists
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 
-	pHandle->m_pofn = std::make_unique<OPENFILENAME>();
-	memcpy(pHandle->m_pofn.get(), lpOpenFileName, sizeof(OPENFILENAME));
+    pHandle->m_pofn = std::make_unique<OPENFILENAME>();
+    memcpy(pHandle->m_pofn.get(), lpOpenFileName, sizeof(OPENFILENAME));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

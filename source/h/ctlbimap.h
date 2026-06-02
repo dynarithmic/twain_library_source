@@ -26,81 +26,81 @@
 
 namespace dynarithmic
 {
-	template<typename Left, typename Right>
-	class BidirectionMap
-	{
-	public:
-		using left_type = Left;
-		using right_type = Right;
+    template<typename Left, typename Right>
+    class BidirectionMap
+    {
+    public:
+        using left_type = Left;
+        using right_type = Right;
 
-		bool Insert(const Left& l, const Right& r)
-		{
-			if (left_to_right.count(l) || right_to_left.count(r))
-				return false;
+        bool Insert(const Left& l, const Right& r)
+        {
+            if (left_to_right.count(l) || right_to_left.count(r))
+                return false;
 
-			left_to_right[l] = r;
-			right_to_left[r] = l;
-			return true;
-		}
+            left_to_right[l] = r;
+            right_to_left[r] = l;
+            return true;
+        }
 
-		bool EraseLeft(const Left& l)
-		{
-			auto it = left_to_right.find(l);
-			if (it == left_to_right.end())
-				return false;
+        bool EraseLeft(const Left& l)
+        {
+            auto it = left_to_right.find(l);
+            if (it == left_to_right.end())
+                return false;
 
-			right_to_left.erase(it->second);
-			left_to_right.erase(it);
-			return true;
-		}
+            right_to_left.erase(it->second);
+            left_to_right.erase(it);
+            return true;
+        }
 
-		bool EraseRight(const Right& r)
-		{
-			auto it = right_to_left.find(r);
-			if (it == right_to_left.end())
-				return false;
+        bool EraseRight(const Right& r)
+        {
+            auto it = right_to_left.find(r);
+            if (it == right_to_left.end())
+                return false;
 
-			left_to_right.erase(it->second);
-			right_to_left.erase(it);
-			return true;
-		}
+            left_to_right.erase(it->second);
+            right_to_left.erase(it);
+            return true;
+        }
 
-		const Right& AtLeft(const Left& l) const
-		{
-			return left_to_right.at(l);
-		}
+        const Right& AtLeft(const Left& l) const
+        {
+            return left_to_right.at(l);
+        }
 
-		const Left& AtRight(const Right& r) const
-		{
-			return right_to_left.at(r);
-		}
+        const Left& AtRight(const Right& r) const
+        {
+            return right_to_left.at(r);
+        }
 
-		bool ContainsLeft(const Left& l) const
-		{
-			return left_to_right.count(l) != 0;
-		}
+        bool ContainsLeft(const Left& l) const
+        {
+            return left_to_right.count(l) != 0;
+        }
 
-		bool ContainsRight(const Right& r) const
-		{
-			return right_to_left.count(r) != 0;
-		}
+        bool ContainsRight(const Right& r) const
+        {
+            return right_to_left.count(r) != 0;
+        }
 
-		void Clear()
-		{
-			left_to_right.clear();
-			right_to_left.clear();
-		}
+        void Clear()
+        {
+            left_to_right.clear();
+            right_to_left.clear();
+        }
 
-		std::size_t Size() const
-		{
-			return left_to_right.size();
-		}
+        std::size_t Size() const
+        {
+            return left_to_right.size();
+        }
 
-		const auto& GetRightToLeftMap() const { return right_to_left; }
-		const auto& GetLeftToRightMap() const { return left_to_right; }
-	private:
-		std::map<Left, Right> left_to_right;
-		std::map<Right, Left> right_to_left;
-	};
+        const auto& GetRightToLeftMap() const { return right_to_left; }
+        const auto& GetLeftToRightMap() const { return left_to_right; }
+    private:
+        std::map<Left, Right> left_to_right;
+        std::map<Right, Left> right_to_left;
+    };
 }
 #endif

@@ -25,30 +25,30 @@ static const char kBase64Table[] =
 
 int Base64Encode(const uint8_t* inData, std::string& out, size_t len)
 {
-	out.clear();
-	out.reserve(((len + 2) / 3) * 4);
+    out.clear();
+    out.reserve(((len + 2) / 3) * 4);
 
-	for (size_t i = 0; i < len; i += 3)
-	{
-		uint32_t n = inData[i] << 16;
-		if (i + 1 < len) 
-			n |= inData[i + 1] << 8;
-		if (i + 2 < len) 
-			n |= inData[i + 2];
+    for (size_t i = 0; i < len; i += 3)
+    {
+        uint32_t n = inData[i] << 16;
+        if (i + 1 < len) 
+            n |= inData[i + 1] << 8;
+        if (i + 2 < len) 
+            n |= inData[i + 2];
 
-		out.push_back(kBase64Table[(n >> 18) & 63]);
-		out.push_back(kBase64Table[(n >> 12) & 63]);
+        out.push_back(kBase64Table[(n >> 18) & 63]);
+        out.push_back(kBase64Table[(n >> 12) & 63]);
 
-		if (i + 1 < len)
-			out.push_back(kBase64Table[(n >> 6) & 63]);
-		else
-			out.push_back('=');
+        if (i + 1 < len)
+            out.push_back(kBase64Table[(n >> 6) & 63]);
+        else
+            out.push_back('=');
 
-		if (i + 2 < len)
-			out.push_back(kBase64Table[n & 63]);
-		else
-			out.push_back('=');
-	}
+        if (i + 2 < len)
+            out.push_back(kBase64Table[n & 63]);
+        else
+            out.push_back('=');
+    }
 
-	return out.size();
+    return out.size();
 }

@@ -24,6 +24,9 @@ OF THIRD PARTY RIGHTS.
 #include <memory>
 #include <cstdio>
 #include <cstdint>
+#include <string>
+#include <optional>
+#include <vector>
 #include "imagefilewriterbase.h"
 #include "dibutil.h"
 
@@ -39,30 +42,30 @@ OF THIRD PARTY RIGHTS.
 
 enum class PnmPixelFlavor
 {
-	BW1,
-	Gray8,
-	Gray16,
-	Bgr24,
-	Bgra32
+    BW1,
+    Gray8,
+    Gray16,
+    Bgr24,
+    Bgra32
 };
 
 struct PreparedPnmDibPage
 {
-	uint32_t width = 0;
-	uint32_t height = 0;
-	uint16_t bitsPerPixel = 0;
-	uint32_t strideBytes = 0;
-	bool bottomUp = true;
+    uint32_t width = 0;
+    uint32_t height = 0;
+    uint16_t bitsPerPixel = 0;
+    uint32_t strideBytes = 0;
+    bool bottomUp = true;
 
-	PnmPixelFlavor pixelFlavor = PnmPixelFlavor::Gray8;
-	const uint8_t* bits = nullptr;
+    PnmPixelFlavor pixelFlavor = PnmPixelFlavor::Gray8;
+    const uint8_t* bits = nullptr;
 };
 
 struct PnmSessionOptions
 {
-	bool useRaw = true;
-	bool fixBilevelPolarity = true;
-	std::string comment;
+    bool useRaw = true;
+    bool fixBilevelPolarity = true;
+    std::string comment;
 };
 
 // ============================================================
@@ -71,48 +74,48 @@ struct PnmSessionOptions
 
 class PnmSessionWriter
 {
-	public:
-		PnmSessionWriter() = default;
-		~PnmSessionWriter();
-		PnmSessionWriter(const PnmSessionWriter&) = delete;
-		PnmSessionWriter& operator=(const PnmSessionWriter&) = delete;
-		bool Open(const std::wstring& filename, const PnmSessionOptions& options);
-		bool SetPageInfo(const PreparedPnmDibPage& page);
-		bool WriteCurrentPage();
-		void Close();
-		bool IsOpen() const noexcept;
-		static std::optional<PreparedPnmDibPage> MakePreparedPnmDibPage(const dynarithmic::DibPageView& view);
+    public:
+        PnmSessionWriter() = default;
+        ~PnmSessionWriter();
+        PnmSessionWriter(const PnmSessionWriter&) = delete;
+        PnmSessionWriter& operator=(const PnmSessionWriter&) = delete;
+        bool Open(const std::wstring& filename, const PnmSessionOptions& options);
+        bool SetPageInfo(const PreparedPnmDibPage& page);
+        bool WriteCurrentPage();
+        void Close();
+        bool IsOpen() const noexcept;
+        static std::optional<PreparedPnmDibPage> MakePreparedPnmDibPage(const dynarithmic::DibPageView& view);
 
-	private:
-		static bool ValidatePage(const PreparedPnmDibPage& page);
-		static uint8_t ReverseBits(uint8_t v);
-		const char* Magic() const;
-		uint32_t MaxValue() const;
-		bool WriteHeader();
-		bool WritePixels();
-		const uint8_t* GetSourceRow(uint32_t y) const;
-		bool WritePbmPlain();
-		bool WritePbmRaw();
-		bool WriteGray8Plain();
-		bool WriteGray8Raw();
-		bool WriteGray16Plain();
-		bool WriteGray16Raw();
-		bool WriteRgb24Plain();
-		bool WriteRgb24Raw();
-		bool WriteRgba32AsRgbPlain();
-		bool WriteRgba32AsRgbRaw();
-		bool WriteCommentLines(const std::string& text);
+    private:
+        static bool ValidatePage(const PreparedPnmDibPage& page);
+        static uint8_t ReverseBits(uint8_t v);
+        const char* Magic() const;
+        uint32_t MaxValue() const;
+        bool WriteHeader();
+        bool WritePixels();
+        const uint8_t* GetSourceRow(uint32_t y) const;
+        bool WritePbmPlain();
+        bool WritePbmRaw();
+        bool WriteGray8Plain();
+        bool WriteGray8Raw();
+        bool WriteGray16Plain();
+        bool WriteGray16Raw();
+        bool WriteRgb24Plain();
+        bool WriteRgb24Raw();
+        bool WriteRgba32AsRgbPlain();
+        bool WriteRgba32AsRgbRaw();
+        bool WriteCommentLines(const std::string& text);
 
-	private:
-		FILE* file_ = nullptr;
-		std::wstring filename_;
-		PnmSessionOptions options_{};
+    private:
+        FILE* file_ = nullptr;
+        std::wstring filename_;
+        PnmSessionOptions options_{};
 
-		PreparedPnmDibPage currentPage_{};
-		bool hasCurrentPage_ = false;
+        PreparedPnmDibPage currentPage_{};
+        bool hasCurrentPage_ = false;
 
-		std::vector<uint8_t> rowBuffer_;
-		std::vector<uint8_t> packedRow_;
+        std::vector<uint8_t> rowBuffer_;
+        std::vector<uint8_t> packedRow_;
 };
 
 // ============================================================
@@ -122,13 +125,13 @@ class PnmSessionWriter
 // ============================================================
 class DTWAINPnmOutput
 {
-	public:
-		bool OnFirstPage(const std::wstring& filename, const PnmSessionOptions& options, const PreparedPnmDibPage& page);
-		bool OnLastPage();
-		bool IsOpen() const noexcept;
+    public:
+        bool OnFirstPage(const std::wstring& filename, const PnmSessionOptions& options, const PreparedPnmDibPage& page);
+        bool OnLastPage();
+        bool IsOpen() const noexcept;
 
-	private:
-		std::unique_ptr<PnmSessionWriter> writer_;
+    private:
+        std::unique_ptr<PnmSessionWriter> writer_;
 };
 
 #endif

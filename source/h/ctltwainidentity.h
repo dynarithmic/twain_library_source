@@ -27,6 +27,7 @@
 #include <sstream>
 #include <numeric>
 #include <string_view>
+#include <windows.h>
 #include "twain.h"
 
 namespace dynarithmic

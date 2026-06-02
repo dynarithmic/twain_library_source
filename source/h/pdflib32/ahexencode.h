@@ -18,21 +18,11 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
-#ifndef DTWAIN_CONFIG_H
-#define DTWAIN_CONFIG_H
+#ifndef AHEXENCODE_H
+#define AHEXENCODE_H
 
-/* Build with DTWAIN logging of call stack */
-#define DTWAIN_BUILD_LOGCALLSTACK 1 
-
-/* Build without DTWAIN logging pointer values on return of functions. 
-   Note that DTWAIN_BUILD_LOGCALLSTACK must be 1 for this to take effect */
-#define DTWAIN_BUILD_LOGPOINTERS 1
-
-/* Define whether the DLL or static version of the CRT runtime will be used */
-#if defined(_DLL)
-    #define DTWAIN_BUILD_NEEDVCRUNTIME 1
-#else
-    #define DTWAIN_BUILD_NEEDVCRUNTIME 0
-#endif
+#include <string>
+#include <string_view>
+int ASCIIHexEncode(std::string_view inData, std::string& outData);
 
 #endif

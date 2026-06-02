@@ -23,76 +23,78 @@ OF THIRD PARTY RIGHTS.
 
 #include <string>
 #include <memory>
+#include <optional>
+#include <vector>
 #include <windows.h>
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 
 enum class MetafileType
 {
-	Emf,
-	Wmf
+    Emf,
+    Wmf
 };
 
 struct MetafileSessionOptions
 {
-	MetafileType type = MetafileType::Emf;
+    MetafileType type = MetafileType::Emf;
 
-	// Logical output size in .01 mm for EMF frame.
-	// If zero, calculated from DIB DPI.
-	int frameWidth01mm = 0;
-	int frameHeight01mm = 0;
+    // Logical output size in .01 mm for EMF frame.
+    // If zero, calculated from DIB DPI.
+    int frameWidth01mm = 0;
+    int frameHeight01mm = 0;
 
-	// WMF mapping target in twips-like logical units.
-	int wmfWidth = 0;
-	int wmfHeight = 0;
+    // WMF mapping target in twips-like logical units.
+    int wmfWidth = 0;
+    int wmfHeight = 0;
 
-	std::wstring description;
+    std::wstring description;
 };
 
 struct PreparedMetafileDibPage
 {
-	const BITMAPINFOHEADER* bih = nullptr;
-	const void* bits = nullptr;
-	uint32_t width = 0;
-	uint32_t height = 0;
-	uint16_t bpp = 0;
-	bool bottomUp = true;
-	double xDpi = 300.0;
-	double yDpi = 300.0;
+    const BITMAPINFOHEADER* bih = nullptr;
+    const void* bits = nullptr;
+    uint32_t width = 0;
+    uint32_t height = 0;
+    uint16_t bpp = 0;
+    bool bottomUp = true;
+    double xDpi = 300.0;
+    double yDpi = 300.0;
 };
 
 class MetafileSessionWriter
 {
-	public:
-		bool Open(const std::wstring& filename, const MetafileSessionOptions& options);
-		bool WritePage(const PreparedMetafileDibPage& page);
-		bool Close();
-		static std::optional<PreparedMetafileDibPage> MakePreparedMetafileDibPage(const dynarithmic::DibPageView& view);
+    public:
+        bool Open(const std::wstring& filename, const MetafileSessionOptions& options);
+        bool WritePage(const PreparedMetafileDibPage& page);
+        bool Close();
+        static std::optional<PreparedMetafileDibPage> MakePreparedMetafileDibPage(const dynarithmic::DibPageView& view);
 
-	private:
-		static int To01mm(double pixels, double dpi);
-		bool WriteEmf(const PreparedMetafileDibPage& page);
-		bool WriteWmfViaEmf(const PreparedMetafileDibPage& page);
-		bool WritePlaceableWmfFile(const std::wstring& filename, const PreparedMetafileDibPage& page,
-			                       const std::vector<BYTE>& wmfBits);
-		HENHMETAFILE CreateRasterEmfInMemory(const PreparedMetafileDibPage& page);
+    private:
+        static int To01mm(double pixels, double dpi);
+        bool WriteEmf(const PreparedMetafileDibPage& page);
+        bool WriteWmfViaEmf(const PreparedMetafileDibPage& page);
+        bool WritePlaceableWmfFile(const std::wstring& filename, const PreparedMetafileDibPage& page,
+                                   const std::vector<BYTE>& wmfBits);
+        HENHMETAFILE CreateRasterEmfInMemory(const PreparedMetafileDibPage& page);
 
 
-	private:
-		std::wstring filename_;
-		MetafileSessionOptions options_{};
-		bool isOpen_ = false;
-		bool wrotePage_ = false;
+    private:
+        std::wstring filename_;
+        MetafileSessionOptions options_{};
+        bool isOpen_ = false;
+        bool wrotePage_ = false;
 };
 
 class DTWAINMetafileOutput
 {
-	public:
-		bool OnFirstPage(const std::wstring& filename, const MetafileSessionOptions& options, const PreparedMetafileDibPage& page);
-		bool OnLastPage();
+    public:
+        bool OnFirstPage(const std::wstring& filename, const MetafileSessionOptions& options, const PreparedMetafileDibPage& page);
+        bool OnLastPage();
 
-	private:
-		std::unique_ptr<MetafileSessionWriter> writer_;
+    private:
+        std::unique_ptr<MetafileSessionWriter> writer_;
 };
 
 #endif

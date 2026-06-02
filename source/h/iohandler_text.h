@@ -25,25 +25,25 @@ OF THIRD PARTY RIGHTS.
 
 namespace dynarithmic
 {
-	class OCREngine;
+    class OCREngine;
 
-	class CTL_TextIOHandler : public CTL_ImageIOHandler
-	{
-		public:
-			CTL_TextIOHandler(CTL_TwainDib* pDib, int nInputFormat, DTWAINImageInfoEx ImageInfoEx,
-				OCREngine* pEngine);
-			int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
-			~CTL_TextIOHandler() override = default;
+    class CTL_TextIOHandler : public CTL_ImageIOHandler
+    {
+        public:
+            CTL_TextIOHandler(CTL_TwainDib* pDib, int nInputFormat, DTWAINImageInfoEx ImageInfoEx,
+                OCREngine* pEngine);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+            ~CTL_TextIOHandler() override = default;
 
-			void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
-			{
-				m_ImageInfoEx = ImageInfo;
-			}
+            void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
+            {
+                m_ImageInfoEx = ImageInfo;
+            }
 
-		private:
-			int m_nInputFormat;
-			DTWAINImageInfoEx m_ImageInfoEx;
-			OCREngine* m_pOCREngine;
-	};
+        private:
+            int m_nInputFormat;
+            DTWAINImageInfoEx m_ImageInfoEx;
+            OCREngine* m_pOCREngine;
+    };
 }
 #endif

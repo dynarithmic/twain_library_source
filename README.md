@@ -1,19 +1,32 @@
-# twain_library_source
-Dynarithmic TWAIN library source and development repository.
+# Dynarithmic TWAIN Library Source Code
 
 This repository contains the source code and development versions of the Dynarithmic TWAIN Library DLL (DTWAIN).  
 
+The DTWAIN library is written in C++ (using language standard C++ 17) with a few modules written in C (mostly the third-party imaging libraries are written in C).
+
 ----
-##### [Obtaining the latest development binaries](#obtain-dev-libraries)
-##### [Rebuilding DTWAIN from source](#rebuild-source)
-##### [Starting Visual Studio](#visual-studio-details)
-##### [Building the Demo Programs](#build-demo)  
-##### [Contributing updates](#contribute-updates)
-##### [Source Code Analysis Tools used](#tools-we-use)
+# Table of Contents
+1. [Obtaining the latest development binaries](#obtain-dev-libraries)
+2. [Building DTWAIN from source](#rebuild-source)
+    * [Requirements](#rebuild-requirements)
+    * [Disk space requirements](#rebuild-disk-space)
+    * [Visual Studio requirements](#rebuild-vs-requirements)
+    * [Build Configurations](#build-configurations)
+    * [Build Using Batch Files](#build-using-batchfiles)
+        * [Building all configurations of DTWAIN using a single batch file](#build-all)
+        * [Boost Library Configuration](#boost-library-configuration)
+            * [Automatic Boost Download](#download-boost)
+            * [Use Existing Boost Installation](#use-existing-boost)
+    * [Advanced Usage — CMake Command Line](#advanced-cmake)
+    * [Using CMake-GUI](#cmake-gui)
+    * [Notes for existing users](#notes-existing-users)
+3. [Building the Demo Programs](#build-demo)  
+4. [Contributing updates](#contribute-updates)
+5. [Source Code Analysis Tools used](#tools-we-use)
 
 ----
 
-### <a name="obtain-dev-libraries"></a> Obtaining the latest development binaries ###
+## <a name="obtain-dev-libraries"></a> Obtaining the latest development binaries ###
 
 To obtain the latest development binaries (DLL's, PDB files, import libraries, etc.):<br>
 For 32-bit: 
@@ -27,132 +40,356 @@ The development binaries are built from the latest source code found in the [dev
 
 1) To run DTWAIN using the development libraries will also require you to use the [text resources](https://github.com/dynarithmic/twain_library_source/tree/development/source/txt) found in the development branch, and not the text resources found in the main branch.  
 
-2) The code found in the main branch reflects the current release version of DTWAIN.<br> If you want to debug the current release version of DTWAIN, the code in the main branch is the code you should retrieve.  
+2) The code found in the [main branch](https://github.com/dynarithmic/twain_library_source/tree/main) reflects the current release version of DTWAIN.<br> If you want to debug the current release version of DTWAIN, the code in the main branch is the code you should retrieve.  
 
 3) Please note that whenever new code is pushed to the development branch, new development binaries will also be created.  
 
 ----
 
-### <a name="rebuild-source"></a> Rebuilding the Dynarithmic TWAIN Library from source ###
+## <a name="rebuild-source"></a> Building the Dynarithmic TWAIN Library from Source
 
-**Please note -- these build steps only supports Visual Studio 2019 and above.**
+Beginning with **DTWAIN 5.9.1**, rebuilding DTWAIN from source has transitioned from pre-generated Visual Studio solution files to a **CMake-based build system**.
 
-The DTWAIN libraries are written in C++, and the minimum C++ standard is **C++17**.
+Previous DTWAIN versions distributed Visual Studio project and solution files directly. These have been replaced with generated solutions created using CMake.
 
-If you want to rebuild the libraries, you will need the following tools and computer resources:
+This change allows:
 
-* One of the following development environments:
+* Support for multiple Visual Studio versions from a single build system
+* Automated [Boost C++ library](http://www.boost.org) setup (optional)
+* Separate build directories for 32-bit and 64-bit builds
+* Easier customization of Unicode / ANSI builds
+* Configurable runtime (CRT / No CRT)
+* Cleaner long-term maintenance of the build system
 
-      Visual Studio 2019 (Community or Professional) with Platform Toolset v142 installed.
-      Visual Studio 2022 or 2026 (Community or Professional) with Platform Toolset v142 or greater installed.
-      
-In addition, you will need 
+Users who only consume the prebuilt DTWAIN binaries are unaffected.
 
-1) At least 20 GB of free disk space.
-2) An installation of the [Boost](http://www.boost.org/) library (version 1.89 or above).  I recommend getting the pre-built Boost libraries found at [SourceForge](https://sourceforge.net/projects/boost/files/boost-binaries/).  When installed, you will get the boost **include** files, plus the library files.  Please download the version of boost that fits your compiler.  
+---
 
-```plaintext
-For Visual Studio 2019, 2022, or 2026 (using platform toolset v142) -- Download files with "14.2" in the file name.
-For Visual Studio 2022 or greater (using platform toolset v143 or greater) -- Download files with "14.3" in the file name.
-```
+## <a name="rebuild-requirements"></a> Requirements
 
-3) An installation of the [7-Zip](https://www.7-zip.org/) archiving utility.
-4) An installation of the [DirHash](https://idrassi.github.io/DirHash/) utility to compute the hash value of the resulting output files.
-5) The following environment variables must be set before compilation (these variables must be set before starting the Visual Studio IDE):
+Before rebuilding DTWAIN from source:
 
-*    BOOST_INCLUDE_DIR
-*    ZIP7_UTIL_CMD
-*    DIRHASH_UTIL_CMD
+#### Required
 
-The following environment variables should be set, depending on the platform toolset being used when building DTWAIN using Visual Studio:
+* Visual Studio 2019 or later (see below for the exact Visual Studio requirements)
+* [CMake 3.25 or later (including CMake 4.x)](https://cmake.org/download/).  
+   *  Note: For Visual Studio 2026, CMake 4.2 or later is required.
+#### Optional
 
-*    BOOST_LIBRARY_DIR_V142_32 -- (required: Visual Studio 2019 and Visual Studio 2022, 2026 using Platform Toolset v142)
-*    BOOST_LIBRARY_DIR_V142_64 -- (required: Visual Studio 2019 and Visual Studio 2022, 2026 using Platform Toolset v142)   
-*    BOOST_LIBRARY_DIR_V143_32 -- (required: Visual Studio 2022, 2026, Platform Toolset v143)
-*    BOOST_LIBRARY_DIR_V143_64 -- (required: Visual Studio 2022, 2026, Platform Toolset v143)   
+* Existing Boost library installation (version 1.89 or greater)
 
-#### Definition of environment variables:
+or
 
-* The **BOOST_INCLUDE_DIR** should point to your boost installation folder that points to the base of the boost C++ header files.  This is usually **C:\boost_install_directory**, where this folder contains a subsequent **Boost** folder, containing the **Boost** header files.  For example:
+* Enable automatic Boost library download during configuration
 
-```plaintext
-SET BOOST_INCLUDE_DIR=C:\boost_installation\boost
-```
+#### <a name="rebuild-disk-space"></a>Disk Space Requirements
 
-* The environment variables named **BOOST_LIBRARY_DIR_xxxx_32**, where **xxxx** is the platform toolset you are using to build DTWAIN with, is the directory where the 32-bit boost libraries are installed.  These libraries would be named similar to **libboost_xxxxxxxx-vcyyy-zzzz-x32.lib**.  
+Building DTWAIN from source requires additional disk space for generated build files, intermediate objects, debug symbols, and optional Boost installation.
 
-For example, the following will set the boost environment variable to allow the usage of the 32-bit version of Boost for the v142 platform toolset:
+Recommended minimum free space:
 
-```plaintext
-SET BOOST_LIBRARY_DIR_V142_32=C:\boost_installation\lib32-msvc-14.2
-```
+- ~10 GB free for building a single compiler / architecture configuration with automatic Boost installation enabled
+- Additional space may be required when building multiple configurations simultaneously
 
-The environment variables named **BOOST_LIBRARY_DIR_xxxx_64**, where **xxxx** is the compiler you are using to build with, is the directory where the 64-bit boost libraries are installed.  These libraries would be named similar to **libboost_xxxxxxxx-vcyyy-zzzz-x64.lib**.  For example, the following will set the boost environment variable to allow the usage of the 64-bit version of Boost for the v142 platform toolset:
+Examples of increased usage:
 
-```plaintext
-SET BOOST_LIBRARY_DIR_V142_64=C:\boost_installation\lib64-msvc-14.2
-```
-
-If the **BOOST_LIBRARY_DIR_xxxx_32** or **BOOST_LIBRARY_DIR_xxxx_64** environment variables are not set or are set incorrectly, the final build of DTWAIN will not link, with the error message stating that the linker could not find the **libboost...** libraries.
+- Building Debug and MinSizeRel
+- Installing Boost automatically
+- Building both x86 and x64 variants
+- Building multiple Visual Studio versions
 
 ----
-* The **ZIP7_UTIL_CMD** is the full path name of the executable file **7z.exe** of the **7-Zip** archiving utility.  For example:
 
-```plaintext
-SET ZIP7_UTIL_CMD=C:\7-Zip\7z.exe
-```
-----
-* The **DIRHASH_UTIL_CMD** is the full path name of the executable file **DirHash.exe** of the **DirHash** hash value computing utility.  For example:
+#### <a name="rebuild-vs-requirements"></a>Visual Studio Requirements
 
-```plaintext
-SET DIRHASH_UTIL_CMD=C:\DirHash\DirHash.exe
-```
+Building DTWAIN from source requires a Visual Studio installation with C/C++ development tools.
 
-If the environment variable is not set, the library files will be built, but the hash code computation of the output files will fail to execute.  
+#### Installing Visual Studio
 
-The final hashes of the files are stored as text in the **binaries\32bit** and **binaries\64bit** folders (the names of the files will look something like **xxxxxxhash.txt**).
+If Visual Studio is not already installed:
 
----- 
-### <a name="visual-studio-details"></a>Starting Visual Studio ###
+Visual Studio Community (free):
+https://visualstudio.microsoft.com/vs/community/
 
-* Start the Microsoft Visual Studio, and open the DTWAIN solution file found in the [source](https://github.com/dynarithmic/twain_library_source/tree/master/source) directory named **dtwain_5_x_vs2019.sln**.
+Install Visual Studio 2019 or later.
 
-When you load the solution and project files in the Visual Studio IDE, you may be prompted to upgrade the platform toolset from v142 to the latest version that is supported by the particular Visual Studio compiler you are using.  You can choose to leave the platform toolset as-is, or decide to upgrade to the latest one.  However the platform toolset must be at least v142, and your current installation must have this toolset installed for your compiler.
+During installation, ensure that the following workload is selected:
 
-Please note that the version of the Boost library that will be used at link time must match the platform toolset that DTWAIN was built with.  
+Required workload:
+- Desktop development with C++
 
-* The next step is to check the **dtwain_config.h**.  This header file has the following entries:
+Required components:
+- MSVC C++ compiler:
+  * MSVC v142 (Visual Studio 2019) or 
+  * MSVC v143 (Visual Studio 2022) or 
+  * MSVC v145 (Visual Studio 2026)
+- Windows 10 SDK or Windows 11 SDK
+- C++ CMake tools for Windows
 
-```cpp
-#define DTWAIN_BUILD_LOGCALLSTACK 1 
-#define DTWAIN_BUILD_LOGPOINTERS 1
-```
-The **DTWAIN_BUILD_LOGCALLSTACK** denotes whether the libraries will be built with full call stack logging enabled.  If this value is **1**, then the libraries will be built with call stack logging.  Otherwise if the value is **0**, no call stack logging will be built.  
+The default Visual Studio installation may not include C/C++ support.  Thus you must ensure that the C/C++ support defined above has been selected during installation of Visual Studio.
 
-The **DTWAIN_BUILD_LOGPOINTERS** denotes whether the libraries will be built with the logging of any pointer values on return of a DTWAIN function that have output pointers as parameters.  As with **DTWAIN_BUILD_LOGCALLSTACK**, the values of **0** or **1** denote whether this option will be built into the DTWAIN DLL's.  Note that **DTWAIN_BUILD_CALLSTACK** must be **1** for **DTWAIN_BUILD_LOGPOINTERS** to take effect.
+Optional:
 
-* A full rebuild of all the configurations available is recommended.  Use the "Build -> Batch Build..." option in the Visual Studio IDE and check all of the configurations to build everything (take a coffee break -- this could take a while).  This will create a "binaries" directory that will contain the following DLLs:
+- Git for Windows
+- C++ AddressSanitizer (developer use)
 
-        32bit/dtwain32.dll   - 32-bit ANSI (MBCS) DLL
-        32bit/dtwain32u.dll  - 32-bit Unicode DLL
-        32bit/dtwain32d.dll  - 32-bit Debug ANSI (MBCS) DLL
-        32bit/dtwain32ud.dll - 32-bit Debug Unicode DLL
-        64bit/dtwain64.dll   - 64-bit ANSI (MBCS) DLL
-        64bit/dtwain64u.dll  - 64-bit Unicode DLL
-        64bit/dtwain64d.dll  - 64-bit Debug ANSI (MBCS) DLL
-        64bit/dtwain64ud.dll - 64-bit Debug Unicode DLL
-
-* Note -- the resulting "*.lib* files that reside in these directories are import libraries compatible with the Visual Studio toolset.  Other compilers will require converting these .lib files to your compiler's import library format, or you can use the [LoadLibrary / GetProcAddress approach](https://github.com/dynarithmic/twain_library?tab=readme-ov-file#what-if-i-dont-have-visual-c-as-the-compiler-to-use-when-building-an-application--the-visual-c-import-libraries-will-not-work-for-me--i-use-embarcaderogclangmingw-fill-in-with-your-favorite-compiler-or-ide--so-how-do-i-use-the-library) to remove the need for import libraries.
-
-* If the IMPLIB.EXE program from Embarcadero is available on the path, it will be called to create Embarcadero C++ compatible import libraries for the 32-bit DLL's.  The names of the Embarcadero import libraries will have a **_embarcadero** appended to the library name.
-
-* When all the configurations are built, there should be multiple DTWDEMO*.exe programs residing in the **binaries** subdirectory, where the suffix used in the program name matches the DTWAIN DLL that will be loaded.  For example, DTWDEMO32U.exe will load the dtwain32u.dll library when run. The easiest way to get started is to debug DTWDEMO.EXE and single step through the program using the debugger to get a feel of the flow of the program.  You should get a good idea of how DTWAIN works if you step into one or more of the DTWAIN functions (such as DTWAIN_SysInitialize or DTWAIN_SelectSource).
+If CMake configuration reports that no suitable compiler is found, re-run the Visual Studio Installer and add the C++ workload.
 
 ----
-### <a name="build-demo"></a> Building the demo applications
+
+#### <a name="build-configurations"></a>Build Configurations
+
+DTWAIN supports the following release build variants:
+
+| Architecture | Character Set | Runtime |
+| ------------ | ------------- | ------- |
+| x86          | ANSI          | CRT     |
+| x86          | ANSI          | No CRT  |
+| x86          | Unicode       | CRT     |
+| x86          | Unicode       | No CRT  |
+| x64          | ANSI          | CRT     |
+| x64          | ANSI          | No CRT  |
+| x64          | Unicode       | CRT     |
+| x64          | Unicode       | No CRT  |
+
+Debug builds are generated separately and are intended primarily for developers debugging DTWAIN internals.
+
+---
+
+### <a name="build-using-batchfiles"></a>Build Using Batch Files (Recommended)
+
+The repository contains batch files which act as wrappers around CMake presets.
+
+By default, running the batch file will create two directories, **MinSizeRel** and **Debug**, within the output folder of the build (the name of the output folder will match the name of the batch file that was used to compile the source code.)  
+
+After a successful build, the **MinSizeRel** directory will contain the release, non-debug versions of the DLL's, PDB files and import libraries that have been built.  The **Debug** directory will contain the debug version of the DLL's, PDB files and import libraries.
+
+----
+
+Each batch file configures and builds a specific DTWAIN configuration (Visual Studio version, architecture, Unicode/ANSI, CRT/No CRT).
+
+Examples:
+
+```text
+build_vs2019_x64_crt_unicode.bat
+build_vs2022_x32_nocrt_ansi.bat
+````
+
+Running a batch file performs the following steps:
+
+1. Configure CMake using a preset
+2. Generate Visual Studio solution files
+3. Locate or install Boost (if enabled)
+4. Build DTWAIN
+5. Build DTWDEMO
+
+Example:
+
+```bat
+build_vs2022_x64_crt_unicode.bat
+```
+
+Generated output appears under the build directory associated with the selected preset.
+
+Example:
+
+```text
+build-vs2022-x64-crt_unicode\
+```
+
+Successful builds generate:
+
+```text
+MinSizeRel\
+Debug\
+```
+
+containing DLLs, import libraries, PDB files, and demo programs.
+
+----
+### <a name="build-all"></a> Building all configurations of DTWAIN using a single batch file
+
+To build [all configurations](#build-configurations) of the DTWAIN DLL's using a single batch file, the following batch files can be used:
+
+* To build all configurations using Visual Studio 2019: `compile_all_vs2019.bat`
+* To build all configurations using Visual Studio 2022: `compile_all_vs2022.bat`
+* To build all configurations using Visual Studio 2026: `compile_all_vs2026.bat`
+
+Running one (or more) of the batch files will compile all the configurations of DTWAIN (x86/x64, ANSI/Unicode, CRT/NoCRT).
+
+----
+
+### <a name="boost-library-configuration"></a> Boost Library Configuration
+When building the source code, you have an option of automatically downloading the Boost Library components, or use an existing Boost library installation.
+
+The default tested Boost version used by the CMake presets is `1.91.0`. 
+
+Advanced users may change `DTWAIN_BOOST_VERSION` in `CMakePresets.json`, provided the matching Boost binary package exists for their Visual Studio compiler.  For example:
+
+`"DTWAIN_BOOST_VERSION" : "1.90.0"`
+
+Please note that the minimum version of Boost that can be used to build DTWAIN is **1.89.0**.  Using a version earlier than 1.89.0 will result in compilation errors.
+
+----
+#### <a name="download-boost"></a> Automatic Boost Download
+
+To automatically download and install Boost:
+
+Edit the appropriate preset in:
+
+```text
+CMakePresets.json
+````
+
+Example:
+
+```json
+"DTWAIN_AUTO_DOWNLOAD_BOOST": "ON",
+"DTWAIN_BOOST_CACHE_ROOT": "C:/BoostDeps"
+```
+
+If Boost is not already installed, DTWAIN will:
+
+* Download Boost binaries
+* Install Boost locally
+* Configure include and library paths automatically
+
+The Boost installation directory should be a relatively short path due to long internal Boost directory names.
+
+Example locations:
+
+```text
+C:/BoostDeps
+D:/BoostDeps
+E:/Libraries/BoostDeps
+```
+
+Installed Boost binaries may be reused by future builds.
+
+----
+#### <a name="use-existing-boost"></a> Using an Existing Boost Installation
+
+DTWAIN requires Boost 1.89.0 or later.
+
+Build options are controlled through:
+
+```text
+CMakePresets.json
+````
+
+To use an existing Boost installation:
+
+Edit the appropriate preset and set:
+
+```json
+"DTWAIN_EXISTING_BOOST_ROOT": "D:/boost_1_90_0",
+"DTWAIN_AUTO_DOWNLOAD_BOOST": "OFF"
+```
+
+The existing Boost installation must follow the directory layout expected by DTWAIN.
+
+Example:
+
+```text
+boost_1_xx_x/
+    boost/
+    lib32-msvc-14.x/
+    lib64-msvc-14.x/
+```
+
+At minimum, the installation must contain the library directory corresponding to the architecture(s) being built.
+
+----
+----
+
+#### <a name="advanced-cmake"></a> Advanced Usage — CMake Command Line
+Advanced users may invoke CMake directly without using the batch files.
+
+List available presets:
+
+```bat
+cmake --list-presets
+````
+
+Configure:
+
+```bat
+cmake --preset vs2022-x64-crt-unicode
+```
+
+Build:
+
+```bat
+cmake --build --preset vs2022-x64-crt-unicode-release
+cmake --build --preset vs2022-x64-crt-unicode-debug
+```
+
+Users familiar with CMake may also edit `CMakePresets.json` directly to customize build behavior.
+
+----
+
+#### <a name="cmake-gui"></a> Using CMake-GUI
+Users who prefer a graphical interface may use CMake-GUI instead of the command line.
+
+1. Start CMake-GUI
+2. Set:
+   * Source directory ? DTWAIN source root
+   * Build directory ? desired output directory
+3. Click **Configure**
+4. Select the desired Visual Studio generator
+5. Optionally choose a preset from `CMakePresets.json`
+6. Modify cache values if desired
+7. Click **Generate**
+8. Open the generated Visual Studio solution
+
+Users familiar with CMake-GUI may override values from `CMakePresets.json` before generating.
+
+Typical values that may be customized:
+
+```text
+DTWAIN_BUILD_UNICODE
+DTWAIN_USE_DYNAMIC_CRT
+DTWAIN_ENABLE_LOGCALLSTACK
+DTWAIN_AUTO_DOWNLOAD_BOOST
+DTWAIN_BOOST_CACHE_ROOT
+DTWAIN_EXISTING_BOOST_ROOT
+````
+----
+----
+#### <a name="notes-existing-users"></a> Notes for Existing Users
+
+Previous DTWAIN versions distributed pre-generated Visual Studio solution files.
+
+DTWAIN now uses generated Visual Studio solutions via CMake.
+
+Old workflow:
+
+```text
+Open .sln
+Build
+````
+
+New workflow:
+
+```text
+Run batch file (which will also perform a full build)
+(or configure/generate via CMake / CMake-GUI)
+
+The steps above will create dtwain.vcxproj and related files, which can be opened in Visual Studio for building or debugging
+If build did not occur, perform build within Visual Studio on the generated project.
+
+```
+
+Generated solutions retain normal Visual Studio functionality including debugging, natvis visualizers, and standard project navigation.
+
+----
+----
+## <a name="build-demo"></a> Building the demo applications
+The demo programs have not been migrated to CMake projects.  Instead they will remain as Visual Studio solutions that need to be loaded explicitly into Visual Studio.
+
 ##### C++
 
-If you wish to build the C and C++ demo applications, the **demos\AllDemos.sln** file can be loaded into Visual Studio 2019 or 2022.  Please note that you must build the base libraries first (by building using the **dtwain_5_x_vs2019.sln** project, mentioned above) before building the demos.  The demos consist of C and C++ language demos, plus C++ demos based on an experimental C++ wrapper library that is currently being developed.
+If you wish to build the C and C++ demo applications, the **demos\AllDemos.sln** file can be loaded into Visual Studio 2019 or 2022.  Please note that you must build the base libraries first.  The demos consist of C and C++ language demos, plus C++ demos based on an experimental C++ wrapper library that is currently being developed.
 
 ###### C#
 
@@ -212,18 +449,17 @@ dtwain32ud.vb    (this will use dtwain32ud.dll at runtime)
 dtwain64d.vb     (this will use dtwain64d.dll at runtime)
 dtwain64ud.vb    (this will use dtwain64ud.dll at runtime)
 ```
-
-
-
+----
 ----
 
-### <a name="contribute-updates"></a> Contributing your updates to this repository
+## <a name="contribute-updates"></a> Contributing your updates to this repository
 If you wish to add your own changes to this repository, it is highly suggested that you "git clone" the **development** branch, and then make a pull request to have your changes merged into the development branch (not the **main** branch).  Once the pull request passes review, the updated changes will be merged into the development branch.  
 
 When deemed appropriate by the maintainer of this repository, the development branch will be merged into the main branch.  Then the main branch will be used to build the libraries found in the dynarithmic/twain_library repository.  The main branch will always reflect the current build being distributed to the public in the dynarithmic/twain_library repository. 
 
 ----
-### <a name="tools-we-use"></a> Source Code Analysis Tools used
+----
+## <a name="tools-we-use"></a> Source Code Analysis Tools used
 We use the following tools for source code analysis of the underlying C++ code base for DTWAIN:
 
 [PVS-Studio](https://pvs-studio.com/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code.

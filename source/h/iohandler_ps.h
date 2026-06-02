@@ -22,22 +22,23 @@ OF THIRD PARTY RIGHTS.
 #define IOHANDLERPS_H
 
 #include "ctldib32.h"
+#include <imagefun/postscriptwriter.h>
 
 namespace dynarithmic
 {
-	class CTL_PSIOHandler final : public CTL_ImageIOHandler
-	{
-	public:
-		CTL_PSIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx& ImageInfoEx);
-		int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
-		~CTL_PSIOHandler() override = default;
+    class CTL_PSIOHandler final : public CTL_ImageIOHandler
+    {
+    public:
+        CTL_PSIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx& ImageInfoEx);
+        int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+        ~CTL_PSIOHandler() override = default;
 
-	private:
-		int m_nFormat;
-		DTWAINImageInfoEx m_ImageInfoEx;
-		PsSessionWriter m_psSessionWriter;
-		LONG m_PSType;
-		bool m_bIsMultiPage;
-	};
+    private:
+        int m_nFormat;
+        DTWAINImageInfoEx m_ImageInfoEx;
+        PsSessionWriter m_psSessionWriter;
+        LONG m_PSType;
+        bool m_bIsMultiPage;
+    };
 }
 #endif

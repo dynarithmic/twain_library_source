@@ -22,22 +22,23 @@ OF THIRD PARTY RIGHTS.
 #define IOHANDLERPCX_H
 
 #include "ctldib32.h"
+#include <imagefun/pcxwriter.h>
 
 namespace dynarithmic
 {
-	class CTL_PcxIOHandler : public CTL_ImageIOHandler
-	{
-		public:
-			CTL_PcxIOHandler() : CTL_ImageIOHandler(), m_nFormat{} {};
-			CTL_PcxIOHandler(CTL_TwainDib* pDib, int nFormat, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
-				m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
+    class CTL_PcxIOHandler : public CTL_ImageIOHandler
+    {
+        public:
+            CTL_PcxIOHandler() : CTL_ImageIOHandler(), m_nFormat{} {};
+            CTL_PcxIOHandler(CTL_TwainDib* pDib, int nFormat, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
+                m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
 
-			int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
-		private:
-			int m_nFormat;
-			DTWAINImageInfoEx m_ImageInfoEx;
-			DTWAINPcxDcxOutput output;
-	};
+        private:
+            int m_nFormat;
+            DTWAINImageInfoEx m_ImageInfoEx;
+            DTWAINPcxDcxOutput output;
+    };
 }
 #endif

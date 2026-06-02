@@ -24,6 +24,6 @@
 #include "dtwain_version.h"
 
 #ifdef _MSC_VER
-	#pragma comment (lib, DTWAIN_IMPORTLIBNAME)
+    #pragma comment (lib, DTWAIN_IMPORTLIBNAME)
 #endif
 #endif

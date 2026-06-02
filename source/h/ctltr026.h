@@ -46,7 +46,7 @@ namespace dynarithmic
             int             GetAcquireFailAction() const { return m_nFailAction; }
             void            SetAcquireFailAction(int nAction) { m_nFailAction = nAction; }
             static void     ResolveImageResolution(CTL_ITwainSource *pSource,  DTWAINImageInfoEx* ImageInfo);
-			std::pair<bool, CTL_ImagePendingTriplet> ResetTransfer(TW_UINT16 Msg = MSG_RESET);
+            std::pair<bool, CTL_ImagePendingTriplet> ResetTransfer(TW_UINT16 Msg = MSG_RESET);
 
         protected:
             struct AbortTraits

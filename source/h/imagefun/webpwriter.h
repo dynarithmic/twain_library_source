@@ -26,6 +26,7 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <memory>
 #include <webp/encode.h>
+#include <optional>
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 
@@ -37,40 +38,40 @@ OF THIRD PARTY RIGHTS.
 
 enum class WebPPixelFlavor
 {
-	Bgr24,
-	Bgra32
+    Bgr24,
+    Bgra32
 };
 
 struct PreparedWebPDibPage
 {
-	uint32_t width = 0;
-	uint32_t height = 0;
-	uint16_t bitsPerPixel = 0;
-	uint32_t strideBytes = 0;
-	bool bottomUp = true;
+    uint32_t width = 0;
+    uint32_t height = 0;
+    uint16_t bitsPerPixel = 0;
+    uint32_t strideBytes = 0;
+    bool bottomUp = true;
 
-	WebPPixelFlavor pixelFlavor = WebPPixelFlavor::Bgr24;
-	const uint8_t* bits = nullptr;
+    WebPPixelFlavor pixelFlavor = WebPPixelFlavor::Bgr24;
+    const uint8_t* bits = nullptr;
 };
 
 struct WebPTextMetadata
 {
-	std::string comment;
-	std::string copyright;
-	std::string author;
-	std::string software;
+    std::string comment;
+    std::string copyright;
+    std::string author;
+    std::string software;
 };
 
 struct WebPSessionOptions
 {
-	// Match FreeImage defaults
-	bool lossless = false;
-	float quality = 75.0f;
-	int method = 4;
-	bool exact = false;
+    // Match FreeImage defaults
+    bool lossless = false;
+    float quality = 75.0f;
+    int method = 4;
+    bool exact = false;
 
-	// Optional new DTWAIN metadata
-	WebPTextMetadata text;
+    // Optional new DTWAIN metadata
+    WebPTextMetadata text;
 };
 
 // ============================================================
@@ -78,7 +79,7 @@ struct WebPSessionOptions
 // ============================================================
 struct WebPMemoryWriterContext
 {
-	std::vector<uint8_t> data;
+    std::vector<uint8_t> data;
 };
 
 // ============================================================
@@ -86,39 +87,39 @@ struct WebPMemoryWriterContext
 // ============================================================
 class WebPSessionWriter
 {
-	public:
-		WebPSessionWriter() = default;
-		~WebPSessionWriter();
-		WebPSessionWriter(const WebPSessionWriter&) = delete;
-		WebPSessionWriter& operator=(const WebPSessionWriter&) = delete;
-		bool Open(const std::wstring& filename, const WebPSessionOptions& options);
-		bool SetPageInfo(const PreparedWebPDibPage& page);
-		bool WriteCurrentPage();
-		void Close();
-		bool IsOpen() const noexcept;
-		static std::optional<PreparedWebPDibPage> MakePreparedWebPDibPage(const dynarithmic::DibPageView& view);
+    public:
+        WebPSessionWriter() = default;
+        ~WebPSessionWriter();
+        WebPSessionWriter(const WebPSessionWriter&) = delete;
+        WebPSessionWriter& operator=(const WebPSessionWriter&) = delete;
+        bool Open(const std::wstring& filename, const WebPSessionOptions& options);
+        bool SetPageInfo(const PreparedWebPDibPage& page);
+        bool WriteCurrentPage();
+        void Close();
+        bool IsOpen() const noexcept;
+        static std::optional<PreparedWebPDibPage> MakePreparedWebPDibPage(const dynarithmic::DibPageView& view);
 
-	private:
-		static bool ValidatePage(const PreparedWebPDibPage& page);
-		bool ImportBgr24(WebPPicture& picture);
-		bool ImportBgra32(WebPPicture& picture);
-		bool WriteOutputFile(const std::vector<uint8_t>& data) const;
-		static bool HasMetadata(const WebPTextMetadata& text);
-		static std::string XmlEscape(const std::string& s);
-		std::string BuildXmpPacket() const;
-		bool AddMetadataWithMux(const std::vector<uint8_t>& encodedImage, std::vector<uint8_t>& finalImage) const;
+    private:
+        static bool ValidatePage(const PreparedWebPDibPage& page);
+        bool ImportBgr24(WebPPicture& picture);
+        bool ImportBgra32(WebPPicture& picture);
+        bool WriteOutputFile(const std::vector<uint8_t>& data) const;
+        static bool HasMetadata(const WebPTextMetadata& text);
+        static std::string XmlEscape(const std::string& s);
+        std::string BuildXmpPacket() const;
+        bool AddMetadataWithMux(const std::vector<uint8_t>& encodedImage, std::vector<uint8_t>& finalImage) const;
 
-	private:
-		std::wstring filename_;
-		WebPSessionOptions options_{};
+    private:
+        std::wstring filename_;
+        WebPSessionOptions options_{};
 
-		PreparedWebPDibPage currentPage_{};
-		bool hasCurrentPage_ = false;
-		bool isOpen_ = false;
+        PreparedWebPDibPage currentPage_{};
+        bool hasCurrentPage_ = false;
+        bool isOpen_ = false;
 
-		std::vector<uint8_t> rowBuffer_;
-		std::vector<uint8_t> rgbBuffer_;
-		std::vector<uint8_t> rgbaBuffer_;
+        std::vector<uint8_t> rowBuffer_;
+        std::vector<uint8_t> rgbBuffer_;
+        std::vector<uint8_t> rgbaBuffer_;
 };
 
 // ============================================================
@@ -128,13 +129,13 @@ class WebPSessionWriter
 // ============================================================
 class DTWAINWebPOutput
 {
-	public:
-		bool OnFirstPage(const std::wstring& filename, const WebPSessionOptions& options, const PreparedWebPDibPage& page);
-		bool OnLastPage();
-		bool IsOpen() const noexcept;
+    public:
+        bool OnFirstPage(const std::wstring& filename, const WebPSessionOptions& options, const PreparedWebPDibPage& page);
+        bool OnLastPage();
+        bool IsOpen() const noexcept;
 
-	private:
-		std::unique_ptr<WebPSessionWriter> writer_;
+    private:
+        std::unique_ptr<WebPSessionWriter> writer_;
 };
 
 #endif

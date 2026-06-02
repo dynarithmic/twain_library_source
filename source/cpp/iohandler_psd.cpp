@@ -28,26 +28,26 @@ using namespace dynarithmic;
 
 static bool WriteOneDibHandleToPsd(const std::wstring& filename, const PsdSessionOptions& options, HANDLE hDib)
 {
-	LockedDibPage lockedPage(hDib);
-	if (!lockedPage.IsValid())
-		return false;
+    LockedDibPage lockedPage(hDib);
+    if (!lockedPage.IsValid())
+        return false;
 
-	PsdSessionWriter writer;
-	if (!writer.Open(filename, options))
-		return false;
+    PsdSessionWriter writer;
+    if (!writer.Open(filename, options))
+        return false;
 
-	auto pageInfo = PsdSessionWriter::MakePreparedPsdDibPage(lockedPage.GetView());
-	if (!pageInfo.has_value())
-		return false;
+    auto pageInfo = PsdSessionWriter::MakePreparedPsdDibPage(lockedPage.GetView());
+    if (!pageInfo.has_value())
+        return false;
 
-	if (!writer.SetPageInfo(pageInfo.value()))
-		return false;
+    if (!writer.SetPageInfo(pageInfo.value()))
+        return false;
 
-	if (!writer.WriteCurrentPage())
-		return false;
+    if (!writer.WriteCurrentPage())
+        return false;
 
-	writer.Close();
-	return true;
+    writer.Close();
+    return true;
 }
 
 
@@ -55,15 +55,15 @@ int CTL_PsdIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 {
     HANDLE hDib = hDib = m_pDib->GetHandle();
 
-	PsdSessionOptions opts{};
-	opts.useRle = true; // raw only in this implementation
+    PsdSessionOptions opts{};
+    opts.useRle = true; // raw only in this implementation
 
-	opts.comment = GetCopyrightString();
+    opts.comment = GetCopyrightString();
 
     std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-	if (!WriteOneDibHandleToPsd(fName, opts, hDib))
-		return DTWAIN_ERR_FILEWRITE;
+    if (!WriteOneDibHandleToPsd(fName, opts, hDib))
+        return DTWAIN_ERR_FILEWRITE;
     return DTWAIN_NO_ERROR;
 }
 

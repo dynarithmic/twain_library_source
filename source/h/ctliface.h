@@ -912,7 +912,7 @@ namespace dynarithmic
     void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
     void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame);
     std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
-	std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
     DTWAIN_ARRAY CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source);
     DTWAIN_FRAME CreateFrameArray(const CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
     void SetArrayValueFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
@@ -1133,8 +1133,6 @@ namespace dynarithmic
     #define THIS_FUNCTION_THROWS
 
     void  DTWAIN_InternalThrowException() THIS_FUNCTION_PROTO_THROWS
-
-    LONG  TS_Command(LPCTSTR lpCommand);
 
     #define IDS_DTWAIN_APPTITLE       9700
     #define IDS_DTWAIN_APPTITLE_HTML  9701

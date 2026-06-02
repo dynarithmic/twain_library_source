@@ -40,69 +40,69 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
     bool isLastPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
     bool isNextPage = (pMultiPageStruct && pMultiPageStruct->Stage == DIB_MULTI_NEXT);
 
-	SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
+    SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
 
     if ( isFirstPage )
     {
-		LockedDibPage page(m_pDib->GetHandle());
-		if (!page.IsValid())
-			return DTWAIN_ERR_FILEWRITE;
+        LockedDibPage page(m_pDib->GetHandle());
+        if (!page.IsValid())
+            return DTWAIN_ERR_FILEWRITE;
 
-		PsSessionOptions opts{};
+        PsSessionOptions opts{};
 
-		switch (m_ImageInfoEx.PostscriptType)
-		{
-		    case DTWAIN_POSTSCRIPT1:
-		    case DTWAIN_POSTSCRIPT1MULTI:
-				opts.level = PsLevel::Level1;
-			    break;
+        switch (m_ImageInfoEx.PostscriptType)
+        {
+            case DTWAIN_POSTSCRIPT1:
+            case DTWAIN_POSTSCRIPT1MULTI:
+                opts.level = PsLevel::Level1;
+                break;
 
-		    case DTWAIN_POSTSCRIPT2:
-		    case DTWAIN_POSTSCRIPT2MULTI:
-				opts.level = PsLevel::Level2;
+            case DTWAIN_POSTSCRIPT2:
+            case DTWAIN_POSTSCRIPT2MULTI:
+                opts.level = PsLevel::Level2;
                 opts.invert1bpp = true;
-				break;
+                break;
 
-			case DTWAIN_POSTSCRIPT3:
-			case DTWAIN_POSTSCRIPT3MULTI:
-				opts.level = PsLevel::Level3;
-				opts.invert1bpp = true;
-				break;
-		}
+            case DTWAIN_POSTSCRIPT3:
+            case DTWAIN_POSTSCRIPT3MULTI:
+                opts.level = PsLevel::Level3;
+                opts.invert1bpp = true;
+                break;
+        }
 
-		std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+        std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
-		opts.creator = GetCopyrightString();
+        opts.creator = GetCopyrightString();
 
-		if (!m_psSessionWriter.Open(fName, opts))
-			return DTWAIN_ERR_FILEWRITE;
+        if (!m_psSessionWriter.Open(fName, opts))
+            return DTWAIN_ERR_FILEWRITE;
 
-		auto pageInfo = PsSessionWriter::MakePreparedPsDibPage(page.GetView());
-		if (!pageInfo.has_value())
-			return DTWAIN_ERR_FILEWRITE; 
+        auto pageInfo = PsSessionWriter::MakePreparedPsDibPage(page.GetView());
+        if (!pageInfo.has_value())
+            return DTWAIN_ERR_FILEWRITE; 
 
-		auto retVal = m_psSessionWriter.WritePage(pageInfo.value());
+        auto retVal = m_psSessionWriter.WritePage(pageInfo.value());
         return retVal ? DTWAIN_NO_ERROR : DTWAIN_ERR_FILEWRITE;
     }
     else
     if ( isNextPage )
     {
-		LockedDibPage page(m_pDib->GetHandle());
-		if (!page.IsValid())
-			return DTWAIN_ERR_FILEWRITE;
+        LockedDibPage page(m_pDib->GetHandle());
+        if (!page.IsValid())
+            return DTWAIN_ERR_FILEWRITE;
 
-		auto pageInfo = PsSessionWriter::MakePreparedPsDibPage(page.GetView());
-		if (!pageInfo.has_value())
-			return DTWAIN_ERR_FILEWRITE;
+        auto pageInfo = PsSessionWriter::MakePreparedPsDibPage(page.GetView());
+        if (!pageInfo.has_value())
+            return DTWAIN_ERR_FILEWRITE;
 
-		auto retVal = m_psSessionWriter.WritePage(pageInfo.value());
-		return retVal ? DTWAIN_NO_ERROR : DTWAIN_ERR_FILEWRITE;
+        auto retVal = m_psSessionWriter.WritePage(pageInfo.value());
+        return retVal ? DTWAIN_NO_ERROR : DTWAIN_ERR_FILEWRITE;
     }
     else
     if ( isLastPage )
     {
-		bool ok = m_psSessionWriter.Close();
-		return ok?DTWAIN_NO_ERROR:DTWAIN_ERR_FILEWRITE;
+        bool ok = m_psSessionWriter.Close();
+        return ok?DTWAIN_NO_ERROR:DTWAIN_ERR_FILEWRITE;
     }
     return DTWAIN_NO_ERROR;
 }

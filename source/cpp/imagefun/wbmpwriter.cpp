@@ -23,16 +23,16 @@
 std::optional<PreparedWbmpDibPage> WbmpSessionWriter::MakePreparedWbmpDibPage(const dynarithmic::DibPageView& view)
 {
 
-	if (view.bitsPerPixel != 1)
-		return std::nullopt;
-	PreparedWbmpDibPage page{};
-	page.width = view.width;
-	page.height = view.height;
-	page.bitsPerPixel = 1;
-	page.strideBytes = view.strideBytes;
-	page.bottomUp = view.bottomUp;
-	page.bits = view.bits;
-	return page;
+    if (view.bitsPerPixel != 1)
+        return std::nullopt;
+    PreparedWbmpDibPage page{};
+    page.width = view.width;
+    page.height = view.height;
+    page.bitsPerPixel = 1;
+    page.strideBytes = view.strideBytes;
+    page.bottomUp = view.bottomUp;
+    page.bits = view.bits;
+    return page;
 }
  
 // ============================================================
@@ -46,190 +46,190 @@ std::optional<PreparedWbmpDibPage> WbmpSessionWriter::MakePreparedWbmpDibPage(co
 // ============================================================
 WbmpSessionWriter::~WbmpSessionWriter()
 {
-	Close();
+    Close();
 }
 
 bool WbmpSessionWriter::Open(const std::wstring& filename, const WbmpSessionOptions& options)
 {
-	if (file_)
-		return false;
+    if (file_)
+        return false;
 
-	file_ = _wfopen(filename.c_str(), L"wb");
-	if (!file_)
-		return false;
+    file_ = _wfopen(filename.c_str(), L"wb");
+    if (!file_)
+        return false;
 
-	filename_ = filename;
-	options_ = options;
-	hasCurrentPage_ = false;
-	return true;
+    filename_ = filename;
+    options_ = options;
+    hasCurrentPage_ = false;
+    return true;
 }
 
 bool WbmpSessionWriter::SetPageInfo(const PreparedWbmpDibPage& page)
 {
-	if (!file_)
-		return false;
+    if (!file_)
+        return false;
 
-	if (!ValidatePage(page))
-		return false;
+    if (!ValidatePage(page))
+        return false;
 
-	currentPage_ = page;
-	hasCurrentPage_ = true;
-	return true;
+    currentPage_ = page;
+    hasCurrentPage_ = true;
+    return true;
 }
 
 bool WbmpSessionWriter::WriteCurrentPage()
 {
-	if (!file_ || !hasCurrentPage_)
-		return false;
+    if (!file_ || !hasCurrentPage_)
+        return false;
 
-	if (!WriteHeader())
-		return false;
+    if (!WriteHeader())
+        return false;
 
-	if (!WriteBitmapData())
-		return false;
+    if (!WriteBitmapData())
+        return false;
 
-	hasCurrentPage_ = false;
-	return true;
+    hasCurrentPage_ = false;
+    return true;
 }
 
 void WbmpSessionWriter::Close()
 {
-	if (file_)
-	{
-		std::fclose(file_);
-		file_ = nullptr;
-	}
+    if (file_)
+    {
+        std::fclose(file_);
+        file_ = nullptr;
+    }
 
-	filename_.clear();
-	rowBuffer_.clear();
-	hasCurrentPage_ = false;
+    filename_.clear();
+    rowBuffer_.clear();
+    hasCurrentPage_ = false;
 }
 
 bool WbmpSessionWriter::IsOpen() const noexcept
 {
-	return file_ != nullptr;
+    return file_ != nullptr;
 }
 
 bool WbmpSessionWriter::ValidatePage(const PreparedWbmpDibPage& page)
 {
-	return page.width > 0 &&
-		page.height > 0 &&
-		page.bitsPerPixel == 1 &&
-		page.bits != nullptr &&
-		page.strideBytes > 0;
+    return page.width > 0 &&
+        page.height > 0 &&
+        page.bitsPerPixel == 1 &&
+        page.bits != nullptr &&
+        page.strideBytes > 0;
 }
 
 uint8_t WbmpSessionWriter::ReverseBits(uint8_t v)
 {
-	v = static_cast<uint8_t>(((v & 0xF0) >> 4) | ((v & 0x0F) << 4));
-	v = static_cast<uint8_t>(((v & 0xCC) >> 2) | ((v & 0x33) << 2));
-	v = static_cast<uint8_t>(((v & 0xAA) >> 1) | ((v & 0x55) << 1));
-	return v;
+    v = static_cast<uint8_t>(((v & 0xF0) >> 4) | ((v & 0x0F) << 4));
+    v = static_cast<uint8_t>(((v & 0xCC) >> 2) | ((v & 0x33) << 2));
+    v = static_cast<uint8_t>(((v & 0xAA) >> 1) | ((v & 0x55) << 1));
+    return v;
 }
 
 bool WbmpSessionWriter::WriteByte(uint8_t b)
 {
-	return std::fwrite(&b, 1, 1, file_) == 1;
+    return std::fwrite(&b, 1, 1, file_) == 1;
 }
 
 bool WbmpSessionWriter::WriteMultiByteUInt(uint32_t value)
 {
-	// WBMP uses big-endian variable-length 7-bit groups.
-	uint8_t tmp[5]{};
-	int count = 0;
+    // WBMP uses big-endian variable-length 7-bit groups.
+    uint8_t tmp[5]{};
+    int count = 0;
 
-	do
-	{
-		tmp[count++] = static_cast<uint8_t>(value & 0x7F);
-		value >>= 7;
-	} while (value != 0 && count < 5);
+    do
+    {
+        tmp[count++] = static_cast<uint8_t>(value & 0x7F);
+        value >>= 7;
+    } while (value != 0 && count < 5);
 
-	for (int i = count - 1; i >= 0; --i)
-	{
-		uint8_t b = tmp[i];
-		if (i != 0)
-			b |= 0x80;
+    for (int i = count - 1; i >= 0; --i)
+    {
+        uint8_t b = tmp[i];
+        if (i != 0)
+            b |= 0x80;
 
-		if (!WriteByte(b))
-			return false;
-	}
+        if (!WriteByte(b))
+            return false;
+    }
 
-	return true;
+    return true;
 }
 
 bool WbmpSessionWriter::WriteHeader()
 {
-	// TypeField = 0, FixHeaderField = 0
-	if (!WriteByte(0))
-		return false;
-	if (!WriteByte(0))
-		return false;
+    // TypeField = 0, FixHeaderField = 0
+    if (!WriteByte(0))
+        return false;
+    if (!WriteByte(0))
+        return false;
 
-	if (!WriteMultiByteUInt(currentPage_.width))
-		return false;
-	if (!WriteMultiByteUInt(currentPage_.height))
-		return false;
+    if (!WriteMultiByteUInt(currentPage_.width))
+        return false;
+    if (!WriteMultiByteUInt(currentPage_.height))
+        return false;
 
-	return true;
+    return true;
 }
 
 bool WbmpSessionWriter::WriteBitmapData()
 {
-	const uint32_t rowBytes = static_cast<uint32_t>((currentPage_.width + 7) / 8);
-	rowBuffer_.resize(rowBytes);
+    const uint32_t rowBytes = static_cast<uint32_t>((currentPage_.width + 7) / 8);
+    rowBuffer_.resize(rowBytes);
 
-	for (uint32_t y = 0; y < currentPage_.height; ++y)
-	{
-		const uint32_t srcY =
-			currentPage_.bottomUp ? (currentPage_.height - 1 - y) : y;
+    for (uint32_t y = 0; y < currentPage_.height; ++y)
+    {
+        const uint32_t srcY =
+            currentPage_.bottomUp ? (currentPage_.height - 1 - y) : y;
 
-		const uint8_t* src =
-			currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
+        const uint8_t* src =
+            currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
 
-		std::memcpy(rowBuffer_.data(), src, rowBytes);
+        std::memcpy(rowBuffer_.data(), src, rowBytes);
 
-		if (options_.reverseBitOrder)
-		{
-			for (uint32_t i = 0; i < rowBytes; ++i)
-				rowBuffer_[i] = ReverseBits(rowBuffer_[i]);
-		}
+        if (options_.reverseBitOrder)
+        {
+            for (uint32_t i = 0; i < rowBytes; ++i)
+                rowBuffer_[i] = ReverseBits(rowBuffer_[i]);
+        }
 
-		if (std::fwrite(rowBuffer_.data(), 1, rowBytes, file_) != rowBytes)
-			return false;
-	}
+        if (std::fwrite(rowBuffer_.data(), 1, rowBytes, file_) != rowBytes)
+            return false;
+    }
 
-	return true;
+    return true;
 }
 
 bool DTWAINWbmpOutput::OnFirstPage(const std::wstring& filename, const WbmpSessionOptions& options, const PreparedWbmpDibPage& page)
 {
-	if (writer_)
-		return false;
+    if (writer_)
+        return false;
 
-	writer_ = std::make_unique<WbmpSessionWriter>();
-	if (!writer_->Open(filename, options))
-	{
-		writer_.reset();
-		return false;
-	}
+    writer_ = std::make_unique<WbmpSessionWriter>();
+    if (!writer_->Open(filename, options))
+    {
+        writer_.reset();
+        return false;
+    }
 
-	if (!writer_->SetPageInfo(page))
-		return false;
+    if (!writer_->SetPageInfo(page))
+        return false;
 
-	return writer_->WriteCurrentPage();
+    return writer_->WriteCurrentPage();
 }
 
 bool DTWAINWbmpOutput::OnLastPage()
 {
-	if (!writer_)
-		return false;
+    if (!writer_)
+        return false;
 
-	writer_.reset();
-	return true;
+    writer_.reset();
+    return true;
 }
 
 bool DTWAINWbmpOutput::IsOpen() const noexcept
 {
-	return writer_ != nullptr && writer_->IsOpen();
+    return writer_ != nullptr && writer_->IsOpen();
 }
 

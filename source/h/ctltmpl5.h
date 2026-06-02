@@ -296,7 +296,7 @@ namespace dynarithmic
             return { true, DTWAIN_NO_ERROR };
         }
         *pAssign = TwainType{};
-		return { false, DTWAIN_ERR_GETCAP_FAILED };
+        return { false, DTWAIN_ERR_GETCAP_FAILED };
     }
 
     template <class T>

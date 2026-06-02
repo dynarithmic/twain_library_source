@@ -28,53 +28,53 @@
 using namespace dynarithmic;
 int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {
-	HANDLE hDib = m_pDib->GetHandle();
+    HANDLE hDib = m_pDib->GetHandle();
 
     const bool bIsFirstPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_FIRST);
     const bool bIsLastPage = (!pMultiPageStruct || pMultiPageStruct->Stage == 0 || pMultiPageStruct->Stage == DIB_MULTI_LAST);
     const bool isDCX = (m_nFormat == DTWAIN_DCX);
 
-	SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
+    SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
 
     std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     if ( bIsFirstPage )
     {
-		LockedDibPage locked(hDib);
-		if (!locked.IsValid())
-			return DTWAIN_ERR_FILEWRITE;
+        LockedDibPage locked(hDib);
+        if (!locked.IsValid())
+            return DTWAIN_ERR_FILEWRITE;
 
-		PcxSessionOptions opts{};
-		opts.writeDcx = isDCX;
+        PcxSessionOptions opts{};
+        opts.writeDcx = isDCX;
 
-		auto pageInfo = PcxSessionWriter::MakePreparedPcxDibPage(locked.GetView());
-		if (!pageInfo.has_value())
-			return DTWAIN_ERR_FILEWRITE;
+        auto pageInfo = PcxSessionWriter::MakePreparedPcxDibPage(locked.GetView());
+        if (!pageInfo.has_value())
+            return DTWAIN_ERR_FILEWRITE;
 
-		if (!output.OnFirstPage(filename, opts, pageInfo.value()))
-			return DTWAIN_ERR_FILEWRITE;
+        if (!output.OnFirstPage(filename, opts, pageInfo.value()))
+            return DTWAIN_ERR_FILEWRITE;
         return DTWAIN_NO_ERROR;
-	}
+    }
     else
     if ( !bIsLastPage && isDCX)
     {
-		LockedDibPage locked(hDib);
-		if (!locked.IsValid())
-			return DTWAIN_ERR_FILEWRITE;
+        LockedDibPage locked(hDib);
+        if (!locked.IsValid())
+            return DTWAIN_ERR_FILEWRITE;
 
-		auto pageInfo = PcxSessionWriter::MakePreparedPcxDibPage(locked.GetView());
-		if (!pageInfo.has_value())
-			return DTWAIN_ERR_FILEWRITE;
+        auto pageInfo = PcxSessionWriter::MakePreparedPcxDibPage(locked.GetView());
+        if (!pageInfo.has_value())
+            return DTWAIN_ERR_FILEWRITE;
 
-		if (!output.OnNextPage(pageInfo.value()))
-			return DTWAIN_ERR_FILEWRITE;
+        if (!output.OnNextPage(pageInfo.value()))
+            return DTWAIN_ERR_FILEWRITE;
         return DTWAIN_NO_ERROR;
     }
     else
     if ( bIsLastPage || !isDCX )
     {
-		if (!output.OnLastPage())
-			return DTWAIN_ERR_FILEWRITE;
+        if (!output.OnLastPage())
+            return DTWAIN_ERR_FILEWRITE;
         return DTWAIN_NO_ERROR;
     }
     return DTWAIN_NO_ERROR;

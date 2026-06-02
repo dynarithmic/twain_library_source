@@ -18,15 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <math.h>
-#include <sstream>
+#include <cmath>
 #include "winbit32.h"
 #include "ctliface.h"
-#include "ctltwainmanager.h"
-#include "ctlfileutils.h"
-#include "logwriterutils.h"
 #include "ctlconstexprfind.h"
-#include <ctlutils.h>
 #include "resample24to8.h"
 #include "dibutil.h"
 
@@ -45,84 +40,84 @@ using namespace dynarithmic;
 
 // Lower level routines
 static FloatRect Normalize(const dynarithmic::dib::LockedDib& hDib, const FloatRect& ActualRect, const FloatRect& RequestedRect,
-						   int sourceunit, int destunit, int dpi)
+                           int sourceunit, int destunit, int dpi)
 {
-	static constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
-																	  {DTWAIN_TWIPS, 1440.0},
-																	  {DTWAIN_POINTS, 72.0},
-																	  {DTWAIN_PICAS, 6.0},
-																	  {DTWAIN_CENTIMETERS, 2.54}} };
-	const UINT32 width = hDib.Width();
+    static constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
+                                                                      {DTWAIN_TWIPS, 1440.0},
+                                                                      {DTWAIN_POINTS, 72.0},
+                                                                      {DTWAIN_PICAS, 6.0},
+                                                                      {DTWAIN_CENTIMETERS, 2.54}} };
+    const UINT32 width = hDib.Width();
 
-	// Set up a return rect
-	FloatRect fRect = RequestedRect;
+    // Set up a return rect
+    FloatRect fRect = RequestedRect;
 
-	// Check dimensions
-	if (fabs(ActualRect.right - ActualRect.left) < 1.0)
-		return fRect;
+    // Check dimensions
+    if (fabs(ActualRect.right - ActualRect.left) < 1.0)
+        return fRect;
 
     const UINT32 pitch = hDib.Pitch(); 
-	if (pitch == 0)
-		return fRect;
+    if (pitch == 0)
+        return fRect;
 
-	const auto iterSourceUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == sourceunit; });
-	const auto iterDestUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == destunit; });
+    const auto iterSourceUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == sourceunit; });
+    const auto iterDestUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == destunit; });
 
-	// If not found return the original rect
-	if (!iterSourceUnit.first || !iterDestUnit.first)
-		return fRect;
+    // If not found return the original rect
+    if (!iterSourceUnit.first || !iterDestUnit.first)
+        return fRect;
 
-	auto actualSourceUnit = Measurement[iterSourceUnit.second].second;
-	auto actualDestUnit = Measurement[iterDestUnit.second].second;
+    auto actualSourceUnit = Measurement[iterSourceUnit.second].second;
+    auto actualDestUnit = Measurement[iterDestUnit.second].second;
 
-	// Convert Actual rect to pixels
-	double PixelsPerInch = dpi;
-	switch (sourceunit)
-	{
-	    case DTWAIN_PIXELS:
-		    break;
+    // Convert Actual rect to pixels
+    double PixelsPerInch = dpi;
+    switch (sourceunit)
+    {
+        case DTWAIN_PIXELS:
+            break;
 
-	    case DTWAIN_INCHES:
-	    case DTWAIN_TWIPS:
-	    case DTWAIN_CENTIMETERS:
-	    case DTWAIN_POINTS:
-	    case DTWAIN_PICAS:
-	    {
-		    const double NumInches = (ActualRect.right - ActualRect.left) / actualSourceUnit;
-		    PixelsPerInch = static_cast<double>(width) / NumInches;
-	    }
-	    break;
-	}
+        case DTWAIN_INCHES:
+        case DTWAIN_TWIPS:
+        case DTWAIN_CENTIMETERS:
+        case DTWAIN_POINTS:
+        case DTWAIN_PICAS:
+        {
+            const double NumInches = (ActualRect.right - ActualRect.left) / actualSourceUnit;
+            PixelsPerInch = static_cast<double>(width) / NumInches;
+        }
+        break;
+    }
 
-	switch (destunit)
-	{
-	    case DTWAIN_PIXELS:
-		    break;
+    switch (destunit)
+    {
+        case DTWAIN_PIXELS:
+            break;
 
-	    case DTWAIN_INCHES:
-	    case DTWAIN_TWIPS:
-	    case DTWAIN_CENTIMETERS:
-	    case DTWAIN_POINTS:
-	    case DTWAIN_PICAS:
-	    {
-		    if (sourceunit == DTWAIN_PIXELS)
-		    {
-			    fRect.left = RequestedRect.left / PixelsPerInch;
-			    fRect.right = RequestedRect.right / PixelsPerInch;
-			    fRect.top = RequestedRect.top / PixelsPerInch;
-			    fRect.bottom = RequestedRect.bottom / PixelsPerInch;
-		    }
-		    else
-		    {
-			    fRect.left = RequestedRect.left / actualDestUnit * PixelsPerInch;
-			    fRect.right = RequestedRect.right / actualDestUnit * PixelsPerInch;
-			    fRect.top = RequestedRect.top / actualDestUnit * PixelsPerInch;
-			    fRect.bottom = RequestedRect.bottom / actualDestUnit * PixelsPerInch;
-		    }
-	    }
-	    break;
-	}
-	return fRect;
+        case DTWAIN_INCHES:
+        case DTWAIN_TWIPS:
+        case DTWAIN_CENTIMETERS:
+        case DTWAIN_POINTS:
+        case DTWAIN_PICAS:
+        {
+            if (sourceunit == DTWAIN_PIXELS)
+            {
+                fRect.left = RequestedRect.left / PixelsPerInch;
+                fRect.right = RequestedRect.right / PixelsPerInch;
+                fRect.top = RequestedRect.top / PixelsPerInch;
+                fRect.bottom = RequestedRect.bottom / PixelsPerInch;
+            }
+            else
+            {
+                fRect.left = RequestedRect.left / actualDestUnit * PixelsPerInch;
+                fRect.right = RequestedRect.right / actualDestUnit * PixelsPerInch;
+                fRect.top = RequestedRect.top / actualDestUnit * PixelsPerInch;
+                fRect.bottom = RequestedRect.bottom / actualDestUnit * PixelsPerInch;
+            }
+        }
+        break;
+    }
+    return fRect;
 
 }
 
@@ -290,56 +285,56 @@ HANDLE CDibInterface::DecreaseBpp(HANDLE hDib, long newbpp)
 HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const FloatRect& RequestedRect, int sourceunit,
                               int destunit, int dpi, bool bConvertActual, int& retval)
 {
-	retval = IS_ERR_OK;
+    retval = IS_ERR_OK;
 
     dynarithmic::dib::LockedDib dibHandle(handle);
 
     const UINT32 width = dibHandle.Width();
-	const UINT32 height = dibHandle.Height();
+    const UINT32 height = dibHandle.Height();
 
-	// Convert the actual rectangle first if necessary
-	// This assumes that the actual rect is in pixels, but
-	// the source unit does not match up correctly
-	FloatRect TempActual = ActualRect;
-	if (bConvertActual)
-		TempActual = Normalize(dibHandle, ActualRect, ActualRect, DTWAIN_PIXELS, sourceunit, dpi);
+    // Convert the actual rectangle first if necessary
+    // This assumes that the actual rect is in pixels, but
+    // the source unit does not match up correctly
+    FloatRect TempActual = ActualRect;
+    if (bConvertActual)
+        TempActual = Normalize(dibHandle, ActualRect, ActualRect, DTWAIN_PIXELS, sourceunit, dpi);
 
-	// Now return a normalized rectangle from the actual and requested rectangles
-	const FloatRect NormalizedRect = Normalize(dibHandle, TempActual, RequestedRect, sourceunit, destunit, dpi);
+    // Now return a normalized rectangle from the actual and requested rectangles
+    const FloatRect NormalizedRect = Normalize(dibHandle, TempActual, RequestedRect, sourceunit, destunit, dpi);
 
-	const double left = NormalizedRect.left;
-	const double top = NormalizedRect.top;
-	const double right = NormalizedRect.right;
-	const double bottom = NormalizedRect.bottom;
+    const double left = NormalizedRect.left;
+    const double top = NormalizedRect.top;
+    const double right = NormalizedRect.right;
+    const double bottom = NormalizedRect.bottom;
 
-	// DIBs are stored upside down, so adjust coordinates here
-	const int newbottom = height - static_cast<UINT32>(top);
-	const int newtop = height - static_cast<UINT32>(bottom);
+    // DIBs are stored upside down, so adjust coordinates here
+    const int newbottom = height - static_cast<UINT32>(top);
+    const int newtop = height - static_cast<UINT32>(bottom);
 
-	long startx = (std::max)(0L, (std::min<long>)(left, width));
-	long endx = (std::max)(0L, (std::min<long>)(right, width));
+    long startx = (std::max)(0L, (std::min<long>)(left, width));
+    long endx = (std::max)(0L, (std::min<long>)(right, width));
 
-	long starty = (std::max)(0L, (std::min<long>)(newtop, height));
-	long endy = (std::max)(0L, (std::min<long>)(newbottom, height));
+    long starty = (std::max)(0L, (std::min<long>)(newtop, height));
+    long endy = (std::max)(0L, (std::min<long>)(newbottom, height));
 
-	if (startx == endx || starty == endy)
-	{
-		retval = IS_ERR_BADPARAM;
-		return nullptr;
-	}
+    if (startx == endx || starty == endy)
+    {
+        retval = IS_ERR_BADPARAM;
+        return nullptr;
+    }
 
-	if (startx > endx)
-	{
-		const long tmp = startx;
-		startx = endx;
-		endx = tmp;
-	}
-	if (starty > endy)
-	{
-		const long tmp = starty;
-		starty = endy;
-		endy = tmp;
-	}
+    if (startx > endx)
+    {
+        const long tmp = startx;
+        startx = endx;
+        endx = tmp;
+    }
+    if (starty > endy)
+    {
+        const long tmp = starty;
+        starty = endy;
+        endy = tmp;
+    }
 
     return dynarithmic::dib::CropDib(handle, startx, starty, endx, endy);
 }

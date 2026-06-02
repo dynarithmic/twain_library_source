@@ -27,13 +27,8 @@
 #include <cctype>
 #include <numeric>
 #include <type_traits>
-#include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
-#include <boost/format.hpp>
 #include <boost/algorithm/hex.hpp>
 #include <assert.h>
 #include <algorithm>
@@ -42,6 +37,9 @@
 #include <locale>
 #include <iostream>
 #include <string_view>
+#include <cctype>
+#include <cwctype>
+#include <random>
 #include <boost/lexical_cast.hpp>
 #include <dtwain_filesystem.h>
 #include "dtwain_standard_defs.h"
@@ -131,14 +129,10 @@ namespace dynarithmic
         using baseoutputstream_type = std::ostream;
         using baseinputstream_type = std::istream;
 
-        using BOOST_FORMAT = boost::format;
         using FILESYSTEM_PATHTYPE = filesys::path;
 
         template <typename T>
         static std::string PathGenericString(const T& x) { return x.generic_string(); }
-
-        template <typename T>
-        static std::string ConvertToBoostUUIDString(const T& x)  { return boost::uuids::to_string(x); }
 
         template <typename T, typename std::enable_if<std::is_arithmetic_v<T>,bool>::type = true>
         static std::string ToString(const T& value)
@@ -282,14 +276,10 @@ namespace dynarithmic
         using baseoutputstream_type = std::wostream;
         using baseinputstream_type = std::wistream;
 
-        using BOOST_FORMAT = boost::wformat;
         using FILESYSTEM_PATHTYPE = filesys::path;
 
         template <typename T>
         static std::wstring PathGenericString(const T& x) { return x.generic_wstring(); }
-
-        template <typename T>
-        static std::wstring ConvertToBoostUUIDString(const T& x) { return boost::uuids::to_wstring(x); }
 
         template <typename T, typename std::enable_if<std::is_arithmetic_v<T>, bool>::type = true>
         static std::wstring ToString(const T& value)
@@ -505,114 +495,114 @@ namespace dynarithmic
         }
 
         private:
-		template <typename CharT>
-		class is_any_of_pred
-		{
-		    public:
-			    using string_type = std::basic_string<CharT>;
+        template <typename CharT>
+        class is_any_of_pred
+        {
+            public:
+                using string_type = std::basic_string<CharT>;
 
-			    explicit is_any_of_pred(string_type chars)
-				    : chars_(std::move(chars)) {
-			    }
+                explicit is_any_of_pred(string_type chars)
+                    : chars_(std::move(chars)) {
+                }
 
-			    bool operator()(CharT ch) const
-			    {
-				    return chars_.find(ch) != string_type::npos;
-			    }
+                bool operator()(CharT ch) const
+                {
+                    return chars_.find(ch) != string_type::npos;
+                }
 
-		    private:
-			    string_type chars_;
-		};
+            private:
+                string_type chars_;
+        };
 
-		template <typename CharT>
-		static auto is_any_of(const CharT* chars)
-		{
-			return is_any_of_pred<CharT>(std::basic_string<CharT>(chars));
-		}
+        template <typename CharT>
+        static auto is_any_of(const CharT* chars)
+        {
+            return is_any_of_pred<CharT>(std::basic_string<CharT>(chars));
+        }
 
-		template <typename StringType, typename Pred>
-		static StringType& ltrim_if(StringType& str, Pred pred)
-		{
-			auto it2 = std::find_if_not(str.begin(), str.end(), pred);
-			str.erase(str.begin(), it2);
-			return str;
-		}
+        template <typename StringType, typename Pred>
+        static StringType& ltrim_if(StringType& str, Pred pred)
+        {
+            auto it2 = std::find_if_not(str.begin(), str.end(), pred);
+            str.erase(str.begin(), it2);
+            return str;
+        }
 
-		template <typename StringType, typename Pred>
+        template <typename StringType, typename Pred>
         static StringType& rtrim_if(StringType& str, Pred pred)
-		{
-			auto it1 = std::find_if_not(str.rbegin(), str.rend(), pred);
-			str.erase(it1.base(), str.end());
-			return str;
-		}
+        {
+            auto it1 = std::find_if_not(str.rbegin(), str.rend(), pred);
+            str.erase(it1.base(), str.end());
+            return str;
+        }
 
-		template <typename StringType, typename Pred>
+        template <typename StringType, typename Pred>
         static StringType ltrim_copy_if(StringType str, Pred pred)
-		{
-			return ltrim_if(str, pred);
-		}
+        {
+            return ltrim_if(str, pred);
+        }
 
-		template <typename StringType, typename Pred>
+        template <typename StringType, typename Pred>
         static StringType rtrim_copy(StringType str, Pred pred)
-		{
-			return ltrim_if(str, pred);
-		}
+        {
+            return ltrim_if(str, pred);
+        }
 
-		template <typename StringType, typename Pred>
+        template <typename StringType, typename Pred>
         static StringType trim_copy_if(StringType str, Pred pred)
-		{
-			return ltrim_if(rtrim_if(str, pred), pred);
-		}
+        {
+            return ltrim_if(rtrim_if(str, pred), pred);
+        }
 
-		template <typename StringType, typename Pred>
+        template <typename StringType, typename Pred>
         static StringType& trim_if(StringType& str, Pred pred)
-		{
-			return ltrim_if(rtrim_if(str, pred), pred);
-		}
+        {
+            return ltrim_if(rtrim_if(str, pred), pred);
+        }
 
         template <typename StringType, typename TrimmerFn>
         static decltype(auto) string_trimmer(StringType&& str, TrimmerFn fn)
         {
-			if constexpr (std::is_same_v <StringType, std::wstring>)
-			{
-				return fn(str, [](unsigned char ch) { return !iswspace(ch); });
-			}
-			else
-			{
-				return fn(str, [](unsigned char ch) { return !isspace(ch); });
-			}
-			return std::forward<StringType>(str);
+            if constexpr (std::is_same_v <StringType, std::wstring>)
+            {
+                return fn(str, [](unsigned char ch) { return !iswspace(ch); });
+            }
+            else
+            {
+                return fn(str, [](unsigned char ch) { return !isspace(ch); });
+            }
+            return std::forward<StringType>(str);
         }
 
-		static decltype(auto) ltrim(StringType&& str)
-		{
+        static decltype(auto) ltrim(StringType&& str)
+        {
             return string_trimmer(str, &ltrim_if);
-		}
+        }
 
-		static decltype(auto) rtrim(StringType&& str)
-		{
+        static decltype(auto) rtrim(StringType&& str)
+        {
             return string_trimmer(str, &rtrim_if);
-		}
+        }
 
-		static decltype(auto) trim(StringType&& str)
-		{
-			return ltrim_copy(rtrim_copy(str));
-		}
+        static decltype(auto) trim(StringType&& str)
+        {
+            return ltrim_copy(rtrim_copy(str));
+        }
 
         static StringType ltrim_copy(StringType str)
-		{
+        {
             return ltrim(str);
-		}
+        }
 
         static StringType rtrim_copy(StringType str)
-		{
+        {
             return rtrim(str);
-		}
+        }
 
-		static StringType trim_copy(StringType str)
-		{
-			return ltrim_copy(rtrim_copy(str));
-		}
+        static StringType trim_copy(StringType str)
+        {
+            return ltrim_copy(rtrim_copy(str));
+        }
 
 
         public:
@@ -918,17 +908,62 @@ namespace dynarithmic
             return pathName;
         }
 
-		static StringType GetGUIDNoCurlyBrace()
-		{
-			const boost::uuids::uuid u = boost::uuids::random_generator()();
-            return StringTraits::ConvertToBoostUUIDString(u);
-		}
+        static StringType GenerateUUIDv4()
+        {
+            using char_type = typename StringType::value_type;
+
+            static_assert(std::is_same_v<StringType, std::string> ||std::is_same_v<StringType, std::wstring>,
+                          "StringType must be std::string or std::wstring");
+
+            std::array<std::uint8_t, 16> bytes{};
+
+            std::random_device rd;
+            std::mt19937_64 gen(rd());
+
+            for (std::size_t i = 0; i < bytes.size(); i += 8)
+            {
+                const auto value = gen();
+
+                for (std::size_t j = 0; j < 8 && i + j < bytes.size(); ++j)
+                {
+                    bytes[i + j] =
+                        static_cast<std::uint8_t>((value >> (j * 8)) & 0xFF);
+                }
+            }
+
+            // UUID version 4
+            bytes[6] = static_cast<std::uint8_t>((bytes[6] & 0x0F) | 0x40);
+
+            // RFC 4122 variant
+            bytes[8] = static_cast<std::uint8_t>((bytes[8] & 0x3F) | 0x80);
+
+            constexpr char_type hex[] =
+            {
+                char_type('0'), char_type('1'), char_type('2'), char_type('3'),
+                char_type('4'), char_type('5'), char_type('6'), char_type('7'),
+                char_type('8'), char_type('9'), char_type('a'), char_type('b'),
+                char_type('c'), char_type('d'), char_type('e'), char_type('f')
+            };
+
+            std::array<char_type, 37> out{};
+            std::size_t pos = 0;
+
+            for (std::size_t i = 0; i < bytes.size(); ++i)
+            {
+                if (i == 4 || i == 6 || i == 8 || i == 10)
+                    out[pos++] = char_type('-');
+
+                out[pos++] = hex[(bytes[i] >> 4) & 0x0F];
+                out[pos++] = hex[bytes[i] & 0x0F];
+            }
+
+            out[pos] = char_type('\0');
+            return StringType(out.data());
+        }
 
         static StringType GetGUID()
         {
-            return StringTraits::GetLeftCurlyBrace() +
-                   GetGUIDNoCurlyBrace() +
-                   StringTraits::GetRightCurlyBrace();
+            return StringTraits::GetLeftCurlyBrace() + GenerateUUIDv4() + StringTraits::GetRightCurlyBrace();
         }
 
         static StringType GetModuleFileName(HMODULE hModule)
@@ -966,71 +1001,170 @@ namespace dynarithmic
         }
 
         static int TokenizeEx(const StringType& str,
-                              const CharType *lpszTokStr,
-                              StringArrayType &rArray,
+                              const typename StringType::value_type* lpszTokStr,
+                              StringArrayType& rArray,
                               bool bGetNullTokens,
-                              std::vector<unsigned>* positionArray= nullptr)
+                              std::vector<unsigned>* positionArray = nullptr)
         {
+            using size_type = typename StringType::size_type;
+
             rArray.clear();
-            if (!lpszTokStr)
-                return 0;
-            typedef boost::tokenizer<boost::char_separator<CharType>,
-                                     typename StringType::const_iterator,
-                                     StringType> tokenizer;
-            boost::empty_token_policy tokenPolicy = bGetNullTokens?boost::keep_empty_tokens : boost::drop_empty_tokens;
-            boost::char_separator<CharType> sepr(lpszTokStr, StringTraits::GetEmptyString(), tokenPolicy);
-            tokenizer tokens(str, sepr);
-            for (typename tokenizer::const_iterator tok_iter = tokens.begin();
-                tok_iter != tokens.end(); ++tok_iter)
+            if (positionArray)
+                positionArray->clear();
+
+            if (!lpszTokStr || !*lpszTokStr)
             {
-                rArray.push_back(*tok_iter);
-                if ( positionArray )
+                if (!str.empty() || bGetNullTokens)
                 {
-                    const std::ptrdiff_t offset = tok_iter.base() - str.begin() - tok_iter->size();
-                    positionArray->push_back(static_cast<unsigned>(offset));
+                    rArray.push_back(str);
+                    if (positionArray)
+                        positionArray->push_back(0);
                 }
+                return static_cast<int>(rArray.size());
             }
+
+            size_type start = 0;
+
+            while (start <= str.size())
+            {
+                const size_type pos = str.find_first_of(lpszTokStr, start);
+
+                const size_type end =
+                    (pos == StringType::npos) ? str.size() : pos;
+
+                if (end != start || bGetNullTokens)
+                {
+                    rArray.emplace_back(str.substr(start, end - start));
+
+                    if (positionArray)
+                        positionArray->push_back(static_cast<unsigned>(start));
+                }
+
+                if (pos == StringType::npos)
+                    break;
+
+                start = pos + 1;
+            }
+
             return static_cast<int>(rArray.size());
         }
 
         static int TokenizeQuotedEx(const StringType& str,
-                                    const CharType *lpszTokStr,
-                                    StringArrayType &rArray,
+                                    const typename StringType::value_type* lpszTokStr,
+                                    StringArrayType& rArray,
                                     bool bGetNullTokens,
                                     std::vector<unsigned>* positionArray = nullptr)
         {
+            using CharT = typename StringType::value_type;
+            using size_type = typename StringType::size_type;
+
             rArray.clear();
-            typedef boost::tokenizer<boost::escaped_list_separator<CharType>,
-                                    typename StringType::const_iterator,
-                                    StringType> tokenizer;
+            if (positionArray)
+                positionArray->clear();
 
-            boost::escaped_list_separator<CharType> sepr(StringTraits::GetEmptyString(), lpszTokStr, StringTraits::AllQuoteString());
-            tokenizer tokens(str, sepr);
-            for (auto tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
+            auto is_delimiter = [lpszTokStr](CharT ch) -> bool
             {
-                rArray.push_back(*tok_iter);
-                if (positionArray)
+                if (!lpszTokStr)
+                    return false;
+
+                for (const CharT* p = lpszTokStr; *p; ++p)
                 {
-                    const std::ptrdiff_t offset = tok_iter.base() - str.begin() - tok_iter->size();
-                    positionArray->push_back(static_cast<unsigned>(offset));
+                    if (*p == ch)
+                        return true;
+                }
+                return false;
+            };
+
+            auto is_quote = [](CharT ch) -> bool
+            {
+                return ch == static_cast<CharT>('\'') ||
+                    ch == static_cast<CharT>('"');
+            };
+
+            auto add_token = [&](size_type tokenStart,
+                size_type tokenEnd,
+                size_type reportedPosition)
+            {
+                if (tokenEnd < tokenStart)
+                    tokenEnd = tokenStart;
+
+                if (tokenEnd != tokenStart || bGetNullTokens)
+                {
+                    rArray.emplace_back(str.substr(tokenStart, tokenEnd - tokenStart));
+
+                    if (positionArray)
+                        positionArray->push_back(static_cast<unsigned>(reportedPosition));
+                }
+            };
+
+            const size_type n = str.size();
+            size_type tokenStart = 0;
+            size_type tokenContentStart = 0;
+            bool inQuote = false;
+            CharT quoteChar = 0;
+            bool tokenStarted = false;
+            bool quotedToken = false;
+
+            for (size_type i = 0; i <= n; ++i)
+            {
+                const bool atEnd = (i == n);
+                const CharT ch = atEnd ? CharT{} : str[i];
+
+                if (!atEnd && !tokenStarted)
+                {
+                    tokenStarted = true;
+                    tokenStart = i;
+                    tokenContentStart = i;
+
+                    if (is_quote(ch))
+                    {
+                        quotedToken = true;
+                        inQuote = true;
+                        quoteChar = ch;
+                        tokenContentStart = i + 1;
+                        continue;
+                    }
+                }
+
+                if (!atEnd && inQuote)
+                {
+                    if (ch == quoteChar)
+                    {
+                        inQuote = false;
+                        continue;
+                    }
+
+                    continue;
+                }
+
+                if (atEnd || (!inQuote && is_delimiter(ch)))
+                {
+                    size_type tokenEnd = i;
+
+                    if (quotedToken)
+                    {
+                        // Strip trailing quote if the token ended after a quote.
+                        tokenEnd = i;
+
+                        if (tokenEnd > tokenContentStart &&
+                            is_quote(str[tokenEnd - 1]))
+                        {
+                            --tokenEnd;
+                        }
+                    }
+
+                    add_token(tokenContentStart, tokenEnd, tokenStart);
+
+                    tokenStarted = false;
+                    quotedToken = false;
+                    inQuote = false;
+                    quoteChar = 0;
+
+                    tokenStart = i + 1;
+                    tokenContentStart = i + 1;
                 }
             }
-            if ( !bGetNullTokens )
-            {
-                std::vector<size_t> removed_pos;
-                for (size_t idx = 0; idx < rArray.size(); ++idx)
-                {
-                    if ( rArray[idx].empty() )
-                        removed_pos.push_back(idx);
-                }
 
-                for (auto i : removed_pos)
-                {
-                    rArray.erase(rArray.begin() + i);
-                    if ( positionArray )
-                        positionArray->erase(positionArray->begin() + i);
-                }
-            }
             return static_cast<int>(rArray.size());
         }
 

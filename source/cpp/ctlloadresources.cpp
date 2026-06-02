@@ -19,8 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <sstream>
-#include <boost/format.hpp>
 #include <string_view>
+#include <queue>
 #include "ctliface.h"
 #include "ctlloadresources.h"
 
@@ -29,13 +29,6 @@
 #include "dtwain_verinfo.h"
 #include "dtwstrfn.h"
 #include "crc32_aux.h"
-
-using namespace dynarithmic;
-
-#ifdef TWAINSAVE_STATIC
-LONG  TS_Command(LPCTSTR lpCommand);
-#endif
-
 
 namespace dynarithmic
 {
@@ -285,8 +278,8 @@ namespace dynarithmic
             CTL_StaticData::GetGeneralCapInfo().insert({ static_cast<TW_UINT16>(lCap), cStruct });
         }
 
-		std::string line;
-		ifs.ignore();
+        std::string line;
+        ifs.ignore();
         auto& mediamap = CTL_StaticData::GetPDFMediaMap();
         while (std::getline(ifs, line))
         {
@@ -397,7 +390,7 @@ namespace dynarithmic
 
         // Read in the image resampling data
         auto& imageMap = CTL_StaticData::GetImageResamplerMap();
-		auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
+        auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
         bppMap.clear();
         imageMap.clear();
         while (std::getline(ifs, totalLine))
@@ -717,7 +710,7 @@ namespace dynarithmic
                         descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
                     else
                     if (resourceID == IDS_DTWAIN_APPTITLE_HTML)
-						descr = StringWrapperA::ReplaceAll(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
+                        descr = StringWrapperA::ReplaceAll(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
                     resourceMap.insert({ resourceID, descr });
                 }
             }

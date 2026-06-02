@@ -177,7 +177,7 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
     {
         // Set the ICAP_TILES capability on here
         auto retValue = dynarithmic::CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
-		DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retValue.second; }, retValue.first, -1, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retValue.second; }, retValue.first, -1, FUNC_MACRO);
         auto arr = retValue.second;
         DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arr);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
@@ -196,7 +196,7 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
     auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
-	DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] 
+    DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] 
         { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
     if (pr.first != DTWAIN_NO_ERROR)
     {

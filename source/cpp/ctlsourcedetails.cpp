@@ -20,13 +20,11 @@
  */
 
 #include "../nlohmann/json.hpp"
-#include <boost/range/adaptor/transformed.hpp>
-#include <string_view>
-#include "ctltwainmanager.h"
+#include <string>
+#include <sstream>
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
-#include "ctlclosesource.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -430,7 +428,6 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     static constexpr int numImageInfoString = 13;
     const auto pHandle = ts.GetTwainDLLHandle();
     using boost::algorithm::join;
-    using boost::adaptors::transformed;
     using json = nlohmann::ordered_json;
 
     struct capabilityInfo
@@ -735,35 +732,35 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     // Get the filetype info
                     tempStrm.str("");
                     static constexpr std::array<std::string_view, 29> fileTypes = {
-															"\"bmp (rle compression)\",",
+                                                            "\"bmp (rle compression)\",",
                                                             "\"bmp\",",
-															"\"dcx\",",
-															"\"emf\",",
+                                                            "\"dcx\",",
+                                                            "\"emf\",",
                                                             "\"gif\",",
-															"\"ico\",",
-															"\"jp2 (jpeg-2000)\",",
-															"\"jpeg-xr\",",
-															"\"jpeg\",",
+                                                            "\"ico\",",
+                                                            "\"jp2 (jpeg-2000)\",",
+                                                            "\"jpeg-xr\",",
+                                                            "\"jpeg\",",
                                                             "\"pcx\",",
                                                             "\"pdf\",",
                                                             "\"png\",",
-															"\"ps1 (Postscript 1)\",",
-															"\"ps2 (Postscript 2)\",",
+                                                            "\"ps1 (Postscript 1)\",",
+                                                            "\"ps2 (Postscript 2)\",",
                                                             "\"psd\",",
-															"\"svg\",",
-															"\"svgz\",",
-															"\"tga (rle compression)\",",
-															"\"tga\",",
+                                                            "\"svg\",",
+                                                            "\"svgz\",",
+                                                            "\"tga (rle compression)\",",
+                                                            "\"tga\",",
                                                             "\"tiff (flate compression)\",",
                                                             "\"tiff (group 3 fax compression)\",",
                                                             "\"tiff (group 4 fax compression)\",",
-															"\"tiff (jpeg compression)\",",
-															"\"tiff (lzw compression)\",",
-															"\"tiff (no compression)\",",
-															"\"tiff (packbits compression)\",",
-															"\"wbmp\",",
-															"\"webp\",",
-															"\"wmf\"" };
+                                                            "\"tiff (jpeg compression)\",",
+                                                            "\"tiff (lzw compression)\",",
+                                                            "\"tiff (no compression)\",",
+                                                            "\"tiff (packbits compression)\",",
+                                                            "\"wbmp\",",
+                                                            "\"webp\",",
+                                                            "\"wmf\"" };
                     std::string allFileTypes;
                     for (auto s : fileTypes)
                         allFileTypes += s.data();

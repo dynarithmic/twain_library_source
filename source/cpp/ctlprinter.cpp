@@ -45,8 +45,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
 
     auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
-	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 32);
-	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 32);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
     auto Array = retVal.second;
 
     // Destroys array when out of scope
@@ -84,8 +84,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG nPrinter
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
-	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-	DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
     auto Array = retVal.second;
     DTWAINArrayLowLevel_RAII a(pHandle, Array);
 

@@ -22,31 +22,32 @@ OF THIRD PARTY RIGHTS.
 #define IOHANDLERTIFF_H
 
 #include "ctldib32.h"
+#include "tiffwriter.h"
 
 namespace dynarithmic
 {
-	class CTL_TiffIOHandler : public CTL_ImageIOHandler
-	{
-		public:
-			CTL_TiffIOHandler(int nFormat, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(), m_nFormat(nFormat),
-				m_ImageInfoEx(ImageInfoEx) {}
-			CTL_TiffIOHandler(CTL_TwainDib* pDib, int nFormat, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
-				m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
-			~CTL_TiffIOHandler() = default;
-			int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct) override;
-			void SetTiffFormat(int nFormat) { m_nFormat = nFormat; }
-			int  GetTiffFormat() const { return m_nFormat; }
-			CTL_StringType GetFileName() const { return sActualFileName; }
-			DTWAINTiffOutput& GetOutputHandler() { return m_TiffOutputHandler; }
+    class CTL_TiffIOHandler : public CTL_ImageIOHandler
+    {
+        public:
+            CTL_TiffIOHandler(int nFormat, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(), m_nFormat(nFormat),
+                m_ImageInfoEx(ImageInfoEx) {}
+            CTL_TiffIOHandler(CTL_TwainDib* pDib, int nFormat, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
+                m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
+            ~CTL_TiffIOHandler() = default;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct) override;
+            void SetTiffFormat(int nFormat) { m_nFormat = nFormat; }
+            int  GetTiffFormat() const { return m_nFormat; }
+            CTL_StringType GetFileName() const { return sActualFileName; }
+            DTWAINTiffOutput& GetOutputHandler() { return m_TiffOutputHandler; }
 
-		private:
-			int WriteOneTiffPage(LPCTSTR path, HANDLE bitmap, const DibMultiPageStruct* multiPageStruct);
-			int m_nFormat;
-			DTWAINImageInfoEx m_ImageInfoEx;
-			CTL_StringType sActualFileName;
-			CTL_StringType sPostscriptName;
-			DTWAINTiffOutput m_TiffOutputHandler;
+        private:
+            int WriteOneTiffPage(LPCTSTR path, HANDLE bitmap, const DibMultiPageStruct* multiPageStruct);
+            int m_nFormat;
+            DTWAINImageInfoEx m_ImageInfoEx;
+            CTL_StringType sActualFileName;
+            CTL_StringType sPostscriptName;
+            DTWAINTiffOutput m_TiffOutputHandler;
 
-		};
+        };
 }
 #endif

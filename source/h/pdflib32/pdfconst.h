@@ -18,11 +18,17 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
-#ifndef AHEXENCODE_H
-#define AHEXENCODE_H
+#ifndef PDFCONST_H
+#define PDFCONST_H
 
-#include <string>
-#include <string_view>
-int ASCIIHexEncode(std::string_view inData, std::string& outData);
+#define PDF_AUTHOR      0
+#define PDF_PRODUCER    1
+#define PDF_TITLE       2
+#define PDF_KEYWORDS    3
+#define PDF_SUBJECT     4
+#define PDF_ORIENTATION 5
+#define PDF_MEDIABOX    6
+#define PDF_SCALETYPE   7
+#define PDF_CREATOR     8
 
 #endif

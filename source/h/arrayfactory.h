@@ -59,7 +59,7 @@ namespace dynarithmic
         CTL_ArrayAnyType = 1000,
         CTL_ArrayToHandleArray = 2000,
         CTL_ArrayFrameSingleType = 3000,
-		CTL_ArrayUIntType = 120,
+        CTL_ArrayUIntType = 120,
         CTL_ArrayShortIntType = 160,
         CTL_ArrayShortUIntType = 170,
         CTL_ArrayInvalid = -1
@@ -103,7 +103,7 @@ namespace dynarithmic
         struct tagged_array : arrayTag
         {
             using value_type = T;  // The underlying array type
-			using value_converted_type = ConvertedType;
+            using value_converted_type = ConvertedType;
             using container_type = std::vector<T>; // the backing container for the array values
             container_type vData;
             container_type& get_container() noexcept { return vData; }  // returns the vector
@@ -114,8 +114,8 @@ namespace dynarithmic
 
         // all of the DTWAIN array types.
         using tagged_array_int16 = tagged_array<int16_t>;
-		using tagged_array_uint16 = tagged_array<uint16_t>;
-		using tagged_array_uint32 = tagged_array<uint32_t>;
+        using tagged_array_uint16 = tagged_array<uint16_t>;
+        using tagged_array_uint32 = tagged_array<uint32_t>;
         using tagged_array_long = tagged_array<LONG, DWORD>;
         using tagged_array_double = tagged_array<double>;
         using tagged_array_string = tagged_array<std::string>;
@@ -181,7 +181,7 @@ namespace dynarithmic
         auto& underlying_container_t(arrayTag* pTag) const
         {
             // Get the tagged_array<T> that represents the DTWAIN Array
-	        if (auto* p = static_cast<tagged_array<T>*>(pTag))
+            if (auto* p = static_cast<tagged_array<T>*>(pTag))
                 return p->get_container(); // Return the std::vector
             throw (std::invalid_argument("underlying_container_t argument cannot be nullptr"));
         }
@@ -400,9 +400,9 @@ namespace dynarithmic
         {
             auto p = static_cast<T*>(tag);
             auto& v = p->get_container();
-			auto first = v.begin() + nWhere;
-			auto last = v.begin() + std::min(nWhere + nCount, v.size());
-			v.erase(first, last);
+            auto first = v.begin() + nWhere;
+            auto last = v.begin() + std::min(nWhere + nCount, v.size());
+            v.erase(first, last);
         }
 
         template <typename T>
@@ -541,9 +541,9 @@ namespace dynarithmic
         {
             constexpr std::array<std::pair<CTL_ArrayType, int>, 15> mapArrayTypeToTag =
             { {
-				{CTL_ArrayIntType, arrayTag::LongType},
-				{CTL_ArrayUIntType, arrayTag::UInt32Type},
-				{CTL_ArrayShortIntType, arrayTag::Int16Type},
+                {CTL_ArrayIntType, arrayTag::LongType},
+                {CTL_ArrayUIntType, arrayTag::UInt32Type},
+                {CTL_ArrayShortIntType, arrayTag::Int16Type},
                 {CTL_ArrayShortUIntType, arrayTag::UInt16Type},
                 {CTL_ArrayInt64Type, arrayTag::Long64Type},
                 {CTL_ArrayDoubleType, arrayTag::DoubleType},
@@ -565,10 +565,10 @@ namespace dynarithmic
         static constexpr CTL_ArrayType tagtype_to_arraytype(int tag)
         {
             constexpr std::array<std::pair<int, CTL_ArrayType>, 15> mapTagToArrayType = { {
-				{arrayTag::Int16Type,                           CTL_ArrayShortIntType},
-				{arrayTag::UInt16Type,                          CTL_ArrayShortUIntType},
+                {arrayTag::Int16Type,                           CTL_ArrayShortIntType},
+                {arrayTag::UInt16Type,                          CTL_ArrayShortUIntType},
                 {arrayTag::LongType,                            CTL_ArrayIntType},
-				{arrayTag::UInt32Type,                          CTL_ArrayUIntType},
+                {arrayTag::UInt32Type,                          CTL_ArrayUIntType},
                 {arrayTag::Long64Type,                          CTL_ArrayInt64Type},
                 {arrayTag::DoubleType,                          CTL_ArrayDoubleType},
                 {arrayTag::VoidPtrType,                         CTL_ArrayHandleType},

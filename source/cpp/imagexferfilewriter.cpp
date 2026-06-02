@@ -509,7 +509,7 @@ int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
     HANDLE pDibBufferHandle;
     auto sessionHandle = DupData.m_pSource->GetTwainSession()->GetTwainDLLHandle();
     char* pDibBuffer = static_cast<char*>(sessionHandle->m_TwainMemoryFunc->AllocateMemoryPtr(
-											static_cast<TW_UINT32>(DupData.nBytes), &pDibBufferHandle));
+                                            static_cast<TW_UINT32>(DupData.nBytes), &pDibBufferHandle));
     if ( !pDibBuffer )
     {
         retval = ProcessManualDuplexState(DTWAIN_TN_MANDUPMEMORYERROR);
@@ -761,7 +761,7 @@ void ImageXferFileWriter::EndProcessingImageFile(bool bSaveFile/*=true*/) const
 void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession, LONG Error, LONG ErrorMsg,
                           const std::string& extraInfo)
 {
-	CTL_TwainAppMgr::SetAndLogError(Error, extraInfo, true);
+    CTL_TwainAppMgr::SetAndLogError(Error, extraInfo, true);
     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, ErrorMsg, reinterpret_cast<LPARAM>(pSource));
 }
 

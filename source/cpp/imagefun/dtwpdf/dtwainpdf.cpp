@@ -102,40 +102,40 @@ typedef std::array<std::array<double, 3>, 3> Matrix3_3;
 
 static uint8_t ReverseBits(uint8_t v)
 {
-	v = static_cast<uint8_t>(((v & 0xF0) >> 4) | ((v & 0x0F) << 4));
-	v = static_cast<uint8_t>(((v & 0xCC) >> 2) | ((v & 0x33) << 2));
-	v = static_cast<uint8_t>(((v & 0xAA) >> 1) | ((v & 0x55) << 1));
-	return v;
+    v = static_cast<uint8_t>(((v & 0xF0) >> 4) | ((v & 0x0F) << 4));
+    v = static_cast<uint8_t>(((v & 0xCC) >> 2) | ((v & 0x33) << 2));
+    v = static_cast<uint8_t>(((v & 0xAA) >> 1) | ((v & 0x55) << 1));
+    return v;
 }
 
 static void ReverseBitsInRow(uint8_t* row, uint32 rowBytes)
 {
-	for (uint32 i = 0; i < rowBytes; ++i)
-		row[i] = ReverseBits(row[i]);
+    for (uint32 i = 0; i < rowBytes; ++i)
+        row[i] = ReverseBits(row[i]);
 }
 
 static Matrix3_3 MultiplyMatrix33(const Matrix3_3 & A, const Matrix3_3 & B)
 {
     Matrix3_3 C;
-	const double a00 = A[0][0], a01 = A[0][1], a02 = A[0][2];
-	const double a10 = A[1][0], a11 = A[1][1], a12 = A[1][2];
-	const double a20 = A[2][0], a21 = A[2][1], a22 = A[2][2];
+    const double a00 = A[0][0], a01 = A[0][1], a02 = A[0][2];
+    const double a10 = A[1][0], a11 = A[1][1], a12 = A[1][2];
+    const double a20 = A[2][0], a21 = A[2][1], a22 = A[2][2];
 
-	const double b00 = B[0][0], b01 = B[0][1], b02 = B[0][2];
-	const double b10 = B[1][0], b11 = B[1][1], b12 = B[1][2];
-	const double b20 = B[2][0], b21 = B[2][1], b22 = B[2][2];
+    const double b00 = B[0][0], b01 = B[0][1], b02 = B[0][2];
+    const double b10 = B[1][0], b11 = B[1][1], b12 = B[1][2];
+    const double b20 = B[2][0], b21 = B[2][1], b22 = B[2][2];
 
-	C[0][0] = a00 * b00 + a01 * b10 + a02 * b20;
-	C[0][1] = a00 * b01 + a01 * b11 + a02 * b21;
-	C[0][2] = a00 * b02 + a01 * b12 + a02 * b22;
+    C[0][0] = a00 * b00 + a01 * b10 + a02 * b20;
+    C[0][1] = a00 * b01 + a01 * b11 + a02 * b21;
+    C[0][2] = a00 * b02 + a01 * b12 + a02 * b22;
 
-	C[1][0] = a10 * b00 + a11 * b10 + a12 * b20;
-	C[1][1] = a10 * b01 + a11 * b11 + a12 * b21;
-	C[1][2] = a10 * b02 + a11 * b12 + a12 * b22;
+    C[1][0] = a10 * b00 + a11 * b10 + a12 * b20;
+    C[1][1] = a10 * b01 + a11 * b11 + a12 * b21;
+    C[1][2] = a10 * b02 + a11 * b12 + a12 * b22;
 
-	C[2][0] = a20 * b00 + a21 * b10 + a22 * b20;
-	C[2][1] = a20 * b01 + a21 * b11 + a22 * b21;
-	C[2][2] = a20 * b02 + a21 * b12 + a22 * b22;
+    C[2][0] = a20 * b00 + a21 * b10 + a22 * b20;
+    C[2][1] = a20 * b01 + a21 * b11 + a22 * b21;
+    C[2][2] = a20 * b02 + a21 * b12 + a22 * b22;
     return C;
 }
 
@@ -1445,7 +1445,7 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
                 // Write info to transformation matrix
                 sprintf(szBuf, "\n%4.2lf %4.2lf %4.2lf %4.2lf %4.2lf %4.2lf Tm",
                     pdfTransformation3[0][0], pdfTransformation3[0][1], pdfTransformation3[1][0], pdfTransformation3[1][1],
-    				(*pIt1)->xpos, (*pIt1)->ypos);
+                    (*pIt1)->xpos, (*pIt1)->ypos);
 
                 m_sText += szBuf;
 
@@ -1700,87 +1700,87 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
 
 bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*/, int& dpix, int& dpiy)
 {
-	TIFF* image = TIFFOpen(StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb");
-	if (!image)
-		return false;
+    TIFF* image = TIFFOpen(StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb");
+    if (!image)
+        return false;
 
-	uint16 bitsPerSample = 0;
-	uint16 samplesPerPixel = 0;
-	uint16 compression = COMPRESSION_NONE;
-	uint16 fillorder = FILLORDER_MSB2LSB;
+    uint16 bitsPerSample = 0;
+    uint16 samplesPerPixel = 0;
+    uint16 compression = COMPRESSION_NONE;
+    uint16 fillorder = FILLORDER_MSB2LSB;
 
-	if (TIFFGetField(image, TIFFTAG_BITSPERSAMPLE, &bitsPerSample) != 0)
-		m_bpp = bpp = bitsPerSample;
+    if (TIFFGetField(image, TIFFTAG_BITSPERSAMPLE, &bitsPerSample) != 0)
+        m_bpp = bpp = bitsPerSample;
 
-	if (TIFFGetField(image, TIFFTAG_SAMPLESPERPIXEL, &samplesPerPixel) == 0)
-	{
-		TIFFClose(image);
-		return false;
-	}
+    if (TIFFGetField(image, TIFFTAG_SAMPLESPERPIXEL, &samplesPerPixel) == 0)
+    {
+        TIFFClose(image);
+        return false;
+    }
 
-	switch (samplesPerPixel)
-	{
-	case 1:  m_sColorSpace = "DeviceGray"; break;
-	default: m_sColorSpace = "DeviceRGB";  break;
-	}
+    switch (samplesPerPixel)
+    {
+    case 1:  m_sColorSpace = "DeviceGray"; break;
+    default: m_sColorSpace = "DeviceRGB";  break;
+    }
 
-	TIFFGetField(image, TIFFTAG_IMAGEWIDTH, &width);
-	TIFFGetField(image, TIFFTAG_IMAGELENGTH, &height);
+    TIFFGetField(image, TIFFTAG_IMAGEWIDTH, &width);
+    TIFFGetField(image, TIFFTAG_IMAGELENGTH, &height);
 
-	float xres = 0.0f, yres = 0.0f;
-	TIFFGetField(image, TIFFTAG_XRESOLUTION, &xres);
-	TIFFGetField(image, TIFFTAG_YRESOLUTION, &yres);
+    float xres = 0.0f, yres = 0.0f;
+    TIFFGetField(image, TIFFTAG_XRESOLUTION, &xres);
+    TIFFGetField(image, TIFFTAG_YRESOLUTION, &yres);
 
-	dpix = static_cast<int>(xres);
-	dpiy = static_cast<int>(yres);
+    dpix = static_cast<int>(xres);
+    dpiy = static_cast<int>(yres);
 
-	m_Width = m_nTiffColumns = width;
-	m_Height = m_nTiffRows = height;
+    m_Width = m_nTiffColumns = width;
+    m_Height = m_nTiffRows = height;
 
-	TIFFGetField(image, TIFFTAG_COMPRESSION, &compression);
-	TIFFGetField(image, TIFFTAG_FILLORDER, &fillorder);
+    TIFFGetField(image, TIFFTAG_COMPRESSION, &compression);
+    TIFFGetField(image, TIFFTAG_FILLORDER, &fillorder);
 
-	// This replacement path is for uncompressed 1-bpp TIFF only.
-	if (bitsPerSample != 1 || samplesPerPixel != 1 || compression != COMPRESSION_NONE)
-	{
-		TIFFClose(image);
-		return false;
-	}
+    // This replacement path is for uncompressed 1-bpp TIFF only.
+    if (bitsPerSample != 1 || samplesPerPixel != 1 || compression != COMPRESSION_NONE)
+    {
+        TIFFClose(image);
+        return false;
+    }
 
-	const uint32 rowBytes = static_cast<uint32>((width + 7) / 8);
+    const uint32 rowBytes = static_cast<uint32>((width + 7) / 8);
 
-	m_vImgStream.assign(static_cast<size_t>(rowBytes) * static_cast<size_t>(height), 0);
-	std::vector<uint8_t> rowBuffer(rowBytes);
+    m_vImgStream.assign(static_cast<size_t>(rowBytes) * static_cast<size_t>(height), 0);
+    std::vector<uint8_t> rowBuffer(rowBytes);
 
-	for (int row = 0; row < height; ++row)
-	{
-		if (TIFFReadScanline(image, rowBuffer.data(), static_cast<uint32>(row), 0) < 0)
-		{
-			TIFFClose(image);
-			return false;
-		}
+    for (int row = 0; row < height; ++row)
+    {
+        if (TIFFReadScanline(image, rowBuffer.data(), static_cast<uint32>(row), 0) < 0)
+        {
+            TIFFClose(image);
+            return false;
+        }
 
-		if (fillorder == FILLORDER_LSB2MSB)
-			ReverseBitsInRow(rowBuffer.data(), rowBytes);
+        if (fillorder == FILLORDER_LSB2MSB)
+            ReverseBitsInRow(rowBuffer.data(), rowBytes);
 
-		std::memcpy(&m_vImgStream[static_cast<size_t>(row) * rowBytes],
-			rowBuffer.data(),
-			rowBytes);
-	}
+        std::memcpy(&m_vImgStream[static_cast<size_t>(row) * rowBytes],
+            rowBuffer.data(),
+            rowBytes);
+    }
 
-	m_imgLengthInBytes = static_cast<unsigned long>(m_vImgStream.size());
+    m_imgLengthInBytes = static_cast<unsigned long>(m_vImgStream.size());
 
-	const std::vector<char> tempRealData = m_vImgStream;
-	EncodeVectorStream(tempRealData,
-		m_imgLengthInBytes,
-		m_vImgStream,
-		PdfDocument::FLATE_COMPRESS);
+    const std::vector<char> tempRealData = m_vImgStream;
+    EncodeVectorStream(tempRealData,
+        m_imgLengthInBytes,
+        m_vImgStream,
+        PdfDocument::FLATE_COMPRESS);
 
-	m_imgLengthInBytes = static_cast<unsigned long>(m_vImgStream.size());
-	const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
-	m_nCurCRCVal = crcVal;
-	TIFFClose(image);
-	return true;
+    m_imgLengthInBytes = static_cast<unsigned long>(m_vImgStream.size());
+    const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
+    m_nCurCRCVal = crcVal;
+    TIFFClose(image);
+    return true;
 }
 void ImageObject::ComposeObject()
 {

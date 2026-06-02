@@ -71,14 +71,14 @@ private:
 
 class UTF8_UTF16_Converter
 {
-	public:
-		static std::pair<std::wstring, bool> UTF8ToUTF16(std::string_view utf8)
-		{
-			if (utf8.empty())
-				return { {}, true };
-			// Not yet implemented
+    public:
+        static std::pair<std::wstring, bool> UTF8ToUTF16(std::string_view utf8)
+        {
+            if (utf8.empty())
+                return { {}, true };
+            // Not yet implemented
             return { {}, false };
-		}
+        }
 
         static std::pair<std::string, bool> UTF16ToUTF8(std::wstring_view utf16string)
         {

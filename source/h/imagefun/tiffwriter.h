@@ -24,170 +24,171 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <memory>
 #include <vector>
+#include <optional>
 #include "tiffio.h"
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 
 enum class TiffContainerFormat
 {
-	ClassicTiff,
-	BigTiff
+    ClassicTiff,
+    BigTiff
 };
 
 enum class TiffCompression
 {
-	None,
-	Group3,
-	Group4,
-	Lzw,
-	Flate,
-	PackBits,
-	Jpeg
+    None,
+    Group3,
+    Group4,
+    Lzw,
+    Flate,
+    PackBits,
+    Jpeg
 };
 
 enum class PixelFlavor
 {
-	BW1,        // 1-bpp bilevel
-	Gray8,      // 8-bpp grayscale
-	Palette8,   // 8-bpp indexed/paletted
-	Gray16,     // 16-bpp grayscale
-	Bgr24,      // 24-bpp Windows DIB
-	Bgra32      // 32-bpp Windows DIB, alpha ignored
+    BW1,        // 1-bpp bilevel
+    Gray8,      // 8-bpp grayscale
+    Palette8,   // 8-bpp indexed/paletted
+    Gray16,     // 16-bpp grayscale
+    Bgr24,      // 24-bpp Windows DIB
+    Bgra32      // 32-bpp Windows DIB, alpha ignored
 };
 
 
 struct TiffSessionOptions
 {
-	TiffContainerFormat containerFormat = TiffContainerFormat::ClassicTiff;
+    TiffContainerFormat containerFormat = TiffContainerFormat::ClassicTiff;
 
-	// Optional TIFF open mode flags
-	bool littleEndian = false;
-	bool bigEndian = false;
-	bool fillOrderLsbToMsb = false;
+    // Optional TIFF open mode flags
+    bool littleEndian = false;
+    bool bigEndian = false;
+    bool fillOrderLsbToMsb = false;
 
-	// Metadata
-	std::string software = "DTWAIN";
-	std::string copyright;
+    // Metadata
+    std::string software = "DTWAIN";
+    std::string copyright;
 };
 
 struct TiffPageSettings
 {
-	TiffCompression compression = TiffCompression::None;
+    TiffCompression compression = TiffCompression::None;
 
-	// CCITT fax options
-	uint32_t group3Options = 0;
-	uint32_t group4Options = 0;
+    // CCITT fax options
+    uint32_t group3Options = 0;
+    uint32_t group4Options = 0;
 
-	// JPEG options
-	int jpegQuality = 75;
+    // JPEG options
+    int jpegQuality = 75;
 
-	// LZW / Flate
-	bool usePredictor = true;
+    // LZW / Flate
+    bool usePredictor = true;
 
-	// Page numbering
-	bool setPageNumber = true;
-	uint16_t pageIndex = 0;
-	uint16_t pageCount = 0;
+    // Page numbering
+    bool setPageNumber = true;
+    uint16_t pageIndex = 0;
+    uint16_t pageCount = 0;
 
-	// 1-bpp TIFF meaning requested by the caller:
-	// PHOTOMETRIC_MINISWHITE => 0 = white, 1 = black
-	// PHOTOMETRIC_MINISBLACK => 0 = black, 1 = white
-	uint16_t bilevelPhotometric = PHOTOMETRIC_MINISWHITE;
+    // 1-bpp TIFF meaning requested by the caller:
+    // PHOTOMETRIC_MINISWHITE => 0 = white, 1 = black
+    // PHOTOMETRIC_MINISBLACK => 0 = black, 1 = white
+    uint16_t bilevelPhotometric = PHOTOMETRIC_MINISWHITE;
 
-	// Low-level packed-bit inversion. This is derived automatically in
-	// SetPageInfo() for BW1 based on the assumed source convention:
-	// source BW1 DIB uses 0 = black, 1 = white.
-	bool invertBilevelBits = false;
+    // Low-level packed-bit inversion. This is derived automatically in
+    // SetPageInfo() for BW1 based on the assumed source convention:
+    // source BW1 DIB uses 0 = black, 1 = white.
+    bool invertBilevelBits = false;
 
-	// Optional per-page fill-order override
-	bool forceFillOrder = false;
-	uint16_t forcedFillOrder = FILLORDER_MSB2LSB;
+    // Optional per-page fill-order override
+    bool forceFillOrder = false;
+    uint16_t forcedFillOrder = FILLORDER_MSB2LSB;
 
-	// Setting specific to DTWAIN for TIFF image inversion
-	bool invertImage = false;
+    // Setting specific to DTWAIN for TIFF image inversion
+    bool invertImage = false;
 };
 
 struct PreparedTiffDibPage
 {
-	uint32_t width = 0;
-	uint32_t height = 0;
-	uint16_t bitsPerPixel = 0;
-	uint32_t strideBytes = 0;
-	bool bottomUp = true;
+    uint32_t width = 0;
+    uint32_t height = 0;
+    uint16_t bitsPerPixel = 0;
+    uint32_t strideBytes = 0;
+    bool bottomUp = true;
 
-	PixelFlavor pixelFlavor = PixelFlavor::Bgr24;
+    PixelFlavor pixelFlavor = PixelFlavor::Bgr24;
 
-	const uint8_t* bits = nullptr;
+    const uint8_t* bits = nullptr;
 
-	// For Palette8 only
-	const RGBQUAD* palette = nullptr;
-	uint32_t paletteEntries = 0;
+    // For Palette8 only
+    const RGBQUAD* palette = nullptr;
+    uint32_t paletteEntries = 0;
 
-	// Resolution
-	double xDpi = 200.0;
-	double yDpi = 200.0;
+    // Resolution
+    double xDpi = 200.0;
+    double yDpi = 200.0;
 };
 
 struct PageTagInfo
 {
-	uint16_t samplesPerPixel = 1;
-	uint16_t bitsPerSample = 1;
-	uint16_t photometric = PHOTOMETRIC_MINISWHITE;
-	bool writeColorMap = false;
+    uint16_t samplesPerPixel = 1;
+    uint16_t bitsPerSample = 1;
+    uint16_t photometric = PHOTOMETRIC_MINISWHITE;
+    bool writeColorMap = false;
 };
 
 class TiffSessionWriter
 {
-	public:
-		TiffSessionWriter() = default;
-		~TiffSessionWriter();
-		TiffSessionWriter(const TiffSessionWriter&) = delete;
-		TiffSessionWriter& operator=(const TiffSessionWriter&) = delete;
-		TiffSessionWriter(TiffSessionWriter&& other) noexcept;
-		TiffSessionWriter& operator=(TiffSessionWriter&& other) noexcept;
-		bool Open(const std::wstring& filename, const TiffSessionOptions& sessionOptions);
-		bool SetPageInfo(const PreparedTiffDibPage& page, const TiffPageSettings& pageSettings);
-		bool WriteCurrentPage();
-		void Close();
-		bool IsOpen() const noexcept;
-		std::size_t GetPageIndex() const noexcept;
-		static std::optional<PreparedTiffDibPage> MakePreparedTiffDibPage(const dynarithmic::DibPageView& view);
+    public:
+        TiffSessionWriter() = default;
+        ~TiffSessionWriter();
+        TiffSessionWriter(const TiffSessionWriter&) = delete;
+        TiffSessionWriter& operator=(const TiffSessionWriter&) = delete;
+        TiffSessionWriter(TiffSessionWriter&& other) noexcept;
+        TiffSessionWriter& operator=(TiffSessionWriter&& other) noexcept;
+        bool Open(const std::wstring& filename, const TiffSessionOptions& sessionOptions);
+        bool SetPageInfo(const PreparedTiffDibPage& page, const TiffPageSettings& pageSettings);
+        bool WriteCurrentPage();
+        void Close();
+        bool IsOpen() const noexcept;
+        std::size_t GetPageIndex() const noexcept;
+        static std::optional<PreparedTiffDibPage> MakePreparedTiffDibPage(const dynarithmic::DibPageView& view);
 
 
-	private:
-		bool ValidateCurrentPage() const;
-		bool SetCommonTags(const PageTagInfo& tagInfo);
-		bool SetCompressionTags(const PageTagInfo& tagInfo);
-		bool SetPaletteTags(uint16_t bitsPerSample);
-		bool WritePixels(const PageTagInfo& tagInfo);
-		bool EnsureRowBufferSize(size_t sizeNeeded);
+    private:
+        bool ValidateCurrentPage() const;
+        bool SetCommonTags(const PageTagInfo& tagInfo);
+        bool SetCompressionTags(const PageTagInfo& tagInfo);
+        bool SetPaletteTags(uint16_t bitsPerSample);
+        bool WritePixels(const PageTagInfo& tagInfo);
+        bool EnsureRowBufferSize(size_t sizeNeeded);
 
-	private:
-		TIFF* tif_ = nullptr;
-		std::wstring filename_;
-		TiffSessionOptions sessionOptions_{};
-		std::size_t pageIndex_ = 0;
+    private:
+        TIFF* tif_ = nullptr;
+        std::wstring filename_;
+        TiffSessionOptions sessionOptions_{};
+        std::size_t pageIndex_ = 0;
 
-		PreparedTiffDibPage currentPage_{};
-		TiffPageSettings currentPageSettings_{};
-		bool hasCurrentPage_ = false;
-		std::vector<uint8_t> rowBuffer_;
+        PreparedTiffDibPage currentPage_{};
+        TiffPageSettings currentPageSettings_{};
+        bool hasCurrentPage_ = false;
+        std::vector<uint8_t> rowBuffer_;
 };
 
 class DTWAINTiffOutput
 {
-	public:
-		std::pair<bool, int> OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedTiffDibPage& page,
-										 TiffPageSettings settings);
-		std::pair<bool, int> OnNextPage(const PreparedTiffDibPage& page, TiffPageSettings settings);
-		std::pair<bool, int> OnLastPage();
-		bool IsOpen() const noexcept;
-	private:
-		std::pair<bool, int> write_page(const PreparedTiffDibPage& page, TiffPageSettings settings);
+    public:
+        std::pair<bool, int> OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedTiffDibPage& page,
+                                         TiffPageSettings settings);
+        std::pair<bool, int> OnNextPage(const PreparedTiffDibPage& page, TiffPageSettings settings);
+        std::pair<bool, int> OnLastPage();
+        bool IsOpen() const noexcept;
+    private:
+        std::pair<bool, int> write_page(const PreparedTiffDibPage& page, TiffPageSettings settings);
 
-	private:
-		std::unique_ptr<TiffSessionWriter> writer_;
-		std::size_t pageIndex_ = 0;
+    private:
+        std::unique_ptr<TiffSessionWriter> writer_;
+        std::size_t pageIndex_ = 0;
 };
 
 #endif

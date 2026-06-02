@@ -22,7 +22,7 @@ template <class T>
 CTL_CapabilitySetOneValTriplet<T>::CTL_CapabilitySetOneValTriplet(CTL_ITwainSession *pSession,
                                                                 CTL_ITwainSource* pSource,
                                                                 TW_UINT16 sType,
-                                                                TW_UINT16	sCap,
+                                                                TW_UINT16    sCap,
                                                                 TW_UINT16 TwainType,
                                                                 const std::vector<T>& rArray)
                        :  CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap,TwainType,rArray)
