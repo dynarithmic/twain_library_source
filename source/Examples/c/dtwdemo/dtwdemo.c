@@ -238,6 +238,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     /* Initialize DTWAIN.  Quit if error! */
     if ( !DTWAIN_SysInitialize( ))
         return 0;
+    LONG major, minor, versiontype, patch;
+    DTWAIN_GetVersionEx(&major, &minor, &versiontype, &patch);
+
     DTWAIN_SetAppInfoA("1.0","Demo Program Menu", "Demo Program Family", "Demo Program Name");
 
     /* Allow DTWAIN messages to be sent directly to our Window proc */
@@ -578,6 +581,15 @@ void SelectTheSource(int nWhich)
     {
         if ( DTWAIN_OpenSource(tempSource) )
         {
+
+            // Test sending array of frames
+            DTWAIN_ARRAY FrameArray = DTWAIN_ArrayCreateFromCap(NULL, ICAP_FRAMES, 0);
+            DTWAIN_ARRAY OneFrame = DTWAIN_FrameCreate(0, 5, 8, 10);
+            DTWAIN_ArrayAddFrame(FrameArray, OneFrame);
+            DTWAIN_FrameSetAll(OneFrame, 1, 1, 6, 8);
+			DTWAIN_ArrayAddFrame(FrameArray, OneFrame);
+            DTWAIN_SetCapValues(tempSource, ICAP_FRAMES, DTWAIN_CAPSET, FrameArray);
+
             // Enable the barcode detection (only valid if source supports barcode detection)
             DTWAIN_EnableBarcodeDetection(tempSource, TRUE);
 
@@ -796,6 +808,10 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     WaitLoop();
     EnableWindow(g_hWnd, TRUE);
     EnableSourceItems(TRUE);
+
+    DTWAIN_ARRAY curAcq = DTWAIN_GetAcquisitionArray(g_CurrentSource);
+    LONG numImages = DTWAIN_GetNumAcquisitions(curAcq);
+    HANDLE hDib = DTWAIN_GetAcquiredImage(curAcq, 0, 0);
 
     DTWAIN_ArrayDestroy( AFileNames );
     LONG pageCount = DTWAIN_GetFileSavePageCount(g_CurrentSource);
