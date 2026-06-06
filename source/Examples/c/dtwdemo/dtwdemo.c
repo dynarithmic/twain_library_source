@@ -581,15 +581,6 @@ void SelectTheSource(int nWhich)
     {
         if ( DTWAIN_OpenSource(tempSource) )
         {
-
-            // Test sending array of frames
-            DTWAIN_ARRAY FrameArray = DTWAIN_ArrayCreateFromCap(NULL, ICAP_FRAMES, 0);
-            DTWAIN_ARRAY OneFrame = DTWAIN_FrameCreate(0, 5, 8, 10);
-            DTWAIN_ArrayAddFrame(FrameArray, OneFrame);
-            DTWAIN_FrameSetAll(OneFrame, 1, 1, 6, 8);
-			DTWAIN_ArrayAddFrame(FrameArray, OneFrame);
-            DTWAIN_SetCapValues(tempSource, ICAP_FRAMES, DTWAIN_CAPSET, FrameArray);
-
             // Enable the barcode detection (only valid if source supports barcode detection)
             DTWAIN_EnableBarcodeDetection(tempSource, TRUE);
 
