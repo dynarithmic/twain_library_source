@@ -34,6 +34,12 @@ option(DTWAIN_USE_DYNAMIC_CRT
        "Use dynamic MSVC runtime DLL (/MD, /MDd)"
        ON)
 
+option(DTWAIN_ENABLE_SEH_EXCEPTIONS
+       "Advanced: ON=/EHa, OFF=/EHsc (recommended)"
+       OFF)
+
+mark_as_advanced(DTWAIN_ENABLE_SEH_EXCEPTIONS)
+
 # -----------------------------------------------------------------------------
 # Boost setup
 # -----------------------------------------------------------------------------
@@ -1200,6 +1206,27 @@ set(DATEMASTER_SOURCES
   )
 
 
+set(TEXT_RESOURCE_FILES
+  ${PROJECT_SOURCE_DIR}/txt/twaininfo.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainlanguage.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_dutch.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_english.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_french.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_german.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_greek.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_italian.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_japanese.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_korean.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_portuguese.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_portuguese_br.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_romanian.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_russian.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_simplified_chinese.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_spanish.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_traditional_chinese.txt
+  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_turkish.txt
+)
+
 set(DTWDEMO_SOURCES
   ${PROJECT_SOURCE_DIR}/Examples/c/dtwdemo/DebugUtils.c
   ${PROJECT_SOURCE_DIR}/Examples/c/dtwdemo/DebugUtils.h
@@ -1343,11 +1370,43 @@ else()
         _MBCS)
 endif()
 
-set(DTWAIN_DEF_FILE_DEBUG
-    "${PROJECT_SOURCE_DIR}/def/dtwain${DTWAIN_BITNESS}${DTWAIN_UNICODE_SUFFIX}d.def")
+set(DTWAIN_SELECTED_DEF_FILE
+    "${PROJECT_SOURCE_DIR}/def/dtwain${DTWAIN_BITNESS}${DTWAIN_BUILD_TYPE_SUFFIX}$<$<CONFIG:Debug>:d>.def"
+)
 
-set(DTWAIN_DEF_FILE_RELEASE
-    "${PROJECT_SOURCE_DIR}/def/dtwain${DTWAIN_BITNESS}${DTWAIN_UNICODE_SUFFIX}.def")
+file(GLOB DTWAIN_DEF_FILES
+    "${PROJECT_SOURCE_DIR}/def/*.def"
+)
+
+set(DTWAIN_DEF_RELEASE
+    "${PROJECT_SOURCE_DIR}/def/dtwain${DTWAIN_BITNESS}${DTWAIN_UNICODE_SUFFIX}.def"
+)
+
+set(DTWAIN_DEF_DEBUG
+    "${PROJECT_SOURCE_DIR}/def/dtwain${DTWAIN_BITNESS}${DTWAIN_UNICODE_SUFFIX}d.def"
+)
+
+target_sources(dtwain PRIVATE
+    ${DTWAIN_DEF_FILES}
+)
+
+set_source_files_properties(
+    ${DTWAIN_DEF_FILES}
+    PROPERTIES
+        HEADER_FILE_ONLY TRUE
+)
+
+source_group(
+    "Module Definition Files"
+    FILES ${DTWAIN_DEF_FILES}
+)
+
+set_target_properties(dtwain PROPERTIES
+    LINK_FLAGS_DEBUG "/DEF:${DTWAIN_DEF_DEBUG}"
+    LINK_FLAGS_MINSIZEREL "/DEF:${DTWAIN_DEF_RELEASE}"
+    LINK_FLAGS_RELEASE "/DEF:${DTWAIN_DEF_RELEASE}"
+    LINK_FLAGS_RELWITHDEBINFO "/DEF:${DTWAIN_DEF_RELEASE}"
+)
 
 set_target_properties(dtwain PROPERTIES
     OUTPUT_NAME_DEBUG
@@ -1367,19 +1426,14 @@ set_target_properties(dtwain PROPERTIES
     CXX_EXTENSIONS OFF
 )
 
-target_sources(dtwain PRIVATE
-    "$<$<CONFIG:Debug>:${DTWAIN_DEF_FILE_DEBUG}>"
-    "$<$<NOT:$<CONFIG:Debug>>:${DTWAIN_DEF_FILE_RELEASE}>"
+file(GLOB DTWAIN_DEF_FILES
+    "${PROJECT_SOURCE_DIR}/def/*.def"
 )
 
-source_group("Module Definition Files" FILES
-    ${DTWAIN_DEF_FILE_DEBUG}
-    ${DTWAIN_DEF_FILE_RELEASE}
-)
-
-target_sources(dtwain PRIVATE
-    ${PROJECT_SOURCE_DIR}/rc/twil32.rc
-)
+target_sources(dtwain PRIVATE ${DTWAIN_DEF_FILES})
+source_group( "Module Definition Files" FILES ${DTWAIN_DEF_FILES})
+target_sources(dtwain PRIVATE ${PROJECT_SOURCE_DIR}/rc/twil32.rc)
+target_sources(dtwain PRIVATE ${TEXT_RESOURCE_FILES})
 
 set(DTWAIN_RC_DEFINES /D_WIN32)
 
@@ -1461,6 +1515,9 @@ if(MSVC)
         $<$<CONFIG:Release>:/LTCG>
     )
 
+    target_link_options(dtwain PRIVATE
+      "/DEF:${DTWAIN_SELECTED_DEF_FILE}"
+)
 endif()
 
 target_compile_features(dtwain PRIVATE cxx_std_17)
@@ -1590,6 +1647,18 @@ if(MSVC)
     endif()
 endif()
 
+if(MSVC)
+    if(DTWAIN_ENABLE_SEH_EXCEPTIONS)
+        set(DTWAIN_EXCEPTION_OPTION "/EHa")
+    else()
+        set(DTWAIN_EXCEPTION_OPTION "/EHsc")
+    endif()
+
+    target_compile_options(dtwain PRIVATE
+        $<$<COMPILE_LANGUAGE:CXX>:${DTWAIN_EXCEPTION_OPTION}>
+    )
+endif()
+
 set(DTWAIN_NATVIS_FILES
     ${PROJECT_SOURCE_DIR}/Natvis/dtwain.natvis
 )
@@ -1600,6 +1669,12 @@ target_sources(dtwain PRIVATE
 
 source_group("Natvis" FILES
     ${DTWAIN_NATVIS_FILES}
+)
+
+source_group(
+    "Text Resources"
+    FILES
+        ${TEXT_RESOURCE_FILES}
 )
 
 if(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)

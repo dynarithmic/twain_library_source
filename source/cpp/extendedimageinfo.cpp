@@ -1308,7 +1308,7 @@ std::pair<bool, int> dynarithmic::GetExtImageInfoDataInternal(CTL_ITwainSource* 
                 Info.ItemType = TWTY_FRAME;
         }
 
-        auto retVal = CreateArrayFromFactory(pHandle, ExtImageInfoArrayType(Info.ItemType), 0);
+        auto retVal = CreateArrayFromFactory(pHandle, GetArrayTypeFromTwainType(Info.ItemType), 0);
 
         if (!retVal.second)
         {

@@ -238,6 +238,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     /* Initialize DTWAIN.  Quit if error! */
     if ( !DTWAIN_SysInitialize( ))
         return 0;
+    LONG major, minor, versiontype, patch;
+    DTWAIN_GetVersionEx(&major, &minor, &versiontype, &patch);
+
     DTWAIN_SetAppInfoA("1.0","Demo Program Menu", "Demo Program Family", "Demo Program Name");
 
     /* Allow DTWAIN messages to be sent directly to our Window proc */
@@ -796,6 +799,10 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     WaitLoop();
     EnableWindow(g_hWnd, TRUE);
     EnableSourceItems(TRUE);
+
+    DTWAIN_ARRAY curAcq = DTWAIN_GetAcquisitionArray(g_CurrentSource);
+    LONG numImages = DTWAIN_GetNumAcquisitions(curAcq);
+    HANDLE hDib = DTWAIN_GetAcquiredImage(curAcq, 0, 0);
 
     DTWAIN_ArrayDestroy( AFileNames );
     LONG pageCount = DTWAIN_GetFileSavePageCount(g_CurrentSource);

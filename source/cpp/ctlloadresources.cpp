@@ -86,10 +86,10 @@ namespace dynarithmic
         return retVal;
     }
 
-    CTL_StringType CreateResourceFileName(LPCTSTR resName)
+    CTL_StringType CreateResourcePathName()
     {
         CTL_StringType sPath;
-        if ( CTL_StaticData::GetResourcePath().empty())
+        if (CTL_StaticData::GetResourcePath().empty())
             sPath = GetDTWAINExecutionPath();
         else
             sPath = StringWrapper::RemoveBackslashFromDirectory(CTL_StaticData::GetResourcePath());
@@ -97,7 +97,12 @@ namespace dynarithmic
         auto& resourcePath = CTL_StaticData::GetResourcePath();
         if (resourcePath.empty())
             resourcePath = sPath;
-        return sPath + resName;
+        return sPath;
+    }
+
+    CTL_StringType CreateResourceFileName(LPCTSTR resName)
+    {
+        return CreateResourcePathName() + resName;
     }
 
     static bool GetDataCRC(std::ifstream& ifs, int numTrailers)

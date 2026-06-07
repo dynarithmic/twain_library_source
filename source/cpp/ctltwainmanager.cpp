@@ -2189,7 +2189,28 @@ CTL_StringType CTL_TwainAppMgr::GetTwainDirFullNameEx(LPCTSTR szTwainDLLName,
 
 std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringType strTwainDLLName, LPLONG pWhichSearch)
 {
-    auto str = GetTwainDirFullName(strTwainDLLName.c_str(), pWhichSearch);
+    bool leaveLoaded = false;
+    auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if (pHandle && pHandle->GetTwainSession())
+    {
+        auto appMgr = CTL_TwainAppMgr::GetInstance();
+        auto appMgrPtr = appMgr.get();
+        if (appMgrPtr)
+        {
+            filesys::path dllName(appMgr->GetDSMPath());
+        #ifdef _UNICODE
+            auto lowerName = StringWrapper::LowerCase(dllName.filename().native());
+        #else
+            auto lowerName = StringWrapper::LowerCase(dllName.filename().string());
+        #endif
+            auto isSame = StringWrapper::CompareNoCase(lowerName, strTwainDLLName.c_str());
+            if (isSame)
+                return { true, appMgrPtr->GetDSMPath() };
+        }
+        else
+            return { false, {} };
+    }
+    auto str = GetTwainDirFullName(strTwainDLLName.c_str(), pWhichSearch, leaveLoaded);
     if ( str.empty())
         return { false, str };
     return { true, str };

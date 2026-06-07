@@ -371,9 +371,9 @@ namespace dynarithmic
         return DTWAIN_ARRAYLONG;
     }
 
-    static constexpr LONG ExtImageInfoArrayType(LONG ExtType) noexcept
+    static constexpr LONG GetArrayTypeFromTwainType(LONG TwainType) noexcept
     {
-        TW_UINT16 actualType = static_cast<TW_UINT16>(ExtType);
+        TW_UINT16 actualType = static_cast<TW_UINT16>(TwainType);
         if (IsTwainIntegralType(actualType))
             return DTWAIN_ARRAYLONG;
         if (IsTwainStringType(actualType))
