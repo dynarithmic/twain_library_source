@@ -494,17 +494,20 @@ static std::pair<LONG, std::array<CTL_StringType, 2>> GetTwainAvailablityInterna
 {
     std::pair<LONG, std::array<CTL_StringType, 2>> retVal;
     LONG availableFlag = 0;
+    bool bRet = false;
 
+#ifndef _WIN64
     // Check TWAIN version 1.x
     auto existCheck = CTL_TwainAppMgr::CheckTwainExistence(TWAINDLLVERSION_1);
-    bool bRet = existCheck.first;
     if (bRet)
     {
         availableFlag |= DTWAIN_TWAINDSM_LEGACY;
         // Store the path found
         retVal.second[0] = existCheck.second;
     }
-
+#else
+    retVal.second[0] = {};
+#endif
     // Check TWAIN version 2.x
     auto existCheck2 = CTL_TwainAppMgr::CheckTwainExistence(TWAINDLLVERSION_2);
     bRet = existCheck2.first;
