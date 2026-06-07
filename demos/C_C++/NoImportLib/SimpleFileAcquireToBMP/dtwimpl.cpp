@@ -118,6 +118,7 @@
     D_ARRAYCREATEFROMLONG64SFUNC                  DYNDTWAIN_API::DTWAIN_ArrayCreateFromLong64s = nullptr;
     D_ARRAYCREATEFROMLONGSFUNC                    DYNDTWAIN_API::DTWAIN_ArrayCreateFromLongs = nullptr;
     D_ARRAYCREATEFROMSTRINGSFUNC                  DYNDTWAIN_API::DTWAIN_ArrayCreateFromStrings = nullptr;
+    D_ARRAYCREATEFROMTYPEFUNC                     DYNDTWAIN_API::DTWAIN_ArrayCreateFromType = nullptr;
     D_ARRAYCREATEFROMWIDESTRINGSFUNC              DYNDTWAIN_API::DTWAIN_ArrayCreateFromWideStrings = nullptr;
     D_ARRAYDESTROYFUNC                            DYNDTWAIN_API::DTWAIN_ArrayDestroy = nullptr;
     D_ARRAYDESTROYALLFUNC                         DYNDTWAIN_API::DTWAIN_ArrayDestroyAll = nullptr;
@@ -1369,6 +1370,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_ArrayCreateFromLong64s, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayCreateFromLongs, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayCreateFromStrings, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ArrayCreateFromType, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayCreateFromWideStrings, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayDestroy, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayDestroyAll, hModule);

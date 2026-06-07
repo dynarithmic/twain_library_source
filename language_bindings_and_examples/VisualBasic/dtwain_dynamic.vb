@@ -2076,6 +2076,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_ArrayCreateFromStringsDelegate(<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPTStr)> pCArray() As String, nSize As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayCreateFromTypeDelegate(Source As System.IntPtr, lType As Integer, lSize As Integer) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayCreateFromWideStringsDelegate(<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPWStr)> pCArray() As String, nSize As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -4708,6 +4711,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_ArrayCreateFromStrings(<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPTStr)> pCArray() As String, nSize As Integer) As System.IntPtr
         Return api.DTWAIN_ArrayCreateFromStrings(pCArray, nSize)
+        End Function
+        
+        Public Function DTWAIN_ArrayCreateFromType(Source As System.IntPtr, lType As Integer, lSize As Integer) As System.IntPtr
+        Return api.DTWAIN_ArrayCreateFromType(Source, lType, lSize)
         End Function
         
         Public Function DTWAIN_ArrayCreateFromWideStrings(<[In], MarshalAs(UnmanagedType.LPArray, ArraySubType:=UnmanagedType.LPWStr)> pCArray() As String, nSize As Integer) As System.IntPtr
@@ -8008,6 +8015,7 @@ Namespace Dynarithmic
             Public DTWAIN_ArrayCreateFromLong64s As DTWAIN_ArrayCreateFromLong64sDelegate
             Public DTWAIN_ArrayCreateFromLongs As DTWAIN_ArrayCreateFromLongsDelegate
             Public DTWAIN_ArrayCreateFromStrings As DTWAIN_ArrayCreateFromStringsDelegate
+            Public DTWAIN_ArrayCreateFromType As DTWAIN_ArrayCreateFromTypeDelegate
             Public DTWAIN_ArrayCreateFromWideStrings As DTWAIN_ArrayCreateFromWideStringsDelegate
             Public DTWAIN_ArrayDestroy As DTWAIN_ArrayDestroyDelegate
             Public DTWAIN_ArrayDestroyAll As DTWAIN_ArrayDestroyAllDelegate

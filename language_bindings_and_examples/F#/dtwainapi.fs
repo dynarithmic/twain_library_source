@@ -2013,6 +2013,9 @@ module TwainAPI =
     type DTWAIN_ArrayCreateFromStringsDelegate = delegate of [<MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPTStr)>] pcArray: string[] * LONG -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayCreateFromTypeDelegate = delegate of DTWAIN_SOURCE * LONG * LONG -> DTWAIN_ARRAY
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayCreateFromWideStringsDelegate = delegate of [<MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)>] pcArray: string[] * LONG -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4485,6 +4488,7 @@ module TwainAPI =
     let private ArrayCreateFromLong64s = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromLong64s" : DTWAIN_ArrayCreateFromLong64sDelegate)
     let private ArrayCreateFromLongs = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromLongs" : DTWAIN_ArrayCreateFromLongsDelegate)
     let private ArrayCreateFromStrings = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromStrings" : DTWAIN_ArrayCreateFromStringsDelegate)
+    let private ArrayCreateFromType = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromType" : DTWAIN_ArrayCreateFromTypeDelegate)
     let private ArrayCreateFromWideStrings = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromWideStrings" : DTWAIN_ArrayCreateFromWideStringsDelegate)
     let private ArrayDestroy = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroy" : DTWAIN_ArrayDestroyDelegate)
     let private ArrayDestroyAll = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroyAll" : DTWAIN_ArrayDestroyAllDelegate)
@@ -5512,6 +5516,10 @@ module TwainAPI =
     let DTWAIN_ArrayCreateFromStrings (pcarray: string[]) (nsize: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayCreateFromStrings.Value.Invoke(pcarray, nsize)
+
+    let DTWAIN_ArrayCreateFromType (source: DTWAIN_SOURCE) (ltype: LONG) (lsize: LONG) : DTWAIN_ARRAY =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayCreateFromType.Value.Invoke(source, ltype, lsize)
 
     let DTWAIN_ArrayCreateFromWideStrings (pcarray: string[]) (nsize: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

@@ -1876,6 +1876,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayCreateFromLong64s.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayCreateFromLongs.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayCreateFromStrings.restype = ct.c_void_p
+     theDLL.DTWAIN_ArrayCreateFromType.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayCreateFromWideStrings.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayDestroy.restype = ct.c_long
      theDLL.DTWAIN_ArrayDestroyAll.restype = ct.c_long
@@ -3059,6 +3060,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayCreateFromLong64s.argtypes = [ct.POINTER(ct.c_int64), ct.c_long]
      theDLL.DTWAIN_ArrayCreateFromLongs.argtypes = [ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_ArrayCreateFromStrings.argtypes = [ct.POINTER(ct.c_wchar_p), ct.c_long]
+     theDLL.DTWAIN_ArrayCreateFromType.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_ArrayCreateFromWideStrings.argtypes = [ct.POINTER(ct.c_wchar_p), ct.c_long]
      theDLL.DTWAIN_ArrayDestroy.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ArrayDestroyFrames.argtypes = [ct.c_void_p]
@@ -4209,6 +4211,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayCreateFromLong64s.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayCreateFromLongs.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayCreateFromStrings.restype = ct.c_void_p
+     theDLL.DTWAIN_ArrayCreateFromType.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayCreateFromWideStrings.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayDestroy.restype = ct.c_long
      theDLL.DTWAIN_ArrayDestroyAll.restype = ct.c_long
@@ -5392,6 +5395,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayCreateFromLong64s.argtypes = [ct.POINTER(ct.c_int64), ct.c_long]
      theDLL.DTWAIN_ArrayCreateFromLongs.argtypes = [ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_ArrayCreateFromStrings.argtypes = [ct.POINTER(ct.c_char_p), ct.c_long]
+     theDLL.DTWAIN_ArrayCreateFromType.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_ArrayCreateFromWideStrings.argtypes = [ct.POINTER(ct.c_wchar_p), ct.c_long]
      theDLL.DTWAIN_ArrayDestroy.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ArrayDestroyFrames.argtypes = [ct.c_void_p]

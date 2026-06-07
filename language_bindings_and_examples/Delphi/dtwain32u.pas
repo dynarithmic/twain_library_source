@@ -1917,6 +1917,7 @@ function DTWAIN_ArrayCreateFromFloats(nSize:LONG) : DTWAIN_ARRAY; stdcall;  exte
 function DTWAIN_ArrayCreateFromLong64s(pCArray:LPLONG64; nSize:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayCreateFromLong64s';
 function DTWAIN_ArrayCreateFromLongs(pCArray:LPLONG; nSize:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayCreateFromLongs';
 function DTWAIN_ArrayCreateFromStrings(pCArray:PPChar; nSize:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayCreateFromStrings';
+function DTWAIN_ArrayCreateFromType(Source:DTWAIN_SOURCE; lType:LONG; lSize:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayCreateFromType';
 function DTWAIN_ArrayCreateFromWideStrings(pCArray:PPWideChar; nSize:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayCreateFromWideStrings';
 function DTWAIN_ArrayDestroy(pArray:DTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayDestroy';
 function DTWAIN_ArrayDestroyAll : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayDestroyAll';
