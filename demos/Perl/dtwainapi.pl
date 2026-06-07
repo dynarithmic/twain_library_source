@@ -1741,6 +1741,7 @@ my $DTWAIN_ArrayCreateFromFloats = new Win32::API($dtwain_dllName, 'DTWAIN_Array
 my $DTWAIN_ArrayCreateFromLong64s = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayCreateFromLong64s', 'Pi', 'P');
 my $DTWAIN_ArrayCreateFromLongs = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayCreateFromLongs', 'Pi', 'P');
 my $DTWAIN_ArrayCreateFromStrings = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayCreateFromStrings', 'Pi', 'P');
+my $DTWAIN_ArrayCreateFromType = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayCreateFromType', 'Pii', 'P');
 my $DTWAIN_ArrayCreateFromWideStrings = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayCreateFromWideStrings', 'Pi', 'P');
 my $DTWAIN_ArrayDestroy = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayDestroy', 'P', 'I');
 my $DTWAIN_ArrayDestroyAll = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayDestroyAll', '', 'I');

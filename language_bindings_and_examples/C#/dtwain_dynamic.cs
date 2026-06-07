@@ -1961,6 +1961,7 @@
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64sDelegate([In] long[] pCArray, int nSize);
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongsDelegate([In] int[] pCArray, int nSize);
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromStringsDelegate([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPTStr)] string[] pCArray, int nSize);
+        public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromTypeDelegate(DTWAIN_SOURCE Source, int lType, int lSize);
         public delegate DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStringsDelegate([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)] string[] pCArray, int nSize);
         public delegate int DTWAIN_ArrayDestroyDelegate(DTWAIN_ARRAY pArray);
         public delegate int DTWAIN_ArrayDestroyAllDelegate();
@@ -3008,6 +3009,9 @@
 
         [DTWAINNativeFunction("DTWAIN_ArrayCreateFromStrings")]
         private readonly DTWAIN_ArrayCreateFromStringsDelegate  _DTWAIN_ArrayCreateFromStrings;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayCreateFromType")]
+        private readonly DTWAIN_ArrayCreateFromTypeDelegate  _DTWAIN_ArrayCreateFromType;
 
         [DTWAINNativeFunction("DTWAIN_ArrayCreateFromWideStrings")]
         private readonly DTWAIN_ArrayCreateFromWideStringsDelegate  _DTWAIN_ArrayCreateFromWideStrings;
@@ -5809,6 +5813,9 @@
 
         public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPTStr)] string[] pCArray, int nSize)
         => _DTWAIN_ArrayCreateFromStrings(pCArray, nSize);
+
+        public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromType(DTWAIN_SOURCE Source, int lType, int lSize)
+        => _DTWAIN_ArrayCreateFromType(Source, lType, lSize);
 
         public  DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings([In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)] string[] pCArray, int nSize)
         => _DTWAIN_ArrayCreateFromWideStrings(pCArray, nSize);

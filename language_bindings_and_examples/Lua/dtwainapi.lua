@@ -144,6 +144,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64s(LPLONG64 pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongs(LPLONG pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings(DTWAIN_CCHARPTRTYPE* pCArray, LONG nSize);
+        DTWAIN_ARRAY DTWAIN_ArrayCreateFromType(DTWAIN_SOURCE Source, LONG lType, LONG lSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings(LPCWSTR* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyAll();
@@ -1382,6 +1383,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64s(LPLONG64 pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongs(LPLONG pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings(DTWAIN_CCHARPTRTYPE* pCArray, LONG nSize);
+        DTWAIN_ARRAY DTWAIN_ArrayCreateFromType(DTWAIN_SOURCE Source, LONG lType, LONG lSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings(LPCWSTR* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyAll();
@@ -2620,6 +2622,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64s(LPLONG64 pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongs(LPLONG pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings(DTWAIN_CCHARPTRTYPE* pCArray, LONG nSize);
+        DTWAIN_ARRAY DTWAIN_ArrayCreateFromType(DTWAIN_SOURCE Source, LONG lType, LONG lSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings(LPCWSTR* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyAll();
@@ -3858,6 +3861,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromLong64s(LPLONG64 pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromLongs(LPLONG pCArray, LONG nSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromStrings(DTWAIN_CCHARPTRTYPE* pCArray, LONG nSize);
+        DTWAIN_ARRAY DTWAIN_ArrayCreateFromType(DTWAIN_SOURCE Source, LONG lType, LONG lSize);
         DTWAIN_ARRAY DTWAIN_ArrayCreateFromWideStrings(LPCWSTR* pCArray, LONG nSize);
         DTWAIN_BOOL DTWAIN_ArrayDestroy(DTWAIN_ARRAY pArray);
         DTWAIN_BOOL DTWAIN_ArrayDestroyAll();
