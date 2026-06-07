@@ -1,5 +1,14 @@
 DTWAIN Version changes
 
+5.9.2
+
+- Fix issue with DTWAIN_IsTwainAvailable and DTWAIN_IsTwainAvailableEx if these
+  functions are called after a TWAIN session has been started.
+
+- Make path specified by DTWAIN_SetResourcePath() also apply to the path where the
+  dtwain32.ini and dtwain64.ini files are found.
+
+
 5.9.1
 
 - Upgraded following internal image libraries:
