@@ -499,6 +499,7 @@ static std::pair<LONG, std::array<CTL_StringType, 2>> GetTwainAvailablityInterna
 #ifndef _WIN64
     // Check TWAIN version 1.x
     auto existCheck = CTL_TwainAppMgr::CheckTwainExistence(TWAINDLLVERSION_1);
+	bRet = existCheck.first;
     if (bRet)
     {
         availableFlag |= DTWAIN_TWAINDSM_LEGACY;

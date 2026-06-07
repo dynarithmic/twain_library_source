@@ -2193,10 +2193,22 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     if (pHandle && pHandle->GetTwainSession())
     {
-        auto* appMgr = CTL_TwainAppMgr::GetInstance().get();
-        if (appMgr)
-            return { true, appMgr->GetDSMPath() };
-        return { false, {} };
+        auto appMgr = CTL_TwainAppMgr::GetInstance();
+        auto appMgrPtr = appMgr.get();
+        if (appMgrPtr)
+        {
+            filesys::path dllName(appMgr->GetDSMPath());
+        #ifdef _UNICODE
+            auto lowerName = StringWrapper::LowerCase(dllName.filename().native());
+        #else
+            auto lowerName = StringWrapper::LowerCase(dllName.filename().string());
+        #endif
+            auto isSame = StringWrapper::CompareNoCase(lowerName, strTwainDLLName.c_str());
+            if (isSame)
+                return { true, appMgrPtr->GetDSMPath() };
+        }
+        else
+            return { false, {} };
     }
     auto str = GetTwainDirFullName(strTwainDLLName.c_str(), pWhichSearch, leaveLoaded);
     if ( str.empty())
