@@ -2330,7 +2330,7 @@ CTL_StringType dynarithmic::GetDTWAININIPath()
     if (!iniPathCache.empty())
         return iniPathCache;
     CTL_StringType szName = DTWAIN_ININAME_NATIVE; 
-    iniPathCache = get_parent_directory(GetDTWAINDLLPath().c_str()) + szName;
+    iniPathCache = CreateResourcePathName() + szName;
     return iniPathCache;
 }
 
