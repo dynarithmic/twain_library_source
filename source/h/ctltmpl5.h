@@ -166,12 +166,10 @@ namespace dynarithmic
                     else
                     if ( bUseStrings & USE_UNICODESTRINGS )
                     {
-    /*
                         TW_UNI512 ThisString;
                         pGetTriplet->GetValue(ThisString, i );
-                        CTL_UnicodeStringArray *pArray = (CTL_UnicodeStringArray *)&rArray;
-                        pArray->push_back(ThisString);
-    */
+                        StringArrayW *pArray = reinterpret_cast<StringArrayW*>(&rArray);
+                        pArray->push_back(reinterpret_cast<LPWSTR>(ThisString));
                     }
                 }
             }

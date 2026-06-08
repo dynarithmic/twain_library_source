@@ -1011,19 +1011,24 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, 
 
 void LoadStaticData(CTL_TwainDLLHandle* pHandle)
 {
-    if ( pHandle->m_mapDTWAINArrayToTwainType.empty() )
+    if (pHandle->m_mapDTWAINArrayToTwainType.empty())
     {
-        static constexpr int TwainIntTypes[] = {TWTY_INT8, TWTY_UINT8, TWTY_BOOL, TWTY_INT16, TWTY_INT32, TWTY_UINT16, TWTY_UINT32};
-        static constexpr int TwainStringTypes[] = {TWTY_STR32, TWTY_STR64, TWTY_STR128, TWTY_STR128, TWTY_STR255, TWTY_STR1024};
-        static constexpr int TwainFloatTypes[] = {TWTY_FIX32};
-        static constexpr int TwainFrameTypes[] = {TWTY_FRAME};
-        static constexpr int DTwainArrayTypes[] = {DTWAIN_ARRAYLONG, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYFLOAT, DTWAIN_ARRAYFRAME, CTL_ArrayFrameSingleType};
-        static constexpr size_t NumTwainTypes[] = {std::size(TwainIntTypes),
+        static constexpr int TwainIntTypes[] = { TWTY_INT8, TWTY_UINT8, TWTY_BOOL, TWTY_INT16, TWTY_INT32, TWTY_UINT16, TWTY_UINT32 };
+        static constexpr int TwainStringTypes[] = { TWTY_STR32, TWTY_STR64, TWTY_STR128, TWTY_STR128, TWTY_STR255, TWTY_STR1024 };
+        static constexpr int TwainFloatTypes[] = { TWTY_FIX32 };
+        static constexpr int TwainFrameTypes[] = { TWTY_FRAME };
+        static constexpr int TwainWideStringTypes[] = { TWTY_UNI512 };
+        static constexpr int DTwainArrayTypes[] = { DTWAIN_ARRAYLONG, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYFLOAT, DTWAIN_ARRAYFRAME,
+                                                   CTL_ArrayFrameSingleType, DTWAIN_ARRAYWIDESTRING };
+        static constexpr size_t NumTwainTypes[] = { std::size(TwainIntTypes),
                                          std::size(TwainStringTypes),
                                          std::size(TwainFloatTypes),
                                          std::size(TwainFrameTypes),
-                                         std::size(TwainFrameTypes)};
-        static constexpr std::array<const int*, 5> intArray = {TwainIntTypes, TwainStringTypes, TwainFloatTypes, TwainFrameTypes, TwainFrameTypes};
+                                         std::size(TwainFrameTypes),
+                                         std::size(TwainWideStringTypes)};
+
+        static constexpr std::array<const int*, 6> intArray = 
+                {TwainIntTypes, TwainStringTypes, TwainFloatTypes, TwainFrameTypes, TwainFrameTypes, TwainWideStringTypes};
 
         static constexpr size_t nNumAllTypes = std::size(NumTwainTypes);
         for (size_t i = 0; i < nNumAllTypes; ++i)
