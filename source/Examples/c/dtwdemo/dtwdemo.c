@@ -235,9 +235,20 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     g_hInstance = hInstance;
     hAccelTable = LoadAccelerators(hInstance, (LPCTSTR)IDC_DTWDEMO);
 
-    /* Initialize DTWAIN.  Quit if error! */
-    if ( !DTWAIN_SysInitialize( ))
-        return 0;
+    /* Initialize DTWAIN */
+    while (1)
+    {
+        if (DTWAIN_SysInitialize())
+            break;
+        
+        /* Retry initialization */
+        LONG nValue =
+            MessageBox(g_hWnd, _T("Initialization failed.  Hit OK to reattempt DTWAIN initialization, Cancel to exit..."), _T("Retry Initialization"), MB_OKCANCEL);
+        if (nValue == IDOK)
+            continue;
+        else
+            return 0;
+    }
     LONG major, minor, versiontype, patch;
     DTWAIN_GetVersionEx(&major, &minor, &versiontype, &patch);
 
