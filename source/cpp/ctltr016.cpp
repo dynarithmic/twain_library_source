@@ -106,13 +106,26 @@ void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData
         memcpy(pItem, &ffix32, sizeof(TW_FIX32));
     }
     else
-    if (IsTwainStringType(pVal->ItemType) || IsTwainLongStringType(pVal->ItemType))
+    if (IsTwainANSIStringType(pVal->ItemType))
     {
         // The data is in the CTL_StringType type.  Must extract
         // Copy data to TW_CONTAINER
         // Make sure that string is fully null terminated
         TW_STR1024 TempString = {};
         auto ptrString = static_cast<std::string*>(pData);
+        std::copy(ptrString->begin(), ptrString->end(), TempString);
+
+        // Note that pVal->Item actually points to the entire allocated memory block
+        // set up by the PreEncode() call, and is not a memory overwrite.
+        void* pItem = &pVal->Item;
+        memcpy(pItem, TempString, dynarithmic::GetTwainItemSize( pVal->ItemType) );
+    }
+    else
+    if (IsTwainUnicodeStringType(pVal->ItemType))
+    {
+        // Make sure that string is fully null terminated
+        TW_UNI512 TempString = {};
+        auto ptrString = static_cast<std::wstring*>(pData);
         std::copy(ptrString->begin(), ptrString->end(), TempString);
 
         // Note that pVal->Item actually points to the entire allocated memory block
