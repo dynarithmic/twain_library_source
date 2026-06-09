@@ -749,7 +749,7 @@ int ParseTokenCallback(const char* line, void* userData)
 
     case TWTY_UNI512:
     {
-        wchar_t wszText[512] = _T("/0");
+        wchar_t wszText[512] = L"/0";
         CharToWide(line, wszText, _countof(wszText));
         DTWAIN_ArrayAddWideString(theInfo->theArray, wszText);
     }
