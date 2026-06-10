@@ -243,7 +243,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         
         /* Retry initialization */
         LONG nValue =
-            MessageBox(g_hWnd, _T("Initialization failed.  Hit OK to reattempt DTWAIN initialization, Cancel to exit..."), _T("Retry Initialization"), MB_OKCANCEL);
+            MessageBox(g_hWnd, _T("Initialization failed.  Select OK to reattempt DTWAIN initialization, Cancel to exit..."), _T("Retry Initialization"), MB_OKCANCEL);
         if (nValue == IDOK)
             continue;
         else

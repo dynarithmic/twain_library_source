@@ -48,6 +48,7 @@
     #pragma warning (disable:4702)
     #pragma comment (lib, "shlwapi")
 #endif
+#include <ctllogsourcecaps.h>
 #ifdef _WIN64
     #pragma message ("Compiling 64-bit DTWAIN")
 #else
@@ -81,6 +82,7 @@ static bool LoadGeneralResources(bool blockExecution);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
 static void LoadSelectSourcePosition();
 static void LoadGetMessageTestOverride();
+static std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle);
 
 #ifdef _WIN32
 static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM w, LPARAM lparam);
@@ -1067,7 +1069,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
             logFilterFlags &= ~DTWAIN_LOG_USECALLBACK;
 
         LoggingTraits fTraits;
-        fTraits.m_bAppend = LogFlags & DTWAIN_LOG_FILEAPPEND?true:false;
+        fTraits.m_bAppend = LogFlags & DTWAIN_LOG_FILEAPPEND ? true : false;
         fTraits.m_bCreateDirectory = LogFlags & DTWAIN_LOG_CREATEDIRECTORY ? true : false;
         fTraits.m_filename = lpszLogFile;
         fTraits.m_bSetConsoleHandler = LogFlags & DTWAIN_LOG_CONSOLEWITHHANDLER ? true : false;
@@ -1075,13 +1077,21 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
 
         // Write the version info
         // Write to all the loggers that were created
-        if ( LogFlags > 0)
+        if (LogFlags > 0)
             WriteVersionToLog(pHandle);
         logFailed = (LogFlags > 0 && !isLogOpen.first);
         if (logFailed)
         {
             // Indicate that there is at least one logger that failed
             DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO, false);
+        }
+
+        // If there are opened sources, log the capabilities for each
+        if (logFilterFlags)
+        {
+            auto pOpenedSources = GetOpenSources(pHandle);
+            for (auto* pCurSource : pOpenedSources)
+                LogSourceCapabilities(pCurSource, false);
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(!logFailed)
@@ -1819,6 +1829,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsAcquiring()
          LOG_FUNC_EXIT_NONAME_PARAMS(true)
     LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
+}
+
+
+/* This function tests all open DLL handles to see if any source is acquiring */
+std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle)
+{
+    std::vector<CTL_ITwainSource*> vSources;
+    for (auto& pr : pHandle->m_mapStringToSource)
+    {
+        if (pr.second->IsOpened())
+            vSources.push_back(pr.second);
+    }
+    return vSources;
 }
 
 HWND  DLLENTRY_DEF  DTWAIN_GetTwainHwnd()

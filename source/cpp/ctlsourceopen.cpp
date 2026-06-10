@@ -25,6 +25,7 @@
 #include "../wildcards/wildcards.hpp"
 #include "ctllogfunctioncall.h"
 #include "ctlsetgetcaps.h"
+#include "ctllogsourcecaps.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -142,39 +143,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // See if audio transfers are supported
     pSource->SetAudioTransferSupported(DTWAIN_IsAudioXferSupported(Source, DTWAIN_ANYSUPPORT)?true:false);
 
-    // if any logging is turned on, then get the capabilities and log the values
-    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
-    {
-        CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
-        LogWriterUtils::WriteLogInfoIndented(msg);
-
-        // Log the caps if logging is turned on
-        CTL_StringType sName;
-
-        std::vector<std::string> VecString(theCapList.size());
-
-        // copy the names
-        std::transform(theCapList.begin(), theCapList.end(), VecString.begin(), [](LONG n) { return CTL_TwainAppMgr::GetCapNameFromCap(n); });
-
-        // Sort the names
-        std::sort(VecString.begin(), VecString.end());
-        CTL_StringStreamType strm;
-        strm << theCapList.size();
-        sName = _T("\n\n");
-        sName += GetResourceStringFromMap_Native(IDS_LOGMSG_CAPABILITYLISTING);
-        sName += _T(" (") + pSource->GetProductName() + _T(")");
-        sName += _T(" (") + strm.str() + _T("):\n{\n");
-        if (theCapList.empty())
-            sName += _T(" No capabilities:\n");
-        else
-        {
-            sName += _T("    ");
-            sName += StringConversion::Convert_Ansi_To_Native(StringWrapperA::Join(VecString, "\n    "));
-        }
-        sName += _T("\n}");
-
-        LogWriterUtils::WriteMultiLineInfoIndented(sName, _T("\n"));
-    }
+    // Log the source capabilities
+    LogSourceCapabilities(pSource, false);
 
     if (bRetval)
         pHandle->m_lLastError = 0; // Reset the error flag to 0
@@ -191,6 +161,49 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
     const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+void dynarithmic::LogSourceCapabilities(CTL_ITwainSource* pSource, bool bUseLogFlag)
+{
+    CapList& actualCapList = pSource->GetCapSupportedList();
+    auto& logCaps = CTL_StaticData::GetLogFilterFlags();
+
+    if (logCaps)
+    {
+        if ((logCaps & DTWAIN_LOG_MISCELLANEOUS) || !bUseLogFlag)
+        {
+            CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
+                LogWriterUtils::WriteLogInfoIndented(msg);
+
+                // Log the caps if logging is turned on
+                CTL_StringType sName;
+
+                std::vector<std::string> VecString(actualCapList.size());
+
+                // copy the names
+                std::transform(actualCapList.begin(), actualCapList.end(), VecString.begin(),
+                    [](LONG n) { return CTL_TwainAppMgr::GetCapNameFromCap(n); });
+
+            // Sort the names
+            std::sort(VecString.begin(), VecString.end());
+            CTL_StringStreamType strm;
+            strm << actualCapList.size();
+            sName = _T("\n\n");
+            sName += GetResourceStringFromMap_Native(IDS_LOGMSG_CAPABILITYLISTING);
+            sName += _T(" (") + pSource->GetProductName() + _T(")");
+            sName += _T(" (") + strm.str() + _T("):\n{\n");
+            if (actualCapList.empty())
+                sName += _T(" No capabilities:\n");
+            else
+            {
+                sName += _T("    ");
+                sName += StringConversion::Convert_Ansi_To_Native(StringWrapperA::Join(VecString, "\n    "));
+            }
+            sName += _T("\n}");
+
+            LogWriterUtils::WriteMultiLineInfoIndented(sName, _T("\n"));
+        }
+    }
 }
 
 void TestAndCachePixelTypes(CTL_ITwainSource* p)
