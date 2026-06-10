@@ -8,6 +8,9 @@ DTWAIN Version changes
 - Make path specified by DTWAIN_SetResourcePath() also apply to the path where the
   dtwain32.ini and dtwain64.ini files are found.
 
+- Ensure that open TWAIN Sources have their capabilities logged when DTWAIN_SetTwainLog()
+  is initially called.
+
 
 5.9.1
 
