@@ -1832,7 +1832,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsAcquiring()
 }
 
 
-/* This function tests all open DLL handles to see if any source is acquiring */
 std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle)
 {
     std::vector<CTL_ITwainSource*> vSources;
