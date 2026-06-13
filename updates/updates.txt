@@ -9,6 +9,9 @@ DTWAIN Version changes
   Canon DR- series of scanners will default to have their user interface auto
   close after the first acquisition attempted.
 
+- Fix potential buffer overrun issue with opening and closing multiple sources in one
+  TWAIN session.
+
 - Make path specified by DTWAIN_SetResourcePath() also apply to the path where the
   dtwain32.ini and dtwain64.ini files are found.
 

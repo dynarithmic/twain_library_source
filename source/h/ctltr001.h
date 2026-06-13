@@ -40,19 +40,8 @@ namespace dynarithmic
             {
                 case TWRC_SUCCESS:
                 {
-                    // Check if source exists
-                    CTL_ITwainSource* pSource = pSession->Find(pCurSource);
-                    if (!pSource)
-                    {
-                        pSession->AddTwainSource(pCurSource);
-                        pSession->SetSelectedSource(pCurSource);
-                    }
-                    else
-                    {
-                        pSession->SetSelectedSource(pSource);
-                        pCurSource->SetActive(FALSE);
-                        CTL_ITwainSource::Destroy(pCurSource);
-                    }
+                    pSession->AddTwainSource(pCurSource);
+                    pSession->SetSelectedSource(pCurSource);
                 }
                 break;
 
@@ -83,17 +72,32 @@ namespace dynarithmic
                     CTL_ITwainSource* pSource = CTL_ITwainSource::Create(pSession, pProduct);
                     SetSourcePtr(pSource);
                     m_bSourceCreated = true;
-                    InitGeneric(pSession, nullptr, DG_CONTROL, DAT_IDENTITY, nMsg, pSource->GetSourceIDPtr(), { true, false });
+
+                    // We need to use the class TW_IDENTITY struct here, and not the
+                    // source's version of TW_IDENTITY.  The reason is that some drivers
+                    // corrupt the saved TW_IDENTITY of the source when selecting and/or closing
+                    // the source
+                    InitGeneric(pSession, nullptr, DG_CONTROL, DAT_IDENTITY, nMsg, &m_tempSourceID, { true, false });
                 }
             }
             CTL_ITwainSource* GetSourceIDPtr() { return GetSourcePtr(); }
 
             TW_UINT16 Execute() override
             {
-                return ExecuteFn::Execute(*this);
+                auto retval = ExecuteFn::Execute(*this);
+                if (retval == TWRC_SUCCESS)
+                {
+                    // We need to use the class TW_IDENTITY struct here, and not the
+                    // source's version of TW_IDENTITY.  The reason is that some drivers
+                    // corrupt the saved TW_IDENTITY of the source when selecting and/or closing
+                    // the source
+                    memcpy(GetSourcePtr()->GetSourceIDPtr(), &m_tempSourceID, sizeof(TW_IDENTITY));
+                }
+                return retval;
             }
         private:
             bool m_bSourceCreated;
+            TW_IDENTITY m_tempSourceID;
     };
 
     template <TW_UINT16 nMsg>
@@ -103,11 +107,17 @@ namespace dynarithmic
             CTL_SourceOpenCloseTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : m_bSourceCreated(false)
             {
                 SetSourcePtr(pSource);
-                InitGeneric(pSession, nullptr, DG_CONTROL, DAT_IDENTITY, nMsg, pSource->GetSourceIDPtr(), {true, false});
+                // We need to use the class TW_IDENTITY struct here, and not the
+                // source's version of TW_IDENTITY.  The reason is that some drivers
+                // corrupt the saved TW_IDENTITY of the source when selecting and/or closing
+                // the source
+                memcpy(&m_tempSourceID, pSource->GetSourceIDPtr(), sizeof(TW_IDENTITY));
+                InitGeneric(pSession, nullptr, DG_CONTROL, DAT_IDENTITY, nMsg, &m_tempSourceID, {true, false});
             }
             CTL_ITwainSource* GetSourceIDPtr() { return GetSourcePtr(); }
 
         private:
+            TW_IDENTITY m_tempSourceID;
             bool m_bSourceCreated;
     };
 

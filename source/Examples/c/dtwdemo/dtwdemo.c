@@ -647,9 +647,6 @@ void SetCaptionToSourceName()
 
 void SetUpAcquire()
 {
-    /* Disable main window */
-    DTWAIN_DisableAppWindow(g_hWnd, TRUE);
-
     /* Check if feeder or duplex is supported */
     if (DTWAIN_IsFeederSupported(g_CurrentSource) || DTWAIN_IsDuplexSupported(g_CurrentSource))
         DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSettings, g_hWnd, (DLGPROC)DisplayAcquireSettingsProc);
@@ -719,9 +716,6 @@ void GenericAcquire(LONG nWhichOne)
     }
     RetrieveAndDisplayDibs(g_hInstance, g_AcquireArray, IDD_dlgDib, g_hWnd);
     DTWAIN_DestroyAcquisitionArray( g_AcquireArray, TRUE );
-
-    /* Enable main window */
-    DTWAIN_DisableAppWindow(g_hWnd, FALSE);
 }
 
 void AcquireNative()
