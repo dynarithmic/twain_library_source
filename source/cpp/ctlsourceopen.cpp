@@ -38,6 +38,8 @@ static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 static void DetermineIfGetMessage(CTL_ITwainSource* p);
 static void DetermineIfPaperDetectable(CTL_ITwainSource* p);
 static void DetermineSheetcountDefs(CTL_ITwainSource* p);
+static void DetermineIfAutoCloseUI(CTL_ITwainSource* pSource);
+
 static std::pair<bool, int> PerformPixelTypeCompliancyTest(CTL_ITwainSource * p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
@@ -114,6 +116,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 
     // See if the source will interpret CAP_SHEETCOUNT as Images or actual sheets of paper
     DetermineSheetcountDefs(pSource);
+
+    // See if the source needs to have the Source UI close on a single acquisition attempted
+    DetermineIfAutoCloseUI(pSource);
 
     // Cache the pixel types and bit depths
     TestAndCachePixelTypes(pSource);
@@ -263,8 +268,8 @@ void TestAndCachePixelTypes(CTL_ITwainSource* p)
 void DetermineIfSpecialXfer(CTL_ITwainSource* p)
 {
     using wildcards::match;
-    auto& xfer_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
-    auto& xfer_list= CTL_TwainAppMgr::GetSourceToXferReadyList();
+    auto& xfer_map = CTL_StaticData::GetSourceToXferReadyMap();
+    auto& xfer_list= CTL_StaticData::GetSourceToXferReadyList();
     std::string sourceName = p->GetProductNameA();
     auto iter = xfer_map.find(sourceName);
 
@@ -291,7 +296,7 @@ void DetermineIfSpecialXfer(CTL_ITwainSource* p)
 void DetermineIfPaperDetectable(CTL_ITwainSource* p)
 {
     using wildcards::match;
-    auto& paperdetectable_map = CTL_TwainAppMgr::GetSourcePaperDetectionMap();
+    auto& paperdetectable_map = CTL_StaticData::GetSourcePaperDetectionMap();
     std::string sourceName = p->GetProductNameA();
 
     // Search map for a matching name
@@ -311,7 +316,7 @@ void DetermineIfPaperDetectable(CTL_ITwainSource* p)
 void DetermineSheetcountDefs(CTL_ITwainSource* p)
 {
     using wildcards::match;
-    auto& sheetcount_map = CTL_TwainAppMgr::GetSourceSheetcountMap();
+    auto& sheetcount_map = CTL_StaticData::GetSourceSheetcountMap();
     std::string sourceName = p->GetProductNameA();
 
     // Search map for a matching name
@@ -333,7 +338,7 @@ void DetermineSheetcountDefs(CTL_ITwainSource* p)
 void DetermineIfGetMessage(CTL_ITwainSource* pSource)
 {
     using wildcards::match;
-    auto& getmsg_list = CTL_TwainAppMgr::GetSourceGetMessageList();
+    auto& getmsg_list = CTL_StaticData::GetSourceGetMessageList();
     std::string sourceName = pSource->GetProductNameA();
     
     // Search vector for a matching name
@@ -344,6 +349,26 @@ void DetermineIfGetMessage(CTL_ITwainSource* pSource)
         if (matches)
         {
             pSource->SetUsePeekMessage(false);
+            return;
+        }
+        ++iterSearch;
+    }
+}
+
+void DetermineIfAutoCloseUI(CTL_ITwainSource* pSource)
+{
+    using wildcards::match;
+    auto& autoclose_list = CTL_StaticData::GetSourceToUIAutocloseMap();
+    std::string sourceName = pSource->GetProductNameA();
+
+    // Search vector for a matching name
+    auto iterSearch = autoclose_list.begin();
+    while (iterSearch != autoclose_list.end())
+    {
+        bool matches = match(sourceName, iterSearch->first);
+        if (matches)
+        {
+            pSource->SetUseAutocloseUI(iterSearch->second);
             return;
         }
         ++iterSearch;

@@ -719,6 +719,9 @@ void GenericAcquire(LONG nWhichOne)
     }
     RetrieveAndDisplayDibs(g_hInstance, g_AcquireArray, IDD_dlgDib, g_hWnd);
     DTWAIN_DestroyAcquisitionArray( g_AcquireArray, TRUE );
+
+    /* Enable main window */
+    DTWAIN_DisableAppWindow(g_hWnd, FALSE);
 }
 
 void AcquireNative()

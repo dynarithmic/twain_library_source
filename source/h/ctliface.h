@@ -435,22 +435,36 @@ namespace dynarithmic
         CTL_StringType& GetExtension() { return m_sExtension; }
     };
 
-    typedef boost::container::flat_map<std::string, SourceStatus> SourceStatusMap;
-    typedef boost::container::flat_map<int, ImageResamplerData> ImageResamplerMap;
-    typedef boost::container::flat_map<int, std::pair<std::string, std::string>> CTL_PDFMediaMap;
-    typedef boost::container::flat_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
-    using TwainConstantType = int64_t;
-    typedef boost::container::flat_map<TwainConstantType, std::vector<std::string>> CTL_TwainConstantToStringMapNode;
-    typedef boost::container::flat_map<int, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
-    typedef boost::container::flat_map<TwainConstantType, std::string> CTL_TwainIDToStringMap;
-    typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
-    typedef boost::container::flat_map<std::string, unsigned long> CTL_ThreadMap;
-    typedef boost::container::flat_map<std::string, TwainConstantType> CTL_StringToConstantMap;
-    typedef boost::container::flat_map<TW_UINT16, TW_INFO> CTL_UINT16ToInfoMap;
-    typedef boost::container::flat_map<int, FileSaveNode> CTL_FileSaveMap;
-    typedef boost::container::flat_map<int, std::vector<int>> CTL_CompressionMap;
+    struct SourceXferReadyOverride
+    {
+        uint32_t m_MaxThreshold = 0;
+        uint32_t m_CurrentCount = 0;
+        bool m_bSeenUIClose = false;
+        bool m_bSeenXferReady = false;
+    };
 
-    typedef std::unordered_map<std::pair<int, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
+    using SourceStatusMap = boost::container::flat_map<std::string, SourceStatus>;
+    using ImageResamplerMap = boost::container::flat_map<int, ImageResamplerData>;
+    using CTL_PDFMediaMap = boost::container::flat_map<int, std::pair<std::string, std::string>>;
+    using CTL_AvailableFileFormatsMap = boost::container::flat_map<LONG, FileFormatNode>;
+    using TwainConstantType = int64_t;
+    using CTL_TwainConstantToStringMapNode = boost::container::flat_map<TwainConstantType, std::vector<std::string>>;
+    using CTL_TwainConstantsMap = boost::container::flat_map<int, CTL_TwainConstantToStringMapNode>;
+    using CTL_TwainIDToStringMap = boost::container::flat_map<TwainConstantType, std::string>;
+    using CTL_ErrorToExtraInfoMap = boost::container::flat_map<int32_t, std::string>;
+    using CTL_ThreadMap = boost::container::flat_map<std::string, unsigned long>;
+    using CTL_StringToConstantMap = boost::container::flat_map<std::string, TwainConstantType>;
+    using CTL_UINT16ToInfoMap = boost::container::flat_map<TW_UINT16, TW_INFO>;
+    using CTL_FileSaveMap = boost::container::flat_map<int, FileSaveNode>;
+    using CTL_CompressionMap = boost::container::flat_map<int, std::vector<int>>;
+    using SourceToUIAutocloseMap = std::map<std::string, bool>;
+    using SourceToXferReadyMap = std::map<std::string, SourceXferReadyOverride>;
+    using SourceToXferReadyList = std::vector<std::pair<std::string, uint32_t>>;
+    using SourceFlatbedOnlyList = std::unordered_set<std::string>;
+    using SourceGetMessageList = std::unordered_set<std::string>;
+    using SourceSheetcountMap = std::vector<std::pair<std::string, std::string>>;
+    using SourcePaperDetectableMap = std::map<std::string, bool>;
+    using CTL_PairToStringMap = std::unordered_map<std::pair<int, std::string>, std::string, CacheKeyHash>;
 
     struct CTL_GeneralResourceInfo
     {
@@ -484,6 +498,7 @@ namespace dynarithmic
                INI_TWAINLOOPGETMSG_KEY,
                INI_SHEETCOUNT_KEY,
                INI_TESTGET_ITEM,
+               INI_AUTOCLOSEUI_KEY,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
@@ -538,6 +553,14 @@ namespace dynarithmic
         CTL_TEXTELEMENTPTRLIST   s_PDFTextElementList;
         int64_t                  s_logFileSaveThreshold = -1LL;
         bool                     s_bTestGetMessage = true;
+        SourceToXferReadyMap     s_SourceToXferReadyMap;
+        SourceToXferReadyList    s_SourceToXferReadyList;
+        SourceFlatbedOnlyList    s_SourceFlatbedOnlyList;
+        SourceGetMessageList     s_SourceGetMessageList;
+        SourcePaperDetectableMap s_SourcePaperDetectableMap;
+        SourceSheetcountMap      s_SourceSheetcountList;
+        SourceToUIAutocloseMap   s_SourceToAutocloseMap;
+
         CTL_StaticDataStruct();
     };
 
@@ -630,6 +653,13 @@ namespace dynarithmic
         static auto& GetPDFTextElementList() { return s_StaticData.s_PDFTextElementList; }
         static auto& GetLogFileSaveThreshold() { return s_StaticData.s_logFileSaveThreshold; }
         static bool& IsTestForGetMessage() { return s_StaticData.s_bTestGetMessage; }
+        static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_StaticData.s_SourceToXferReadyMap; }
+        static SourceToXferReadyList& GetSourceToXferReadyList() { return s_StaticData.s_SourceToXferReadyList; }
+        static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_StaticData.s_SourceFlatbedOnlyList; }
+        static SourceGetMessageList& GetSourceGetMessageList() { return s_StaticData.s_SourceGetMessageList; }
+        static SourcePaperDetectableMap& GetSourcePaperDetectionMap() { return s_StaticData.s_SourcePaperDetectableMap; }
+        static SourceSheetcountMap& GetSourceSheetcountMap() { return s_StaticData.s_SourceSheetcountList; }
+        static SourceToUIAutocloseMap& GetSourceToUIAutocloseMap() { return s_StaticData.s_SourceToAutocloseMap; }
     };
 
     struct CTL_LoggerCallbackInfo

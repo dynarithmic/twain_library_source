@@ -244,6 +244,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bUsePeekMessage(true),
     m_nLastAcquireError(false),
     m_bTwainMsgLoopStarted(false),
+    m_bAutocloseUI(false),
     m_tbIsFileSystemSupported(boost::logic::indeterminate),
     m_tbIsTileModeSupported(boost::logic::indeterminate),
     m_tbIsFeederSupported(boost::logic::indeterminate),

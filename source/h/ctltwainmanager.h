@@ -46,20 +46,6 @@ namespace dynarithmic
     class CTL_ImageXferTriplet;
     class CTL_ImageInfoTriplet;
 
-    struct SourceXferReadyOverride
-    {
-        uint32_t m_MaxThreshold = 0;
-        uint32_t m_CurrentCount = 0;
-        bool m_bSeenUIClose = false;
-        bool m_bSeenXferReady = false;
-    };
-
-    using SourceToXferReadyMap = std::map<std::string, SourceXferReadyOverride>;
-    using SourceToXferReadyList = std::vector<std::pair<std::string, uint32_t>>;
-    using SourceFlatbedOnlyList = std::unordered_set<std::string>;
-    using SourceGetMessageList = std::unordered_set<std::string>;
-    using SourceSheetcountMap = std::vector<std::pair<std::string, std::string>>;
-    using SourcePaperDetectableMap = std::map<std::string, bool>;
 
     class CTL_TwainAppMgr;
     typedef std::shared_ptr<CTL_TwainAppMgr> CTL_TwainAppMgrPtr;
@@ -262,12 +248,6 @@ namespace dynarithmic
             static CTL_StringType GetDSMVersionInfo();
             static LONG GetDSMPathLocation();
             auto GetDSMModuleHandle() const { return m_hLibModule.native(); }
-            static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_SourceToXferReadyMap; }
-            static SourceToXferReadyList& GetSourceToXferReadyList() { return s_SourceToXferReadyList; }
-            static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_SourceFlatbedOnlyList; }
-            static SourceGetMessageList& GetSourceGetMessageList() { return s_SourceGetMessageList; }
-            static SourcePaperDetectableMap& GetSourcePaperDetectionMap() { return s_SourcePaperDetectableMap; }
-            static SourceSheetcountMap& GetSourceSheetcountMap() { return s_SourceSheetcountList; }
             const CTL_TwainTriplet* GetCurrentTriplet() const { return m_pCurrentTriplet;}
 
         private:
@@ -470,12 +450,6 @@ namespace dynarithmic
             static std::string        s_strLastError;
             static HINSTANCE         s_ThisInstance;
             static VOID CALLBACK TwainTimeOutProc(HWND, UINT, ULONG, DWORD);
-            static SourceToXferReadyMap s_SourceToXferReadyMap;
-            static SourceToXferReadyList s_SourceToXferReadyList;
-            static SourceFlatbedOnlyList s_SourceFlatbedOnlyList;
-            static SourceGetMessageList s_SourceGetMessageList;
-            static SourcePaperDetectableMap s_SourcePaperDetectableMap;
-            static SourceSheetcountMap      s_SourceSheetcountList;
     };
 
     #define DTWAIN_ERROR_CONDITION(Err, RetVal, mustReport) {               \

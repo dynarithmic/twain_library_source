@@ -289,7 +289,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     DTWAIN_CALLBACK oldCall = pHandle->m_CallbackMsg;
     DTWAIN_SetCallbackProc(DTWAIN_AcquireProc, DTWAIN_CallbackMESSAGE);
 #endif
-    auto& user_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
+    auto& user_map = CTL_StaticData::GetSourceToXferReadyMap();
     auto iter = user_map.find(pSource->GetProductNameA());
     if (iter != user_map.end())
     {

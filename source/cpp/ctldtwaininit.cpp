@@ -73,6 +73,7 @@ static void WriteVersionToLog(CTL_TwainDLLHandle* pHandle);
 static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandle, bool bCheck=true);
 static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, bool bClear);
 static void LoadTransferReadyOverrides();
+static void LoadAutocloseUIOverrides();
 static void LoadFlatbedOnlyOverrides();
 static void LoadTwainLoopOverrides();
 static void LoadPaperDetectionOverrides();
@@ -855,6 +856,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 
                 // Load DS overrides for transfer ready / close UI requests
                 LoadTransferReadyOverrides();
+
+                // Load auto close UI overrides
+                LoadAutocloseUIOverrides();
 
                 // Load Twain message loop overrides for peek message
                 LoadTwainLoopOverrides();
@@ -2410,9 +2414,9 @@ CTL_StringType CheckSearchOrderString(CTL_StringType str)
 // before sending the "start transfer" request when acquiring images.
 void LoadTransferReadyOverrides()
 {
-    auto& xfer_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
+    auto& xfer_map = CTL_StaticData::GetSourceToXferReadyMap();
     xfer_map.clear();
-    auto& xfer_list = CTL_TwainAppMgr::GetSourceToXferReadyList();
+    auto& xfer_list = CTL_StaticData::GetSourceToXferReadyList();
     xfer_list.clear();
 
     // Get the section name
@@ -2455,11 +2459,53 @@ void LoadTransferReadyOverrides()
     }
 }
 
+// This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [AutocloseUI]
+// section for TWAIN sources that will require the source UI to autoclose
+// after a single acquisition
+void LoadAutocloseUIOverrides()
+{
+    auto& autoclose_map = CTL_StaticData::GetSourceToUIAutocloseMap();
+    autoclose_map.clear();
+
+    // Get the section name
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
+        return;
+    CSimpleIniA::TNamesDepend keys;
+    auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_AUTOCLOSEUI_KEY).data();
+    customProfile->GetAllKeys(iniKey, keys);
+    auto iter = keys.begin();
+    while (iter != keys.end())
+    {
+        CSimpleIniA::TNamesDepend vals;
+        customProfile->GetAllValues(iniKey, iter->pItem, vals);
+        if (!vals.empty())
+        {
+            auto iter2 = vals.begin();
+            if (!vals.empty())
+            {
+                try
+                {
+                    uint32_t valueToUse = std::stoi(iter2->pItem);
+                    autoclose_map.insert({ iter->pItem, (valueToUse != 0)?true:false });
+                }
+                catch (const std::invalid_argument& /*ex*/)
+                {
+                }
+                catch (const std::out_of_range& /*ex*/)
+                {
+                }
+            }
+        }
+        ++iter;
+    }
+}
+
 // This loads the sources that rely on the TWAIN loop when processing the acquisitions
 // to use GetMessage() instead of PeekMessage().
 void LoadTwainLoopOverrides()
 {
-    auto& getmsgloop_list = CTL_TwainAppMgr::GetSourceGetMessageList();
+    auto& getmsgloop_list = CTL_StaticData::GetSourceGetMessageList();
     getmsgloop_list.clear();
 
     // Get the section name
@@ -2489,7 +2535,7 @@ void LoadGetMessageTestOverride()
 // whether the source supports checking for paper loaded in feeder
 void LoadPaperDetectionOverrides()
 {
-    auto& paperdetectable_map = CTL_TwainAppMgr::GetSourcePaperDetectionMap();
+    auto& paperdetectable_map = CTL_StaticData::GetSourcePaperDetectionMap();
     paperdetectable_map.clear();
 
     auto* customProfile = CTL_StaticData::GetINIInterface();
@@ -2532,7 +2578,7 @@ void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle)
 // of sheets of paper, not the number of images)
 void LoadSheetcountProperties(CTL_TwainDLLHandle* pHandle)
 {
-    auto& sheetcount_map = CTL_TwainAppMgr::GetSourceSheetcountMap();
+    auto& sheetcount_map = CTL_StaticData::GetSourceSheetcountMap();
     sheetcount_map.clear();
 
     // Get the section name
@@ -2568,7 +2614,7 @@ void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)
 // only the flatbed portion of the device.  
 void LoadFlatbedOnlyOverrides()
 {
-    auto& flatbed_list = CTL_TwainAppMgr::GetSourceFlatbedOnlyList();
+    auto& flatbed_list = CTL_StaticData::GetSourceFlatbedOnlyList();
     flatbed_list.clear();
 
     // Get the section name
