@@ -771,7 +771,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(AbortTraits abortTrait
                 }
             }
 
-            if ( ptrPending->Count == 0 || !nContinue || abortTraits.m_bForceClose || bEndOfJobDetected || bProcessSinglePage ||
+            if (ptrPending->Count == 0 || !nContinue || abortTraits.m_bForceClose || bEndOfJobDetected || bProcessSinglePage ||
                 abortTraits.m_bStopFeeder)
             {
                 struct UIShutDown
@@ -784,7 +784,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(AbortTraits abortTrait
                         : pSession(pSes), pSource(pSrc), bShutdown(bClose), bFeederStopped(feederStopped) {}
                     ~UIShutDown()
                     {
-                        if (bShutdown && !bFeederStopped )
+                        if (bShutdown && !bFeederStopped)
                             CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
                     }
                 };
@@ -792,14 +792,16 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(AbortTraits abortTrait
                 // Prompt to save image here
 
                 // Send a message to close things down if
-                // there was no user interface chosen
+                // there was no user interface chosen or if we need to force the UI to be closed
                 bool keepProcessingSinglePage = bProcessSinglePage && (ptrPending->Count > 0);
+                bool forceClose = pSource->IsUseAutocloseUI() && (ptrPending->Count == 0);
+
                 // If there are no more images pending for single page image types, and
                 // the device is not showing the user-interface, and there are no pages in 
                 // the feeder, shut the UI down.
-                UIShutDown uiCloser(pSession, pSource, !keepProcessingSinglePage && !pSource->IsUIOpenOnAcquire(),
+                UIShutDown uiCloser(pSession, pSource,
+                    (!keepProcessingSinglePage && !pSource->IsUIOpenOnAcquire()) || forceClose,
                                     abortTraits.m_bStopFeeder);
-
                 if ( pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative)
                 {
                     if ( !abortTraits.m_bForceClose )

@@ -151,9 +151,9 @@ static HWND CreateTwainWindow(CTL_TwainDLLHandle * /*pHandle*/,
     GetWindowRect(hWndP, &rect);
     const HWND hwnd = CreateWindow(_T("DTWAINWindowClass"),              // class
         _T("Twain Window"),                 // title
-        WS_OVERLAPPED,    // style
+        WS_OVERLAPPED | WS_POPUP | WS_CAPTION | WS_EX_TOOLWINDOW,    // style
         0, 0,   // x, y
-        0, 0,   // width, height
+        100, 100,   // width, height
         hWndParent ? hWndP : NULL,
         NULL,                            // hmenu
         hInstance,

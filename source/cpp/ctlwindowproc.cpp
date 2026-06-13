@@ -720,6 +720,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DisableAppWindow(HWND hWnd, DTWAIN_BOOL bDisable
    else
        appWindows.erase( hWnd );
    #endif
+   DisableAppWindows(bDisable);
    LOG_FUNC_EXIT_NONAME_PARAMS(true)
    CATCH_BLOCK(false)
 }

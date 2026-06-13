@@ -383,6 +383,7 @@ set(MAIN_HEADERS
 	${PROJECT_SOURCE_DIR}/h/ctlloadresources.h
 	${PROJECT_SOURCE_DIR}/h/ctllogcalls.h
 	${PROJECT_SOURCE_DIR}/h/ctllogfunctioncall.h
+	${PROJECT_SOURCE_DIR}/h/ctllogsourcecaps.h
 	${PROJECT_SOURCE_DIR}/h/ctlobstr.h
 	${PROJECT_SOURCE_DIR}/h/ctlobtyp.h
 	${PROJECT_SOURCE_DIR}/h/ctlrandnumutils.h

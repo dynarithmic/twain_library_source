@@ -243,7 +243,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         
         /* Retry initialization */
         LONG nValue =
-            MessageBox(g_hWnd, _T("Initialization failed.  Hit OK to reattempt DTWAIN initialization, Cancel to exit..."), _T("Retry Initialization"), MB_OKCANCEL);
+            MessageBox(g_hWnd, _T("Initialization failed.  Select OK to reattempt DTWAIN initialization, Cancel to exit..."), _T("Retry Initialization"), MB_OKCANCEL);
         if (nValue == IDOK)
             continue;
         else
@@ -647,9 +647,6 @@ void SetCaptionToSourceName()
 
 void SetUpAcquire()
 {
-    /* Disable main window */
-    DTWAIN_DisableAppWindow(g_hWnd, TRUE);
-
     /* Check if feeder or duplex is supported */
     if (DTWAIN_IsFeederSupported(g_CurrentSource) || DTWAIN_IsDuplexSupported(g_CurrentSource))
         DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSettings, g_hWnd, (DLGPROC)DisplayAcquireSettingsProc);
