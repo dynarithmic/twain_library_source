@@ -428,6 +428,8 @@ namespace dynarithmic
         enum { DRIVE_POS, DRIVE_PATH, DIRECTORY_POS, NAME_POS, EXTENSION_POS };
         typedef std::vector<StringType> StringArrayType;
 
+        static traits_type GetTraits() { return {}; }
+
         static StringType Mid(typename StringTraits::stringview_type str, size_t nFirst)
         {
             return str.substr(nFirst).data();
