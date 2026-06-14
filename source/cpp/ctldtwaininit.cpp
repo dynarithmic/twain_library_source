@@ -2357,12 +2357,8 @@ CTL_StringType GetDTWAINInternalBuildNumber()
 
 CTL_StringType dynarithmic::GetDTWAININIPath()
 {
-    auto& iniPathCache = CTL_StaticData::GetINIPath();
-    if (!iniPathCache.empty())
-        return iniPathCache;
     CTL_StringType szName = DTWAIN_ININAME_NATIVE; 
-    iniPathCache = CreateResourcePathName() + szName;
-    return iniPathCache;
+    return CreateResourcePathName() + szName;
 }
 
 std::string dynarithmic::GetDTWAININIPathA()

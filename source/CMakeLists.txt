@@ -1208,24 +1208,26 @@ set(DATEMASTER_SOURCES
 
 
 set(TEXT_RESOURCE_FILES
-  ${PROJECT_SOURCE_DIR}/txt/twaininfo.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainlanguage.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_dutch.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_english.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_french.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_german.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_greek.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_italian.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_japanese.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_korean.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_portuguese.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_portuguese_br.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_romanian.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_russian.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_simplified_chinese.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_spanish.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_traditional_chinese.txt
-  ${PROJECT_SOURCE_DIR}/txt/twainresourcestrings_turkish.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/dtwain32.ini
+  ${PROJECT_SOURCE_DIR}/text_resources/dtwain64.ini
+  ${PROJECT_SOURCE_DIR}/text_resources/twaininfo.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainlanguage.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_dutch.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_english.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_french.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_german.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_greek.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_italian.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_japanese.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_korean.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_portuguese.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_portuguese_br.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_romanian.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_russian.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_simplified_chinese.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_spanish.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_traditional_chinese.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_turkish.txt
 )
 
 set(DTWDEMO_SOURCES
@@ -1296,6 +1298,7 @@ target_compile_definitions(dtwdemo PRIVATE
     $<$<BOOL:${DTWAIN_BUILD_UNICODE}>:_UNICODE>
     $<$<NOT:$<BOOL:${DTWAIN_BUILD_UNICODE}>>:_MBCS>
     $<$<CONFIG:Debug>:USE_DTWAIN_DEBUG_LIB>
+    ALTERNATE_RESOURCE_PATH="${PROJECT_SOURCE_DIR}/text_resources"
 )
 
 add_library(dtwain_libpng STATIC
