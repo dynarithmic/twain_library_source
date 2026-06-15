@@ -238,10 +238,24 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     /* Initialize DTWAIN */
     while (1)
     {
+        /* Try initialization, but do not show error
+           message box if there is a failure */
+        if (DTWAIN_SysInitializeNoBlocking())
+            break; 
+
+        /* Retry initialization with alternate path */
+        DTWAIN_SetResourcePathA(ALTERNATE_RESOURCE_PATH);
+
+        /* Try initialization again using the alternate path */
         if (DTWAIN_SysInitialize())
             break;
-        
-        /* Retry initialization */
+
+        /* Reset the resource path to the default (which is the DTWAIN DLL's path) */
+        DTWAIN_SetResourcePathA("");
+
+        /* Failed, so either the user exits the program, or copies the 
+           proper text resource files to a folder (on the path or to the 
+           ALTERNATE_RESOURCE_PATH) */
         LONG nValue =
             MessageBox(g_hWnd, _T("Initialization failed.  Select OK to reattempt DTWAIN initialization, Cancel to exit..."), _T("Retry Initialization"), MB_OKCANCEL);
         if (nValue == IDOK)

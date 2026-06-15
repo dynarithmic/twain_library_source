@@ -59,7 +59,14 @@
 
 using namespace dynarithmic;
 
-static DTWAIN_HANDLE SysInitializeHelper(bool noblock, bool bMinimalSetup = false);
+struct SysInitializeOptions
+{
+    bool showErrorBox = false;
+    bool createErrorLog = false;
+    bool createMinimalSetup = false;
+};
+
+static DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& options);
 static LONG DTWAIN_CloseAllSources();
 static void UnhookAllDisplays();
 static bool AssociateThreadToTwainDLL(std::shared_ptr<CTL_TwainDLLHandle>& pHandle, unsigned long threadId);
@@ -79,7 +86,7 @@ static void LoadTwainLoopOverrides();
 static void LoadPaperDetectionOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
 static void LoadSheetcountProperties(CTL_TwainDLLHandle* pHandle);
-static bool LoadGeneralResources(bool blockExecution);
+static bool LoadGeneralResources(const SysInitializeOptions& initOptions);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
 static void LoadSelectSourcePosition();
 static void LoadGetMessageTestOverride();
@@ -551,7 +558,7 @@ static LONG IsTwainAvailableHelper(LPTSTR directories, LONG nMaxLen)
         if (!pHandle)
         {
             // Temporarily set up a handle without loading everything
-            pHandle = static_cast<CTL_TwainDLLHandle*> (SysInitializeHelper(false, true));
+            pHandle = static_cast<CTL_TwainDLLHandle*> (SysInitializeHelper({ false, false , true }));
             if (!pHandle)
                 LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_BAD_HANDLE)
             bMustDestroy = true;
@@ -766,15 +773,20 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
 
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeNoBlocking()
 {
-    return SysInitializeHelper(false);
+    return SysInitializeHelper({ false, false , false });
+}
+
+DTWAIN_HANDLE  DLLENTRY_DEF DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile)
+{
+    return SysInitializeHelper({ false, bCreateLogFile ? true : false , false });
 }
 
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
 {
-    return SysInitializeHelper(true);
+    return SysInitializeHelper({ true, false , false });
 }
 
-DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
+DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& initOptions)
 {
     std::lock_guard<std::mutex> lg(CTL_StaticData::s_mutexInitDestroy);
 #ifdef DTWAIN_LIB
@@ -815,7 +827,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
         // Associate a GUID with the handle
         pHandle->GetGUID() = StringWrapperA::GenerateUUIDv4();
 
-        if (!bMinimalSetup)
+        if (!initOptions.createMinimalSetup)
         {
             // Open dtwain32.ini or dtwain64.ini
             if ( !CTL_StaticData::s_iniInterface )
@@ -828,7 +840,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 CTL_StaticData::GetINIPath() = GetDTWAININIPath();
             }
 
-            bool resourcesLoaded = LoadGeneralResources(block);
+            bool resourcesLoaded = LoadGeneralResources(initOptions);
             if (!resourcesLoaded)
             {
                 RemoveThreadIdFromAssociation(threadId);
@@ -925,7 +937,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
     }
     catch (std::exception& ex)
     {
-        if (block)
+        if (initOptions.showErrorBox)
         {
             MessageBoxA(nullptr, "DTWAIN Initialization Error", ex.what(), MB_ICONERROR);
         }
@@ -1990,7 +2002,10 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrderEx(LPTSTR SearchOrder, LPTSTR UserDire
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePath(LPCTSTR ResourcePath)
 {
     LOG_FUNC_ENTRY_PARAMS((ResourcePath))
-    CTL_StaticData::GetResourcePath() = ResourcePath;
+    if ( ResourcePath )
+        CTL_StaticData::GetResourcePath() = ResourcePath;
+    else
+        CTL_StaticData::GetResourcePath() = _T("");
     LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
     CATCH_BLOCK(false)
 }
@@ -2357,12 +2372,8 @@ CTL_StringType GetDTWAINInternalBuildNumber()
 
 CTL_StringType dynarithmic::GetDTWAININIPath()
 {
-    auto& iniPathCache = CTL_StaticData::GetINIPath();
-    if (!iniPathCache.empty())
-        return iniPathCache;
     CTL_StringType szName = DTWAIN_ININAME_NATIVE; 
-    iniPathCache = CreateResourcePathName() + szName;
-    return iniPathCache;
+    return CreateResourcePathName() + szName;
 }
 
 std::string dynarithmic::GetDTWAININIPathA()
@@ -2634,7 +2645,7 @@ void LoadFlatbedOnlyOverrides()
     }
 }
 
-bool LoadGeneralResources(bool blockExecution)
+bool LoadGeneralResources(const SysInitializeOptions& initOptions)
 {
     bool bResourcesLoaded = false;
     CTL_StaticData::SetResourceLoadError(DTWAIN_NO_ERROR);
@@ -2700,7 +2711,7 @@ bool LoadGeneralResources(bool blockExecution)
             CTL_StringType sAllErrors = _T("Error in reading resource file:\r\n") + ret.resourcePath + _T("\r\n") +
                 errorMsg + szBuf + versionErrorMessage;
 
-            if (blockExecution)
+            if (initOptions.showErrorBox)
             {
                 // Only display the error message box if DTWAIN_SysInitialize() was called
                 // instead of DTWAIN_SysInitialNoBlocking()
@@ -2709,18 +2720,31 @@ bool LoadGeneralResources(bool blockExecution)
                 #endif
             }
             else
-            // Write the information to errorlog_*.txt located in the resource directory
             {
-                // Get the base file name with time stamp
-                auto baseFileName = StringConversion::Convert_Ansi_To_Native(CreateFileNameWithDateTime("errorlog_", "txt"));
+                bool bWroteInfoToFile = false;
+                std::string sErr = StringConversion::Convert_Native_To_Ansi(StringWrapper::ReplaceAll(sAllErrors, _T("\r"), _T(" ")));
+                if (initOptions.createErrorLog)
+                {
+                    // Write the information to errorlog_*.txt located in the resource directory
+                    // Get the base file name with time stamp
+                    auto baseFileName = StringConversion::Convert_Ansi_To_Native(CreateFileNameWithDateTime("errorlog_", "txt"));
 
-                // Create the file name with the path of the resources
-                auto errorName = StringConversion::Convert_Native_To_Ansi(CreateResourceFileName(baseFileName.c_str()));
+                    // Create the file name with the path of the resources
+                    auto errorName = StringConversion::Convert_Native_To_Ansi(CreateResourceFileName(baseFileName.c_str()));
 
-                // Write the information to the errorlog file
-                std::ofstream ofs(errorName);
-                if (ofs)
-                    ofs << StringConversion::Convert_Native_To_Ansi(StringWrapper::ReplaceAll(sAllErrors, _T("\r"), _T(" ")));
+                    // Write the information to the error log file
+                    std::ofstream ofs(errorName);
+                    if (ofs)
+                    {
+                        ofs << sErr;
+                        bWroteInfoToFile = true;
+                    }
+                }
+                if ( !bWroteInfoToFile )
+                {
+                    // Show error in debug console
+                    OutputDebugStringA(sErr.c_str());
+                }
             }
         }
         else

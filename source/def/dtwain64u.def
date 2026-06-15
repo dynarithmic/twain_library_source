@@ -1193,3 +1193,4 @@ DTWAIN_GetAllSourceInfoW                          @1189
 DTWAIN_ArrayDestroyAll                            @1190
 DTWAIN_GetMaxBuffersEx                            @1191
 DTWAIN_ArrayCreateFromType                        @1192
+DTWAIN_SysInitializeNoBlockingEx                  @1193
