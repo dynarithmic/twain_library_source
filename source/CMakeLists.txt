@@ -194,8 +194,17 @@ set(DTWAIN_BOOST_LIBRARY_DIR
 set(DTWAIN_BOOST_INSTALLER
     "boost_${DTWAIN_BOOST_VERSION_UNDERSCORE}-msvc-${DTWAIN_BOOST_MSVC}-${DTWAIN_BOOST_BITS}.exe")
 
-set(DTWAIN_BOOST_URL
-    "https://sourceforge.net/projects/boost/files/boost-binaries/${DTWAIN_BOOST_VERSION}/${DTWAIN_BOOST_INSTALLER}/download")
+set(DTWAIN_BOOST_DOWNLOAD_SITE "sourceforge" CACHE STRING "Boost download site: sourceforge or teeks99")
+
+if(DTWAIN_BOOST_DOWNLOAD_SITE STREQUAL "sourceforge")
+    set(DTWAIN_BOOST_URL "https://sourceforge.net/projects/boost/files/boost-binaries/${DTWAIN_BOOST_VERSION}/${DTWAIN_BOOST_INSTALLER}/download")
+elseif(DTWAIN_BOOST_DOWNLOAD_SITE STREQUAL "teeks99")
+    set(DTWAIN_BOOST_URL "https://boost.teeks99.com/bin/${DTWAIN_BOOST_VERSION}/${DTWAIN_BOOST_INSTALLER}")
+else()
+    message(FATAL_ERROR "Unknown DTWAIN_BOOST_DOWNLOAD_SITE: ${DTWAIN_BOOST_DOWNLOAD_SITE}")
+endif()
+
+set_property(CACHE DTWAIN_BOOST_DOWNLOAD_SITE PROPERTY STRINGS sourceforge teeks99)
 
 set(DTWAIN_BOOST_DOWNLOADED_EXE
     "${DTWAIN_BOOST_CACHE_ROOT}/${DTWAIN_BOOST_INSTALLER}")
@@ -241,6 +250,9 @@ if(NOT DTWAIN_EXISTING_BOOST_ROOT AND
         message(STATUS "    -DTWAIN_DELETE_BOOST_INSTALLER_AFTER_INSTALL=ON")
         message(STATUS "    -DTWAIN_DELETE_BOOST_INSTALL_LOG_AFTER_INSTALL=ON")
         message(STATUS "")
+        message(STATUS "The download site and installer file for Boost: ")
+        message(STATUS "   ${DTWAIN_BOOST_URL} ")
+        message(STATUS "")
         return()
     endif()
 
@@ -259,9 +271,9 @@ if(NOT DTWAIN_EXISTING_BOOST_ROOT AND
           message(FATAL_ERROR
               "Boost download failed: \"${DTWAIN_BOOST_DOWNLOAD_MESSAGE}\"\n\n"
               "URL:\n"
-              "  ${BOOST_DOWNLOAD_URL}\n\n"
+              "  ${DTWAIN_BOOST_URL}\n\n"
               "Possible causes:\n"
-              "  * Temporary SourceForge outage\n"
+              "  * Temporary ${DTWAIN_BOOST_DOWNLOAD_SITE} outage\n"
               "  * TLS/SSL certificate issue\n"
               "  * Corporate proxy/firewall\n"
               "  * Antivirus HTTPS inspection\n\n"
@@ -293,10 +305,18 @@ if(NOT DTWAIN_EXISTING_BOOST_ROOT AND
         RESULT_VARIABLE DTWAIN_BOOST_INSTALL_RESULT)
 
     if(NOT DTWAIN_BOOST_INSTALL_RESULT EQUAL 0)
+        file(REMOVE "${DTWAIN_BOOST_DOWNLOADED_EXE}")
+
         message(FATAL_ERROR
-            "Boost installer failed with exit code ${DTWAIN_BOOST_INSTALL_RESULT}.\n"
-            "Installer: ${DTWAIN_BOOST_DOWNLOADED_EXE}\n"
-            "Log: ${DTWAIN_BOOST_INSTALL_LOG}")
+            "Boost installer failed with exit code ${DTWAIN_BOOST_INSTALL_RESULT}.\n\n"
+            "The downloaded installer was removed because it may be incomplete or invalid.\n\n"
+            "Installer:\n"
+            "  ${DTWAIN_BOOST_DOWNLOADED_EXE}\n\n"
+            "Log:\n"
+            "  ${DTWAIN_BOOST_INSTALL_LOG}\n\n"
+            "Download URL:\n"
+            "  ${DTWAIN_BOOST_URL}\n\n"
+            "Try running CMake again, or switch DTWAIN_BOOST_DOWNLOAD_SITE.")
     endif()
 
     # Optional cleanup after a successful install.  These are OFF by default so
@@ -321,11 +341,17 @@ if(NOT DTWAIN_EXISTING_BOOST_ROOT AND
 endif()
 
 if(NOT EXISTS "${DTWAIN_BOOST_INCLUDE_DIR}/boost/version.hpp")
-    message(FATAL_ERROR "Boost headers were not found at: ${DTWAIN_BOOST_INCLUDE_DIR}")
+    message(FATAL_ERROR
+        "Boost headers were not found:\n"
+        "  ${DTWAIN_BOOST_INCLUDE_DIR}/boost/version.hpp")
 endif()
 
 if(NOT EXISTS "${DTWAIN_BOOST_LIBRARY_DIR}")
-    message(FATAL_ERROR "Boost library directory was not found at: ${DTWAIN_BOOST_LIBRARY_DIR}")
+    message(FATAL_ERROR
+        "Required Boost library directory was not found:\n"
+        "  ${DTWAIN_BOOST_LIBRARY_DIR}\n\n"
+        "Install the matching Boost binary package for this Visual Studio version and architecture,\n"
+        "or enable DTWAIN_AUTO_DOWNLOAD_BOOST.")
 endif()
 
 # These are CMake variables, not machine-wide environment variables. CMake writes
