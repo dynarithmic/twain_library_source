@@ -1231,6 +1231,7 @@
     D_SYSINITIALIZELIBEXAFUNC                     DYNDTWAIN_API::DTWAIN_SysInitializeLibExA = nullptr;
     D_SYSINITIALIZELIBEXWFUNC                     DYNDTWAIN_API::DTWAIN_SysInitializeLibExW = nullptr;
     D_SYSINITIALIZENOBLOCKINGFUNC                 DYNDTWAIN_API::DTWAIN_SysInitializeNoBlocking = nullptr;
+    D_SYSINITIALIZENOBLOCKINGEXFUNC               DYNDTWAIN_API::DTWAIN_SysInitializeNoBlockingEx = nullptr;
     D_TESTGETCAPFUNC                              DYNDTWAIN_API::DTWAIN_TestGetCap = nullptr;
     D_UNLOCKMEMORYFUNC                            DYNDTWAIN_API::DTWAIN_UnlockMemory = nullptr;
     D_UNLOCKMEMORYEXFUNC                          DYNDTWAIN_API::DTWAIN_UnlockMemoryEx = nullptr;
@@ -2483,6 +2484,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SysInitializeLibExA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SysInitializeLibExW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SysInitializeNoBlocking, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_SysInitializeNoBlockingEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_TestGetCap, hModule);
           LOADFUNCTIONIMPL(DTWAIN_UnlockMemory, hModule);
           LOADFUNCTIONIMPL(DTWAIN_UnlockMemoryEx, hModule);

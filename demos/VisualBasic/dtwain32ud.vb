@@ -2612,6 +2612,7 @@ Class DTWAINAPI
     Public Declare Unicode Function DTWAIN_SysInitializeLibEx Lib "dtwain32ud.dll" (hInstance As System.IntPtr, szINIPath As String) As System.IntPtr
     Public Declare Unicode Function DTWAIN_SysInitializeLibEx2 Lib "dtwain32ud.dll" (hInstance As System.IntPtr, szINIPath As String, szImageDLLPath As String, szLangResourcePath As String) As System.IntPtr
     Public Declare Function DTWAIN_SysInitializeNoBlocking Lib "dtwain32ud.dll" () As System.IntPtr
+    Public Declare Function DTWAIN_SysInitializeNoBlockingEx Lib "dtwain32ud.dll" (bCreateLogFile As Integer) As System.IntPtr
     Public Declare Function DTWAIN_TestGetCap Lib "dtwain32ud.dll" (Source As System.IntPtr, lCapability As Integer) As System.IntPtr
     Public Declare Function DTWAIN_UnlockMemory Lib "dtwain32ud.dll" (h As System.IntPtr) As Integer
     Public Declare Function DTWAIN_UnlockMemoryEx Lib "dtwain32ud.dll" (h As System.IntPtr) As Integer

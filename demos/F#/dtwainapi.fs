@@ -4425,6 +4425,9 @@ module TwainAPI =
     type DTWAIN_SysInitializeNoBlockingDelegate = delegate of unit -> DTWAIN_HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_SysInitializeNoBlockingExDelegate = delegate of DTWAIN_BOOL -> DTWAIN_HANDLE
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_TestGetCapDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -5292,6 +5295,7 @@ module TwainAPI =
     let private SysInitializeLibEx = lazy (DynamicDll.Bind "DTWAIN_SysInitializeLibEx" : DTWAIN_SysInitializeLibExDelegate)
     let private SysInitializeLibEx2 = lazy (DynamicDll.Bind "DTWAIN_SysInitializeLibEx2" : DTWAIN_SysInitializeLibEx2Delegate)
     let private SysInitializeNoBlocking = lazy (DynamicDll.Bind "DTWAIN_SysInitializeNoBlocking" : DTWAIN_SysInitializeNoBlockingDelegate)
+    let private SysInitializeNoBlockingEx = lazy (DynamicDll.Bind "DTWAIN_SysInitializeNoBlockingEx" : DTWAIN_SysInitializeNoBlockingExDelegate)
     let private TestGetCap = lazy (DynamicDll.Bind "DTWAIN_TestGetCap" : DTWAIN_TestGetCapDelegate)
     let private UnlockMemory = lazy (DynamicDll.Bind "DTWAIN_UnlockMemory" : DTWAIN_UnlockMemoryDelegate)
     let private UnlockMemoryEx = lazy (DynamicDll.Bind "DTWAIN_UnlockMemoryEx" : DTWAIN_UnlockMemoryExDelegate)
@@ -8732,6 +8736,10 @@ module TwainAPI =
     let DTWAIN_SysInitializeNoBlocking() : DTWAIN_HANDLE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SysInitializeNoBlocking.Value.Invoke()
+
+    let DTWAIN_SysInitializeNoBlockingEx (bcreatelogfile: DTWAIN_BOOL) : DTWAIN_HANDLE =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        SysInitializeNoBlockingEx.Value.Invoke(bcreatelogfile)
 
     let DTWAIN_TestGetCap (source: DTWAIN_SOURCE) (lcapability: LONG) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

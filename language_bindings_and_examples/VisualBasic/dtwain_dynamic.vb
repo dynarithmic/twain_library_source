@@ -4500,6 +4500,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_SysInitializeNoBlockingDelegate() As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_SysInitializeNoBlockingExDelegate(bCreateLogFile As Integer) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_TestGetCapDelegate(Source As System.IntPtr, lCapability As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -7945,6 +7948,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_SysInitializeNoBlocking()
         End Function
         
+        Public Function DTWAIN_SysInitializeNoBlockingEx(bCreateLogFile As Integer) As System.IntPtr
+        Return api.DTWAIN_SysInitializeNoBlockingEx(bCreateLogFile)
+        End Function
+        
         Public Function DTWAIN_TestGetCap(Source As System.IntPtr, lCapability As Integer) As System.IntPtr
         Return api.DTWAIN_TestGetCap(Source, lCapability)
         End Function
@@ -8823,6 +8830,7 @@ Namespace Dynarithmic
             Public DTWAIN_SysInitializeLibEx As DTWAIN_SysInitializeLibExDelegate
             Public DTWAIN_SysInitializeLibEx2 As DTWAIN_SysInitializeLibEx2Delegate
             Public DTWAIN_SysInitializeNoBlocking As DTWAIN_SysInitializeNoBlockingDelegate
+            Public DTWAIN_SysInitializeNoBlockingEx As DTWAIN_SysInitializeNoBlockingExDelegate
             Public DTWAIN_TestGetCap As DTWAIN_TestGetCapDelegate
             Public DTWAIN_UnlockMemory As DTWAIN_UnlockMemoryDelegate
             Public DTWAIN_UnlockMemoryEx As DTWAIN_UnlockMemoryExDelegate

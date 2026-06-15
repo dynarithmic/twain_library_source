@@ -1312,6 +1312,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_SysInitializeLibExA
    attr_reader :DTWAIN_SysInitializeLibExW
    attr_reader :DTWAIN_SysInitializeNoBlocking
+   attr_reader :DTWAIN_SysInitializeNoBlockingEx
    attr_reader :DTWAIN_TestGetCap
    attr_reader :DTWAIN_UnlockMemory
    attr_reader :DTWAIN_UnlockMemoryEx
@@ -4186,6 +4187,7 @@ class DTWAINAPI
        @DTWAIN_SysInitializeLibExA = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeLibExA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_SysInitializeLibExW = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeLibExW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_SysInitializeNoBlocking = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeNoBlocking'],[],Fiddle::TYPE_VOIDP)
+       @DTWAIN_SysInitializeNoBlockingEx = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeNoBlockingEx'],[Fiddle::TYPE_INT],Fiddle::TYPE_VOIDP)
        @DTWAIN_TestGetCap = Fiddle::Function::new(dtwain_dll['DTWAIN_TestGetCap'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_UnlockMemory = Fiddle::Function::new(dtwain_dll['DTWAIN_UnlockMemory'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_UnlockMemoryEx = Fiddle::Function::new(dtwain_dll['DTWAIN_UnlockMemoryEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)

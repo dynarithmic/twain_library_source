@@ -1767,7 +1767,7 @@ func Load_DTWAINDLL(path string) (*DTWAIN_DLL, error) {
         return nil, err
     }
 
-    var arr [1180] string
+    var arr [1181] string
     arr[0] = "DTWAIN_AcquireAudioFile"
     arr[1] = "DTWAIN_AcquireAudioFileA"
     arr[2] = "DTWAIN_AcquireAudioFileW"
@@ -2943,11 +2943,12 @@ func Load_DTWAINDLL(path string) (*DTWAIN_DLL, error) {
     arr[1172] = "DTWAIN_SysInitializeLibExA"
     arr[1173] = "DTWAIN_SysInitializeLibExW"
     arr[1174] = "DTWAIN_SysInitializeNoBlocking"
-    arr[1175] = "DTWAIN_TestGetCap"
-    arr[1176] = "DTWAIN_UnlockMemory"
-    arr[1177] = "DTWAIN_UnlockMemoryEx"
-    arr[1178] = "DTWAIN_UpdateCurrentAcquiredImage"
-    arr[1179] = "DTWAIN_UseMultipleThreads"
+    arr[1175] = "DTWAIN_SysInitializeNoBlockingEx"
+    arr[1176] = "DTWAIN_TestGetCap"
+    arr[1177] = "DTWAIN_UnlockMemory"
+    arr[1178] = "DTWAIN_UnlockMemoryEx"
+    arr[1179] = "DTWAIN_UpdateCurrentAcquiredImage"
+    arr[1180] = "DTWAIN_UseMultipleThreads"
     for _, name := range arr {
         addr, err := syscall.GetProcAddress(d.Handle, name)
         if err != nil {
@@ -10183,6 +10184,12 @@ func (d *DTWAIN_DLL) DTWAIN_SysInitializeLibExW(hInstance HINSTANCE, szINIPath u
 func (d *DTWAIN_DLL) DTWAIN_SysInitializeNoBlocking() DTWAIN_HANDLE {
     theProc := d.procs["DTWAIN_SysInitializeNoBlocking"]
     v1, _, _ := syscall.SyscallN(theProc)
+    return DTWAIN_HANDLE(v1)
+}
+
+func (d *DTWAIN_DLL) DTWAIN_SysInitializeNoBlockingEx(bCreateLogFile int32) DTWAIN_HANDLE {
+    theProc := d.procs["DTWAIN_SysInitializeNoBlockingEx"]
+    v1, _, _ := syscall.SyscallN(theProc, uintptr(bCreateLogFile))
     return DTWAIN_HANDLE(v1)
 }
 

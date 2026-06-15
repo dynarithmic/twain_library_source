@@ -4590,6 +4590,9 @@ namespace Dynarithmic
         public static extern DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(int bCreateLogFile);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, int lCapability);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]

@@ -3025,6 +3025,7 @@ function DTWAIN_SysInitializeLibEx2W(hInstance:NativeInt; szINIPath:LPCWSTR; szI
 function DTWAIN_SysInitializeLibExA(hInstance:NativeInt; szINIPath:LPCSTR) : DTWAIN_HANDLE; external 'dtwain64d.dll'  name 'DTWAIN_SysInitializeLibExA';
 function DTWAIN_SysInitializeLibExW(hInstance:NativeInt; szINIPath:LPCWSTR) : DTWAIN_HANDLE; external 'dtwain64d.dll'  name 'DTWAIN_SysInitializeLibExW';
 function DTWAIN_SysInitializeNoBlocking : DTWAIN_HANDLE; external 'dtwain64d.dll'  name 'DTWAIN_SysInitializeNoBlocking';
+function DTWAIN_SysInitializeNoBlockingEx(bCreateLogFile:BOOL) : DTWAIN_HANDLE; external 'dtwain64d.dll'  name 'DTWAIN_SysInitializeNoBlockingEx';
 function DTWAIN_TestGetCap(Source:DTWAIN_SOURCE; lCapability:LONG) : DTWAIN_ARRAY; external 'dtwain64d.dll'  name 'DTWAIN_TestGetCap';
 function DTWAIN_UnlockMemory(h:NativeInt) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_UnlockMemory';
 function DTWAIN_UnlockMemoryEx(h:NativeInt) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_UnlockMemoryEx';

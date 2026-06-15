@@ -2841,6 +2841,7 @@
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeLibExDelegate(HINSTANCE hInstance, [MarshalAs(UnmanagedType.LPTStr)] string szINIPath);
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeLibEx2Delegate(HINSTANCE hInstance, [MarshalAs(UnmanagedType.LPTStr)] string szINIPath, [MarshalAs(UnmanagedType.LPTStr)] string szImageDLLPath, [MarshalAs(UnmanagedType.LPTStr)] string szLangResourcePath);
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingDelegate();
+        public delegate DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingExDelegate(int bCreateLogFile);
         public delegate DTWAIN_ARRAY DTWAIN_TestGetCapDelegate(DTWAIN_SOURCE Source, int lCapability);
         public delegate int DTWAIN_UnlockMemoryDelegate(HANDLE h);
         public delegate int DTWAIN_UnlockMemoryExDelegate(HANDLE h);
@@ -5650,6 +5651,9 @@
         [DTWAINNativeFunction("DTWAIN_SysInitializeNoBlocking")]
         private readonly DTWAIN_SysInitializeNoBlockingDelegate  _DTWAIN_SysInitializeNoBlocking;
 
+        [DTWAINNativeFunction("DTWAIN_SysInitializeNoBlockingEx")]
+        private readonly DTWAIN_SysInitializeNoBlockingExDelegate  _DTWAIN_SysInitializeNoBlockingEx;
+
         [DTWAINNativeFunction("DTWAIN_TestGetCap")]
         private readonly DTWAIN_TestGetCapDelegate  _DTWAIN_TestGetCap;
 
@@ -8453,6 +8457,9 @@
 
         public  DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking()
         => _DTWAIN_SysInitializeNoBlocking();
+
+        public  DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(int bCreateLogFile)
+        => _DTWAIN_SysInitializeNoBlockingEx(bCreateLogFile);
 
         public  DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, int lCapability)
         => _DTWAIN_TestGetCap(Source, lCapability);
