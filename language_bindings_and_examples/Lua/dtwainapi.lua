@@ -1251,6 +1251,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_HANDLE DTWAIN_SysInitializeLibExA(HINSTANCE hInstance, LPCSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeLibExW(HINSTANCE hInstance, LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
+        DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
@@ -2490,6 +2491,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_HANDLE DTWAIN_SysInitializeLibExA(HINSTANCE hInstance, LPCSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeLibExW(HINSTANCE hInstance, LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
+        DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
@@ -3729,6 +3731,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_HANDLE DTWAIN_SysInitializeLibExA(HINSTANCE hInstance, LPCSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeLibExW(HINSTANCE hInstance, LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
+        DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);
@@ -4968,6 +4971,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_HANDLE DTWAIN_SysInitializeLibExA(HINSTANCE hInstance, LPCSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeLibExW(HINSTANCE hInstance, LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
+        DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
         DTWAIN_BOOL DTWAIN_UnlockMemory(HANDLE h);
         DTWAIN_BOOL DTWAIN_UnlockMemoryEx(HANDLE h);

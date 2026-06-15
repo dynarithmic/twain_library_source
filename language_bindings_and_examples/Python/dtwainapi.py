@@ -2986,6 +2986,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SysInitializeLibExA.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeLibExW.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeNoBlocking.restype = ct.c_void_p
+     theDLL.DTWAIN_SysInitializeNoBlockingEx.restype = ct.c_void_p
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
      theDLL.DTWAIN_UnlockMemory.restype = ct.c_long
      theDLL.DTWAIN_UnlockMemoryEx.restype = ct.c_long
@@ -4123,6 +4124,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SysInitializeLibEx2W.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
      theDLL.DTWAIN_SysInitializeLibExA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SysInitializeLibExW.argtypes = [ct.c_void_p, ct.c_wchar_p]
+     theDLL.DTWAIN_SysInitializeNoBlockingEx.argtypes = [ct.c_long]
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_UnlockMemoryEx.argtypes = [ct.c_void_p]
@@ -5321,6 +5323,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SysInitializeLibExA.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeLibExW.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeNoBlocking.restype = ct.c_void_p
+     theDLL.DTWAIN_SysInitializeNoBlockingEx.restype = ct.c_void_p
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
      theDLL.DTWAIN_UnlockMemory.restype = ct.c_long
      theDLL.DTWAIN_UnlockMemoryEx.restype = ct.c_long
@@ -6458,6 +6461,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SysInitializeLibEx2W.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
      theDLL.DTWAIN_SysInitializeLibExA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SysInitializeLibExW.argtypes = [ct.c_void_p, ct.c_wchar_p]
+     theDLL.DTWAIN_SysInitializeNoBlockingEx.argtypes = [ct.c_long]
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_UnlockMemoryEx.argtypes = [ct.c_void_p]

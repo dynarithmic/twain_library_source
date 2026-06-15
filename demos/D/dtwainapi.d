@@ -3086,6 +3086,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_HANDLE function(HINSTANCE, LPCSTR) DTWAIN_SysInitializeLibExA;
     extern(Windows) DTWAIN_HANDLE function(HINSTANCE, LPCWSTR) DTWAIN_SysInitializeLibExW;
     extern(Windows) DTWAIN_HANDLE function() DTWAIN_SysInitializeNoBlocking;
+    extern(Windows) DTWAIN_HANDLE function(DTWAIN_BOOL) DTWAIN_SysInitializeNoBlockingEx;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG) DTWAIN_TestGetCap;
     extern(Windows) DTWAIN_BOOL function(HANDLE) DTWAIN_UnlockMemory;
     extern(Windows) DTWAIN_BOOL function(HANDLE) DTWAIN_UnlockMemoryEx;
@@ -4266,6 +4267,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_SysInitializeLibExA, "DTWAIN_SysInitializeLibExA");
         bindFunction(cast(void**)&DTWAIN_SysInitializeLibExW, "DTWAIN_SysInitializeLibExW");
         bindFunction(cast(void**)&DTWAIN_SysInitializeNoBlocking, "DTWAIN_SysInitializeNoBlocking");
+        bindFunction(cast(void**)&DTWAIN_SysInitializeNoBlockingEx, "DTWAIN_SysInitializeNoBlockingEx");
         bindFunction(cast(void**)&DTWAIN_TestGetCap, "DTWAIN_TestGetCap");
         bindFunction(cast(void**)&DTWAIN_UnlockMemory, "DTWAIN_UnlockMemory");
         bindFunction(cast(void**)&DTWAIN_UnlockMemoryEx, "DTWAIN_UnlockMemoryEx");

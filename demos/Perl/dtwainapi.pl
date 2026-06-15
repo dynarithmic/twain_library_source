@@ -2851,6 +2851,7 @@ my $DTWAIN_SysInitializeLibEx2W = new Win32::API($dtwain_dllName, 'DTWAIN_SysIni
 my $DTWAIN_SysInitializeLibExA = new Win32::API($dtwain_dllName, 'DTWAIN_SysInitializeLibExA', 'PP', 'P');
 my $DTWAIN_SysInitializeLibExW = new Win32::API($dtwain_dllName, 'DTWAIN_SysInitializeLibExW', 'PP', 'P');
 my $DTWAIN_SysInitializeNoBlocking = new Win32::API($dtwain_dllName, 'DTWAIN_SysInitializeNoBlocking', '', 'P');
+my $DTWAIN_SysInitializeNoBlockingEx = new Win32::API($dtwain_dllName, 'DTWAIN_SysInitializeNoBlockingEx', 'I', 'P');
 my $DTWAIN_TestGetCap = new Win32::API($dtwain_dllName, 'DTWAIN_TestGetCap', 'Pi', 'P');
 my $DTWAIN_UnlockMemory = new Win32::API($dtwain_dllName, 'DTWAIN_UnlockMemory', 'P', 'I');
 my $DTWAIN_UnlockMemoryEx = new Win32::API($dtwain_dllName, 'DTWAIN_UnlockMemoryEx', 'P', 'I');
