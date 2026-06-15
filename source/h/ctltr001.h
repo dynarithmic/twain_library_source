@@ -91,7 +91,7 @@ namespace dynarithmic
                     // source's version of TW_IDENTITY.  The reason is that some drivers
                     // corrupt the saved TW_IDENTITY of the source when selecting and/or closing
                     // the source
-                    memcpy(GetSourcePtr()->GetSourceIDPtr(), &m_tempSourceID, sizeof(TW_IDENTITY));
+                    *(GetSourcePtr()->GetSourceIDPtr()) = m_tempSourceID;
                 }
                 return retval;
             }
@@ -111,7 +111,7 @@ namespace dynarithmic
                 // source's version of TW_IDENTITY.  The reason is that some drivers
                 // corrupt the saved TW_IDENTITY of the source when selecting and/or closing
                 // the source
-                memcpy(&m_tempSourceID, pSource->GetSourceIDPtr(), sizeof(TW_IDENTITY));
+                m_tempSourceID = *(pSource->GetSourceIDPtr());
                 InitGeneric(pSession, nullptr, DG_CONTROL, DAT_IDENTITY, nMsg, &m_tempSourceID, {true, false});
             }
             CTL_ITwainSource* GetSourceIDPtr() { return GetSourcePtr(); }
