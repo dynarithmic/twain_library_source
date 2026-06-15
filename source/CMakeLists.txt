@@ -1701,3 +1701,67 @@ if(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)
         message(STATUS "implib.exe not found; Embarcadero import library will not be generated.")
     endif()
 endif()
+
+set(DTWAIN_PUBLIC_HEADERS
+    "${PROJECT_SOURCE_DIR}/h/capconst.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwain.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwainc.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwaindefs.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwainx.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwain_filetypes.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwain_library_selector.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwain_standard_defs.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwain_version.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwpdft.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwstrfn.h"
+    "${PROJECT_SOURCE_DIR}/h/dtwtype.h"
+    "${PROJECT_SOURCE_DIR}/h/twain.h"
+    "${PROJECT_SOURCE_DIR}/h/winconst.h"
+)
+
+get_filename_component(
+    DTWAIN_DEMOS_DIR
+    "${PROJECT_SOURCE_DIR}/../demos/C_C++/c_cpp_includes"
+    ABSOLUTE
+)
+
+add_custom_command(
+    TARGET dtwain
+    POST_BUILD
+
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+            "${DTWAIN_DEMOS_DIR}"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${DTWAIN_PUBLIC_HEADERS}
+            "${DTWAIN_DEMOS_DIR}"
+
+    COMMENT "Copying DTWAIN public headers to demos directory"
+)
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(DTWAIN_DEMOS_LIB_DIR
+        "${PROJECT_SOURCE_DIR}/../demos/C_C++/libs/64bit")
+else()
+    set(DTWAIN_DEMOS_LIB_DIR
+        "${PROJECT_SOURCE_DIR}/../demos/C_C++/libs/32bit")
+endif()
+
+add_custom_command(
+    TARGET dtwain
+    POST_BUILD
+
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+            "${DTWAIN_DEMOS_LIB_DIR}"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_LINKER_FILE:dtwain>"
+            "${DTWAIN_DEMOS_LIB_DIR}"
+
+    COMMAND ${CMAKE_COMMAND}
+            -DSRC="$<TARGET_FILE_DIR:dtwain>/$<TARGET_FILE_BASE_NAME:dtwain>_embarcadero.lib"
+            -DDST="${DTWAIN_DEMOS_LIB_DIR}"
+            -P "${PROJECT_SOURCE_DIR}/copy_if_exists.cmake"
+
+    COMMENT "Copying DTWAIN import libraries to demos library directory"
+)
