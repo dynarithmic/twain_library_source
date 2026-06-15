@@ -8,7 +8,7 @@ if(POLICY CMP0167)
     cmake_policy(SET CMP0167 OLD)
 endif()
 
-project (dtwain VERSION 5.9.1 LANGUAGES C CXX)
+project (dtwain VERSION 5.9.2 LANGUAGES C CXX)
 
 option(DTWAIN_BUILD_UNICODE
        "Build DTWAIN as Unicode instead of ANSI"
