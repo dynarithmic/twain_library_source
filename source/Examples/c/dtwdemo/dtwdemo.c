@@ -822,10 +822,6 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     EnableWindow(g_hWnd, TRUE);
     EnableSourceItems(TRUE);
 
-    DTWAIN_ARRAY curAcq = DTWAIN_GetAcquisitionArray(g_CurrentSource);
-    LONG numImages = DTWAIN_GetNumAcquisitions(curAcq);
-    HANDLE hDib = DTWAIN_GetAcquiredImage(curAcq, 0, 0);
-
     DTWAIN_ArrayDestroy( AFileNames );
     LONG pageCount = DTWAIN_GetFileSavePageCount(g_CurrentSource);
     if ( !bAcquireOK || pageCount == 0 || !bPageOK )
