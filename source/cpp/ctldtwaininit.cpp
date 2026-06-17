@@ -48,6 +48,7 @@
     #pragma warning (disable:4702)
     #pragma comment (lib, "shlwapi")
 #endif
+#include <ctllogsourcecaps.h>
 #ifdef _WIN64
     #pragma message ("Compiling 64-bit DTWAIN")
 #else
@@ -58,7 +59,14 @@
 
 using namespace dynarithmic;
 
-static DTWAIN_HANDLE SysInitializeHelper(bool noblock, bool bMinimalSetup = false);
+struct SysInitializeOptions
+{
+    bool showErrorBox = false;
+    bool createErrorLog = false;
+    bool createMinimalSetup = false;
+};
+
+static DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& options);
 static LONG DTWAIN_CloseAllSources();
 static void UnhookAllDisplays();
 static bool AssociateThreadToTwainDLL(std::shared_ptr<CTL_TwainDLLHandle>& pHandle, unsigned long threadId);
@@ -72,15 +80,17 @@ static void WriteVersionToLog(CTL_TwainDLLHandle* pHandle);
 static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandle, bool bCheck=true);
 static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, bool bClear);
 static void LoadTransferReadyOverrides();
+static void LoadAutocloseUIOverrides();
 static void LoadFlatbedOnlyOverrides();
 static void LoadTwainLoopOverrides();
 static void LoadPaperDetectionOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
 static void LoadSheetcountProperties(CTL_TwainDLLHandle* pHandle);
-static bool LoadGeneralResources(bool blockExecution);
+static bool LoadGeneralResources(const SysInitializeOptions& initOptions);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
 static void LoadSelectSourcePosition();
 static void LoadGetMessageTestOverride();
+static std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle);
 
 #ifdef _WIN32
 static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM w, LPARAM lparam);
@@ -494,17 +504,21 @@ static std::pair<LONG, std::array<CTL_StringType, 2>> GetTwainAvailablityInterna
 {
     std::pair<LONG, std::array<CTL_StringType, 2>> retVal;
     LONG availableFlag = 0;
+    bool bRet = false;
 
+#ifndef _WIN64
     // Check TWAIN version 1.x
     auto existCheck = CTL_TwainAppMgr::CheckTwainExistence(TWAINDLLVERSION_1);
-    bool bRet = existCheck.first;
+	bRet = existCheck.first;
     if (bRet)
     {
         availableFlag |= DTWAIN_TWAINDSM_LEGACY;
         // Store the path found
         retVal.second[0] = existCheck.second;
     }
-
+#else
+    retVal.second[0] = {};
+#endif
     // Check TWAIN version 2.x
     auto existCheck2 = CTL_TwainAppMgr::CheckTwainExistence(TWAINDLLVERSION_2);
     bRet = existCheck2.first;
@@ -544,7 +558,7 @@ static LONG IsTwainAvailableHelper(LPTSTR directories, LONG nMaxLen)
         if (!pHandle)
         {
             // Temporarily set up a handle without loading everything
-            pHandle = static_cast<CTL_TwainDLLHandle*> (SysInitializeHelper(false, true));
+            pHandle = static_cast<CTL_TwainDLLHandle*> (SysInitializeHelper({ false, false , true }));
             if (!pHandle)
                 LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_BAD_HANDLE)
             bMustDestroy = true;
@@ -759,15 +773,20 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
 
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeNoBlocking()
 {
-    return SysInitializeHelper(false);
+    return SysInitializeHelper({ false, false , false });
+}
+
+DTWAIN_HANDLE  DLLENTRY_DEF DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile)
+{
+    return SysInitializeHelper({ false, bCreateLogFile ? true : false , false });
 }
 
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
 {
-    return SysInitializeHelper(true);
+    return SysInitializeHelper({ true, false , false });
 }
 
-DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
+DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& initOptions)
 {
     std::lock_guard<std::mutex> lg(CTL_StaticData::s_mutexInitDestroy);
 #ifdef DTWAIN_LIB
@@ -808,7 +827,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
         // Associate a GUID with the handle
         pHandle->GetGUID() = StringWrapperA::GenerateUUIDv4();
 
-        if (!bMinimalSetup)
+        if (!initOptions.createMinimalSetup)
         {
             // Open dtwain32.ini or dtwain64.ini
             if ( !CTL_StaticData::s_iniInterface )
@@ -821,7 +840,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 CTL_StaticData::GetINIPath() = GetDTWAININIPath();
             }
 
-            bool resourcesLoaded = LoadGeneralResources(block);
+            bool resourcesLoaded = LoadGeneralResources(initOptions);
             if (!resourcesLoaded)
             {
                 RemoveThreadIdFromAssociation(threadId);
@@ -849,6 +868,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 
                 // Load DS overrides for transfer ready / close UI requests
                 LoadTransferReadyOverrides();
+
+                // Load auto close UI overrides
+                LoadAutocloseUIOverrides();
 
                 // Load Twain message loop overrides for peek message
                 LoadTwainLoopOverrides();
@@ -915,7 +937,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
     }
     catch (std::exception& ex)
     {
-        if (block)
+        if (initOptions.showErrorBox)
         {
             MessageBoxA(nullptr, "DTWAIN Initialization Error", ex.what(), MB_ICONERROR);
         }
@@ -1007,19 +1029,24 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, 
 
 void LoadStaticData(CTL_TwainDLLHandle* pHandle)
 {
-    if ( pHandle->m_mapDTWAINArrayToTwainType.empty() )
+    if (pHandle->m_mapDTWAINArrayToTwainType.empty())
     {
-        static constexpr int TwainIntTypes[] = {TWTY_INT8, TWTY_UINT8, TWTY_BOOL, TWTY_INT16, TWTY_INT32, TWTY_UINT16, TWTY_UINT32};
-        static constexpr int TwainStringTypes[] = {TWTY_STR32, TWTY_STR64, TWTY_STR128, TWTY_STR128, TWTY_STR255, TWTY_STR1024};
-        static constexpr int TwainFloatTypes[] = {TWTY_FIX32};
-        static constexpr int TwainFrameTypes[] = {TWTY_FRAME};
-        static constexpr int DTwainArrayTypes[] = {DTWAIN_ARRAYLONG, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYFLOAT, DTWAIN_ARRAYFRAME, CTL_ArrayFrameSingleType};
-        static constexpr size_t NumTwainTypes[] = {std::size(TwainIntTypes),
+        static constexpr int TwainIntTypes[] = { TWTY_INT8, TWTY_UINT8, TWTY_BOOL, TWTY_INT16, TWTY_INT32, TWTY_UINT16, TWTY_UINT32 };
+        static constexpr int TwainStringTypes[] = { TWTY_STR32, TWTY_STR64, TWTY_STR128, TWTY_STR128, TWTY_STR255, TWTY_STR1024 };
+        static constexpr int TwainFloatTypes[] = { TWTY_FIX32 };
+        static constexpr int TwainFrameTypes[] = { TWTY_FRAME };
+        static constexpr int TwainWideStringTypes[] = { TWTY_UNI512 };
+        static constexpr int DTwainArrayTypes[] = { DTWAIN_ARRAYLONG, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYFLOAT, DTWAIN_ARRAYFRAME,
+                                                   CTL_ArrayFrameSingleType, DTWAIN_ARRAYWIDESTRING };
+        static constexpr size_t NumTwainTypes[] = { std::size(TwainIntTypes),
                                          std::size(TwainStringTypes),
                                          std::size(TwainFloatTypes),
                                          std::size(TwainFrameTypes),
-                                         std::size(TwainFrameTypes)};
-        static constexpr std::array<const int*, 5> intArray = {TwainIntTypes, TwainStringTypes, TwainFloatTypes, TwainFrameTypes, TwainFrameTypes};
+                                         std::size(TwainFrameTypes),
+                                         std::size(TwainWideStringTypes)};
+
+        static constexpr std::array<const int*, 6> intArray = 
+                {TwainIntTypes, TwainStringTypes, TwainFloatTypes, TwainFrameTypes, TwainFrameTypes, TwainWideStringTypes};
 
         static constexpr size_t nNumAllTypes = std::size(NumTwainTypes);
         for (size_t i = 0; i < nNumAllTypes; ++i)
@@ -1058,7 +1085,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
             logFilterFlags &= ~DTWAIN_LOG_USECALLBACK;
 
         LoggingTraits fTraits;
-        fTraits.m_bAppend = LogFlags & DTWAIN_LOG_FILEAPPEND?true:false;
+        fTraits.m_bAppend = LogFlags & DTWAIN_LOG_FILEAPPEND ? true : false;
         fTraits.m_bCreateDirectory = LogFlags & DTWAIN_LOG_CREATEDIRECTORY ? true : false;
         fTraits.m_filename = lpszLogFile;
         fTraits.m_bSetConsoleHandler = LogFlags & DTWAIN_LOG_CONSOLEWITHHANDLER ? true : false;
@@ -1066,13 +1093,21 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
 
         // Write the version info
         // Write to all the loggers that were created
-        if ( LogFlags > 0)
+        if (LogFlags > 0)
             WriteVersionToLog(pHandle);
         logFailed = (LogFlags > 0 && !isLogOpen.first);
         if (logFailed)
         {
             // Indicate that there is at least one logger that failed
             DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO, false);
+        }
+
+        // If there are opened sources, log the capabilities for each
+        if (logFilterFlags)
+        {
+            auto pOpenedSources = GetOpenSources(pHandle);
+            for (auto* pCurSource : pOpenedSources)
+                LogSourceCapabilities(pCurSource, false);
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(!logFailed)
@@ -1812,6 +1847,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsAcquiring()
     CATCH_BLOCK(false)
 }
 
+
+std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle)
+{
+    std::vector<CTL_ITwainSource*> vSources;
+    for (auto& pr : pHandle->m_mapStringToSource)
+    {
+        if (pr.second->IsOpened())
+            vSources.push_back(pr.second);
+    }
+    return vSources;
+}
+
 HWND  DLLENTRY_DEF  DTWAIN_GetTwainHwnd()
 {
     LOG_FUNC_ENTRY_PARAMS(())
@@ -1955,7 +2002,10 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrderEx(LPTSTR SearchOrder, LPTSTR UserDire
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePath(LPCTSTR ResourcePath)
 {
     LOG_FUNC_ENTRY_PARAMS((ResourcePath))
-    CTL_StaticData::GetResourcePath() = ResourcePath;
+    if ( ResourcePath )
+        CTL_StaticData::GetResourcePath() = ResourcePath;
+    else
+        CTL_StaticData::GetResourcePath() = _T("");
     LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
     CATCH_BLOCK(false)
 }
@@ -2322,12 +2372,8 @@ CTL_StringType GetDTWAINInternalBuildNumber()
 
 CTL_StringType dynarithmic::GetDTWAININIPath()
 {
-    auto& iniPathCache = CTL_StaticData::GetINIPath();
-    if (!iniPathCache.empty())
-        return iniPathCache;
     CTL_StringType szName = DTWAIN_ININAME_NATIVE; 
-    iniPathCache = get_parent_directory(GetDTWAINDLLPath().c_str()) + szName;
-    return iniPathCache;
+    return CreateResourcePathName() + szName;
 }
 
 std::string dynarithmic::GetDTWAININIPathA()
@@ -2379,9 +2425,9 @@ CTL_StringType CheckSearchOrderString(CTL_StringType str)
 // before sending the "start transfer" request when acquiring images.
 void LoadTransferReadyOverrides()
 {
-    auto& xfer_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
+    auto& xfer_map = CTL_StaticData::GetSourceToXferReadyMap();
     xfer_map.clear();
-    auto& xfer_list = CTL_TwainAppMgr::GetSourceToXferReadyList();
+    auto& xfer_list = CTL_StaticData::GetSourceToXferReadyList();
     xfer_list.clear();
 
     // Get the section name
@@ -2424,11 +2470,53 @@ void LoadTransferReadyOverrides()
     }
 }
 
+// This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [AutocloseUI]
+// section for TWAIN sources that will require the source UI to autoclose
+// after a single acquisition
+void LoadAutocloseUIOverrides()
+{
+    auto& autoclose_map = CTL_StaticData::GetSourceToUIAutocloseMap();
+    autoclose_map.clear();
+
+    // Get the section name
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
+        return;
+    CSimpleIniA::TNamesDepend keys;
+    auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_AUTOCLOSEUI_KEY).data();
+    customProfile->GetAllKeys(iniKey, keys);
+    auto iter = keys.begin();
+    while (iter != keys.end())
+    {
+        CSimpleIniA::TNamesDepend vals;
+        customProfile->GetAllValues(iniKey, iter->pItem, vals);
+        if (!vals.empty())
+        {
+            auto iter2 = vals.begin();
+            if (!vals.empty())
+            {
+                try
+                {
+                    uint32_t valueToUse = std::stoi(iter2->pItem);
+                    autoclose_map.insert({ iter->pItem, (valueToUse != 0)?true:false });
+                }
+                catch (const std::invalid_argument& /*ex*/)
+                {
+                }
+                catch (const std::out_of_range& /*ex*/)
+                {
+                }
+            }
+        }
+        ++iter;
+    }
+}
+
 // This loads the sources that rely on the TWAIN loop when processing the acquisitions
 // to use GetMessage() instead of PeekMessage().
 void LoadTwainLoopOverrides()
 {
-    auto& getmsgloop_list = CTL_TwainAppMgr::GetSourceGetMessageList();
+    auto& getmsgloop_list = CTL_StaticData::GetSourceGetMessageList();
     getmsgloop_list.clear();
 
     // Get the section name
@@ -2458,7 +2546,7 @@ void LoadGetMessageTestOverride()
 // whether the source supports checking for paper loaded in feeder
 void LoadPaperDetectionOverrides()
 {
-    auto& paperdetectable_map = CTL_TwainAppMgr::GetSourcePaperDetectionMap();
+    auto& paperdetectable_map = CTL_StaticData::GetSourcePaperDetectionMap();
     paperdetectable_map.clear();
 
     auto* customProfile = CTL_StaticData::GetINIInterface();
@@ -2501,7 +2589,7 @@ void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle)
 // of sheets of paper, not the number of images)
 void LoadSheetcountProperties(CTL_TwainDLLHandle* pHandle)
 {
-    auto& sheetcount_map = CTL_TwainAppMgr::GetSourceSheetcountMap();
+    auto& sheetcount_map = CTL_StaticData::GetSourceSheetcountMap();
     sheetcount_map.clear();
 
     // Get the section name
@@ -2537,7 +2625,7 @@ void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)
 // only the flatbed portion of the device.  
 void LoadFlatbedOnlyOverrides()
 {
-    auto& flatbed_list = CTL_TwainAppMgr::GetSourceFlatbedOnlyList();
+    auto& flatbed_list = CTL_StaticData::GetSourceFlatbedOnlyList();
     flatbed_list.clear();
 
     // Get the section name
@@ -2557,7 +2645,7 @@ void LoadFlatbedOnlyOverrides()
     }
 }
 
-bool LoadGeneralResources(bool blockExecution)
+bool LoadGeneralResources(const SysInitializeOptions& initOptions)
 {
     bool bResourcesLoaded = false;
     CTL_StaticData::SetResourceLoadError(DTWAIN_NO_ERROR);
@@ -2623,7 +2711,7 @@ bool LoadGeneralResources(bool blockExecution)
             CTL_StringType sAllErrors = _T("Error in reading resource file:\r\n") + ret.resourcePath + _T("\r\n") +
                 errorMsg + szBuf + versionErrorMessage;
 
-            if (blockExecution)
+            if (initOptions.showErrorBox)
             {
                 // Only display the error message box if DTWAIN_SysInitialize() was called
                 // instead of DTWAIN_SysInitialNoBlocking()
@@ -2632,18 +2720,31 @@ bool LoadGeneralResources(bool blockExecution)
                 #endif
             }
             else
-            // Write the information to errorlog_*.txt located in the resource directory
             {
-                // Get the base file name with time stamp
-                auto baseFileName = StringConversion::Convert_Ansi_To_Native(CreateFileNameWithDateTime("errorlog_", "txt"));
+                bool bWroteInfoToFile = false;
+                std::string sErr = StringConversion::Convert_Native_To_Ansi(StringWrapper::ReplaceAll(sAllErrors, _T("\r"), _T(" ")));
+                if (initOptions.createErrorLog)
+                {
+                    // Write the information to errorlog_*.txt located in the resource directory
+                    // Get the base file name with time stamp
+                    auto baseFileName = StringConversion::Convert_Ansi_To_Native(CreateFileNameWithDateTime("errorlog_", "txt"));
 
-                // Create the file name with the path of the resources
-                auto errorName = StringConversion::Convert_Native_To_Ansi(CreateResourceFileName(baseFileName.c_str()));
+                    // Create the file name with the path of the resources
+                    auto errorName = StringConversion::Convert_Native_To_Ansi(CreateResourceFileName(baseFileName.c_str()));
 
-                // Write the information to the errorlog file
-                std::ofstream ofs(errorName);
-                if (ofs)
-                    ofs << StringConversion::Convert_Native_To_Ansi(StringWrapper::ReplaceAll(sAllErrors, _T("\r"), _T(" ")));
+                    // Write the information to the error log file
+                    std::ofstream ofs(errorName);
+                    if (ofs)
+                    {
+                        ofs << sErr;
+                        bWroteInfoToFile = true;
+                    }
+                }
+                if ( !bWroteInfoToFile )
+                {
+                    // Show error in debug console
+                    OutputDebugStringA(sErr.c_str());
+                }
             }
         }
         else

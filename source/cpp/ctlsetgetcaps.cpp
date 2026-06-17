@@ -67,6 +67,14 @@ struct StringSetCapConverterA
     }
 };
 
+struct StringSetCapConverterW
+{
+    static std::wstring& convert(std::wstring& value, DTWAIN_ARRAY)
+    {
+        return value;
+    }
+};
+
 struct FrameGetCapConverter
 {
     static TwainFrameInternal Convert(TW_FRAME fValue)
@@ -388,9 +396,14 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
         retVal = PerformGetCap<double>(pSource, lCap, nDataType, lContainerType, lGetType, overrideDataType,CTL_ArrayDoubleType);
     }
     else
-    if (dynarithmic::IsTwainStringType(static_cast<TW_UINT16>(nDataType)))
+    if (dynarithmic::IsTwainANSIStringType(static_cast<TW_UINT16>(nDataType)))
     {
-        retVal = PerformGetCap<std::string/*, NullGetCapConverter*/>(pSource, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayANSIStringType);
+        retVal = PerformGetCap<std::string>(pSource, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayANSIStringType);
+    }
+    else
+    if (dynarithmic::IsTwainUnicodeStringType(static_cast<TW_UINT16>(nDataType)))
+    {
+        retVal = PerformGetCap<std::wstring>(pSource, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayWideStringType);
     }
     else
     if (dynarithmic::IsTwainFrameType(static_cast<TW_UINT16>(nDataType)))
@@ -538,9 +551,13 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
         if (dynarithmic::IsTwainFix32Type(static_cast<TW_UINT16>(nDataType)))
             bOk = performSetCap<double, double>(pHandle, pActualSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::DoubleType, CTL_ArrayDoubleType, nDataType);
         else
-        if (dynarithmic::IsTwainStringType(static_cast<TW_UINT16>(nDataType)))
+        if (dynarithmic::IsTwainANSIStringType(static_cast<TW_UINT16>(nDataType)))
             bOk = performSetCap<std::string, std::string, std::string, StringSetCapConverterA>
                             (pHandle, pActualSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::StringType, CTL_ArrayANSIStringType, nDataType);
+        else
+        if (dynarithmic::IsTwainUnicodeStringType(static_cast<TW_UINT16>(nDataType)))
+            bOk = performSetCap<std::wstring, std::wstring, std::wstring, StringSetCapConverterW>
+            (pHandle, pActualSource, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::WStringType, CTL_ArrayWideStringType, nDataType);
         else
         if (dynarithmic::IsTwainFrameType(static_cast<TW_UINT16>(nDataType)))
         {

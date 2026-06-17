@@ -548,6 +548,8 @@ namespace dynarithmic
         bool        IsUsePeekMessage() const { return m_bUsePeekMessage; }
         bool        IsTwainLoopStarted() const { return m_bTwainMsgLoopStarted; }
         void        SetTwainLoopStarted(bool bSet) { m_bTwainMsgLoopStarted = bSet; }
+        void        SetUseAutocloseUI(bool bSet) { m_bAutocloseUI = bSet; }
+        bool        IsUseAutocloseUI() const { return m_bAutocloseUI; }
         AcquireFileStatus& GetAcquireFileStatusRef() { return m_AcquireFileStatus; }
         AcquireFileStatus GetAcquireFileStatus() const { return m_AcquireFileStatus; }
         ExtendedImageInformation* GetExtendedImageInfo() { return m_pExtendedImageInformation.get(); }
@@ -686,6 +688,7 @@ namespace dynarithmic
         bool            m_bUsePeekMessage;
         int             m_nLastAcquireError;
         bool            m_bTwainMsgLoopStarted;
+        bool            m_bAutocloseUI;
         boost::logic::tribool m_tbIsFileSystemSupported;
         boost::logic::tribool m_tbIsTileModeSupported;
         boost::logic::tribool m_tbIsFeederSupported;

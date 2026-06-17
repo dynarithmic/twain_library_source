@@ -67,7 +67,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
    // Check message from source
     // There are some issues with Sources *not* sending MSG_XFERREADY in
     // a consistent manner to start the scan, and instead issue a MSG_CLOSEDSREQ.
-    auto& user_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
+    auto& user_map = CTL_StaticData::GetSourceToXferReadyMap();
     std::string prodName = pSource->GetProductNameA();
     auto iter = user_map.find(prodName);
 

@@ -140,13 +140,23 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
     };
 
     auto& sourceStatusMap = CTL_StaticData::GetSourceStatusMap();
-    if ( std::find_if(m_arrTwainSource.begin(), m_arrTwainSource.end(), SourceFinder(strProduct)) == m_arrTwainSource.end())
+    auto iterFound = std::find_if(m_arrTwainSource.begin(), m_arrTwainSource.end(), SourceFinder(strProduct));
+    if ( iterFound == m_arrTwainSource.end())
     {
         auto uid = StringWrapperA::GenerateUUIDv4();
         pSource->GetDTWAINHandle()->GetGUIDMap(GUID_SOURCES).Insert( uid, pSource );
         m_arrTwainSource.insert( pSource );
         auto iter = sourceStatusMap.insert({ pSource->GetProductNameA(), {} }).first;
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, true);
+        return true;
+    }
+    else
+    {
+        // The source has already been selected, so update the info in the twain source array
+        // and destroy the previous instance.  Keep the UUID and status
+        CTL_ITwainSource::Destroy(*iterFound);
+        m_arrTwainSource.erase(iterFound);
+        m_arrTwainSource.insert(pSource);
         return true;
     }
     return false;

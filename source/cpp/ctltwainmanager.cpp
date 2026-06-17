@@ -2189,7 +2189,28 @@ CTL_StringType CTL_TwainAppMgr::GetTwainDirFullNameEx(LPCTSTR szTwainDLLName,
 
 std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringType strTwainDLLName, LPLONG pWhichSearch)
 {
-    auto str = GetTwainDirFullName(strTwainDLLName.c_str(), pWhichSearch);
+    bool leaveLoaded = false;
+    auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if (pHandle && pHandle->GetTwainSession())
+    {
+        auto appMgr = CTL_TwainAppMgr::GetInstance();
+        auto appMgrPtr = appMgr.get();
+        if (appMgrPtr)
+        {
+            filesys::path dllName(appMgr->GetDSMPath());
+        #ifdef _UNICODE
+            auto lowerName = StringWrapper::LowerCase(dllName.filename().native());
+        #else
+            auto lowerName = StringWrapper::LowerCase(dllName.filename().string());
+        #endif
+            auto isSame = StringWrapper::CompareNoCase(lowerName, strTwainDLLName.c_str());
+            if (isSame)
+                return { true, appMgrPtr->GetDSMPath() };
+        }
+        else
+            return { false, {} };
+    }
+    auto str = GetTwainDirFullName(strTwainDLLName.c_str(), pWhichSearch, leaveLoaded);
     if ( str.empty())
         return { false, str };
     return { true, str };
@@ -2524,8 +2545,19 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         {
             // Minimal reporting only if an SEH exception occurred
             char buffer[128]{};
+
+            TW_UINT32    nDG = pTriplet.GetDG();
+            TW_UINT16    nDAT = pTriplet.GetDAT();
+            TW_UINT16    nMSG = pTriplet.GetMSG();
+            std::array<std::pair<bool, CTL_StringType>, 3> ret;
+
+            ret[0] = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DG, nDG);
+            ret[1] = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DAT, nDAT);
+            ret[2] = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_MSG, nMSG);
+            auto retAll = _T("TWAIN triplet: ") + ret[0].second + _T(" / ") + ret[1].second + _T(" / ") + ret[2].second + _T("\r\n");
             wsprintfA(buffer, "DTWAIN: SEH exception 0x%08lX occurred while calling TWAIN DSM/Data Source.\r\n", dsmResult.exceptionCode);
             OutputDebugStringA(buffer);
+            OutputDebugString(retAll.c_str());
             return TWRC_FAILURE;
         }
     }
@@ -2671,9 +2703,3 @@ CTL_ITwainSession* CTL_TwainAppMgr::s_pSelectedSession = nullptr;
 int          CTL_TwainAppMgr::s_nLastError = 0;
 std::string  CTL_TwainAppMgr::s_strLastError;
 HINSTANCE    CTL_TwainAppMgr::s_ThisInstance = static_cast<HINSTANCE>(nullptr);
-SourceToXferReadyMap CTL_TwainAppMgr::s_SourceToXferReadyMap;
-SourceToXferReadyList CTL_TwainAppMgr::s_SourceToXferReadyList;
-SourceFlatbedOnlyList CTL_TwainAppMgr::s_SourceFlatbedOnlyList;
-SourceGetMessageList CTL_TwainAppMgr::s_SourceGetMessageList;
-SourcePaperDetectableMap CTL_TwainAppMgr::s_SourcePaperDetectableMap;
-SourceSheetcountMap CTL_TwainAppMgr::s_SourceSheetcountList;

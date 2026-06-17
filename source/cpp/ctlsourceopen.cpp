@@ -25,6 +25,7 @@
 #include "../wildcards/wildcards.hpp"
 #include "ctllogfunctioncall.h"
 #include "ctlsetgetcaps.h"
+#include "ctllogsourcecaps.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -37,6 +38,8 @@ static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 static void DetermineIfGetMessage(CTL_ITwainSource* p);
 static void DetermineIfPaperDetectable(CTL_ITwainSource* p);
 static void DetermineSheetcountDefs(CTL_ITwainSource* p);
+static void DetermineIfAutoCloseUI(CTL_ITwainSource* pSource);
+
 static std::pair<bool, int> PerformPixelTypeCompliancyTest(CTL_ITwainSource * p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
@@ -114,6 +117,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // See if the source will interpret CAP_SHEETCOUNT as Images or actual sheets of paper
     DetermineSheetcountDefs(pSource);
 
+    // See if the source needs to have the Source UI close on a single acquisition attempted
+    DetermineIfAutoCloseUI(pSource);
+
     // Cache the pixel types and bit depths
     TestAndCachePixelTypes(pSource);
 
@@ -142,39 +148,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // See if audio transfers are supported
     pSource->SetAudioTransferSupported(DTWAIN_IsAudioXferSupported(Source, DTWAIN_ANYSUPPORT)?true:false);
 
-    // if any logging is turned on, then get the capabilities and log the values
-    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
-    {
-        CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
-        LogWriterUtils::WriteLogInfoIndented(msg);
-
-        // Log the caps if logging is turned on
-        CTL_StringType sName;
-
-        std::vector<std::string> VecString(theCapList.size());
-
-        // copy the names
-        std::transform(theCapList.begin(), theCapList.end(), VecString.begin(), [](LONG n) { return CTL_TwainAppMgr::GetCapNameFromCap(n); });
-
-        // Sort the names
-        std::sort(VecString.begin(), VecString.end());
-        CTL_StringStreamType strm;
-        strm << theCapList.size();
-        sName = _T("\n\n");
-        sName += GetResourceStringFromMap_Native(IDS_LOGMSG_CAPABILITYLISTING);
-        sName += _T(" (") + pSource->GetProductName() + _T(")");
-        sName += _T(" (") + strm.str() + _T("):\n{\n");
-        if (theCapList.empty())
-            sName += _T(" No capabilities:\n");
-        else
-        {
-            sName += _T("    ");
-            sName += StringConversion::Convert_Ansi_To_Native(StringWrapperA::Join(VecString, "\n    "));
-        }
-        sName += _T("\n}");
-
-        LogWriterUtils::WriteMultiLineInfoIndented(sName, _T("\n"));
-    }
+    // Log the source capabilities
+    LogSourceCapabilities(pSource, false);
 
     if (bRetval)
         pHandle->m_lLastError = 0; // Reset the error flag to 0
@@ -191,6 +166,49 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
     const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+void dynarithmic::LogSourceCapabilities(CTL_ITwainSource* pSource, bool bUseLogFlag)
+{
+    CapList& actualCapList = pSource->GetCapSupportedList();
+    auto& logCaps = CTL_StaticData::GetLogFilterFlags();
+
+    if (logCaps)
+    {
+        if ((logCaps & DTWAIN_LOG_MISCELLANEOUS) || !bUseLogFlag)
+        {
+            CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
+                LogWriterUtils::WriteLogInfoIndented(msg);
+
+                // Log the caps if logging is turned on
+                CTL_StringType sName;
+
+                std::vector<std::string> VecString(actualCapList.size());
+
+                // copy the names
+                std::transform(actualCapList.begin(), actualCapList.end(), VecString.begin(),
+                    [](LONG n) { return CTL_TwainAppMgr::GetCapNameFromCap(n); });
+
+            // Sort the names
+            std::sort(VecString.begin(), VecString.end());
+            CTL_StringStreamType strm;
+            strm << actualCapList.size();
+            sName = _T("\n\n");
+            sName += GetResourceStringFromMap_Native(IDS_LOGMSG_CAPABILITYLISTING);
+            sName += _T(" (") + pSource->GetProductName() + _T(")");
+            sName += _T(" (") + strm.str() + _T("):\n{\n");
+            if (actualCapList.empty())
+                sName += _T(" No capabilities:\n");
+            else
+            {
+                sName += _T("    ");
+                sName += StringConversion::Convert_Ansi_To_Native(StringWrapperA::Join(VecString, "\n    "));
+            }
+            sName += _T("\n}");
+
+            LogWriterUtils::WriteMultiLineInfoIndented(sName, _T("\n"));
+        }
+    }
 }
 
 void TestAndCachePixelTypes(CTL_ITwainSource* p)
@@ -250,8 +268,8 @@ void TestAndCachePixelTypes(CTL_ITwainSource* p)
 void DetermineIfSpecialXfer(CTL_ITwainSource* p)
 {
     using wildcards::match;
-    auto& xfer_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
-    auto& xfer_list= CTL_TwainAppMgr::GetSourceToXferReadyList();
+    auto& xfer_map = CTL_StaticData::GetSourceToXferReadyMap();
+    auto& xfer_list= CTL_StaticData::GetSourceToXferReadyList();
     std::string sourceName = p->GetProductNameA();
     auto iter = xfer_map.find(sourceName);
 
@@ -278,7 +296,7 @@ void DetermineIfSpecialXfer(CTL_ITwainSource* p)
 void DetermineIfPaperDetectable(CTL_ITwainSource* p)
 {
     using wildcards::match;
-    auto& paperdetectable_map = CTL_TwainAppMgr::GetSourcePaperDetectionMap();
+    auto& paperdetectable_map = CTL_StaticData::GetSourcePaperDetectionMap();
     std::string sourceName = p->GetProductNameA();
 
     // Search map for a matching name
@@ -298,7 +316,7 @@ void DetermineIfPaperDetectable(CTL_ITwainSource* p)
 void DetermineSheetcountDefs(CTL_ITwainSource* p)
 {
     using wildcards::match;
-    auto& sheetcount_map = CTL_TwainAppMgr::GetSourceSheetcountMap();
+    auto& sheetcount_map = CTL_StaticData::GetSourceSheetcountMap();
     std::string sourceName = p->GetProductNameA();
 
     // Search map for a matching name
@@ -320,7 +338,7 @@ void DetermineSheetcountDefs(CTL_ITwainSource* p)
 void DetermineIfGetMessage(CTL_ITwainSource* pSource)
 {
     using wildcards::match;
-    auto& getmsg_list = CTL_TwainAppMgr::GetSourceGetMessageList();
+    auto& getmsg_list = CTL_StaticData::GetSourceGetMessageList();
     std::string sourceName = pSource->GetProductNameA();
     
     // Search vector for a matching name
@@ -331,6 +349,26 @@ void DetermineIfGetMessage(CTL_ITwainSource* pSource)
         if (matches)
         {
             pSource->SetUsePeekMessage(false);
+            return;
+        }
+        ++iterSearch;
+    }
+}
+
+void DetermineIfAutoCloseUI(CTL_ITwainSource* pSource)
+{
+    using wildcards::match;
+    auto& autoclose_list = CTL_StaticData::GetSourceToUIAutocloseMap();
+    std::string sourceName = pSource->GetProductNameA();
+
+    // Search vector for a matching name
+    auto iterSearch = autoclose_list.begin();
+    while (iterSearch != autoclose_list.end())
+    {
+        bool matches = match(sourceName, iterSearch->first);
+        if (matches)
+        {
+            pSource->SetUseAutocloseUI(iterSearch->second);
             return;
         }
         ++iterSearch;

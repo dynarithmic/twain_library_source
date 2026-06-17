@@ -141,6 +141,11 @@ namespace dynarithmic
         return false;
     }
 
+    static constexpr bool IsTwainANSIStringType(TW_UINT16 nItemType)
+    {
+        return IsTwainShortStringType(nItemType) || IsTwainLongStringType(nItemType);
+    }
+
     static constexpr bool IsTwainUIntegralType(TW_UINT16 nItemType)
     {
         return IsTwain16BitUIntegralType(nItemType) || IsTwain32BitUIntegralType(nItemType);
@@ -362,8 +367,10 @@ namespace dynarithmic
 
     static constexpr LONG GetArrayTypeFromCapType(TW_UINT16 CapType) noexcept
     {
-        if (IsTwainShortStringType(CapType) || IsTwainLongStringType(CapType))
+        if (IsTwainANSIStringType(CapType))
             return DTWAIN_ARRAYANSISTRING;
+        if (IsTwainUnicodeStringType(CapType))
+            return DTWAIN_ARRAYWIDESTRING;
         if ( IsTwainFrameType(CapType))
             return DTWAIN_ARRAYFRAME;
         if ( IsTwainFix32Type(CapType))
@@ -371,9 +378,9 @@ namespace dynarithmic
         return DTWAIN_ARRAYLONG;
     }
 
-    static constexpr LONG ExtImageInfoArrayType(LONG ExtType) noexcept
+    static constexpr LONG GetArrayTypeFromTwainType(LONG TwainType) noexcept
     {
-        TW_UINT16 actualType = static_cast<TW_UINT16>(ExtType);
+        TW_UINT16 actualType = static_cast<TW_UINT16>(TwainType);
         if (IsTwainIntegralType(actualType))
             return DTWAIN_ARRAYLONG;
         if (IsTwainStringType(actualType))
