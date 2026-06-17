@@ -2545,8 +2545,19 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         {
             // Minimal reporting only if an SEH exception occurred
             char buffer[128]{};
+
+            TW_UINT32    nDG = pTriplet.GetDG();
+            TW_UINT16    nDAT = pTriplet.GetDAT();
+            TW_UINT16    nMSG = pTriplet.GetMSG();
+            std::array<std::pair<bool, CTL_StringType>, 3> ret;
+
+            ret[0] = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DG, nDG);
+            ret[1] = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DAT, nDAT);
+            ret[2] = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_MSG, nMSG);
+            auto retAll = _T("TWAIN triplet: ") + ret[0].second + _T(" / ") + ret[1].second + _T(" / ") + ret[2].second + _T("\r\n");
             wsprintfA(buffer, "DTWAIN: SEH exception 0x%08lX occurred while calling TWAIN DSM/Data Source.\r\n", dsmResult.exceptionCode);
             OutputDebugStringA(buffer);
+            OutputDebugString(retAll.c_str());
             return TWRC_FAILURE;
         }
     }
