@@ -374,8 +374,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     if (g_allDTWAINFileTypes[i].resourceId == wmId)
                     {
+                        EnableAllMenuItems(FALSE);
                         g_FileType = g_allDTWAINFileTypes[i].dtwainType;
                         AcquireFile(g_allDTWAINFileTypes[i].resourceId < nFirstAcquireFileID, g_allDTWAINFileTypes[i].dtwainType);
+                        EnableAllMenuItems(TRUE);
                         break;
                     }
                 }
