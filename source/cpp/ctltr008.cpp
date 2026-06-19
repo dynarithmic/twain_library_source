@@ -92,7 +92,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
     {
         case MSG_XFERREADY:
         {
-            static int nCount = 0;
+            int nCount = pSource->GetPendingImageNum();
             // For those sources we are tracking for the close / transfer behavior
             // mark that we have received a transfer message
             if ( iter != user_map.end())
@@ -118,7 +118,6 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
 
             // Loop for all documents installed
             int  bPending = 1;
-            nCount = 0;
             pSource->SetPendingJobNum(0);
             while (bPending != 0)
             {
@@ -176,6 +175,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                         nCount++;
                     else
                         bNextAttemptIsRetry = true;
+                    pSource->SetPendingImageNum(nCount);
                 }
 
                 // Something happened to require a shutdown of the current
