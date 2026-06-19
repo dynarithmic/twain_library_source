@@ -802,7 +802,6 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     EnableSourceItems(FALSE);
     bAcquireOK = DTWAIN_AcquireFile(g_CurrentSource, 
                                     g_FileName,
-                                    g_FileName,
                                     fileType,
                                     FileFlags | DTWAIN_CREATE_DIRECTORY,
                                     DTWAIN_PT_DEFAULT, /* Use default */
