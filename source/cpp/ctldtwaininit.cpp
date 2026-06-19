@@ -2617,7 +2617,11 @@ void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)
         return;
     CTL_StaticData::SetResamplingDone(customProfile->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_IMAGEGILE_KEY).data(), 
                                         CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_RESAMPLE_ITEM).data(), true));
-    return;
+    auto& parseDelims = CTL_StaticData::GetFileParseDelimiters();
+    const char* defName = "|*;";
+    std::string sParseDelims = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
+                                                       CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_PARSEDELIMS_ITEM).data(), defName);
+    parseDelims = StringConversion::Convert_Ansi_To_Native(sParseDelims);
 }
 
 // This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [FlatbedOnly]

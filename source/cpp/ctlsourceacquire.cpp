@@ -33,32 +33,6 @@
 
 using namespace dynarithmic;
 
-template <typename PtrType>
-static void ParseFileNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY FileList, PtrType lpszFiles, DTWAIN_ARRAY pArray)
-{
-    auto& factory = pHandle->m_ArrayFactory;
-    if (FileList)
-    {
-        factory->copy(pArray, FileList);
-        return;
-    }
-
-    const CTL_StringType szParseDelim(_T(",;| "));
-    const CTL_StringType strTemp(lpszFiles);
-    std::vector<CTL_StringType> strArray;
-
-    const int nTokens = StringWrapper::TokenizeQuoted(strTemp, szParseDelim.c_str(), strArray);
-    factory->clear(pArray);
-    std::for_each(strArray.begin(), strArray.begin() + nTokens, [&](const CTL_StringType& s)
-    {
-    #ifdef _UNICODE
-        std::wstring val = s;
-    #else
-        std::string val = s;
-    #endif
-        factory->add_to_back(pArray, &val, 1);
-    });
-}
 
 DTWAIN_ACQUIRE CTL_TwainDLLHandle::GetNewAcquireNum()
 {
@@ -668,20 +642,21 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
             // Determine the naming convention
             bool bUsePrompt = false;
-            if (lFileFlags & DTWAIN_USEPROMPT)
-                bUsePrompt = true;
-            else
-            if (!(lFileFlags & (DTWAIN_USENAME | DTWAIN_USELONGNAME)))
-                bUsePrompt = true;
 
-            if (bUsePrompt)
+            // Use the prompt only if specified as an explicit flag
+            if (lFileFlags & DTWAIN_USEPROMPT)
                 lFileFlags = lMode | DTWAIN_USEPROMPT;
             else
             {
+                // Use the name specified.
                 // Check file naming option
+
+                // This will shorten the name to DOS 8.3 style
                 if (lFileFlags & DTWAIN_USENAME)
                     lFileFlags = lMode | DTWAIN_USENAME;
                 else
+
+                // Default.  Use the name without shortening the name.
                     lFileFlags = lMode | DTWAIN_USELONGNAME;
 
                 // Allocate for array
@@ -692,7 +667,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_BAD_ARRAY, -1, FUNC_MACRO);
 
                 // Parse the filename string into the array
-                ParseFileNames(pHandle, opts.getFileList(), opts.getFileName(), pArray);
+                ParseFileNames(pHandle, opts.getFileList(), opts.getFileName(), &pArray);
                 CTL_StringType szName;
                 const size_t nFileCount = pHandle->m_ArrayFactory->size(pArray);
                 if (nFileCount > 0)

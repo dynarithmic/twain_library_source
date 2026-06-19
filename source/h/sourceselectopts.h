@@ -110,5 +110,27 @@ namespace dynarithmic
         }
     };
 
+    template <typename PtrType>
+    static void ParseFileNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY FileList, 
+                               PtrType lpszFiles, LPDTWAIN_ARRAY pArray)
+    {
+        auto& factory = pHandle->m_ArrayFactory;
+        if (FileList)
+        {
+            factory->copy(*pArray, FileList);
+            return;
+        }
+
+        const CTL_StringType szParseDelim(CTL_StaticData::GetFileParseDelimiters());
+        const CTL_StringType strTemp(lpszFiles);
+        std::vector<CTL_StringType> strArray;
+
+        const int nTokens = StringWrapper::TokenizeQuoted(strTemp, szParseDelim.c_str(), strArray);
+        factory->clear(*pArray);
+        std::for_each(strArray.begin(), strArray.begin() + nTokens, [&](CTL_StringType& s)
+        {
+            factory->add_to_back(*pArray, &s, 1);
+        });
+    }
 }
 #endif
