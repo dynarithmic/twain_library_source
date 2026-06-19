@@ -797,24 +797,19 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
 
     SetUpAcquire();
 
-    /* Create the array of names.  This function is to be used
-       since the user may have entered a file name that has
-       embedded spaces */
-    AFileNames = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, 1);
-    DTWAIN_ArraySetAt( AFileNames, 0, g_FileName );
-
     /* Acquire the file */
     UseUI = GetToggleMenuState(IDM_USE_SOURCE_UI);
     EnableSourceItems(FALSE);
-    bAcquireOK = DTWAIN_AcquireFileEx(g_CurrentSource,
-                                  AFileNames,
-                                  fileType,
-                                  FileFlags | DTWAIN_CREATE_DIRECTORY,
-                                  DTWAIN_PT_DEFAULT, /* Use default */
-                                  DTWAIN_ACQUIREALL, /* Get all pages */
-                                  UseUI,
-                                  TRUE,  /* Close Source when UI is closed */
-                                  &ErrStatus /* Error Status */
+    bAcquireOK = DTWAIN_AcquireFile(g_CurrentSource, 
+                                    g_FileName,
+                                    g_FileName,
+                                    fileType,
+                                    FileFlags | DTWAIN_CREATE_DIRECTORY,
+                                    DTWAIN_PT_DEFAULT, /* Use default */
+                                    DTWAIN_ACQUIREALL, /* Get all pages */
+                                    UseUI,
+                                    TRUE,  /* Close Source when UI is closed */
+                                    &ErrStatus /* Error Status */
                                   );
     if (!bAcquireOK)
     {
@@ -824,7 +819,6 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     EnableWindow(g_hWnd, TRUE);
     EnableSourceItems(TRUE);
 
-    DTWAIN_ArrayDestroy( AFileNames );
     LONG pageCount = DTWAIN_GetFileSavePageCount(g_CurrentSource);
     if ( !bAcquireOK || pageCount == 0 || !bPageOK )
     {
@@ -836,11 +830,7 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     }
     else
     {
-        if (_taccess(g_FileName, 0) == 0)
-        {
-            MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_OK);
-            return;
-        }
+        MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_OK);
     }
 }
 
