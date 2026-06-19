@@ -211,11 +211,11 @@ containing DLLs, import libraries, PDB files, and demo programs.
 
 To build [all configurations](#build-configurations) of the DTWAIN DLL's using a single batch file, the following batch files can be used:
 
-* To build all configurations using Visual Studio 2019: `compile_all_vs2019.bat`
-* To build all configurations using Visual Studio 2022: `compile_all_vs2022.bat`
-* To build all configurations using Visual Studio 2026: `compile_all_vs2026.bat`
+* To build all configurations using Visual Studio 2019: `build_all_vs2019.bat`
+* To build all configurations using Visual Studio 2022: `build_all_vs2022.bat`
+* To build all configurations using Visual Studio 2026: `build_all_vs2026.bat`
 
-Running one (or more) of the batch files will compile all the configurations of DTWAIN (x86/x64, ANSI/Unicode, CRT/NoCRT).
+Running one (or more) of the batch files will build all the configurations of DTWAIN (x86/x64, ANSI/Unicode, CRT/NoCRT).
 
 ----
 
