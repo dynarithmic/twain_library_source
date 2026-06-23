@@ -867,6 +867,7 @@ module TwainAPI =
     let public DTWAIN_ERR_RANGE_STEPISZERO = (-1086)
     let public DTWAIN_ERR_BLANKNAMEDETECTED = (-1087)
     let public DTWAIN_ERR_FEEDER_NOPAPERSENSOR = (-1088)
+    let public DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089)
     let public TWAIN_ERR_LOW_MEMORY = (-1100)
     let public TWAIN_ERR_FALSE_ALARM = (-1101)
     let public TWAIN_ERR_BUMMER = (-1102)
