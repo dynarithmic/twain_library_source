@@ -377,6 +377,9 @@ endif()
 
 set(DTWAIN_RESOURCE_FILES
     ${PROJECT_SOURCE_DIR}/rc/twil32.rc
+)
+
+set(DTWAIN_MISCELLANEOUS_FILES
     ${PROJECT_SOURCE_DIR}/rc/twainresourcestrings_english.rc2
     ${PROJECT_SOURCE_DIR}/rc/resource_verinfo.rc2
 )
@@ -1463,6 +1466,7 @@ file(GLOB DTWAIN_DEF_FILES
 target_sources(dtwain PRIVATE ${DTWAIN_DEF_FILES})
 source_group( "Module Definition Files" FILES ${DTWAIN_DEF_FILES})
 target_sources(dtwain PRIVATE ${PROJECT_SOURCE_DIR}/rc/twil32.rc)
+target_sources(dtwain PRIVATE ${DTWAIN_MISCELLANEOUS_FILES})
 target_sources(dtwain PRIVATE ${TEXT_RESOURCE_FILES})
 
 set(DTWAIN_RC_DEFINES /D_WIN32)
@@ -1501,6 +1505,10 @@ set_source_files_properties(
 
 source_group("Resource Files" FILES
     ${DTWAIN_RESOURCE_FILES}
+)
+
+source_group("Miscellaneous Files" FILES
+    ${DTWAIN_MISCELLANEOUS_FILES}
 )
 
 target_compile_definitions(dtwain PRIVATE
