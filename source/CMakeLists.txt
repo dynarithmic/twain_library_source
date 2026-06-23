@@ -505,7 +505,7 @@ set(MAIN_HEADERS
 	${PROJECT_SOURCE_DIR}/h/funcmac.h
 	${PROJECT_SOURCE_DIR}/h/imagefun/bmprlewriter.h
 	${PROJECT_SOURCE_DIR}/h/imagefun/dibutil.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/dtwpdf/crc32_aux.h
+	${PROJECT_SOURCE_DIR}/h/crc32_aux.h
 	${PROJECT_SOURCE_DIR}/h/imagefun/dtwpdf/dtwainpdf.h
 	${PROJECT_SOURCE_DIR}/h/imagefun/gifwriter.h
 	${PROJECT_SOURCE_DIR}/h/imagefun/icowriter.h
@@ -764,7 +764,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdflib32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/stdafx.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windows_versioninfo.cpp
-  ${PROJECT_SOURCE_DIR}/c/imagefun/dtwpdf/crc32_aux.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/crc32_aux.cpp
 )
 
 set(LIBGIF_SOURCES
