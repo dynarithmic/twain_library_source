@@ -40,7 +40,6 @@ namespace dynarithmic
                 pCap->Cap = static_cast<TW_UINT16>(gCap);
                 pCap->ConType = TWON_ONEVALUE;
                 pCap->hContainer = nullptr;
-                m_bIsSupported = false;
             }
 
             TW_UINT16  Execute() override
@@ -54,7 +53,7 @@ namespace dynarithmic
                 return rc;
             }
 
-            bool            IsSupported() const noexcept { return m_bIsSupported; }
+            bool            IsSupportedOp() const noexcept { return m_bIsSupported; }
             std::string     GetString() const { return m_strLabel; }
 
         protected:
@@ -83,7 +82,7 @@ namespace dynarithmic
             }
 
         private:
-            bool m_bIsSupported;
+            bool m_bIsSupported = false;
             std::string m_strLabel;
     };
 
@@ -104,7 +103,7 @@ namespace dynarithmic
             }
 
         private:
-            bool m_bIsSupported;
+            bool m_bIsSupported = false;
             std::vector<std::string> m_aStrings;
     };
 

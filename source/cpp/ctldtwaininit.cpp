@@ -850,7 +850,6 @@ DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& initOptions)
             pHandle->m_pSaveAsDlgProc = FileSaveAsHookProc;
             RegisterTwainWindowClass();
 #endif
-
             LoadStaticData(pHandle);
             auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
             if (!threadMap.empty())

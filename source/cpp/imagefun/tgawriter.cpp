@@ -364,16 +364,8 @@ bool TgaSessionWriter::PrepareRow(const uint8_t* src, uint8_t* dst, uint32_t row
     {
         case TgaPixelFlavor::Palette8:
         case TgaPixelFlavor::Gray8:
-            std::memcpy(dst, src, rowBytes);
-            return true;
-
         case TgaPixelFlavor::Bgr24:
-            // DIB is already BGR, same as TGA true-color byte order.
-            std::memcpy(dst, src, rowBytes);
-            return true;
-
         case TgaPixelFlavor::Bgra32:
-            // DIB is already BGRA, same as TGA true-color+alpha byte order.
             std::memcpy(dst, src, rowBytes);
             return true;
     }
