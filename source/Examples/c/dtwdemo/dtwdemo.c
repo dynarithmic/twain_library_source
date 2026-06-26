@@ -13,7 +13,11 @@
 #include <io.h>
 #include "SourceProperties.h"
 #define MAX_LOADSTRING 100
-
+#ifdef _WIN64
+    #define TWAINDLLS TWAINDLL_VERSION2
+#else
+    #define TWAINDLLS TWAINDLL_VERSION1 " or 32-bit " TWAINDLL_VERSION2
+#endif
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 TCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
@@ -219,7 +223,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     HACCEL hAccelTable;
     if ( !DTWAIN_IsTwainAvailable() )
     {
-        MessageBox(NULL, _T("TWAIN is not installed!\r\nExiting..."), _T("Error"), MB_ICONSTOP);
+        MessageBoxA(NULL, TWAINDLLS " was not found!\r\nExiting...", "Error", MB_ICONSTOP);
         return FALSE;
     }
 
