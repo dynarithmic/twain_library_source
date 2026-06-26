@@ -199,7 +199,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         // the TWAIN DSM.
         SetErrorModeRAII errMode;
 
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
+        if (CTL_StaticData::GetLogFilterFlags())
         {
             CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" ...");
             LogWriterUtils::WriteLogInfo(msg);
