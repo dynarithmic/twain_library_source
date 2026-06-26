@@ -117,8 +117,8 @@ namespace dynarithmic
     /* Sent when DTWAIN_Acquire...() functions are about to return */
     #define  DTWAIN_AcquireTerminated            (DTWAIN_INTERNAL_NOTIFICATION + 8)
     #ifdef _WIN32
-    #define  TWAINDLLVERSION_1    _T("TWAIN_32.DLL")
-    #define  TWAINDLLVERSION_2    _T("TWAINDSM.DLL")
+    #define  TWAINDLLVERSION_1    _T(TWAINDLL_VERSION1)
+    #define  TWAINDLLVERSION_2    _T(TWAINDLL_VERSION2)
     #else
     #define  TWAINDLLVERSION_1    ""
     #define  TWAINDLLVERSION_2    "/usr/local/lib/libtwaindsm.so"

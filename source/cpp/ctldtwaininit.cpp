@@ -600,7 +600,6 @@ static bool CheckTwainAvailability(LPTSTR directories, LONG nMaxLen, LONG* maxCh
     if (maxCharsCopied)
         *maxCharsCopied = retVal;
     StringWrapper::Tokenize(dirsToUse, _T("|"), arr);
-    bool bTwainFound = false;
     for (auto& s : arr)
     {
         if (s != s_NullEntry)
