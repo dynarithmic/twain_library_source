@@ -104,8 +104,6 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     int bRetval = DTWAIN_NO_ERROR;
     auto [pHandle, pSource] = VerifyHandles(Source);
     
-    AcquireAttemptRAII aRaii(pSource);
-
     // Check for null aFileNames
     if (!aFileNames)
     {
@@ -125,7 +123,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
     auto& factory = pHandle->m_ArrayFactory;
 
-    const LONG Type = factory->tagtype_to_arraytype(factory->tag_type(aFileNames));
+    const LONG Type = CTL_ArrayFactory::tagtype_to_arraytype(factory->tag_type(aFileNames));
     const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
     DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     const auto idx = std::distance(validTypes.begin(), itArrType);
@@ -149,18 +147,14 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     // Return error if array is empty or if there are blank entries
     DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return bRetval != DTWAIN_NO_ERROR; }, bRetval, false, FUNC_MACRO);
 
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setFileType(lFileType).setFileFlags(lFileFlags | DTWAIN_USELIST).
-                setFileList(arrayToUse).setPixelType(PixelType).setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).
-                setRemainOpen(!(bCloseSource ? true : false));
+    FileAcquireOptions fOps = {};
+    fOps.fileFlags = lFileFlags | DTWAIN_USELIST;
+    fOps.fileList = arrayToUse;
+    fOps.fileName = nullptr;
+    fOps.fileType = lFileType;
 
-    bool bRetval2 = AcquireFileHelper(opts, ACQUIREFILE);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    bool bRetval2 = AcquireHelper(pHandle, pSource, ACQUIREFILE, 
+                                  false, 0, false, nullptr, PixelType, lMaxPages, bShowUI, &fOps, pStatus).second;
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval2)
     CATCH_BLOCK_LOG_PARAMS(false)

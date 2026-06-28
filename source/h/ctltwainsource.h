@@ -40,6 +40,7 @@
 #include "ctltwaincompliancy.h"
 #include "dtwain_anyutils.h"
 #include "extendedimageinfo.h"
+#include "sourceacquireopts.h"
 #include "ctlguiddef.h"
 
 namespace dynarithmic
@@ -146,6 +147,7 @@ namespace dynarithmic
         CTL_TwainIdentity& GetTwainIdentity() { return m_SourceId; }
 
         CTL_ITwainSession* GetTwainSession() const;
+        DTWAIN_SOURCE GetDTWAINSource() { return reinterpret_cast<DTWAIN_SOURCE>(this); }
 
         bool isCapValuesCached(TW_UINT16 lCap, LONG getType) const
         {
@@ -559,6 +561,7 @@ namespace dynarithmic
         void        SetFeederWaitTimeOption(int option) noexcept { m_nFeederWaitTimeOption = option; }
         void        SetUpdatedDIB(HANDLE hDib) { m_UpdatedDIB = hDib; }
         HANDLE      GetUpdatedDIB() const { return m_UpdatedDIB; }
+        SourceAcquireOptions& GetAcquireOptions() { return m_acquireOptions; }
 
         // Only public member
         void *      m_pUserPtr;
@@ -699,6 +702,7 @@ namespace dynarithmic
         boost::logic::tribool m_tbUseSheetCountAsSheets;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;
+        SourceAcquireOptions m_acquireOptions;
         HANDLE m_UpdatedDIB = nullptr;
 
         struct tagCapCachInfo {

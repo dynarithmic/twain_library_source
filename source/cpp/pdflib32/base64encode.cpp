@@ -50,5 +50,5 @@ int Base64Encode(const uint8_t* inData, std::string& out, size_t len)
             out.push_back('=');
     }
 
-    return out.size();
+    return static_cast<int>(out.size());
 }

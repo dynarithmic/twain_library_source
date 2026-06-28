@@ -355,6 +355,78 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     CATCH_BLOCK(nullptr)
 }
 
+std::pair<DTWAIN_ARRAY, bool> dynarithmic::AcquireHelper(CTL_TwainDLLHandle* pHandle, 
+                                                         CTL_ITwainSource* pSource,
+                                                         int acquireType, 
+                                                         bool discardDibs, 
+                                                         int nTransferMode,
+                                                         bool bUseClipboard, 
+                                                         DTWAIN_ARRAY userArray, 
+                                                         int PixelType, 
+                                                         int nMaxPages, 
+                                                         bool bShowUI,
+                                                         const FileAcquireOptions* fileOps,
+                                                         LONG* pStatus)
+
+{
+    AcquireAttemptRAII aRaii(pSource);
+    auto& actualOpts = pSource->GetAcquireOptions();
+    actualOpts = {};
+
+    actualOpts.setHandle(pSource->GetDTWAINHandle()).
+        setSource(pSource->GetDTWAINSource()).
+        setPixelType(PixelType).
+        setMaxPages(nMaxPages).
+        setShowUI(bShowUI ? true : false).
+        setRemainOpen(true).
+        setAcquireType(acquireType).
+        setTransferMode(nTransferMode).
+        setUserArray(userArray).
+        setUseClipboard(bUseClipboard);
+
+    if ( fileOps )
+    {
+        actualOpts.
+            setFileType(fileOps->fileType).
+            setFileFlags(fileOps->fileFlags).
+            setFileList(fileOps->fileList).
+            setFileName(fileOps->fileName);
+    }
+
+    DTWAIN_ARRAY aDibs{};
+    bool bRet = false;
+    switch (acquireType)
+    {
+        case ACQUIRENATIVE:
+        case ACQUIREBUFFERED:
+            aDibs = SourceAcquire(actualOpts);
+            actualOpts.setTransferMode(acquireType == ACQUIRENATIVE ? DTWAIN_USENATIVE : DTWAIN_USEBUFFERED);
+        break;
+
+        case ACQUIRENATIVEEX:
+        case ACQUIREBUFFEREDEX:
+        case ACQUIREAUDIONATIVEEX:
+            bRet = AcquireExHelper(actualOpts);
+            actualOpts.setTransferMode(acquireType == ACQUIRENATIVEEX ? DTWAIN_USENATIVE : DTWAIN_USEBUFFERED);
+        break;
+
+        case ACQUIREFILE:
+        case ACQUIREAUDIOFILE:
+            bRet = AcquireFileHelper(actualOpts, acquireType);
+        break;
+        default:
+            return { nullptr, false };
+    }
+    if (pStatus)
+        *pStatus = actualOpts.getStatus();
+    if (actualOpts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
+    if (pSource->GetLastAcquireError() != 0)
+        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    return { aDibs, bRet };
+}
+
 DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
@@ -410,23 +482,15 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
             break;
 
-        case ACQUIREBUFFER:
-        case ACQUIREBUFFEREX:
+        case ACQUIREBUFFERED:
+        case ACQUIREBUFFEREDEX:
             if (DTWAIN_LLAcquireBuffered(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
                 LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
-            if (opts.getAcquireType() == ACQUIREBUFFEREX)
+            if (opts.getAcquireType() == ACQUIREBUFFEREDEX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
-            break;
-
-        case ACQUIRECLIPBOARD:
-            if (DTWAIN_LLAcquireToClipboard(opts) == -1L)
-            {
-                opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
-            }
             break;
 
         case ACQUIREFILE:
@@ -702,15 +766,6 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
         }
         else
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, []{return true; }, DTWAIN_ERR_FILE_FORMAT, -1, FUNC_MACRO);
-    }
-    else
-    if (opts.getActualAcquireType() == TWAINAcquireType_Clipboard)
-    {
-        if (opts.getTransferMode() == DTWAIN_USENATIVE)
-            ClipboardTransferType = TWSX_NATIVE;
-        else
-            ClipboardTransferType = TWSX_MEMORY;
-        pSource->SetAcquireType(static_cast<CTL_TwainAcquireEnum>(opts.getActualAcquireType()));
     }
     else
         pSource->SetAcquireType(static_cast<CTL_TwainAcquireEnum>(opts.getActualAcquireType()));

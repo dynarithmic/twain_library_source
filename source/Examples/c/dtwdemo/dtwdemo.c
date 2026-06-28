@@ -690,26 +690,26 @@ void GenericAcquire(LONG nWhichOne)
     if (nWhichOne == 0)
     {
         bRet = DTWAIN_AcquireNativeEx(
-            g_CurrentSource,
-            DTWAIN_PT_DEFAULT, /* Use default */
-            DTWAIN_ACQUIREALL, /* Get all pages */
-            GetToggleMenuState(IDM_USE_SOURCE_UI),
-            FALSE,  /* Close Source when UI is closed */
-            g_AcquireArray,
-            &ErrStatus /* Error Status */
-        );
+                                g_CurrentSource,
+                                DTWAIN_PT_DEFAULT, /* Use default */
+                                DTWAIN_ACQUIREALL, /* Get all pages */
+                                GetToggleMenuState(IDM_USE_SOURCE_UI),
+                                FALSE,  /* Close Source when UI is closed */
+                                g_AcquireArray,
+                                &ErrStatus /* Error Status */
+                            );
     }
     else
     {
         bRet = DTWAIN_AcquireBufferedEx(
-            g_CurrentSource,
-            DTWAIN_PT_DEFAULT, /* Use default */
-            DTWAIN_ACQUIREALL, /* Get all pages */
-            GetToggleMenuState(IDM_USE_SOURCE_UI),
-            TRUE,  /* Close Source when UI is closed */
-            g_AcquireArray,
-            &ErrStatus /* Error Status */
-        );
+                                g_CurrentSource,
+                                DTWAIN_PT_DEFAULT, /* Use default */
+                                DTWAIN_ACQUIREALL, /* Get all pages */
+                                GetToggleMenuState(IDM_USE_SOURCE_UI),
+                                TRUE,  /* Close Source when UI is closed */
+                                g_AcquireArray,
+                                &ErrStatus /* Error Status */
+                            );
     }
     EnableSourceItems(TRUE);
     if (!bRet)

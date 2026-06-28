@@ -22,79 +22,113 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "sourceacquireopts.h"
+#include "acquisitionarray.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
 
+static bool CopyDibToClipboard(HANDLE hDib)
+{
+#ifdef _WIN32
+    if (hDib)
+    {
+        // Open the clipboard
+        if (OpenClipboard(nullptr/*hWnd*/))
+        {
+            // Empty the clipboard
+            if (EmptyClipboard())
+            {
+                SetClipboardData(CF_DIB, hDib);
+                CloseClipboard();
+                return true;
+            }
+            CloseClipboard();
+            return true;
+        }
+    }
+    return false;
+#endif
+}
+
 DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,
-    LPLONG pStatus)
+                                                     LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, nTransferMode, bDiscardDibs, bShowUI, bCloseSource, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
-        setTransferMode(nTransferMode).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
-        setAcquireType(ACQUIRECLIPBOARD).setDiscardDibs(bDiscardDibs ? true : false);
 
-    DTWAIN_ARRAY aDibs = SourceAcquire(opts);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (aDibs && bDiscardDibs)
+    DTWAIN_ARRAY aDibs = DTWAIN_CreateAcquisitionArray();
+    if (!aDibs)
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+    AcquisitionArrayRAII raii(aDibs, true);
+
+    int actualAcquireMode = ACQUIREBUFFEREDEX;
+    if (nTransferMode == DTWAIN_USENATIVE)
+        actualAcquireMode = ACQUIRENATIVEEX;
+
+    bool bRet = dynarithmic::AcquireHelper(pHandle, pSource, actualAcquireMode, bDiscardDibs, 
+                                       nTransferMode, true, 
+                                       aDibs, PixelType, nMaxPages, bShowUI,nullptr, pStatus).second;
+    if (bRet)
     {
-        auto& factory = pHandle->m_ArrayFactory;
-        DTWAINArrayLowLevel_RAII arrAcq(pHandle, aDibs);
-        auto& vValues = factory->underlying_container_t<HANDLE>(aDibs);
-        const LONG nCount = static_cast<LONG>(vValues.size());
-        for (LONG i = 0; i < nCount; i++)
+        LONG numAcquisitions = DTWAIN_GetNumAcquisitions(aDibs);
+        if (numAcquisitions > 0)
         {
-            DTWAIN_ARRAY aDibHandle = VOID_TO_DTWAIN_ARRAY(vValues[i]);
-            DTWAINArrayLowLevel_RAII arr(pHandle, aDibHandle);
-            const auto& vDibs = factory->underlying_container_t<HANDLE>(aDibHandle);
-
-            if (vDibs.empty())
-                continue;
-
-            const LONG nCount2 = static_cast<LONG>(vDibs.size());
-            // Leave last DIB.  This is the one in the clipboard!!
-            LONG nLastDib = nCount2;
-            if (i == nCount - 1)
-                nLastDib = nCount2 - 1;
-
-            for (int j = 0; j < nLastDib; j++)
+            LONG numImages = DTWAIN_GetNumAcquiredImages(aDibs, numAcquisitions - 1);
+            if (numImages > 0)
             {
-                const HANDLE hDib = DTWAIN_GetAcquiredImage(aDibs, i, j);
-                if (pHandle->m_TwainMemoryFunc->LockMemory(hDib))
+                const HANDLE last_dib = DTWAIN_GetAcquiredImage(aDibs, numAcquisitions - 1, numImages - 1);
+                if (last_dib)
                 {
-                    pHandle->m_TwainMemoryFunc->UnlockMemory(hDib);
-                    pHandle->m_TwainMemoryFunc->FreeMemory(hDib);
+                    HANDLE copied_dib = CDibInterface::CopyDib(last_dib);
+                    if (copied_dib)
+                    {
+                        bool bInClip = CopyDibToClipboard(copied_dib);
+                        if (!bInClip)
+                            LogWin32Error(GetLastError());
+                        else
+                            CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, 
+                                                                  DTWAIN_TN_CLIPTRANSFERDONE, 
+                                                                  reinterpret_cast<LPARAM>(pSource));
+                    }
                 }
             }
         }
     }
-    else
-    if (!aDibs)
-        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-
     if (!bDiscardDibs)
-        LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
-
-    aDibs = VOID_TO_DTWAIN_ARRAY(reinterpret_cast<HANDLE>(1));
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+        raii.bDestroy = false;
     else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+        aDibs = reinterpret_cast<DTWAIN_ARRAY>(1);
+
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
     CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
-DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireToClipboard(SourceAcquireOptions& opts)
+
+#if 0
+// This has been deprecated as of version 5.9.3.  
+// This function will now default to DTWAIN_AcquireNative or DTWAIN_AcquireBuffered.
+// If data is required to be on the clipboard, the application should call the DTWAIN_CopyDIBToClipboard function.
+DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,
+    LPLONG pStatus)
 {
-    LONG lTransferMode = opts.getTransferMode();
-    if (lTransferMode != DTWAIN_USENATIVE && lTransferMode != DTWAIN_USEBUFFERED)
-        lTransferMode = DTWAIN_USENATIVE;
-    opts.setActualAcquireType(TWAINAcquireType_Clipboard).setTransferMode(lTransferMode);
-    return LLAcquireImage(opts);
+    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, nTransferMode, bDiscardDibs, bShowUI, bCloseSource, pStatus))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+
+    DTWAIN_ARRAY aDibs = {};
+
+    int actualAcquireMode = ACQUIREBUFFERED;
+    if (nTransferMode == DTWAIN_USENATIVE)
+        actualAcquireMode = ACQUIRENATIVE;
+
+    aDibs = dynarithmic::AcquireHelper(pHandle, pSource, actualAcquireMode, bDiscardDibs,
+        nTransferMode, true,
+        nullptr, PixelType, nMaxPages, bShowUI, pStatus).first;
+
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
+#endif
