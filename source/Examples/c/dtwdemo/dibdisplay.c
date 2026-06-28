@@ -13,10 +13,6 @@ static int DisplayOne = 0;
 
 void RetrieveAndDisplayDibs(HINSTANCE hInstance, DTWAIN_ARRAY AcquireArray, UINT resID, HWND wndHandle)
 {
-    LONG Count;
-    LONG DibCount;
-    LONG Count2;
-    HANDLE hDib;
     LONG numAcquisitions;
     /* Get the number of total acquisitions attempted */
     numAcquisitions = DTWAIN_ArrayGetCount(AcquireArray);
