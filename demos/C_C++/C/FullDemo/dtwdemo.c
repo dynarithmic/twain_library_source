@@ -13,7 +13,11 @@
 #include <io.h>
 #include "SourceProperties.h"
 #define MAX_LOADSTRING 100
-
+#ifdef _WIN64
+    #define TWAINDLLS TWAINDLL_VERSION2
+#else
+    #define TWAINDLLS TWAINDLL_VERSION1 " or 32-bit " TWAINDLL_VERSION2
+#endif
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 TCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
@@ -219,7 +223,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     HACCEL hAccelTable;
     if ( !DTWAIN_IsTwainAvailable() )
     {
-        MessageBox(NULL, _T("TWAIN is not installed!\r\nExiting..."), _T("Error"), MB_ICONSTOP);
+        MessageBoxA(NULL, TWAINDLLS " was not found!\r\nExiting...", "Error", MB_ICONSTOP);
         return FALSE;
     }
 
@@ -374,8 +378,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     if (g_allDTWAINFileTypes[i].resourceId == wmId)
                     {
+                        EnableAllMenuItems(FALSE);
                         g_FileType = g_allDTWAINFileTypes[i].dtwainType;
                         AcquireFile(g_allDTWAINFileTypes[i].resourceId < nFirstAcquireFileID, g_allDTWAINFileTypes[i].dtwainType);
+                        EnableAllMenuItems(TRUE);
                         break;
                     }
                 }
@@ -684,26 +690,26 @@ void GenericAcquire(LONG nWhichOne)
     if (nWhichOne == 0)
     {
         bRet = DTWAIN_AcquireNativeEx(
-            g_CurrentSource,
-            DTWAIN_PT_DEFAULT, /* Use default */
-            DTWAIN_ACQUIREALL, /* Get all pages */
-            GetToggleMenuState(IDM_USE_SOURCE_UI),
-            FALSE,  /* Close Source when UI is closed */
-            g_AcquireArray,
-            &ErrStatus /* Error Status */
-        );
+                                g_CurrentSource,
+                                DTWAIN_PT_DEFAULT, /* Use default */
+                                DTWAIN_ACQUIREALL, /* Get all pages */
+                                GetToggleMenuState(IDM_USE_SOURCE_UI),
+                                FALSE,  /* Close Source when UI is closed */
+                                g_AcquireArray,
+                                &ErrStatus /* Error Status */
+                            );
     }
     else
     {
         bRet = DTWAIN_AcquireBufferedEx(
-            g_CurrentSource,
-            DTWAIN_PT_DEFAULT, /* Use default */
-            DTWAIN_ACQUIREALL, /* Get all pages */
-            GetToggleMenuState(IDM_USE_SOURCE_UI),
-            TRUE,  /* Close Source when UI is closed */
-            g_AcquireArray,
-            &ErrStatus /* Error Status */
-        );
+                                g_CurrentSource,
+                                DTWAIN_PT_DEFAULT, /* Use default */
+                                DTWAIN_ACQUIREALL, /* Get all pages */
+                                GetToggleMenuState(IDM_USE_SOURCE_UI),
+                                TRUE,  /* Close Source when UI is closed */
+                                g_AcquireArray,
+                                &ErrStatus /* Error Status */
+                            );
     }
     EnableSourceItems(TRUE);
     if (!bRet)
@@ -795,24 +801,18 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
 
     SetUpAcquire();
 
-    /* Create the array of names.  This function is to be used
-       since the user may have entered a file name that has
-       embedded spaces */
-    AFileNames = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, 1);
-    DTWAIN_ArraySetAt( AFileNames, 0, g_FileName );
-
     /* Acquire the file */
     UseUI = GetToggleMenuState(IDM_USE_SOURCE_UI);
     EnableSourceItems(FALSE);
-    bAcquireOK = DTWAIN_AcquireFileEx(g_CurrentSource,
-                                  AFileNames,
-                                  fileType,
-                                  FileFlags | DTWAIN_CREATE_DIRECTORY,
-                                  DTWAIN_PT_DEFAULT, /* Use default */
-                                  DTWAIN_ACQUIREALL, /* Get all pages */
-                                  UseUI,
-                                  TRUE,  /* Close Source when UI is closed */
-                                  &ErrStatus /* Error Status */
+    bAcquireOK = DTWAIN_AcquireFile(g_CurrentSource, 
+                                    g_FileName,
+                                    fileType,
+                                    FileFlags | DTWAIN_CREATE_DIRECTORY,
+                                    DTWAIN_PT_DEFAULT, /* Use default */
+                                    DTWAIN_ACQUIREALL, /* Get all pages */
+                                    UseUI,
+                                    TRUE,  /* Close Source when UI is closed */
+                                    &ErrStatus /* Error Status */
                                   );
     if (!bAcquireOK)
     {
@@ -822,7 +822,6 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     EnableWindow(g_hWnd, TRUE);
     EnableSourceItems(TRUE);
 
-    DTWAIN_ArrayDestroy( AFileNames );
     LONG pageCount = DTWAIN_GetFileSavePageCount(g_CurrentSource);
     if ( !bAcquireOK || pageCount == 0 || !bPageOK )
     {
@@ -834,11 +833,7 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     }
     else
     {
-        if (_taccess(g_FileName, 0) == 0)
-        {
-            MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_OK);
-            return;
-        }
+        MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_OK);
     }
 }
 
