@@ -29,12 +29,16 @@ The DTWAIN library is written in C++ (using language standard C++ 17) with a few
 ## <a name="obtain-dev-libraries"></a> Obtaining the latest development binaries ###
 
 To obtain the latest development binaries (DLL's, PDB files, import libraries, etc.):<br>
-For 32-bit: 
-[DTWAIN-Binaries-x86.zip](https://github.com/dynarithmic/twain_library_source/releases/download/development-latest/DTWAIN-Binaries-x86.zip)
+For 32-bit:<br> 
+[DTWAIN-Binaries-x86.zip](https://github.com/dynarithmic/twain_library_source/releases/download/development-latest/DTWAIN-Binaries-x86.zip)  
+[Release 32-bit PDB files](https://github.com/dynarithmic/twain_library_source/releases/download/development-latest/DTWAIN-ReleasePDB-x86.zip)  
+[Debug 32-bit PDB files](https://github.com/dynarithmic/twain_library_source/releases/download/development-latest/DTWAIN-DebugPDB-x86.zip)  
 
 
-For 64-bit:
-[DTWAIN-Binaries-x64.zip](https://github.com/dynarithmic/twain_library_source/releases/download/development-latest/DTWAIN-Binaries-x64.zip)
+For 64-bit:<br>
+[DTWAIN-Binaries-x64.zip](https://github.com/dynarithmic/twain_library_source/releases/download/development-latest/DTWAIN-Binaries-x64.zip)  
+[Release 64-bit PDB files](https://github.com/dynarithmic/twain_library_source/releases/download/development-latest/DTWAIN-ReleasePDB-x64.zip)  
+[Debug 64-bit PDB files](https://github.com/dynarithmic/twain_library_source/releases/download/development-latest/DTWAIN-DebugPDB-x64.zip)
 
 The development binaries are built from the latest source code found in the [development branch](https://github.com/dynarithmic/twain_library_source/tree/development).  
 
