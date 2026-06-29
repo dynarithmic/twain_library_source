@@ -246,6 +246,17 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
 }
 #endif
 
+struct LogWin_DestroyTraits
+{
+    static void Destroy(LPSTR p)
+    {
+        if (p)
+            LocalFree(p);
+    }
+};
+
+using LogMsg_RAII = DTWAIN_RAII<LPSTR, LogWin_DestroyTraits>;
+
 std::string dynarithmic::LogWin32Error(DWORD lastError)
 {
     LPSTR lpMsgBuf = nullptr;
@@ -260,6 +271,8 @@ std::string dynarithmic::LogWin32Error(DWORD lastError)
         nullptr
     );
 
+    LogMsg_RAII raiiFree(lpMsgBuf);
+
     // Display the string.
     std::string sError = lpMsgBuf;
     while (!sError.empty())
@@ -272,9 +285,6 @@ std::string dynarithmic::LogWin32Error(DWORD lastError)
     StringStreamA strm;
     strm << "Win32 Error: " << lastError << " (" << sError << ")";
     LogWriterUtils::WriteLogInfoIndentedA(strm.str());
-
-    // Free the buffer.
-    LocalFree(lpMsgBuf);
 
     return strm.str();
 }

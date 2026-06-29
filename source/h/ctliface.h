@@ -117,8 +117,8 @@ namespace dynarithmic
     /* Sent when DTWAIN_Acquire...() functions are about to return */
     #define  DTWAIN_AcquireTerminated            (DTWAIN_INTERNAL_NOTIFICATION + 8)
     #ifdef _WIN32
-    #define  TWAINDLLVERSION_1    _T("TWAIN_32.DLL")
-    #define  TWAINDLLVERSION_2    _T("TWAINDSM.DLL")
+    #define  TWAINDLLVERSION_1    _T(TWAINDLL_VERSION1)
+    #define  TWAINDLLVERSION_2    _T(TWAINDLL_VERSION2)
     #else
     #define  TWAINDLLVERSION_1    ""
     #define  TWAINDLLVERSION_2    "/usr/local/lib/libtwaindsm.so"
@@ -499,6 +499,7 @@ namespace dynarithmic
                INI_SHEETCOUNT_KEY,
                INI_TESTGET_ITEM,
                INI_AUTOCLOSEUI_KEY,
+               INI_PARSEDELIMS_ITEM,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
@@ -516,6 +517,7 @@ namespace dynarithmic
         UINT                         s_nTimeoutMilliseconds = 0;
         bool                         s_ResourcesInitialized = false;
         bool                         s_bTimerIDSet = false;
+        CTL_StringType               s_FileParseDelimiters;
         CTL_UINT16ToInfoMap          s_IntToTwainInfoMap;
         CTL_StringToConstantMap      s_MapStringToConstant;
         CTL_TwainIDToStringMap     s_MapExtendedImageInfo;
@@ -660,6 +662,7 @@ namespace dynarithmic
         static SourcePaperDetectableMap& GetSourcePaperDetectionMap() { return s_StaticData.s_SourcePaperDetectableMap; }
         static SourceSheetcountMap& GetSourceSheetcountMap() { return s_StaticData.s_SourceSheetcountList; }
         static SourceToUIAutocloseMap& GetSourceToUIAutocloseMap() { return s_StaticData.s_SourceToAutocloseMap; }
+        static CTL_StringType& GetFileParseDelimiters() { return s_StaticData.s_FileParseDelimiters; }
     };
 
     struct CTL_LoggerCallbackInfo

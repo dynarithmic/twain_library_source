@@ -1,5 +1,20 @@
 DTWAIN Version changes
 
+5.9.3
+
+- Allow DTWAIN_AcquireFile() to accept file names with embedded space characters.
+  Previously, only DTWAIN_AcquireFileEx() would allow file names with embedded spaces, due
+  to the file names being stored in an array of names.
+
+- The DTWAIN_AcquireFile() file name parser now by default will only accept pipe (|),
+  asterisk (*), and semicolons (:) as delimiters if a list of files are specified.  The
+  space character is no longer a valid delimiter character.
+
+- Fix issues with DTWAIN_IsTwainAvailable() when run on a system without TWAIN_32.DLL installed.
+
+- Fix issue with logging the Windows version if using Windows Server 2003 Enterprise.
+ 
+
 5.9.2 Update 1
 
 - Minor change to DTWDEMO program. Main menu items are now disabled during acquisition to a file

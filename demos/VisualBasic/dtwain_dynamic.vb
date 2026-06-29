@@ -982,6 +982,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_ERR_RANGE_STEPISZERO As Integer = (-1086)
         Public Const DTWAIN_ERR_BLANKNAMEDETECTED As Integer = (-1087)
         Public Const DTWAIN_ERR_FEEDER_NOPAPERSENSOR As Integer = (-1088)
+        Public Const DTWAIN_ERR_DTWAINDLL_LOADERROR As Integer = (-1089)
         Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
         Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
         Public Const TWAIN_ERR_BUMMER As Integer = (-1102)

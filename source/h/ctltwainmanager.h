@@ -306,9 +306,6 @@ namespace dynarithmic
                                         CTL_ITwainSource  *pSource,
                                         bool bIsMememoryFile = false );
 
-            static int  ClipboardTransfer( CTL_ITwainSession *pSession,
-                                           CTL_ITwainSource *pSource );
-
             static int  StartTransfer( CTL_ITwainSession *pSession,
                                        CTL_ITwainSource * pSource,
                                        CTL_ImageXferTriplet *pTrip);

@@ -864,6 +864,7 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_RANGE_STEPISZERO = (-1086);
         public const int DTWAIN_ERR_BLANKNAMEDETECTED = (-1087);
         public const int DTWAIN_ERR_FEEDER_NOPAPERSENSOR = (-1088);
+        public const int DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089);
         public const int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const int TWAIN_ERR_FALSE_ALARM = (-1101);
         public const int TWAIN_ERR_BUMMER = (-1102);

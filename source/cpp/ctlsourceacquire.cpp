@@ -33,32 +33,6 @@
 
 using namespace dynarithmic;
 
-template <typename PtrType>
-static void ParseFileNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY FileList, PtrType lpszFiles, DTWAIN_ARRAY pArray)
-{
-    auto& factory = pHandle->m_ArrayFactory;
-    if (FileList)
-    {
-        factory->copy(pArray, FileList);
-        return;
-    }
-
-    const CTL_StringType szParseDelim(_T(",;| "));
-    const CTL_StringType strTemp(lpszFiles);
-    std::vector<CTL_StringType> strArray;
-
-    const int nTokens = StringWrapper::TokenizeQuoted(strTemp, szParseDelim.c_str(), strArray);
-    factory->clear(pArray);
-    std::for_each(strArray.begin(), strArray.begin() + nTokens, [&](const CTL_StringType& s)
-    {
-    #ifdef _UNICODE
-        std::wstring val = s;
-    #else
-        std::string val = s;
-    #endif
-        factory->add_to_back(pArray, &val, 1);
-    });
-}
 
 DTWAIN_ACQUIRE CTL_TwainDLLHandle::GetNewAcquireNum()
 {
@@ -381,6 +355,78 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     CATCH_BLOCK(nullptr)
 }
 
+std::pair<DTWAIN_ARRAY, bool> dynarithmic::AcquireHelper(CTL_TwainDLLHandle* pHandle, 
+                                                         CTL_ITwainSource* pSource,
+                                                         int acquireType, 
+                                                         bool discardDibs, 
+                                                         int nTransferMode,
+                                                         bool bUseClipboard, 
+                                                         DTWAIN_ARRAY userArray, 
+                                                         int PixelType, 
+                                                         int nMaxPages, 
+                                                         bool bShowUI,
+                                                         const FileAcquireOptions* fileOps,
+                                                         LONG* pStatus)
+
+{
+    AcquireAttemptRAII aRaii(pSource);
+    auto& actualOpts = pSource->GetAcquireOptions();
+    actualOpts = {};
+
+    actualOpts.setHandle(pSource->GetDTWAINHandle()).
+        setSource(pSource->GetDTWAINSource()).
+        setPixelType(PixelType).
+        setMaxPages(nMaxPages).
+        setShowUI(bShowUI ? true : false).
+        setRemainOpen(true).
+        setAcquireType(acquireType).
+        setTransferMode(nTransferMode).
+        setUserArray(userArray).
+        setUseClipboard(bUseClipboard);
+
+    if ( fileOps )
+    {
+        actualOpts.
+            setFileType(fileOps->fileType).
+            setFileFlags(fileOps->fileFlags).
+            setFileList(fileOps->fileList).
+            setFileName(fileOps->fileName);
+    }
+
+    DTWAIN_ARRAY aDibs{};
+    bool bRet = false;
+    switch (acquireType)
+    {
+        case ACQUIRENATIVE:
+        case ACQUIREBUFFERED:
+            aDibs = SourceAcquire(actualOpts);
+            actualOpts.setTransferMode(acquireType == ACQUIRENATIVE ? DTWAIN_USENATIVE : DTWAIN_USEBUFFERED);
+        break;
+
+        case ACQUIRENATIVEEX:
+        case ACQUIREBUFFEREDEX:
+        case ACQUIREAUDIONATIVEEX:
+            bRet = AcquireExHelper(actualOpts);
+            actualOpts.setTransferMode(acquireType == ACQUIRENATIVEEX ? DTWAIN_USENATIVE : DTWAIN_USEBUFFERED);
+        break;
+
+        case ACQUIREFILE:
+        case ACQUIREAUDIOFILE:
+            bRet = AcquireFileHelper(actualOpts, acquireType);
+        break;
+        default:
+            return { nullptr, false };
+    }
+    if (pStatus)
+        *pStatus = actualOpts.getStatus();
+    if (actualOpts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
+    if (pSource->GetLastAcquireError() != 0)
+        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    return { aDibs, bRet };
+}
+
 DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
@@ -436,23 +482,15 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
             break;
 
-        case ACQUIREBUFFER:
-        case ACQUIREBUFFEREX:
+        case ACQUIREBUFFERED:
+        case ACQUIREBUFFEREDEX:
             if (DTWAIN_LLAcquireBuffered(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
                 LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
-            if (opts.getAcquireType() == ACQUIREBUFFEREX)
+            if (opts.getAcquireType() == ACQUIREBUFFEREDEX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
-            break;
-
-        case ACQUIRECLIPBOARD:
-            if (DTWAIN_LLAcquireToClipboard(opts) == -1L)
-            {
-                opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
-            }
             break;
 
         case ACQUIREFILE:
@@ -668,20 +706,21 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
             // Determine the naming convention
             bool bUsePrompt = false;
-            if (lFileFlags & DTWAIN_USEPROMPT)
-                bUsePrompt = true;
-            else
-            if (!(lFileFlags & (DTWAIN_USENAME | DTWAIN_USELONGNAME)))
-                bUsePrompt = true;
 
-            if (bUsePrompt)
+            // Use the prompt only if specified as an explicit flag
+            if (lFileFlags & DTWAIN_USEPROMPT)
                 lFileFlags = lMode | DTWAIN_USEPROMPT;
             else
             {
+                // Use the name specified.
                 // Check file naming option
+
+                // This will shorten the name to DOS 8.3 style
                 if (lFileFlags & DTWAIN_USENAME)
                     lFileFlags = lMode | DTWAIN_USENAME;
                 else
+
+                // Default.  Use the name without shortening the name.
                     lFileFlags = lMode | DTWAIN_USELONGNAME;
 
                 // Allocate for array
@@ -692,7 +731,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_BAD_ARRAY, -1, FUNC_MACRO);
 
                 // Parse the filename string into the array
-                ParseFileNames(pHandle, opts.getFileList(), opts.getFileName(), pArray);
+                ParseFileNames(pHandle, opts.getFileList(), opts.getFileName(), &pArray);
                 CTL_StringType szName;
                 const size_t nFileCount = pHandle->m_ArrayFactory->size(pArray);
                 if (nFileCount > 0)
@@ -727,15 +766,6 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
         }
         else
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, []{return true; }, DTWAIN_ERR_FILE_FORMAT, -1, FUNC_MACRO);
-    }
-    else
-    if (opts.getActualAcquireType() == TWAINAcquireType_Clipboard)
-    {
-        if (opts.getTransferMode() == DTWAIN_USENATIVE)
-            ClipboardTransferType = TWSX_NATIVE;
-        else
-            ClipboardTransferType = TWSX_MEMORY;
-        pSource->SetAcquireType(static_cast<CTL_TwainAcquireEnum>(opts.getActualAcquireType()));
     }
     else
         pSource->SetAcquireType(static_cast<CTL_TwainAcquireEnum>(opts.getActualAcquireType()));

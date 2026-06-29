@@ -842,9 +842,6 @@ int CTL_TwainAppMgr::TransferImage(const CTL_ITwainSource *pSource, int nImageNu
 
         case TWAINAcquireType_AudioNative:
             return AudioNativeTransfer(pSession, pTempSource);
-
-        case TWAINAcquireType_Clipboard:
-            return ClipboardTransfer( pSession, pTempSource );
         default:
             break;
     }
@@ -908,15 +905,6 @@ int CTL_TwainAppMgr::AudioNativeTransfer(CTL_ITwainSession *pSession, CTL_ITwain
     CTL_ImageXferTriplet AXfer(pSession, pSource, DAT_AUDIONATIVEXFER);
     return StartTransfer(pSession, pSource, &AXfer);
 }
-
-int CTL_TwainAppMgr::ClipboardTransfer( CTL_ITwainSession *pSession,
-                                         CTL_ITwainSource *pSource )
-{
-    if ( pSource->GetSpecialTransferMode() == DTWAIN_USENATIVE )
-        return NativeTransfer( pSession, pSource );
-    return BufferTransfer( pSession, pSource );
-}
-
 
 int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
                                     CTL_ITwainSource  *pSource,
@@ -1778,9 +1766,6 @@ int CTL_TwainAppMgr::SetTransferMechanism( const CTL_ITwainSource *pSource,CTL_T
     TW_UINT16 uTwainType = static_cast<TW_UINT16>(AcquireType);
     if ( AcquireType == TWAINAcquireType_FileUsingNative )
         uTwainType = TWSX_NATIVE;
-    else
-    if ( AcquireType == TWAINAcquireType_Clipboard)
-        uTwainType = static_cast<TW_UINT16>(ClipboardTransferType);
     else
     if ( AcquireType == TWAINAcquireType_File)
         uTwainType = TWSX_FILE;

@@ -55,13 +55,6 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             DTWAIN_BOOL expandRange,
                             GetCapValuesFn fn);
 
-#if DTWAIN_BUILD_LOGCALLSTACK == 1
-    #define GENERATE_PARAM_LOG(func, argVals) \
-            CTL_LogFunctionCallAndParamsIn_String(DTWAIN_LOG_CALLSTACK, func, #argVals, std::make_tuple argVals)
-#else
-    #define GENERATE_PARAM_LOG(func, argVals) {}
-#endif
-
 template <typename CapArrayType>
 static std::pair<bool, int> GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
                                           GetCapValuesFn /*capFn*/)
@@ -135,7 +128,7 @@ static T FunctionCaller(FnToCall fn)
         bRet = fn();
         return bRet;
     }
-    catch (T var) { return var; }
+    catch (T& var) { return var; }
     catch (...)
     {
         LogExceptionErrorA("Exception occurred", true);
@@ -380,7 +373,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
        LOG_FUNC_ENTRY_PARAMS((Source)) \
        CapDataType::value_type value = {}; \
        auto bRet = GetCapability<CapDataType>(Source, Cap, &value, CapFn); \
-       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first?value : errorRetValue); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first?value : (errorRetValue)); \
        CATCH_BLOCK(errorRetValue) \
     }
 
@@ -400,7 +393,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
        LOG_FUNC_ENTRY_PARAMS((Source)) \
        CapDataType::value_type value = {}; \
        auto bRet = GetCapability<CapDataType>(Source, Cap, &value, CapFn); \
-       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first?static_cast<CapDataType::value_converted_type>(value) : errorRetValue); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first?static_cast<CapDataType::value_converted_type>(value) : (errorRetValue)); \
        CATCH_BLOCK(errorRetValue) \
     }
 
@@ -410,7 +403,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
        LOG_FUNC_ENTRY_PARAMS((Source, bCurrent)) \
        CapDataType::value_type value = {};    \
        auto bRet = FuncNameToCall(Source, &value, bCurrent);\
-       LOG_FUNC_EXIT_NONAME_PARAMS(bRet?value : ErrorValue);\
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet?value : (ErrorValue));\
        CATCH_BLOCK(ErrorValue) \
     }
 
@@ -465,7 +458,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     DTWAIN_BOOL DLLENTRY_DEF FuncName##String(DTWAIN_SOURCE Source, LPCTSTR value)\
    {\
        LOG_FUNC_ENTRY_PARAMS((Source, value)) \
-       CapSetterFn fn(Source, value, &FuncName);\
+       CapSetterFn fn(Source, value, &(FuncName));\
        auto bRet = SetCapabilityByString(fn);\
        LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
        CATCH_BLOCK(false) \
@@ -475,7 +468,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     DTWAIN_BOOL DLLENTRY_DEF FuncName##String(DTWAIN_SOURCE Source, LPCTSTR value, DTWAIN_BOOL condition)\
     {\
        LOG_FUNC_ENTRY_PARAMS((Source, value, condition)) \
-       CapSetterFn2 fn(Source, value, condition?true:false, &FuncName);\
+       CapSetterFn2 fn(Source, value, condition?true:false, &(FuncName));\
        auto bRet = SetCapabilityByString(fn);\
        LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
        CATCH_BLOCK(false) \
@@ -1037,6 +1030,13 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
             {
                 nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(arrayToUse)); 
             }
+            break;
+            default:
+                // Error occurred
+                DTWAIN_Check_Error_Condition_NoThrow_Ex_WithParams(pHandle, [&] { return true; }, 
+                    DTWAIN_ERR_BAD_CONTAINER, 0, FUNC_MACRO, false,
+                    { CTL_TwainAppMgr::GetCapNameFromCap(lCap) });
+            break;
         }
         MoveArray(pHandle, pArray, &arrayToUse);
     }

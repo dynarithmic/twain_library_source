@@ -25,7 +25,7 @@ std::optional<PreparedBmpRle8Page> BmpRle8Writer::MakePreparedBmpRle8Page(const 
     if (view.bitsPerPixel != 8 || !view.palette || view.paletteEntries == 0)
         return std::nullopt;
 
-    PreparedBmpRle8Page page{};
+    PreparedBmpRle8Page page;
     page.width = view.width;
     page.height = view.height;
     page.bitsPerPixel = 8;
@@ -259,8 +259,8 @@ bool BmpRle8Writer::write_bmp_file()
 
     const uint32_t paletteBytes =
         static_cast<uint32_t>(currentPage_.paletteEntries * sizeof(RGBQUAD));
-    const uint32_t infoHeaderSize = sizeof(BITMAPINFOHEADER);
-    const uint32_t fileHeaderSize = sizeof(BITMAPFILEHEADER);
+    constexpr uint32_t infoHeaderSize = sizeof(BITMAPINFOHEADER);
+    constexpr uint32_t fileHeaderSize = sizeof(BITMAPFILEHEADER);
     const uint32_t offBits = fileHeaderSize + infoHeaderSize + paletteBytes;
     const uint32_t imageSize = static_cast<uint32_t>(encodedData_.size());
     const uint32_t fileSize = offBits + imageSize;

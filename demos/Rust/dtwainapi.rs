@@ -3136,6 +3136,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_ERR_RANGE_STEPISZERO: i32 = -1086;
     pub const DTWAIN_ERR_BLANKNAMEDETECTED: i32 = -1087;
     pub const DTWAIN_ERR_FEEDER_NOPAPERSENSOR: i32 = -1088;
+    pub const DTWAIN_ERR_DTWAINDLL_LOADERROR: i32 = -1089;
     pub const TWAIN_ERR_LOW_MEMORY: i32 = -1100;
     pub const TWAIN_ERR_FALSE_ALARM: i32 = -1101;
     pub const TWAIN_ERR_BUMMER: i32 = -1102;

@@ -23,6 +23,7 @@
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
 #include "sourceselectopts.h"
+#include "acquisitionarray.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -35,26 +36,14 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG n
     LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
 
-    // Check if audio transfers are supported
-    auto val = pSource->IsAudioTransferSupported();
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
+    DTWAIN_ARRAY Acquisitions = DTWAIN_CreateAcquisitionArray();
+    AcquisitionArrayRAII raii(Acquisitions, false);
+    auto bRet = DTWAIN_AcquireAudioNativeEx(Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus);
+    if ( bRet )
+        raii.bDestroy = false;
 
-    AcquireAttemptRAII aRaii(pSource);
-
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).
-                                                           setMaxPages(nMaxAudioClips).
-                                                           setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
-                                                           setAcquireType(ACQUIREAUDIONATIVE);
-    const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
+    LOG_FUNC_EXIT_NONAME_PARAMS(Acquisitions)
     CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
@@ -68,22 +57,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG 
     auto val = pSource->IsAudioTransferSupported();
     DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
 
-    AcquireAttemptRAII aRaii(pSource);
-
-    SourceAcquireOptions opts = SourceAcquireOptions().setSource(Source).setMaxPages(nMaxAudioClips).
-    setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
-    setAcquireType(ACQUIREAUDIONATIVEEX).setHandle(pHandle);
-
-    const bool bRet = AcquireExHelper(opts);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    auto ret = dynarithmic::AcquireHelper(pHandle, pSource, 
+                                                    ACQUIREAUDIONATIVEEX, false, 
+                                                  0, false, Acquisitions, 
+                                                      0, nMaxAudioClips, bShowUI, nullptr, pStatus);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(ret.second)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
@@ -98,20 +77,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR l
     auto val = pSource->IsAudioTransferSupported();
     DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
 
-    AcquireAttemptRAII aRaii(pSource);
-
     lFileFlags &= ~DTWAIN_USELIST;
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).
-                                setFileName(lpszFile).setFileFlags(lFileFlags).
-                                setMaxPages(nMaxAudioClips).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIREAUDIOFILE);
-    const bool bRetval = AcquireFileHelper(opts, ACQUIREAUDIOFILE);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+
+    FileAcquireOptions fileOps = {};
+    fileOps.fileFlags = lFileFlags &= ~DTWAIN_USELIST;
+    fileOps.fileList = nullptr;
+    fileOps.fileName = lpszFile;
+    
+    const bool bRetval = dynarithmic::AcquireHelper(pHandle, pSource, 
+        ACQUIREAUDIOFILE,false,0,false,
+        nullptr,0,nMaxAudioClips,bShowUI, &fileOps, pStatus).second;
+
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)

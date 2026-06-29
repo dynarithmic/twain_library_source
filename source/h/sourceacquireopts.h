@@ -25,7 +25,7 @@
 #include "notimpl.h"
 namespace dynarithmic
 {
-    enum { ACQUIRENATIVE=1, ACQUIREBUFFER, ACQUIREFILE, ACQUIRECLIPBOARD, ACQUIRENATIVEEX, ACQUIREBUFFEREX,
+    enum { ACQUIRENATIVE=1, ACQUIREBUFFERED, ACQUIREFILE, ACQUIRECLIPBOARD, ACQUIRENATIVEEX, ACQUIREBUFFEREDEX,
         ACQUIREAUDIONATIVE, ACQUIREAUDIOFILE, ACQUIREAUDIONATIVEEX};
     struct SourceAcquireOptions : NotImpl<SourceAcquireOptions>
     {
@@ -46,6 +46,7 @@ namespace dynarithmic
         LONG     lFileFlags; // = 0,
         LPCTSTR   lpszFile; // = _T(""),
         DTWAIN_ARRAY  FileList; //
+        bool bUseClipboard = false;
 
         SourceAcquireOptions(DTWAIN_HANDLE hnd=NULL,
                              DTWAIN_SOURCE src=NULL,
@@ -100,6 +101,7 @@ namespace dynarithmic
         SourceAcquireOptions& setStatus(LONG nStatus) { return_status = nStatus; return *this;}
         SourceAcquireOptions& setActualAcquireType(LONG acqType) { nActualAcquireType = acqType; return *this;}
         SourceAcquireOptions& setIsUIIOnly(bool bSet) { bIsUIOnly = bSet; return *this; }
+        SourceAcquireOptions& setUseClipboard(bool bSet) { bUseClipboard = bSet; return *this; }
         LONG getStatus() const { return return_status; }
         DTWAIN_SOURCE getSource() { return Source; }
         DTWAIN_HANDLE getHandle() { return DLLHandle; }
@@ -117,6 +119,7 @@ namespace dynarithmic
         LPCTSTR getFileName() const { return lpszFile; }
         LONG getTransferMode() const { return nTransferMode; }
         LONG getActualAcquireType() const { return nActualAcquireType; }
+        bool getUseClipboard() const { return bUseClipboard; }
 
         friend std::wostream& operator << (std::wostream& strm, const SourceAcquireOptions& src);
         friend std::ostream& operator << (std::ostream& strm, const SourceAcquireOptions& src);
@@ -169,8 +172,20 @@ namespace dynarithmic
     DTWAIN_ACQUIRE    DTWAIN_LLAcquireNative( SourceAcquireOptions& opts );
     DTWAIN_ACQUIRE    DTWAIN_LLAcquireBuffered( SourceAcquireOptions& opts);
     DTWAIN_ACQUIRE    DTWAIN_LLAcquireFile( SourceAcquireOptions& opts );
-    DTWAIN_ACQUIRE    DTWAIN_LLAcquireToClipboard( SourceAcquireOptions& opts);
     DTWAIN_ACQUIRE    DTWAIN_LLAcquireAudioNative(SourceAcquireOptions& opts);
     DTWAIN_ACQUIRE    DTWAIN_LLAcquireAudioFile(SourceAcquireOptions& opts);
+
+    struct FileAcquireOptions
+    {
+        int fileType;
+        int fileFlags;
+        LPCTSTR fileName;
+        DTWAIN_ARRAY fileList;
+    };
+
+    std::pair<DTWAIN_ARRAY, bool> AcquireHelper(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource,
+                                                int acquireType, bool discardDibs, int nTransferMode, bool bUseClipboard, 
+                                                DTWAIN_ARRAY userArray, int PixelType, int nMaxPages, 
+                                                bool bShowUI, const FileAcquireOptions* fileOps, LONG* pStatus);
 }
 #endif

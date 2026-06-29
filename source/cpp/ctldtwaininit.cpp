@@ -110,6 +110,8 @@ static CTL_StringType GetDTWAINInternalBuildNumber();
 static DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch);
 static CTL_StringType CheckSearchOrderString(CTL_StringType);
 
+static constexpr TCHAR* s_NullEntry = _T("<null>");
+
 #ifdef DTWAIN_LIB
     static void GetVersionFromResource(LPLONG lMajor, LPLONG lMinor, LPLONG patch);
 #endif
@@ -583,20 +585,44 @@ static LONG IsTwainAvailableHelper(LPTSTR directories, LONG nMaxLen)
     CATCH_BLOCK(0)
 }
 
+static bool CheckTwainAvailability(LPTSTR directories, LONG nMaxLen, LONG* maxCharsCopied)
+{
+    TCHAR szTemp[100] = {};
+    LPTSTR dirsToUse = directories;
+    LONG maxLenToUse = nMaxLen;
+    if (!dirsToUse)
+    {
+        dirsToUse = szTemp;
+        maxLenToUse = 100;
+    }
+    CTL_StringArrayType arr;
+    auto retVal = IsTwainAvailableHelper(dirsToUse, maxLenToUse);
+    if (maxCharsCopied)
+        *maxCharsCopied = retVal;
+    StringWrapper::Tokenize(dirsToUse, _T("|"), arr);
+    for (auto& s : arr)
+    {
+        if (s != s_NullEntry)
+            return true;
+    }
+    return false;
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainAvailable()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    auto retVal = IsTwainAvailableHelper(nullptr, 0);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal > 0 ? true : false)
+    auto retVal = CheckTwainAvailability(nullptr, 0, nullptr);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)
 }
 
 LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    auto retVal = IsTwainAvailableHelper(directories, nMaxLen);
+    LONG maxCharsCopied = 0;
+    CheckTwainAvailability(directories, nMaxLen, &maxCharsCopied);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
-    LOG_FUNC_EXIT_NONAME_PARAMS((std::max)(retVal, 0L))
+    LOG_FUNC_EXIT_NONAME_PARAMS(maxCharsCopied)
     CATCH_BLOCK(0)
 }
 
@@ -629,12 +655,11 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen
             s = _T("<null>");
     }
 
-
     CTL_StringType sDirs;
     auto joinedString = StringWrapper::Join(availability.second, _T("|"));
-    StringWrapper::CopyInfoToCString(joinedString, directories, nMaxLen);
+    auto actualLengthCopied = StringWrapper::CopyInfoToCString(joinedString, directories, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
-    LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(joinedString.length()))
+    LOG_FUNC_EXIT_NONAME_PARAMS(actualLengthCopied)
     CATCH_BLOCK(0)
 }
 
@@ -850,7 +875,6 @@ DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& initOptions)
             pHandle->m_pSaveAsDlgProc = FileSaveAsHookProc;
             RegisterTwainWindowClass();
 #endif
-
             LoadStaticData(pHandle);
             auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
             if (!threadMap.empty())
@@ -2617,7 +2641,11 @@ void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)
         return;
     CTL_StaticData::SetResamplingDone(customProfile->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_IMAGEGILE_KEY).data(), 
                                         CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_RESAMPLE_ITEM).data(), true));
-    return;
+    auto& parseDelims = CTL_StaticData::GetFileParseDelimiters();
+    const char* defName = "|*;";
+    std::string sParseDelims = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
+                                                       CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_PARSEDELIMS_ITEM).data(), defName);
+    parseDelims = StringConversion::Convert_Ansi_To_Native(sParseDelims);
 }
 
 // This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [FlatbedOnly]

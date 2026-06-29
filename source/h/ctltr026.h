@@ -68,7 +68,6 @@ namespace dynarithmic
             void            StopAcquisitions(int errfile);
             bool            StopFeeder();
             bool            IsJobControlPending(TW_PENDINGXFERS *pPending) const;
-            static bool     CopyDibToClipboard(CTL_ITwainSession *pSession, HANDLE hDib);
             TW_UINT16       GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UINT16 nMsg=MSG_ENDXFER);
             CTL_ImageIOHandler *GetImageHandler() const { return m_pImgHandler; }
             CTL_ImageIOHandler *m_pImgHandler;

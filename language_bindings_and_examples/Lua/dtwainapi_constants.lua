@@ -738,6 +738,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_ERR_RANGE_STEPISZERO = (-1086)
    dtwain_constants.DTWAIN_ERR_BLANKNAMEDETECTED = (-1087)
    dtwain_constants.DTWAIN_ERR_FEEDER_NOPAPERSENSOR = (-1088)
+   dtwain_constants.DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089)
    dtwain_constants.TWAIN_ERR_LOW_MEMORY = (-1100)
    dtwain_constants.TWAIN_ERR_FALSE_ALARM = (-1101)
    dtwain_constants.TWAIN_ERR_BUMMER = (-1102)

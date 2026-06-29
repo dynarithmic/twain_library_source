@@ -125,5 +125,6 @@ namespace dynarithmic
         auto& vect = GetArrayFactoryFromHandle(pHandle)->underlying_container_t<ArrayType>(theArray);
         std::transform(vect.begin(), vect.end(), vect.begin(), [&](ArrayType value) { return static_cast<TwainTypeOut>(value); });
     }
+    void SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib);
 }
 #endif

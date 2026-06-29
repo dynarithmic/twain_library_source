@@ -433,18 +433,6 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             break;
                         }
 
-                        if ( pSource->GetAcquireType() == TWAINAcquireType_Clipboard )
-                        {
-                            // This may be a compressed image instead of a DIB.  Don't place in clipboard
-                            if ( m_nCompression == TWCP_NONE )
-                            {
-                                if ( pSource->GetSpecialTransferMode() == DTWAIN_USEBUFFERED )
-                                    bInClip = CopyDibToClipboard( pSession, CurDib->GetHandle());
-                            }
-                            else
-                                bInClip = false;
-                        }
-                        else
                         if ( pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative)
                         {
                             auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();

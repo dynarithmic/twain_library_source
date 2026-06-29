@@ -271,7 +271,7 @@ HANDLE dynarithmic::dib::IncreaseDibBpp(HANDLE hDib, uint16_t dstBpp)
     {
         FillGrayPalette(dstPal, 16);
 
-        if (srcPal && srcPalEntries > 0)
+        if (dstPal && srcPal && srcPalEntries > 0)
         {
             const uint32_t copyCount = std::min(srcPalEntries, dstPalEntries);
             std::memcpy(dstPal, srcPal, copyCount * sizeof(RGBQUAD));

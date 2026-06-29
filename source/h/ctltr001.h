@@ -97,7 +97,7 @@ namespace dynarithmic
             }
         private:
             bool m_bSourceCreated;
-            TW_IDENTITY m_tempSourceID;
+            TW_IDENTITY m_tempSourceID = {};
     };
 
     template <TW_UINT16 nMsg>
@@ -117,7 +117,7 @@ namespace dynarithmic
             CTL_ITwainSource* GetSourceIDPtr() { return GetSourcePtr(); }
 
         private:
-            TW_IDENTITY m_tempSourceID;
+            TW_IDENTITY m_tempSourceID = {};
             bool m_bSourceCreated;
     };
 

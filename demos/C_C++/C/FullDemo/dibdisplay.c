@@ -13,10 +13,6 @@ static int DisplayOne = 0;
 
 void RetrieveAndDisplayDibs(HINSTANCE hInstance, DTWAIN_ARRAY AcquireArray, UINT resID, HWND wndHandle)
 {
-    LONG Count;
-    LONG DibCount;
-    LONG Count2;
-    HANDLE hDib;
     LONG numAcquisitions;
     /* Get the number of total acquisitions attempted */
     numAcquisitions = DTWAIN_ArrayGetCount(AcquireArray);
@@ -26,25 +22,6 @@ void RetrieveAndDisplayDibs(HINSTANCE hInstance, DTWAIN_ARRAY AcquireArray, UINT
 
     /* Display the acquired pages in a dialog */
     DisplayDibPages(hInstance, AcquireArray, resID, wndHandle);
-
-    /* Get the number of DIBs (pages) that were
-    scanned for each acquisition */
-
-    /* Loop for each acquisition attempted */
-    /* Alternately, the DTWAIN_GetAcquiredImageArray function
-    could have been used also to get the array of DIBs */
-    for ( Count = 0; Count < numAcquisitions; ++Count )
-    {
-        DibCount = DTWAIN_GetNumAcquiredImages( AcquireArray, Count);
-        /* Loop for each DIB in the acquisition */
-        for (Count2 = 0; Count2 < DibCount; ++Count2 )
-        {
-            /* Retrieve the DIB */
-            hDib = DTWAIN_GetAcquiredImage(AcquireArray, Count, Count2);
-            if ( hDib )
-                GlobalFree( hDib );
-        }
-    }
 }
 
 

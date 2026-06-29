@@ -3012,14 +3012,25 @@ LONG DLLENTRY_DEF DTWAIN_GetNumAcquiredImages( DTWAIN_ARRAY aAcq, LONG nWhich )
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
-HANDLE DLLENTRY_DEF DTWAIN_GetAcquiredImage( DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib )
+
+void dynarithmic::SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib )
+{
+    const int nDibs = GetNumAcquiredImages(pHandle, aAcq, nWhichAcq );
+    if (nWhichDib >= nDibs)
+        return;
+    auto& factory = pHandle->m_ArrayFactory;
+    DTWAIN_ARRAY aDib = VOID_TO_DTWAIN_ARRAY(factory->get_value(aAcq, nWhichAcq, nullptr));
+    factory->set_value(aDib, nWhichDib, theDib);
+}
+
+HANDLE DLLENTRY_DEF DTWAIN_GetAcquiredImage(DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib)
 {
     LOG_FUNC_ENTRY_PARAMS((aAcq, nWhichAcq, nWhichDib))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
     DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return nWhichAcq < 0 || nWhichDib < 0; },
-                                      DTWAIN_ERR_INVALID_PARAM, nullptr, FUNC_MACRO);
-    const int nDibs = GetNumAcquiredImages(pHandle, aAcq, nWhichAcq );
-    if ( nDibs == DTWAIN_FAILURE1 || nWhichDib >= nDibs )
+                                              DTWAIN_ERR_INVALID_PARAM, nullptr, FUNC_MACRO);
+    const int nDibs = GetNumAcquiredImages(pHandle, aAcq, nWhichAcq);
+    if (nDibs == DTWAIN_FAILURE1 || nWhichDib >= nDibs)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     auto& factory = pHandle->m_ArrayFactory;
     DTWAIN_ARRAY aDib = VOID_TO_DTWAIN_ARRAY(factory->get_value(aAcq, nWhichAcq, nullptr));

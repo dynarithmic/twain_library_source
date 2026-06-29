@@ -73,6 +73,23 @@ static int CheckValidNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aFileNames,
     return bRetval;
 }
 
+static bool IsSupportedFileType(DTWAIN_SOURCE Source, LONG lFileType, LONG lFileFlags)
+{
+    bool bFileGood = true;
+    // Check if the file format is valid
+    auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
+    if (availableFileTypes.find(lFileType) == availableFileTypes.end())
+    {
+        // Not a universal file type, so see if this is a type supported
+        // by the Source's file transfer
+        if (lFileFlags & DTWAIN_USESOURCEMODE)
+            bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType) ? true : false;
+        else
+            bFileGood = false;
+    }
+    return bFileGood;
+}
+
 DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
                                                     DTWAIN_ARRAY aFileNames,
                                                     LONG     lFileType,
@@ -87,28 +104,17 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     int bRetval = DTWAIN_NO_ERROR;
     auto [pHandle, pSource] = VerifyHandles(Source);
     
-    AcquireAttemptRAII aRaii(pSource);
-
     // Check for null aFileNames
     if (!aFileNames)
     {
         DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
     }
 
-    // Check if the file format is valid
-    auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
-    if (availableFileTypes.find(lFileType) == availableFileTypes.end())
+    // Check if file format is supported
+    if (!IsSupportedFileType(Source, lFileType, lFileFlags))
     {
-        // Not a universal file type, so see if this is a type supported
-        // by the Source's file transfer
-        BOOL bFileGood = FALSE;
-        if (lFileFlags & DTWAIN_USESOURCEMODE)
-            bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType);
-        if (!bFileGood)
-        {
-            DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
-        }
+        DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
 
     DTWAIN_ARRAY tempNames = nullptr;
@@ -117,7 +123,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
     auto& factory = pHandle->m_ArrayFactory;
 
-    const LONG Type = factory->tagtype_to_arraytype(factory->tag_type(aFileNames));
+    const LONG Type = CTL_ArrayFactory::tagtype_to_arraytype(factory->tag_type(aFileNames));
     const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
     DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     const auto idx = std::distance(validTypes.begin(), itArrType);
@@ -141,18 +147,14 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     // Return error if array is empty or if there are blank entries
     DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return bRetval != DTWAIN_NO_ERROR; }, bRetval, false, FUNC_MACRO);
 
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setFileType(lFileType).setFileFlags(lFileFlags | DTWAIN_USELIST).
-                setFileList(arrayToUse).setPixelType(PixelType).setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).
-                setRemainOpen(!(bCloseSource ? true : false));
+    FileAcquireOptions fOps = {};
+    fOps.fileFlags = lFileFlags | DTWAIN_USELIST;
+    fOps.fileList = arrayToUse;
+    fOps.fileName = nullptr;
+    fOps.fileType = lFileType;
 
-    bool bRetval2 = AcquireFileHelper(opts, ACQUIREFILE);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    bool bRetval2 = AcquireHelper(pHandle, pSource, ACQUIREFILE, 
+                                  false, 0, false, nullptr, PixelType, lMaxPages, bShowUI, &fOps, pStatus).second;
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval2)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -177,41 +179,14 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
         DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     }
 
-    if (StringWrapper::IsAllSpace(lpszFile))
-    {
-        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BLANKNAMEDETECTED, false, FUNC_MACRO);
-    }
+    DTWAIN_ARRAY aFileNames = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0).second;
+    DTWAINArrayPtr_RAII tempRAII(pHandle, &aFileNames);
 
-    // Check if the file format is valid
-    auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
-    if (availableFileTypes.find(lFileType) == availableFileTypes.end())
-    {
-        // Not a universal file type, so see if this is a type supported
-        // by the Source's file transfer
-        BOOL bFileGood = FALSE;
-        if (lFileFlags & DTWAIN_USESOURCEMODE)
-            bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType);
-        if (!bFileGood)
-        {
-            DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
-        }
-    }
+    // Parse the file name list into separate items.  
+    ParseFileNames(pHandle, NULL, lpszFile, &aFileNames);
 
-    AcquireAttemptRAII aRaii(pSource);
+    auto bRetval = DTWAIN_AcquireFileEx(Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
 
-    lFileFlags &= ~DTWAIN_USELIST;
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).
-        setFileName(lpszFile).setFileType(lFileType).setFileFlags(lFileFlags).setPixelType(PixelType).
-        setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIREFILE);
-    const bool bRetval = AcquireFileHelper(opts, ACQUIREFILE);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)

@@ -253,7 +253,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
             {
                 bool bProcessDibEx = true;
                 // Get the array of current array of DIBS (this pointer allows changes to Source's internal DIB array)
-                // If this is an audio transfer, the the "DIB" is actually WAV data (for Windows)
+                // If this is an audio transfer, the "DIB" is actually WAV data (for Windows)
                 pArray = pSource->GetDibArray();
 
                 // Let Source set the handle (Source knows if this is a new or old DIB to replace)
@@ -456,17 +456,9 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 }
                 break;
 
-                case TWAINAcquireType_Clipboard:
-                    if ( pSource->GetSpecialTransferMode() == DTWAIN_USENATIVE )
-                        bInClip = CopyDibToClipboard( pSession, m_hDataHandle );
-                break;
                 default:
                     break;
             }
-
-            if ( bInClip )
-                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_CLIPTRANSFERDONE,static_cast<LPARAM>(pSource->GetAcquireNum()));
-
             if ( errfile != 0 )
                SendFileAcquireError(pSource, pSession, errfile, DTWAIN_TN_FILESAVEERROR, 
                                     StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
@@ -1194,28 +1186,6 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
         // Let array class handle deleting of the DIB (Global memory will be freed only)
         pArray->DeleteDibMemory( nImageNum );
     return 1;
-}
-
-bool CTL_ImageXferTriplet::CopyDibToClipboard(CTL_ITwainSession * /*pSession*/, HANDLE hDib)
-{
-#ifdef _WIN32
-    if (hDib)
-    {
-        // Open the clipboard
-        if (OpenClipboard(nullptr/*hWnd*/ ))
-        {
-            // Empty the clipboard
-            if (EmptyClipboard() )
-            {
-                SetClipboardData(CF_DIB, hDib);
-                CloseClipboard();
-                return true;
-            }
-            CloseClipboard();
-        }
-    }
-#endif
-    return false;
 }
 
 bool CTL_ImageXferTriplet::CropDib(CTL_ITwainSession *pSession, const CTL_ITwainSource *pSource, const CTL_TwainDibPtr &CurDib)

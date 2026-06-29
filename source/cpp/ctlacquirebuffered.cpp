@@ -39,19 +39,10 @@ DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG P
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    AcquireAttemptRAII aRaii(pSource);
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
-        setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
-        setAcquireType(ACQUIREBUFFEREX);
-
-    const bool bRet = AcquireExHelper(opts);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    const bool bRet =  AcquireHelper(pHandle, pSource, ACQUIREBUFFEREDEX,
+                                     false, DTWAIN_USEBUFFERED, false, Acquisitions,
+                                     PixelType, nMaxPages, bShowUI, nullptr,pStatus).second;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -61,21 +52,11 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG Pixe
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    AcquireAttemptRAII aRaii(pSource);
-
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
-                                                        setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
-                                                        setAcquireType(ACQUIREBUFFER);
-    const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    auto aDibs = AcquireHelper(pHandle, pSource, ACQUIREBUFFERED,
+                                                   false, DTWAIN_USEBUFFERED, false, nullptr,
+                                                   PixelType, nMaxPages, bShowUI, nullptr, pStatus);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
+    LOG_FUNC_EXIT_NONAME_PARAMS(aDibs.first)
     CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
@@ -129,7 +110,8 @@ static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
     if (origValue != vTiles[0])
     {
         vTiles[0] = origValue;
-        bRet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+        SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, 
+                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
     }
 
     // Set the support and return the final results
