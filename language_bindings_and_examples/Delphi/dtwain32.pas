@@ -2543,6 +2543,7 @@ function DTWAIN_GetVersionCopyright(lpszApp:LPTSTR; nLength:LONG) : LONG; stdcal
 function DTWAIN_GetVersionCopyrightA(lpszApp:LPSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetVersionCopyrightA';
 function DTWAIN_GetVersionCopyrightW(lpszApp:LPWSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetVersionCopyrightW';
 function DTWAIN_GetVersionEx(lMajor:LPLONG; lMinor:LPLONG; lVersionType:LPLONG; lPatchLevel:LPLONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetVersionEx';
+function DTWAIN_GetVersionEx2(lMajor:LPLONG; lMinor:LPLONG; lVersionType:LPLONG; lPatchLevel:LPLONG; lBuildNumber:LPLONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetVersionEx2';
 function DTWAIN_GetVersionInfo(lpszVer:LPTSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetVersionInfo';
 function DTWAIN_GetVersionInfoA(lpszVer:LPSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetVersionInfoA';
 function DTWAIN_GetVersionInfoW(lpszVer:LPWSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetVersionInfoW';

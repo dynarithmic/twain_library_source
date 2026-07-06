@@ -2507,6 +2507,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetVersionCopyrightA.restype = ct.c_long
      theDLL.DTWAIN_GetVersionCopyrightW.restype = ct.c_long
      theDLL.DTWAIN_GetVersionEx.restype = ct.c_long
+     theDLL.DTWAIN_GetVersionEx2.restype = ct.c_long
      theDLL.DTWAIN_GetVersionInfo.restype = ct.c_long
      theDLL.DTWAIN_GetVersionInfoA.restype = ct.c_long
      theDLL.DTWAIN_GetVersionInfoW.restype = ct.c_long
@@ -3661,6 +3662,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetVersionCopyrightA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetVersionCopyrightW.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetVersionEx.argtypes = [ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetVersionEx2.argtypes = [ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetVersionInfo.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetVersionInfoA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetVersionInfoW.argtypes = [ct.c_wchar_p, ct.c_long]
@@ -4844,6 +4846,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetVersionCopyrightA.restype = ct.c_long
      theDLL.DTWAIN_GetVersionCopyrightW.restype = ct.c_long
      theDLL.DTWAIN_GetVersionEx.restype = ct.c_long
+     theDLL.DTWAIN_GetVersionEx2.restype = ct.c_long
      theDLL.DTWAIN_GetVersionInfo.restype = ct.c_long
      theDLL.DTWAIN_GetVersionInfoA.restype = ct.c_long
      theDLL.DTWAIN_GetVersionInfoW.restype = ct.c_long
@@ -5998,6 +6001,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetVersionCopyrightA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetVersionCopyrightW.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetVersionEx.argtypes = [ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetVersionEx2.argtypes = [ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetVersionInfo.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetVersionInfoA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetVersionInfoW.argtypes = [ct.c_wchar_p, ct.c_long]

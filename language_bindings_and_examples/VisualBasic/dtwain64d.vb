@@ -2274,6 +2274,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetVersion Lib "dtwain64d.dll" (ByRef lpMajor As Integer, ByRef lpMinor As Integer, ByRef lpVersionType As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetVersionCopyright Lib "dtwain64d.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszApp As StringBuilder, nLength As Integer) As Integer
     Public Declare Function DTWAIN_GetVersionEx Lib "dtwain64d.dll" (ByRef lMajor As Integer, ByRef lMinor As Integer, ByRef lVersionType As Integer, ByRef lPatchLevel As Integer) As Integer
+    Public Declare Function DTWAIN_GetVersionEx2 Lib "dtwain64d.dll" (ByRef lMajor As Integer, ByRef lMinor As Integer, ByRef lVersionType As Integer, ByRef lPatchLevel As Integer, ByRef lBuildNumber As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetVersionInfo Lib "dtwain64d.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszVer As StringBuilder, nLength As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetVersionString Lib "dtwain64d.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszVer As StringBuilder, nLength As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetWindowsVersionInfo Lib "dtwain64d.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer

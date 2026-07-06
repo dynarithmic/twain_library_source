@@ -832,6 +832,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetVersionCopyrightA
    attr_reader :DTWAIN_GetVersionCopyrightW
    attr_reader :DTWAIN_GetVersionEx
+   attr_reader :DTWAIN_GetVersionEx2
    attr_reader :DTWAIN_GetVersionInfo
    attr_reader :DTWAIN_GetVersionInfoA
    attr_reader :DTWAIN_GetVersionInfoW
@@ -3708,6 +3709,7 @@ class DTWAINAPI
        @DTWAIN_GetVersionCopyrightA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionCopyrightA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetVersionCopyrightW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionCopyrightW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetVersionEx = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_GetVersionEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionEx2'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetVersionInfo = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionInfo'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetVersionInfoA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionInfoA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetVersionInfoW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionInfoW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)

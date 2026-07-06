@@ -744,6 +744,7 @@ type DtwaingetversioncopyrightFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
 type DtwaingetversioncopyrightaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
 type DtwaingetversioncopyrightwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
 type DtwaingetversionexFunc = unsafe extern "C" fn(*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
+type Dtwaingetversionex2Func = unsafe extern "C" fn(*mut i32,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
 type DtwaingetversioninfoFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
 type DtwaingetversioninfoaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
 type DtwaingetversioninfowFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
@@ -1929,6 +1930,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetVersionCopyrightAFunc: Symbol<'a, DtwaingetversioncopyrightaFunc>,
     DTWAIN_GetVersionCopyrightWFunc: Symbol<'a, DtwaingetversioncopyrightwFunc>,
     DTWAIN_GetVersionExFunc: Symbol<'a, DtwaingetversionexFunc>,
+    DTWAIN_GetVersionEx2Func: Symbol<'a, Dtwaingetversionex2Func>,
     DTWAIN_GetVersionInfoFunc: Symbol<'a, DtwaingetversioninfoFunc>,
     DTWAIN_GetVersionInfoAFunc: Symbol<'a, DtwaingetversioninfoaFunc>,
     DTWAIN_GetVersionInfoWFunc: Symbol<'a, DtwaingetversioninfowFunc>,
@@ -4769,6 +4771,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetVersionCopyrightA: Symbol<DtwaingetversioncopyrightaFunc> = unsafe { library.get(b"DTWAIN_GetVersionCopyrightA")? };
         let DTWAIN_GetVersionCopyrightW: Symbol<DtwaingetversioncopyrightwFunc> = unsafe { library.get(b"DTWAIN_GetVersionCopyrightW")? };
         let DTWAIN_GetVersionEx: Symbol<DtwaingetversionexFunc> = unsafe { library.get(b"DTWAIN_GetVersionEx")? };
+        let DTWAIN_GetVersionEx2: Symbol<Dtwaingetversionex2Func> = unsafe { library.get(b"DTWAIN_GetVersionEx2")? };
         let DTWAIN_GetVersionInfo: Symbol<DtwaingetversioninfoFunc> = unsafe { library.get(b"DTWAIN_GetVersionInfo")? };
         let DTWAIN_GetVersionInfoA: Symbol<DtwaingetversioninfoaFunc> = unsafe { library.get(b"DTWAIN_GetVersionInfoA")? };
         let DTWAIN_GetVersionInfoW: Symbol<DtwaingetversioninfowFunc> = unsafe { library.get(b"DTWAIN_GetVersionInfoW")? };
@@ -5953,6 +5956,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetVersionCopyrightAFunc: DTWAIN_GetVersionCopyrightA,
             DTWAIN_GetVersionCopyrightWFunc: DTWAIN_GetVersionCopyrightW,
             DTWAIN_GetVersionExFunc: DTWAIN_GetVersionEx,
+            DTWAIN_GetVersionEx2Func: DTWAIN_GetVersionEx2,
             DTWAIN_GetVersionInfoFunc: DTWAIN_GetVersionInfo,
             DTWAIN_GetVersionInfoAFunc: DTWAIN_GetVersionInfoA,
             DTWAIN_GetVersionInfoWFunc: DTWAIN_GetVersionInfoW,
@@ -9229,6 +9233,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetVersionEx(&self, lMajor: *mut i32, lMinor: *mut i32, lVersionType: *mut i32, lPatchLevel: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_GetVersionExFunc)(lMajor, lMinor, lVersionType, lPatchLevel);  }
+    }
+
+    pub fn DTWAIN_GetVersionEx2(&self, lMajor: *mut i32, lMinor: *mut i32, lVersionType: *mut i32, lPatchLevel: *mut i32, lBuildNumber: *mut i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetVersionEx2Func)(lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber);  }
     }
 
     pub fn DTWAIN_GetVersionInfo(&self, lpszVer: *mut u16, nLength: i32) -> i32 {

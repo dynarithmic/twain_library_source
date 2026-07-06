@@ -3547,6 +3547,9 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetVersionEx(ref int lMajor, ref int lMinor, ref int lVersionType, ref int lPatchLevel);
 
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_GetVersionEx2(ref int lMajor, ref int lMinor, ref int lVersionType, ref int lPatchLevel, ref int lBuildNumber);
+
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
         public static extern int DTWAIN_GetVersionInfo([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszVer, int nLength);
 

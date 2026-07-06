@@ -3429,6 +3429,9 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetVersionExDelegate = delegate of int byref * int byref * int byref * int byref -> DTWAIN_BOOL
 
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetVersionEx2Delegate = delegate of int byref * int byref * int byref * int byref * int byref -> DTWAIN_BOOL
+
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetVersionInfoDelegate = delegate of System.Text.StringBuilder * LONG -> LONG
 
@@ -4964,6 +4967,7 @@ module TwainAPI =
     let private GetVersion = lazy (DynamicDll.Bind "DTWAIN_GetVersion" : DTWAIN_GetVersionDelegate)
     let private GetVersionCopyright = lazy (DynamicDll.Bind "DTWAIN_GetVersionCopyright" : DTWAIN_GetVersionCopyrightDelegate)
     let private GetVersionEx = lazy (DynamicDll.Bind "DTWAIN_GetVersionEx" : DTWAIN_GetVersionExDelegate)
+    let private GetVersionEx2 = lazy (DynamicDll.Bind "DTWAIN_GetVersionEx2" : DTWAIN_GetVersionEx2Delegate)
     let private GetVersionInfo = lazy (DynamicDll.Bind "DTWAIN_GetVersionInfo" : DTWAIN_GetVersionInfoDelegate)
     let private GetVersionString = lazy (DynamicDll.Bind "DTWAIN_GetVersionString" : DTWAIN_GetVersionStringDelegate)
     let private GetWindowsVersionInfo = lazy (DynamicDll.Bind "DTWAIN_GetWindowsVersionInfo" : DTWAIN_GetWindowsVersionInfoDelegate)
@@ -7409,6 +7413,10 @@ module TwainAPI =
     let DTWAIN_GetVersionEx (lmajor: int byref) (lminor: int byref) (lversiontype: int byref) (lpatchlevel: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetVersionEx.Value.Invoke(&lmajor, &lminor, &lversiontype, &lpatchlevel)
+
+    let DTWAIN_GetVersionEx2 (lmajor: int byref) (lminor: int byref) (lversiontype: int byref) (lpatchlevel: int byref) (lbuildnumber: int byref) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetVersionEx2.Value.Invoke(&lmajor, &lminor, &lversiontype, &lpatchlevel, &lbuildnumber)
 
     let DTWAIN_GetVersionInfo (lpszver: System.Text.StringBuilder) (nlength: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

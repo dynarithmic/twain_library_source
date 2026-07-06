@@ -3486,6 +3486,9 @@ Namespace Dynarithmic
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetVersionExDelegate(ByRef lMajor As Integer, ByRef lMinor As Integer, ByRef lVersionType As Integer, ByRef lPatchLevel As Integer) As Integer
         
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetVersionEx2Delegate(ByRef lMajor As Integer, ByRef lMinor As Integer, ByRef lVersionType As Integer, ByRef lPatchLevel As Integer, ByRef lBuildNumber As Integer) As Integer
+        
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetVersionInfoDelegate(<MarshalAs(UnmanagedType.LPTStr)> lpszVer As StringBuilder, nLength As Integer) As Integer
         
@@ -6597,6 +6600,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetVersionEx(lMajor, lMinor, lVersionType, lPatchLevel)
         End Function
         
+        Public Function DTWAIN_GetVersionEx2(ByRef lMajor As Integer, ByRef lMinor As Integer, ByRef lVersionType As Integer, ByRef lPatchLevel As Integer, ByRef lBuildNumber As Integer) As Integer
+        Return api.DTWAIN_GetVersionEx2(lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber)
+        End Function
+        
         Public Function DTWAIN_GetVersionInfo(<MarshalAs(UnmanagedType.LPTStr)> lpszVer As StringBuilder, nLength As Integer) As Integer
         Return api.DTWAIN_GetVersionInfo(lpszVer, nLength)
         End Function
@@ -8493,6 +8500,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetVersion As DTWAIN_GetVersionDelegate
             Public DTWAIN_GetVersionCopyright As DTWAIN_GetVersionCopyrightDelegate
             Public DTWAIN_GetVersionEx As DTWAIN_GetVersionExDelegate
+            Public DTWAIN_GetVersionEx2 As DTWAIN_GetVersionEx2Delegate
             Public DTWAIN_GetVersionInfo As DTWAIN_GetVersionInfoDelegate
             Public DTWAIN_GetVersionString As DTWAIN_GetVersionStringDelegate
             Public DTWAIN_GetWindowsVersionInfo As DTWAIN_GetWindowsVersionInfoDelegate

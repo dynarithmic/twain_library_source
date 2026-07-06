@@ -2372,6 +2372,7 @@ my $DTWAIN_GetVersionCopyright = new Win32::API($dtwain_dllName, 'DTWAIN_GetVers
 my $DTWAIN_GetVersionCopyrightA = new Win32::API($dtwain_dllName, 'DTWAIN_GetVersionCopyrightA', 'Pi', 'i');
 my $DTWAIN_GetVersionCopyrightW = new Win32::API($dtwain_dllName, 'DTWAIN_GetVersionCopyrightW', 'Pi', 'i');
 my $DTWAIN_GetVersionEx = new Win32::API($dtwain_dllName, 'DTWAIN_GetVersionEx', 'PPPP', 'I');
+my $DTWAIN_GetVersionEx2 = new Win32::API($dtwain_dllName, 'DTWAIN_GetVersionEx2', 'PPPPP', 'I');
 my $DTWAIN_GetVersionInfo = new Win32::API($dtwain_dllName, 'DTWAIN_GetVersionInfo', 'Pi', 'i');
 my $DTWAIN_GetVersionInfoA = new Win32::API($dtwain_dllName, 'DTWAIN_GetVersionInfoA', 'Pi', 'i');
 my $DTWAIN_GetVersionInfoW = new Win32::API($dtwain_dllName, 'DTWAIN_GetVersionInfoW', 'Pi', 'i');

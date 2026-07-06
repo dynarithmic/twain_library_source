@@ -2612,6 +2612,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetVersionCopyrightA;
     extern(Windows) LONG function(LPWSTR, LONG) DTWAIN_GetVersionCopyrightW;
     extern(Windows) DTWAIN_BOOL function(LPLONG, LPLONG, LPLONG, LPLONG) DTWAIN_GetVersionEx;
+    extern(Windows) DTWAIN_BOOL function(LPLONG, LPLONG, LPLONG, LPLONG, LPLONG) DTWAIN_GetVersionEx2;
     extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetVersionInfo;
     extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetVersionInfoA;
     extern(Windows) LONG function(LPWSTR, LONG) DTWAIN_GetVersionInfoW;
@@ -3793,6 +3794,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetVersionCopyrightA, "DTWAIN_GetVersionCopyrightA");
         bindFunction(cast(void**)&DTWAIN_GetVersionCopyrightW, "DTWAIN_GetVersionCopyrightW");
         bindFunction(cast(void**)&DTWAIN_GetVersionEx, "DTWAIN_GetVersionEx");
+        bindFunction(cast(void**)&DTWAIN_GetVersionEx2, "DTWAIN_GetVersionEx2");
         bindFunction(cast(void**)&DTWAIN_GetVersionInfo, "DTWAIN_GetVersionInfo");
         bindFunction(cast(void**)&DTWAIN_GetVersionInfoA, "DTWAIN_GetVersionInfoA");
         bindFunction(cast(void**)&DTWAIN_GetVersionInfoW, "DTWAIN_GetVersionInfoW");

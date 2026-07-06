@@ -771,6 +771,7 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightW(LPWSTR lpszApp, LONG nLength);
         DTWAIN_BOOL DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel);
+        DTWAIN_BOOL DTWAIN_GetVersionEx2(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel, LPLONG lBuildNumber);
         LONG DTWAIN_GetVersionInfo(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetVersionInfoA(LPSTR lpszVer, LONG nLength);
         LONG DTWAIN_GetVersionInfoW(LPWSTR lpszVer, LONG nLength);
@@ -2011,6 +2012,7 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightW(LPWSTR lpszApp, LONG nLength);
         DTWAIN_BOOL DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel);
+        DTWAIN_BOOL DTWAIN_GetVersionEx2(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel, LPLONG lBuildNumber);
         LONG DTWAIN_GetVersionInfo(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetVersionInfoA(LPSTR lpszVer, LONG nLength);
         LONG DTWAIN_GetVersionInfoW(LPWSTR lpszVer, LONG nLength);
@@ -3251,6 +3253,7 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightW(LPWSTR lpszApp, LONG nLength);
         DTWAIN_BOOL DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel);
+        DTWAIN_BOOL DTWAIN_GetVersionEx2(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel, LPLONG lBuildNumber);
         LONG DTWAIN_GetVersionInfo(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetVersionInfoA(LPSTR lpszVer, LONG nLength);
         LONG DTWAIN_GetVersionInfoW(LPWSTR lpszVer, LONG nLength);
@@ -4491,6 +4494,7 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightW(LPWSTR lpszApp, LONG nLength);
         DTWAIN_BOOL DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel);
+        DTWAIN_BOOL DTWAIN_GetVersionEx2(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel, LPLONG lBuildNumber);
         LONG DTWAIN_GetVersionInfo(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetVersionInfoA(LPSTR lpszVer, LONG nLength);
         LONG DTWAIN_GetVersionInfoW(LPWSTR lpszVer, LONG nLength);

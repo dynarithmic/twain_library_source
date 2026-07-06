@@ -748,6 +748,7 @@
     D_GETVERSIONCOPYRIGHTAFUNC                    DYNDTWAIN_API::DTWAIN_GetVersionCopyrightA = nullptr;
     D_GETVERSIONCOPYRIGHTWFUNC                    DYNDTWAIN_API::DTWAIN_GetVersionCopyrightW = nullptr;
     D_GETVERSIONEXFUNC                            DYNDTWAIN_API::DTWAIN_GetVersionEx = nullptr;
+    D_GETVERSIONEX2FUNC                           DYNDTWAIN_API::DTWAIN_GetVersionEx2 = nullptr;
     D_GETVERSIONINFOFUNC                          DYNDTWAIN_API::DTWAIN_GetVersionInfo = nullptr;
     D_GETVERSIONINFOAFUNC                         DYNDTWAIN_API::DTWAIN_GetVersionInfoA = nullptr;
     D_GETVERSIONINFOWFUNC                         DYNDTWAIN_API::DTWAIN_GetVersionInfoW = nullptr;
@@ -2001,6 +2002,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetVersionCopyrightA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetVersionCopyrightW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetVersionEx, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetVersionEx2, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetVersionInfo, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetVersionInfoA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetVersionInfoW, hModule);

@@ -2494,6 +2494,7 @@
         public delegate int DTWAIN_GetVersionCopyrightDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszApp, int nLength);
         public delegate int DTWAIN_GetVersionCopyrightDelegate_overload(System.IntPtr lpszApp, int nLength);
         public delegate int DTWAIN_GetVersionExDelegate(ref int lMajor, ref int lMinor, ref int lVersionType, ref int lPatchLevel);
+        public delegate int DTWAIN_GetVersionEx2Delegate(ref int lMajor, ref int lMinor, ref int lVersionType, ref int lPatchLevel, ref int lBuildNumber);
         public delegate int DTWAIN_GetVersionInfoDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszVer, int nLength);
         public delegate int DTWAIN_GetVersionInfoDelegate_overload(System.IntPtr lpszVer, int nLength);
         public delegate int DTWAIN_GetVersionStringDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszVer, int nLength);
@@ -4607,6 +4608,9 @@
 
         [DTWAINNativeFunction("DTWAIN_GetVersionEx")]
         private readonly DTWAIN_GetVersionExDelegate  _DTWAIN_GetVersionEx;
+
+        [DTWAINNativeFunction("DTWAIN_GetVersionEx2")]
+        private readonly DTWAIN_GetVersionEx2Delegate  _DTWAIN_GetVersionEx2;
 
         [DTWAINNativeFunction("DTWAIN_GetVersionInfo")]
         private readonly DTWAIN_GetVersionInfoDelegate  _DTWAIN_GetVersionInfo;
@@ -7414,6 +7418,9 @@
 
         public  int DTWAIN_GetVersionEx(ref int lMajor, ref int lMinor, ref int lVersionType, ref int lPatchLevel)
         => _DTWAIN_GetVersionEx(ref lMajor, ref lMinor, ref lVersionType, ref lPatchLevel);
+
+        public  int DTWAIN_GetVersionEx2(ref int lMajor, ref int lMinor, ref int lVersionType, ref int lPatchLevel, ref int lBuildNumber)
+        => _DTWAIN_GetVersionEx2(ref lMajor, ref lMinor, ref lVersionType, ref lPatchLevel, ref lBuildNumber);
 
         public  int DTWAIN_GetVersionInfo([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszVer, int nLength)
         => _DTWAIN_GetVersionInfo(lpszVer, nLength);
