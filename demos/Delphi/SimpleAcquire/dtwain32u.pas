@@ -1845,6 +1845,11 @@ const
   DTWAIN_PDF_AES256 = 2;
   DTWAIN_FEEDER_TERMINATE = 1;
   DTWAIN_FEEDER_USEFLATBED = 2;
+  DTWAIN_CHECKDLLVERLESS = 0;
+  DTWAIN_CHECKDLLVEREQUAL = 1;
+  DTWAIN_CHECKDLLVERGREATER = 2;
+  DTWAIN_CHECKDLLVERLESSEQ = 3;
+  DTWAIN_CHECKDLLVERGREATEREQ = 4;
 
 { DTWAIN DLL functional interface }
 
@@ -2029,6 +2034,7 @@ function DTWAIN_ArrayWideStringToFloat(StringArray:DTWAIN_ARRAY) : DTWAIN_ARRAY;
 function DTWAIN_CallCallback(wParam:WPARAM; lParam:LPARAM; UserData:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_CallCallback';
 function DTWAIN_CallCallback64(wParam:WPARAM; lParam:LPARAM; UserData:Int64) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_CallCallback64';
 function DTWAIN_CallDSMProc(AppID:DTWAIN_IDENTITY; SourceId:DTWAIN_IDENTITY; lDG:LONG; lDAT:LONG; lMSG:LONG; pData:LPVOID) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_CallDSMProc';
+function DTWAIN_CheckDLLVersion(lMajor:LONG; lMinor:LONG; lPatchLevel:LONG; lBuildNumber:LONG; MatchType:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_CheckDLLVersion';
 function DTWAIN_CheckHandles(bCheck:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_CheckHandles';
 function DTWAIN_ClearBuffers(Source:DTWAIN_SOURCE; ClearBuffer:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ClearBuffers';
 function DTWAIN_ClearErrorBuffer : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ClearErrorBuffer';

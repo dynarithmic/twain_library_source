@@ -222,6 +222,7 @@ typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ARRAYWIDESTRINGTOFLOATFUNC)              
 typedef LONG (DLLENTRY_DEF * D_CALLCALLBACKFUNC)                                (WPARAM, LPARAM, LONG);
 typedef LONG (DLLENTRY_DEF * D_CALLCALLBACK64FUNC)                              (WPARAM, LPARAM, LONGLONG);
 typedef LONG (DLLENTRY_DEF * D_CALLDSMPROCFUNC)                                 (DTWAIN_IDENTITY, DTWAIN_IDENTITY, LONG, LONG, LONG, LPVOID);
+typedef DTWAIN_BOOL (DLLENTRY_DEF * D_CHECKDLLVERSIONFUNC)                      (LONG, LONG, LONG, LONG, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_CHECKHANDLESFUNC)                         (DTWAIN_BOOL);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_CLEARBUFFERSFUNC)                         (DTWAIN_SOURCE, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_CLEARERRORBUFFERFUNC)                     (VOID_PROTOTYPE);
@@ -1426,6 +1427,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_CALLCALLBACKFUNC                               DTWAIN_CallCallback;
     STATIC D_CALLCALLBACK64FUNC                             DTWAIN_CallCallback64;
     STATIC D_CALLDSMPROCFUNC                                DTWAIN_CallDSMProc;
+    STATIC D_CHECKDLLVERSIONFUNC                            DTWAIN_CheckDLLVersion;
     STATIC D_CHECKHANDLESFUNC                               DTWAIN_CheckHandles;
     STATIC D_CLEARBUFFERSFUNC                               DTWAIN_ClearBuffers;
     STATIC D_CLEARERRORBUFFERFUNC                           DTWAIN_ClearErrorBuffer;

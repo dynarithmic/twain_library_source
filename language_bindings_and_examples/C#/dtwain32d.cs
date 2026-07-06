@@ -1797,6 +1797,11 @@ namespace Dynarithmic
         public const int DTWAIN_PDF_AES256 = 2;
         public const int DTWAIN_FEEDER_TERMINATE = 1;
         public const int DTWAIN_FEEDER_USEFLATBED = 2;
+        public const int DTWAIN_CHECKDLLVERLESS = 0;
+        public const int DTWAIN_CHECKDLLVEREQUAL = 1;
+        public const int DTWAIN_CHECKDLLVERGREATER = 2;
+        public const int DTWAIN_CHECKDLLVERLESSEQ = 3;
+        public const int DTWAIN_CHECKDLLVERGREATEREQ = 4;
 
         public const string DTWAIN_LIBRARY = "dtwain32d.dll";
 
@@ -2219,6 +2224,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_CallDSMProc(DTWAIN_IDENTITY AppID, DTWAIN_IDENTITY SourceId, int lDG, int lDAT, int lMSG, System.IntPtr pData);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_CheckDLLVersion(int lMajor, int lMinor, int lPatchLevel, int lBuildNumber, int MatchType);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_CheckHandles(int bCheck);

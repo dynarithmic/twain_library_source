@@ -229,6 +229,7 @@
     D_CALLCALLBACKFUNC                            DYNDTWAIN_API::DTWAIN_CallCallback = nullptr;
     D_CALLCALLBACK64FUNC                          DYNDTWAIN_API::DTWAIN_CallCallback64 = nullptr;
     D_CALLDSMPROCFUNC                             DYNDTWAIN_API::DTWAIN_CallDSMProc = nullptr;
+    D_CHECKDLLVERSIONFUNC                         DYNDTWAIN_API::DTWAIN_CheckDLLVersion = nullptr;
     D_CHECKHANDLESFUNC                            DYNDTWAIN_API::DTWAIN_CheckHandles = nullptr;
     D_CLEARBUFFERSFUNC                            DYNDTWAIN_API::DTWAIN_ClearBuffers = nullptr;
     D_CLEARERRORBUFFERFUNC                        DYNDTWAIN_API::DTWAIN_ClearErrorBuffer = nullptr;
@@ -1483,6 +1484,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_CallCallback, hModule);
           LOADFUNCTIONIMPL(DTWAIN_CallCallback64, hModule);
           LOADFUNCTIONIMPL(DTWAIN_CallDSMProc, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_CheckDLLVersion, hModule);
           LOADFUNCTIONIMPL(DTWAIN_CheckHandles, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ClearBuffers, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ClearErrorBuffer, hModule);

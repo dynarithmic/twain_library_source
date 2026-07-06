@@ -225,6 +225,7 @@ type DtwainarraywidestringtofloatFunc = unsafe extern "C" fn(*mut c_void) -> *mu
 type DtwaincallcallbackFunc = unsafe extern "C" fn(i32,i32,i32) -> i32;
 type Dtwaincallcallback64Func = unsafe extern "C" fn(i32,i32,i64) -> i32;
 type DtwaincalldsmprocFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,i32,i32,i32,*mut c_void) -> i32;
+type DtwaincheckdllversionFunc = unsafe extern "C" fn(i32,i32,i32,i32,i32) -> i32;
 type DtwaincheckhandlesFunc = unsafe extern "C" fn(i32) -> i32;
 type DtwainclearbuffersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainclearerrorbufferFunc = unsafe extern "C" fn() -> i32;
@@ -1411,6 +1412,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_CallCallbackFunc: Symbol<'a, DtwaincallcallbackFunc>,
     DTWAIN_CallCallback64Func: Symbol<'a, Dtwaincallcallback64Func>,
     DTWAIN_CallDSMProcFunc: Symbol<'a, DtwaincalldsmprocFunc>,
+    DTWAIN_CheckDLLVersionFunc: Symbol<'a, DtwaincheckdllversionFunc>,
     DTWAIN_CheckHandlesFunc: Symbol<'a, DtwaincheckhandlesFunc>,
     DTWAIN_ClearBuffersFunc: Symbol<'a, DtwainclearbuffersFunc>,
     DTWAIN_ClearErrorBufferFunc: Symbol<'a, DtwainclearerrorbufferFunc>,
@@ -4071,6 +4073,11 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_PDF_AES256: i32 = 2;
     pub const DTWAIN_FEEDER_TERMINATE: i32 = 1;
     pub const DTWAIN_FEEDER_USEFLATBED: i32 = 2;
+    pub const DTWAIN_CHECKDLLVERLESS: i32 = 0;
+    pub const DTWAIN_CHECKDLLVEREQUAL: i32 = 1;
+    pub const DTWAIN_CHECKDLLVERGREATER: i32 = 2;
+    pub const DTWAIN_CHECKDLLVERLESSEQ: i32 = 3;
+    pub const DTWAIN_CHECKDLLVERGREATEREQ: i32 = 4;
 
     pub fn new(library: &'a Library) -> Result<Self, Box<dyn std::error::Error>>
     {
@@ -4252,6 +4259,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_CallCallback: Symbol<DtwaincallcallbackFunc> = unsafe { library.get(b"DTWAIN_CallCallback")? };
         let DTWAIN_CallCallback64: Symbol<Dtwaincallcallback64Func> = unsafe { library.get(b"DTWAIN_CallCallback64")? };
         let DTWAIN_CallDSMProc: Symbol<DtwaincalldsmprocFunc> = unsafe { library.get(b"DTWAIN_CallDSMProc")? };
+        let DTWAIN_CheckDLLVersion: Symbol<DtwaincheckdllversionFunc> = unsafe { library.get(b"DTWAIN_CheckDLLVersion")? };
         let DTWAIN_CheckHandles: Symbol<DtwaincheckhandlesFunc> = unsafe { library.get(b"DTWAIN_CheckHandles")? };
         let DTWAIN_ClearBuffers: Symbol<DtwainclearbuffersFunc> = unsafe { library.get(b"DTWAIN_ClearBuffers")? };
         let DTWAIN_ClearErrorBuffer: Symbol<DtwainclearerrorbufferFunc> = unsafe { library.get(b"DTWAIN_ClearErrorBuffer")? };
@@ -5437,6 +5445,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_CallCallbackFunc: DTWAIN_CallCallback,
             DTWAIN_CallCallback64Func: DTWAIN_CallCallback64,
             DTWAIN_CallDSMProcFunc: DTWAIN_CallDSMProc,
+            DTWAIN_CheckDLLVersionFunc: DTWAIN_CheckDLLVersion,
             DTWAIN_CheckHandlesFunc: DTWAIN_CheckHandles,
             DTWAIN_ClearBuffersFunc: DTWAIN_ClearBuffers,
             DTWAIN_ClearErrorBufferFunc: DTWAIN_ClearErrorBuffer,
@@ -7157,6 +7166,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_CallDSMProc(&self, AppID: *mut c_void, SourceId: *mut c_void, lDG: i32, lDAT: i32, lMSG: i32, pData: *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_CallDSMProcFunc)(AppID, SourceId, lDG, lDAT, lMSG, pData);  }
+    }
+
+    pub fn DTWAIN_CheckDLLVersion(&self, lMajor: i32, lMinor: i32, lPatchLevel: i32, lBuildNumber: i32, MatchType: i32) -> i32 {
+        unsafe { return (self.DTWAIN_CheckDLLVersionFunc)(lMajor, lMinor, lPatchLevel, lBuildNumber, MatchType);  }
     }
 
     pub fn DTWAIN_CheckHandles(&self, bCheck: i32) -> i32 {

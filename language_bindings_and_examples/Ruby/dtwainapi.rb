@@ -313,6 +313,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_CallCallback
    attr_reader :DTWAIN_CallCallback64
    attr_reader :DTWAIN_CallDSMProc
+   attr_reader :DTWAIN_CheckDLLVersion
    attr_reader :DTWAIN_CheckHandles
    attr_reader :DTWAIN_ClearBuffers
    attr_reader :DTWAIN_ClearErrorBuffer
@@ -2970,6 +2971,11 @@ class DTWAINAPI
    DTWAIN_PDF_AES256 = 2
    DTWAIN_FEEDER_TERMINATE = 1
    DTWAIN_FEEDER_USEFLATBED = 2
+   DTWAIN_CHECKDLLVERLESS = 0
+   DTWAIN_CHECKDLLVEREQUAL = 1
+   DTWAIN_CHECKDLLVERGREATER = 2
+   DTWAIN_CHECKDLLVERLESSEQ = 3
+   DTWAIN_CHECKDLLVERGREATEREQ = 4
 
    @isinit = false
 
@@ -3190,6 +3196,7 @@ class DTWAINAPI
        @DTWAIN_CallCallback = Fiddle::Function::new(dtwain_dll['DTWAIN_CallCallback'],[Fiddle::TYPE_INT, Fiddle::TYPE_INT, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_CallCallback64 = Fiddle::Function::new(dtwain_dll['DTWAIN_CallCallback64'],[Fiddle::TYPE_INT, Fiddle::TYPE_INT, Fiddle::TYPE_LONG_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_CallDSMProc = Fiddle::Function::new(dtwain_dll['DTWAIN_CallDSMProc'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
+       @DTWAIN_CheckDLLVersion = Fiddle::Function::new(dtwain_dll['DTWAIN_CheckDLLVersion'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_CheckHandles = Fiddle::Function::new(dtwain_dll['DTWAIN_CheckHandles'],[Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_ClearBuffers = Fiddle::Function::new(dtwain_dll['DTWAIN_ClearBuffers'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_ClearErrorBuffer = Fiddle::Function::new(dtwain_dll['DTWAIN_ClearErrorBuffer'],[],Fiddle::TYPE_INT)

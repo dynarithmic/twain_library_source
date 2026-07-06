@@ -1800,6 +1800,11 @@ module TwainAPI =
     let public DTWAIN_PDF_AES256 = 2
     let public DTWAIN_FEEDER_TERMINATE = 1
     let public DTWAIN_FEEDER_USEFLATBED = 2
+    let public DTWAIN_CHECKDLLVERLESS = 0
+    let public DTWAIN_CHECKDLLVEREQUAL = 1
+    let public DTWAIN_CHECKDLLVERGREATER = 2
+    let public DTWAIN_CHECKDLLVERLESSEQ = 3
+    let public DTWAIN_CHECKDLLVERGREATEREQ = 4
 
     // Public state exposed after successful Load
     let mutable private IsLoaded = false
@@ -2273,6 +2278,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_CallDSMProcDelegate = delegate of DTWAIN_IDENTITY * DTWAIN_IDENTITY * LONG * LONG * LONG * LPVOID -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_CheckDLLVersionDelegate = delegate of LONG * LONG * LONG * LONG * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_CheckHandlesDelegate = delegate of DTWAIN_BOOL -> DTWAIN_BOOL
@@ -4582,6 +4590,7 @@ module TwainAPI =
     let private CallCallback = lazy (DynamicDll.Bind "DTWAIN_CallCallback" : DTWAIN_CallCallbackDelegate)
     let private CallCallback64 = lazy (DynamicDll.Bind "DTWAIN_CallCallback64" : DTWAIN_CallCallback64Delegate)
     let private CallDSMProc = lazy (DynamicDll.Bind "DTWAIN_CallDSMProc" : DTWAIN_CallDSMProcDelegate)
+    let private CheckDLLVersion = lazy (DynamicDll.Bind "DTWAIN_CheckDLLVersion" : DTWAIN_CheckDLLVersionDelegate)
     let private CheckHandles = lazy (DynamicDll.Bind "DTWAIN_CheckHandles" : DTWAIN_CheckHandlesDelegate)
     let private ClearBuffers = lazy (DynamicDll.Bind "DTWAIN_ClearBuffers" : DTWAIN_ClearBuffersDelegate)
     let private ClearErrorBuffer = lazy (DynamicDll.Bind "DTWAIN_ClearErrorBuffer" : DTWAIN_ClearErrorBufferDelegate)
@@ -5873,6 +5882,10 @@ module TwainAPI =
     let DTWAIN_CallDSMProc (appid: DTWAIN_IDENTITY) (sourceid: DTWAIN_IDENTITY) (ldg: LONG) (ldat: LONG) (lmsg: LONG) (pdata: LPVOID) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         CallDSMProc.Value.Invoke(appid, sourceid, ldg, ldat, lmsg, pdata)
+
+    let DTWAIN_CheckDLLVersion (lmajor: LONG) (lminor: LONG) (lpatchlevel: LONG) (lbuildnumber: LONG) (matchtype: LONG) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        CheckDLLVersion.Value.Invoke(lmajor, lminor, lpatchlevel, lbuildnumber, matchtype)
 
     let DTWAIN_CheckHandles (bcheck: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

@@ -255,6 +255,7 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_CallCallback(WPARAM wParam, LPARAM lParam, LONG UserData);
         LONG DTWAIN_CallCallback64(WPARAM wParam, LPARAM lParam, LONGLONG UserData);
         LONG DTWAIN_CallDSMProc(DTWAIN_IDENTITY AppID, DTWAIN_IDENTITY SourceId, LONG lDG, LONG lDAT, LONG lMSG, LPVOID pData);
+        DTWAIN_BOOL DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG lPatchLevel, LONG lBuildNumber, LONG MatchType);
         DTWAIN_BOOL DTWAIN_CheckHandles(DTWAIN_BOOL bCheck);
         DTWAIN_BOOL DTWAIN_ClearBuffers(DTWAIN_SOURCE Source, LONG ClearBuffer);
         DTWAIN_BOOL DTWAIN_ClearErrorBuffer();
@@ -1496,6 +1497,7 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_CallCallback(WPARAM wParam, LPARAM lParam, LONG UserData);
         LONG DTWAIN_CallCallback64(WPARAM wParam, LPARAM lParam, LONGLONG UserData);
         LONG DTWAIN_CallDSMProc(DTWAIN_IDENTITY AppID, DTWAIN_IDENTITY SourceId, LONG lDG, LONG lDAT, LONG lMSG, LPVOID pData);
+        DTWAIN_BOOL DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG lPatchLevel, LONG lBuildNumber, LONG MatchType);
         DTWAIN_BOOL DTWAIN_CheckHandles(DTWAIN_BOOL bCheck);
         DTWAIN_BOOL DTWAIN_ClearBuffers(DTWAIN_SOURCE Source, LONG ClearBuffer);
         DTWAIN_BOOL DTWAIN_ClearErrorBuffer();
@@ -2737,6 +2739,7 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_CallCallback(WPARAM wParam, LPARAM lParam, LONG UserData);
         LONG DTWAIN_CallCallback64(WPARAM wParam, LPARAM lParam, LONGLONG UserData);
         LONG DTWAIN_CallDSMProc(DTWAIN_IDENTITY AppID, DTWAIN_IDENTITY SourceId, LONG lDG, LONG lDAT, LONG lMSG, LPVOID pData);
+        DTWAIN_BOOL DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG lPatchLevel, LONG lBuildNumber, LONG MatchType);
         DTWAIN_BOOL DTWAIN_CheckHandles(DTWAIN_BOOL bCheck);
         DTWAIN_BOOL DTWAIN_ClearBuffers(DTWAIN_SOURCE Source, LONG ClearBuffer);
         DTWAIN_BOOL DTWAIN_ClearErrorBuffer();
@@ -3978,6 +3981,7 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_CallCallback(WPARAM wParam, LPARAM lParam, LONG UserData);
         LONG DTWAIN_CallCallback64(WPARAM wParam, LPARAM lParam, LONGLONG UserData);
         LONG DTWAIN_CallDSMProc(DTWAIN_IDENTITY AppID, DTWAIN_IDENTITY SourceId, LONG lDG, LONG lDAT, LONG lMSG, LPVOID pData);
+        DTWAIN_BOOL DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG lPatchLevel, LONG lBuildNumber, LONG MatchType);
         DTWAIN_BOOL DTWAIN_CheckHandles(DTWAIN_BOOL bCheck);
         DTWAIN_BOOL DTWAIN_ClearBuffers(DTWAIN_SOURCE Source, LONG ClearBuffer);
         DTWAIN_BOOL DTWAIN_ClearErrorBuffer();

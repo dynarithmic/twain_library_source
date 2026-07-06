@@ -1744,6 +1744,11 @@ Class DTWAINAPI
     Public Const DTWAIN_PDF_AES256 As Integer = 2
     Public Const DTWAIN_FEEDER_TERMINATE As Integer = 1
     Public Const DTWAIN_FEEDER_USEFLATBED As Integer = 2
+    Public Const DTWAIN_CHECKDLLVERLESS As Integer = 0
+    Public Const DTWAIN_CHECKDLLVEREQUAL As Integer = 1
+    Public Const DTWAIN_CHECKDLLVERGREATER As Integer = 2
+    Public Const DTWAIN_CHECKDLLVERLESSEQ As Integer = 3
+    Public Const DTWAIN_CHECKDLLVERGREATEREQ As Integer = 4
 
     Public Delegate Function DTwainCallback(WParam As IntPtr, LParam As IntPtr, UserData As IntPtr) As IntPtr
     Public Delegate Function DTwainCallback64(WParam As IntPtr, LParam As IntPtr, UserData As IntPtr) As IntPtr
@@ -1892,6 +1897,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_CallCallback Lib "dtwain32u.dll" (wParam As Integer, lParam As Integer, UserData As Integer) As Integer
     Public Declare Function DTWAIN_CallCallback64 Lib "dtwain32u.dll" (wParam As Integer, lParam As Integer, UserData As System.Int64) As Integer
     Public Declare Function DTWAIN_CallDSMProc Lib "dtwain32u.dll" (AppID As System.IntPtr, SourceId As System.IntPtr, lDG As Integer, lDAT As Integer, lMSG As Integer, pData As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_CheckDLLVersion Lib "dtwain32u.dll" (lMajor As Integer, lMinor As Integer, lPatchLevel As Integer, lBuildNumber As Integer, MatchType As Integer) As Integer
     Public Declare Function DTWAIN_CheckHandles Lib "dtwain32u.dll" (bCheck As Integer) As Integer
     Public Declare Function DTWAIN_ClearBuffers Lib "dtwain32u.dll" (Source As System.IntPtr, ClearBuffer As Integer) As Integer
     Public Declare Function DTWAIN_ClearErrorBuffer Lib "dtwain32u.dll" () As Integer

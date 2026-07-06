@@ -1917,6 +1917,11 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_PDF_AES256 = 2;
     public static const int DTWAIN_FEEDER_TERMINATE = 1;
     public static const int DTWAIN_FEEDER_USEFLATBED = 2;
+    public static const int DTWAIN_CHECKDLLVERLESS = 0;
+    public static const int DTWAIN_CHECKDLLVEREQUAL = 1;
+    public static const int DTWAIN_CHECKDLLVERGREATER = 2;
+    public static const int DTWAIN_CHECKDLLVERLESSEQ = 3;
+    public static const int DTWAIN_CHECKDLLVERGREATEREQ = 4;
 
     /************ Core API ************/
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CCHARPTRTYPE, LONG, LONG, DTWAIN_BOOL, DTWAIN_BOOL, LPLONG) DTWAIN_AcquireAudioFile;
@@ -2100,6 +2105,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(WPARAM, LPARAM, LONG) DTWAIN_CallCallback;
     extern(Windows) LONG function(WPARAM, LPARAM, LONGLONG) DTWAIN_CallCallback64;
     extern(Windows) LONG function(DTWAIN_IDENTITY, DTWAIN_IDENTITY, LONG, LONG, LONG, LPVOID) DTWAIN_CallDSMProc;
+    extern(Windows) DTWAIN_BOOL function(LONG, LONG, LONG, LONG, LONG) DTWAIN_CheckDLLVersion;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_BOOL) DTWAIN_CheckHandles;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_ClearBuffers;
     extern(Windows) DTWAIN_BOOL function() DTWAIN_ClearErrorBuffer;
@@ -3282,6 +3288,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_CallCallback, "DTWAIN_CallCallback");
         bindFunction(cast(void**)&DTWAIN_CallCallback64, "DTWAIN_CallCallback64");
         bindFunction(cast(void**)&DTWAIN_CallDSMProc, "DTWAIN_CallDSMProc");
+        bindFunction(cast(void**)&DTWAIN_CheckDLLVersion, "DTWAIN_CheckDLLVersion");
         bindFunction(cast(void**)&DTWAIN_CheckHandles, "DTWAIN_CheckHandles");
         bindFunction(cast(void**)&DTWAIN_ClearBuffers, "DTWAIN_ClearBuffers");
         bindFunction(cast(void**)&DTWAIN_ClearErrorBuffer, "DTWAIN_ClearErrorBuffer");

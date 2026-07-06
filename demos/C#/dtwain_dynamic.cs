@@ -1815,6 +1815,11 @@
         public const int DTWAIN_PDF_AES256 = 2;
         public const int DTWAIN_FEEDER_TERMINATE = 1;
         public const int DTWAIN_FEEDER_USEFLATBED = 2;
+        public const int DTWAIN_CHECKDLLVERLESS = 0;
+        public const int DTWAIN_CHECKDLLVEREQUAL = 1;
+        public const int DTWAIN_CHECKDLLVERGREATER = 2;
+        public const int DTWAIN_CHECKDLLVERLESSEQ = 3;
+        public const int DTWAIN_CHECKDLLVERGREATEREQ = 4;
         // string type constants
         // these include room for the strings and a null char
         public enum TWSTR : int
@@ -2052,6 +2057,7 @@
         public delegate int DTWAIN_CallCallbackDelegate(int wParam, int lParam, int UserData);
         public delegate int DTWAIN_CallCallback64Delegate(int wParam, int lParam, LONGLONG UserData);
         public delegate int DTWAIN_CallDSMProcDelegate(DTWAIN_IDENTITY AppID, DTWAIN_IDENTITY SourceId, int lDG, int lDAT, int lMSG, System.IntPtr pData);
+        public delegate int DTWAIN_CheckDLLVersionDelegate(int lMajor, int lMinor, int lPatchLevel, int lBuildNumber, int MatchType);
         public delegate int DTWAIN_CheckHandlesDelegate(int bCheck);
         public delegate int DTWAIN_ClearBuffersDelegate(DTWAIN_SOURCE Source, int ClearBuffer);
         public delegate int DTWAIN_ClearErrorBufferDelegate();
@@ -3282,6 +3288,9 @@
 
         [DTWAINNativeFunction("DTWAIN_CallDSMProc")]
         private readonly DTWAIN_CallDSMProcDelegate  _DTWAIN_CallDSMProc;
+
+        [DTWAINNativeFunction("DTWAIN_CheckDLLVersion")]
+        private readonly DTWAIN_CheckDLLVersionDelegate  _DTWAIN_CheckDLLVersion;
 
         [DTWAINNativeFunction("DTWAIN_CheckHandles")]
         private readonly DTWAIN_CheckHandlesDelegate  _DTWAIN_CheckHandles;
@@ -6092,6 +6101,9 @@
 
         public  int DTWAIN_CallDSMProc(DTWAIN_IDENTITY AppID, DTWAIN_IDENTITY SourceId, int lDG, int lDAT, int lMSG, System.IntPtr pData)
         => _DTWAIN_CallDSMProc(AppID, SourceId, lDG, lDAT, lMSG, pData);
+
+        public  int DTWAIN_CheckDLLVersion(int lMajor, int lMinor, int lPatchLevel, int lBuildNumber, int MatchType)
+        => _DTWAIN_CheckDLLVersion(lMajor, lMinor, lPatchLevel, lBuildNumber, MatchType);
 
         public  int DTWAIN_CheckHandles(int bCheck)
         => _DTWAIN_CheckHandles(bCheck);

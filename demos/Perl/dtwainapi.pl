@@ -1670,6 +1670,11 @@ use constant DTWAIN_PDF_AES128 => 1;
 use constant DTWAIN_PDF_AES256 => 2;
 use constant DTWAIN_FEEDER_TERMINATE => 1;
 use constant DTWAIN_FEEDER_USEFLATBED => 2;
+use constant DTWAIN_CHECKDLLVERLESS => 0;
+use constant DTWAIN_CHECKDLLVEREQUAL => 1;
+use constant DTWAIN_CHECKDLLVERGREATER => 2;
+use constant DTWAIN_CHECKDLLVERLESSEQ => 3;
+use constant DTWAIN_CHECKDLLVERGREATEREQ => 4;
 
 # DTWAIN function definitions. 
 my $dtwain_dllName = 'DTWAIN64.DLL';  # This is the placeholder for the DLL Name that will be loaded.
@@ -1853,6 +1858,7 @@ my $DTWAIN_ArrayWideStringToFloat = new Win32::API($dtwain_dllName, 'DTWAIN_Arra
 my $DTWAIN_CallCallback = new Win32::API($dtwain_dllName, 'DTWAIN_CallCallback', 'iii', 'i');
 my $DTWAIN_CallCallback64 = new Win32::API($dtwain_dllName, 'DTWAIN_CallCallback64', 'iiq', 'i');
 my $DTWAIN_CallDSMProc = new Win32::API($dtwain_dllName, 'DTWAIN_CallDSMProc', 'PPiiiP', 'i');
+my $DTWAIN_CheckDLLVersion = new Win32::API($dtwain_dllName, 'DTWAIN_CheckDLLVersion', 'iiiii', 'I');
 my $DTWAIN_CheckHandles = new Win32::API($dtwain_dllName, 'DTWAIN_CheckHandles', 'I', 'I');
 my $DTWAIN_ClearBuffers = new Win32::API($dtwain_dllName, 'DTWAIN_ClearBuffers', 'Pi', 'I');
 my $DTWAIN_ClearErrorBuffer = new Win32::API($dtwain_dllName, 'DTWAIN_ClearErrorBuffer', '', 'I');

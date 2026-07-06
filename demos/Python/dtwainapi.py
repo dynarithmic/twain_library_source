@@ -1710,6 +1710,11 @@ DTWAIN_PDF_AES128 = 1
 DTWAIN_PDF_AES256 = 2
 DTWAIN_FEEDER_TERMINATE = 1
 DTWAIN_FEEDER_USEFLATBED = 2
+DTWAIN_CHECKDLLVERLESS = 0
+DTWAIN_CHECKDLLVEREQUAL = 1
+DTWAIN_CHECKDLLVERGREATER = 2
+DTWAIN_CHECKDLLVERLESSEQ = 3
+DTWAIN_CHECKDLLVERGREATEREQ = 4
 
 # Example:
 # load the 64-bit unicode version of the dtwain dll
@@ -1988,6 +1993,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_CallCallback.restype = ct.c_long
      theDLL.DTWAIN_CallCallback64.restype = ct.c_long
      theDLL.DTWAIN_CallDSMProc.restype = ct.c_long
+     theDLL.DTWAIN_CheckDLLVersion.restype = ct.c_long
      theDLL.DTWAIN_CheckHandles.restype = ct.c_long
      theDLL.DTWAIN_ClearBuffers.restype = ct.c_long
      theDLL.DTWAIN_ClearErrorBuffer.restype = ct.c_long
@@ -3172,6 +3178,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_CallCallback.argtypes = [ct.c_long, ct.c_long, ct.c_long]
      theDLL.DTWAIN_CallCallback64.argtypes = [ct.c_long, ct.c_long, ct.c_int64]
      theDLL.DTWAIN_CallDSMProc.argtypes = [ct.c_void_p, ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_void_p]
+     theDLL.DTWAIN_CheckDLLVersion.argtypes = [ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.c_long]
      theDLL.DTWAIN_CheckHandles.argtypes = [ct.c_long]
      theDLL.DTWAIN_ClearBuffers.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ClearPDFTextElements.argtypes = [ct.c_void_p]
@@ -4327,6 +4334,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_CallCallback.restype = ct.c_long
      theDLL.DTWAIN_CallCallback64.restype = ct.c_long
      theDLL.DTWAIN_CallDSMProc.restype = ct.c_long
+     theDLL.DTWAIN_CheckDLLVersion.restype = ct.c_long
      theDLL.DTWAIN_CheckHandles.restype = ct.c_long
      theDLL.DTWAIN_ClearBuffers.restype = ct.c_long
      theDLL.DTWAIN_ClearErrorBuffer.restype = ct.c_long
@@ -5511,6 +5519,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_CallCallback.argtypes = [ct.c_long, ct.c_long, ct.c_long]
      theDLL.DTWAIN_CallCallback64.argtypes = [ct.c_long, ct.c_long, ct.c_int64]
      theDLL.DTWAIN_CallDSMProc.argtypes = [ct.c_void_p, ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_void_p]
+     theDLL.DTWAIN_CheckDLLVersion.argtypes = [ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.c_long]
      theDLL.DTWAIN_CheckHandles.argtypes = [ct.c_long]
      theDLL.DTWAIN_ClearBuffers.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ClearPDFTextElements.argtypes = [ct.c_void_p]

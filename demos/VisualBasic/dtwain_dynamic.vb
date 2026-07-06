@@ -1915,6 +1915,11 @@ Namespace Dynarithmic
         Public Const DTWAIN_PDF_AES256 As Integer = 2
         Public Const DTWAIN_FEEDER_TERMINATE As Integer = 1
         Public Const DTWAIN_FEEDER_USEFLATBED As Integer = 2
+        Public Const DTWAIN_CHECKDLLVERLESS As Integer = 0
+        Public Const DTWAIN_CHECKDLLVEREQUAL As Integer = 1
+        Public Const DTWAIN_CHECKDLLVERGREATER As Integer = 2
+        Public Const DTWAIN_CHECKDLLVERLESSEQ As Integer = 3
+        Public Const DTWAIN_CHECKDLLVERGREATEREQ As Integer = 4
 
         Public Delegate Function DTwainCallback(WParam As IntPtr, LParam As IntPtr, UserData As IntPtr) As IntPtr
         Public Delegate Function DTwainCallback64(WParam As IntPtr, LParam As IntPtr, UserData As IntPtr) As IntPtr
@@ -2336,6 +2341,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_CallDSMProcDelegate(AppID As System.IntPtr, SourceId As System.IntPtr, lDG As Integer, lDAT As Integer, lMSG As Integer, pData As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_CheckDLLVersionDelegate(lMajor As Integer, lMinor As Integer, lPatchLevel As Integer, lBuildNumber As Integer, MatchType As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_CheckHandlesDelegate(bCheck As Integer) As Integer
@@ -5066,6 +5074,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_CallDSMProc(AppID As System.IntPtr, SourceId As System.IntPtr, lDG As Integer, lDAT As Integer, lMSG As Integer, pData As System.IntPtr) As Integer
         Return api.DTWAIN_CallDSMProc(AppID, SourceId, lDG, lDAT, lMSG, pData)
+        End Function
+        
+        Public Function DTWAIN_CheckDLLVersion(lMajor As Integer, lMinor As Integer, lPatchLevel As Integer, lBuildNumber As Integer, MatchType As Integer) As Integer
+        Return api.DTWAIN_CheckDLLVersion(lMajor, lMinor, lPatchLevel, lBuildNumber, MatchType)
         End Function
         
         Public Function DTWAIN_CheckHandles(bCheck As Integer) As Integer
@@ -8117,6 +8129,7 @@ Namespace Dynarithmic
             Public DTWAIN_CallCallback As DTWAIN_CallCallbackDelegate
             Public DTWAIN_CallCallback64 As DTWAIN_CallCallback64Delegate
             Public DTWAIN_CallDSMProc As DTWAIN_CallDSMProcDelegate
+            Public DTWAIN_CheckDLLVersion As DTWAIN_CheckDLLVersionDelegate
             Public DTWAIN_CheckHandles As DTWAIN_CheckHandlesDelegate
             Public DTWAIN_ClearBuffers As DTWAIN_ClearBuffersDelegate
             Public DTWAIN_ClearErrorBuffer As DTWAIN_ClearErrorBufferDelegate
