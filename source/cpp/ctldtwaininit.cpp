@@ -148,6 +148,56 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx2(LPLONG lMajor, LPLONG lMinor, LPLO
     CATCH_BLOCK(false)
 }
 
+// Check the match type.  If version must be < than the passed-in values, return TRUE if version is <
+// If version must be equal to the passed-in values, return TRUE if version is equal
+// If version must be greater to the passed-in values, return TRUE if version is greater
+// Build number is ignored if passed-in build number is 0.
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG lPatchLevel, LONG lBuildNumber,
+                                                LONG MatchType)
+{
+    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lPatchLevel, lBuildNumber, MatchType))
+    LONG lpVersionVals[4] = {};
+    const bool bRetVal = DTWAIN_GetVersionInternal(&lpVersionVals[0],
+                                                    &lpVersionVals[1],
+                                                    nullptr,
+                                                    &lpVersionVals[2],
+                                                    &lpVersionVals[3]);
+    bool bMatchOk = false;
+    if ( bRetVal )
+    {
+        if (lBuildNumber == 0)
+            lpVersionVals[3] = 0;
+        long totalVerNum = lpVersionVals[0] * 1000 +
+                           lpVersionVals[1] * 100 + 
+                           lpVersionVals[2] * 10 +  
+                           lpVersionVals[3];
+        long inputVerNum = lMajor * 1000 + lMinor * 100 + lPatchLevel * 10 + lBuildNumber;
+        switch ( MatchType )
+        {
+            case DTWAIN_CHECKDLLVERLESS:
+                bMatchOk = totalVerNum < inputVerNum;
+            break;
+            case DTWAIN_CHECKDLLVEREQUAL:
+                bMatchOk = totalVerNum == inputVerNum;
+            break;
+            case DTWAIN_CHECKDLLVERGREATER:
+                bMatchOk = totalVerNum > inputVerNum;
+            break;
+            case DTWAIN_CHECKDLLVERLESSEQ:
+                bMatchOk = totalVerNum <= inputVerNum;
+            break;
+            case DTWAIN_CHECKDLLVERGREATEREQ:
+                bMatchOk = totalVerNum >= inputVerNum;
+            break;
+            default:
+                bMatchOk = totalVerNum == inputVerNum;
+            break;
+        }
+    }
+    LOG_FUNC_EXIT_NONAME_PARAMS(bMatchOk)
+    CATCH_BLOCK(false)
+}
+
 DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch, LPLONG lBuildNumber)
 {
     LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType, lBuildNumber))
