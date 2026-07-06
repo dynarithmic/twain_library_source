@@ -107,7 +107,7 @@ static std::string GetStaticLibVer();
 static void LoadStaticData(CTL_TwainDLLHandle*);
 static CTL_StringType GetDTWAINDLLVersionInfoStr();
 static CTL_StringType GetDTWAINInternalBuildNumber();
-static DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch);
+static DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch, LPLONG lBuild = nullptr);
 static CTL_StringType CheckSearchOrderString(CTL_StringType);
 
 static constexpr TCHAR* s_NullEntry = _T("<null>");
@@ -138,9 +138,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLON
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx2(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel, 
+                                              LPLONG lBuildNumber)
 {
-    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType))
+    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber))
+    const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber) ? true : false;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber))
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetVal)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch, LPLONG lBuildNumber)
+{
+    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType, lBuildNumber))
     constexpr LONG nDistr = DTWAIN_OPENSOURCE_VERSION;
     static constexpr auto modRet = GetDTWAINDLLVersionInfo();
     if (lMajor)
@@ -151,6 +161,11 @@ DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVers
         *lPatch = modRet[2];
     if ( lVersionType )
         *lVersionType = nDistr | GetDTWAINVersionType();
+    if (lBuildNumber)
+    {
+        auto str = GetDTWAINInternalBuildNumber();
+        *lBuildNumber = std::stoi(str);
+    }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
