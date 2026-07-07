@@ -156,15 +156,23 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG l
                                                 LONG MatchType)
 {
     LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lPatchLevel, lBuildNumber, MatchType))
-    LONG lpVersionVals[4] = {};
-    const bool bRetVal = DTWAIN_GetVersionInternal(&lpVersionVals[0],
-                                                    &lpVersionVals[1],
-                                                    nullptr,
-                                                    &lpVersionVals[2],
-                                                    &lpVersionVals[3]);
+    VersionNumbersSmall info;
     bool bMatchOk = false;
-    if ( bRetVal )
+    bool bGotInfo = GetDLLVersionNumbersSmall(CTL_StaticData::GetDLLInstanceHandle(), info);
+    if ( bGotInfo )
     {
+        StringArrayW sVersionArray;
+        StringWrapperW::Tokenize(info.FileVersion, L".", sVersionArray);
+        LONG lpVersionVals[4] = {};
+        if (sVersionArray.size() != 4)
+            return false;
+        int nCur = 0;
+        for (auto& s : sVersionArray)
+        {
+            lpVersionVals[nCur] = std::stoi(s);
+            ++nCur;
+        }
+
         if (lBuildNumber == 0)
             lpVersionVals[3] = 0;
         long totalVerNum = lpVersionVals[0] * 1000 +
