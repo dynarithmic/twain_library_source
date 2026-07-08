@@ -376,7 +376,7 @@ else()
 endif()
 
 set(DTWAIN_RESOURCE_FILES
-    ${PROJECT_SOURCE_DIR}/rc/twil32.rc
+    ${PROJECT_SOURCE_DIR}/rc/dtwain_resources.rc
 )
 
 set(DTWAIN_MISCELLANEOUS_FILES
@@ -1466,7 +1466,7 @@ file(GLOB DTWAIN_DEF_FILES
 
 target_sources(dtwain PRIVATE ${DTWAIN_DEF_FILES})
 source_group( "Module Definition Files" FILES ${DTWAIN_DEF_FILES})
-target_sources(dtwain PRIVATE ${PROJECT_SOURCE_DIR}/rc/twil32.rc)
+target_sources(dtwain PRIVATE ${PROJECT_SOURCE_DIR}/rc/dtwain_resources.rc)
 target_sources(dtwain PRIVATE ${DTWAIN_MISCELLANEOUS_FILES})
 target_sources(dtwain PRIVATE ${TEXT_RESOURCE_FILES})
 
@@ -1499,7 +1499,7 @@ if(DTWAIN_USE_DYNAMIC_CRT)
 endif()
 
 set_source_files_properties(
-    ${PROJECT_SOURCE_DIR}/rc/twil32.rc
+    ${PROJECT_SOURCE_DIR}/rc/dtwain_resources.rc
     PROPERTIES
         COMPILE_OPTIONS "${DTWAIN_RC_DEFINES}"
 )
