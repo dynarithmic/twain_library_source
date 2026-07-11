@@ -112,7 +112,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
 }
 
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, LPLONG lpEvent)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, LPDWORD lpEvent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpEvent))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
@@ -123,13 +123,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, LPLONG lpEv
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lpEvent, LPDTWAIN_ARRAY pArray)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPDWORD lpEvent, LPDTWAIN_ARRAY pArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpEvent, pArray))
     if (!DTWAIN_GetDeviceEvent(Source, lpEvent))
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
     auto pHandle = pSource->GetDTWAINHandle();
     DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
@@ -153,7 +153,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventInfo(DTWAIN_SOURCE Source, LONG nW
     {
         case DTWAIN_GETDE_EVENT:
         {
-            const auto p = static_cast<LPLONG>(pValue);
+            const auto p = static_cast<LPDWORD>(pValue);
             *p = DeviceEvent.GetEvent() + 1;
         }
         break;
@@ -168,7 +168,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventInfo(DTWAIN_SOURCE Source, LONG nW
 
         case DTWAIN_GETDE_BATTERYMINUTES:
         {
-            const LPLONG p = static_cast<LPLONG>(pValue);
+            const LPDWORD p = static_cast<LPDWORD>(pValue);
             *p = DeviceEvent.GetBatteryMinutes();
         }
         break;
@@ -196,28 +196,28 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventInfo(DTWAIN_SOURCE Source, LONG nW
 
         case DTWAIN_GETDE_FLASHUSED:
         {
-            const LPLONG p = static_cast<LPLONG>(pValue);
+            const LPDWORD p = static_cast<LPDWORD>(pValue);
             *p = DeviceEvent.GetFlashUsed2();
         }
         break;
 
         case DTWAIN_GETDE_AUTOCAPTURE:
         {
-            const LPLONG p = static_cast<LPLONG>(pValue);
+            const LPDWORD p = static_cast<LPDWORD>(pValue);
             *p = DeviceEvent.GetAutomaticCapture();
         }
         break;
 
         case DTWAIN_GETDE_TIMEBEFORECAPTURE:
         {
-            const LPLONG p = static_cast<LPLONG>(pValue);
+            const LPDWORD p = static_cast<LPDWORD>(pValue);
             *p = DeviceEvent.GetTimeBeforeFirstCapture();
         }
         break;
 
         case DTWAIN_GETDE_TIMEBETWEENCAPTURES:
         {
-            const LPLONG p = static_cast<LPLONG>(pValue);
+            const LPDWORD p = static_cast<LPDWORD>(pValue);
             *p = DeviceEvent.GetTimeBetweenCaptures();
         }
         break;

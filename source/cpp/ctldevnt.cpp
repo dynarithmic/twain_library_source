@@ -21,7 +21,6 @@
 #include "ctltripletbase.h"
 #include "ctltr010.h"
 #include "ctldevnt.h"
-#include "twainfix32.h"
 #include "arrayfactory.h"
 
 using namespace dynarithmic;
@@ -29,7 +28,7 @@ CTL_DeviceEvent::CTL_DeviceEvent() : m_DeviceEvent() {}
 
 TW_UINT32  CTL_DeviceEvent::GetEvent() const { return             m_DeviceEvent.Event;            }
 CTL_StringType CTL_DeviceEvent::GetDeviceName() const { return    StringConversion::Convert_AnsiPtr_To_Native(m_DeviceEvent.DeviceName); }
-std::string CTL_DeviceEvent::GetDeviceNameA() const { return    m_DeviceEvent.DeviceName?m_DeviceEvent.DeviceName:""; }
+std::string CTL_DeviceEvent::GetDeviceNameA() const { return    m_DeviceEvent.DeviceName; }
 TW_UINT32  CTL_DeviceEvent::GetBatteryMinutes() const { return    m_DeviceEvent.BatteryMinutes;   }
 TW_INT16   CTL_DeviceEvent::GetBatteryPercentage() const { return m_DeviceEvent.BatteryPercentage;}
 TW_INT32   CTL_DeviceEvent::GetPowerSupply() const { return       m_DeviceEvent.PowerSupply;      }

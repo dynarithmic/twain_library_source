@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <cstdio>
-#include <functional>
 #include <algorithm>
 #include "cppfunc.h"
 #include "errorcheck.h"
@@ -93,7 +92,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     CTL_SetCustomDSTriplet DST(pSession, p);
 
     // Check what options the user wants to do
-    char *pData = nullptr;
 
     int nTwainRet = TWRC_SUCCESS;
 
@@ -113,7 +111,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     if( Data && (nFlags & DTWAINSCD_USEDATA ))
     {
         // Allocate local copy of handle
-        pData = static_cast<char*>(ImageMemoryHandler::GlobalAllocPr(GMEM_DDESHARE, dSize));
+        char* pData = static_cast<char*>(ImageMemoryHandler::GlobalAllocPr(GMEM_DDESHARE, dSize));
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return pData == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
 
         // Make sure memory is cleaned up at the end

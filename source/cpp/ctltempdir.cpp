@@ -18,31 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstdio>
 #include <string>
 
 #include "cppfunc.h"
-#include "ctltwainmanager.h"
-#include "dtwain_resource_constants.h"
 #include "ctlobstr.h"
 #include "errorcheck.h"
 #include "ctlfileutils.h"
 
 using namespace dynarithmic;
-
-#if 0
-bool CreateDirectoryTree(LPCTSTR lpszPath, DWORD* /*lasterror*/)
-{
-    CTL_StringType thePath;
-    CTL_StringArrayType pathInfo;
-    StringWrapper::SplitPath(lpszPath, pathInfo);
-
-    CTL_StringArrayType dirs;
-    StringWrapper::Tokenize(pathInfo[StringWrapper::DIRECTORY_POS], _T("\\/"), dirs);
-    thePath = pathInfo[StringWrapper::DRIVE_POS] + StringWrapper::Join(dirs,_T("\\"));
-    return true;
-}
-#endif
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG CreationFlags)
 {

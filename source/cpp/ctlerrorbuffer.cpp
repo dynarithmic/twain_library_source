@@ -62,13 +62,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearErrorBuffer(VOID_PROTOTYPE)
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(LONG nErrors)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(DWORD nErrors)
 {
     LOG_FUNC_ENTRY_PARAMS((nErrors))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 
     // Minimum of 50 errors
-    const LONG nEntries = (std::max<LONG>)(nErrors, 50);
+    const DWORD nEntries = (std::max<DWORD>)(nErrors, 50);
 
     // clear buffer
     pHandle->m_nErrorBufferThreshold = nEntries;
@@ -80,11 +80,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(LONG nErrors)
     CATCH_BLOCK(false)
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetErrorBufferThreshold(VOID_PROTOTYPE)
+DWORD DLLENTRY_DEF DTWAIN_GetErrorBufferThreshold(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG nValues = pHandle->m_nErrorBufferThreshold;
+    const DWORD nValues = pHandle->m_nErrorBufferThreshold;
     LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
     CATCH_BLOCK(-1)
 }

@@ -324,7 +324,6 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     bool bRetval = false;
     if (aDibs)
     {
-        bRetval = true;
         if (pHandle->m_lAcquireMode == DTWAIN_MODAL)
         {
             if (!(opts.getFileFlags() & DTWAIN_NODELETEDIBS))

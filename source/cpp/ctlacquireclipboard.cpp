@@ -20,7 +20,6 @@
  */
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
-#include "arrayfactory.h"
 #include "sourceacquireopts.h"
 #include "acquisitionarray.h"
 #ifdef _MSC_VER
@@ -105,30 +104,3 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG 
     LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
     CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
-
-
-#if 0
-// This has been deprecated as of version 5.9.3.  
-// This function will now default to DTWAIN_AcquireNative or DTWAIN_AcquireBuffered.
-// If data is required to be on the clipboard, the application should call the DTWAIN_CopyDIBToClipboard function.
-DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,
-    LPLONG pStatus)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, nTransferMode, bDiscardDibs, bShowUI, bCloseSource, pStatus))
-        auto [pHandle, pSource] = VerifyHandles(Source);
-
-    DTWAIN_ARRAY aDibs = {};
-
-    int actualAcquireMode = ACQUIREBUFFERED;
-    if (nTransferMode == DTWAIN_USENATIVE)
-        actualAcquireMode = ACQUIRENATIVE;
-
-    aDibs = dynarithmic::AcquireHelper(pHandle, pSource, actualAcquireMode, bDiscardDibs,
-        nTransferMode, true,
-        nullptr, PixelType, nMaxPages, bShowUI, pStatus).first;
-
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-        LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
-        CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-#endif

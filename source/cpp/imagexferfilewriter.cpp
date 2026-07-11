@@ -20,7 +20,6 @@
  */
 #include <algorithm>
 #include <utility>
-#include <dtwain_filesystem.h>
 #include "imagexferfilewriter.h"
 #include "logwriterutils.h"
 

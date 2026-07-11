@@ -20,7 +20,6 @@
  */
 #include <thread>
 #include <string>
-#include <cstdio>
 #include <boost/lexical_cast.hpp>
 #include "ctliface.h"
 #include "ctlthreadutils.h"

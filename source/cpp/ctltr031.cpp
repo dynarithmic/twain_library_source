@@ -19,11 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr031.h"
-#include "ctltr027.h"
 #include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
-#include "ctldib.h"
-#include "dtwain.h"
 #include "winbit32.h"
 #include "logwriterutils.h"
 #include "ctldib32ex.h"

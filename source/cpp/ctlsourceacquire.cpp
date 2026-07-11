@@ -25,7 +25,6 @@
 #include "sourceselectopts.h"
 #include "arrayfactory.h"
 #include "dtwstrfn.h"
-#include "ctlclosesource.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

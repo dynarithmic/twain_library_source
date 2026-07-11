@@ -20,7 +20,6 @@
  */
 #include "ctltr043.h"
 #include "ctltwainmanager.h"
-#include "dtwain.h"
 #include "winbit32.h"
 #include "logwriterutils.h"
 using namespace dynarithmic;

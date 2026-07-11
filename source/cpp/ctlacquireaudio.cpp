@@ -22,7 +22,6 @@
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
-#include "sourceselectopts.h"
 #include "acquisitionarray.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -34,12 +33,11 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG n
                                                     DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    VerifyHandles(Source);
 
     DTWAIN_ARRAY Acquisitions = DTWAIN_CreateAcquisitionArray();
     AcquisitionArrayRAII raii(Acquisitions, false);
-    auto bRet = DTWAIN_AcquireAudioNativeEx(Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus);
-    if ( bRet )
+    if (DTWAIN_AcquireAudioNativeEx(Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus))
         raii.bDestroy = false;
 
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))

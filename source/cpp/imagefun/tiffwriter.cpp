@@ -22,16 +22,13 @@
 #pragma warning (disable : 4786)
 #endif
 #include <tiffio.h>
-#include <windows.h>
 #include <cstdint>
-#include <cstring>
 #include <string>
 #include <vector>
 #include <memory>
 #include <utility>
 #include "tiffwriter.h"
 #include "dtwaindefs.h"
-#include "dibutil.h"
 
 // ============================================================
 // Internal helpers

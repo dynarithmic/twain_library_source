@@ -134,38 +134,28 @@ LONG dynarithmic::GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCa
             // We need to match up the MSG_GET container with the MSG_SETCONSTRAINT container
             case DTWAIN_CAPSETAVAILABLE:
             case DTWAIN_CAPSETCONSTRAINT:
-            {
                 return PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, pSource, nCap, MSG_GET, CapInfo);
-            }
-            break;
 
             case DTWAIN_CAPGETCURRENT:
-            {
                 return PerformCapContainerTest<CAPINFO_IDX_GETCURRENTCONTAINER>(pHandle, pSource, nCap, MSG_GETCURRENT, CapInfo);
-            }
-            break;
 
             case DTWAIN_CAPGETDEFAULT:
-            {
                 return PerformCapContainerTest<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, pSource, nCap, MSG_GETDEFAULT, CapInfo);
-            }
-            break;
 
             case DTWAIN_CAPSET:
             case DTWAIN_CAPSETCURRENT:
             {
                 if (nCap >= CAP_CUSTOMBASE)
-                {
                     // We need to use the MSG_GET container type
                     return PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, pSource, nCap, MSG_GET, CapInfo);
-                }
                 return static_cast<LONG>(std::get<CAPINFO_IDX_SETCONTAINER>(*CapInfo));
             }
-            break;
+
             case DTWAIN_CAPRESET:
-            {
                 return static_cast<LONG>(std::get<CAPINFO_IDX_RESETCONTAINER>(*CapInfo));
-            }
+
+            default: 
+                return 0;
         }
     }
     return 0;

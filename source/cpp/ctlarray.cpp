@@ -975,8 +975,8 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_ArrayInsertAtFrameN(DTWAIN_ARRAY pArray, LONG n
     {
         DTWAIN_Check_Error_Condition_WithThrow_Ex_WithParams(pHandle, [&] { return true; },
                             val.first, false, FUNC_MACRO, true, { val.second });
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
     auto& vect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(pArray);
     auto tempVect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(frame);

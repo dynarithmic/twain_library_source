@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <algorithm>
-#include "ctldib.h"
 #include "ctliface.h"
 #include "jpegxrwriter.h"
 #include "iohandler_jpegxr.h"

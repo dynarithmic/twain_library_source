@@ -18,21 +18,33 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+
 #include <chrono>
+#include <ctime>
 #include <iomanip>
 #include <sstream>
-#include <array>
+#include <string>
 #include <string_view>
-#include <boost/algorithm/string/replace.hpp>
-#include <vector>
+#include <array>
 
-#include "ctltwainmanager.h"
 #include "ctliface.h"
 #include "cppfunc.h"
 #include "ctlstringutils.h"
 #include "ctlconstexprfind.h"
 
 using namespace dynarithmic;
+
+namespace timeutils
+{
+    bool GetLocalTime(std::time_t value, std::tm& result)
+    {
+    #ifdef _WIN32
+        return ::localtime_s(&result, &value) == 0;
+    #else
+        return ::localtime_r(&value, &result) != nullptr;
+    #endif
+    }
+}
 
 template <typename WrapperToUse, typename PointerType>
 static HANDLE ConvertToAPIString_Internal(PointerType lpOrigString)
@@ -118,18 +130,42 @@ namespace dynarithmic
 
     std::string CreateFileNameWithDateTime(std::string_view prefix, std::string_view ext, bool useUTC)
     {
-        auto now = std::chrono::system_clock::now();
+        using namespace std::chrono;
+        const auto now = system_clock::now();
+        std::string result(prefix);
+
         if (useUTC)
         {
-            auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
-            return prefix.data() + std::to_string(UTC) + "." + ext.data();
+            const auto utcMilliseconds = duration_cast<milliseconds>(now.time_since_epoch()).count();
+            result += std::to_string(utcMilliseconds);
         }
-        auto in_time_t = std::chrono::system_clock::to_time_t(now);
-        std::stringstream datetime;
-        datetime << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
-        std::string outVal = datetime.str();
-        outVal = StringWrapperA::ReplaceAll(outVal, ":", "_");
-        return prefix.data() + outVal + "." + ext.data();
+        else
+        {
+            const auto localmilliseconds = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+            const std::time_t timeValue = system_clock::to_time_t(now);
+
+            std::tm localTime{};
+            if (!timeutils::GetLocalTime(timeValue, localTime))
+                return {};
+
+            std::ostringstream os;
+
+            os << std::put_time(&localTime, "%Y-%m-%d_%H-%M-%S")
+                << '_'
+                << std::setw(3)
+                << std::setfill('0')
+                << localmilliseconds.count();
+
+            result += os.str();
+        }
+
+        if (!ext.empty())
+        {
+            result += '.';
+            result.append(ext.data(), ext.size());
+        }
+
+        return result;
     }
 
     // Function to convert a two-character hex string to a byte

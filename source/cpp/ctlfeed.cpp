@@ -51,8 +51,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
     if (getSupport.value != boost::tribool::indeterminate_value)
         LOG_FUNC_EXIT_NONAME_PARAMS(getSupport ? true : false)
 
-    BOOL bRet = false;
-
     // Check if feeder has been enabled.  If so, then device has a feeder
     DTWAIN_ARRAY arr = nullptr;
     const BOOL bOk = GetCapValuesEx2_Internal(pSource, CAP_FEEDERENABLED, 
@@ -77,7 +75,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
     }
     // Enable the feeder temporarily to test if setting it will work.
     vFeeder[0] = 1;
-    bRet = SetCapValuesEx2_Internal(pSource, CAP_FEEDERENABLED, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+    BOOL bRet = SetCapValuesEx2_Internal(pSource, CAP_FEEDERENABLED, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT,
+                                         arr);
     if (!bRet)
     {
         pSource->SetFeederSupported(false);
@@ -268,10 +267,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSensitive(DTWAIN_SOURCE Source)
     if (getSupport.value != boost::tribool::indeterminate_value)
         LOG_FUNC_EXIT_NONAME_PARAMS(getSupport ? true : false)
 
-    bool bRet = false;
-
     // Check if paper detectable
-    bRet = DTWAIN_IsPaperDetectable(Source);
+    bool bRet = DTWAIN_IsPaperDetectable(Source);
     pSource->SetFeederSensitive(bRet);
 
     // We will see if the source is compliant
@@ -394,42 +391,3 @@ int dynarithmic::FeederWait(CTL_ITwainSource *pSource)
     return DTWAIN_NO_ERROR;
 }
 ///////////////////////////////////////////////////////////
-#if 0
-VOID CALLBACK ThisTimerProc(HWND, UINT, ULONG idEvent, DWORD)
-{
-    return;
-    // This is experimental code that unfortunately does not work
-    // consistently, thus it is commented out.
-    #if 0
-    #ifdef _WIN32
-    // Make sure that user set a callback
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    const auto pFn = DTWAIN_GetCallback();
-    if ( !pFn )
-        return;
-
-    if ( idEvent == CTL_TwainDLLHandle::s_nTimerID )
-    {
-        // Check if any open source supports feeder
-        auto it = pHandle->m_aFeederSources.begin();
-        const auto it2 = pHandle->m_aFeederSources.end();
-
-        while ( it != it2 )
-        {
-            const auto pSource = static_cast<CTL_ITwainSource*>(*it);
-            const auto sourceState = pSource->GetState();
-            if ( sourceState != SOURCE_STATE_XFERREADY &&
-                 sourceState != SOURCE_STATE_TRANSFERRING)
-            {
-                if (DTWAIN_IsFeederLoaded( *it ))
-                    (*pFn)(DTWAIN_TN_FEEDERLOADED, reinterpret_cast<LPARAM>(*it), pHandle->m_lCallbackData);
-                else
-                    (*pFn)(DTWAIN_TN_FEEDERNOTLOADED, reinterpret_cast<LPARAM>(*it), pHandle->m_lCallbackData);
-            }
-            ++it;
-        }
-    }
-    #endif
-    #endif
-}
-#endif

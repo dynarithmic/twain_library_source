@@ -23,13 +23,10 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
-#include "dtwain_resource_constants.h"
 #include "errorcheck.h"
 #include "dtwstrfn.h"
 
 using namespace dynarithmic;
-static std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator>
-    CheckPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement, CTL_ITwainSource* pSource, LONG& ConditionCode);
 static std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator>
     CheckGlobalPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement);
 
@@ -376,20 +373,21 @@ static std::shared_ptr<PDFTextElement> GenericAddPDFText(CTL_ITwainSource *pSour
         element.m_font.m_fontName = sFontName;
     else
         element.m_font.m_fontName = StringConversion::Convert_NativePtr_To_Ansi(fontName);
-    for (int i = 0; i < numDefVals; ++i)
+
+    for (const auto& defVal : defVals)
     {
-        if (Flags & defVals[i].flagValue)
-            *defVals[i].pDestination = defVals[i].DefaultValue;
+        if (Flags & defVal.flagValue)
+            *defVal.pDestination = defVal.DefaultValue;
         else
-            *defVals[i].pDestination = defVals[i].pSource;
+            *defVal.pDestination = defVal.pSource;
     }
 
-    for (int i = 0; i < numDefValsDOUBLE; ++i)
+    for (const auto& i : defValsDOUBLE)
     {
-        if (Flags & defValsDOUBLE[i].flagValue)
-            *defValsDOUBLE[i].pDestination = defValsDOUBLE[i].DefaultValue;
+        if (Flags & i.flagValue)
+            *i.pDestination = i.DefaultValue;
         else
-            *defValsDOUBLE[i].pDestination = defValsDOUBLE[i].pSource;
+            *i.pDestination = i.pSource;
     }
 
     /* Now get the position */
@@ -398,7 +396,7 @@ static std::shared_ptr<PDFTextElement> GenericAddPDFText(CTL_ITwainSource *pSour
 
     if (!pTextElement)
     {
-        PDFTextElementPtr pPtr = std::make_shared<PDFTextElement>();
+        auto pPtr = std::make_shared<PDFTextElement>();
 
         auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_PDFTEXTELEMENTS);
         guidMap.Insert(StringWrapperA::GenerateUUIDv4(), pPtr.get());
@@ -431,7 +429,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_P
 {
     LOG_FUNC_ENTRY_PARAMS((Source, TextElement))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    PDFTextElement* pElement = static_cast<PDFTextElement*>(TextElement);
+    auto pElement = static_cast<PDFTextElement*>(TextElement);
     auto validElement = CheckGlobalPDFTextElement(TextElement);
     DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return !validElement.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     GenericAddPDFText(pSource,
@@ -573,15 +571,6 @@ DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElement()
     LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
     CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
-
-struct FindPDFTextHandle
-{
-    FindPDFTextHandle(PDFTextElement* pEl) : m_Element(pEl) { }
-    bool operator() (const PDFTextElementPtr& pEl) const { return pEl.get() == m_Element; }
-
-private:
-    PDFTextElement* m_Element;
-};
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement)
 {

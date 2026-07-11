@@ -131,16 +131,15 @@ static std::pair<int, DTWAIN_ARRAY> PerformGetCap(CTL_ITwainSource* pSource,
     DTWAIN_ARRAY pDTWAINArray = ThisArray;
     pHandle->m_ArrayFactory->clear(pDTWAINArray);
     int bOk = 0;
-    std::pair<bool, int> retValue;
     if (lContainerType == DTWAIN_CONTONEVALUE)
     {
-        retValue = GetOneCapValue<DataType>(pHandle,
-                                       pActualSource,
-                                       static_cast<UINT>(lCap),
-                                       static_cast<TW_UINT16>(lGetType),
-                                       oneCapFlag,
-                                       &dValue,
-                                       static_cast<TW_UINT16>(overrideDataType));
+        std::pair<bool, int> retValue = GetOneCapValue<DataType>(pHandle,
+                                                                 pActualSource,
+                                                                 static_cast<UINT>(lCap),
+                                                                 static_cast<TW_UINT16>(lGetType),
+                                                                 oneCapFlag,
+                                                                 &dValue,
+                                                                 static_cast<TW_UINT16>(overrideDataType));
         bOk = retValue.first;
         if (!bOk)
             return { retValue.second, nullptr };

@@ -23,7 +23,6 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctltwaindecoder.h"
-#include "twainfix32.h"
 
 using namespace dynarithmic;
 
@@ -34,7 +33,7 @@ static std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem);
 static std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups);
 constexpr const char * IndentDefinition() { return "    "; }
 
-#define ADD_ERRORCODE_TO_MAP2(x, y) {x + y, #y}
+#define ADD_ERRORCODE_TO_MAP2(x, y) {(x) + (y), #y}
 
 static constexpr std::array<std::pair<uint32_t, const char*>, 41> mapTwainDSMReturnCodes =
 { {

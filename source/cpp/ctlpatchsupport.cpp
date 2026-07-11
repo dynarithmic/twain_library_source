@@ -22,9 +22,8 @@
 #include <algorithm>
 
 #include "cppfunc.h"
-#include "dtwain.h"
 #include "ctliface.h"
-#include "ctltwainmanager.h"
+
 using namespace dynarithmic;
 
 // This file processes both patch codes and bar code caps, since currently the capabilities

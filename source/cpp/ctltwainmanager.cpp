@@ -28,7 +28,6 @@
 #include <algorithm>
 #include <set>
 #include <memory>
-#include <cstring>
 #include <sstream>
 #include <array>
 #include <boost/format.hpp>
@@ -40,14 +39,12 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
-#include "twainfix32.h"
 #include "dtwinverex.h"
 #include "cppfunc.h"
 #include "logwriterutils.h"
 #include "ctltripletbase.h"
 #include "ctlconstexprutils.h"
 #include "ctlstringutils.h"
-#include "ctlsetgetcaps.h"
 #include "ctldib32ex.h"
 
 using namespace dynarithmic;

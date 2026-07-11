@@ -28,7 +28,7 @@ class A85Decoder
 private:
     unsigned long pow85[5];
     static void wput(std::string & output, unsigned long tuple, int nBytes);
-    std::string decode85();
+    std::string decode85() const;
     std::string m_scratch;
 
 public:

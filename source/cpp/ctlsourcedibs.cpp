@@ -165,8 +165,6 @@ std::pair<bool, int> dynarithmic::DestroyAcquisitionArray(CTL_TwainDLLHandle* pH
 {
     const auto& factory = pHandle->m_ArrayFactory;
 
-    // Check if array exists
-    std::pair<bool, int> retFalse = { false, DTWAIN_ERR_WRONG_ARRAY_TYPE };
     if (!factory->is_valid(aAcq))
         return { false, DTWAIN_ERR_WRONG_ARRAY_TYPE };
 

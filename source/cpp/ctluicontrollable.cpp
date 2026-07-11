@@ -19,10 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltwainmanager.h"
-#include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
-#include "ctlclosesource.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

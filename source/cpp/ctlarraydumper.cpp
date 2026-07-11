@@ -68,19 +68,6 @@ struct StreamerImplFrame
     }
 };
 
-struct StreamerImplNativeString
-{
-    CTL_OutputBaseStreamType* m_pStrm;
-    size_t* m_pCurItem;
-    StreamerImplNativeString(CTL_OutputBaseStreamType* strm, size_t* curItem) : m_pStrm(strm), m_pCurItem(curItem) { *curItem = 0; }
-
-    void operator()(CTL_StringType& pPtr) const
-    {
-        *m_pStrm << pPtr << _T("\n");
-        ++*m_pCurItem;
-    }
-};
-
 struct StreamerImplTwainSource
 {
     CTL_OutputBaseStreamType* m_pStrm;
@@ -199,7 +186,7 @@ static void DumpArrayNativeString(DTWAIN_ARRAY Array)
 template <typename StringWrapperType, typename WriterFn>
 static void GenericDumpArrayString(DTWAIN_ARRAY Array, WriterFn fn)
 {
-    using string_type = StringWrapperType::traits_type::string_type;
+    using string_type = typename StringWrapperType::traits_type::string_type;
     static constexpr auto newLine = StringWrapperType::traits_type::GetNewLineString();
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     const auto& vData = 

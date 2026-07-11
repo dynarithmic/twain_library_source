@@ -23,7 +23,6 @@
 #endif
 #include "pdffun32.h"
 #include <string>
-#include <cmath>
 #include <pdfconst.h>
 #include <utility>
 #include <memory>

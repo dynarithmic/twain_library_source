@@ -95,11 +95,10 @@ namespace dynarithmic
 
     std::pair<bool, std::string> create_directory(LPCTSTR directory)
     {
-        bool directory_created = false;
         try
         {
             std::error_code eCode;
-            directory_created = filesys::create_directories(directory, eCode);
+            bool directory_created = filesys::create_directories(directory, eCode);
             if (eCode.value() == 0 || directory_created)
                 return { true, "" };
             return { false, eCode.message() };

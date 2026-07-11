@@ -275,7 +275,6 @@ bool OCREngine::SetPDFFileTypes(OCRPDFInfo::enumPDFColorType nWhich, LONG fileTy
     return true;
 }
 
-typedef std::string(OCREngine::* OCRINFOFUNC)() const;
 LONG dynarithmic::GetOCRInfo(OCREngine* pEngine, OCRINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen)
 {
     const CTL_StringType pName = StringConversion::Convert_Ansi_To_Native((pEngine->*pFunc)());

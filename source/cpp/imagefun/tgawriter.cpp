@@ -18,9 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <windows.h>
 #include <cstdint>
-#include <cstring>
 #include <array>
 #include "tgawriter.h"
 
@@ -147,7 +145,7 @@ bool TgaSessionWriter::WriteExtensionAreaWithComments()
 
     footer.extensionOffset = extensionOffset;
     footer.developerOffset = 0;
-
+    
     std::memcpy(footer.signature, "TRUEVISION-XFILE.", 17);
     footer.signature[17] = '\0';
 

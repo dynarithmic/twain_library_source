@@ -19,10 +19,9 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr010.h"
-
 #include "ctliface.h"
 #include "ctltwainmanager.h"
-#include "twainfix32.h"
+
 using namespace dynarithmic;
 
 CTL_CapabilityTriplet::CTL_CapabilityTriplet(CTL_ITwainSession *pSession,

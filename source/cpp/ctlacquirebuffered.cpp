@@ -24,7 +24,6 @@
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
 #include "ctltwainmsgloop.h"
-#include "sourceselectopts.h"
 #include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER

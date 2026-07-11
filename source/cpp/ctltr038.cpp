@@ -21,7 +21,6 @@
 #include "ctltr038.h"
 
 #include "ctliface.h"
-#include "ctltr010.h"
 #include "ctltwainmanager.h"
 
 using namespace dynarithmic;

@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
 #include "ctliface.h"
 #include "ctlfileutils.h"
 #include "icowriter.h"
@@ -61,8 +60,8 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
         return DTWAIN_ERR_DIB;
 
     dynarithmic::dib::LockedDib dibHandle(m_pDib->GetHandle());
-    int height = dibHandle.Height();
-    int width = dibHandle.Width();
+    auto height = dibHandle.Height();
+    auto width = dibHandle.Width();
 
     if (!m_ImageInfoEx.IsVistaIcon)
     {

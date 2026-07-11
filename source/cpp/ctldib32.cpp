@@ -28,7 +28,6 @@
 #include "winconst.h"
 #include "winbit32.h"
 #include "ctltwainmanager.h"
-#include "ctldib.h"
 #include "ctldib32ex.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
@@ -51,17 +50,8 @@
 #include "iohandler_text.h"
 #include "iohandler_svg.h"
 
- /* Header signatures for various resources */
-constexpr auto BFT_ICON = 0x4349   /* 'IC' */;
-constexpr auto BFT_BITMAP = 0x4d42   /* 'BM' */;
-constexpr auto BFT_CURSOR = 0x5450   /* 'PT' */;
-constexpr auto MAXREAD = 65535;
-
 template<typename T1, typename T2, typename T3>
 constexpr auto BOUND(T1 x, T2 min, T3 max) { return ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x))); }
-
-#define LPBimage(lpbi)  ((HPSTR)lpbi+lpbi->biSize+(long)(lpbi->biClrUsed*sizeof(RGBQUAD)))
-#define LPBlinewidth(lpbi) (WIDTHBYTES((WORD)lpbi->biWidth*lpbi->biBitCount))
 
 using namespace dynarithmic;
 
@@ -158,7 +148,7 @@ CTL_TwainDib& CTL_TwainDib::operator=(const CTL_TwainDib& rDib)
 void CTL_TwainDib::SetEqual( const CTL_TwainDib &rDib )
 {
     m_bAutoDelete = rDib.m_bAutoDelete;
-    CTL_TwainDib *pDib = (CTL_TwainDib *)&rDib;
+    CTL_TwainDib *pDib = const_cast<CTL_TwainDib*>(&rDib);
     pDib->m_bAutoDelete = false;
     m_bIsValid = rDib.m_bIsValid;
     m_TwainDibInfo = rDib.m_TwainDibInfo;
@@ -773,7 +763,7 @@ bool CTL_TwainDib::FlipBitMap(bool /*bRGB*/)
 
         DTWAINGlobalHandle_RAII hDibHandler(hDib);
 
-        LPBITMAPINFO pdib = (LPBITMAPINFO)pDib;
+        LPBITMAPINFO pdib = reinterpret_cast<LPBITMAPINFO>(pDib);
         LONG Width = pdib->bmiHeader.biWidth;
         LONG Height = pdib->bmiHeader.biHeight;
         DWORD SizeImage = pdib->bmiHeader.biSizeImage;

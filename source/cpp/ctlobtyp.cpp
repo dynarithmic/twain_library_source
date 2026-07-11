@@ -19,10 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <cstring>
-#include <algorithm>
 
 #include "ctlobtyp.h"
-#include "ctltr010.h"
 #include "ctliface.h"
 
 using namespace dynarithmic;

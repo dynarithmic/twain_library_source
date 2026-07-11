@@ -25,6 +25,10 @@
 #include <vector>
 #include <string_view>
 
+// Widening string macros
+#define WIDEN2(x) L##x
+#define WIDEN(x)  WIDEN2(x)
+
 namespace dynarithmic
 {
     // Truncate a string if it goes over maxLen, and replace truncated contents with
