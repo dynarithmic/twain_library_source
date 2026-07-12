@@ -2955,7 +2955,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetCaption(DTWAIN_SOURCE Source, System.IntPtr Caption);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetCompressionSize(DTWAIN_SOURCE Source, ref int lBytes);
+        public static extern int DTWAIN_GetCompressionSize(DTWAIN_SOURCE Source, ref DWORD lBytes);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetCompressionType(DTWAIN_SOURCE Source, ref int lpCompression, int bCurrent);
@@ -3027,10 +3027,10 @@ namespace Dynarithmic
         public static extern DTWAIN_HANDLE DTWAIN_GetDTWAINHandle();
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, ref int lpEvent);
+        public static extern int DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, ref DWORD lpEvent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, ref int lpEvent, ref DTWAIN_ARRAY pArray);
+        public static extern int DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, ref DWORD lpEvent, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetDeviceEventInfo(DTWAIN_SOURCE Source, int nWhichInfo, System.IntPtr pValue);
@@ -3060,7 +3060,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetErrorBuffer(ref DTWAIN_ARRAY ArrayBuffer);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetErrorBufferThreshold();
+        public static extern uint DTWAIN_GetErrorBufferThreshold();
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern DTwainErrorProc DTWAIN_GetErrorCallback();
@@ -4272,7 +4272,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetEOJDetectValue(DTWAIN_SOURCE Source, int nValue);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_SetErrorBufferThreshold(int nErrors);
+        public static extern int DTWAIN_SetErrorBufferThreshold(uint nErrors);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_SetErrorCallback(DTwainErrorProc proc, int UserData);

@@ -2304,7 +2304,7 @@ function DTWAIN_GetCapValuesEx2(Source:DTWAIN_SOURCE; lCap:LONG; lGetType:LONG; 
 function DTWAIN_GetCaption(Source:DTWAIN_SOURCE; Caption:LPTSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCaption';
 function DTWAIN_GetCaptionA(Source:DTWAIN_SOURCE; Caption:LPSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCaptionA';
 function DTWAIN_GetCaptionW(Source:DTWAIN_SOURCE; Caption:LPWSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCaptionW';
-function DTWAIN_GetCompressionSize(Source:DTWAIN_SOURCE; lBytes:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCompressionSize';
+function DTWAIN_GetCompressionSize(Source:DTWAIN_SOURCE; lBytes:LPDWORD) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCompressionSize';
 function DTWAIN_GetCompressionType(Source:DTWAIN_SOURCE; lpCompression:LPLONG; bCurrent:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCompressionType';
 function DTWAIN_GetCompressionTypeEx(Source:DTWAIN_SOURCE; bCurrent:BOOL) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCompressionTypeEx';
 function DTWAIN_GetConditionCodeString(lError:LONG; lpszBuffer:LPTSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetConditionCodeString';
@@ -2335,8 +2335,8 @@ function DTWAIN_GetDSMSearchOrderEx(SearchOrder:LPTSTR; UserDirectory:LPTSTR) : 
 function DTWAIN_GetDSMSearchOrderExA(SearchOrder:LPSTR; UserDirectory:LPSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMSearchOrderExA';
 function DTWAIN_GetDSMSearchOrderExW(SearchOrder:LPWSTR; UserDirectory:LPWSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMSearchOrderExW';
 function DTWAIN_GetDTWAINHandle : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDTWAINHandle';
-function DTWAIN_GetDeviceEvent(Source:DTWAIN_SOURCE; lpEvent:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceEvent';
-function DTWAIN_GetDeviceEventEx(Source:DTWAIN_SOURCE; lpEvent:LPLONG; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceEventEx';
+function DTWAIN_GetDeviceEvent(Source:DTWAIN_SOURCE; lpEvent:LPDWORD) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceEvent';
+function DTWAIN_GetDeviceEventEx(Source:DTWAIN_SOURCE; lpEvent:LPDWORD; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceEventEx';
 function DTWAIN_GetDeviceEventInfo(Source:DTWAIN_SOURCE; nWhichInfo:LONG; pValue:LPVOID) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceEventInfo';
 function DTWAIN_GetDeviceNotifications(Source:DTWAIN_SOURCE; DevEvents:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceNotifications';
 function DTWAIN_GetDeviceTimeDate(Source:DTWAIN_SOURCE; szTimeDate:LPTSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceTimeDate';
@@ -2347,7 +2347,7 @@ function DTWAIN_GetDoubleFeedDetectValues(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_
 function DTWAIN_GetDuplexType(Source:DTWAIN_SOURCE; lpDupType:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDuplexType';
 function DTWAIN_GetDuplexTypeEx(Source:DTWAIN_SOURCE) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDuplexTypeEx';
 function DTWAIN_GetErrorBuffer(ArrayBuffer:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetErrorBuffer';
-function DTWAIN_GetErrorBufferThreshold : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetErrorBufferThreshold';
+function DTWAIN_GetErrorBufferThreshold : DWORD; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetErrorBufferThreshold';
 function DTWAIN_GetErrorCallback : DTwainErrorProc; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetErrorCallback';
 function DTWAIN_GetErrorCallback64 : DTwainErrorProc64; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetErrorCallback64';
 function DTWAIN_GetErrorString(lError:LONG; lpszBuffer:LPTSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetErrorString';
@@ -2861,7 +2861,7 @@ function DTWAIN_SetDoubleFeedDetectLengthStringW(Source:DTWAIN_SOURCE; szLength:
 function DTWAIN_SetDoubleFeedDetectValues(Source:DTWAIN_SOURCE; prray:DTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetDoubleFeedDetectValues';
 function DTWAIN_SetDoublePageCountOnDuplex(Source:DTWAIN_SOURCE; bDoubleCount:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetDoublePageCountOnDuplex';
 function DTWAIN_SetEOJDetectValue(Source:DTWAIN_SOURCE; nValue:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetEOJDetectValue';
-function DTWAIN_SetErrorBufferThreshold(nErrors:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetErrorBufferThreshold';
+function DTWAIN_SetErrorBufferThreshold(nErrors:DWORD) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetErrorBufferThreshold';
 function DTWAIN_SetErrorCallback(proc:DTwainErrorProc; UserData:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetErrorCallback';
 function DTWAIN_SetErrorCallback64(proc:DTwainErrorProc64; UserData64:Int64) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetErrorCallback64';
 function DTWAIN_SetFeederAlignment(Source:DTWAIN_SOURCE; lpAlignment:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetFeederAlignment';

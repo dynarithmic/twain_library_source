@@ -495,7 +495,7 @@ type Dtwaingetcapvaluesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i3
 type DtwaingetcaptionFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
 type DtwaingetcaptionaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
 type DtwaingetcaptionwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetcompressionsizeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetcompressionsizeFunc = unsafe extern "C" fn(*mut c_void,*mut u32) -> i32;
 type DtwaingetcompressiontypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
 type DtwaingetcompressiontypeexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwaingetconditioncodestringFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
@@ -526,8 +526,8 @@ type DtwaingetdsmsearchorderexFunc = unsafe extern "C" fn(*mut u16,*mut u16) -> 
 type DtwaingetdsmsearchorderexaFunc = unsafe extern "C" fn(*mut c_char,*mut c_char) -> i32;
 type DtwaingetdsmsearchorderexwFunc = unsafe extern "C" fn(*mut u16,*mut u16) -> i32;
 type DtwaingetdtwainhandleFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwaingetdeviceeventFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetdeviceeventexFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut *mut c_void) -> i32;
+type DtwaingetdeviceeventFunc = unsafe extern "C" fn(*mut c_void,*mut u32) -> i32;
+type DtwaingetdeviceeventexFunc = unsafe extern "C" fn(*mut c_void,*mut u32,*mut *mut c_void) -> i32;
 type DtwaingetdeviceeventinfoFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
 type DtwaingetdevicenotificationsFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
 type DtwaingetdevicetimedateFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
@@ -538,7 +538,7 @@ type DtwaingetdoublefeeddetectvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut
 type DtwaingetduplextypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
 type DtwaingetduplextypeexFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingeterrorbufferFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
-type DtwaingeterrorbufferthresholdFunc = unsafe extern "C" fn() -> i32;
+type DtwaingeterrorbufferthresholdFunc = unsafe extern "C" fn() -> u32;
 type DtwaingeterrorcallbackFunc = unsafe extern "C" fn() -> DTWAIN_ERROR_PROC;
 type Dtwaingeterrorcallback64Func = unsafe extern "C" fn() -> DTWAIN_ERROR_PROC64;
 type DtwaingeterrorstringFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
@@ -1050,7 +1050,7 @@ type DtwainsetdoublefeeddetectlengthstringwFunc = unsafe extern "C" fn(*mut c_vo
 type DtwainsetdoublefeeddetectvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
 type DtwainsetdoublepagecountonduplexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainseteojdetectvalueFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainseterrorbufferthresholdFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainseterrorbufferthresholdFunc = unsafe extern "C" fn(u32) -> i32;
 type DtwainseterrorcallbackFunc = unsafe extern "C" fn(DTWAIN_ERROR_PROC,i32) -> i32;
 type Dtwainseterrorcallback64Func = unsafe extern "C" fn(DTWAIN_ERROR_PROC64,i64) -> i32;
 type DtwainsetfeederalignmentFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
@@ -8248,7 +8248,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetCaptionWFunc)(Source, Caption);  }
     }
 
-    pub fn DTWAIN_GetCompressionSize(&self, Source: *mut c_void, lBytes: *mut i32) -> i32 {
+    pub fn DTWAIN_GetCompressionSize(&self, Source: *mut c_void, lBytes: *mut u32) -> i32 {
         unsafe { return (self.DTWAIN_GetCompressionSizeFunc)(Source, lBytes);  }
     }
 
@@ -8372,11 +8372,11 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetDTWAINHandleFunc)();  }
     }
 
-    pub fn DTWAIN_GetDeviceEvent(&self, Source: *mut c_void, lpEvent: *mut i32) -> i32 {
+    pub fn DTWAIN_GetDeviceEvent(&self, Source: *mut c_void, lpEvent: *mut u32) -> i32 {
         unsafe { return (self.DTWAIN_GetDeviceEventFunc)(Source, lpEvent);  }
     }
 
-    pub fn DTWAIN_GetDeviceEventEx(&self, Source: *mut c_void, lpEvent: *mut i32, pArray: *mut *mut c_void) -> i32 {
+    pub fn DTWAIN_GetDeviceEventEx(&self, Source: *mut c_void, lpEvent: *mut u32, pArray: *mut *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_GetDeviceEventExFunc)(Source, lpEvent, pArray);  }
     }
 
@@ -8420,7 +8420,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetErrorBufferFunc)(ArrayBuffer);  }
     }
 
-    pub fn DTWAIN_GetErrorBufferThreshold(&self) -> i32 {
+    pub fn DTWAIN_GetErrorBufferThreshold(&self) -> u32 {
         unsafe { return (self.DTWAIN_GetErrorBufferThresholdFunc)();  }
     }
 
@@ -10468,7 +10468,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetEOJDetectValueFunc)(Source, nValue);  }
     }
 
-    pub fn DTWAIN_SetErrorBufferThreshold(&self, nErrors: i32) -> i32 {
+    pub fn DTWAIN_SetErrorBufferThreshold(&self, nErrors: u32) -> i32 {
         unsafe { return (self.DTWAIN_SetErrorBufferThresholdFunc)(nErrors);  }
     }
 

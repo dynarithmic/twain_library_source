@@ -3033,7 +3033,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetCaptionDelegate(Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> Caption As StringBuilder) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetCompressionSizeDelegate(Source As System.IntPtr, ByRef lBytes As Integer) As Integer
+        Private Delegate Function DTWAIN_GetCompressionSizeDelegate(Source As System.IntPtr, ByRef lBytes As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetCompressionTypeDelegate(Source As System.IntPtr, ByRef lpCompression As Integer, bCurrent As Integer) As Integer
@@ -3090,10 +3090,10 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetDTWAINHandleDelegate() As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetDeviceEventDelegate(Source As System.IntPtr, ByRef lpEvent As Integer) As Integer
+        Private Delegate Function DTWAIN_GetDeviceEventDelegate(Source As System.IntPtr, ByRef lpEvent As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetDeviceEventExDelegate(Source As System.IntPtr, ByRef lpEvent As Integer, ByRef pArray As System.IntPtr) As Integer
+        Private Delegate Function DTWAIN_GetDeviceEventExDelegate(Source As System.IntPtr, ByRef lpEvent As UInteger, ByRef pArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetDeviceEventInfoDelegate(Source As System.IntPtr, nWhichInfo As Integer, pValue As System.IntPtr) As Integer
@@ -3120,7 +3120,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetErrorBufferDelegate(ByRef ArrayBuffer As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetErrorBufferThresholdDelegate() As Integer
+        Private Delegate Function DTWAIN_GetErrorBufferThresholdDelegate() As UInteger
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetErrorCallbackDelegate() As DTwainErrorProc
@@ -4182,7 +4182,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_SetEOJDetectValueDelegate(Source As System.IntPtr, nValue As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SetErrorBufferThresholdDelegate(nErrors As Integer) As Integer
+        Private Delegate Function DTWAIN_SetErrorBufferThresholdDelegate(nErrors As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetErrorCallbackDelegate(proc As DTwainErrorProc, UserData As Integer) As Integer
@@ -5996,7 +5996,7 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetCaption(Source, Caption)
         End Function
         
-        Public Function DTWAIN_GetCompressionSize(Source As System.IntPtr, ByRef lBytes As Integer) As Integer
+        Public Function DTWAIN_GetCompressionSize(Source As System.IntPtr, ByRef lBytes As UInteger) As Integer
         Return api.DTWAIN_GetCompressionSize(Source, lBytes)
         End Function
         
@@ -6072,11 +6072,11 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetDTWAINHandle()
         End Function
         
-        Public Function DTWAIN_GetDeviceEvent(Source As System.IntPtr, ByRef lpEvent As Integer) As Integer
+        Public Function DTWAIN_GetDeviceEvent(Source As System.IntPtr, ByRef lpEvent As UInteger) As Integer
         Return api.DTWAIN_GetDeviceEvent(Source, lpEvent)
         End Function
         
-        Public Function DTWAIN_GetDeviceEventEx(Source As System.IntPtr, ByRef lpEvent As Integer, ByRef pArray As System.IntPtr) As Integer
+        Public Function DTWAIN_GetDeviceEventEx(Source As System.IntPtr, ByRef lpEvent As UInteger, ByRef pArray As System.IntPtr) As Integer
         Return api.DTWAIN_GetDeviceEventEx(Source, lpEvent, pArray)
         End Function
         
@@ -6112,7 +6112,7 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetErrorBuffer(ArrayBuffer)
         End Function
         
-        Public Function DTWAIN_GetErrorBufferThreshold() As Integer
+        Public Function DTWAIN_GetErrorBufferThreshold() As UInteger
         Return api.DTWAIN_GetErrorBufferThreshold()
         End Function
         
@@ -7528,7 +7528,7 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetEOJDetectValue(Source, nValue)
         End Function
         
-        Public Function DTWAIN_SetErrorBufferThreshold(nErrors As Integer) As Integer
+        Public Function DTWAIN_SetErrorBufferThreshold(nErrors As UInteger) As Integer
         Return api.DTWAIN_SetErrorBufferThreshold(nErrors)
         End Function
         

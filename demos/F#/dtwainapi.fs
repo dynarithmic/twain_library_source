@@ -2970,7 +2970,7 @@ module TwainAPI =
     type DTWAIN_GetCaptionDelegate = delegate of DTWAIN_SOURCE * System.Text.StringBuilder -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_GetCompressionSizeDelegate = delegate of DTWAIN_SOURCE * int byref -> DTWAIN_BOOL
+    type DTWAIN_GetCompressionSizeDelegate = delegate of DTWAIN_SOURCE * DWORD byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetCompressionTypeDelegate = delegate of DTWAIN_SOURCE * int byref * DTWAIN_BOOL -> DTWAIN_BOOL
@@ -3027,10 +3027,10 @@ module TwainAPI =
     type DTWAIN_GetDTWAINHandleDelegate = delegate of unit -> DTWAIN_HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_GetDeviceEventDelegate = delegate of DTWAIN_SOURCE * int byref -> DTWAIN_BOOL
+    type DTWAIN_GetDeviceEventDelegate = delegate of DTWAIN_SOURCE * DWORD byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_GetDeviceEventExDelegate = delegate of DTWAIN_SOURCE * int byref * DTWAIN_ARRAY byref -> DTWAIN_BOOL
+    type DTWAIN_GetDeviceEventExDelegate = delegate of DTWAIN_SOURCE * DWORD byref * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetDeviceEventInfoDelegate = delegate of DTWAIN_SOURCE * LONG * LPVOID -> DTWAIN_BOOL
@@ -3057,7 +3057,7 @@ module TwainAPI =
     type DTWAIN_GetErrorBufferDelegate = delegate of DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_GetErrorBufferThresholdDelegate = delegate of unit -> LONG
+    type DTWAIN_GetErrorBufferThresholdDelegate = delegate of unit -> DWORD
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetErrorCallbackDelegate = delegate of unit -> DTWAIN_ERROR_PROC
@@ -4119,7 +4119,7 @@ module TwainAPI =
     type DTWAIN_SetEOJDetectValueDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_SetErrorBufferThresholdDelegate = delegate of LONG -> DTWAIN_BOOL
+    type DTWAIN_SetErrorBufferThresholdDelegate = delegate of DWORD -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SetFeederAlignmentDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
@@ -6803,7 +6803,7 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCaption.Value.Invoke(source, caption)
 
-    let DTWAIN_GetCompressionSize (source: DTWAIN_SOURCE) (lbytes: int byref) : DTWAIN_BOOL =
+    let DTWAIN_GetCompressionSize (source: DTWAIN_SOURCE) (lbytes: DWORD byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCompressionSize.Value.Invoke(source, &lbytes)
 
@@ -6879,11 +6879,11 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDTWAINHandle.Value.Invoke()
 
-    let DTWAIN_GetDeviceEvent (source: DTWAIN_SOURCE) (lpevent: int byref) : DTWAIN_BOOL =
+    let DTWAIN_GetDeviceEvent (source: DTWAIN_SOURCE) (lpevent: DWORD byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDeviceEvent.Value.Invoke(source, &lpevent)
 
-    let DTWAIN_GetDeviceEventEx (source: DTWAIN_SOURCE) (lpevent: int byref) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
+    let DTWAIN_GetDeviceEventEx (source: DTWAIN_SOURCE) (lpevent: DWORD byref) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDeviceEventEx.Value.Invoke(source, &lpevent, &parray)
 
@@ -6919,7 +6919,7 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetErrorBuffer.Value.Invoke(&arraybuffer)
 
-    let DTWAIN_GetErrorBufferThreshold() : LONG =
+    let DTWAIN_GetErrorBufferThreshold() : DWORD =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetErrorBufferThreshold.Value.Invoke()
 
@@ -8335,7 +8335,7 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SetEOJDetectValue.Value.Invoke(source, nvalue)
 
-    let DTWAIN_SetErrorBufferThreshold (nerrors: LONG) : DTWAIN_BOOL =
+    let DTWAIN_SetErrorBufferThreshold (nerrors: DWORD) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SetErrorBufferThreshold.Value.Invoke(nerrors)
 

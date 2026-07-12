@@ -2373,7 +2373,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CHARPTRTYPE) DTWAIN_GetCaption;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPSTR) DTWAIN_GetCaptionA;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPWSTR) DTWAIN_GetCaptionW;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetCompressionSize;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDWORD) DTWAIN_GetCompressionSize;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, DTWAIN_BOOL) DTWAIN_GetCompressionType;
     extern(Windows) LONG function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_GetCompressionTypeEx;
     extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetConditionCodeString;
@@ -2404,8 +2404,8 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LPSTR, LPSTR) DTWAIN_GetDSMSearchOrderExA;
     extern(Windows) LONG function(LPWSTR, LPWSTR) DTWAIN_GetDSMSearchOrderExW;
     extern(Windows) DTWAIN_HANDLE function() DTWAIN_GetDTWAINHandle;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetDeviceEvent;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPDTWAIN_ARRAY) DTWAIN_GetDeviceEventEx;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDWORD) DTWAIN_GetDeviceEvent;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDWORD, LPDTWAIN_ARRAY) DTWAIN_GetDeviceEventEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LPVOID) DTWAIN_GetDeviceEventInfo;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetDeviceNotifications;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CHARPTRTYPE) DTWAIN_GetDeviceTimeDate;
@@ -2416,7 +2416,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetDuplexType;
     extern(Windows) LONG function(DTWAIN_SOURCE) DTWAIN_GetDuplexTypeEx;
     extern(Windows) DTWAIN_BOOL function(LPDTWAIN_ARRAY) DTWAIN_GetErrorBuffer;
-    extern(Windows) LONG function() DTWAIN_GetErrorBufferThreshold;
+    extern(Windows) DWORD function() DTWAIN_GetErrorBufferThreshold;
     extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetErrorString;
     extern(Windows) LONG function(LONG, LPSTR, LONG) DTWAIN_GetErrorStringA;
     extern(Windows) LONG function(LONG, LPWSTR, LONG) DTWAIN_GetErrorStringW;
@@ -2923,7 +2923,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_ARRAY) DTWAIN_SetDoubleFeedDetectValues;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_SetDoublePageCountOnDuplex;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetEOJDetectValue;
-    extern(Windows) DTWAIN_BOOL function(LONG) DTWAIN_SetErrorBufferThreshold;
+    extern(Windows) DTWAIN_BOOL function(DWORD) DTWAIN_SetErrorBufferThreshold;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetFeederAlignment;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetFeederOrder;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG) DTWAIN_SetFeederWaitTime;

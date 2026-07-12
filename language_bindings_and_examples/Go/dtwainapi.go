@@ -5730,7 +5730,7 @@ func (d *DTWAIN_DLL) DTWAIN_GetCaptionW(Source DTWAIN_SOURCE, Caption []uint16) 
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetCompressionSize(Source DTWAIN_SOURCE, lBytes *int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetCompressionSize(Source DTWAIN_SOURCE, lBytes *uint32) int32 {
     theProc := d.procs["DTWAIN_GetCompressionSize"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(lBytes)))
     return int32(v1)
@@ -5917,13 +5917,13 @@ func (d *DTWAIN_DLL) DTWAIN_GetDTWAINHandle() DTWAIN_HANDLE {
     return DTWAIN_HANDLE(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetDeviceEvent(Source DTWAIN_SOURCE, lpEvent *int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetDeviceEvent(Source DTWAIN_SOURCE, lpEvent *uint32) int32 {
     theProc := d.procs["DTWAIN_GetDeviceEvent"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(lpEvent)))
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetDeviceEventEx(Source DTWAIN_SOURCE, lpEvent *int32, pArray LPDTWAIN_ARRAY) int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetDeviceEventEx(Source DTWAIN_SOURCE, lpEvent *uint32, pArray LPDTWAIN_ARRAY) int32 {
     theProc := d.procs["DTWAIN_GetDeviceEventEx"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(lpEvent)), uintptr(unsafe.Pointer(pArray)))
     return int32(v1)
@@ -5989,10 +5989,10 @@ func (d *DTWAIN_DLL) DTWAIN_GetErrorBuffer(ArrayBuffer LPDTWAIN_ARRAY) int32 {
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_GetErrorBufferThreshold() int32 {
+func (d *DTWAIN_DLL) DTWAIN_GetErrorBufferThreshold() uint32 {
     theProc := d.procs["DTWAIN_GetErrorBufferThreshold"]
     v1, _, _ := syscall.SyscallN(theProc)
-    return int32(v1)
+    return uint32(v1)
 }
 
 func (d *DTWAIN_DLL) DTWAIN_GetErrorCallback() DTWAIN_ERROR_PROC {
@@ -9111,7 +9111,7 @@ func (d *DTWAIN_DLL) DTWAIN_SetEOJDetectValue(Source DTWAIN_SOURCE, nValue int32
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_SetErrorBufferThreshold(nErrors int32) int32 {
+func (d *DTWAIN_DLL) DTWAIN_SetErrorBufferThreshold(nErrors uint32) int32 {
     theProc := d.procs["DTWAIN_SetErrorBufferThreshold"]
     v1, _, _ := syscall.SyscallN(theProc, uintptr(nErrors))
     return int32(v1)

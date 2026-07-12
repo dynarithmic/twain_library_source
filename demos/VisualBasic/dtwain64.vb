@@ -2126,7 +2126,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetCapValuesEx Lib "dtwain64.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer, lContainerType As Integer, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetCapValuesEx2 Lib "dtwain64.dll" (Source As System.IntPtr, lCap As Integer, lGetType As Integer, lContainerType As Integer, nDataType As Integer, ByRef pArray As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_GetCaption Lib "dtwain64.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Caption As StringBuilder) As Integer
-    Public Declare Function DTWAIN_GetCompressionSize Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lBytes As Integer) As Integer
+    Public Declare Function DTWAIN_GetCompressionSize Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lBytes As UInteger) As Integer
     Public Declare Function DTWAIN_GetCompressionType Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lpCompression As Integer, bCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetCompressionTypeEx Lib "dtwain64.dll" (Source As System.IntPtr, bCurrent As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetConditionCodeString Lib "dtwain64.dll" (lError As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
@@ -2145,8 +2145,8 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetDSMSearchOrder Lib "dtwain64.dll" () As Integer
     Public Declare Ansi Function DTWAIN_GetDSMSearchOrderEx Lib "dtwain64.dll" (<MarshalAs(UnmanagedType.LPStr)> SearchOrder As StringBuilder, <MarshalAs(UnmanagedType.LPStr)> UserDirectory As StringBuilder) As Integer
     Public Declare Function DTWAIN_GetDTWAINHandle Lib "dtwain64.dll" () As System.IntPtr
-    Public Declare Function DTWAIN_GetDeviceEvent Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lpEvent As Integer) As Integer
-    Public Declare Function DTWAIN_GetDeviceEventEx Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lpEvent As Integer, ByRef pArray As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_GetDeviceEvent Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lpEvent As UInteger) As Integer
+    Public Declare Function DTWAIN_GetDeviceEventEx Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lpEvent As UInteger, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetDeviceEventInfo Lib "dtwain64.dll" (Source As System.IntPtr, nWhichInfo As Integer, pValue As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetDeviceNotifications Lib "dtwain64.dll" (Source As System.IntPtr, ByRef DevEvents As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetDeviceTimeDate Lib "dtwain64.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> szTimeDate As StringBuilder) As Integer
@@ -2155,7 +2155,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetDuplexType Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lpDupType As Integer) As Integer
     Public Declare Function DTWAIN_GetDuplexTypeEx Lib "dtwain64.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetErrorBuffer Lib "dtwain64.dll" (ByRef ArrayBuffer As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_GetErrorBufferThreshold Lib "dtwain64.dll" () As Integer
+    Public Declare Function DTWAIN_GetErrorBufferThreshold Lib "dtwain64.dll" () As UInteger
     Public Declare Function DTWAIN_GetErrorCallback Lib "dtwain64.dll" () As DTwainErrorProc
     Public Declare Function DTWAIN_GetErrorCallback64 Lib "dtwain64.dll" () As DTwainErrorProc64
     Public Declare Ansi Function DTWAIN_GetErrorString Lib "dtwain64.dll" (lError As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
@@ -2509,7 +2509,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_SetDoubleFeedDetectValues Lib "dtwain64.dll" (Source As System.IntPtr, prray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_SetDoublePageCountOnDuplex Lib "dtwain64.dll" (Source As System.IntPtr, bDoubleCount As Integer) As Integer
     Public Declare Function DTWAIN_SetEOJDetectValue Lib "dtwain64.dll" (Source As System.IntPtr, nValue As Integer) As Integer
-    Public Declare Function DTWAIN_SetErrorBufferThreshold Lib "dtwain64.dll" (nErrors As Integer) As Integer
+    Public Declare Function DTWAIN_SetErrorBufferThreshold Lib "dtwain64.dll" (nErrors As UInteger) As Integer
     Public Declare Function DTWAIN_SetErrorCallback Lib "dtwain64.dll" (proc As DTwainErrorProc, UserData As Integer) As Integer
     Public Declare Function DTWAIN_SetErrorCallback64 Lib "dtwain64.dll" (proc As DTwainErrorProc64, UserData64 As System.Int64) As Integer
     Public Declare Function DTWAIN_SetFeederAlignment Lib "dtwain64.dll" (Source As System.IntPtr, lpAlignment As Integer) As Integer
