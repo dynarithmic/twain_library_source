@@ -40,6 +40,11 @@ option(DTWAIN_ENABLE_SEH_EXCEPTIONS
 
 mark_as_advanced(DTWAIN_ENABLE_SEH_EXCEPTIONS)
 
+option(DTWAIN_BUILD_CPP_DEMOS
+       "Add a target that builds the existing C/C++ demo solution"
+       OFF)
+
+mark_as_advanced(DTWAIN_BUILD_CPP_DEMOS)
 # -----------------------------------------------------------------------------
 # Boost setup
 # -----------------------------------------------------------------------------
@@ -565,14 +570,14 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/twainframe.h
         ${PROJECT_SOURCE_DIR}/h/versioninfo.h
         ${PROJECT_SOURCE_DIR}/h/winconst.h
-  ${PROJECT_SOURCE_DIR}/h/aeslib/AES.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/a85encode.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/ahexencode.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/base64encode.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/flateencode.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/pdfencrypt.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/pdflib32.h
-  ${PROJECT_SOURCE_DIR}/h/ImageFun/dtwpdf/pdffont_basic.h
+        ${PROJECT_SOURCE_DIR}/h/aeslib/AES.h
+        ${PROJECT_SOURCE_DIR}/h/pdflib32/a85encode.h
+        ${PROJECT_SOURCE_DIR}/h/pdflib32/ahexencode.h
+        ${PROJECT_SOURCE_DIR}/h/pdflib32/base64encode.h
+        ${PROJECT_SOURCE_DIR}/h/pdflib32/flateencode.h
+        ${PROJECT_SOURCE_DIR}/h/pdflib32/pdfencrypt.h
+        ${PROJECT_SOURCE_DIR}/h/pdflib32/pdflib32.h
+        ${PROJECT_SOURCE_DIR}/h/ImageFun/dtwpdf/pdffont_basic.h
 )
 
 set(MAIN_INL
@@ -1751,9 +1756,19 @@ set(DTWAIN_PUBLIC_HEADERS
 )
 
 get_filename_component(
-    DTWAIN_DEMOS_DIR
+    DTWAIN_DEMOS_INCLUDE_DIR
     "${PROJECT_SOURCE_DIR}/../demos/C_C++/c_cpp_includes"
     ABSOLUTE
+)
+
+get_filename_component(
+    DTWAIN_CPP_DEMOS_DIR
+    "${PROJECT_SOURCE_DIR}/../demos/C_C++"
+    ABSOLUTE
+)
+
+set(DTWAIN_CPP_DEMOS_SOLUTION
+    "${DTWAIN_CPP_DEMOS_DIR}/AllDemos.sln"
 )
 
 add_custom_command(
@@ -1761,11 +1776,11 @@ add_custom_command(
     POST_BUILD
 
     COMMAND ${CMAKE_COMMAND} -E make_directory
-            "${DTWAIN_DEMOS_DIR}"
+            "${DTWAIN_DEMOS_INCLUDE_DIR}"
 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${DTWAIN_PUBLIC_HEADERS}
-            "${DTWAIN_DEMOS_DIR}"
+            "${DTWAIN_DEMOS_INCLUDE_DIR}"
 
     COMMENT "Copying DTWAIN public headers to demos directory"
 )
@@ -1776,6 +1791,53 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 else()
     set(DTWAIN_DEMOS_LIB_DIR
         "${PROJECT_SOURCE_DIR}/../demos/C_C++/libs/32bit")
+endif()
+
+
+if(DTWAIN_BUILD_CPP_DEMOS)
+    if(NOT MSVC)
+        message(FATAL_ERROR
+            "DTWAIN_BUILD_CPP_DEMOS requires Visual Studio/MSVC.")
+    endif()
+
+    if(NOT EXISTS "${DTWAIN_CPP_DEMOS_SOLUTION}")
+        message(FATAL_ERROR
+            "The C/C++ demo solution was not found:\n"
+            "  ${DTWAIN_CPP_DEMOS_SOLUTION}")
+    endif()
+
+    if(NOT CMAKE_VS_MSBUILD_COMMAND)
+        message(FATAL_ERROR
+            "CMake could not determine the Visual Studio MSBuild executable.")
+    endif()
+
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(DTWAIN_DEMOS_PLATFORM "x64")
+    else()
+        set(DTWAIN_DEMOS_PLATFORM "Win32")
+    endif()
+
+    add_custom_target(build_cpp_demos
+        COMMAND
+            "${CMAKE_VS_MSBUILD_COMMAND}"
+            "${DTWAIN_CPP_DEMOS_SOLUTION}"
+            /target:Build
+            "/property:Configuration=$<CONFIG>"
+            "/property:Platform=${DTWAIN_DEMOS_PLATFORM}"
+            /m
+            /nologo
+
+        WORKING_DIRECTORY
+            "${DTWAIN_CPP_DEMOS_DIR}"
+
+        COMMENT
+            "Building DTWAIN C/C++ demo solution"
+
+        VERBATIM
+        USES_TERMINAL
+    )
+
+    add_dependencies(build_cpp_demos dtwain)
 endif()
 
 add_custom_command(
