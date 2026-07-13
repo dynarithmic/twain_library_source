@@ -33,8 +33,6 @@
 #pragma warning (disable:4244)
 #endif
 
-#define GetAValue(rgb)      ((BYTE)((rgb)>>24))
-
 using namespace dynarithmic;
 
 

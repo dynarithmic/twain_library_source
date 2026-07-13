@@ -225,7 +225,7 @@ static LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSour
     if (!CapInfo)
         return 0;
     // Try and get the operations now from TWAIN
-    return CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true);
+    return static_cast<LONG>(CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true));
 }
 
 template <TW_UINT16 msgType>

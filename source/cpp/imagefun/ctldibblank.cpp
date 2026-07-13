@@ -19,13 +19,9 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <windows.h>
-#include <cstdint>
 #include <array>
 #include <algorithm>
 #include <cmath>
-#include <limits>
-#include <math.h>
-#include <sstream>
 #include "winbit32.h"
 #include "ctliface.h"
 #include "dibutil.h"
@@ -79,11 +75,6 @@ namespace
             114 * static_cast<int>(b)) / 1000;
     }
 
-    int ComputeStride(int width, int bpp)
-    {
-        return ((width * bpp + 31) / 32) * 4;
-    }
-
     bool IsSupportedHeader(const BITMAPINFOHEADER* bih)
     {
         if (!bih)
@@ -122,20 +113,6 @@ namespace
         }
 
         return true;
-    }
-
-    int GetAllPaletteEntries(const BITMAPINFOHEADER* bih)
-    {
-        if (!bih)
-            return 0;
-
-        if (bih->biBitCount > 8)
-            return 0;
-
-        if (bih->biClrUsed != 0)
-            return static_cast<int>(bih->biClrUsed);
-
-        return 1 << bih->biBitCount;
     }
 
     bool MakeDibContext(const BITMAPINFOHEADER* bih, DibContext& ctx)

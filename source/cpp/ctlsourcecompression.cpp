@@ -175,8 +175,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
         bool isFileTransfer = (currentMode == TWSX_FILE || currentMode == TWSX_MEMFILE);
         if (isFileTransfer)
         {
-            BOOL bFileGood = FALSE;
-            bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType);
+            BOOL bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType);
             if ( currentMode == TWSX_MEMFILE )
                 bFileGood = DTWAIN_IsMemFileXferSupported(Source);
             if (!bFileGood)

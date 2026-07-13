@@ -1633,4 +1633,9 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_PDF_AES256 = 2
    dtwain_constants.DTWAIN_FEEDER_TERMINATE = 1
    dtwain_constants.DTWAIN_FEEDER_USEFLATBED = 2
+   dtwain_constants.DTWAIN_CHECKDLLVERLESS = 0
+   dtwain_constants.DTWAIN_CHECKDLLVEREQUAL = 1
+   dtwain_constants.DTWAIN_CHECKDLLVERGREATER = 2
+   dtwain_constants.DTWAIN_CHECKDLLVERLESSEQ = 3
+   dtwain_constants.DTWAIN_CHECKDLLVERGREATEREQ = 4
 return dtwain_constants

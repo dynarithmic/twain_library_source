@@ -20,7 +20,6 @@
  */
 #include "logwriterutils.h"
 #include "ctliface.h"
-#include "cppfunc.h"
 #include "ctlstringutils.h"
 
 namespace dynarithmic

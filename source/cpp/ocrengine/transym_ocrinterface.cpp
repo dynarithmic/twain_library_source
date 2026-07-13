@@ -21,7 +21,6 @@
 #include "capconst.h"
  #ifdef _WIN32
 #include <string>
-#include <cstdio>
 #include <tchar.h>
 #include "transym_ocrinterface.h"
 #include "versioninfo.h"

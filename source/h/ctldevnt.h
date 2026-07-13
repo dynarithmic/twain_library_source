@@ -46,7 +46,7 @@ namespace dynarithmic
             bool       GetEventInfoEx(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Array) const;
 
         private:
-            TW_DEVICEEVENT  m_DeviceEvent;
+            TW_DEVICEEVENT  m_DeviceEvent {};
     };
 }
 #endif

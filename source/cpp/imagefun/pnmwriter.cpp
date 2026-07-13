@@ -396,12 +396,10 @@ bool PnmSessionWriter::WriteGray8Raw()
 
 bool PnmSessionWriter::WriteGray16Plain()
 {
-    const uint16_t* src16 = nullptr;
-
     for (uint32_t y = 0; y < currentPage_.height; ++y)
     {
         const uint8_t* src = GetSourceRow(y);
-        src16 = reinterpret_cast<const uint16_t*>(src);
+        const uint16_t* src16 = reinterpret_cast<const uint16_t*>(src);
 
         for (uint32_t x = 0; x < currentPage_.width; ++x)
         {

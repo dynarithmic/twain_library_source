@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
 #include "ctliface.h"
 #include "ctlfileutils.h"
 #include "wbmpwriter.h"
@@ -53,10 +52,10 @@ static bool WriteOneDibHandleToWbmp(const std::wstring& filename, const WbmpSess
 
 int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = hDib = m_pDib->GetHandle();
+    HANDLE hDib = m_pDib->GetHandle();
     dynarithmic::dib::LockedDib dibHandle(m_pDib->GetHandle());
-    int height = dibHandle.Height();
-    int width = dibHandle.Width();
+    auto height = dibHandle.Height();
+    auto width = dibHandle.Width();
 
     if (m_ImageInfoEx.IsWBMPResized && (height > 255 || width > 255))
     {

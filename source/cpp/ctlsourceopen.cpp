@@ -40,8 +40,6 @@ static void DetermineIfPaperDetectable(CTL_ITwainSource* p);
 static void DetermineSheetcountDefs(CTL_ITwainSource* p);
 static void DetermineIfAutoCloseUI(CTL_ITwainSource* pSource);
 
-static std::pair<bool, int> PerformPixelTypeCompliancyTest(CTL_ITwainSource * p);
-
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((bSet))
@@ -220,7 +218,6 @@ void TestAndCachePixelTypes(CTL_ITwainSource* p)
         ~ProcessingRAII() { m_pSource->SetCurrentlyProcessingPixelInfo(false); }
     };
 
-    static constexpr int MaxMessage = 1024;
     if (p->PixelTypesRetrieved())
         return;
 

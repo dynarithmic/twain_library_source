@@ -18,7 +18,6 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
-#include "ctldib.h"
 #include "ctliface.h"
 #include "webpwriter.h"
 #include "iohandler_webp.h"
@@ -53,7 +52,7 @@ static bool WriteOneDibHandleToWebP(const std::wstring& filename, const WebPSess
 int CTL_WebpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
     HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
+    if (!m_pDib || !((hDib = m_pDib->GetHandle())))
         return DTWAIN_ERR_DIB;
 
     if (!IsValidBitDepth(DTWAIN_WEBP, m_pDib->GetBitsPerPixel()))

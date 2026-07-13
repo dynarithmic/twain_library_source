@@ -41,7 +41,7 @@ LONG DLLENTRY_DEF  DTWAIN_GetCapFromName(LPCTSTR szName)
 LONG DLLENTRY_DEF DTWAIN_GetNameFromCap(LONG nCapValue, LPTSTR szValue, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((nCapValue, szValue, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const LONG nTotalBytes = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(CTL_TwainAppMgr::GetCapNameFromCap(nCapValue)), szValue, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szValue))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)

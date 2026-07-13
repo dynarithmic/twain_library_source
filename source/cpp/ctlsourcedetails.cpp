@@ -156,10 +156,10 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
     if (!bOk || !aFileFormats)
         return {};
 
-        DTWAINArrayPtr_RAII raii1(pHandle, &aFileFormats);
-        auto& vFileFormats = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aFileFormats);
+    DTWAINArrayPtr_RAII raii1(pHandle, &aFileFormats);
+    auto& vFileFormats = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aFileFormats);
     if (vFileFormats.empty())
-    return {};
+        return {};
 
     std::vector<std::string> vRetVal;
     for (auto curFormat : vFileFormats)

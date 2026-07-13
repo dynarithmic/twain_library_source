@@ -174,7 +174,7 @@ LONG DLLENTRY_DEF DTWAIN_GetBitDepthEx(DTWAIN_SOURCE Source, DTWAIN_BOOL bCurren
     LOG_FUNC_ENTRY_PARAMS((Source, bCurrent))
     LONG val = {};
     auto bRet = DTWAIN_GetBitDepth(Source, &val, bCurrent);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? val : -1);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? val : -1)
     CATCH_BLOCK(-1)
 }
 

@@ -32,7 +32,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
 {
     LOG_FUNC_ENTRY_PARAMS((Source, JobControl, bSetCurrent))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    CHECK_IF_CAP_SUPPORTED(pSource, pHandle, CAP_JOBCONTROL, false);
+    CHECK_IF_CAP_SUPPORTED(pSource, pHandle, CAP_JOBCONTROL, false)
 
     LONG SetType = DTWAIN_CAPSET;
     if ( !bSetCurrent )

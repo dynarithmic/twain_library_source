@@ -20,7 +20,6 @@
  */
 #include "txtfun32.h"
 #include "winbit32.h"
-#include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "logwriterutils.h"
 #include "iohandler_bmp.h"

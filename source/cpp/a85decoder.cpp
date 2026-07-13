@@ -35,7 +35,7 @@ void A85Decoder::wput(std::string & output, unsigned long tuple, int bytes)
     }
 }
 
-std::string A85Decoder::decode85()
+std::string A85Decoder::decode85() const
 {
     unsigned long tuple = 0;
     int count = 0;
@@ -43,7 +43,7 @@ std::string A85Decoder::decode85()
     std::string output;
     while (curinputPos < static_cast<int>(m_scratch.size()))
     {
-        int c = m_scratch[curinputPos++];
+        int c = static_cast<int>(m_scratch[curinputPos++]);
         switch (c)
         {
         default:

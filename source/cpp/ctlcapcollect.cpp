@@ -48,21 +48,6 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
 {
     if (pSource->RetrievedAllCaps())
         return true;
-    struct CapFinder
-    {
-        CTL_ITwainSource *m_ps;
-        LONG m_nCap;
-        CapFinder(CTL_ITwainSource *ps, LONG nCap) : m_ps(ps), m_nCap(nCap) {}
-        bool operator()(const CTL_CapInfo& CapInfo) const
-        {
-            if (static_cast<int>(std::get<CAPINFO_IDX_CAPABILITY>(CapInfo)) == m_nCap)
-            {
-                m_ps->SetCapCached(static_cast<TW_UINT16>(m_nCap), true);
-                return true;
-            }
-            return false;
-        }
-    };
 
     // Check if this source has had capabilities negotiated and tested
     int nWhere;
@@ -88,7 +73,6 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         if (nWhere != -1 && pSource->IsCapabilityCached(static_cast<TW_UINT16>(*vIt))) // Already negotiated
             continue;
 
-        bool bCanQuerySupport = true;
         // Not found, so test capabilities
         // Create these dynamically whenever a new source is opened
         // and source cap info does not exist.  Add cap info statically.
@@ -105,11 +89,6 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
 
         // Add capabilities where the state info is set
         pSource->AddCapToStateInfo(CAP_CUSTOMDSDATA, DTWAIN_STATE4);
-
-        // Test the capability and see which container works.
-        UINT cQuerySupport = 0;
-
-        bCanQuerySupport = cQuerySupport ? true : false;
 
         auto& allCapInfo = CTL_StaticData::GetGeneralCapInfo();
         auto thisCapInfo = allCapInfo.find(nCap);

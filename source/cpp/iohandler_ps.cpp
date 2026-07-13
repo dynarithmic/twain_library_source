@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "iohandler_ps.h"
-#include "ctliface.h"
 #include "ctldib32ex.h"
 
 using namespace dynarithmic;

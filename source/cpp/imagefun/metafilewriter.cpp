@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "metafilewriter.h"
-#include <windows.h>
 
 #pragma pack(push, 1)
 struct AldusPlaceableHeader

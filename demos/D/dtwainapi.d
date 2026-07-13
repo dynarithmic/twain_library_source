@@ -1917,6 +1917,11 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_PDF_AES256 = 2;
     public static const int DTWAIN_FEEDER_TERMINATE = 1;
     public static const int DTWAIN_FEEDER_USEFLATBED = 2;
+    public static const int DTWAIN_CHECKDLLVERLESS = 0;
+    public static const int DTWAIN_CHECKDLLVEREQUAL = 1;
+    public static const int DTWAIN_CHECKDLLVERGREATER = 2;
+    public static const int DTWAIN_CHECKDLLVERLESSEQ = 3;
+    public static const int DTWAIN_CHECKDLLVERGREATEREQ = 4;
 
     /************ Core API ************/
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CCHARPTRTYPE, LONG, LONG, DTWAIN_BOOL, DTWAIN_BOOL, LPLONG) DTWAIN_AcquireAudioFile;
@@ -2100,6 +2105,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(WPARAM, LPARAM, LONG) DTWAIN_CallCallback;
     extern(Windows) LONG function(WPARAM, LPARAM, LONGLONG) DTWAIN_CallCallback64;
     extern(Windows) LONG function(DTWAIN_IDENTITY, DTWAIN_IDENTITY, LONG, LONG, LONG, LPVOID) DTWAIN_CallDSMProc;
+    extern(Windows) DTWAIN_BOOL function(LONG, LONG, LONG, LONG, LONG) DTWAIN_CheckDLLVersion;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_BOOL) DTWAIN_CheckHandles;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_ClearBuffers;
     extern(Windows) DTWAIN_BOOL function() DTWAIN_ClearErrorBuffer;
@@ -2367,7 +2373,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CHARPTRTYPE) DTWAIN_GetCaption;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPSTR) DTWAIN_GetCaptionA;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPWSTR) DTWAIN_GetCaptionW;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetCompressionSize;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDWORD) DTWAIN_GetCompressionSize;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, DTWAIN_BOOL) DTWAIN_GetCompressionType;
     extern(Windows) LONG function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_GetCompressionTypeEx;
     extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetConditionCodeString;
@@ -2398,8 +2404,8 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LPSTR, LPSTR) DTWAIN_GetDSMSearchOrderExA;
     extern(Windows) LONG function(LPWSTR, LPWSTR) DTWAIN_GetDSMSearchOrderExW;
     extern(Windows) DTWAIN_HANDLE function() DTWAIN_GetDTWAINHandle;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetDeviceEvent;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPDTWAIN_ARRAY) DTWAIN_GetDeviceEventEx;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDWORD) DTWAIN_GetDeviceEvent;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDWORD, LPDTWAIN_ARRAY) DTWAIN_GetDeviceEventEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LPVOID) DTWAIN_GetDeviceEventInfo;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetDeviceNotifications;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CHARPTRTYPE) DTWAIN_GetDeviceTimeDate;
@@ -2410,7 +2416,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetDuplexType;
     extern(Windows) LONG function(DTWAIN_SOURCE) DTWAIN_GetDuplexTypeEx;
     extern(Windows) DTWAIN_BOOL function(LPDTWAIN_ARRAY) DTWAIN_GetErrorBuffer;
-    extern(Windows) LONG function() DTWAIN_GetErrorBufferThreshold;
+    extern(Windows) DWORD function() DTWAIN_GetErrorBufferThreshold;
     extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetErrorString;
     extern(Windows) LONG function(LONG, LPSTR, LONG) DTWAIN_GetErrorStringA;
     extern(Windows) LONG function(LONG, LPWSTR, LONG) DTWAIN_GetErrorStringW;
@@ -2612,6 +2618,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetVersionCopyrightA;
     extern(Windows) LONG function(LPWSTR, LONG) DTWAIN_GetVersionCopyrightW;
     extern(Windows) DTWAIN_BOOL function(LPLONG, LPLONG, LPLONG, LPLONG) DTWAIN_GetVersionEx;
+    extern(Windows) DTWAIN_BOOL function(LPLONG, LPLONG, LPLONG, LPLONG, LPLONG) DTWAIN_GetVersionEx2;
     extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetVersionInfo;
     extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetVersionInfoA;
     extern(Windows) LONG function(LPWSTR, LONG) DTWAIN_GetVersionInfoW;
@@ -2916,7 +2923,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_ARRAY) DTWAIN_SetDoubleFeedDetectValues;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_SetDoublePageCountOnDuplex;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetEOJDetectValue;
-    extern(Windows) DTWAIN_BOOL function(LONG) DTWAIN_SetErrorBufferThreshold;
+    extern(Windows) DTWAIN_BOOL function(DWORD) DTWAIN_SetErrorBufferThreshold;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetFeederAlignment;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetFeederOrder;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG) DTWAIN_SetFeederWaitTime;
@@ -3281,6 +3288,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_CallCallback, "DTWAIN_CallCallback");
         bindFunction(cast(void**)&DTWAIN_CallCallback64, "DTWAIN_CallCallback64");
         bindFunction(cast(void**)&DTWAIN_CallDSMProc, "DTWAIN_CallDSMProc");
+        bindFunction(cast(void**)&DTWAIN_CheckDLLVersion, "DTWAIN_CheckDLLVersion");
         bindFunction(cast(void**)&DTWAIN_CheckHandles, "DTWAIN_CheckHandles");
         bindFunction(cast(void**)&DTWAIN_ClearBuffers, "DTWAIN_ClearBuffers");
         bindFunction(cast(void**)&DTWAIN_ClearErrorBuffer, "DTWAIN_ClearErrorBuffer");
@@ -3793,6 +3801,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetVersionCopyrightA, "DTWAIN_GetVersionCopyrightA");
         bindFunction(cast(void**)&DTWAIN_GetVersionCopyrightW, "DTWAIN_GetVersionCopyrightW");
         bindFunction(cast(void**)&DTWAIN_GetVersionEx, "DTWAIN_GetVersionEx");
+        bindFunction(cast(void**)&DTWAIN_GetVersionEx2, "DTWAIN_GetVersionEx2");
         bindFunction(cast(void**)&DTWAIN_GetVersionInfo, "DTWAIN_GetVersionInfo");
         bindFunction(cast(void**)&DTWAIN_GetVersionInfoA, "DTWAIN_GetVersionInfoA");
         bindFunction(cast(void**)&DTWAIN_GetVersionInfoW, "DTWAIN_GetVersionInfoW");

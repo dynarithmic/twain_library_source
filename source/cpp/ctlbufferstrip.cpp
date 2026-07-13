@@ -19,8 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <cstdio>
-#include <functional>
-#include <algorithm>
 #include "cppfunc.h"
 #include "errorcheck.h"
 using namespace dynarithmic;

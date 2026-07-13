@@ -18,9 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <windows.h>
 #include <cstdint>
-#include <cstring>
 #include <string>
 #include <vector>
 #include <memory>

@@ -37,8 +37,6 @@ namespace dynarithmic
         int m_nFormat;
         DTWAINImageInfoEx m_ImageInfoEx;
         PsSessionWriter m_psSessionWriter;
-        LONG m_PSType;
-        bool m_bIsMultiPage;
     };
 }
 #endif

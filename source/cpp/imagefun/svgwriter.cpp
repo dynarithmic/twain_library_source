@@ -18,12 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <windows.h>
-#include <cstdint>
-#include <cstring>
 #include <string>
 #include <vector>
-#include <memory>
 #include <utility>
 #include <sstream>
 #include "svgwriter.h"
@@ -31,7 +27,6 @@
 #include "ctlstringconversion.h"
 #include "base64encode.h"
 #include <gdiplus.h>
-#include <stdexcept>
 #include <fstream>
 #include "dtwain_raii.h"
 
@@ -445,12 +440,14 @@ bool SvgSessionWriter::SaveDIBAsSVGEx(const BITMAPINFOHEADER& bih, const uint8_t
     if (svg.empty())
         return false;
 
-    std::pair<bool, int> retValue = {};
     if (isSVGZ)
-        retValue = SaveSVGZ(svg, filename);
+    {
+        std::pair<bool, int> retValue = SaveSVGZ(svg, filename);
+        if (retValue.second != DTWAIN_NO_ERROR)
+            return false;
+    }
     else
     {
-
         std::ofstream f(filename, std::ios::binary);
         f.write(svg.data(), svg.size());
         if (f.good())
@@ -459,4 +456,3 @@ bool SvgSessionWriter::SaveDIBAsSVGEx(const BITMAPINFOHEADER& bih, const uint8_t
     }
     return true;
 }
-

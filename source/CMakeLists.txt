@@ -376,7 +376,7 @@ else()
 endif()
 
 set(DTWAIN_RESOURCE_FILES
-    ${PROJECT_SOURCE_DIR}/rc/twil32.rc
+    ${PROJECT_SOURCE_DIR}/rc/dtwain_resources.rc
 )
 
 set(DTWAIN_MISCELLANEOUS_FILES
@@ -643,10 +643,6 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctltr011.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr015.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr016.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr017.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr018.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr019.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr020.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr024.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr025.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr026.cpp
@@ -1466,7 +1462,7 @@ file(GLOB DTWAIN_DEF_FILES
 
 target_sources(dtwain PRIVATE ${DTWAIN_DEF_FILES})
 source_group( "Module Definition Files" FILES ${DTWAIN_DEF_FILES})
-target_sources(dtwain PRIVATE ${PROJECT_SOURCE_DIR}/rc/twil32.rc)
+target_sources(dtwain PRIVATE ${PROJECT_SOURCE_DIR}/rc/dtwain_resources.rc)
 target_sources(dtwain PRIVATE ${DTWAIN_MISCELLANEOUS_FILES})
 target_sources(dtwain PRIVATE ${TEXT_RESOURCE_FILES})
 
@@ -1499,7 +1495,7 @@ if(DTWAIN_USE_DYNAMIC_CRT)
 endif()
 
 set_source_files_properties(
-    ${PROJECT_SOURCE_DIR}/rc/twil32.rc
+    ${PROJECT_SOURCE_DIR}/rc/dtwain_resources.rc
     PROPERTIES
         COMPILE_OPTIONS "${DTWAIN_RC_DEFINES}"
 )

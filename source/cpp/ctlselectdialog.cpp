@@ -23,7 +23,6 @@
 #include "ctltmpl5.h"
 #include "sourceselectopts.h"
 #include "errorcheck.h"
-#include "../simpleini/simpleini.h"
 #include <boost/logic/tribool.hpp>
 
 using namespace dynarithmic;

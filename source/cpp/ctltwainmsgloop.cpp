@@ -112,7 +112,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto bRet = !DTWAIN_IsPeekMessageLoopEnabled(Source);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 

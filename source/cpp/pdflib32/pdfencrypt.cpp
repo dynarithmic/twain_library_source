@@ -34,11 +34,6 @@ OF THIRD PARTY RIGHTS.
 #undef max
 #include "pdfencrypt.h"
 #include "ctlhashutils.h"
-#include "ctlstringutils.h"
-#include "ctlobstr.h"
-
-#define STRINGER_2_(x) #x
-#define STRINGER_(x) STRINGER_2_(x)
 
 std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER

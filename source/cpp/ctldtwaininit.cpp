@@ -19,8 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <cstring>
-#include <cstdio>
-#include <cstdlib>
 #include <algorithm>
 #include <string>
 #include <string_view>
@@ -107,7 +105,7 @@ static std::string GetStaticLibVer();
 static void LoadStaticData(CTL_TwainDLLHandle*);
 static CTL_StringType GetDTWAINDLLVersionInfoStr();
 static CTL_StringType GetDTWAINInternalBuildNumber();
-static DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch);
+static DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch, LPLONG lBuild = nullptr);
 static CTL_StringType CheckSearchOrderString(CTL_StringType);
 
 static constexpr TCHAR* s_NullEntry = _T("<null>");
@@ -138,9 +136,77 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLON
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx2(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel, 
+                                              LPLONG lBuildNumber)
 {
-    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType))
+    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber))
+    const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber) ? true : false;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber))
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetVal)
+    CATCH_BLOCK(false)
+}
+
+// Check the match type.  If version must be < than the passed-in values, return TRUE if version is <
+// If version must be equal to the passed-in values, return TRUE if version is equal
+// If version must be greater to the passed-in values, return TRUE if version is greater
+// Build number is ignored if passed-in build number is 0.
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG lPatchLevel, LONG lBuildNumber,
+                                                LONG MatchType)
+{
+    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lPatchLevel, lBuildNumber, MatchType))
+    VersionNumbersSmall info;
+    bool bMatchOk = false;
+    bool bGotInfo = GetDLLVersionNumbersSmall(CTL_StaticData::GetDLLInstanceHandle(), info);
+    if ( bGotInfo )
+    {
+        StringArrayW sVersionArray;
+        StringWrapperW::Tokenize(info.FileVersion, L".", sVersionArray);
+        LONG lpVersionVals[4] = {};
+        if (sVersionArray.size() != 4)
+            return false;
+        int nCur = 0;
+        for (auto& s : sVersionArray)
+        {
+            lpVersionVals[nCur] = std::stoi(s);
+            ++nCur;
+        }
+
+        if (lBuildNumber == 0)
+            lpVersionVals[3] = 0;
+        long totalVerNum = lpVersionVals[0] * 1000 +
+                           lpVersionVals[1] * 100 + 
+                           lpVersionVals[2] * 10 +  
+                           lpVersionVals[3];
+        long inputVerNum = lMajor * 1000 + lMinor * 100 + lPatchLevel * 10 + lBuildNumber;
+        switch ( MatchType )
+        {
+            case DTWAIN_CHECKDLLVERLESS:
+                bMatchOk = totalVerNum < inputVerNum;
+            break;
+            case DTWAIN_CHECKDLLVEREQUAL:
+                bMatchOk = totalVerNum == inputVerNum;
+            break;
+            case DTWAIN_CHECKDLLVERGREATER:
+                bMatchOk = totalVerNum > inputVerNum;
+            break;
+            case DTWAIN_CHECKDLLVERLESSEQ:
+                bMatchOk = totalVerNum <= inputVerNum;
+            break;
+            case DTWAIN_CHECKDLLVERGREATEREQ:
+                bMatchOk = totalVerNum >= inputVerNum;
+            break;
+            default:
+                bMatchOk = totalVerNum == inputVerNum;
+            break;
+        }
+    }
+    LOG_FUNC_EXIT_NONAME_PARAMS(bMatchOk)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch, LPLONG lBuildNumber)
+{
+    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType, lBuildNumber))
     constexpr LONG nDistr = DTWAIN_OPENSOURCE_VERSION;
     static constexpr auto modRet = GetDTWAINDLLVersionInfo();
     if (lMajor)
@@ -151,6 +217,11 @@ DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVers
         *lPatch = modRet[2];
     if ( lVersionType )
         *lVersionType = nDistr | GetDTWAINVersionType();
+    if (lBuildNumber)
+    {
+        auto str = GetDTWAINInternalBuildNumber();
+        *lBuildNumber = std::stoi(str);
+    }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

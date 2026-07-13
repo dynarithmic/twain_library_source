@@ -1800,6 +1800,11 @@ module TwainAPI =
     let public DTWAIN_PDF_AES256 = 2
     let public DTWAIN_FEEDER_TERMINATE = 1
     let public DTWAIN_FEEDER_USEFLATBED = 2
+    let public DTWAIN_CHECKDLLVERLESS = 0
+    let public DTWAIN_CHECKDLLVEREQUAL = 1
+    let public DTWAIN_CHECKDLLVERGREATER = 2
+    let public DTWAIN_CHECKDLLVERLESSEQ = 3
+    let public DTWAIN_CHECKDLLVERGREATEREQ = 4
 
     // Public state exposed after successful Load
     let mutable private IsLoaded = false
@@ -2273,6 +2278,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_CallDSMProcDelegate = delegate of DTWAIN_IDENTITY * DTWAIN_IDENTITY * LONG * LONG * LONG * LPVOID -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_CheckDLLVersionDelegate = delegate of LONG * LONG * LONG * LONG * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_CheckHandlesDelegate = delegate of DTWAIN_BOOL -> DTWAIN_BOOL
@@ -2962,7 +2970,7 @@ module TwainAPI =
     type DTWAIN_GetCaptionDelegate = delegate of DTWAIN_SOURCE * System.Text.StringBuilder -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_GetCompressionSizeDelegate = delegate of DTWAIN_SOURCE * int byref -> DTWAIN_BOOL
+    type DTWAIN_GetCompressionSizeDelegate = delegate of DTWAIN_SOURCE * DWORD byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetCompressionTypeDelegate = delegate of DTWAIN_SOURCE * int byref * DTWAIN_BOOL -> DTWAIN_BOOL
@@ -3019,10 +3027,10 @@ module TwainAPI =
     type DTWAIN_GetDTWAINHandleDelegate = delegate of unit -> DTWAIN_HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_GetDeviceEventDelegate = delegate of DTWAIN_SOURCE * int byref -> DTWAIN_BOOL
+    type DTWAIN_GetDeviceEventDelegate = delegate of DTWAIN_SOURCE * DWORD byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_GetDeviceEventExDelegate = delegate of DTWAIN_SOURCE * int byref * DTWAIN_ARRAY byref -> DTWAIN_BOOL
+    type DTWAIN_GetDeviceEventExDelegate = delegate of DTWAIN_SOURCE * DWORD byref * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetDeviceEventInfoDelegate = delegate of DTWAIN_SOURCE * LONG * LPVOID -> DTWAIN_BOOL
@@ -3049,7 +3057,7 @@ module TwainAPI =
     type DTWAIN_GetErrorBufferDelegate = delegate of DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_GetErrorBufferThresholdDelegate = delegate of unit -> LONG
+    type DTWAIN_GetErrorBufferThresholdDelegate = delegate of unit -> DWORD
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetErrorCallbackDelegate = delegate of unit -> DTWAIN_ERROR_PROC
@@ -3428,6 +3436,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetVersionExDelegate = delegate of int byref * int byref * int byref * int byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetVersionEx2Delegate = delegate of int byref * int byref * int byref * int byref * int byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetVersionInfoDelegate = delegate of System.Text.StringBuilder * LONG -> LONG
@@ -4108,7 +4119,7 @@ module TwainAPI =
     type DTWAIN_SetEOJDetectValueDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_SetErrorBufferThresholdDelegate = delegate of LONG -> DTWAIN_BOOL
+    type DTWAIN_SetErrorBufferThresholdDelegate = delegate of DWORD -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SetFeederAlignmentDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
@@ -4579,6 +4590,7 @@ module TwainAPI =
     let private CallCallback = lazy (DynamicDll.Bind "DTWAIN_CallCallback" : DTWAIN_CallCallbackDelegate)
     let private CallCallback64 = lazy (DynamicDll.Bind "DTWAIN_CallCallback64" : DTWAIN_CallCallback64Delegate)
     let private CallDSMProc = lazy (DynamicDll.Bind "DTWAIN_CallDSMProc" : DTWAIN_CallDSMProcDelegate)
+    let private CheckDLLVersion = lazy (DynamicDll.Bind "DTWAIN_CheckDLLVersion" : DTWAIN_CheckDLLVersionDelegate)
     let private CheckHandles = lazy (DynamicDll.Bind "DTWAIN_CheckHandles" : DTWAIN_CheckHandlesDelegate)
     let private ClearBuffers = lazy (DynamicDll.Bind "DTWAIN_ClearBuffers" : DTWAIN_ClearBuffersDelegate)
     let private ClearErrorBuffer = lazy (DynamicDll.Bind "DTWAIN_ClearErrorBuffer" : DTWAIN_ClearErrorBufferDelegate)
@@ -4964,6 +4976,7 @@ module TwainAPI =
     let private GetVersion = lazy (DynamicDll.Bind "DTWAIN_GetVersion" : DTWAIN_GetVersionDelegate)
     let private GetVersionCopyright = lazy (DynamicDll.Bind "DTWAIN_GetVersionCopyright" : DTWAIN_GetVersionCopyrightDelegate)
     let private GetVersionEx = lazy (DynamicDll.Bind "DTWAIN_GetVersionEx" : DTWAIN_GetVersionExDelegate)
+    let private GetVersionEx2 = lazy (DynamicDll.Bind "DTWAIN_GetVersionEx2" : DTWAIN_GetVersionEx2Delegate)
     let private GetVersionInfo = lazy (DynamicDll.Bind "DTWAIN_GetVersionInfo" : DTWAIN_GetVersionInfoDelegate)
     let private GetVersionString = lazy (DynamicDll.Bind "DTWAIN_GetVersionString" : DTWAIN_GetVersionStringDelegate)
     let private GetWindowsVersionInfo = lazy (DynamicDll.Bind "DTWAIN_GetWindowsVersionInfo" : DTWAIN_GetWindowsVersionInfoDelegate)
@@ -5869,6 +5882,10 @@ module TwainAPI =
     let DTWAIN_CallDSMProc (appid: DTWAIN_IDENTITY) (sourceid: DTWAIN_IDENTITY) (ldg: LONG) (ldat: LONG) (lmsg: LONG) (pdata: LPVOID) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         CallDSMProc.Value.Invoke(appid, sourceid, ldg, ldat, lmsg, pdata)
+
+    let DTWAIN_CheckDLLVersion (lmajor: LONG) (lminor: LONG) (lpatchlevel: LONG) (lbuildnumber: LONG) (matchtype: LONG) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        CheckDLLVersion.Value.Invoke(lmajor, lminor, lpatchlevel, lbuildnumber, matchtype)
 
     let DTWAIN_CheckHandles (bcheck: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -6786,7 +6803,7 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCaption.Value.Invoke(source, caption)
 
-    let DTWAIN_GetCompressionSize (source: DTWAIN_SOURCE) (lbytes: int byref) : DTWAIN_BOOL =
+    let DTWAIN_GetCompressionSize (source: DTWAIN_SOURCE) (lbytes: DWORD byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCompressionSize.Value.Invoke(source, &lbytes)
 
@@ -6862,11 +6879,11 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDTWAINHandle.Value.Invoke()
 
-    let DTWAIN_GetDeviceEvent (source: DTWAIN_SOURCE) (lpevent: int byref) : DTWAIN_BOOL =
+    let DTWAIN_GetDeviceEvent (source: DTWAIN_SOURCE) (lpevent: DWORD byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDeviceEvent.Value.Invoke(source, &lpevent)
 
-    let DTWAIN_GetDeviceEventEx (source: DTWAIN_SOURCE) (lpevent: int byref) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
+    let DTWAIN_GetDeviceEventEx (source: DTWAIN_SOURCE) (lpevent: DWORD byref) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDeviceEventEx.Value.Invoke(source, &lpevent, &parray)
 
@@ -6902,7 +6919,7 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetErrorBuffer.Value.Invoke(&arraybuffer)
 
-    let DTWAIN_GetErrorBufferThreshold() : LONG =
+    let DTWAIN_GetErrorBufferThreshold() : DWORD =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetErrorBufferThreshold.Value.Invoke()
 
@@ -7409,6 +7426,10 @@ module TwainAPI =
     let DTWAIN_GetVersionEx (lmajor: int byref) (lminor: int byref) (lversiontype: int byref) (lpatchlevel: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetVersionEx.Value.Invoke(&lmajor, &lminor, &lversiontype, &lpatchlevel)
+
+    let DTWAIN_GetVersionEx2 (lmajor: int byref) (lminor: int byref) (lversiontype: int byref) (lpatchlevel: int byref) (lbuildnumber: int byref) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetVersionEx2.Value.Invoke(&lmajor, &lminor, &lversiontype, &lpatchlevel, &lbuildnumber)
 
     let DTWAIN_GetVersionInfo (lpszver: System.Text.StringBuilder) (nlength: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -8314,7 +8335,7 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SetEOJDetectValue.Value.Invoke(source, nvalue)
 
-    let DTWAIN_SetErrorBufferThreshold (nerrors: LONG) : DTWAIN_BOOL =
+    let DTWAIN_SetErrorBufferThreshold (nerrors: DWORD) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SetErrorBufferThreshold.Value.Invoke(nerrors)
 

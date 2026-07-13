@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctltr037.h"
@@ -30,18 +29,24 @@
 
 using namespace dynarithmic;
 
-#define GET_FIRST           0
-#define GET_NEXT            1
-#define GET_CLOSE           2
-#define GET_FILE_TYPE       3
-#define CHANGE_DIRECTORY    4
-#define CREATE_DIRECTORY    5
-#define COPY_DIRECTORY      6
-#define RENAME_DIRECTORY    7
-#define DELETE_DIRECTORY    8
-#define FORMAT_MEDIA        9
+enum
+{
+    GET_FIRST = 0,
+    GET_NEXT = 1,
+    GET_CLOSE = 2,
+    GET_FILE_TYPE = 3,
+    CHANGE_DIRECTORY = 4,
+    CREATE_DIRECTORY = 5,
+    COPY_DIRECTORY = 6,
+    RENAME_DIRECTORY = 7,
+    DELETE_DIRECTORY = 8,
+    FORMAT_MEDIA = 9
+};
 
-#define DTWAIN_FT_ALLCAMERAS     0xFFFF
+enum
+{
+    DTWAIN_FT_ALLCAMERAS = 0xFFFF
+};
 
 using FileSysRetType = std::pair<LONG, TW_MEMREF>;
 static FileSysRetType FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich);
