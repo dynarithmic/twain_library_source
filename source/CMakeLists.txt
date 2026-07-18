@@ -1243,6 +1243,7 @@ set(TEXT_RESOURCE_FILES
   ${PROJECT_SOURCE_DIR}/text_resources/dtwain64.ini
   ${PROJECT_SOURCE_DIR}/text_resources/twaininfo.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainlanguage.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_cantonese.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_dutch.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_english.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_french.txt
