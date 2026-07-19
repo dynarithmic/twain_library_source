@@ -12,7 +12,9 @@ DTWAIN Version changes
 
 - Fix issues with DTWAIN_IsTwainAvailable() when run on a system without TWAIN_32.DLL installed.
 
-- Fix issue with logging the Windows version if using Windows Server 2003 Enterprise.
+- Fix issue with logging the Windows version if using Windows Server Enterprise Edition.
+
+- Add Cantonese string resources.
  
 
 5.9.2 Update 1
