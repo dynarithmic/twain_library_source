@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctliface.h"
-#include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "tiff.h"
 #include "logwriterutils.h"

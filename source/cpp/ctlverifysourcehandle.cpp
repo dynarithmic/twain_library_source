@@ -18,10 +18,15 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "errorcheck.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
+#include "cppfunc.h"
+#include "ctliface.h"
+#include "ctltwainmanager.h"
+#include "dtwtype.h"
+#include "winconst.h"
 
 using namespace dynarithmic;
 

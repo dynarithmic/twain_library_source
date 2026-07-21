@@ -19,8 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "dtwain.h"
-#include "ctltwainmanager.h"
+#include "ctliface.h"
+#include "dtwainc.h"
 using namespace dynarithmic;
 
 DTWAIN_DIBUPDATE_PROC DLLENTRY_DEF DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc)

@@ -22,7 +22,6 @@
 #include "ctltwainmanager.h"
 #include "ctltwainmsgloop.h"
 #include "sourceacquireopts.h"
-#include "ctllogfunctioncall.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

@@ -19,9 +19,9 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "txtfun32.h"
-#include "winbit32.h"
+
 #include "ctlfileutils.h"
-#include "logwriterutils.h"
+#include "winbit32.h"
 #include "iohandler_bmp.h"
 #include "iohandler_tiff.h"
 

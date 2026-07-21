@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltwainmanager.h"
 #include "pcxwriter.h"
 #include "iohandler_pcx.h"
 #include "ctldib32ex.h"

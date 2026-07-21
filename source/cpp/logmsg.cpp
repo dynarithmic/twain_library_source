@@ -23,8 +23,6 @@ OF THIRD PARTY RIGHTS.
 #include <cstdio>
 #include <sstream>
 #ifdef _WIN32
-#include <windows.h>
-#include <tchar.h>
 #else
 #include <dlfcn.h>
 #endif

@@ -18,12 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <windows.h>
 #include <array>
 #include <algorithm>
 #include <cmath>
 #include "winbit32.h"
-#include "ctliface.h"
 #include "dibutil.h"
 
 using namespace dynarithmic;

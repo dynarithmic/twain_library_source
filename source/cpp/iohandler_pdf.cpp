@@ -18,9 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <unordered_map>
 #include <array>
-#include "ctldib.h"
 #include "arrayfactory.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"

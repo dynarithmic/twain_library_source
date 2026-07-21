@@ -125,7 +125,8 @@ AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("engli
                                  {ID_LANGUAGE_TRADITIONALCHINESE    , _T("traditional_chinese")},
                                  {ID_LANGUAGE_JAPANESE              , _T("japanese")},
                                  {ID_LANGUAGE_KOREAN                , _T("korean")},
-                                 {ID_LANGUAGE_TURKISH               , _T("turkish")}
+                                 {ID_LANGUAGE_TURKISH               , _T("turkish")},
+                                 {ID_LANGUAGE_CANTONESE             , _T("cantonese")},
                                 };
 
 AllFileTypes g_allDTWAINFileTypes[] = {
@@ -486,6 +487,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case ID_LANGUAGE_SIMPLIFIEDCHINESE  : 
                 case ID_LANGUAGE_PORTUGUESE:
                 case ID_LANGUAGE_TURKISH:
+                case ID_LANGUAGE_CANTONESE:
                     LoadLanguage(wmId);
                 break;
 

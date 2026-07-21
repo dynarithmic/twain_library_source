@@ -19,9 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "dtwain.h"
 #include "ctliface.h"
-#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
 using namespace dynarithmic;

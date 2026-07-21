@@ -183,7 +183,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
     DTWAINArrayPtr_RAII tempRAII(pHandle, &aFileNames);
 
     // Parse the file name list into separate items.  
-    ParseFileNames(pHandle, NULL, lpszFile, &aFileNames);
+    ParseFileNames(pHandle, nullptr, lpszFile, &aFileNames);
 
     auto bRetval = DTWAIN_AcquireFileEx(Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
 

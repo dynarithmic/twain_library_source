@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr027.h"
-#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 CTL_ImagePendingTriplet::CTL_ImagePendingTriplet(CTL_ITwainSession *pSession,

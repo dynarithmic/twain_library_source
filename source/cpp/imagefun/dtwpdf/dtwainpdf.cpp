@@ -29,15 +29,12 @@
 #pragma warning (pop)
 #endif
 #include <sstream>
-#include <iomanip>
 #include <algorithm>
 #include <vector>
 #include <array>
 #include <unordered_map>
 #include <string_view>
 #include <time.h>
-#include <boost/functional/hash.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread_time.hpp>
 
 #include "dtwainpdf.h"
@@ -45,7 +42,6 @@
 #include "jpeglib.h"
 #include "ctlhashutils.h"
 #undef Z_PREFIX
-#include "zlib.h"
 #ifdef __MSL__
    #include <ctime>
 #else
@@ -60,9 +56,7 @@
 #include "ahexencode.h"
 #include "flateencode.h"
 #include "pdfencrypt.h"
-#include "tif_config.h"
 #include "tiffio.h"
-#include "dtwain_float_utils.h"
 #include "logwriterutils.h"
 
 #ifdef _MSC_VER

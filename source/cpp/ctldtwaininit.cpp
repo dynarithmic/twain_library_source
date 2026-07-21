@@ -38,7 +38,6 @@
 #include "arrayfactory.h"
 #include "ctltwainmsgloop.h"
 #include "ctldefsource.h"
-#include "ctlstringutils.h"
 #include "ctlclosesource.h"
 #include "ctlguiddef.h"
 

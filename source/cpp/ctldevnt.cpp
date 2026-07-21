@@ -19,12 +19,9 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltripletbase.h"
-#include "ctltr010.h"
 #include "ctldevnt.h"
-#include "arrayfactory.h"
 
 using namespace dynarithmic;
-CTL_DeviceEvent::CTL_DeviceEvent() : m_DeviceEvent() {}
 
 TW_UINT32  CTL_DeviceEvent::GetEvent() const { return             m_DeviceEvent.Event;            }
 CTL_StringType CTL_DeviceEvent::GetDeviceName() const { return    StringConversion::Convert_AnsiPtr_To_Native(m_DeviceEvent.DeviceName); }

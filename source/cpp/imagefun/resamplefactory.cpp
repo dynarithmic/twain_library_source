@@ -19,9 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctliface.h"
-#include "ctltwainmanager.h"
 #include "resamplefactory.h"
-#include "cppfunc.h"
 #include "ctldib32ex.h"
 
 namespace dynarithmic

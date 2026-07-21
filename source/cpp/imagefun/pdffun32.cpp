@@ -27,7 +27,6 @@
 #include <utility>
 #include <memory>
 #include "ctliface.h"
-#include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "dtwain_float_utils.h"
 #include "logwriterutils.h"

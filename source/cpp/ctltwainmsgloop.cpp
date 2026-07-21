@@ -173,108 +173,111 @@ bool TwainMessageLoopImpl::IsAcquireTerminated(CTL_ITwainSource* pSource, bool b
 // on PeekMessage(), or rely on the return value of GetMessage().
 // The settings are found in dtwain32.ini or dtwain64.ini under the
 // "TwainLoopGetMsg" section.
-struct ContinueLoopTraitsPeek
+namespace 
 {
-    static constexpr bool isPeekMsg = true;
-    static bool ContinueLoop(MSG* msg)
+    struct ContinueLoopTraitsPeek
     {
-        PeekMessage(msg, nullptr, 0, 0, PM_REMOVE);
-        return true;
-    }
-};
-
-struct ContinueLoopTraitsGet
-{
-    static constexpr bool isPeekMsg = false;
-    static bool ContinueLoop(MSG* msg)
-    {
-        auto bRet = GetMessage(msg, nullptr, 0, 0);
-        return bRet != 0 && bRet != -1;
-    }
-};
-
-template <typename LoopTraits = ContinueLoopTraitsGet>
-struct ContinueLoopTraits
-{
-    static bool InvokeLoop(TwainMessageLoopImpl* pImpl, CTL_ITwainSource* pSource, bool isUIOnly)
-    {
-        MSG msg;
-        auto& acquireRef = pImpl->GetAcquireNumRef();
-        auto& sOpts = pImpl->GetAcquireOptions();
-        bool bInitializeAcquisitionProcess = false;
-
-        struct TwainWatchdog
+        static constexpr bool isPeekMsg = true;
+        static bool ContinueLoop(MSG* msg)
         {
-            DWORD lastProgressTick;
-            DWORD timeoutMs;
-            bool  triggered;
-        };
+            PeekMessage(msg, nullptr, 0, 0, PM_REMOVE);
+            return true;
+        }
+    };
 
-        TwainWatchdog wd{ GetTickCount(), 3000, false };
-
-        DWORD lastTwainProgressTick = GetTickCount();
-
-        // Start the message loop.
-        while (LoopTraits::ContinueLoop(&msg))
+    struct ContinueLoopTraitsGet
+    {
+        static constexpr bool isPeekMsg = false;
+        static bool ContinueLoop(MSG* msg)
         {
-            // If in UIOnly mode, set it up here
-            if (isUIOnly && !bInitializeAcquisitionProcess)
-            {
-                LLSetupUIOnly(pSource);
-                bInitializeAcquisitionProcess = true;
-                lastTwainProgressTick = GetTickCount();
-            }
+            auto bRet = GetMessage(msg, nullptr, 0, 0);
+            return bRet != 0 && bRet != -1;
+        }
+    };
 
-            // If acquire has been terminated, break out of this loop
-            if (pImpl->IsAcquireTerminated(pSource, isUIOnly))
-            {
-                if (isUIOnly)
-                    pSource->SetUIOnly(false);
-                lastTwainProgressTick = GetTickCount();
-                break;
-            }
+    template <typename LoopTraits = ContinueLoopTraitsGet>
+    struct ContinueLoopTraits
+    {
+        static bool InvokeLoop(TwainMessageLoopImpl* pImpl, CTL_ITwainSource* pSource, bool isUIOnly)
+        {
+            MSG msg;
+            auto& acquireRef = pImpl->GetAcquireNumRef();
+            auto& sOpts = pImpl->GetAcquireOptions();
+            bool bInitializeAcquisitionProcess = false;
 
-            // If we haven't set up the TWAIN device for the acquisition,
-            // do it now.  The LLAcquireImage() will also eventually show
-            // the user-interface of the device, or acquire immediately if
-            // no user-interface is being used.
-            if (!bInitializeAcquisitionProcess)
+            struct TwainWatchdog
             {
-                acquireRef = LLAcquireImage(sOpts);
-                bInitializeAcquisitionProcess = true;
-                lastTwainProgressTick = GetTickCount();
+                DWORD lastProgressTick;
+                DWORD timeoutMs;
+                bool  triggered;
+            };
 
-                // Didn't get an acquisition number, so something failed
-                if (acquireRef == -1L)
-                    break;
-            }
+            TwainWatchdog wd{ GetTickCount(), 3000, false };
 
-            // This will test for TWAIN messages, Data Source messages or application messages.
-            if (pImpl->CanEnterDispatch(&msg))
+            DWORD lastTwainProgressTick = GetTickCount();
+
+            // Start the message loop.
+            while (LoopTraits::ContinueLoop(&msg))
             {
-                TranslateMessage(&msg);
-                ::DispatchMessage(&msg);
-            }
-
-#if 0 // Note that this has not been implemented
-            // PeekMessage watchdog
-            if (LoopTraits::isPeekMsg)
-            {
-                const DWORD timeoutMs = 3000;
-                if (GetTickCount() - lastTwainProgressTick > timeoutMs)
+                // If in UIOnly mode, set it up here
+                if (isUIOnly && !bInitializeAcquisitionProcess)
                 {
-                    // no progress for timeout, exit loop
-                    wd.triggered = true;
+                    LLSetupUIOnly(pSource);
+                    bInitializeAcquisitionProcess = true;
+                    lastTwainProgressTick = GetTickCount();
+                }
+
+                // If acquire has been terminated, break out of this loop
+                if (pImpl->IsAcquireTerminated(pSource, isUIOnly))
+                {
+                    if (isUIOnly)
+                        pSource->SetUIOnly(false);
+                    lastTwainProgressTick = GetTickCount();
                     break;
                 }
-            }
+
+                // If we haven't set up the TWAIN device for the acquisition,
+                // do it now.  The LLAcquireImage() will also eventually show
+                // the user-interface of the device, or acquire immediately if
+                // no user-interface is being used.
+                if (!bInitializeAcquisitionProcess)
+                {
+                    acquireRef = LLAcquireImage(sOpts);
+                    bInitializeAcquisitionProcess = true;
+                    lastTwainProgressTick = GetTickCount();
+
+                    // Didn't get an acquisition number, so something failed
+                    if (acquireRef == -1L)
+                        break;
+                }
+
+                // This will test for TWAIN messages, Data Source messages or application messages.
+                if (pImpl->CanEnterDispatch(&msg))
+                {
+                    TranslateMessage(&msg);
+                    ::DispatchMessage(&msg);
+                }
+
+#if 0 // Note that this has not been implemented
+                // PeekMessage watchdog
+                if (LoopTraits::isPeekMsg)
+                {
+                    const DWORD timeoutMs = 3000;
+                    if (GetTickCount() - lastTwainProgressTick > timeoutMs)
+                    {
+                        // no progress for timeout, exit loop
+                        wd.triggered = true;
+                        break;
+                    }
+                }
 #endif
-            // Optional throttle to avoid CPU spin 
-            Sleep(1);
+                // Optional throttle to avoid CPU spin 
+                Sleep(1);
+            }
+            return wd.triggered;
         }
-        return wd.triggered;
-    }
-};
+    };
+}
 
 int TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, bool isUIOnly)
 {
@@ -325,14 +328,12 @@ int TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, b
     if (pSource->IsUsePeekMessage())
     {
         // Use the PeekMessage() version of the message loop
-        ContinueLoopTraits<ContinueLoopTraitsPeek> msgLoop;
-        watchdog_triggered = msgLoop.InvokeLoop(this, pSource, isUIOnly);
+        watchdog_triggered = ::ContinueLoopTraits<::ContinueLoopTraitsPeek>::InvokeLoop(this, pSource, isUIOnly);
     }
     else
     {
         // Use the GetMessage() version of the message loop
-        ContinueLoopTraits<ContinueLoopTraitsGet> msgLoop;
-        watchdog_triggered = msgLoop.InvokeLoop(this, pSource, isUIOnly);
+        watchdog_triggered = ::ContinueLoopTraits<::ContinueLoopTraitsGet>::InvokeLoop(this, pSource, isUIOnly);
     }
 
     if (watchdog_triggered)

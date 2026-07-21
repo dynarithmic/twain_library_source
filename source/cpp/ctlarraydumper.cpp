@@ -24,218 +24,217 @@
 #include "errorcheck.h"
 using namespace dynarithmic;
 
-
-template <typename T>
-struct StreamerImpl
+namespace
 {
-    static void streamMe(OutputBaseStreamA* strm, size_t* pCur, T& val, bool makeUnsigned)
+    template <typename T>
+    struct StreamerImpl
     {
-        using D = std::decay_t<T>;
-
-        if constexpr (std::is_integral_v<T> && std::is_signed_v<T>)
+        static void streamMe(OutputBaseStreamA* strm, size_t* pCur, T& val, bool makeUnsigned)
         {
-            if (makeUnsigned)
+            using D = std::decay_t<T>;
+
+            if constexpr (std::is_integral_v<T> && std::is_signed_v<T>)
             {
-                using U = std::make_unsigned_t<D>;
-                *strm << "Array[" << *pCur << "] = " << static_cast<U>(val) << "\n";
+                if (makeUnsigned)
+                {
+                    using U = std::make_unsigned_t<D>;
+                    *strm << "Array[" << *pCur << "] = " << static_cast<U>(val) << "\n";
+                }
+                else
+                {
+                    *strm << "Array[" << *pCur << "] = " << val << "\n";
+                }
             }
             else
             {
                 *strm << "Array[" << *pCur << "] = " << val << "\n";
             }
         }
-        else
+    };
+
+    struct StreamerImplFrame
+    {
+        CTL_OutputBaseStreamType* m_pStrm;
+        size_t* m_pCurItem;
+        StreamerImplFrame(CTL_OutputBaseStreamType* strm, size_t* curItem) : m_pStrm(strm), m_pCurItem(curItem) { *curItem = 0; }
+
+        void operator()(const TwainFrameInternal& pPtr) const
         {
-            *strm << "Array[" << *pCur << "] = " << val << "\n";
+            *m_pStrm << _T("Array[") << *m_pCurItem << _T("]");
+            *m_pStrm << _T("{left=" << pPtr.m_FrameComponent[0] << _T("}\n"));
+            *m_pStrm << _T("{top=" << pPtr.m_FrameComponent[1] << _T("}\n"));
+            *m_pStrm << _T("{right=" << pPtr.m_FrameComponent[2] << _T("}\n"));
+            *m_pStrm << _T("{bottom=" << pPtr.m_FrameComponent[3] << _T("}\n"));
+            ++* m_pCurItem;
         }
-    }
-};
+    };
 
-struct StreamerImplFrame
-{
-    CTL_OutputBaseStreamType* m_pStrm;
-    size_t* m_pCurItem;
-    StreamerImplFrame(CTL_OutputBaseStreamType* strm, size_t* curItem) : m_pStrm(strm), m_pCurItem(curItem) { *curItem = 0; }
-
-    void operator()(const TwainFrameInternal& pPtr) const
+    struct StreamerImplTwainSource
     {
-        *m_pStrm << _T("Array[") << *m_pCurItem << _T("]");
-        *m_pStrm << _T("{left=" <<   pPtr.m_FrameComponent[0] << _T("}\n"));
-        *m_pStrm << _T("{top=" <<    pPtr.m_FrameComponent[1] << _T("}\n"));
-        *m_pStrm << _T("{right=" <<  pPtr.m_FrameComponent[2] << _T("}\n"));
-        *m_pStrm << _T("{bottom=" << pPtr.m_FrameComponent[3] << _T("}\n"));
-        ++*m_pCurItem;
-    }
-};
+        CTL_OutputBaseStreamType* m_pStrm;
+        size_t* m_pCurItem;
+        StreamerImplTwainSource(CTL_OutputBaseStreamType* strm, size_t* curItem) : m_pStrm(strm), m_pCurItem(curItem) { *curItem = 0; }
 
-struct StreamerImplTwainSource
-{
-    CTL_OutputBaseStreamType* m_pStrm;
-    size_t* m_pCurItem;
-    StreamerImplTwainSource(CTL_OutputBaseStreamType* strm, size_t* curItem) : m_pStrm(strm), m_pCurItem(curItem) { *curItem = 0; }
+        void operator()(CTL_ITwainSource* pPtr) const
+        {
+            if (pPtr)
+                *m_pStrm << _T("Source ") << *m_pCurItem + 1 << _T(": ") <<
+                StringConversion::Convert_Ansi_To_Native(pPtr->GetTwainIdentity().get_product_name()) << "\n";
+            ++* m_pCurItem;
+        }
+    };
 
-    void operator()(CTL_ITwainSource* pPtr) const
+    template <typename T, typename StreamFn = StreamerImpl<T> >
+    struct oStreamer
     {
-        if (pPtr)
-            *m_pStrm << _T("Source ") << *m_pCurItem + 1 << _T(": ") << 
-            StringConversion::Convert_Ansi_To_Native(pPtr->GetTwainIdentity().get_product_name()) << "\n";
-        ++*m_pCurItem;
-    }
-};
 
-template <typename T, typename StreamFn = StreamerImpl<T> >
-struct oStreamer
-{
+        OutputBaseStreamA* m_pStrm;
+        size_t* m_pCurItem;
+        bool m_bMakeUnsigned;
+        oStreamer(OutputBaseStreamA* strm, size_t* curItem, bool makeUnsigned = false) :
+            m_pStrm(strm), m_pCurItem(curItem), m_bMakeUnsigned(makeUnsigned) {
+            *curItem = 0;
+        }
+        void operator()(T& n)
+        {
+            StreamFn::streamMe(m_pStrm, m_pCurItem, n, m_bMakeUnsigned);
+            ++* m_pCurItem;
+        }
+    };
 
-    OutputBaseStreamA* m_pStrm;
-    size_t* m_pCurItem;
-    bool m_bMakeUnsigned;
-    oStreamer(OutputBaseStreamA* strm, size_t* curItem, bool makeUnsigned = false) : 
-        m_pStrm(strm), m_pCurItem(curItem), m_bMakeUnsigned(makeUnsigned) { *curItem = 0; }
-    void operator()(T& n)
+    template <typename T>
+    void genericDumper(DTWAIN_ARRAY Array, bool makeUnsigned = false)
     {
-        StreamFn::streamMe(m_pStrm, m_pCurItem, n, m_bMakeUnsigned);
-        ++*m_pCurItem;
+        // Get the array contents as a vector
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(Array);
+
+        StringStreamA strm;
+        size_t n;
+
+        std::for_each(vCaps.begin(), vCaps.end(), oStreamer<typename T::value_type>(&strm, &n, makeUnsigned));
+        LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
-};
 
-template <typename T>
-static void genericDumper(DTWAIN_ARRAY Array, bool makeUnsigned = false)
-{
-    // Get the array contents as a vector
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(Array);
+    template <typename IntType>
+    void CapDumper(DTWAIN_ARRAY Array)
+    {
+        // Get the array contents as a vector
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<IntType>(Array);
 
-    StringStreamA strm;
-    size_t n;
+        StringStreamA strm;
+        size_t n;
+        strm << "\n";
 
-    std::for_each(vCaps.begin(), vCaps.end(), oStreamer<typename T::value_type>(&strm, &n, makeUnsigned));
-    LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
-}
+        // if the cap is for supported caps, then output the strings.
+        // vector of names
+        std::vector<std::string> CapNames;
 
-template <typename IntType>
-static void CapDumper(DTWAIN_ARRAY Array)
-{
-    // Get the array contents as a vector
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<IntType>(Array);
+        // get the vector of cap names given cap number
+        std::transform(vCaps.begin(), vCaps.end(), std::back_inserter(CapNames),
+            [](IntType n) {return CTL_TwainAppMgr::GetCapNameFromCap(n); });
 
-    StringStreamA strm;
-    size_t n;
-    strm << "\n";
+        // stream the cap information from the cap names
+        std::for_each(CapNames.begin(), CapNames.end(), oStreamer<std::string>(&strm, &n));
+        LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
+    }
+    
+    void DumpArrayULONG(DTWAIN_ARRAY Array)
+    {
+        genericDumper<CTL_ArrayFactory::tagged_array_long>(Array, true);
+    }
 
-    // if the cap is for supported caps, then output the strings.
-    // vector of names
-    std::vector<std::string> CapNames;
+    void DumpArrayLONG(DTWAIN_ARRAY Array, LONG lCap, bool bAsUnsigned)
+    {
+        if (lCap != CAP_SUPPORTEDCAPS)
+            genericDumper<CTL_ArrayFactory::tagged_array_long>(Array, bAsUnsigned);
+        else
+            CapDumper<LONG>(Array);
+    }
 
-    // get the vector of cap names given cap number
-    std::transform(vCaps.begin(), vCaps.end(), std::back_inserter(CapNames),
-        [](IntType n) {return CTL_TwainAppMgr::GetCapNameFromCap(n); });
+    void DumpArrayFLOAT(DTWAIN_ARRAY Array)
+    {
+        genericDumper<CTL_ArrayFactory::tagged_array_double>(Array);
+    }
 
-    // stream the cap information from the cap names
-    std::for_each(CapNames.begin(), CapNames.end(), oStreamer<std::string>(&strm, &n));
-    LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
+    void DumpArrayAcquisitions(DTWAIN_ARRAY Array)
+    {
+        genericDumper<CTL_ArrayFactory::tagged_array_tagged_array_voidptr>(Array);
+    }
 
-}
+    void DumpArrayHandles(DTWAIN_ARRAY Array)
+    {
+        genericDumper<CTL_ArrayFactory::tagged_array_voidptr>(Array);
+    }
 
-static void DumpArrayULONG(DTWAIN_ARRAY Array)
-{
-    genericDumper<CTL_ArrayFactory::tagged_array_long>(Array, true);
-}
+    void DumpArrayLONG64(DTWAIN_ARRAY Array)
+    {
+        genericDumper<CTL_ArrayFactory::tagged_array_long64>(Array);
+    }
 
-static void DumpArrayLONG(DTWAIN_ARRAY Array, LONG lCap, bool bAsUnsigned)
-{
-    if ( lCap != CAP_SUPPORTEDCAPS )
-        genericDumper<CTL_ArrayFactory::tagged_array_long>(Array, bAsUnsigned);
-    else
-        CapDumper<LONG>(Array);
-}
+    void DumpArrayWideString(DTWAIN_ARRAY Array);
+    void DumpArrayAnsiString(DTWAIN_ARRAY Array);
 
-static void DumpArrayFLOAT(DTWAIN_ARRAY Array)
-{
-    genericDumper<CTL_ArrayFactory::tagged_array_double>(Array);
-}
-
-static void DumpArrayAcquisitions(DTWAIN_ARRAY Array)
-{
-    genericDumper<CTL_ArrayFactory::tagged_array_tagged_array_voidptr>(Array);
-}
-
-static void DumpArrayHandles(DTWAIN_ARRAY Array)
-{
-    genericDumper<CTL_ArrayFactory::tagged_array_voidptr>(Array);
-}
-
-static void DumpArrayLONG64(DTWAIN_ARRAY Array)
-{
-    genericDumper<CTL_ArrayFactory::tagged_array_long64>(Array);
-}
-
-static void DumpArrayWideString(DTWAIN_ARRAY Array);
-static void DumpArrayAnsiString(DTWAIN_ARRAY Array);
-
-static void DumpArrayNativeString(DTWAIN_ARRAY Array)
-{
+    void DumpArrayNativeString(DTWAIN_ARRAY Array)
+    {
 #ifdef _UNICODE
-    DumpArrayWideString(Array);
+        DumpArrayWideString(Array);
 #else
-    DumpArrayAnsiString(Array);
+        DumpArrayAnsiString(Array);
 #endif
+    }
+
+    template <typename StringWrapperType, typename WriterFn>
+    void GenericDumpArrayString(DTWAIN_ARRAY Array, WriterFn fn)
+    {
+        using string_type = typename StringWrapperType::traits_type::string_type;
+        static constexpr auto newLine = StringWrapperType::traits_type::GetNewLineString();
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& vData =
+            pHandle->m_ArrayFactory->underlying_container_t<string_type>(Array);
+        string_type allValues = StringWrapperType::Join(vData.begin(), vData.end(), newLine);
+        fn(allValues, newLine);
+    }
+
+    void DumpArrayWideString(DTWAIN_ARRAY Array)
+    {
+        GenericDumpArrayString<StringWrapperW, decltype(LogWriterUtils::WriteMultiLineInfoIndentedW)>
+            (Array, &LogWriterUtils::WriteMultiLineInfoIndentedW);
+    }
+
+    void DumpArrayAnsiString(DTWAIN_ARRAY Array)
+    {
+        GenericDumpArrayString<StringWrapperA, decltype(LogWriterUtils::WriteMultiLineInfoIndentedA)>
+            (Array, &LogWriterUtils::WriteMultiLineInfoIndentedA);
+    }
+
+    void DumpArrayFrame(DTWAIN_ARRAY Array)
+    {
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Array);
+        size_t n;
+        CTL_StringStreamType strm;
+        std::for_each(vData.begin(), vData.end(), StreamerImplFrame(&strm, &n));
+        LogWriterUtils::WriteMultiLineInfoIndented(strm.str(), _T("\n"));
+    }
+
+    void DumpSourceNames(DTWAIN_ARRAY Array)
+    {
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(Array);
+        size_t n;
+        CTL_StringStreamType strm;
+        std::for_each(vData.begin(), vData.end(), StreamerImplTwainSource(&strm, &n));
+        LogWriterUtils::WriteMultiLineInfoIndented(strm.str(), _T("\n"));
+    }
 }
 
-template <typename StringWrapperType, typename WriterFn>
-static void GenericDumpArrayString(DTWAIN_ARRAY Array, WriterFn fn)
-{
-    using string_type = typename StringWrapperType::traits_type::string_type;
-    static constexpr auto newLine = StringWrapperType::traits_type::GetNewLineString();
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const auto& vData = 
-        pHandle->m_ArrayFactory->underlying_container_t<string_type>(Array);
-    string_type allValues = StringWrapperType::Join(vData.begin(), vData.end(), newLine);
-    fn(allValues, newLine);
-}
-
-static void DumpArrayWideString(DTWAIN_ARRAY Array)
-{
-    GenericDumpArrayString<StringWrapperW, decltype(LogWriterUtils::WriteMultiLineInfoIndentedW)>
-        (Array, &LogWriterUtils::WriteMultiLineInfoIndentedW);
-}
-
-static void DumpArrayAnsiString(DTWAIN_ARRAY Array)
-{
-    GenericDumpArrayString<StringWrapperA, decltype(LogWriterUtils::WriteMultiLineInfoIndentedA)>
-        (Array, &LogWriterUtils::WriteMultiLineInfoIndentedA);
-}
-
-static void DumpArrayFrame(DTWAIN_ARRAY Array)
-{
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Array);
-    size_t n;
-    CTL_StringStreamType strm;
-    std::for_each(vData.begin(), vData.end(), StreamerImplFrame(&strm, &n));
-    LogWriterUtils::WriteMultiLineInfoIndented(strm.str(), _T("\n"));
-}
-
-static void DumpSourceNames(DTWAIN_ARRAY Array)
-{
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(Array);
-    size_t n;
-    CTL_StringStreamType strm;
-    std::for_each(vData.begin(), vData.end(), StreamerImplTwainSource(&strm, &n));
-    LogWriterUtils::WriteMultiLineInfoIndented(strm.str(), _T("\n"));
-}
 
 void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFlags, bool bAsUnsigned)
 {
     auto logFlags = CTL_StaticData::GetLogFilterFlags();
-    bool doArrayDump = false;
-    if (logFlags && anyLogFlags)
-        doArrayDump = true;
-    else
-    if ( logFlags & DTWAIN_LOG_MISCELLANEOUS )
-        doArrayDump = true;
+    bool doArrayDump = ((logFlags && anyLogFlags) || (logFlags & DTWAIN_LOG_MISCELLANEOUS));
     if ( !doArrayDump )
         return;
 

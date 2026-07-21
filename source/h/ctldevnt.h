@@ -27,7 +27,7 @@ namespace dynarithmic
     class CTL_DeviceEvent
     {
         public:
-            CTL_DeviceEvent();
+            CTL_DeviceEvent() = default;
             operator pTW_DEVICEEVENT() { return &m_DeviceEvent; }
 
             TW_UINT32  GetEvent() const;                  /* One of the TWDE_xxxx values. */

@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <cmath>
-#include <cstdio>
 #include <algorithm>
 
 #include "cppfunc.h"

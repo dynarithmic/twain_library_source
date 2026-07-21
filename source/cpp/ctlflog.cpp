@@ -24,7 +24,6 @@
 #include "ctllogcalls.h"
 #include "logwriterutils.h"
 #include "ctltwainmanager.h"
-#include <boost/format.hpp>
 
 using namespace dynarithmic;
 
@@ -171,9 +170,9 @@ void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
         else
             return;
         std::ostringstream strm;
-        strm << boost::format("**** DTWAIN %1% ****.  %2%: %3%\n") %
-            GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT).c_str() %
-            GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT).c_str() % fname;
+        strm << ReplacePlaceHolders<std::string>("**** DTWAIN %1 ****.  %2: %3\n", {
+            GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT),
+            GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT), fname });
         if (sAdditionalText)
             strm << "\nAdditional Information: " << sAdditionalText;
         #ifdef _WIN32
