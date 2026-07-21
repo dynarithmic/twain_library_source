@@ -128,18 +128,21 @@ DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_GetCallback64()
     CATCH_BLOCK(nullptr)
 }
 
-template <typename CallbackType, typename UserType>
-struct CallbackFinder
+namespace
 {
-    CallbackFinder(CallbackType Fn) : theFn(Fn) {}
-    bool operator () (const CallbackInfo<CallbackType, UserType>& Info)
+    template <typename CallbackType, typename UserType>
+    struct CallbackFinder
     {
-        return Info.Fn == theFn;
-    }
+        CallbackFinder(CallbackType Fn) : theFn(Fn) {}
+        bool operator () (const CallbackInfo<CallbackType, UserType>& Info)
+        {
+            return Info.Fn == theFn;
+        }
 
     private:
         CallbackType theFn;
-};
+    };
+}
 
 #ifdef _WIN32
 LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
@@ -557,26 +560,29 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
 }
 #endif // _WIN32
 
-template <typename CallbackType, typename UserType>
-LRESULT CallOneCallback(CallbackType Fn, WPARAM wParam, LPARAM lParam, UserType UserData)
+namespace
 {
-    return (*Fn)(wParam, lParam, UserData);
-}
-
-template <typename CallbackType, typename UserType>
-struct CallBatchProcessor
-{
-    CallBatchProcessor(WPARAM wParam, LPARAM lParam) :thewparm(wParam), thelparm(lParam) {}
-
-    void operator() (CallbackInfo<CallbackType, UserType>& Info)
+    template <typename CallbackType, typename UserType>
+    LRESULT CallOneCallback(CallbackType Fn, WPARAM wParam, LPARAM lParam, UserType UserData)
     {
-        Info.retvalue = CallOneCallback(Info.Fn, thewparm, thelparm, Info.UserData );
+        return (*Fn)(wParam, lParam, UserData);
     }
+
+    template <typename CallbackType, typename UserType>
+    struct CallBatchProcessor
+    {
+        CallBatchProcessor(WPARAM wParam, LPARAM lParam) :thewparm(wParam), thelparm(lParam) {}
+
+        void operator() (CallbackInfo<CallbackType, UserType>& Info)
+        {
+            Info.retvalue = CallOneCallback(Info.Fn, thewparm, thelparm, Info.UserData);
+        }
 
     private:
         WPARAM thewparm;
         LPARAM thelparm;
-};
+    };
+}
 
 template <typename CallbackType, typename UserType>
 LRESULT ExecuteCallback(CallbackType Fn, HWND hWnd, UINT uMsg,

@@ -20,20 +20,23 @@
  */
 #include "metafilewriter.h"
 
-#pragma pack(push, 1)
-struct AldusPlaceableHeader
+namespace
 {
-    DWORD key = 0x9AC6CDD7;
-    WORD  hmf = 0;
-    SHORT left = 0;
-    SHORT top = 0;
-    SHORT right = 0;
-    SHORT bottom = 0;
-    WORD  inch = 1440;
-    DWORD reserved = 0;
-    WORD  checksum = 0;
-};
+#pragma pack(push, 1)
+    struct AldusPlaceableHeader
+    {
+        DWORD key = 0x9AC6CDD7;
+        WORD  hmf = 0;
+        SHORT left = 0;
+        SHORT top = 0;
+        SHORT right = 0;
+        SHORT bottom = 0;
+        WORD  inch = 1440;
+        DWORD reserved = 0;
+        WORD  checksum = 0;
+    };
 #pragma pack(pop)
+}
 
 static WORD ComputePlaceableChecksum(const AldusPlaceableHeader& h)
 {

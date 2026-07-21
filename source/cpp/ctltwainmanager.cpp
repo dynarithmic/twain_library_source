@@ -2429,41 +2429,44 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
     }
 }
 
-struct TripletSaveRestore
+namespace
 {
-    const CTL_TwainTriplet **pTrip = nullptr;
-    TripletSaveRestore(const CTL_TwainTriplet** p) : pTrip(p) {}
-    ~TripletSaveRestore()
+    struct TripletSaveRestore
     {
-        if ( pTrip && *pTrip )
-            *pTrip = nullptr;
-    }
-};
+        const CTL_TwainTriplet** pTrip = nullptr;
+        TripletSaveRestore(const CTL_TwainTriplet** p) : pTrip(p) {}
+        ~TripletSaveRestore()
+        {
+            if (pTrip && *pTrip)
+                *pTrip = nullptr;
+        }
+    };
 
 
-struct DSMCallResult
-{
-    TW_UINT16 retcode = TWRC_FAILURE;
-    DWORD exceptionCode = 0;
-    bool sehException = false;
-};
-
-static DSMCallResult SafeDSMEntryCall( DSMENTRYPROC lpDSMEntry, pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, 
-                                       TW_UINT32 nDG,TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF pData)
-{
-    DSMCallResult result;
-
-    __try
+    struct DSMCallResult
     {
-        result.retcode = (*lpDSMEntry)( pOrigin, pDest, nDG, nDAT, nMSG, pData);
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
+        TW_UINT16 retcode = TWRC_FAILURE;
+        DWORD exceptionCode = 0;
+        bool sehException = false;
+    };
+
+    DSMCallResult SafeDSMEntryCall(DSMENTRYPROC lpDSMEntry, pTW_IDENTITY pOrigin, pTW_IDENTITY pDest,
+        TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF pData)
     {
-        result.retcode = TWRC_FAILURE;
-        result.exceptionCode = GetExceptionCode();
-        result.sehException = true;
+        DSMCallResult result;
+
+        __try
+        {
+            result.retcode = (*lpDSMEntry)(pOrigin, pDest, nDG, nDAT, nMSG, pData);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result.retcode = TWRC_FAILURE;
+            result.exceptionCode = GetExceptionCode();
+            result.sehException = true;
+        }
+        return result;
     }
-    return result;
 }
 
 TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )

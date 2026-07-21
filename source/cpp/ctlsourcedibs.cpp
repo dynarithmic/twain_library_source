@@ -125,41 +125,44 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
     CATCH_BLOCK(nullptr)
 }
 
-// class whose purpose is to destroy the image data array
-struct NestedAcquisitionDestroyer
+namespace
 {
-    CTL_TwainDLLHandle* m_pHandle;
-    bool m_bDestroyDibs;
-    NestedAcquisitionDestroyer(CTL_TwainDLLHandle* pHandle, bool bDestroyDibs) : m_pHandle(pHandle), m_bDestroyDibs(bDestroyDibs) {}
-
-    void operator()(void* ImagesArray) const
+    // class whose purpose is to destroy the image data array
+    struct NestedAcquisitionDestroyer
     {
-        // we want this array destroyed when we're finished
-        DTWAINArrayLowLevel_RAII raii(m_pHandle, VOID_TO_DTWAIN_ARRAY(ImagesArray));
+        CTL_TwainDLLHandle* m_pHandle;
+        bool m_bDestroyDibs;
+        NestedAcquisitionDestroyer(CTL_TwainDLLHandle* pHandle, bool bDestroyDibs) : m_pHandle(pHandle), m_bDestroyDibs(bDestroyDibs) {}
 
-        // Test if the DIB data should also be destroyed
-        if (m_bDestroyDibs)
+        void operator()(void* ImagesArray) const
         {
-            // get underlying vector of dibs
-            auto& vHandles = m_pHandle->m_ArrayFactory->underlying_container_t<void*>(ImagesArray);
+            // we want this array destroyed when we're finished
+            DTWAINArrayLowLevel_RAII raii(m_pHandle, VOID_TO_DTWAIN_ARRAY(ImagesArray));
 
-            // for each dib, destroy the data
-            std::for_each(vHandles.begin(), vHandles.end(), DestroyDibData);
+            // Test if the DIB data should also be destroyed
+            if (m_bDestroyDibs)
+            {
+                // get underlying vector of dibs
+                auto& vHandles = m_pHandle->m_ArrayFactory->underlying_container_t<void*>(ImagesArray);
+
+                // for each dib, destroy the data
+                std::for_each(vHandles.begin(), vHandles.end(), DestroyDibData);
+            }
         }
-    }
 
-    static void DestroyDibData(HANDLE hImageData)
-    {
-        #ifdef _WIN32
-        const UINT nCount = GlobalFlags(hImageData) & GMEM_LOCKCOUNT;
-        #else
-        UINT nCount = 1;
-        #endif
-        for (UINT k = 0; k < nCount; k++)
-            ImageMemoryHandler::GlobalUnlock(hImageData);
-        ImageMemoryHandler::GlobalFree(hImageData);
-    }
-};
+        static void DestroyDibData(HANDLE hImageData)
+        {
+#ifdef _WIN32
+            const UINT nCount = GlobalFlags(hImageData) & GMEM_LOCKCOUNT;
+#else
+            UINT nCount = 1;
+#endif
+            for (UINT k = 0; k < nCount; k++)
+                ImageMemoryHandler::GlobalUnlock(hImageData);
+            ImageMemoryHandler::GlobalFree(hImageData);
+        }
+    };
+}
 
 std::pair<bool, int> dynarithmic::DestroyAcquisitionArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, bool bDestroyDibs)
 {

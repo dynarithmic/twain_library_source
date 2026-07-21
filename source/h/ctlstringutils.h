@@ -24,7 +24,6 @@
 #include <string>
 #include <vector>
 #include <string_view>
-#include <initializer_list>
 
 // Widening string macros
 #define WIDEN2(x) L##x

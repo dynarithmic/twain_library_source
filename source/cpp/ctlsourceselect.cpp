@@ -380,13 +380,15 @@ static CTL_StringType GetDefaultSource()
     return {};
 }
 
-
-struct openSourceSaver
+namespace
 {
-    bool m_bSaved;
-    openSourceSaver(bool bSaved) : m_bSaved(bSaved) {}
-    ~openSourceSaver() { DTWAIN_OpenSourcesOnSelect(m_bSaved); }
-};
+    struct openSourceSaver
+    {
+        bool m_bSaved;
+        openSourceSaver(bool bSaved) : m_bSaved(bSaved) {}
+        ~openSourceSaver() { DTWAIN_OpenSourcesOnSelect(m_bSaved); }
+    };
+}
 
 static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
 {

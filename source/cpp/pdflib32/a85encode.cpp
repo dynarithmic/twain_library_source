@@ -23,20 +23,23 @@ OF THIRD PARTY RIGHTS.
 #include <string_view>
 #include "a85encode.h"
 
-class A85Encoder
+namespace
 {
-    public:
-        A85Encoder() : count(0), width(72), pos(0), tuple(0) { }
-        std::string EncodeA85(std::string_view strIn);
+    class A85Encoder
+    {
+        public:
+            A85Encoder() : count(0), width(72), pos(0), tuple(0) { }
+            std::string EncodeA85(std::string_view strIn);
 
-    private:
-        int count;
-        unsigned long width, pos, tuple;
-        void processA85char(unsigned c);
-        void cleanup85();
-        void encode(unsigned long, int count);
-        std::string strOut;
-};
+        private:
+            int count;
+            unsigned long width, pos, tuple;
+            void processA85char(unsigned c);
+            void cleanup85();
+            void encode(unsigned long, int count);
+            std::string strOut;
+    };
+}
 
 std::string A85Encoder::EncodeA85(std::string_view strIn)
 {

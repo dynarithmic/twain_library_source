@@ -1023,13 +1023,16 @@ static uint16_t SampleBicubic16(const dynarithmic::dib::LockedDib& src,
     return ClampU16(sum);
 }
 
-struct BgraD
+namespace
 {
-    double b = 0;
-    double g = 0;
-    double r = 0;
-    double a = 255;
-};
+    struct BgraD
+    {
+        double b = 0;
+        double g = 0;
+        double r = 0;
+        double a = 255;
+    };
+}
 
 static BgraD SampleBicubic24Or32(const dynarithmic::dib::LockedDib& src,
     double srcX,

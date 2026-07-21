@@ -31,88 +31,91 @@
 
 using namespace dynarithmic;
 
-struct PDFDimensions
+namespace
 {
-    std::array<double,4> mediabox{};
-    constexpr PDFDimensions() : mediabox{ 0,0,0,0 } { }
-
-    constexpr PDFDimensions(double d1, double d2, double d3, double d4) : mediabox {}
+    struct PDFDimensions
     {
-        SetDimensions(d1, d2, d3, d4);
-    }
+        std::array<double, 4> mediabox{};
+        constexpr PDFDimensions() : mediabox{ 0,0,0,0 } { }
 
-    constexpr void SetDimensions(double d1, double d2, double d3, double d4)
+        constexpr PDFDimensions(double d1, double d2, double d3, double d4) : mediabox{}
+        {
+            SetDimensions(d1, d2, d3, d4);
+        }
+
+        constexpr void SetDimensions(double d1, double d2, double d3, double d4)
+        {
+            mediabox[0] = d1; mediabox[1] = d2; mediabox[2] = d3; mediabox[3] = d4;
+        }
+
+        constexpr void GetDimensions(double& d1, double& d2, double& d3, double& d4) const
+        {
+            d1 = mediabox[0]; d2 = mediabox[1]; d3 = mediabox[2]; d4 = mediabox[3];
+        }
+    };
+
+    typedef std::pair<double, double> PDFPosition;
+
+    typedef std::vector<PDFTextElement> PDFStringToTextElement;
+
+    struct AllPDFDimensions
     {
-        mediabox[0] = d1; mediabox[1] = d2; mediabox[2] = d3; mediabox[3] = d4;
-    }
-
-    constexpr void GetDimensions(double& d1, double &d2, double& d3, double& d4) const
-    {
-        d1 = mediabox[0]; d2 = mediabox[1]; d3 = mediabox[2]; d4 = mediabox[3];
-    }
-};
-
-typedef std::pair<double, double> PDFPosition;
-
-typedef std::vector<PDFTextElement> PDFStringToTextElement;
-
-struct AllPDFDimensions
-{
-    static constexpr std::array<std::pair<LONG, PDFDimensions>, 52> m_mediamap = { {
-    {DTWAIN_FS_USLETTER, {0, 0, 612.00, 792.00}},
-    {DTWAIN_FS_USLEGAL, {0, 0, 612.00, 1008.00}},
-    {DTWAIN_FS_USEXECUTIVE, {0, 0, 521.86, 756.00}},
-    {DTWAIN_FS_USLEDGER, {0, 0, 792.00, 1224.00}},
-    {DTWAIN_FS_USSTATEMENT, {0, 0, 396.00, 792.00}},
-    {DTWAIN_FS_BUSINESSCARD, {0, 0, 144.00, 290.00}},
-    {DTWAIN_FS_4A0, {0, 0, 4767.87, 6740.79}},
-    {DTWAIN_FS_2A0, {0, 0, 3370.39, 4767.87}},
-    {DTWAIN_FS_A0, {0, 0, 2383.94, 3370.39}},
-    {DTWAIN_FS_A1, {0, 0, 1683.78, 2383.94}},
-    {DTWAIN_FS_A2, {0, 0, 1190.55, 1683.78}},
-    {DTWAIN_FS_A3, {0, 0, 841.89, 1190.55}},
-    {DTWAIN_FS_A4, {0, 0, 595.28, 841.89}},
-    {DTWAIN_FS_A5, {0, 0, 419.53, 595.28}},
-    {DTWAIN_FS_A6, {0, 0, 297.64, 419.53}},
-    {DTWAIN_FS_A7, {0, 0, 209.76, 297.64}},
-    {DTWAIN_FS_A8, {0, 0, 147.40, 209.76}},
-    {DTWAIN_FS_A9, {0, 0, 104.88, 147.40}},
-    {DTWAIN_FS_A10, {0, 0, 73.70, 104.88}},
-    {DTWAIN_FS_ISOB0, {0, 0, 2834.65, 4008.19}},
-    {DTWAIN_FS_ISOB1, {0, 0, 2004.09, 2834.65}},
-    {DTWAIN_FS_ISOB2, {0, 0, 1417.32, 2004.09}},
-    {DTWAIN_FS_ISOB3, {0, 0, 1000.63, 1417.32}},
-    {DTWAIN_FS_ISOB4, {0, 0, 708.66, 1000.63}},
-    {DTWAIN_FS_ISOB5, {0, 0, 498.90, 708.66}},
-    {DTWAIN_FS_ISOB6, {0, 0, 354.33, 498.90}},
-    {DTWAIN_FS_ISOB7, {0, 0, 249.45, 354.33}},
-    {DTWAIN_FS_ISOB8, {0, 0, 175.75, 249.45}},
-    {DTWAIN_FS_ISOB9, {0, 0, 124.72, 175.75}},
-    {DTWAIN_FS_ISOB10, {0, 0, 87.87, 124.72}},
-    {DTWAIN_FS_C0, {0, 0, 2599.37, 3676.54}},
-    {DTWAIN_FS_C1, {0, 0, 1836.85, 2599.37}},
-    {DTWAIN_FS_C2, {0, 0, 1298.27, 1836.85}},
-    {DTWAIN_FS_C3, {0, 0, 918.43, 1298.27}},
-    {DTWAIN_FS_C4, {0, 0, 649.13, 918.43}},
-    {DTWAIN_FS_C5, {0, 0, 459.21, 649.13}},
-    {DTWAIN_FS_C6, {0, 0, 323.15, 459.21}},
-    {DTWAIN_FS_C7, {0, 0, 229.61, 323.15}},
-    {DTWAIN_FS_C8, {0, 0, 161.57, 229.61}},
-    {DTWAIN_FS_C9, {0, 0, 113.39, 161.57}},
-    {DTWAIN_FS_C10, {0, 0, 79.37, 113.39}},
-    {DTWAIN_FS_JISB0, {0, 0, 2923.2, 4125.6}},
-    {DTWAIN_FS_JISB1, {0, 0, 2066.4, 2923.2}},
-    {DTWAIN_FS_JISB2, {0, 0, 1461.6, 2066.4}},
-    {DTWAIN_FS_JISB3, {0, 0, 1029.6, 1461.6}},
-    {DTWAIN_FS_JISB4, {0, 0, 727.2, 1029.6}},
-    {DTWAIN_FS_JISB5, {0, 0, 518.4, 727.2}},
-    {DTWAIN_FS_JISB6, {0, 0, 360, 518.4}},
-    {DTWAIN_FS_JISB7, {0, 0, 259.2, 360}},
-    {DTWAIN_FS_JISB8, {0, 0, 180, 259.2}},
-    {DTWAIN_FS_JISB9, {0, 0, 129.6, 180}},
-    {DTWAIN_FS_JISB10, {0, 0, 93.6, 129.6}}
-    } };
-};
+        static constexpr std::array<std::pair<LONG, PDFDimensions>, 52> m_mediamap = { {
+        {DTWAIN_FS_USLETTER, {0, 0, 612.00, 792.00}},
+        {DTWAIN_FS_USLEGAL, {0, 0, 612.00, 1008.00}},
+        {DTWAIN_FS_USEXECUTIVE, {0, 0, 521.86, 756.00}},
+        {DTWAIN_FS_USLEDGER, {0, 0, 792.00, 1224.00}},
+        {DTWAIN_FS_USSTATEMENT, {0, 0, 396.00, 792.00}},
+        {DTWAIN_FS_BUSINESSCARD, {0, 0, 144.00, 290.00}},
+        {DTWAIN_FS_4A0, {0, 0, 4767.87, 6740.79}},
+        {DTWAIN_FS_2A0, {0, 0, 3370.39, 4767.87}},
+        {DTWAIN_FS_A0, {0, 0, 2383.94, 3370.39}},
+        {DTWAIN_FS_A1, {0, 0, 1683.78, 2383.94}},
+        {DTWAIN_FS_A2, {0, 0, 1190.55, 1683.78}},
+        {DTWAIN_FS_A3, {0, 0, 841.89, 1190.55}},
+        {DTWAIN_FS_A4, {0, 0, 595.28, 841.89}},
+        {DTWAIN_FS_A5, {0, 0, 419.53, 595.28}},
+        {DTWAIN_FS_A6, {0, 0, 297.64, 419.53}},
+        {DTWAIN_FS_A7, {0, 0, 209.76, 297.64}},
+        {DTWAIN_FS_A8, {0, 0, 147.40, 209.76}},
+        {DTWAIN_FS_A9, {0, 0, 104.88, 147.40}},
+        {DTWAIN_FS_A10, {0, 0, 73.70, 104.88}},
+        {DTWAIN_FS_ISOB0, {0, 0, 2834.65, 4008.19}},
+        {DTWAIN_FS_ISOB1, {0, 0, 2004.09, 2834.65}},
+        {DTWAIN_FS_ISOB2, {0, 0, 1417.32, 2004.09}},
+        {DTWAIN_FS_ISOB3, {0, 0, 1000.63, 1417.32}},
+        {DTWAIN_FS_ISOB4, {0, 0, 708.66, 1000.63}},
+        {DTWAIN_FS_ISOB5, {0, 0, 498.90, 708.66}},
+        {DTWAIN_FS_ISOB6, {0, 0, 354.33, 498.90}},
+        {DTWAIN_FS_ISOB7, {0, 0, 249.45, 354.33}},
+        {DTWAIN_FS_ISOB8, {0, 0, 175.75, 249.45}},
+        {DTWAIN_FS_ISOB9, {0, 0, 124.72, 175.75}},
+        {DTWAIN_FS_ISOB10, {0, 0, 87.87, 124.72}},
+        {DTWAIN_FS_C0, {0, 0, 2599.37, 3676.54}},
+        {DTWAIN_FS_C1, {0, 0, 1836.85, 2599.37}},
+        {DTWAIN_FS_C2, {0, 0, 1298.27, 1836.85}},
+        {DTWAIN_FS_C3, {0, 0, 918.43, 1298.27}},
+        {DTWAIN_FS_C4, {0, 0, 649.13, 918.43}},
+        {DTWAIN_FS_C5, {0, 0, 459.21, 649.13}},
+        {DTWAIN_FS_C6, {0, 0, 323.15, 459.21}},
+        {DTWAIN_FS_C7, {0, 0, 229.61, 323.15}},
+        {DTWAIN_FS_C8, {0, 0, 161.57, 229.61}},
+        {DTWAIN_FS_C9, {0, 0, 113.39, 161.57}},
+        {DTWAIN_FS_C10, {0, 0, 79.37, 113.39}},
+        {DTWAIN_FS_JISB0, {0, 0, 2923.2, 4125.6}},
+        {DTWAIN_FS_JISB1, {0, 0, 2066.4, 2923.2}},
+        {DTWAIN_FS_JISB2, {0, 0, 1461.6, 2066.4}},
+        {DTWAIN_FS_JISB3, {0, 0, 1029.6, 1461.6}},
+        {DTWAIN_FS_JISB4, {0, 0, 727.2, 1029.6}},
+        {DTWAIN_FS_JISB5, {0, 0, 518.4, 727.2}},
+        {DTWAIN_FS_JISB6, {0, 0, 360, 518.4}},
+        {DTWAIN_FS_JISB7, {0, 0, 259.2, 360}},
+        {DTWAIN_FS_JISB8, {0, 0, 180, 259.2}},
+        {DTWAIN_FS_JISB9, {0, 0, 129.6, 180}},
+        {DTWAIN_FS_JISB10, {0, 0, 93.6, 129.6}}
+        } };
+    };
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CTL_PDFIOHandler::CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx &ImageInfoEx)
@@ -130,58 +133,172 @@ static char CleanupOCRText1(char ch)
     return ch;
 }
 
-struct OCRTextInfo
+namespace
 {
-    std::vector<LONG> xPos;
-    std::vector<LONG> yPos;
-    std::vector<LONG> xDim;
-    std::vector<LONG> yDim;
-    std::string OCRChar;
-    PDFDimensions m_RealDimensions;
-    PDFDimensions m_ScaledDimensions;
-    std::pair<LONG, LONG> m_ImageDimensions;
-    std::pair<double, double> m_PDFScalingFactorForPage;
-
-    void GetCharacterPositionAndHeightInPDF(LONG nChar, PDFPosition& pdfPosition, double& fontHeight, double& fontWidth)
+    struct OCRTextInfo
     {
-        double xP = m_RealDimensions.mediabox[2] * xPos[nChar] / m_ImageDimensions.first;  // get PDF x-position of character
-        double yP = m_RealDimensions.mediabox[3] * yPos[nChar] / m_ImageDimensions.second; // get PDF y-position of character
-        yP = m_RealDimensions.mediabox[3] - yP;
-        fontHeight = m_RealDimensions.mediabox[3] * yDim[nChar] / m_ImageDimensions.second * 1.5; // get font height of character
-        fontWidth = m_RealDimensions.mediabox[2] * xDim[nChar] / m_ImageDimensions.first * 1.5;
-        yP -= fontHeight/2.0;  // adjust y-position per PDF coordinate system
-        pdfPosition = std::make_pair(xP, yP);  // make the pair and get out
+        std::vector<LONG> xPos;
+        std::vector<LONG> yPos;
+        std::vector<LONG> xDim;
+        std::vector<LONG> yDim;
+        std::string OCRChar;
+        PDFDimensions m_RealDimensions;
+        PDFDimensions m_ScaledDimensions;
+        std::pair<LONG, LONG> m_ImageDimensions;
+        std::pair<double, double> m_PDFScalingFactorForPage;
+
+        void GetCharacterPositionAndHeightInPDF(LONG nChar, PDFPosition& pdfPosition, double& fontHeight, double& fontWidth)
+        {
+            double xP = m_RealDimensions.mediabox[2] * xPos[nChar] / m_ImageDimensions.first;  // get PDF x-position of character
+            double yP = m_RealDimensions.mediabox[3] * yPos[nChar] / m_ImageDimensions.second; // get PDF y-position of character
+            yP = m_RealDimensions.mediabox[3] - yP;
+            fontHeight = m_RealDimensions.mediabox[3] * yDim[nChar] / m_ImageDimensions.second * 1.5; // get font height of character
+            fontWidth = m_RealDimensions.mediabox[2] * xDim[nChar] / m_ImageDimensions.first * 1.5;
+            yP -= fontHeight / 2.0;  // adjust y-position per PDF coordinate system
+            pdfPosition = std::make_pair(xP, yP);  // make the pair and get out
+        }
+
+        double FontWidthFromPixelSize(LONG PixelSize) const
+        {
+            return m_RealDimensions.mediabox[2] * PixelSize / m_ImageDimensions.first * 1.5;
+        }
+
+        double FontHeightFromPixelSize(LONG PixelSize) const
+        {
+            return m_RealDimensions.mediabox[3] * PixelSize / m_ImageDimensions.second * 1.5;
+        }
+
+        PDFPosition PDFPositionFromPixelPosition(LONG x, LONG y, double fontHeight) const
+        {
+            double xP = m_RealDimensions.mediabox[2] * x / m_ImageDimensions.first;  // get PDF x-position of character
+            double yP = m_RealDimensions.mediabox[3] * y / m_ImageDimensions.second; // get PDF y-position of character
+            yP = m_RealDimensions.mediabox[3] - yP;
+            yP -= fontHeight / 2.0;
+            return std::make_pair(xP, yP);
+        }
+    };
+
+    bool GetOCRCharacterInformation(OCREngine* pEngine, OCRTextInfo& tInfo, HANDLE hBitmap, const DTWAINImageInfoEx& imageInfoEx)
+    {
+        const DTWAIN_OCRTEXTINFOHANDLE tInfoHandle = DTWAIN_GetOCRTextInfoHandle(reinterpret_cast<DTWAIN_OCRENGINE>(pEngine), 0);
+        if (!tInfoHandle)
+            return false;
+
+        // Get the text info length
+        LONG bufSize;
+        DTWAIN_GetOCRText(reinterpret_cast<DTWAIN_OCRENGINE>(pEngine), 0, nullptr, 0, &bufSize, DTWAINOCR_COPYDATA); // first get the buffer size
+
+        // size the components in the struct
+        tInfo.xDim.resize(bufSize);
+        tInfo.yDim.resize(bufSize);
+        tInfo.xPos.resize(bufSize);
+        tInfo.yPos.resize(bufSize);
+
+        // Get the data
+        DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARXPOS, &tInfo.xPos[0], bufSize);
+        DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARYPOS, &tInfo.yPos[0], bufSize);
+        DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARXWIDTH, &tInfo.xDim[0], bufSize);
+        DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARYWIDTH, &tInfo.yDim[0], bufSize);
+
+        // Get the original bitmap info translated into PDF units
+        const LPBITMAPINFOHEADER pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hBitmap));
+        DTWAINGlobalHandle_RAII dibHandle(hBitmap);
+
+        const double xInches = static_cast<double>(pbi->biXPelsPerMeter) / 39.37;
+        const double yInches = static_cast<double>(pbi->biYPelsPerMeter) / 39.37;
+        const double xWidth = static_cast<double>(pbi->biWidth);
+        const double yHeight = static_cast<double>(pbi->biHeight);
+        const double widthInPoints = xWidth / xInches * 72.0;
+        const double heightInPoints = yHeight / yInches * 72.0;
+
+        tInfo.m_RealDimensions.SetDimensions(0, 0, widthInPoints, heightInPoints);
+
+        // test scaling of normal PDF page
+        AllPDFDimensions pdfdims;
+        auto it = dynarithmic::generic_array_finder_if(pdfdims.m_mediamap, [&](const auto& pr) { return pr.first == imageInfoEx.PDFPageSize; });
+        if (it.first)
+        {
+            double d1, d2, d3, d4;
+            pdfdims.m_mediamap[it.second].second.GetDimensions(d1, d2, d3, d4);
+            tInfo.m_ScaledDimensions.SetDimensions(d1, d2, d3, d4);
+        }
+        else
+        {
+            switch (imageInfoEx.PDFPageSize)
+            {
+            case DTWAIN_PDF_CUSTOMSIZE:
+                tInfo.m_ScaledDimensions.SetDimensions(0, 0, imageInfoEx.PDFCustomSize[0], imageInfoEx.PDFCustomSize[1]);
+                break;
+
+            case DTWAIN_PDF_PIXELSPERMETERSIZE:
+                tInfo.m_ScaledDimensions.SetDimensions(0, 0, widthInPoints, heightInPoints);
+                break;
+
+            case DTWAIN_PDF_VARIABLEPAGESIZE:
+                tInfo.m_ScaledDimensions.SetDimensions(0, 0, xWidth, yHeight);
+                break;
+            }
+        }
+        tInfo.m_PDFScalingFactorForPage.first = tInfo.m_ScaledDimensions.mediabox[2] / tInfo.m_RealDimensions.mediabox[2];
+        tInfo.m_PDFScalingFactorForPage.second = tInfo.m_ScaledDimensions.mediabox[3] / tInfo.m_RealDimensions.mediabox[3];
+
+        // end test
+        tInfo.m_ImageDimensions = std::make_pair(static_cast<LONG>(xWidth), static_cast<LONG>(yHeight));
+        return true;
     }
 
-    double FontWidthFromPixelSize(LONG PixelSize) const
-    { return m_RealDimensions.mediabox[2] * PixelSize / m_ImageDimensions.first * 1.5; }
-
-    double FontHeightFromPixelSize(LONG PixelSize) const
-    { return m_RealDimensions.mediabox[3] * PixelSize / m_ImageDimensions.second * 1.5; }
-
-    PDFPosition PDFPositionFromPixelPosition(LONG x, LONG y, double fontHeight) const
+    PDFStringToTextElement CreatePDFTextElementMap(OCRTextInfo& tInfo)
     {
-        double xP = m_RealDimensions.mediabox[2] * x / m_ImageDimensions.first;  // get PDF x-position of character
-        double yP = m_RealDimensions.mediabox[3] * y / m_ImageDimensions.second; // get PDF y-position of character
-        yP = m_RealDimensions.mediabox[3] - yP;
-        yP -= fontHeight / 2.0;
-        return std::make_pair(xP, yP);
+        // Identify strings in OCRTextInfo
+        // 1) For each string:
+        //  a) determine max xDim and yDim (could be average if max does not work).  Determine scaling from these numbers.
+        //  b) The starting position in PDF is always the first character in string
+        //  c) All other text info fields are "static"
+        std::vector<unsigned> PositionVec;
+        StringArray strArray;
+        StringWrapperA::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
+        PDFStringToTextElement pMap;
+        pMap.reserve(strArray.size());
+        PDFTextElement element;
+        for (size_t i = 0; i < strArray.size(); ++i)
+        {
+            element.m_text = strArray[i];
+            // get the max x-dimension for this word
+            LONG maxWidth = *std::max_element(tInfo.xDim.begin() + PositionVec[i],
+                tInfo.xDim.begin() + PositionVec[i] + strArray[i].size());
+            LONG maxHeight = *std::max_element(tInfo.yDim.begin() + PositionVec[i],
+                tInfo.yDim.begin() + PositionVec[i] + strArray[i].size());
+            const double fheight = tInfo.FontHeightFromPixelSize(maxHeight);
+            element.scalingX = tInfo.FontWidthFromPixelSize(maxWidth) * tInfo.m_PDFScalingFactorForPage.first;
+            element.scalingY = fheight * tInfo.m_PDFScalingFactorForPage.second;
+            element.colorRGB = 0;
+            element.fontSize = 1;
+            element.renderMode = DTWAIN_PDFRENDER_INVISIBLE; // change this to invisible later!
+            PDFPosition pPos = tInfo.PDFPositionFromPixelPosition(tInfo.xPos[PositionVec[i]],
+                tInfo.yPos[PositionVec[i]],
+                fheight);
+            pPos.first = pPos.first * tInfo.m_ScaledDimensions.mediabox[2] / tInfo.m_RealDimensions.mediabox[2];
+            pPos.second = pPos.second * tInfo.m_ScaledDimensions.mediabox[3] / tInfo.m_RealDimensions.mediabox[3];
+            element.xpos = pPos.first;
+            element.ypos = pPos.second;
+            element.displayFlags = DTWAIN_PDFTEXT_CURRENTPAGE | DTWAIN_PDFTEXT_NOWORDSPACING;
+            element.m_font.m_fontName = "Courier";
+            pMap.push_back(element);
+        }
+        return pMap;
     }
-};
 
-static bool GetOCRCharacterInformation( OCREngine* pEngine, OCRTextInfo& tInfo, HANDLE hBitmap, const DTWAINImageInfoEx& imageInfoEx );
-static PDFStringToTextElement CreatePDFTextElementMap(OCRTextInfo& tInfo);
-
-struct PDFTextElementEraser
-{
-    PDFTextElementEraser(LONG Flags) : m_Flags(Flags) {}
-    bool operator()(const PDFTextElement* pElement) const
+    struct PDFTextElementEraser
     {
-        return pElement->displayFlags & m_Flags?true:false;
-    }
+        PDFTextElementEraser(LONG Flags) : m_Flags(Flags) {}
+        bool operator()(const PDFTextElement* pElement) const
+        {
+            return pElement->displayFlags & m_Flags ? true : false;
+        }
 
-    LONG m_Flags;
-};
+        LONG m_Flags;
+    };
+}
 
 int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, DibMultiPageStruct* pMultiPageStruct)
 {
@@ -558,112 +675,3 @@ bool CTL_PDFIOHandler::CheckValidConvertType(int fileType, int pageType)
 }
 
 
-bool GetOCRCharacterInformation( OCREngine* pEngine, OCRTextInfo& tInfo, HANDLE hBitmap, const DTWAINImageInfoEx& imageInfoEx )
-{
-    const DTWAIN_OCRTEXTINFOHANDLE tInfoHandle = DTWAIN_GetOCRTextInfoHandle(reinterpret_cast<DTWAIN_OCRENGINE>(pEngine), 0);
-    if ( !tInfoHandle )
-        return false;
-
-    // Get the text info length
-    LONG bufSize;
-    DTWAIN_GetOCRText( reinterpret_cast<DTWAIN_OCRENGINE>(pEngine), 0, nullptr, 0, &bufSize, DTWAINOCR_COPYDATA ); // first get the buffer size
-
-    // size the components in the struct
-    tInfo.xDim.resize(bufSize);
-    tInfo.yDim.resize(bufSize);
-    tInfo.xPos.resize(bufSize);
-    tInfo.yPos.resize(bufSize);
-
-    // Get the data
-    DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARXPOS,  &tInfo.xPos[0], bufSize);
-    DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARYPOS, &tInfo.yPos[0], bufSize);
-    DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARXWIDTH, &tInfo.xDim[0], bufSize);
-    DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARYWIDTH, &tInfo.yDim[0], bufSize);
-
-    // Get the original bitmap info translated into PDF units
-    const LPBITMAPINFOHEADER pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hBitmap));
-    DTWAINGlobalHandle_RAII dibHandle(hBitmap);
-
-    const double xInches = static_cast<double>(pbi->biXPelsPerMeter) / 39.37;
-    const double yInches = static_cast<double>(pbi->biYPelsPerMeter) / 39.37;
-    const double xWidth = static_cast<double>(pbi->biWidth);
-    const double yHeight = static_cast<double>(pbi->biHeight);
-    const double widthInPoints = xWidth / xInches * 72.0;
-    const double heightInPoints = yHeight / yInches * 72.0;
-
-    tInfo.m_RealDimensions.SetDimensions(0,0, widthInPoints, heightInPoints );
-
-    // test scaling of normal PDF page
-    AllPDFDimensions pdfdims;
-    auto it = dynarithmic::generic_array_finder_if(pdfdims.m_mediamap, [&](const auto& pr) { return pr.first == imageInfoEx.PDFPageSize; });
-    if ( it.first )
-    {
-        double d1, d2, d3, d4;
-        pdfdims.m_mediamap[it.second].second.GetDimensions(d1, d2, d3, d4);
-        tInfo.m_ScaledDimensions.SetDimensions(d1, d2, d3, d4);
-    }
-    else
-    {
-        switch (imageInfoEx.PDFPageSize )
-        {
-            case DTWAIN_PDF_CUSTOMSIZE:
-                tInfo.m_ScaledDimensions.SetDimensions(0, 0, imageInfoEx.PDFCustomSize[0], imageInfoEx.PDFCustomSize[1]);
-            break;
-
-            case DTWAIN_PDF_PIXELSPERMETERSIZE:
-                tInfo.m_ScaledDimensions.SetDimensions(0, 0, widthInPoints, heightInPoints);
-            break;
-
-            case DTWAIN_PDF_VARIABLEPAGESIZE:
-                tInfo.m_ScaledDimensions.SetDimensions(0, 0, xWidth, yHeight);
-            break;
-        }
-    }
-    tInfo.m_PDFScalingFactorForPage.first = tInfo.m_ScaledDimensions.mediabox[2] / tInfo.m_RealDimensions.mediabox[2];
-    tInfo.m_PDFScalingFactorForPage.second = tInfo.m_ScaledDimensions.mediabox[3] / tInfo.m_RealDimensions.mediabox[3];
-
-    // end test
-    tInfo.m_ImageDimensions = std::make_pair(static_cast<LONG>(xWidth), static_cast<LONG>(yHeight));
-    return true;
-}
-
-PDFStringToTextElement CreatePDFTextElementMap(OCRTextInfo& tInfo)
-{
-    // Identify strings in OCRTextInfo
-    // 1) For each string:
-    //  a) determine max xDim and yDim (could be average if max does not work).  Determine scaling from these numbers.
-    //  b) The starting position in PDF is always the first character in string
-    //  c) All other text info fields are "static"
-    std::vector<unsigned> PositionVec;
-    StringArray strArray;
-    StringWrapperA::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
-    PDFStringToTextElement pMap;
-    pMap.reserve(strArray.size());
-    PDFTextElement element;
-    for (size_t i = 0; i < strArray.size(); ++i)
-    {
-        element.m_text = strArray[i];
-        // get the max x-dimension for this word
-        LONG maxWidth = *std::max_element(tInfo.xDim.begin() + PositionVec[i],
-                                          tInfo.xDim.begin() + PositionVec[i] + strArray[i].size());
-        LONG maxHeight = *std::max_element(tInfo.yDim.begin() + PositionVec[i],
-                                           tInfo.yDim.begin() + PositionVec[i] + strArray[i].size());
-        const double fheight = tInfo.FontHeightFromPixelSize(maxHeight);
-        element.scalingX = tInfo.FontWidthFromPixelSize(maxWidth) * tInfo.m_PDFScalingFactorForPage.first;
-        element.scalingY = fheight * tInfo.m_PDFScalingFactorForPage.second;
-        element.colorRGB = 0;
-        element.fontSize = 1;
-        element.renderMode = DTWAIN_PDFRENDER_INVISIBLE; // change this to invisible later!
-        PDFPosition pPos = tInfo.PDFPositionFromPixelPosition(tInfo.xPos[PositionVec[i]],
-                                                              tInfo.yPos[PositionVec[i]],
-                                                              fheight);
-        pPos.first = pPos.first * tInfo.m_ScaledDimensions.mediabox[2] / tInfo.m_RealDimensions.mediabox[2];
-        pPos.second = pPos.second * tInfo.m_ScaledDimensions.mediabox[3] / tInfo.m_RealDimensions.mediabox[3];
-        element.xpos = pPos.first;
-        element.ypos = pPos.second;
-        element.displayFlags = DTWAIN_PDFTEXT_CURRENTPAGE | DTWAIN_PDFTEXT_NOWORDSPACING;
-        element.m_font.m_fontName = "Courier";
-        pMap.push_back(element);
-    }
-    return pMap;
-}

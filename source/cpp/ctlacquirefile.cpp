@@ -36,58 +36,61 @@
 
 using namespace dynarithmic;
 
-template <typename T, typename SW>
-static bool CheckForAnyBlankNames(const T& vect)
+namespace
 {
-    for (auto& oneName : vect)
+    template <typename T, typename SW>
+    bool CheckForAnyBlankNames(const T& vect)
     {
-        if (SW::IsAllSpace(oneName))
-            return true;
-    }
-    return false;
-}
-
-template <typename StringType, typename StringArrayType, typename StringWrapperType, typename CopyFn>
-static int CheckValidNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aFileNames, LPDTWAIN_ARRAY tempNames, CopyFn fn)
-{
-    int bRetval = DTWAIN_NO_ERROR;
-    auto& vect = pHandle->m_ArrayFactory->underlying_container_t<StringType>(aFileNames);
-    if (!vect.empty())
-    {
-        if (!CheckForAnyBlankNames<StringArrayType, StringWrapperType>(vect))
+        for (auto& oneName : vect)
         {
-            auto retVal = dynarithmic::CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
-            if (!retVal.second)
-                bRetval = retVal.first;
-            else
+            if (SW::IsAllSpace(oneName))
+                return true;
+        }
+        return false;
+    }
+
+    template <typename StringType, typename StringArrayType, typename StringWrapperType, typename CopyFn>
+    int CheckValidNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aFileNames, LPDTWAIN_ARRAY tempNames, CopyFn fn)
+    {
+        int bRetval = DTWAIN_NO_ERROR;
+        auto& vect = pHandle->m_ArrayFactory->underlying_container_t<StringType>(aFileNames);
+        if (!vect.empty())
+        {
+            if (!CheckForAnyBlankNames<StringArrayType, StringWrapperType>(vect))
             {
-                *tempNames = retVal.second;
-                fn(pHandle, aFileNames, *tempNames);
+                auto retVal = dynarithmic::CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
+                if (!retVal.second)
+                    bRetval = retVal.first;
+                else
+                {
+                    *tempNames = retVal.second;
+                    fn(pHandle, aFileNames, *tempNames);
+                }
             }
+            else
+                bRetval = DTWAIN_ERR_BLANKNAMEDETECTED;
         }
         else
-            bRetval = DTWAIN_ERR_BLANKNAMEDETECTED;
+            bRetval = DTWAIN_ERR_EMPTY_ARRAY;
+        return bRetval;
     }
-    else
-        bRetval = DTWAIN_ERR_EMPTY_ARRAY;
-    return bRetval;
-}
 
-static bool IsSupportedFileType(DTWAIN_SOURCE Source, LONG lFileType, LONG lFileFlags)
-{
-    bool bFileGood = true;
-    // Check if the file format is valid
-    auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
-    if (availableFileTypes.find(lFileType) == availableFileTypes.end())
+    bool IsSupportedFileType(DTWAIN_SOURCE Source, LONG lFileType, LONG lFileFlags)
     {
-        // Not a universal file type, so see if this is a type supported
-        // by the Source's file transfer
-        if (lFileFlags & DTWAIN_USESOURCEMODE)
-            bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType) ? true : false;
-        else
-            bFileGood = false;
+        bool bFileGood = true;
+        // Check if the file format is valid
+        auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
+        if (availableFileTypes.find(lFileType) == availableFileTypes.end())
+        {
+            // Not a universal file type, so see if this is a type supported
+            // by the Source's file transfer
+            if (lFileFlags & DTWAIN_USESOURCEMODE)
+                bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType) ? true : false;
+            else
+                bFileGood = false;
+        }
+        return bFileGood;
     }
-    return bFileGood;
 }
 
 DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,

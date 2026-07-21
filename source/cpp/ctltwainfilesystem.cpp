@@ -100,39 +100,42 @@ static int CheckFileSystemSupport(CTL_ITwainSource* pSource)
 /**********************************************************************************/
 /**********************************************************************************/
 /**********************************************************************************/
-struct GetFileOpTraits
+namespace
 {
-    static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPTSTR sz, LPTSTR /* */, TW_MEMREF FSHandle, int operation)
+    struct GetFileOpTraits
     {
-        return FSGetFile(pSource, sz, FSHandle, operation);
-    }
-};
+        static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPTSTR sz, LPTSTR /* */, TW_MEMREF FSHandle, int operation)
+        {
+            return FSGetFile(pSource, sz, FSHandle, operation);
+        }
+    };
 
-struct FileOpTraits
-{
-    static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPCTSTR sz, LPCTSTR sz2, TW_MEMREF /*FSHandle*/, int operation)
+    struct FileOpTraits
     {
-        return FSFileOp(pSource, sz, sz2, operation);
-    }
-};
+        static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPCTSTR sz, LPCTSTR sz2, TW_MEMREF /*FSHandle*/, int operation)
+        {
+            return FSFileOp(pSource, sz, sz2, operation);
+        }
+    };
 
-struct DirectoryOpTraits
-{
-    static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPCTSTR sz, LPCTSTR sz2, TW_MEMREF /*FSHandle*/, int operation)
+    struct DirectoryOpTraits
     {
-        return FSDirectory(pSource, sz, operation);
-    }
-};
+        static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPCTSTR sz, LPCTSTR sz2, TW_MEMREF /*FSHandle*/, int operation)
+        {
+            return FSDirectory(pSource, sz, operation);
+        }
+    };
 
-template <typename StringType=LPTSTR, typename Fn = GetFileOpTraits>
-static std::pair<int, FileSysRetType> PerfomFileSystemOperation(DTWAIN_SOURCE Source, StringType szDir, StringType szDir2, TW_MEMREF FSHandle, int operation)
-{
-    CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    int fsSupported = CheckFileSystemSupport(pSource);
-    if (fsSupported != DTWAIN_NO_ERROR)
-        return { fsSupported, {false, {} } };
-    auto bRet = Fn::DoOperation(pSource, szDir, szDir2, FSHandle, operation); 
-    return { DTWAIN_NO_ERROR, {bRet.first, bRet.second } };
+    template <typename StringType = LPTSTR, typename Fn = GetFileOpTraits>
+    std::pair<int, FileSysRetType> PerfomFileSystemOperation(DTWAIN_SOURCE Source, StringType szDir, StringType szDir2, TW_MEMREF FSHandle, int operation)
+    {
+        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        int fsSupported = CheckFileSystemSupport(pSource);
+        if (fsSupported != DTWAIN_NO_ERROR)
+            return { fsSupported, {false, {} } };
+        auto bRet = Fn::DoOperation(pSource, szDir, szDir2, FSHandle, operation);
+        return { DTWAIN_NO_ERROR, {bRet.first, bRet.second } };
+    }
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source )
@@ -269,21 +272,24 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetFileType(DTWAIN_SOURCE Source, LPCTSTR szFi
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-struct CameraStruct {
-    DTWAIN_ARRAY aCameras = {};
-    TW_UINT16 CameraType;
-};
-
-static DTWAIN_ARRAY GenericEnumCameras(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
+namespace
 {
-    auto retVal = DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
-    if (retVal)
+    struct CameraStruct {
+        DTWAIN_ARRAY aCameras = {};
+        TW_UINT16 CameraType;
+    };
+
+    DTWAIN_ARRAY GenericEnumCameras(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
     {
-        CTL_TwainDLLHandle* pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-        MoveArray(pHandle, Cameras, &retVal);
-        return *Cameras;
+        auto retVal = DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
+        if (retVal)
+        {
+            CTL_TwainDLLHandle* pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+            MoveArray(pHandle, Cameras, &retVal);
+            return *Cameras;
+        }
+        return nullptr;
     }
-    return nullptr;
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
