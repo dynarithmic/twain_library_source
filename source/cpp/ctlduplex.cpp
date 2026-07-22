@@ -24,24 +24,27 @@
 #include "ctlsetgetcaps.h"
 using namespace dynarithmic;
 
-static std::pair<bool, int> GetDuplexType(DTWAIN_SOURCE Source)
+namespace
 {
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    if (!pSource->IsCapInSupportedList(CAP_DUPLEX))
-        return { false, TWDX_NONE };
-
-    DTWAIN_ARRAY Array = nullptr;
-    const auto pHandle = pSource->GetDTWAINHandle();
-    const DTWAIN_BOOL bRet2 = GetCapValuesEx2_Internal(pSource, CAP_DUPLEX, DTWAIN_CAPGET,
-                                                       DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
-    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &Array);
-    if (bRet2 && Array)
+    std::pair<bool, int> GetDuplexType(DTWAIN_SOURCE Source)
     {
-        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
-        if (!vValues.empty())
-            return { true, vValues.front() };
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        if (!pSource->IsCapInSupportedList(CAP_DUPLEX))
+            return { false, TWDX_NONE };
+
+        DTWAIN_ARRAY Array = nullptr;
+        const auto pHandle = pSource->GetDTWAINHandle();
+        const DTWAIN_BOOL bRet2 = GetCapValuesEx2_Internal(pSource, CAP_DUPLEX, DTWAIN_CAPGET,
+            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+        DTWAINArrayLowLevelPtr_RAII arr(pHandle, &Array);
+        if (bRet2 && Array)
+        {
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
+            if (!vValues.empty())
+                return { true, vValues.front() };
+        }
+        return { false, TWDX_NONE };
     }
-    return { false, TWDX_NONE };
 }
 
 // Duplex Scanner support 

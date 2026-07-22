@@ -237,30 +237,33 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
-template <typename T>
-static std::vector<T> FileListToVector(SourceAcquireOptions& opts)
+namespace
 {
-    std::vector<T> allNames;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
-    auto fileList = opts.getFileList();
-    if (fileList)
-        allNames = pHandle->m_ArrayFactory->underlying_container_t<T>(fileList);
-    else
-        allNames.push_back(opts.getFileName());
-    return allNames;
-}
+    template <typename T>
+    std::vector<T> FileListToVector(SourceAcquireOptions& opts)
+    {
+        std::vector<T> allNames;
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
+        auto fileList = opts.getFileList();
+        if (fileList)
+            allNames = pHandle->m_ArrayFactory->underlying_container_t<T>(fileList);
+        else
+            allNames.push_back(opts.getFileName());
+        return allNames;
+    }
 
-static std::string GetDirectoryCreationError(CTL_StringViewType fileName)
-{
-    return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
+    std::string GetDirectoryCreationError(CTL_StringViewType fileName)
+    {
+        return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
             GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " +
             StringConversion::Convert_NativePtr_To_Ansi(fileName.data());
+    }
 }
 
 bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
-    CTL_ITwainSource *pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+    auto *pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
 
     DumpArrayContents(opts.getFileList(), 0, false, false);
     #ifdef _UNICODE
@@ -286,7 +289,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     bool bUsePrompt = opts.getFileFlags() & DTWAIN_USEPROMPT;
     if (!bUsePrompt)
     {
-        // The following loop makes sure that all of the files specified have directories that are writable
+        // The following loop makes sure that all the files specified have directories that are writable
         for (auto& fileName : vTest)
         {
             if (!bCreateDir)

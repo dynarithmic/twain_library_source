@@ -252,7 +252,7 @@ bool BmpRle8Writer::encode_rle8()
 }
 
 
-bool BmpRle8Writer::write_bmp_file()
+bool BmpRle8Writer::write_bmp_file() const
 {
     static_assert(sizeof(BITMAPFILEHEADER) == 14, "BITMAPFILEHEADER must be 14 bytes");
     static_assert(sizeof(BITMAPINFOHEADER) == 40, "BITMAPINFOHEADER must be 40 bytes");

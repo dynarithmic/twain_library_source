@@ -27,7 +27,31 @@
 #endif
 using namespace dynarithmic;
 
-static bool GetMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount);
+namespace
+{
+    bool GetMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
+    {
+        auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
+        CTL_DSMMetricsTriplet triplet(p->GetTwainSession(), p);
+        const TW_UINT16 rc = triplet.Execute();
+        switch (rc)
+        {
+            case TWRC_SUCCESS:
+            {
+                const TW_METRICS& metrics = triplet.getMetrics();
+                if (ImageCount)
+                    *ImageCount = static_cast<LONG>(metrics.ImageCount);
+                if (SheetCount)
+                    *SheetCount = static_cast<LONG>(metrics.SheetCount);
+                return true;
+            }
+            default:
+            {}
+        }
+        CTL_TwainAppMgr::ProcessReturnCodeOneValue(p, rc);
+        return false;
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
@@ -40,25 +64,3 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireMetrics(DTWAIN_SOURCE Source, LPLONG I
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-static bool GetMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
-{
-    auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
-    CTL_DSMMetricsTriplet triplet(p->GetTwainSession(), p);
-    const TW_UINT16 rc = triplet.Execute();
-    switch (rc)
-    {
-        case TWRC_SUCCESS:
-        {
-            const TW_METRICS& metrics = triplet.getMetrics();
-            if (ImageCount)
-                *ImageCount = static_cast<LONG>(metrics.ImageCount);
-            if (SheetCount)
-                *SheetCount = static_cast<LONG>(metrics.SheetCount);
-            return true;
-        }
-        default:
-        {}
-    }
-    CTL_TwainAppMgr::ProcessReturnCodeOneValue(p, rc);
-    return false;
-}

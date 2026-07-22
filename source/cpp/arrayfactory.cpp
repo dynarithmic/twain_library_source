@@ -26,28 +26,31 @@
 
 namespace dynarithmic
 {
-    template <typename ArraySourceT, typename ConversionFunc>
-    static void ArrayToNativeArray(CTL_TwainDLLHandle* pHandle, 
-                                   DTWAIN_ARRAY ArraySource,
-                                   DTWAIN_ARRAY ArrayDest,
-                                   int ArraySourceType,
-                                   ConversionFunc fn)
+    namespace
     {
-        const auto& factory = pHandle->m_ArrayFactory;
-        const auto TypeSource = factory->tag_type(CTL_ArrayFactory::from_void(ArraySource));
-        const auto TypeDest = factory->tag_type(CTL_ArrayFactory::from_void(ArrayDest));
-        if (TypeSource != ArraySourceType)
-            return;
-        if (!(TypeDest == CTL_ArrayFactory::arrayTag::StringType || TypeDest == CTL_ArrayFactory::arrayTag::WStringType))
-            return;
-        const auto theSourceTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArraySource));
-        const auto theDestTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArrayDest));
-        auto& vSource = factory->underlying_container_t<typename ArraySourceT::value_type>(theSourceTag);
-        for (auto& str : vSource)
+        template <typename ArraySourceT, typename ConversionFunc>
+        void ArrayToNativeArray(CTL_TwainDLLHandle* pHandle,
+            DTWAIN_ARRAY ArraySource,
+            DTWAIN_ARRAY ArrayDest,
+            int ArraySourceType,
+            ConversionFunc fn)
         {
-            CTL_StringType sVal;
-            sVal = fn(str);
-            factory->add_to_back(theDestTag, &sVal, 1);
+            const auto& factory = pHandle->m_ArrayFactory;
+            const auto TypeSource = factory->tag_type(CTL_ArrayFactory::from_void(ArraySource));
+            const auto TypeDest = factory->tag_type(CTL_ArrayFactory::from_void(ArrayDest));
+            if (TypeSource != ArraySourceType)
+                return;
+            if (!(TypeDest == CTL_ArrayFactory::arrayTag::StringType || TypeDest == CTL_ArrayFactory::arrayTag::WStringType))
+                return;
+            const auto theSourceTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArraySource));
+            const auto theDestTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArrayDest));
+            auto& vSource = factory->underlying_container_t<typename ArraySourceT::value_type>(theSourceTag);
+            for (auto& str : vSource)
+            {
+                CTL_StringType sVal;
+                sVal = fn(str);
+                factory->add_to_back(theDestTag, &sVal, 1);
+            }
         }
     }
 
@@ -351,21 +354,24 @@ namespace dynarithmic
         return -1;
     }
 
-    template <typename MapType>
-    typename MapType::const_iterator perform_operation(const MapType& theMap, int tag, const char* op)
+    namespace
     {
-        typename MapType::const_iterator iter = theMap.find(tag);
-        if (iter != theMap.end())
-            return iter;
-        else
+        template <typename MapType>
+        typename MapType::const_iterator perform_operation(const MapType& theMap, int tag, const char* op)
         {
-            char szBuf[100];
-            sprintf_s(szBuf, "%s operation not supported for array type", op);
-            throw std::invalid_argument::invalid_argument(szBuf);
+            typename MapType::const_iterator iter = theMap.find(tag);
+            if (iter != theMap.end())
+                return iter;
+            else
+            {
+                char szBuf[100];
+                sprintf_s(szBuf, "%s operation not supported for array type", op);
+                throw std::invalid_argument::invalid_argument(szBuf);
+            }
         }
     }
 
-    void CTL_ArrayFactory::copy(arrayTag *pTagDest, arrayTag* pTagSource)
+    void CTL_ArrayFactory::copy(arrayTag *pTagDest, arrayTag* pTagSource) const
     {
         if (!is_valid(pTagDest) || !is_valid(pTagSource))
             return;
@@ -385,7 +391,7 @@ namespace dynarithmic
         guidMap.EraseRight(pTag);
     }
 
-    void CTL_ArrayFactory::add_to_back(arrayTag *pTag, void *value, size_t num)
+    void CTL_ArrayFactory::add_to_back(arrayTag *pTag, void *value, size_t num) const
     {
         if (!is_valid(pTag))
             return;
@@ -399,28 +405,28 @@ namespace dynarithmic
         return perform_operation(m_vfnGetMap, pTag->getTag(), "get_value()")->second(pTag, nWhere, value);
     }
 
-    void CTL_ArrayFactory::insert(arrayTag* pTag, void* value, size_t nWhere, size_t num)
+    void CTL_ArrayFactory::insert(arrayTag* pTag, void* value, size_t nWhere, size_t num) const
     {
         if (!is_valid(pTag))
             return;
         perform_operation(m_vfnInserterMap, pTag->getTag(), "insert()")->second(pTag, nWhere, num, value);
     }
 
-    void CTL_ArrayFactory::remove(arrayTag* pTag, std::size_t nWhere, std::size_t num)
+    void CTL_ArrayFactory::remove(arrayTag* pTag, std::size_t nWhere, std::size_t num) const
     {
         if (!is_valid(pTag))
             return;
         perform_operation(m_vfnRemoverMap, pTag->getTag(), "remove()")->second(pTag, nWhere, num);
     }
 
-    void CTL_ArrayFactory::clear(arrayTag *pTag)
+    void CTL_ArrayFactory::clear(arrayTag *pTag) const
     {
         if (!is_valid(pTag))
             return;
         perform_operation(m_vfnClearerMap, pTag->getTag(), "clear()")->second(pTag);
     }
 
-    void CTL_ArrayFactory::resize(arrayTag* pTag, std::size_t num)
+    void CTL_ArrayFactory::resize(arrayTag* pTag, std::size_t num) const
     {
         if (!is_valid(pTag))
             return;
@@ -434,7 +440,7 @@ namespace dynarithmic
         return perform_operation(m_vfnCounterMap, pTag->getTag(), "size()")->second(pTag);
     }
 
-    size_t CTL_ArrayFactory::find(arrayTag *pTag, void *value, double tol)
+    size_t CTL_ArrayFactory::find(arrayTag *pTag, void *value, double tol) const
     {
         if (!is_valid(pTag))
             return 0;
@@ -443,14 +449,14 @@ namespace dynarithmic
         return perform_operation(m_vfnFindMap, pTag->getTag(), "find()")->second(pTag, value, {});
     }
 
-    void CTL_ArrayFactory::set_value(arrayTag *pTag, std::size_t nWhere, void *value)
+    void CTL_ArrayFactory::set_value(arrayTag *pTag, std::size_t nWhere, void *value) const
     {
         if (!is_valid(pTag))
             return;
         perform_operation(m_vfnSetterMap, pTag->getTag(), "set_value()")->second(pTag, nWhere, value);
     }
 
-    void* CTL_ArrayFactory::get_buffer(arrayTag *pTag, std::size_t nWhere)
+    void* CTL_ArrayFactory::get_buffer(arrayTag *pTag, std::size_t nWhere) const
     {
         if (!is_valid(pTag))
             return nullptr;

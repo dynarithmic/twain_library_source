@@ -27,7 +27,32 @@
 
 using namespace dynarithmic;
 
-static void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText=nullptr);
+namespace
+{
+    void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
+    {
+        try
+        {
+            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            if (pHandle)
+                pHandle->m_lLastError = DTWAIN_ERR_EXCEPTION_ERROR;
+            else
+                return;
+            std::ostringstream strm;
+            strm << ReplacePlaceHolders<std::string>("**** DTWAIN %1 ****.  %2: %3\n", {
+                GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT),
+                GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT), fname });
+            if (sAdditionalText)
+                strm << "\nAdditional Information: " << sAdditionalText;
+#ifdef _WIN32
+            MessageBoxA(nullptr, strm.str().c_str(), GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT).c_str(), MB_ICONSTOP);
+#else
+            std::cout << strm.str() << '\n';
+#endif
+        }
+        catch (...) {}  // can't really do anything
+    }
+}
 
 #if DTWAIN_BUILD_LOGCALLSTACK == 1
 std::string dynarithmic::CTL_LogFunctionCallA(int32_t logFlags, const char *pFuncName, int nWhich, const char *pOptionalString/* = NULL*/)
@@ -160,29 +185,6 @@ void dynarithmic::LogExceptionErrorA(const char * fname, bool bIsCatchAll, const
     }
 }
 
-void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
-{
-    try
-    {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        if (pHandle)
-            pHandle->m_lLastError = DTWAIN_ERR_EXCEPTION_ERROR;
-        else
-            return;
-        std::ostringstream strm;
-        strm << ReplacePlaceHolders<std::string>("**** DTWAIN %1 ****.  %2: %3\n", {
-            GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT),
-            GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT), fname });
-        if (sAdditionalText)
-            strm << "\nAdditional Information: " << sAdditionalText;
-        #ifdef _WIN32
-        MessageBoxA(nullptr, strm.str().c_str(), GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT).c_str(), MB_ICONSTOP);
-        #else
-           std::cout << strm.str() << '\n';
-        #endif
-    }
-    catch (...) {}  // can't really do anything
-}
 
 uint32_t& dynarithmic::GetLogFilterFlags()
 {

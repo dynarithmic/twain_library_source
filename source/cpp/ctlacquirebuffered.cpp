@@ -59,63 +59,66 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG Pixe
     CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
-static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
+namespace
 {
-    // Check if we already tested for tiled buffer support
-    auto isSupported = pSource->IsBufferedTileModeSupported();
-    if (isSupported.value != boost::tribool::indeterminate_value)
-        return isSupported ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
-
-    // Check if cap is in supported list
-    if (!pSource->IsCapInSupportedList(ICAP_TILES))
+    int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
     {
-        pSource->SetBufferedTileModeSupported(false);
-        return DTWAIN_ERR_TILES_NOT_SUPPORTED;
+        // Check if we already tested for tiled buffer support
+        auto isSupported = pSource->IsBufferedTileModeSupported();
+        if (isSupported.value != boost::tribool::indeterminate_value)
+            return isSupported ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
+
+        // Check if cap is in supported list
+        if (!pSource->IsCapInSupportedList(ICAP_TILES))
+        {
+            pSource->SetBufferedTileModeSupported(false);
+            return DTWAIN_ERR_TILES_NOT_SUPPORTED;
+        }
+
+        // Test for capability setting
+        auto pHandle = pSource->GetDTWAINHandle();
+        DTWAIN_ARRAY arr = {};
+        DTWAINArrayPtr_RAII tempRAII(pHandle, &arr);
+
+        // Get the original capability
+        auto bRet = GetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPGET,
+            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+        if (!bRet)
+        {
+            pSource->SetBufferedTileModeSupported(false);
+            return DTWAIN_ERR_TILES_NOT_SUPPORTED;
+        }
+
+        // Check for an empty array of values.  If so, determine that support
+        // for Tiled mode is not available
+        const auto& factory = pHandle->m_ArrayFactory;
+        auto& vTiles = factory->underlying_container_t<LONG>(arr);
+        if (vTiles.empty())
+        {
+            pSource->SetBufferedTileModeSupported(false);
+            return DTWAIN_ERR_TILES_NOT_SUPPORTED;
+        }
+
+        // Test for setting to tile mode temporarily
+        auto origValue = vTiles[0];
+        vTiles[0] = 1;
+
+        // Set the capability to see if it accepts TRUE for the ICAP_TILES cap
+        bRet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+        const int finalReturnValue = bRet ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
+
+        // Reset to original value
+        if (origValue != vTiles[0])
+        {
+            vTiles[0] = origValue;
+            SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET,
+                DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+        }
+
+        // Set the support and return the final results
+        pSource->SetBufferedTileModeSupported(finalReturnValue == DTWAIN_NO_ERROR);
+        return finalReturnValue;
     }
-
-    // Test for capability setting
-    auto pHandle = pSource->GetDTWAINHandle();
-    DTWAIN_ARRAY arr = {};
-    DTWAINArrayPtr_RAII tempRAII(pHandle, &arr);
-
-    // Get the original capability
-    auto bRet = GetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPGET, 
-                                         DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
-    if (!bRet)
-    {
-        pSource->SetBufferedTileModeSupported(false);
-        return DTWAIN_ERR_TILES_NOT_SUPPORTED;
-    }
-
-    // Check for an empty array of values.  If so, determine that support
-    // for Tiled mode is not available
-    const auto& factory = pHandle->m_ArrayFactory;
-    auto& vTiles = factory->underlying_container_t<LONG>(arr);
-    if (vTiles.empty())
-    {
-        pSource->SetBufferedTileModeSupported(false);
-        return DTWAIN_ERR_TILES_NOT_SUPPORTED;
-    }
-
-    // Test for setting to tile mode temporarily
-    auto origValue = vTiles[0];
-    vTiles[0] = 1;
-
-    // Set the capability to see if it accepts TRUE for the ICAP_TILES cap
-    bRet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-    const int finalReturnValue = bRet ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
-
-    // Reset to original value
-    if (origValue != vTiles[0])
-    {
-        vTiles[0] = origValue;
-        SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, 
-                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-    }
-
-    // Set the support and return the final results
-    pSource->SetBufferedTileModeSupported(finalReturnValue == DTWAIN_NO_ERROR);
-    return finalReturnValue;
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBufferedTileMode(DTWAIN_SOURCE Source, DTWAIN_BOOL bTileMode)
