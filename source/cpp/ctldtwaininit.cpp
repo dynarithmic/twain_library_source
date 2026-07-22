@@ -65,7 +65,6 @@ namespace
         bool createMinimalSetup = false;
     };
 }
-
 static DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& options);
 static LONG DTWAIN_CloseAllSources();
 static void UnhookAllDisplays();

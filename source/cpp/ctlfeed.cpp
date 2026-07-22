@@ -351,18 +351,20 @@ LONG DLLENTRY_DEF DTWAIN_GetFeederFuncs(DTWAIN_SOURCE Source)
     CATCH_BLOCK(0)
 }
 
-
-static bool IsFeederLoaded(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY aFeederLoaded)
+namespace
 {
-    BOOL retval = GetCapValuesEx2_Internal(pSource, CAP_FEEDERLOADED, DTWAIN_CAPGETCURRENT, 
-                                            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aFeederLoaded);
-    if (retval)
+    bool IsFeederLoaded(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY aFeederLoaded)
     {
-        auto& vValues = pSource->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(*aFeederLoaded);
-        if (!vValues.empty())
-            return vValues.front();
+        BOOL retval = GetCapValuesEx2_Internal(pSource, CAP_FEEDERLOADED, DTWAIN_CAPGETCURRENT,
+            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aFeederLoaded);
+        if (retval)
+        {
+            auto& vValues = pSource->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(*aFeederLoaded);
+            if (!vValues.empty())
+                return vValues.front();
+        }
+        return false;
     }
-    return false;
 }
 
 int dynarithmic::FeederWait(CTL_ITwainSource *pSource)
