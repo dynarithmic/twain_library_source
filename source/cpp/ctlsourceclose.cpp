@@ -28,7 +28,25 @@
 
 using namespace dynarithmic;
 
-static DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, CTL_ITwainSource *pSource);
+namespace
+{
+    DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+
+        if (pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE && pSource->IsAcquireAttempt())
+        {
+            CTL_TwainAppMgr::DisableUserInterface(pSource);
+            pSource->SetAcquireAttempt(false);
+        }
+        else
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pSource->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+
+        bool bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, pSource) ? true : false;
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+        CATCH_BLOCK(false)
+    }
+}
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
 {
@@ -50,22 +68,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, CTL_ITwainSource *pSource)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-
-    if (pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE && pSource->IsAcquireAttempt())
-    {
-        CTL_TwainAppMgr::DisableUserInterface(pSource);
-        pSource->SetAcquireAttempt(false);
-    }
-    else
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return pSource->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
-
-    bool bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, pSource) ? true : false;
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
-    CATCH_BLOCK(false)
-}
 
 bool dynarithmic::CloseSourceInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource)
 {

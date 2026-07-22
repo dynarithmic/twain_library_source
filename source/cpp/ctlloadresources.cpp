@@ -32,58 +32,189 @@
 
 namespace dynarithmic
 {
-    static std::string LoadResourceFromRC(unsigned resNum)
+    namespace
     {
-        char szBuffer[DTWAIN_USERRES_MAXSIZE + 1];
-        if (::LoadStringA(CTL_StaticData::GetDLLInstanceHandle(), resNum, szBuffer, DTWAIN_USERRES_MAXSIZE))
-            return szBuffer;
-        return {};
-    }
-
-    static std::vector<std::pair<uint16_t, uint16_t>> parseBracketedPairs(std::string bracketedPairs)
-    {
-        std::vector<std::pair<uint16_t, uint16_t>> retVal;
-        while (true)
+        std::string LoadResourceFromRC(unsigned resNum)
         {
-            size_t pos = bracketedPairs.find_first_of('[');
-            if (pos != std::string::npos)
-            {
-                auto pos2 = bracketedPairs.find_first_of(']', pos + 1);
-                if (pos2 != std::string::npos)
-                {
-                    std::string subPair = bracketedPairs.substr(pos + 1, pos2 - pos - 1);
-                    StringWrapperA::TrimAll(subPair);
-                    if (StringWrapperA::IsEmpty(subPair))
-                        break;
-                    std::istringstream strm(subPair);
-                    uint16_t firstNum, secondNum;
-                    strm >> firstNum >> secondNum;
-                    retVal.push_back({ firstNum, secondNum });
-                    bracketedPairs.erase(bracketedPairs.begin(), bracketedPairs.begin() + pos2 + 1);
-                }
-            }
-            else
-                break;
+            char szBuffer[DTWAIN_USERRES_MAXSIZE + 1];
+            if (::LoadStringA(CTL_StaticData::GetDLLInstanceHandle(), resNum, szBuffer, DTWAIN_USERRES_MAXSIZE))
+                return szBuffer;
+            return {};
         }
-        return retVal;
-    }
 
-    static std::vector<uint16_t> parseBracketedNumberList(std::string bracketedList)
-    {
-        std::vector<uint16_t> retVal;
-        auto pos = bracketedList.find_first_of('[');
-        if (pos == std::string::npos)
+        std::vector<std::pair<uint16_t, uint16_t>> parseBracketedPairs(std::string bracketedPairs)
+        {
+            std::vector<std::pair<uint16_t, uint16_t>> retVal;
+            while (true)
+            {
+                size_t pos = bracketedPairs.find_first_of('[');
+                if (pos != std::string::npos)
+                {
+                    auto pos2 = bracketedPairs.find_first_of(']', pos + 1);
+                    if (pos2 != std::string::npos)
+                    {
+                        std::string subPair = bracketedPairs.substr(pos + 1, pos2 - pos - 1);
+                        StringWrapperA::TrimAll(subPair);
+                        if (StringWrapperA::IsEmpty(subPair))
+                            break;
+                        std::istringstream strm(subPair);
+                        uint16_t firstNum, secondNum;
+                        strm >> firstNum >> secondNum;
+                        retVal.push_back({ firstNum, secondNum });
+                        bracketedPairs.erase(bracketedPairs.begin(), bracketedPairs.begin() + pos2 + 1);
+                    }
+                }
+                else
+                    break;
+            }
             return retVal;
-        auto pos2 = bracketedList.find_first_of(']', pos + 1);
-        if (pos2 == std::string::npos)
+        }
+
+        std::vector<uint16_t> parseBracketedNumberList(std::string bracketedList)
+        {
+            std::vector<uint16_t> retVal;
+            auto pos = bracketedList.find_first_of('[');
+            if (pos == std::string::npos)
+                return retVal;
+            auto pos2 = bracketedList.find_first_of(']', pos + 1);
+            if (pos2 == std::string::npos)
+                return retVal;
+            bracketedList.erase(bracketedList.begin() + pos2);
+            bracketedList.erase(bracketedList.begin() + pos);
+            std::istringstream strm(bracketedList);
+            uint16_t num;
+            while (strm >> num)
+                retVal.push_back(num);
             return retVal;
-        bracketedList.erase(bracketedList.begin() + pos2);
-        bracketedList.erase(bracketedList.begin() + pos);
-        std::istringstream strm(bracketedList);
-        uint16_t num;
-        while (strm >> num)
-            retVal.push_back(num);
-        return retVal;
+        }
+
+        bool GetDataCRC(std::ifstream& ifs, int numTrailers)
+        {
+            std::queue<std::string> lineQueue;
+            std::string line;
+            std::string totalBuf;
+            for (int i = 0; i < numTrailers; ++i)
+            {
+                std::getline(ifs, line);
+                boost::trim(line);
+                lineQueue.push(line);
+            }
+            while (std::getline(ifs, line))
+            {
+                boost::trim(line);
+                totalBuf += lineQueue.front();
+                lineQueue.pop();
+                lineQueue.push(line);
+            }
+            auto crcVal = crc32_aux(reinterpret_cast<unsigned char*>(totalBuf.data()), static_cast<unsigned int>(totalBuf.size()));
+            try
+            {
+                uint64_t crc = std::stoul(lineQueue.front());
+                if (crc != crcVal)
+                    return false;
+            }
+            catch (...)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        std::string GetResourceString_Internal(UINT nResNumber)
+        {
+            // First check the external resources
+            auto str = GetResourceStringFromMap(static_cast<LONG>(nResNumber));
+            if (str.empty())
+                // Try the internal resources
+                str = LoadResourceFromRC(nResNumber);
+            return str;
+        }
+
+        void ClearMapEntries(CTL_LongToStringMap& resourceMap, LONG border, bool deleteBeforeBorder = true)
+        {
+            if (resourceMap.empty())
+                return;
+            auto iterFirst = resourceMap.lower_bound(border);
+            if (iterFirst == resourceMap.end())
+            {
+                if (deleteBeforeBorder)
+                    resourceMap.clear();
+                return;
+            }
+
+            if (deleteBeforeBorder)
+                resourceMap.erase(resourceMap.begin(), iterFirst);
+            else
+                resourceMap.erase(iterFirst, resourceMap.end());
+            return;
+        }
+
+        bool LoadLanguageResourceFromFileA(const char* szLangName, std::string_view sPath, bool clearEntry, bool bIsCustom)
+        {
+            auto& allLanguages = CTL_StaticData::GetAllLanguagesResourceMap();
+
+            // Search for language already loaded
+            auto iterLang = allLanguages.find(szLangName);
+            if (iterLang != allLanguages.end())
+            {
+                // language was already loaded, so set as the current language
+                CTL_StaticData::SetCurrentLanguageResourceKey(iterLang->first);
+
+                if (clearEntry)
+                    ClearMapEntries(iterLang->second, DTWAIN_USERRES_START, !bIsCustom);
+                else
+                    if (!bIsCustom)
+                        return true;
+            }
+
+            // Create an empty map
+            std::ifstream ifs(sPath.data());
+            bool open = false;
+            const char* BOMHeaderUTF = "\xEF\xBB\xBF";
+            if (ifs)
+            {
+                CTL_StringToMapLongToStringMap::mapped_type resourceMap;
+                std::string descr;
+                int resourceID;
+                open = true;
+                std::string line;
+                bool bReadFirstLine = false;
+                while (getline(ifs, line))
+                {
+                    // Read the BOM header if it already exists
+                    if (!bReadFirstLine)
+                    {
+                        if (line.size() >= 3 && StringWrapperA::StartsWith(line, BOMHeaderUTF))
+                            line = line.substr(3);
+                    }
+                    bReadFirstLine = true;
+                    std::istringstream strm(line);
+                    while (strm >> resourceID)
+                    {
+                        getline(strm, descr);
+                        if (resourceID == IDS_DTWAIN_APPTITLE || resourceID == IDS_DTWAIN_APPTITLE_HTML)
+                            descr = StringConversion::Convert_Native_To_Ansi(
+                                CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, resourceID).second);
+                        StringWrapperA::TrimAll(descr);
+                        descr = StringWrapperA::ReplaceAll(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
+                        descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
+                        if (resourceID == IDS_DTWAIN_APPTITLE)
+                            descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                        else
+                            if (resourceID == IDS_DTWAIN_APPTITLE_HTML)
+                                descr = StringWrapperA::ReplaceAll(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
+                        resourceMap.insert({ resourceID, descr });
+                    }
+                }
+                allLanguages[szLangName].insert(resourceMap.begin(), resourceMap.end());
+                CTL_StaticData::SetCurrentLanguageResourceKey(szLangName);
+                auto& info = CTL_StaticData::GetGeneralResourceInfo();
+                info.sResourceName = StringConversion::Convert_AnsiPtr_To_Native(szLangName);
+                info.bIsFromRC = false;
+            }
+            return open;
+        }
+
     }
 
     CTL_StringType CreateResourcePathName()
@@ -105,37 +236,6 @@ namespace dynarithmic
         return CreateResourcePathName() + resName;
     }
 
-    static bool GetDataCRC(std::ifstream& ifs, int numTrailers)
-    {
-        std::queue<std::string> lineQueue;
-        std::string line;
-        std::string totalBuf;
-        for (int i = 0; i < numTrailers; ++i)
-        {
-            std::getline(ifs, line);
-            boost::trim(line);
-            lineQueue.push(line);
-        }
-        while (std::getline(ifs, line))
-        {
-            boost::trim(line);
-            totalBuf += lineQueue.front();
-            lineQueue.pop();
-            lineQueue.push(line);
-        }
-        auto crcVal = crc32_aux(reinterpret_cast<unsigned char*>(totalBuf.data()), static_cast<unsigned int>(totalBuf.size()));
-        try
-        {
-            uint64_t crc = std::stoul(lineQueue.front());
-            if (crc != crcVal)
-                return false;
-        }
-        catch (...)
-        {
-            return false;
-        }
-        return true;
-    }
 
     bool LoadTwainResources(ResourceLoadingInfo& retValue)
     {
@@ -577,16 +677,6 @@ namespace dynarithmic
         return ret;
     }
 
-    static std::string GetResourceString_Internal(UINT nResNumber)
-    {
-        // First check the external resources
-        auto str = GetResourceStringFromMap(static_cast<LONG>(nResNumber));
-        if (str.empty())
-            // Try the internal resources
-            str = LoadResourceFromRC(nResNumber);
-        return str;
-    }
-
     std::string GetErrorString_Internal(int nError)
     {
         UINT nRealError = std::abs(nError);
@@ -642,91 +732,6 @@ namespace dynarithmic
         return retString;
     }
 
-
-    static void ClearMapEntries(CTL_LongToStringMap& resourceMap, LONG border, bool deleteBeforeBorder = true)
-    {
-        if (resourceMap.empty())
-            return;
-        auto iterFirst = resourceMap.lower_bound(border);
-        if (iterFirst == resourceMap.end())
-        {
-            if (deleteBeforeBorder)
-                resourceMap.clear();
-            return;
-        }
-
-        if (deleteBeforeBorder)
-            resourceMap.erase(resourceMap.begin(), iterFirst);
-        else
-            resourceMap.erase(iterFirst, resourceMap.end());
-        return;
-    }
-
-    static bool LoadLanguageResourceFromFileA(const char* szLangName, std::string_view sPath, bool clearEntry, bool bIsCustom)
-    {
-        auto& allLanguages = CTL_StaticData::GetAllLanguagesResourceMap();
-
-        // Search for language already loaded
-        auto iterLang = allLanguages.find(szLangName);
-        if (iterLang != allLanguages.end())
-        {
-            // language was already loaded, so set as the current language
-            CTL_StaticData::SetCurrentLanguageResourceKey(iterLang->first);
-
-            if (clearEntry)
-                ClearMapEntries(iterLang->second, DTWAIN_USERRES_START, !bIsCustom);
-            else
-            if (!bIsCustom)
-                return true;
-        }
-
-        // Create an empty map
-        std::ifstream ifs(sPath.data());
-        bool open = false;
-        const char* BOMHeaderUTF = "\xEF\xBB\xBF";
-        if (ifs)
-        {
-            CTL_StringToMapLongToStringMap::mapped_type resourceMap;
-            std::string descr;
-            int resourceID;
-            open = true;
-            std::string line;
-            bool bReadFirstLine = false;
-            while (getline(ifs, line))
-            {
-                // Read the BOM header if it already exists
-                if (!bReadFirstLine)
-                {
-                    if (line.size() >= 3 && StringWrapperA::StartsWith(line, BOMHeaderUTF))
-                        line = line.substr(3);
-                }
-                bReadFirstLine = true;
-                std::istringstream strm(line);
-                while (strm >> resourceID)
-                {
-                    getline(strm, descr);
-                    if (resourceID == IDS_DTWAIN_APPTITLE || resourceID == IDS_DTWAIN_APPTITLE_HTML)
-                        descr = StringConversion::Convert_Native_To_Ansi(
-                            CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, resourceID).second);
-                    StringWrapperA::TrimAll(descr);
-                    descr = StringWrapperA::ReplaceAll(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
-                    descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
-                    if (resourceID == IDS_DTWAIN_APPTITLE)
-                        descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
-                    else
-                    if (resourceID == IDS_DTWAIN_APPTITLE_HTML)
-                        descr = StringWrapperA::ReplaceAll(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
-                    resourceMap.insert({ resourceID, descr });
-                }
-            }
-            allLanguages[szLangName].insert(resourceMap.begin(), resourceMap.end());
-            CTL_StaticData::SetCurrentLanguageResourceKey(szLangName);
-            auto& info = CTL_StaticData::GetGeneralResourceInfo();
-            info.sResourceName = StringConversion::Convert_AnsiPtr_To_Native(szLangName);
-            info.bIsFromRC = false;
-        }
-        return open;
-    }
 
     // Only works for english language
     bool LoadLanguageResourceFromRC()

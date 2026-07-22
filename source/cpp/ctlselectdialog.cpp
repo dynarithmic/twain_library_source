@@ -28,23 +28,160 @@
 using namespace dynarithmic;
 using namespace boost::logic;
 
-static HWND GetEffectiveConsoleWindow()
+namespace
 {
-    // 1) Already attached?
-    HWND hwnd = GetConsoleWindow();
-    if (hwnd)
-        return hwnd;
-
-    // 2) Try attaching to parent console
-    if (AttachConsole(ATTACH_PARENT_PROCESS))
+    HWND GetEffectiveConsoleWindow()
     {
-        hwnd = GetConsoleWindow();
+        // 1) Already attached?
+        HWND hwnd = GetConsoleWindow();
         if (hwnd)
             return hwnd;
-    }
-    return NULL;
-}
 
+        // 2) Try attaching to parent console
+        if (AttachConsole(ATTACH_PARENT_PROCESS))
+        {
+            hwnd = GetConsoleWindow();
+            if (hwnd)
+                return hwnd;
+        }
+        return NULL;
+    }
+
+    void DisplayLocalString(HWND hWnd, int nID, int resID)
+    {
+        std::string sText;
+        sText = GetResourceStringFromMap(resID);
+        if (!sText.empty())
+        {
+            const HWND hWndControl = GetDlgItem(hWnd, nID);
+            if (hWndControl)
+            {
+                // Convert UTF-8 text to UTF-16.  If the conversion fails, a "normal"
+                // wide string is returned (i.e. ASCII char / null pairs for each ASCII char).
+                SetDlgItemTextW(hWnd, nID, StringConversion::Convert_UTF8_To_UTF16(sText).first.c_str());
+            }
+        }
+    }
+
+#ifdef _WIN32
+    /////////////////////////////////////////////////////////////////////////////////
+    /// TWAIN Dialog procedure
+    BOOL CALLBACK ChildEnumFontProc(HWND hWnd, LPARAM lParam)
+    {
+        SendMessage(hWnd, WM_SETFONT, static_cast<WPARAM>(lParam), 0);
+        return TRUE;
+    }
+
+    std::vector<CTL_StringType> AdjustSourceNames(std::vector<CTL_StringType>& vSourceNames, CustomPlacement CS)
+    {
+        if (vSourceNames.empty())
+            return {};
+
+        const bool doExclude = !CS.aExcludeNames.empty(); // Use an include list
+        const bool doInclude = !CS.aIncludeNames.empty(); // Use an exclude list
+        const bool doMapping = !CS.mapNames.empty();  // Use a name mapping list
+
+        if (!doInclude && !doExclude && !doMapping)
+            return vSourceNames;
+
+        for (auto& sName : vSourceNames)
+            sName = StringWrapper::TrimAll(sName);
+
+        if (doInclude)
+        {
+            for (auto& sName : CS.aIncludeNames)
+                sName = StringWrapper::TrimAll(sName);
+
+            // Create a list of the names to include (extract only those names)            
+            std::vector<CTL_StringType> vReturn2;
+            std::sort(vSourceNames.begin(), vSourceNames.end());
+            std::sort(CS.aIncludeNames.begin(), CS.aIncludeNames.end());
+            std::set_intersection(vSourceNames.begin(), vSourceNames.end(),
+                CS.aIncludeNames.begin(), CS.aIncludeNames.end(), std::back_inserter(vReturn2));
+            if (!vReturn2.empty())
+                vSourceNames = vReturn2;
+        }
+
+        auto vReturn = vSourceNames;
+
+        if (doExclude)
+        {
+            for (auto& sName : CS.aExcludeNames)
+                sName = StringWrapper::TrimAll(sName);
+
+            // Create a list of the names to include if we remove the excluded names
+            std::vector<CTL_StringType> vReturn2;
+            std::sort(vSourceNames.begin(), vSourceNames.end());
+            std::sort(CS.aExcludeNames.begin(), CS.aExcludeNames.end());
+
+            // This does the magic of removing the excluded names
+            std::set_difference(vSourceNames.begin(), vSourceNames.end(),
+                CS.aExcludeNames.begin(), CS.aExcludeNames.end(), std::back_inserter(vReturn2));
+            if (!vReturn2.empty())
+                vReturn = vReturn2;
+        }
+
+        if (doMapping)
+        {
+            // Check if a mapped name should be used
+            std::vector<CTL_StringType> vMapped;
+            for (auto& sName : vReturn)
+            {
+                auto iter = CS.mapNames.find(sName);
+                if (iter != CS.mapNames.end())
+                    // replace real source name with mapped name
+                    vMapped.push_back(iter->second);
+                else
+                    // just use the real source name
+                    vMapped.push_back(sName);
+            }
+            vReturn = vMapped;
+        }
+
+        // Return the new vector of Source names to display in the
+        // Select Source dialog.
+        return vReturn;
+    }
+
+    // Determine if the selected source name is actually a mapped name
+    CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelectedSourceName)
+    {
+        if (CS.mapNames.empty())
+            return szSelectedSourceName;
+
+        auto& mapping = CS.mapNames;
+
+        // check if selected source name is a map key
+        auto iter = mapping.find(szSelectedSourceName);
+        if (iter != mapping.end())
+            return iter->first;  // return that a Source "by coincidence" is the name of an actual source
+
+        // Go through map to see what the real source name is of the mapped, selected source name
+        for (auto& it : mapping)
+        {
+            if (it.second == szSelectedSourceName)
+                return it.first; // return the real Source name
+        }
+
+        // No name matches
+        return {};
+    }
+
+    void SetLastSavePos(HWND hWndDlg, SelectStruct* pS)
+    {
+        if (pS->CS.nOptions & DTWAIN_DLG_SAVELASTSCREENPOS)
+        {
+            auto& lastPos = CTL_StaticData::GetSelectSourcePos();
+            RECT windowRect;
+            if (GetWindowRect(hWndDlg, &windowRect))
+            {
+                lastPos.first = windowRect.left;
+                lastPos.second = windowRect.top;
+            }
+        }
+    }
+
+}
 
 CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& opts)
 {
@@ -127,141 +264,6 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
     }
     return actualSourceName;
     #endif
-}
-
-
-static void DisplayLocalString(HWND hWnd, int nID, int resID)
-{
-    std::string sText;
-    sText = GetResourceStringFromMap(resID);
-    if (!sText.empty())
-    {
-        const HWND hWndControl = GetDlgItem(hWnd, nID);
-        if (hWndControl)
-        {
-            // Convert UTF-8 text to UTF-16.  If the conversion fails, a "normal"
-            // wide string is returned (i.e. ASCII char / null pairs for each ASCII char).
-            SetDlgItemTextW(hWnd, nID, StringConversion::Convert_UTF8_To_UTF16(sText).first.c_str());
-        }
-    }
-}
-
-#ifdef _WIN32
-/////////////////////////////////////////////////////////////////////////////////
-/// TWAIN Dialog procedure
-static BOOL CALLBACK ChildEnumFontProc(HWND hWnd, LPARAM lParam)
-{
-    SendMessage(hWnd, WM_SETFONT, static_cast<WPARAM>(lParam), 0);
-    return TRUE;
-}
-
-static std::vector<CTL_StringType> AdjustSourceNames(std::vector<CTL_StringType>& vSourceNames, CustomPlacement CS)
-{
-    if (vSourceNames.empty())
-        return {};
-
-    const bool doExclude = !CS.aExcludeNames.empty(); // Use an include list
-    const bool doInclude = !CS.aIncludeNames.empty(); // Use an exclude list
-    const bool doMapping = !CS.mapNames.empty();  // Use a name mapping list
-
-    if (!doInclude && !doExclude && !doMapping)
-        return vSourceNames;
-
-    for (auto& sName : vSourceNames)
-        sName = StringWrapper::TrimAll(sName);
-
-    if (doInclude)
-    {
-        for (auto& sName : CS.aIncludeNames)
-            sName = StringWrapper::TrimAll(sName);
-
-        // Create a list of the names to include (extract only those names)            
-        std::vector<CTL_StringType> vReturn2;
-        std::sort(vSourceNames.begin(), vSourceNames.end());
-        std::sort(CS.aIncludeNames.begin(), CS.aIncludeNames.end());
-        std::set_intersection(vSourceNames.begin(), vSourceNames.end(),
-            CS.aIncludeNames.begin(), CS.aIncludeNames.end(), std::back_inserter(vReturn2));
-        if (!vReturn2.empty())
-            vSourceNames = vReturn2;
-    }
-
-    auto vReturn = vSourceNames;
-
-    if (doExclude)
-    {
-        for (auto& sName : CS.aExcludeNames)
-            sName = StringWrapper::TrimAll(sName);
-
-        // Create a list of the names to include if we remove the excluded names
-        std::vector<CTL_StringType> vReturn2;
-        std::sort(vSourceNames.begin(), vSourceNames.end());
-        std::sort(CS.aExcludeNames.begin(), CS.aExcludeNames.end());
-
-        // This does the magic of removing the excluded names
-        std::set_difference(vSourceNames.begin(), vSourceNames.end(),
-            CS.aExcludeNames.begin(), CS.aExcludeNames.end(), std::back_inserter(vReturn2));
-        if (!vReturn2.empty())
-            vReturn = vReturn2;
-    }
-
-    if (doMapping)
-    {
-        // Check if a mapped name should be used
-        std::vector<CTL_StringType> vMapped;
-        for (auto& sName : vReturn)
-        {
-            auto iter = CS.mapNames.find(sName);
-            if (iter != CS.mapNames.end())
-                // replace real source name with mapped name
-                vMapped.push_back(iter->second);
-            else
-                // just use the real source name
-                vMapped.push_back(sName);
-        }
-        vReturn = vMapped;
-    }
-
-    // Return the new vector of Source names to display in the
-    // Select Source dialog.
-    return vReturn;
-}
-
-// Determine if the selected source name is actually a mapped name
-static CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelectedSourceName)
-{
-    if (CS.mapNames.empty())
-        return szSelectedSourceName;
-
-    auto& mapping = CS.mapNames;
-
-    // check if selected source name is a map key
-    auto iter = mapping.find(szSelectedSourceName);
-    if (iter != mapping.end())
-        return iter->first;  // return that a Source "by coincidence" is the name of an actual source
-
-    // Go through map to see what the real source name is of the mapped, selected source name
-    for (auto& it : mapping)
-    {
-        if (it.second == szSelectedSourceName)
-            return it.first; // return the real Source name
-    }
-
-    // No name matches
-    return {};
-}
-
-static void SetLastSavePos(HWND hWndDlg, SelectStruct* pS)
-{
-    if (pS->CS.nOptions & DTWAIN_DLG_SAVELASTSCREENPOS)
-    {
-        auto& lastPos = CTL_StaticData::GetSelectSourcePos();
-        RECT windowRect;
-        if (GetWindowRect(hWndDlg, &windowRect))
-        {
-            lastPos.first = windowRect.left;
-            lastPos.second = windowRect.top;
-        }
-    }
 }
 
 LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
