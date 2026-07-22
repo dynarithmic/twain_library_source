@@ -71,7 +71,14 @@ Users who only consume the prebuilt DTWAIN binaries are unaffected.
 
 ## <a name="rebuild-requirements"></a> Requirements
 
-Before rebuilding DTWAIN from source:
+The first step in building DTWAIN from source is to clone the Git repository:<br><br>
+`https://github.com/dynarithmic/twain_library_source.git`
+
+This will create a local copy of the repository.
+
+---
+
+After cloning the repository, there are further requirements listed below.  
 
 #### Required
 
