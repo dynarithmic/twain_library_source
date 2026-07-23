@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctliface.h"
 #include "psdwriter.h"
 #include "iohandler_psd.h"
 #include "ctldib32ex.h"

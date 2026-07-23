@@ -46,7 +46,7 @@ BEGIN
         VALUE "PrivateBuild",   DTWAIN_VERINFO_PRIVATEBUILD
         VALUE "ProductName",    DTWAIN_VERINFO_PRODUCTNAME
         VALUE "ProductVersion", DTWAIN_VERINFO_PRODUCTVERSION
-        VALUE "SpecialBuild",   DTWAIN_VERINFO_SPECIALBUILD
+        VALUE "SpecialBuild",   DTWAIN_BUILD_COMPILER
         END
     END
     BLOCK "VarFileInfo"

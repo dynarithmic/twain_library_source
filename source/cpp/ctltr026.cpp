@@ -18,25 +18,18 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <bitset>
-#include <boost/lexical_cast.hpp>
-#include <boost/format.hpp>
 #include <fstream>
 #include <array>
 #include <string_view>
-#include "ctltr010.h"
 #include "ctltr026.h"
 #include "ctltr027.h"
 #include "ctltr025.h"
 #include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
-#include "ctldib.h"
-#include "dtwain.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
 #include "resamplefactory.h"
 #include "ctlfilesave.h"
-#include "cppfunc.h"
 #include "ctlsetgetcaps.h"
 #include "ctldib32ex.h"
 

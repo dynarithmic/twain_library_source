@@ -20,7 +20,6 @@
  */
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
-#include "ctltmpl5.h"
 #include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER

@@ -18,9 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
 #include "ctliface.h"
-#include "ctltwainmanager.h"
 #include "ctlloadresources.h"
 #include "ctldib32ex.h"
 #include "logwriterutils.h"

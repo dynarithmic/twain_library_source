@@ -18,15 +18,11 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <deque>
 #include <algorithm>
 
 #include "cppfunc.h"
-#include "dtwain.h"
 #include "ctliface.h"
-#include "arrayfactory.h"
-#include "ctltwainmanager.h"
-#include <errorcheck.h>
+#include "errorcheck.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)

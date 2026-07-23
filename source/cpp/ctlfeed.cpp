@@ -18,13 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "dtwain.h"
-#include "ctliface.h"
-#include "ctltwainmanager.h"
-#include "arrayfactory.h"
 #include <algorithm>
-#include <chrono>
 #include <thread>
+#include "ctliface.h"
+#include "arrayfactory.h"
 #include "cppfunc.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
@@ -36,9 +33,70 @@ using namespace std::chrono_literals;
 typedef void (CTL_ITwainSource::*SetFunc)(bool);
 typedef bool (CTL_ITwainSource::*IsEnabledFunc)() const;
 
-static bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* p, SetFunc Func, bool bSet);
-static bool IsFeederEnabledFunc(DTWAIN_SOURCE Source, IsEnabledFunc Func);
-static bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap);
+namespace
+{
+    bool IsFeederEnabledFunc(DTWAIN_SOURCE Source, IsEnabledFunc Func)
+    {
+        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
+        return (p->*Func)();
+    }
+
+    bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
+    {
+        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        if (!pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCap)))
+            return false;
+
+        const auto pHandle = pSource->GetDTWAINHandle();
+        DTWAIN_ARRAY aValues = CreateArrayFromCap(pHandle, nullptr, lCap, 0).second;
+        if (!aValues)
+            return false;
+        DTWAINArrayLowLevel_RAII aRAII(pHandle, aValues);
+        auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
+        vCaps.push_back(true);
+        SetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aValues);
+        return false;
+    }
+
+    bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* pSource, SetFunc Func, bool bSet)
+    {
+        // Set the capability value
+        DTWAIN_ARRAY aValues = nullptr;
+
+        // Check the current value
+        const auto pHandle = pSource->GetDTWAINHandle();
+        DTWAIN_BOOL bReturn = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aValues);
+        if (!bReturn || !aValues)
+            return false;
+        DTWAINArrayLowLevelPtr_RAII arr(pHandle, &aValues);
+        auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
+
+        if (vFeeder.empty())
+            return false;
+
+        const bool Val = vFeeder[0] ? true : false;
+        bool bValue = false;
+        if (bSet != 0)
+            bValue = true;
+
+        // Already set, so return
+        if (bValue == Val)
+        {
+            (pSource->*Func)(bValue);
+            return true;
+        }
+
+        // Set here
+        vFeeder[0] = bValue;
+        bReturn = SetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPSETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aValues) ? true : false;
+        if (bReturn)
+            (pSource->*Func)(bValue);
+        else
+            (pSource->*Func)(FALSE);
+        return true;
+    }
+
+}
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
 {
@@ -137,11 +195,6 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsAutoFeedEnabled(DTWAIN_SOURCE Source)
     CATCH_BLOCK(false)
 }
 
-bool IsFeederEnabledFunc(DTWAIN_SOURCE Source, IsEnabledFunc Func)
-{
-    CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
-    return (p->*Func)();
-}
 //*********************************************************************************************
 DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet)
 {
@@ -219,43 +272,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFeederWaitTime(DTWAIN_SOURCE Source)
     LOG_FUNC_EXIT_NONAME_PARAMS(waitTime)
     CATCH_BLOCK(-1)
 }
-bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* pSource, SetFunc Func, bool bSet)
-{
-    // Set the capability value
-    DTWAIN_ARRAY aValues = nullptr;
 
-    // Check the current value
-    const auto pHandle = pSource->GetDTWAINHandle();
-    DTWAIN_BOOL bReturn = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aValues);
-    if (!bReturn || !aValues)
-        return false;
-    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &aValues);
-    auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
-
-    if ( vFeeder.empty() )
-        return false;
-
-    const bool Val = vFeeder[0]?true:false;
-    bool bValue=false;
-    if ( bSet != 0 )
-        bValue = true;
-
-    // Already set, so return
-    if ( bValue == Val )
-    {
-        (pSource->*Func)(bValue);
-        return true;
-    }
-
-    // Set here
-    vFeeder[0] = bValue;
-    bReturn = SetCapValuesEx2_Internal( pSource, lCap, DTWAIN_CAPSETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aValues)?true:false;
-    if ( bReturn )
-        (pSource->*Func)(bValue);
-    else
-        (pSource->*Func)(FALSE);
-    return true;
-}
 //*********************************************************************************************
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSensitive(DTWAIN_SOURCE Source)
 {
@@ -334,34 +351,20 @@ LONG DLLENTRY_DEF DTWAIN_GetFeederFuncs(DTWAIN_SOURCE Source)
     CATCH_BLOCK(0)
 }
 
-bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
+namespace
 {
-    CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    if (!pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCap)))
-        return false;
-
-    const auto pHandle = pSource->GetDTWAINHandle();
-    DTWAIN_ARRAY aValues = CreateArrayFromCap(pHandle, nullptr, lCap, 0).second;
-    if ( !aValues )
-        return false;
-    DTWAINArrayLowLevel_RAII aRAII(pHandle, aValues);
-    auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
-    vCaps.push_back(true);
-    SetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aValues);
-    return false;
-}
-
-static bool IsFeederLoaded(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY aFeederLoaded)
-{
-    BOOL retval = GetCapValuesEx2_Internal(pSource, CAP_FEEDERLOADED, DTWAIN_CAPGETCURRENT, 
-                                            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aFeederLoaded);
-    if (retval)
+    bool IsFeederLoaded(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY aFeederLoaded)
     {
-        auto& vValues = pSource->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(*aFeederLoaded);
-        if (!vValues.empty())
-            return vValues.front();
+        BOOL retval = GetCapValuesEx2_Internal(pSource, CAP_FEEDERLOADED, DTWAIN_CAPGETCURRENT,
+            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aFeederLoaded);
+        if (retval)
+        {
+            auto& vValues = pSource->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(*aFeederLoaded);
+            if (!vValues.empty())
+                return vValues.front();
+        }
+        return false;
     }
-    return false;
 }
 
 int dynarithmic::FeederWait(CTL_ITwainSource *pSource)

@@ -32,259 +32,278 @@
 
 using namespace dynarithmic;
 
-template <typename Iter>
-static std::string join_string(Iter it1, Iter it2, const char* val = ",")
+namespace
 {
-    return StringWrapperA::Join(it1, it2, val);
-}
-
-static std::string remove_quotes(std::string s)
-{
-    s.erase(std::remove(s.begin(), s.end(), '\"'), s.end());
-    return s;
-}
-
-template <typename T>
-static void create_stream(std::ostringstream& strm, DTWAIN_SOURCE Source, LONG capValue, LONG twainConstantID, bool useTwainName = false)
-{
-    DTWAIN_ARRAY arr = nullptr;
-    DTWAIN_GetCapValuesEx2(Source, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
-    if (pHandle && arr)
+    template <typename Iter>
+    std::string join_string(Iter it1, Iter it2, const char* val = ",")
     {
-        DTWAINArrayPtr_RAII raii(pHandle, &arr);
-        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<T>(arr);
-        auto nCount = vValues.size();
-        if (nCount == 0)
-            strm << "\"<not available>\"";
-        else
-        {
-            strm << "{";
-
-            // check if range
-            LONG status;
-            bool isRange = DTWAIN_GetCapContainer(Source, capValue, DTWAIN_CAPGET) == DTWAIN_CONTRANGE;
-            if (isRange && DTWAIN_RangeIsValid(arr, &status))
-                strm << "\"data-type\":\"range\",";
-            else
-                strm << "\"data-type\":\"discrete\",";
-            std::string joined_names;
-            if constexpr (std::is_integral_v<T>)
-            {
-                if (!isRange && useTwainName)
-                {
-                    std::vector<std::string> vTwainNames;
-                    for (auto& val : vValues)
-                    {
-                        auto sConstantName = CTL_StaticData::GetTwainNameFromConstantA(twainConstantID, val).second;
-                        std::vector<std::string> saParsedNames;
-                        StringWrapperA::Tokenize(sConstantName, ", ", saParsedNames);
-                        for (auto& sName : saParsedNames)
-                        {
-                            std::string sTotalName = "\"" + std::string(sName) + "\"";
-                            vTwainNames.push_back(sTotalName);
-                        }
-                    }
-                    joined_names = join_string(vTwainNames.begin(), vTwainNames.end());
-                }
-                else
-                    joined_names = join_string(vValues.begin(), vValues.end());
-            }
-            else
-                joined_names = join_string(vValues.begin(), vValues.end());
-            strm << "\"data-values\":[" << joined_names << "]}";
-        }
+        return StringWrapperA::Join(it1, it2, val);
     }
-    else
-        strm << "\"<not available>\"";
-}
 
-struct DefaultStringFnGetter
-{
-    static DTWAIN_ARRAY GetAllStringValues(DTWAIN_SOURCE Source, LONG capValue)
+    std::string remove_quotes(std::string s)
+    {
+        s.erase(std::remove(s.begin(), s.end(), '\"'), s.end());
+        return s;
+    }
+
+    template <typename T>
+    void create_stream(std::ostringstream& strm, DTWAIN_SOURCE Source, LONG capValue, LONG twainConstantID, bool useTwainName = false)
     {
         DTWAIN_ARRAY arr = nullptr;
         DTWAIN_GetCapValuesEx2(Source, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
-        return arr;
-    }
-};
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
+        if (pHandle && arr)
+        {
+            DTWAINArrayPtr_RAII raii(pHandle, &arr);
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<T>(arr);
+            auto nCount = vValues.size();
+            if (nCount == 0)
+                strm << "\"<not available>\"";
+            else
+            {
+                strm << "{";
 
-struct CameraSystemStringFnGetter
-{
-    static DTWAIN_ARRAY GetAllStringValues(DTWAIN_SOURCE Source, LONG)
+                // check if range
+                LONG status;
+                bool isRange = DTWAIN_GetCapContainer(Source, capValue, DTWAIN_CAPGET) == DTWAIN_CONTRANGE;
+                if (isRange && DTWAIN_RangeIsValid(arr, &status))
+                    strm << "\"data-type\":\"range\",";
+                else
+                    strm << "\"data-type\":\"discrete\",";
+                std::string joined_names;
+                if constexpr (std::is_integral_v<T>)
+                {
+                    if (!isRange && useTwainName)
+                    {
+                        std::vector<std::string> vTwainNames;
+                        for (auto& val : vValues)
+                        {
+                            auto sConstantName = CTL_StaticData::GetTwainNameFromConstantA(twainConstantID, val).second;
+                            std::vector<std::string> saParsedNames;
+                            StringWrapperA::Tokenize(sConstantName, ", ", saParsedNames);
+                            for (auto& sName : saParsedNames)
+                            {
+                                std::string sTotalName = "\"" + std::string(sName) + "\"";
+                                vTwainNames.push_back(sTotalName);
+                            }
+                        }
+                        joined_names = join_string(vTwainNames.begin(), vTwainNames.end());
+                    }
+                    else
+                        joined_names = join_string(vValues.begin(), vValues.end());
+                }
+                else
+                    joined_names = join_string(vValues.begin(), vValues.end());
+                strm << "\"data-values\":[" << joined_names << "]}";
+            }
+        }
+        else
+            strm << "\"<not available>\"";
+    }
+
+    struct DefaultStringFnGetter
+    {
+        static DTWAIN_ARRAY GetAllStringValues(DTWAIN_SOURCE Source, LONG capValue)
+        {
+            DTWAIN_ARRAY arr = nullptr;
+            DTWAIN_GetCapValuesEx2(Source, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+            return arr;
+        }
+    };
+
+    struct CameraSystemStringFnGetter
+    {
+        static DTWAIN_ARRAY GetAllStringValues(DTWAIN_SOURCE Source, LONG)
+        {
+            DTWAIN_ARRAY arr = nullptr;
+            if (DTWAIN_IsFileSystemSupported(Source))
+            {
+                DTWAIN_EnumCameras(Source, &arr);
+            }
+            return arr;
+        }
+    };
+
+    template <typename Fn>
+    void create_stream_from_strings(std::ostringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
+    {
+        const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+        std::vector<std::string> imageVals;
+        DTWAIN_ARRAY arr = Fn::GetAllStringValues(Source, capValue);
+        DTWAINArrayPtr_RAII raii(pHandle, &arr);
+        if (arr)
+        {
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(arr);
+            auto nCount = vValues.size();
+            if (nCount == 0)
+                strm << "\"<not available>\"";
+            else
+            {
+                std::transform(vValues.begin(), vValues.end(),
+                    std::back_inserter(imageVals), [](auto& s) { return "\"" + s + "\""; });
+                strm << "{";
+                strm << "\"data-values\":[" << join_string(imageVals.begin(), imageVals.end()) << "]}";
+            }
+        }
+        else
+            strm << "\"<not available>\"";
+    }
+
+    std::string get_source_file_types(DTWAIN_SOURCE Source)
+    {
+        // get all the image file formats
+        const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+        DTWAIN_ARRAY aFileFormats = nullptr;
+        auto bOk = DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aFileFormats);
+        if (!bOk || !aFileFormats)
+            return {};
+
+        DTWAINArrayPtr_RAII raii1(pHandle, &aFileFormats);
+        auto& vFileFormats = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aFileFormats);
+        if (vFileFormats.empty())
+            return {};
+
+        std::vector<std::string> vRetVal;
+        for (auto curFormat : vFileFormats)
+        {
+            auto sFileFormat = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, curFormat).second;
+            vRetVal.push_back(StringWrapperA::QuoteString(sFileFormat));
+        }
+        return join_string(vRetVal.begin(), vRetVal.end());
+    }
+
+    using pixelMap = std::map<LONG, std::vector<LONG>>;
+
+    pixelMap get_pixel_bitdepth_info(CTL_ITwainSource* pSource)
+    {
+        const auto pHandle = pSource->GetDTWAINHandle();
+        DTWAIN_SOURCE pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
+        // Get the pixel information
+        DTWAIN_ARRAY aPixelTypes = nullptr;
+        DTWAIN_EnumPixelTypes(pActualSource, &aPixelTypes);
+        DTWAINArrayPtr_RAII raii(pHandle, &aPixelTypes);
+        auto& pixInfo = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aPixelTypes);
+        pixelMap pMap;
+        for (auto curPixInfo : pixInfo)
+        {
+            auto iter = pMap.insert({ curPixInfo, {} }).first;
+            DTWAIN_ARRAY aBitDepthInfo = nullptr;
+            DTWAINArrayPtr_RAII raii2(pHandle, &aBitDepthInfo);
+            DTWAIN_SetPixelType(pActualSource, curPixInfo, DTWAIN_DEFAULT, TRUE);
+            DTWAIN_EnumBitDepths(pActualSource, &aBitDepthInfo);
+            if (aBitDepthInfo)
+            {
+                auto& aBitDepthInfoPtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepthInfo);
+                for (auto curBitDepth : aBitDepthInfoPtr)
+                    iter->second.push_back(curBitDepth);
+            }
+        }
+        return pMap;
+    }
+
+    template <typename FnAdjuster>
+    std::vector<std::string> getNamesFromConstants(CTL_ITwainSource* pSource, LONG capValue, LONG twainconstantID, FnAdjuster fn)
     {
         DTWAIN_ARRAY arr = nullptr;
-        if (DTWAIN_IsFileSystemSupported(Source))
+        const auto pHandle = pSource->GetDTWAINHandle();
+        BOOL bRet = DTWAIN_GetCapValuesEx2(reinterpret_cast<DTWAIN_SOURCE>(pSource), capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+        std::vector<std::string> allNames;
+        if (bRet)
         {
-            DTWAIN_EnumCameras(Source, &arr);
+            DTWAINArrayPtr_RAII raii(pHandle, &arr);
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
+            for (LONG value : vValues)
+            {
+                value = fn(value);
+                allNames.push_back(CTL_StaticData::GetTwainNameFromConstantA(twainconstantID, value).second);
+            }
         }
-        return arr;
+        return allNames;
     }
-};
 
-template <typename Fn>
-static void create_stream_from_strings(std::ostringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
-{
-    const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-    std::vector<std::string> imageVals;
-    DTWAIN_ARRAY arr = Fn::GetAllStringValues(Source, capValue);
-    DTWAINArrayPtr_RAII raii(pHandle, &arr);
-    if (arr)
+    std::vector<std::string> getDGDATNamesFromConstants(CTL_ITwainSource* pSource)
     {
-        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(arr);
-        auto nCount = vValues.size();
-        if (nCount == 0)
-            strm << "\"<not available>\"";
-        else
+        DTWAIN_ARRAY arr = nullptr;
+        const auto pHandle = pSource->GetDTWAINHandle();
+        BOOL bRet = DTWAIN_GetCapValuesEx2(reinterpret_cast<DTWAIN_SOURCE>(pSource), CAP_SUPPORTEDDATS, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+        std::vector<std::string> allNames;
+        if (bRet)
         {
-            std::transform(vValues.begin(), vValues.end(), 
-                            std::back_inserter(imageVals), [](auto& s) { return "\"" + s + "\""; });
-            strm << "{";
-            strm << "\"data-values\":[" << join_string(imageVals.begin(), imageVals.end()) << "]}";
+            DTWAINArrayPtr_RAII raii(pHandle, &arr);
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<TW_UINT32>(arr);
+            for (auto value : vValues)
+            {
+                auto valueDG = (value & 0xFFFF0000) >> 16;
+                auto valueDAT = value & 0x0000FFFF;
+                std::string dgName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, valueDG).second;
+                std::string datName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, valueDAT).second;
+                allNames.push_back(dgName + " / " + datName);
+            }
         }
+        return allNames;
     }
-    else
-        strm << "\"<not available>\"";
-}
 
-static std::string get_source_file_types(DTWAIN_SOURCE Source)
-{
-    // get all the image file formats
-    const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-    DTWAIN_ARRAY aFileFormats = nullptr;
-    auto bOk = DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aFileFormats);
-    if (!bOk || !aFileFormats)
-        return {};
-
-    DTWAINArrayPtr_RAII raii1(pHandle, &aFileFormats);
-    auto& vFileFormats = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aFileFormats);
-    if (vFileFormats.empty())
-        return {};
-
-    std::vector<std::string> vRetVal;
-    for (auto curFormat : vFileFormats)
+    std::vector<std::string> getCompressionNames(CTL_ITwainSource* pSource)
     {
-        auto sFileFormat = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, curFormat).second;
-        vRetVal.push_back(StringWrapperA::QuoteString(sFileFormat)); 
-    }
-    return join_string(vRetVal.begin(), vRetVal.end());
-}
+        const auto pHandle = pSource->GetDTWAINHandle();
+        auto pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
+        std::set<LONG> compressionSets;
 
-using pixelMap = std::map<LONG, std::vector<LONG>>;
+        // Enumerate all the file types available for file transfer
+        DTWAIN_ARRAY aFileTypes = DTWAIN_EnumFileXferFormatsEx(pActualSource);
+        if (!aFileTypes)
+            return {};
 
-static pixelMap get_pixel_bitdepth_info(CTL_ITwainSource* pSource)
-{
-    const auto pHandle = pSource->GetDTWAINHandle();
-    DTWAIN_SOURCE pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
-    // Get the pixel information
-    DTWAIN_ARRAY aPixelTypes = nullptr;
-    DTWAIN_EnumPixelTypes(pActualSource, &aPixelTypes);
-    DTWAINArrayPtr_RAII raii(pHandle, &aPixelTypes);
-    auto& pixInfo = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aPixelTypes);
-    pixelMap pMap;
-    for (auto curPixInfo : pixInfo)
-    {
-        auto iter = pMap.insert({ curPixInfo, {} }).first;
-        DTWAIN_ARRAY aBitDepthInfo = nullptr;
-        DTWAINArrayPtr_RAII raii2(pHandle, &aBitDepthInfo);
-        DTWAIN_SetPixelType(pActualSource, curPixInfo, DTWAIN_DEFAULT, TRUE);
-        DTWAIN_EnumBitDepths(pActualSource, &aBitDepthInfo);
-        if (aBitDepthInfo)
+        DTWAINArrayLowLevel_RAII raii(pHandle, aFileTypes);
+
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aFileTypes);
+
+        if (vValues.empty())
+            return {};
+        std::vector<std::string> allNames;
+
+        for (auto& fileType : vValues)
         {
-            auto& aBitDepthInfoPtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepthInfo);
-            for (auto curBitDepth : aBitDepthInfoPtr)
-                iter->second.push_back(curBitDepth);
+            // Call function to enumerate the compressions types for the fileType image type
+            auto allCompressionTypes = DTWAIN_EnumCompressionTypesEx2(pActualSource, fileType, false);
+            if (!allCompressionTypes)
+                continue;
+            DTWAINArrayLowLevel_RAII raii2(pHandle, allCompressionTypes);
+            auto& vCompression = pHandle->m_ArrayFactory->underlying_container_t<LONG>(allCompressionTypes);
+            compressionSets.insert(vCompression.begin(), vCompression.end());
         }
-    }
-    return pMap;
-}
-
-template <typename FnAdjuster>
-static std::vector<std::string> getNamesFromConstants(CTL_ITwainSource *pSource, LONG capValue, LONG twainconstantID, FnAdjuster fn)
-{
-    DTWAIN_ARRAY arr = nullptr;
-    const auto pHandle = pSource->GetDTWAINHandle();
-    BOOL bRet = DTWAIN_GetCapValuesEx2(reinterpret_cast<DTWAIN_SOURCE>(pSource), capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
-    std::vector<std::string> allNames;
-    if (bRet)
-    {
-        DTWAINArrayPtr_RAII raii(pHandle, &arr);
-        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
-        for (LONG value : vValues)
+        for (auto value : compressionSets)
         {
-            value = fn(value);
-            allNames.push_back(CTL_StaticData::GetTwainNameFromConstantA(twainconstantID, value).second);
+            std::string compressName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWCP, value).second;
+            allNames.push_back(compressName);
         }
+        return allNames;
     }
-    return allNames;
-}
 
-static std::vector<std::string> getDGDATNamesFromConstants(CTL_ITwainSource* pSource)
-{
-    DTWAIN_ARRAY arr = nullptr;
-    const auto pHandle = pSource->GetDTWAINHandle();
-    BOOL bRet = DTWAIN_GetCapValuesEx2(reinterpret_cast<DTWAIN_SOURCE>(pSource), CAP_SUPPORTEDDATS, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
-    std::vector<std::string> allNames;
-    if (bRet)
+    struct OneResInfo
     {
-        DTWAINArrayPtr_RAII raii(pHandle, &arr);
-        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<TW_UINT32>(arr);
-        for (auto value : vValues)
-        {
-            auto valueDG = (value & 0xFFFF0000) >> 16;
-            auto valueDAT = value & 0x0000FFFF;
-            std::string dgName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, valueDG).second;
-            std::string datName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, valueDAT).second;
-            allNames.push_back(dgName + " / " + datName); 
-        }
-    }
-    return allNames;
-}
+        std::vector<double> m_AllRes;
+        bool m_bIsRange;
+        OneResInfo() : m_bIsRange{} {}
+    };
 
-static std::vector<std::string> getCompressionNames(CTL_ITwainSource* pSource)
-{
-    const auto pHandle = pSource->GetDTWAINHandle();
-    auto pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
-    std::set<LONG> compressionSets;
-
-    // Enumerate all the file types available for file transfer
-    DTWAIN_ARRAY aFileTypes = DTWAIN_EnumFileXferFormatsEx(pActualSource);
-    if (!aFileTypes)
-        return {};
-
-    DTWAINArrayLowLevel_RAII raii(pHandle, aFileTypes);
-
-    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aFileTypes);
-
-    if (vValues.empty())
-        return {};
-    std::vector<std::string> allNames;
-
-    for (auto& fileType : vValues)
+    struct OneCapInfo
     {
-        // Call function to enumerate the compressions types for the fileType image type
-        auto allCompressionTypes = DTWAIN_EnumCompressionTypesEx2(pActualSource, fileType, false);
-        if (!allCompressionTypes)
-            continue;
-        DTWAINArrayLowLevel_RAII raii2(pHandle, allCompressionTypes);
-        auto& vCompression = pHandle->m_ArrayFactory->underlying_container_t<LONG>(allCompressionTypes);
-        compressionSets.insert(vCompression.begin(), vCompression.end());
-    }
-    for (auto value : compressionSets)
+        std::string capName;
+        LONG value;
+        std::string capType;
+        OneCapInfo(std::string name = "", LONG v = 0, std::string type = "") : capName(name), value(v), capType(type) {}
+    };
+
+    using AllCapInfoMap = std::map<LONG, OneCapInfo>;
+
+    struct AllCapInfo
     {
-        std::string compressName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWCP, value).second;
-        allNames.push_back(compressName);
-    }
-    return allNames;
+        AllCapInfoMap m_infoMap;
+        std::array<size_t, 3> mapCounts;
+        AllCapInfo() : mapCounts{} {}
+    };
 }
-
-struct OneResInfo
-{
-    std::vector<double> m_AllRes;
-    bool m_bIsRange;
-    OneResInfo() : m_bIsRange{} {}
-};
-
 
 using ResInfoMap = std::map<LONG, OneResInfo>;
 
@@ -345,23 +364,6 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
     }
     return resMap;
 }
-
-struct OneCapInfo
-{
-    std::string capName;
-    LONG value;
-    std::string capType;
-    OneCapInfo(std::string name = "", LONG v = 0, std::string type = "") : capName(name), value(v), capType(type) {}
-};
-
-using AllCapInfoMap = std::map<LONG, OneCapInfo>;
-
-struct AllCapInfo
-{
-   AllCapInfoMap m_infoMap;
-   std::array<size_t, 3> mapCounts;
-   AllCapInfo() : mapCounts{} {}
-};
 
 static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
 {

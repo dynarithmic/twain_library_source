@@ -644,21 +644,24 @@ bool CTL_TwainDib::DecreaseBpp(unsigned long bpp)
     return IncreaseBppImpl(bpp, false);
 }
 
-template <typename T>
-static int ResampleImpl(CTL_TwainDibInfo& info, T newx, T newy)
+namespace
 {
-    const HANDLE hDib = info.GetDib();
-    if (hDib)
+    template <typename T>
+    int ResampleImpl(CTL_TwainDibInfo& info, T newx, T newy)
     {
-        HANDLE hNewDib = CDibInterface::ResampleDIB(hDib, newx, newy);
-        if (hNewDib)
+        const HANDLE hDib = info.GetDib();
+        if (hDib)
         {
-            info.DeleteDib();
-            info.SetDib(hNewDib);
-            return 1;
+            HANDLE hNewDib = CDibInterface::ResampleDIB(hDib, newx, newy);
+            if (hNewDib)
+            {
+                info.DeleteDib();
+                info.SetDib(hNewDib);
+                return 1;
+            }
         }
+        return 0;
     }
-    return 0;
 }
 
 int CTL_TwainDib::ResampleDib(long newx, long newy)

@@ -19,9 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <utility>
-
-#include "ctliface.h"
-#include "ctltwainmanager.h"
 #include "iohandler_text.h"
 #include "txtfun32.h"
 #include "ctldib32ex.h"

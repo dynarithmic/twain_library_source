@@ -20,7 +20,7 @@ OF THIRD PARTY RIGHTS.
 */
 #include <base64encode.h>
 
-static const char kBase64Table[] =
+static constexpr char kBase64Table[] =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 int Base64Encode(const uint8_t* inData, std::string& out, size_t len)

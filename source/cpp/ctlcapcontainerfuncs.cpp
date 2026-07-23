@@ -66,21 +66,23 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
     CATCH_BLOCK_LOG_PARAMS(0)
 }
 
-template <int CapInfoIdx>
-static LONG PerformCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nCap, LONG lCapType, CTL_CapInfo* CapInfo)
+namespace
 {
-    // Get the container information for this cap
-    LONG lResults = (LONG)std::get<CapInfoIdx>(*CapInfo);
+    template <int CapInfoIdx>
+    LONG PerformCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nCap, LONG lCapType, CTL_CapInfo* CapInfo)
+    {
+        // Get the container information for this cap
+        LONG lResults = (LONG)std::get<CapInfoIdx>(*CapInfo);
 
-    // Test if the container info specifies a single container type
-    size_t numBitsOn = dynarithmic::countOneBits(static_cast<uint32_t>(lResults));
-    if (numBitsOn == 1)
-        return lResults;  // This is a single container type
+        // Test if the container info specifies a single container type
+        size_t numBitsOn = dynarithmic::countOneBits(static_cast<uint32_t>(lResults));
+        if (numBitsOn == 1)
+            return lResults;  // This is a single container type
 
-    // Multiple container options exist for this cap or we have no idea (a custom cap).  Use TWAIN to get the best container type now
-    return CTL_TwainAppMgr::DoCapContainerTest(pHandle, pSource, static_cast<TW_UINT16 >(nCap), lCapType);
+        // Multiple container options exist for this cap or we have no idea (a custom cap).  Use TWAIN to get the best container type now
+        return CTL_TwainAppMgr::DoCapContainerTest(pHandle, pSource, static_cast<TW_UINT16>(nCap), lCapType);
+    }
 }
-
 
 LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG lCapType)
 {

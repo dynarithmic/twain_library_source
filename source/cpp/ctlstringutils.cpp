@@ -46,29 +46,32 @@ namespace timeutils
     }
 }
 
-template <typename WrapperToUse, typename PointerType>
-static HANDLE ConvertToAPIString_Internal(PointerType lpOrigString)
+namespace
 {
-    if (!lpOrigString)
-        return NULL;
-    return WrapperToUse::ConvertToAPIStringEx(lpOrigString);
-}
-
-template <typename WrapperToUse, typename PointerTypeIn, typename PointerTypeOut>
-static LONG ConvertToAPIString_InternalEx(PointerTypeIn lpOrigString, PointerTypeOut outString, LONG nLength)
-{
-    if (!lpOrigString)
-        return 0;
-    auto retval = WrapperToUse::ConvertToAPIStringEx(lpOrigString);
-    if (retval)
+    template <typename WrapperToUse, typename PointerType>
+    HANDLE ConvertToAPIString_Internal(PointerType lpOrigString)
     {
-        HandleRAII raii(retval);
-        PointerTypeIn ptrData = (PointerTypeIn)raii.getData();
-        auto len = WrapperToUse::traits_type::Length(ptrData);
-        typename WrapperToUse::traits_type::string_type str(ptrData, len);
-        return StringWrapper::CopyInfoToCString(str, outString, nLength);
+        if (!lpOrigString)
+            return NULL;
+        return WrapperToUse::ConvertToAPIStringEx(lpOrigString);
     }
-    return 0;
+
+    template <typename WrapperToUse, typename PointerTypeIn, typename PointerTypeOut>
+    LONG ConvertToAPIString_InternalEx(PointerTypeIn lpOrigString, PointerTypeOut outString, LONG nLength)
+    {
+        if (!lpOrigString)
+            return 0;
+        auto retval = WrapperToUse::ConvertToAPIStringEx(lpOrigString);
+        if (retval)
+        {
+            HandleRAII raii(retval);
+            PointerTypeIn ptrData = (PointerTypeIn)raii.getData();
+            auto len = WrapperToUse::traits_type::Length(ptrData);
+            typename WrapperToUse::traits_type::string_type str(ptrData, len);
+            return StringWrapper::CopyInfoToCString(str, outString, nLength);
+        }
+        return 0;
+    }
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
@@ -201,19 +204,5 @@ namespace dynarithmic
             byteArray.push_back((highNibble << 4) | lowNibble);
         }
         return byteArray;
-    }
-
-    // Replace string that contains %1, %2, etc. with string replacements
-    std::string& ReplacePlaceHolders(std::string& sOrigString, const std::vector<std::string>& vReplacements)
-    {
-        int i = 1;
-        std::string placeHolder;
-        for (auto& s : vReplacements)
-        {
-            placeHolder = "%" + std::to_string(i);
-            boost::algorithm::replace_all(sOrigString, placeHolder, s);
-            ++i;
-        }
-        return sOrigString;
     }
 }

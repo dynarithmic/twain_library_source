@@ -486,32 +486,32 @@ namespace dynarithmic
 
         int tag_type(void* pTag) const { return tag_type(from_void(pTag)); }
         int tag_type(arrayTag* pTag) const;
-        void clear(arrayTag *pTag);
-        void clear(void *pTag) { clear(from_void(pTag)); }
+        void clear(arrayTag *pTag) const;
+        void clear(void *pTag) const { clear(from_void(pTag)); }
 
         void destroy(arrayTag* pTag);
         void destroy(void* pTag) { destroy(from_void(pTag)); }
 
-        void copy(arrayTag* pTagDest, arrayTag* pTagSource);
-        void copy(void * pTagDest, void* pTagSource) { return copy(from_void(pTagDest), from_void(pTagSource)); }
+        void copy(arrayTag* pTagDest, arrayTag* pTagSource) const;
+        void copy(void * pTagDest, void* pTagSource) const { return copy(from_void(pTagDest), from_void(pTagSource)); }
 
-        void add_to_back(arrayTag *pTag, void *value, std::size_t num);
-        void add_to_back(void *pTag, void *value, std::size_t num) { return add_to_back(from_void(pTag), value, num); }
+        void add_to_back(arrayTag *pTag, void *value, std::size_t num) const;
+        void add_to_back(void *pTag, void *value, std::size_t num) const { return add_to_back(from_void(pTag), value, num); }
 
-        void insert(arrayTag* pTag, void* value, std::size_t nWhere, std::size_t num);
-        void insert(void* pTag, void* value, std::size_t nWhere, std::size_t num) { insert(from_void(pTag), value, nWhere, num); }
+        void insert(arrayTag* pTag, void* value, std::size_t nWhere, std::size_t num) const;
+        void insert(void* pTag, void* value, std::size_t nWhere, std::size_t num) const { insert(from_void(pTag), value, nWhere, num); }
 
-        void remove(arrayTag* pTag, std::size_t nWhere, std::size_t num);
-        void remove(void* pTag, std::size_t nWhere, std::size_t num) { remove(from_void(pTag), nWhere, num); }
+        void remove(arrayTag* pTag, std::size_t nWhere, std::size_t num) const;
+        void remove(void* pTag, std::size_t nWhere, std::size_t num) const { remove(from_void(pTag), nWhere, num); }
 
-        void resize(arrayTag* pTag, std::size_t num);
-        void resize(void* pTag, std::size_t num) { return resize(from_void(pTag), num); }
+        void resize(arrayTag* pTag, std::size_t num) const;
+        void resize(void* pTag, std::size_t num) const { return resize(from_void(pTag), num); }
 
-        std::size_t find(arrayTag *pTag, void *value, double tol = 1.0e-08);
-        std::size_t find(void *pTag, void *value, double tol = 1.0e-08) { return find(from_void(pTag), value, tol); }
+        std::size_t find(arrayTag *pTag, void *value, double tol = 1.0e-08) const;
+        std::size_t find(void *pTag, void *value, double tol = 1.0e-08) const { return find(from_void(pTag), value, tol); }
 
-        void set_value(arrayTag *pTag, std::size_t nWhere, void *value);
-        void set_value(void *pTag, std::size_t nWhere, void *value) { set_value(from_void(pTag), nWhere, value); }
+        void set_value(arrayTag *pTag, std::size_t nWhere, void *value) const;
+        void set_value(void *pTag, std::size_t nWhere, void *value) const { set_value(from_void(pTag), nWhere, value); }
 
         void* get_value(arrayTag *pTag, size_t nWhere, void *value) const;
         void* get_value(void *pTag, size_t nWhere, void *value) const { return get_value(from_void(pTag), nWhere, value); }
@@ -529,8 +529,8 @@ namespace dynarithmic
         template <typename T>
         T get_value(void*av, size_t nWhere) const { return get_value<T>(from_void(av), nWhere); }
 
-        void* get_buffer(arrayTag *pTag, std::size_t nWhere = 0);
-        void* get_buffer(void* pTag, std::size_t nWhere = 0) { return get_buffer(from_void(pTag), nWhere); }
+        void* get_buffer(arrayTag *pTag, std::size_t nWhere = 0) const;
+        void* get_buffer(void* pTag, std::size_t nWhere = 0) const { return get_buffer(from_void(pTag), nWhere); }
 
         arrayTag* create_frame(double left = 0, double top = 0, double right = 0, double bottom = 0);
         bool is_frame_valid(const void *frame) const;

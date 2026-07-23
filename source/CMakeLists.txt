@@ -1474,6 +1474,10 @@ target_sources(dtwain PRIVATE ${TEXT_RESOURCE_FILES})
 
 set(DTWAIN_RC_DEFINES /D_WIN32)
 
+target_compile_definitions(dtwain PRIVATE
+    RC_MSC_VER=${MSVC_VERSION}
+)
+
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     list(APPEND DTWAIN_RC_DEFINES /D_WIN64)
 endif()

@@ -27,41 +27,45 @@
 using namespace dynarithmic;
 
 // TWAINDSM 2.0 memory related functions
-template <typename VarType>
-struct TwainAllocation
+namespace
 {
-    CTL_TwainDLLHandle* m_pHandle = nullptr;
-    TwainAllocation(CTL_TwainDLLHandle* pHandle) : m_pHandle(pHandle) {}
-    HANDLE operator()(VarType memSize)
+    template <typename VarType>
+    struct TwainAllocation
     {
-        HANDLE h = {};
-        if (m_pHandle->m_TwainMemoryFunc)
-            h = m_pHandle->m_TwainMemoryFunc->AllocateMemory(memSize);
-        return h;
-    }
-};
+        CTL_TwainDLLHandle* m_pHandle = nullptr;
+        TwainAllocation(CTL_TwainDLLHandle* pHandle) : m_pHandle(pHandle) {}
+        HANDLE operator()(VarType memSize)
+        {
+            HANDLE h = {};
+            if (m_pHandle->m_TwainMemoryFunc)
+                h = m_pHandle->m_TwainMemoryFunc->AllocateMemory(memSize);
+            return h;
+        }
+    };
 
-// General Windows memory allocation functions
-template <typename VarType>
-struct SystemAllocation
-{
-    HANDLE operator()(VarType memSize)
+    // General Windows memory allocation functions
+    template <typename VarType>
+    struct SystemAllocation
     {
-        HANDLE h = ImageMemoryHandler::GlobalAlloc(GHND, memSize);
-        #ifdef WIN32
-        if (!h)
-            dynarithmic::LogWin32Error(ImageMemoryHandler::GetLastError());
-        #endif
-        return h;
-    }
-};
+        HANDLE operator()(VarType memSize)
+        {
+            HANDLE h = ImageMemoryHandler::GlobalAlloc(GHND, memSize);
+            #ifdef WIN32
+            if (!h)
+                dynarithmic::LogWin32Error(ImageMemoryHandler::GetLastError());
+            #endif
+            return h;
+        }
+    };
 
-template <typename AllocationFunc, typename VarType>
-static HANDLE GeneralAllocator(ULONG64 memSize, AllocationFunc fn)
-{
-    // Call the memory allocation function
-    return fn(static_cast<VarType>(memSize)); 
+    template <typename AllocationFunc, typename VarType>
+    HANDLE GeneralAllocator(ULONG64 memSize, AllocationFunc fn)
+    {
+        // Call the memory allocation function
+        return fn(static_cast<VarType>(memSize));
+    }
 }
+
 
 HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory(DWORD memSize)
 {

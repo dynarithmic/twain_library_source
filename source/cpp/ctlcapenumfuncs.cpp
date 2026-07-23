@@ -123,62 +123,84 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-template <typename CacheFn>
-static void CopyCapsToUserArray(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Array, CacheFn fn)
+namespace
 {
-    // Create the container to copy the caps to
-    auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-    if (!retValue.second)
-        return;
-    DTWAIN_ARRAY ThisArray = retValue.second;
-
-    // If anything goes wrong, make sure the array is deleted from memory
-    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ThisArray);
-
-    auto& factory = pHandle->m_ArrayFactory;
-
-    // Now copy the caps to to the container
-    auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
-    auto& capCache = (pSource->*fn)();
-    vCaps.insert(vCaps.begin(), capCache.begin(), capCache.end());
-
-    MoveArray(pHandle, Array, &ThisArray);
-}
-
-struct EnumCustomTraits
-{
-    static bool EnumAllCaps(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Array)
+    template <typename CacheFn>
+    void CopyCapsToUserArray(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Array, CacheFn fn)
     {
-        if (!pSource->RetrievedAllCaps())
+        // Create the container to copy the caps to
+        auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+        if (!retValue.second)
+            return;
+        DTWAIN_ARRAY ThisArray = retValue.second;
+
+        // If anything goes wrong, make sure the array is deleted from memory
+        DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ThisArray);
+
+        auto& factory = pHandle->m_ArrayFactory;
+
+        // Now copy the caps to to the container
+        auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
+        auto& capCache = (pSource->*fn)();
+        vCaps.insert(vCaps.begin(), capCache.begin(), capCache.end());
+
+        MoveArray(pHandle, Array, &ThisArray);
+    }
+
+    struct EnumCustomTraits
+    {
+        static bool EnumAllCaps(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Array)
         {
-            if (!DTWAIN_EnumSupportedCaps(reinterpret_cast<DTWAIN_SOURCE>(pSource), Array))
-                return false;
+            if (!pSource->RetrievedAllCaps())
+            {
+                if (!DTWAIN_EnumSupportedCaps(reinterpret_cast<DTWAIN_SOURCE>(pSource), Array))
+                    return false;
+            }
+            return true;
         }
-        return true;
-    }
-};
+    };
 
-struct EnumExtendedTraits
-{
-    static bool EnumAllCaps(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY /*Array*/)
+    struct EnumExtendedTraits
     {
-        pSource->RetrieveExtendedCaps();
-        return true;
+        static bool EnumAllCaps(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY /*Array*/)
+        {
+            pSource->RetrieveExtendedCaps();
+            return true;
+        }
+    };
+
+    template <typename EnumFn, typename CacheFn>
+    int32_t EnumCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, CacheFn fn)
+    {
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const auto pHandle = pSource->GetDTWAINHandle();
+
+        bool bRet = EnumFn::EnumAllCaps(pSource, Array);
+        if (bRet)
+            CopyCapsToUserArray(pHandle, pSource, Array, fn);
+        else
+            return DTWAIN_ERR_NO_CAPS_DEFINED;
+        return DTWAIN_NO_ERROR;
     }
-};
 
-template <typename EnumFn, typename CacheFn>
-static int32_t EnumCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, CacheFn fn)
-{
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
+    LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapability)
+    {
+        CTL_CapInfo* CapInfo = GetCapInfo(pHandle, pSource, static_cast<TW_UINT16>(lCapability));
+        if (!CapInfo)
+            return 0;
+        // Try and get the operations now from TWAIN
+        return static_cast<LONG>(CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true));
+    }
 
-    bool bRet = EnumFn::EnumAllCaps(pSource, Array);
-    if (bRet)
-        CopyCapsToUserArray(pHandle, pSource, Array, fn);
-    else
-        return DTWAIN_ERR_NO_CAPS_DEFINED;
-    return DTWAIN_NO_ERROR;
+    template <TW_UINT16 msgType>
+    CTL_StringType GetCapLabelHelpInternal(CTL_TwainDLLHandle* pHandle, LONG lCapability)
+    {
+        CTL_CapabilityLabelHelpTriplet<msgType> LabelHelpTrip(pHandle->m_pTwainSession, static_cast<TW_UINT16>(lCapability));
+        auto rc = LabelHelpTrip.Execute();
+        if (rc == TWRC_SUCCESS)
+            return StringConversion::Convert_Ansi_To_Native(LabelHelpTrip.GetString());
+        return {};
+    }
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
@@ -217,25 +239,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_AR
     // Everything is ok.
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-static LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapability)
-{
-    CTL_CapInfo* CapInfo = GetCapInfo(pHandle, pSource, static_cast<TW_UINT16>(lCapability));
-    if (!CapInfo)
-        return 0;
-    // Try and get the operations now from TWAIN
-    return static_cast<LONG>(CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true));
-}
-
-template <TW_UINT16 msgType>
-static CTL_StringType GetCapLabelHelpInternal(CTL_TwainDLLHandle* pHandle, LONG lCapability)
-{
-    CTL_CapabilityLabelHelpTriplet<msgType> LabelHelpTrip(pHandle->m_pTwainSession, static_cast<TW_UINT16>(lCapability));
-    auto rc = LabelHelpTrip.Execute();
-    if (rc == TWRC_SUCCESS)
-        return StringConversion::Convert_Ansi_To_Native(LabelHelpTrip.GetString());
-    return {};
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability)

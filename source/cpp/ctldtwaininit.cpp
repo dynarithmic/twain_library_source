@@ -38,7 +38,6 @@
 #include "arrayfactory.h"
 #include "ctltwainmsgloop.h"
 #include "ctldefsource.h"
-#include "ctlstringutils.h"
 #include "ctlclosesource.h"
 #include "ctlguiddef.h"
 
@@ -57,13 +56,15 @@
 
 using namespace dynarithmic;
 
-struct SysInitializeOptions
+namespace
 {
-    bool showErrorBox = false;
-    bool createErrorLog = false;
-    bool createMinimalSetup = false;
-};
-
+    struct SysInitializeOptions
+    {
+        bool showErrorBox = false;
+        bool createErrorLog = false;
+        bool createMinimalSetup = false;
+    };
+}
 static DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& options);
 static LONG DTWAIN_CloseAllSources();
 static void UnhookAllDisplays();

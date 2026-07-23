@@ -28,27 +28,30 @@
 
 using namespace dynarithmic;
 
-static bool CopyDibToClipboard(HANDLE hDib)
+namespace
 {
-#ifdef _WIN32
-    if (hDib)
+    bool CopyDibToClipboard(HANDLE hDib)
     {
-        // Open the clipboard
-        if (OpenClipboard(nullptr/*hWnd*/))
+#ifdef _WIN32
+        if (hDib)
         {
-            // Empty the clipboard
-            if (EmptyClipboard())
+            // Open the clipboard
+            if (OpenClipboard(nullptr/*hWnd*/))
             {
-                SetClipboardData(CF_DIB, hDib);
+                // Empty the clipboard
+                if (EmptyClipboard())
+                {
+                    SetClipboardData(CF_DIB, hDib);
+                    CloseClipboard();
+                    return true;
+                }
                 CloseClipboard();
                 return true;
             }
-            CloseClipboard();
-            return true;
         }
-    }
-    return false;
+        return false;
 #endif
+    }
 }
 
 DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,

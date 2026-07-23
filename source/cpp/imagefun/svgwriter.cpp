@@ -256,14 +256,17 @@ static void WriteLE32(std::vector<unsigned char>& out, uint32_t v)
     out.push_back((unsigned char)((v >> 24) & 0xFF));
 }
 
-struct mz_DestroyTraits
+namespace
 {
-    static void Destroy(void* p)
+    struct mz_DestroyTraits
     {
-        if (p)
-            mz_free(p);
-    }
-};
+        static void Destroy(void* p)
+        {
+            if (p)
+                mz_free(p);
+        }
+    };
+}
 
 typedef DTWAIN_RAII<void*, mz_DestroyTraits> mz_RAII;
 

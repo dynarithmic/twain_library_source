@@ -320,109 +320,112 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG 
     CATCH_BLOCK(-1)
 }
 
-static std::shared_ptr<PDFTextElement> GenericAddPDFText(CTL_ITwainSource *pSource,
-                              LPCTSTR szText, LONG xPos, LONG yPos,
-                              LPCTSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB,
-                              LONG renderMode, DTWAIN_FLOAT scaling,
-                              DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing,
-                              DTWAIN_FLOAT strokeWidth, DWORD Flags, std::shared_ptr<PDFTextElement> pTextElement = nullptr)
+namespace
 {
-    struct DefaultValSetterLONG
+    std::shared_ptr<PDFTextElement> GenericAddPDFText(CTL_ITwainSource* pSource,
+        LPCTSTR szText, LONG xPos, LONG yPos,
+        LPCTSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB,
+        LONG renderMode, DTWAIN_FLOAT scaling,
+        DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing,
+        DTWAIN_FLOAT strokeWidth, DWORD Flags, std::shared_ptr<PDFTextElement> pTextElement = nullptr)
     {
-        LONG DefaultSetting;
-        int DefaultValue;
-        LONG pSource;
-        int* pDestination;
-        DWORD flagValue;
-    };
+        struct DefaultValSetterLONG
+        {
+            LONG DefaultSetting;
+            int DefaultValue;
+            LONG pSource;
+            int* pDestination;
+            DWORD flagValue;
+        };
 
-    struct DefaultValSetterDOUBLE
-    {
-        double DefaultSetting;
-        double DefaultValue;
-        double pSource;
-        double* pDestination;
-        DWORD flagValue;
-    };
+        struct DefaultValSetterDOUBLE
+        {
+            double DefaultSetting;
+            double DefaultValue;
+            double pSource;
+            double* pDestination;
+            DWORD flagValue;
+        };
 
-    PDFTextElement element;
-    constexpr LONG riseValue = 0;
-    const DefaultValSetterLONG defVals[] = {
-                        {DTWAIN_DEFAULT, 0 , renderMode, &element.renderMode,DTWAIN_PDFTEXT_NORENDERMODE},
-                        {riseValue, 0 , riseValue, &element.riseValue,1},
-                        {DTWAIN_DEFAULT, 0 , colorRGB, &element.colorRGB, DTWAIN_PDFTEXT_NORGBCOLOR},
-                        {static_cast<LONG>(Flags), static_cast<int>(Flags), static_cast<LONG>(Flags), &element.displayFlags, 1}
-    };
+        PDFTextElement element;
+        constexpr LONG riseValue = 0;
+        const DefaultValSetterLONG defVals[] = {
+                            {DTWAIN_DEFAULT, 0 , renderMode, &element.renderMode,DTWAIN_PDFTEXT_NORENDERMODE},
+                            {riseValue, 0 , riseValue, &element.riseValue,1},
+                            {DTWAIN_DEFAULT, 0 , colorRGB, &element.colorRGB, DTWAIN_PDFTEXT_NORGBCOLOR},
+                            {static_cast<LONG>(Flags), static_cast<int>(Flags), static_cast<LONG>(Flags), &element.displayFlags, 1}
+        };
 
-    const DefaultValSetterDOUBLE defValsDOUBLE[] = {
-                         {fontSize, 10.0 , fontSize, &element.fontSize, DTWAIN_PDFTEXT_NOFONTSIZE},
-                         {DTWAIN_FLOATDEFAULT, 100.0 , scaling, &element.scaling, DTWAIN_PDFTEXT_NOSCALING},
-                         {DTWAIN_FLOATDEFAULT, 0.0 , wordSpacing, &element.wordSpacing, DTWAIN_PDFTEXT_NOWORDSPACING},
-                         {DTWAIN_FLOATDEFAULT, 0.0 , charSpacing, &element.charSpacing, DTWAIN_PDFTEXT_NOCHARSPACING},
-                          {DTWAIN_FLOATDEFAULT, 1.0 , strokeWidth, &element.strokeWidth,DTWAIN_PDFTEXT_NOSTROKEWIDTH},
-    };
+        const DefaultValSetterDOUBLE defValsDOUBLE[] = {
+                             {fontSize, 10.0 , fontSize, &element.fontSize, DTWAIN_PDFTEXT_NOFONTSIZE},
+                             {DTWAIN_FLOATDEFAULT, 100.0 , scaling, &element.scaling, DTWAIN_PDFTEXT_NOSCALING},
+                             {DTWAIN_FLOATDEFAULT, 0.0 , wordSpacing, &element.wordSpacing, DTWAIN_PDFTEXT_NOWORDSPACING},
+                             {DTWAIN_FLOATDEFAULT, 0.0 , charSpacing, &element.charSpacing, DTWAIN_PDFTEXT_NOCHARSPACING},
+                              {DTWAIN_FLOATDEFAULT, 1.0 , strokeWidth, &element.strokeWidth,DTWAIN_PDFTEXT_NOSTROKEWIDTH},
+        };
 
-    constexpr size_t numDefVals = std::size(defVals);
-    constexpr size_t numDefValsDOUBLE = std::size(defValsDOUBLE);
+        constexpr size_t numDefVals = std::size(defVals);
+        constexpr size_t numDefValsDOUBLE = std::size(defValsDOUBLE);
 
-    element.m_text = StringConversion::Convert_NativePtr_To_Ansi(szText);
-    element.xpos = xPos;
-    element.ypos = yPos;
-    std::string sFontName = "Helvetica";
-    if (!fontName)
-        element.m_font.m_fontName = sFontName;
-    else
-        element.m_font.m_fontName = StringConversion::Convert_NativePtr_To_Ansi(fontName);
-
-    for (const auto& defVal : defVals)
-    {
-        if (Flags & defVal.flagValue)
-            *defVal.pDestination = defVal.DefaultValue;
+        element.m_text = StringConversion::Convert_NativePtr_To_Ansi(szText);
+        element.xpos = xPos;
+        element.ypos = yPos;
+        std::string sFontName = "Helvetica";
+        if (!fontName)
+            element.m_font.m_fontName = sFontName;
         else
-            *defVal.pDestination = defVal.pSource;
-    }
+            element.m_font.m_fontName = StringConversion::Convert_NativePtr_To_Ansi(fontName);
 
-    for (const auto& i : defValsDOUBLE)
-    {
-        if (Flags & i.flagValue)
-            *i.pDestination = i.DefaultValue;
+        for (const auto& defVal : defVals)
+        {
+            if (Flags & defVal.flagValue)
+                *defVal.pDestination = defVal.DefaultValue;
+            else
+                *defVal.pDestination = defVal.pSource;
+        }
+
+        for (const auto& i : defValsDOUBLE)
+        {
+            if (Flags & i.flagValue)
+                *i.pDestination = i.DefaultValue;
+            else
+                *i.pDestination = i.pSource;
+        }
+
+        /* Now get the position */
+        if (Flags & DTWAIN_PDFTEXT_NOABSPOSITION)
+            element.stockPosition = Flags & 0x000FFF00;
+
+        if (!pTextElement)
+        {
+            auto pPtr = std::make_shared<PDFTextElement>();
+
+            auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_PDFTEXTELEMENTS);
+            guidMap.Insert(StringWrapperA::GenerateUUIDv4(), pPtr.get());
+
+            *pPtr = element;
+            // Add to the global list
+            auto& globalTextElementList = CTL_StaticData::GetPDFTextElementList();
+            globalTextElementList.push_back(pPtr);
+
+            if (pSource)
+                // Now point the source to this item
+                pSource->SetPDFValue(PDFTEXTELEMENTKEY, pPtr);
+
+            // Set the "has already been displayed" to false
+            pPtr->hasBeenDisplayed = false;
+            pPtr->displayFlags = Flags;
+            return pPtr;
+        }
         else
-            *i.pDestination = i.pSource;
+        {
+            pTextElement->hasBeenDisplayed = false;
+            if (pSource)
+                pSource->SetPDFValue(PDFTEXTELEMENTKEY, pTextElement);
+            pTextElement->displayFlags = Flags;
+        }
+        return pTextElement;
     }
-
-    /* Now get the position */
-    if (Flags & DTWAIN_PDFTEXT_NOABSPOSITION)
-        element.stockPosition = Flags & 0x000FFF00;
-
-    if (!pTextElement)
-    {
-        auto pPtr = std::make_shared<PDFTextElement>();
-
-        auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_PDFTEXTELEMENTS);
-        guidMap.Insert(StringWrapperA::GenerateUUIDv4(), pPtr.get());
-
-        *pPtr = element;
-        // Add to the global list
-        auto& globalTextElementList = CTL_StaticData::GetPDFTextElementList();
-        globalTextElementList.push_back(pPtr);
-
-        if ( pSource )
-            // Now point the source to this item
-            pSource->SetPDFValue(PDFTEXTELEMENTKEY, pPtr);
-
-        // Set the "has already been displayed" to false
-        pPtr->hasBeenDisplayed = false;
-        pPtr->displayFlags = Flags;
-        return pPtr;
-    }
-    else
-    {
-        pTextElement->hasBeenDisplayed = false;
-        if ( pSource )
-            pSource->SetPDFValue(PDFTEXTELEMENTKEY, pTextElement);
-        pTextElement->displayFlags = Flags;
-    }
-    return pTextElement;
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement)

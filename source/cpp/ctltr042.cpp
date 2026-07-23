@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr042.h"
-#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 CTL_TwainDirectTriplet::CTL_TwainDirectTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_TwainDirect{}

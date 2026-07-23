@@ -78,8 +78,8 @@ private:
     void emit_byte(uint8_t b);
     void emit_word(uint8_t a, uint8_t b);
     bool encode_rle8();
-    int RLEEncodeLineLikeFreeImage(uint8_t* target, const uint8_t* source, int size);
-    bool write_bmp_file();
+    static int RLEEncodeLineLikeFreeImage(uint8_t* target, const uint8_t* source, int size);
+    bool write_bmp_file() const;
 
 private:
     FILE* file_ = nullptr;

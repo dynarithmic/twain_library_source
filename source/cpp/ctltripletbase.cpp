@@ -59,7 +59,7 @@ bool CTL_TwainTriplet::InitGeneric(CTL_ITwainSession* pSession, CTL_ITwainSource
     const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
 
     // Only Initialize if App Manager is valid
-    if (pMgr && pMgr->IsValidTwainSession(pSession))
+    if (pMgr && CTL_TwainAppMgr::IsValidTwainSession(pSession))
     {
         Init(pSession?pSession->GetAppIDPtr():nullptr,
             pSource?pSource->GetSourceIDPtr():nullptr,

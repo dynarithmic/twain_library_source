@@ -26,26 +26,32 @@
 
 #include <cstdio>
 #include <algorithm>
-#include <set>
 #include <memory>
 #include <sstream>
 #include <array>
-#include <boost/format.hpp>
 #include <boost/dll/shared_library.hpp>
-#include "dtwain_resource_constants.h"
-#include "dtwain_filesystem.h"
-#include "dtwain.h"
-#include "ctltrall.h"
-#include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "dtwinverex.h"
-#include "cppfunc.h"
 #include "logwriterutils.h"
 #include "ctltripletbase.h"
 #include "ctlconstexprutils.h"
 #include "ctlstringutils.h"
 #include "ctldib32ex.h"
+#include "ctltr000.h"
+#include "ctltr001.h"
+#include "ctltr007.h"
+#include "ctltr008.h"
+#include "ctltr021.h"
+#include "ctltr025.h"
+#include "ctltr026.h"
+#include "ctltr028.h"
+#include "ctltr029.h"
+#include "ctltr030.h"
+#include "ctltr031.h"
+#include "ctltr032.h"
+#include "ctltr039.h"
+#include "ctltr043.h"
 
 using namespace dynarithmic;
 
@@ -1448,7 +1454,7 @@ void CTL_TwainAppMgr::SetError(int nError, std::string_view extraInfo, bool bMus
     s_nLastError    = nError;
 
     // Replace any placeholders with information from replacementArgs
-    ReplacePlaceHolders(s_strLastError, replacementArgs);
+    s_strLastError = ReplacePlaceHolders(s_strLastError, replacementArgs);
 
     CTL_StaticData::GetExtraErrorInfoMap()[abs(s_nLastError)] = extraInfo;
     if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USEBUFFER )
@@ -2423,41 +2429,44 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
     }
 }
 
-struct TripletSaveRestore
+namespace
 {
-    const CTL_TwainTriplet **pTrip = nullptr;
-    TripletSaveRestore(const CTL_TwainTriplet** p) : pTrip(p) {}
-    ~TripletSaveRestore()
+    struct TripletSaveRestore
     {
-        if ( pTrip && *pTrip )
-            *pTrip = nullptr;
-    }
-};
+        const CTL_TwainTriplet** pTrip = nullptr;
+        TripletSaveRestore(const CTL_TwainTriplet** p) : pTrip(p) {}
+        ~TripletSaveRestore()
+        {
+            if (pTrip && *pTrip)
+                *pTrip = nullptr;
+        }
+    };
 
 
-struct DSMCallResult
-{
-    TW_UINT16 retcode = TWRC_FAILURE;
-    DWORD exceptionCode = 0;
-    bool sehException = false;
-};
-
-static DSMCallResult SafeDSMEntryCall( DSMENTRYPROC lpDSMEntry, pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, 
-                                       TW_UINT32 nDG,TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF pData)
-{
-    DSMCallResult result;
-
-    __try
+    struct DSMCallResult
     {
-        result.retcode = (*lpDSMEntry)( pOrigin, pDest, nDG, nDAT, nMSG, pData);
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
+        TW_UINT16 retcode = TWRC_FAILURE;
+        DWORD exceptionCode = 0;
+        bool sehException = false;
+    };
+
+    DSMCallResult SafeDSMEntryCall(DSMENTRYPROC lpDSMEntry, pTW_IDENTITY pOrigin, pTW_IDENTITY pDest,
+        TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF pData)
     {
-        result.retcode = TWRC_FAILURE;
-        result.exceptionCode = GetExceptionCode();
-        result.sehException = true;
+        DSMCallResult result;
+
+        __try
+        {
+            result.retcode = (*lpDSMEntry)(pOrigin, pDest, nDG, nDAT, nMSG, pData);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result.retcode = TWRC_FAILURE;
+            result.exceptionCode = GetExceptionCode();
+            result.sehException = true;
+        }
+        return result;
     }
-    return result;
 }
 
 TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
@@ -2569,7 +2578,9 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
             std::ostringstream strm;
             sz = e.GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
             s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
-            strm << boost::format("%1%=%2% (%3%)\n%4%") % GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT) % retcode % sz % s;
+            strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4",
+                { GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT),
+                                  std::to_string(retcode),sz, s });
             LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
         }
         return retcode;
@@ -2585,10 +2596,9 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         std::string sz;
         std::ostringstream strm;
         s =  e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
-        sz = e.GetTWAINDSMError(retcode);
+        sz = CTL_TWAINDecoderStruct::GetTWAINDSMError(retcode);
         std::string s1 = GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT);
-        boost::format fmt("%1%=%2% (%3%)\n%4%\n");
-        strm << fmt % s1.c_str() % retcode % sz % s;
+        strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4\n", { s1, std::to_string(retcode), sz, s });
         LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
     if (retcode == TWRC_FAILURE || retcode == TWRC_CHECKSTATUS)

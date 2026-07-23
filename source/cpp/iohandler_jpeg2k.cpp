@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctliface.h"
 #include "jpeg2kwriter.h"
 #include "iohandler_jpeg2k.h"
 #include "ctldib32ex.h"

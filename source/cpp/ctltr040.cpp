@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr040.h"
-#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 CTL_DSMCallbackTriplet::CTL_DSMCallbackTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, TW_UINT16 msg) : 

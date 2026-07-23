@@ -42,7 +42,42 @@ namespace dynarithmic
     std::vector<unsigned char> HexStringToByteArray(std::string_view hexString);
 
     // Search and replace %1, %2, etc. placeholders with data
-    std::string& ReplacePlaceHolders(std::string& sOrigString, const std::vector<std::string>& vReplacements);
+    template <typename StringType, typename Container=std::vector<StringType>>
+    StringType ReplacePlaceHolders(const StringType& fmt, const Container& values)
+    {
+        using char_type = typename StringType::value_type;
+
+        StringType result;
+        result.reserve(fmt.size());
+
+        for (std::size_t i = 0; i < fmt.size(); ++i)
+        {
+            if (fmt[i] == char_type('%') && i + 1 < fmt.size())
+            {
+                std::size_t j = i + 1;
+                std::size_t index = 0;
+
+                while (j < fmt.size() &&
+                    fmt[j] >= char_type('0') &&
+                    fmt[j] <= char_type('9'))
+                {
+                    index = (index * 10) + static_cast<std::size_t>(fmt[j] - char_type('0'));
+                    ++j;
+                }
+
+                if (index >= 1 && index <= values.size())
+                {
+                    result += values[index - 1];
+                    i = j - 1;
+                    continue;
+                }
+            }
+
+            result += fmt[i];
+        }
+
+        return result;
+    }
 }
 #endif
 

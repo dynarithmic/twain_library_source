@@ -56,8 +56,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFCompressType(DTWAIN_SOURCE Source, LONG S
 
     DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !bIsCurTiff;}, DTWAIN_ERR_FILE_FORMAT, false, FUNC_MACRO);
 
-    const bool bIsTiffMulti = dynarithmic::IsFileTypeMultiPage(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
-    if (bIsTiffMulti)
+    if (dynarithmic::IsFileTypeMultiPage(static_cast<CTL_TwainFileFormatEnum>(curAcquireType)))
         acquireFileStatus.SetAcquireFileFormat(dynarithmic::GetMultiPageType(static_cast<CTL_TwainFileFormatEnum>(Setting)));
     else
         acquireFileStatus.SetAcquireFileFormat(static_cast<CTL_TwainFileFormatEnum>(Setting));
