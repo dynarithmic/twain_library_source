@@ -562,7 +562,6 @@ namespace dynarithmic
         SourcePaperDetectableMap s_SourcePaperDetectableMap;
         SourceSheetcountMap      s_SourceSheetcountList;
         SourceToUIAutocloseMap   s_SourceToAutocloseMap;
-        CTL_StringType           s_ApplicationName;
 
         CTL_StaticDataStruct();
     };
@@ -664,7 +663,6 @@ namespace dynarithmic
         static SourceSheetcountMap& GetSourceSheetcountMap() { return s_StaticData.s_SourceSheetcountList; }
         static SourceToUIAutocloseMap& GetSourceToUIAutocloseMap() { return s_StaticData.s_SourceToAutocloseMap; }
         static CTL_StringType& GetFileParseDelimiters() { return s_StaticData.s_FileParseDelimiters; }
-        static CTL_StringType& GetApplicationName() { return s_StaticData.s_ApplicationName;  }
     };
 
     struct CTL_LoggerCallbackInfo
