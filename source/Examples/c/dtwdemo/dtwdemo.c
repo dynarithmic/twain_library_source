@@ -1464,7 +1464,7 @@ void WaitLoop()
 
 LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserData)
 {
-    static pdf_page_count = 1;
+    static int pdf_page_count = 1;
     switch (wParam)
     {
         case DTWAIN_TN_ACQUIRESTARTED:
