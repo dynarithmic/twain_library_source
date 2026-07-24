@@ -897,7 +897,11 @@ DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& initOptions)
     }
     CTL_StaticData::GetLogFilterFlags() = 0;
     CTL_StaticData::s_nRegisteredDTWAINMsg = ::RegisterWindowMessage(REGISTERED_DTWAIN_MSG);
-#endif
+#else
+    auto& sAppName = CTL_StaticData::GetApplicationName();
+    if ( sAppName.empty() )
+        sAppName = StringWrapper::GetModuleFileName(nullptr);
+#endif    
     LOG_FUNC_ENTRY_PARAMS(())
 
     CTL_TwainDLLHandlePtr pHandlePtr;
@@ -2385,14 +2389,15 @@ CTL_StringType dynarithmic::GetVersionString()
             sStatic += "\n";
         }
 
-        strm << sStatic << "Dynarithmic TWAIN Library, Version " << lMajor << "." << lMinor << " - " << s << " (Patch Level "
-            << lPatch << ") Internal Build Number: " << StringConversion::Convert_Native_To_Ansi(GetDTWAINInternalBuildNumber()) << "\n" << 
+        auto appName = StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetApplicationName());
+        strm << sStatic << "Dynarithmic TWAIN Library, Version " << DTWAIN_VERINFO_FILEVERSION << " " << s << "\n" << 
             "Shared Library path : " <<  StringConversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
-        strm << "\nUsing Resource file (twaininfo.txt) version: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourceVersion());
+        strm << "\nUsing Resource file (twaininfo.txt) version: " << DTWAIN_TEXTRESOURCE_FILEVERSION;
         strm << "\nResource file path: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourcePath());
         strm << "\nText Resource Language: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetGeneralResourceInfo().sResourceName);
         if (CTL_StaticData::GetGeneralResourceInfo().bIsFromRC)
             strm << " (Text resources are directly from DTWAIN DLL and not from a text resource file)";
+        strm << "\nApplication Name: " << appName;
         verString = StringConversion::Convert_Ansi_To_Native(strm.str());
         return verString;
     }
