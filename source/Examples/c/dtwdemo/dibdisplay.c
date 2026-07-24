@@ -158,7 +158,18 @@ LRESULT CALLBACK DisplayDIBProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
                 SetWindowText(hwndOk, _T("Keep"));
                 SetWindowText(hwndCancel, _T("Discard"));
             }
-               return TRUE;
+
+            SetForegroundWindow(hDlg);
+            SetWindowPos(hDlg,       // handle to window
+                HWND_TOPMOST,  // placement-order handle
+                0,     // horizontal position
+                0,      // vertical position
+                0,  // width
+                0, // height
+                SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE// window-positioning options
+            );
+
+            return TRUE;
         }
 
     case WM_PAINT:
