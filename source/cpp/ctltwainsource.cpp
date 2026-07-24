@@ -1191,7 +1191,8 @@ void CTL_ITwainSource::DeleteDuplexFiles(int nWhich)
         pData = &m_DuplexFileData.first;
     else
         pData = &m_DuplexFileData.second;
-    for_each(pData->begin(), pData->end(), [](const sDuplexFileData& Data) {delete_file(Data.sFileName.c_str()); });
+    for_each(pData->begin(), pData->end(), [](const sDuplexFileData& Data) 
+        {dynarithmic::fileutils::delete_file(Data.sFileName.c_str()); });
 }
 
 unsigned long CTL_ITwainSource::GetNumDuplexFiles(int nWhich) const

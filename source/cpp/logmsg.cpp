@@ -96,7 +96,7 @@ namespace dynarithmic
         if (fTraits.m_bCreateDirectory)
         {
             // auto-create the directory
-            const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(fTraits.m_filename.c_str(), false).c_str());
+            const auto dirCreated = dynarithmic::fileutils::create_directory(dynarithmic::fileutils::get_parent_directory(fTraits.m_filename.c_str(), false).c_str());
             if (!dirCreated.first)
             {
                 m_bFileCreated = false;

@@ -434,7 +434,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                                 acquireFileStatus.SetLastAcquiredFileName( strTempFile );
 
                             // Remove the temporary file
-                            if (delete_file(acquireFileStatus.GetAcquireFileName().c_str()))
+                            if (dynarithmic::fileutils::delete_file(acquireFileStatus.GetAcquireFileName().c_str()))
                                 acquireFileStatus.SetAcquireFileName(StringWrapper::traits_type::GetEmptyString());
 
                         }
@@ -1165,7 +1165,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
         {
             // Copy default file name to the new file
             // Check if default file exists
-            if (file_exists( acquireFileStatus.GetAcquireFileName().c_str()))
+            if (dynarithmic::fileutils::file_exists( acquireFileStatus.GetAcquireFileName().c_str()))
                 CTL_TwainAppMgr::CopyFile(acquireFileStatus.GetAcquireFileName(), strTempFile);
             else
                 return 0;

@@ -210,7 +210,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if (isFirstPage)
     {
         // Attempt to delete the file
-        if (!delete_file(sActualFileName.c_str()))
+        if (!dynarithmic::fileutils::delete_file(sActualFileName.c_str()))
             LogWriterUtils::WriteLogInfoIndentedA("Could not delete existing file " + StringConversion::Convert_Native_To_Ansi(sActualFileName));
     }
 

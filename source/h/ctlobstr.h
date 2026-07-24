@@ -115,6 +115,72 @@ namespace dynarithmic
     #define STRINGWRAPPER_QUALIFIER StringWrapper::
     #define STRINGWRAPPER_PREFIX StringWrapper::
 
+
+    namespace
+    {
+        struct WindowsWideFuncImpl
+        {
+            static UINT GetWindowsDirectory(LPWSTR lpBuffer, UINT uSize)
+            {
+                return ::GetWindowsDirectoryW(&lpBuffer[0], uSize);
+            }
+
+            static UINT GetSystemDirectory(LPWSTR lpBuffer, UINT uSize)
+            {
+                return ::GetSystemDirectoryW(&lpBuffer[0], uSize);
+            }
+
+            static DWORD GetModuleFileName(HMODULE hModule, LPWSTR lpBuffer, DWORD nSize)
+            {
+                return ::GetModuleFileNameW(hModule, &lpBuffer[0], nSize);
+            }
+        };
+
+        struct WindowsAnsiFuncImpl
+        {
+            static UINT GetWindowsDirectory(LPSTR lpBuffer, UINT uSize)
+            {
+                return ::GetWindowsDirectoryA(&lpBuffer[0], uSize);
+            }
+
+            static UINT GetSystemDirectory(LPSTR lpBuffer, UINT uSize)
+            {
+                return ::GetSystemDirectoryA(&lpBuffer[0], uSize);
+            }
+
+            static DWORD GetModuleFileName(HMODULE hModule, LPSTR lpBuffer, DWORD nSize)
+            {
+                return ::GetModuleFileNameA(hModule, &lpBuffer[0], nSize);
+            }
+        };
+
+        template <typename string_type, typename WinAPITraits>
+        struct WindowsAPIImpl
+        {
+            static UINT GetWindowsDirectoryImpl(string_type& buffer)
+            {
+                buffer.resize(_MAX_PATH);
+                auto nSize = WinAPITraits::GetWindowsDirectory(&buffer[0], _MAX_PATH);
+                buffer.resize(nSize);
+                return nSize;
+            }
+            static UINT GetSystemDirectoryImpl(string_type& buffer)
+            {
+                buffer.resize(_MAX_PATH);
+                auto nSize = WinAPITraits::GetSystemDirectory(&buffer[0], _MAX_PATH);
+                buffer.resize(nSize);
+                return nSize;
+            }
+            static DWORD GetModuleFileNameImpl(HMODULE hModule, string_type& lpFileName, DWORD nSize)
+            {
+                lpFileName.resize(nSize);
+                auto actualSize = WinAPITraits::GetModuleFileName(hModule, &lpFileName[0], nSize);
+                lpFileName.resize(std::min(nSize, actualSize));
+                return actualSize;
+            }
+        };
+    }
+
     struct ANSIStringTraits
     {
         using char_type = char;
@@ -130,6 +196,7 @@ namespace dynarithmic
         using baseinputstream_type = std::istream;
 
         using FILESYSTEM_PATHTYPE = filesys::path;
+        using winapiimpl_type = WindowsAPIImpl<string_type, WindowsAnsiFuncImpl>;
 
         template <typename T>
         static std::string PathGenericString(const T& x) { return x.generic_string(); }
@@ -210,34 +277,6 @@ namespace dynarithmic
         }
 
         #ifdef _WIN32
-        static UINT GetWindowsDirectoryImpl(char_type* buffer)
-                    { return GetWindowsDirectoryA(buffer, _MAX_PATH); }
-        static UINT GetSystemDirectoryImpl(char_type* buffer)
-                    { return GetSystemDirectoryA(buffer, _MAX_PATH); }
-        static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
-                    { return GetModuleFileNameA(hModule, lpFileName, nSize); }
-        static UINT GetWindowsDirectoryImpl(string_type& buffer)
-        {
-            buffer.resize(_MAX_PATH);
-            auto nSize = GetWindowsDirectoryA(&buffer[0], _MAX_PATH);
-            buffer.resize(nSize);
-            return nSize;
-        }
-        static UINT GetSystemDirectoryImpl(string_type& buffer)
-        {
-            buffer.resize(_MAX_PATH);
-            auto nSize = GetSystemDirectoryA(&buffer[0], _MAX_PATH);
-            buffer.resize(nSize);
-            return nSize;
-        }
-        static DWORD GetModuleFileNameImpl(HMODULE hModule, string_type& lpFileName, DWORD nSize)
-        {
-            lpFileName.resize(nSize);
-            auto actualSize = GetModuleFileNameA(hModule, &lpFileName[0], nSize);
-            if (actualSize < nSize)
-                lpFileName.resize(actualSize);
-            return actualSize;
-        }
         #else
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
         { getcwd(buffer, 8096); return 1; }
@@ -277,6 +316,7 @@ namespace dynarithmic
         using baseinputstream_type = std::wistream;
 
         using FILESYSTEM_PATHTYPE = filesys::path;
+        using winapiimpl_type = WindowsAPIImpl<string_type, WindowsWideFuncImpl>;
 
         template <typename T>
         static std::wstring PathGenericString(const T& x) { return x.generic_wstring(); }
@@ -359,37 +399,6 @@ namespace dynarithmic
         }
 
         #ifdef _WIN32
-        static UINT GetWindowsDirectoryImpl(char_type* buffer)
-        { return GetWindowsDirectoryW(buffer, _MAX_PATH); }
-        static UINT GetSystemDirectoryImpl(char_type* buffer)
-        { return GetSystemDirectoryW(buffer, _MAX_PATH); }
-        static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
-        { return GetModuleFileNameW(hModule, lpFileName, nSize); }
-
-        static UINT GetWindowsDirectoryImpl(string_type& buffer)
-        {
-            buffer.resize(_MAX_PATH);
-            auto nSize = GetWindowsDirectoryW(&buffer[0], _MAX_PATH);
-            buffer.resize(nSize);
-            return nSize;
-        }
-
-        static UINT GetSystemDirectoryImpl(string_type& buffer)
-        {
-            buffer.resize(_MAX_PATH);
-            auto nSize = GetSystemDirectoryW(&buffer[0], _MAX_PATH);
-            buffer.resize(nSize);
-            return nSize;
-        }
-
-        static DWORD GetModuleFileNameImpl(HMODULE hModule, string_type& lpFileName, DWORD nSize)
-        {
-            lpFileName.resize(nSize);
-            auto actualSize = GetModuleFileNameW(hModule, &lpFileName[0], nSize);
-            if (actualSize < nSize)
-                lpFileName.resize(actualSize);
-            return actualSize;
-        }
         #else
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
         {
@@ -875,19 +884,28 @@ namespace dynarithmic
         static StringType GetWindowsDirectory()
         {
             StringType buffer;
-            const UINT retValue = StringTraits::GetWindowsDirectoryImpl(buffer);
+            const UINT retValue = StringTraits::winapiimpl_type::GetWindowsDirectoryImpl(buffer);
             if ( retValue != 0 )
                 return buffer;
-            return StringTraits::GetEmptyString();
+            return {};
         }
 
         static StringType GetSystemDirectory()
         {
             StringType buffer;
-            const UINT retValue = StringTraits::GetSystemDirectoryImpl(buffer);
+            const UINT retValue = StringTraits::winapiimpl_type::GetSystemDirectoryImpl(buffer);
             if ( retValue != 0 )
                 return buffer;
-            return StringTraits::GetEmptyString();
+            return {};
+        }
+
+        static StringType GetModuleFileName(HMODULE hModule)
+        {
+            StringType buffer; 
+            const UINT retValue = StringTraits::winapiimpl_type::GetModuleFileNameImpl(hModule, buffer, 32767);
+            if (retValue != 0)
+                return buffer;
+            return {};
         }
 
         static StringType AddBackslashToDirectory(typename StringTraits::stringview_type pathName)
@@ -966,21 +984,6 @@ namespace dynarithmic
         static StringType GetGUID()
         {
             return StringTraits::GetLeftCurlyBrace() + GenerateUUIDv4() + StringTraits::GetRightCurlyBrace();
-        }
-
-        static StringType GetModuleFileName(HMODULE hModule)
-        {
-            // Try 1024 bytes for the app name
-            StringType szName(1024,0);
-            DWORD nBytes = StringTraits::GetModuleFileNameImpl(hModule, szName, 1024);
-
-            // Get the file name safely
-            if (nBytes > 1024)
-            {
-                szName.resize(nBytes + 1, 0);
-                StringTraits::GetModuleFileNameImpl(hModule, szName, nBytes);
-            }
-            return szName;
         }
 
         static StringType ConvertToAPIString(const StringType& origString)

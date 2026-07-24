@@ -77,7 +77,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
             {
                 // Always delete the temporary file
                 if (m_pTextPageInfo && !m_pTextPageInfo->szTempFile.empty())
-                    delete_file(m_pTextPageInfo->szTempFile.c_str());
+                    dynarithmic::fileutils::delete_file(m_pTextPageInfo->szTempFile.c_str());
 
                 m_pTextPageInfo.reset();
                 try

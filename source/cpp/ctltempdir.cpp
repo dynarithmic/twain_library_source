@@ -56,7 +56,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
     {
         bool bLogMessages = (CTL_StaticData::GetLogFilterFlags()) ? true : false;
         CTL_StringType sTemp = StringWrapper::RemoveBackslashFromDirectory(szFilePath);
-        auto dirCreated = create_directory(sTemp.c_str());
+        auto dirCreated = dynarithmic::fileutils::create_directory(sTemp.c_str());
         if (!dirCreated.first)
         {
             if (bLogMessages)

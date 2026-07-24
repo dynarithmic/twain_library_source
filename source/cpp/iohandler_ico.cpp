@@ -76,7 +76,7 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
             return DTWAIN_ERR_INVALIDICONFORMAT;
     }
 
-    if (!parent_directory_exists(szFile).first)
+    if (!dynarithmic::fileutils::parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
 
     std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
