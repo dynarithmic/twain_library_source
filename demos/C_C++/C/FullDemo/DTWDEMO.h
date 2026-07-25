@@ -186,6 +186,7 @@
 #define ID_LANGUAGE_KOREAN              32784
 #define ID_LANGUAGE_GREEK               32785
 #define ID_LANGUAGE_TURKISH             32786
+#define ID_LANGUAGE_CANTONESE           32787  
 
 
 #endif

@@ -25,20 +25,6 @@
 #include "..\h\dtwain_resource_constants.h"
 #include "..\rc\twainresourcestrings_english.rc2"
 
-#ifndef RC_MSC_VER
-    #define DTWAIN_BUILD_COMPILER "Unknown Visual Studio"
-#else
-    #if RC_MSC_VER >= 1920 && RC_MSC_VER < 1930
-        #define DTWAIN_BUILD_COMPILER "Visual Studio 2019"
-    #elif RC_MSC_VER >= 1930 && RC_MSC_VER < 1940
-        #define DTWAIN_BUILD_COMPILER "Visual Studio 2022"
-    #elif RC_MSC_VER >= 1940 && RC_MSC_VER < 1950
-        #define DTWAIN_BUILD_COMPILER "Visual Studio 2022 version 17.1x"
-    #elif RC_MSC_VER >= 1950
-        #define DTWAIN_BUILD_COMPILER "Visual Studio 2026"
-    #endif
-#endif
-
 // Twain dialog
 IDC_DLGSELECTSOURCE DIALOG DISCARDABLE  0, 0, 214, 95
 STYLE  DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
