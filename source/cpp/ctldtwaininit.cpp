@@ -2355,10 +2355,7 @@ CTL_StringType dynarithmic::GetVersionString()
         if ( lVersionType & DTWAIN_64BIT_VERSION )
             sBits = "[64-bit]";
 
-        if (lVersionType & DTWAIN_UNICODE_VERSION)
-            s += " [Unicode]";
-        else
-            s += " [ANSI]";
+        s += std::string(" ") + DTWAIN_VCRUNTIME_CHARSET;
 
         if (lVersionType & DTWAIN_DEVELOP_VERSION)
             s += " [Debug]";
