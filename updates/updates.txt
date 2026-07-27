@@ -15,6 +15,9 @@ DTWAIN Version changes
 - Fix issue with logging the Windows version if using Windows Server Enterprise Edition.
 
 - Add Cantonese string resources.
+
+- Update DTWAIN versioning to add build number to version string 
+  (e.g. 5.9.3.x, where "x" is the build number for version 5.9.3)
  
 
 5.9.2 Update 1
