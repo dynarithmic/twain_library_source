@@ -66,7 +66,7 @@ int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     else
         return DTWAIN_ERR_INVALIDWBMP; 
 
-    if (!parent_directory_exists(szFile).first)
+    if (!dynarithmic::fileutils::parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
 
     WbmpSessionOptions opts{};

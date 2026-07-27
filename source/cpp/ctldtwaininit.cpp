@@ -1507,11 +1507,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
     HWND hWndMsg;
 #endif
 
-#ifdef _UNICODE
-    const CTL_StringType szName = boost::dll::symbol_location(DTWAIN_DLLNAME).wstring();
-#else
-    CTL_StringType szName = boost::dll::symbol_location(DTWAIN_DLLNAME).string();
-#endif
+    const CTL_StringType szName = GetDTWAINExecutionPath(); // ::dll::symbol_location(DTWAIN_DLLNAME).wstring();
 
     // See if we need to create a TWAIN application manager
     if ( !CTL_TwainAppMgr::GetInstance() )
@@ -1542,8 +1538,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
     #else
     CTL_TwainAppMgr::SetDLLInstance( static_cast<HINSTANCE>(GetDLLInstance()) );
     #endif
-
-    pHandle->m_pAppMgr     = CTL_TwainAppMgr::GetInstance().get();
+    auto appInstance = CTL_TwainAppMgr::GetInstance();
+    pHandle->m_pAppMgr = appInstance.get();
     pHandle->m_pTwainSession = Session;
     pHandle->m_hInstance   = hInstance;
 
@@ -2323,33 +2319,25 @@ LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(LPTSTR lpszBuffer, LONG nMaxLen)
 
 CTL_StringType dynarithmic::GetDTWAINExecutionPath()
 {
-    const auto symlocation = boost::dll::symbol_location(DTWAIN_DLLNAME);
-    #ifdef _UNICODE
-    CTL_StringType szName = symlocation.parent_path().wstring();
-    #else
-    CTL_StringType szName = symlocation.parent_path().string();
-    #endif
-    return szName;
+    // Get the total path name.
+    dynarithmic::GetDTWAINDLLPath();
+
+    // Return the parent directory of the executable
+    return CTL_StaticData::GetDLLParentPath();
 }
 
+// Gets the entire path, including file name of the loaded DTWAIN DLL.
 CTL_StringType dynarithmic::GetDTWAINDLLPath()
 {
     auto& dllPath = CTL_StaticData::GetDLLPath();
     if (!dllPath.empty())
         return dllPath;
-    size_t initialSize = 1024;
-    while (true)
-    {
-        dllPath.resize(initialSize + 1);
-        auto nChars = boost::winapi::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle(), dllPath.data(), initialSize);
-        if (::GetLastError() != ERROR_INSUFFICIENT_BUFFER || initialSize >= 8192)
-        {
-            dllPath.resize(nChars);
-            return dllPath;
-        }
-        initialSize += 1000;
-    }
-    return {};
+    dllPath = StringWrapper::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle());
+
+    // Also remember the parent path.
+    auto& dllParentPath = CTL_StaticData::GetDLLParentPath();
+    dllParentPath = dynarithmic::fileutils::get_parent_directory(dllPath.c_str(), false);
+    return dllPath;
 }
 
 CTL_StringType dynarithmic::GetVersionString()
@@ -2367,10 +2355,7 @@ CTL_StringType dynarithmic::GetVersionString()
         if ( lVersionType & DTWAIN_64BIT_VERSION )
             sBits = "[64-bit]";
 
-        if (lVersionType & DTWAIN_UNICODE_VERSION)
-            s += " [Unicode]";
-        else
-            s += " [ANSI]";
+        s += std::string(" ") + DTWAIN_VCRUNTIME_CHARSET;
 
         if (lVersionType & DTWAIN_DEVELOP_VERSION)
             s += " [Debug]";
@@ -2489,7 +2474,7 @@ CTL_StringType dynarithmic::GetDTWAINTempFilePath(CTL_TwainDLLHandle* pHandle)
         return sDummy;
     if ( pHandle->m_sTempFilePath.empty())
     {
-        const auto tempPath = temp_directory_path();
+        const auto tempPath = dynarithmic::fileutils::temp_directory_path();
         if (tempPath.empty())
         {
             std::string msg = GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": " + GetResourceStringFromMap(IDS_LOGMSG_TEMPFILENOTEXISTTEXT);

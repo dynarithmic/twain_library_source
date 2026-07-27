@@ -1131,7 +1131,7 @@ int TransymOCR::GetNumPagesInFile(CTL_StringType szFileName, int& errCode)
 
     // Set the mode to not show the message box
     m_SDK.TOCRSetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);
-    const int fExists = file_exists(szFileName.c_str());
+    const int fExists = dynarithmic::fileutils::file_exists(szFileName.c_str());
     bRet = m_SDK.TOCRGetNumPages(m_JobHandle, (char *)szFileName.c_str(), TOCRJOBTYPE_TIFFFILE, &nPages);
 
     // Set the old error mode back

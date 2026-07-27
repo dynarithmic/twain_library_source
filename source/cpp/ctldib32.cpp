@@ -481,7 +481,7 @@ int CTL_TwainDib::WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int 
         if ( !bSaveFile)
         {
             // remove the file
-            delete_file(s.strName.c_str());
+            dynarithmic::fileutils::delete_file(s.strName.c_str());
         }
     }
     else

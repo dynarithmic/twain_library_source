@@ -295,20 +295,20 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
             if (!bCreateDir)
             {
                 // Check for existing writable directory
-                if (!dynarithmic::directory_writeable(fileName.c_str()))
+                if (!dynarithmic::fileutils::directory_writeable(fileName.c_str()))
                 {
-                    LogWriterUtils::WriteLogInfoIndentedA(GetDirectoryCreationError(dynarithmic::get_parent_directory(fileName.c_str(), false)));
+                    LogWriterUtils::WriteLogInfoIndentedA(GetDirectoryCreationError(dynarithmic::fileutils::get_parent_directory(fileName.c_str(), false)));
                     DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{ return true; }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
                 }
             }
             else
             {
-                if (!parent_directory_exists(fileName.c_str()).first)
+                if (!dynarithmic::fileutils::parent_directory_exists(fileName.c_str()).first)
                 {
-                    auto testDir = dynarithmic::get_parent_directory(fileName.c_str(), false);
+                    auto testDir = dynarithmic::fileutils::get_parent_directory(fileName.c_str(), false);
 
                     // auto-create the directory
-                    const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(fileName.c_str(), false).c_str());
+                    const auto dirCreated = dynarithmic::fileutils::create_directory(testDir.c_str());
 
                     if (!dirCreated.first)
                     {

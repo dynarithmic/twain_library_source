@@ -348,7 +348,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                     if ( bRet != 0 )
                     {
                         LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempFileA);
-                        delete_file(szTempFile.c_str());
+                        dynarithmic::fileutils::delete_file(szTempFile.c_str());
                         return bRet;
                     }
                     else
@@ -418,7 +418,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
             CTL_TwainAppMgr::SendTwainMsgToWindow(m_ImageInfoEx.theSession, nullptr,
                 DTWAIN_TN_PDFOCRERROR, reinterpret_cast<LPARAM>(m_ImageInfoEx.theSource));
             bRet = DTWAIN_ERR_OCR_RECOGNITIONERROR;
-            delete_file(szTempFile.c_str());
+            dynarithmic::fileutils::delete_file(szTempFile.c_str());
         }
         else
         {
@@ -494,7 +494,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
 
     if ( bRet != 0 )
     {
-        delete_file( szTempFile.c_str() );
+        dynarithmic::fileutils::delete_file( szTempFile.c_str() );
     }
 
     if ( pMultiPageStruct )
@@ -643,7 +643,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
 
                 // Delete the temp file if we created one
                 if ( bMustConvert )
-                    delete_file(sFileToUse.c_str());
+                    dynarithmic::fileutils::delete_file(sFileToUse.c_str());
 
                 if ( bSave )
                 {

@@ -235,7 +235,7 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
 
     if (!pPDFInfo->m_Interface->DTWLIB_PDFWritePage(pPDFInfo->pPDFdoc, path))
     {
-        delete_file(path);
+        dynarithmic::fileutils::delete_file(path);
         pPDFInfo->m_Interface->DTWLIB_PDFReleaseDocument(pPDFInfo->pPDFdoc);
         pPDFInfo.reset();
         return DTWAIN_ERR_FILEWRITE;
@@ -243,7 +243,7 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
 
     // Add the file to the array for later deletion
     // delete the temporary file
-    delete_file(path);
+    dynarithmic::fileutils::delete_file(path);
 
     if ( m_MultiPageStruct.Stage == 0)
     {
@@ -361,7 +361,7 @@ void CPDFImageHandler::RemoveAllImageFiles(PDFINFO *pPDFInfo)
     auto it = pPDFInfo->TempFileArray.begin();
     while (it != pPDFInfo->TempFileArray.end())
     {
-        delete_file((*it).c_str());
+        dynarithmic::fileutils::delete_file((*it).c_str());
         ++it;
     }
 }

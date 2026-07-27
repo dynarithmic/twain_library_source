@@ -24,6 +24,20 @@
 #include "dtwain_config.h"
 #include "dtwain_version.h"
 
+#ifndef RC_MSC_VER
+    #define DTWAIN_BUILD_COMPILER "Unknown Visual Studio"
+#else
+    #if RC_MSC_VER >= 1920 && RC_MSC_VER < 1930
+        #define DTWAIN_BUILD_COMPILER "Visual Studio 2019"
+    #elif RC_MSC_VER >= 1930 && RC_MSC_VER < 1940
+        #define DTWAIN_BUILD_COMPILER "Visual Studio 2022"
+    #elif RC_MSC_VER >= 1940 && RC_MSC_VER < 1950
+        #define DTWAIN_BUILD_COMPILER "Visual Studio 2022 version 17.1x"
+    #elif RC_MSC_VER >= 1950
+        #define DTWAIN_BUILD_COMPILER "Visual Studio 2026"
+    #endif
+#endif
+
 #define DTWAIN_VERINFO_COMMENTS             DTWAIN_VERINFO_FILEVERSION 
 #define DTWAIN_VERINFO_COMPANYNAME          "Dynarithmic Software\0"
 #define DTWAIN_VERINFO_LEGALCOPYRIGHT       "Copyright © 2020-2026\0"

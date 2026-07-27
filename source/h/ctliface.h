@@ -528,6 +528,7 @@ namespace dynarithmic
         CTL_TwainConstantsMap s_TwainConstantsMap;
         CTL_StringType           s_strResourcePath;  // path to the DTWAIN resource strings
         CTL_StringType           s_DLLPath;
+        CTL_StringType           s_DLLParentPath;
         CTL_StringType           s_sINIPath;
         CTL_StringType           s_ShortVersionString;
         CTL_StringType           s_StartupDSMSearchOrder = _T("CWSOU");
@@ -595,6 +596,7 @@ namespace dynarithmic
         { 
             CTL_StaticDataStruct tempStruct; 
             tempStruct.s_DLLPath = s_StaticData.s_DLLPath;
+            tempStruct.s_DLLParentPath = s_StaticData.s_DLLParentPath;
             tempStruct.s_DLLInstance = s_StaticData.s_DLLInstance;
             tempStruct.s_StartupDSMSearchOrder = s_StaticData.s_StartupDSMSearchOrder;
             tempStruct.s_StartupDSMSearchOrderDir = s_StaticData.s_StartupDSMSearchOrderDir;
@@ -665,6 +667,7 @@ namespace dynarithmic
         static SourceToUIAutocloseMap& GetSourceToUIAutocloseMap() { return s_StaticData.s_SourceToAutocloseMap; }
         static CTL_StringType& GetFileParseDelimiters() { return s_StaticData.s_FileParseDelimiters; }
         static CTL_StringType& GetApplicationName() { return s_StaticData.s_ApplicationName;  }
+        static CTL_StringType& GetDLLParentPath() { return s_StaticData.s_DLLParentPath; }
     };
 
     struct CTL_LoggerCallbackInfo
