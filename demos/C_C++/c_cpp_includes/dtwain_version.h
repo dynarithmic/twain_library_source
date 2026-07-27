@@ -64,7 +64,7 @@
         #define UNICODE_VERSION "(Unicode)"
         #define UNICODE_SUFFIX  "u"
     #else
-        #define UNICODE_VERSION
+        #define UNICODE_VERSION "(ANSI)"
         #define UNICODE_SUFFIX ""
     #endif
 
