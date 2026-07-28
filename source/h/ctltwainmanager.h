@@ -423,9 +423,6 @@ namespace dynarithmic
 
             void DestroySession(const CTL_ITwainSession* pSession);
             void DestroyAllTwainSessions();
-            void WriteToLogFile(int rc);
-            void OpenLogFile(LPCSTR lpszFile);
-            void CloseLogFile();
             CTL_TwainDLLHandle* GetDLLHandle() const { return m_pDLLHandle; }
             static CTL_TwainSessionArray::iterator FindSession(const CTL_ITwainSession* pSession);
 

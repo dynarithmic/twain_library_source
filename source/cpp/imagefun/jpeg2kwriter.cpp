@@ -26,6 +26,8 @@
     #pragma warning (disable : 4244)
 #endif
 
+using namespace dynarithmic;
+
 std::optional<PreparedJpeg2000DibPage> Jpeg2000SessionWriter::MakePreparedJpeg2000Page(const dynarithmic::DibPageView& view)
 {
     if (!view.bits)

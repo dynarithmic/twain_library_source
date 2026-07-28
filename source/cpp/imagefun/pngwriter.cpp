@@ -31,7 +31,9 @@
     #pragma warning (disable : 4611)
 #endif
 
-std::optional<PreparedPngDibPage> PngSessionWriter::MakePreparedPngDibPage(const dynarithmic::DibPageView& view)
+using namespace dynarithmic;
+
+std::optional<PreparedPngDibPage> PngSessionWriter::MakePreparedPngDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;

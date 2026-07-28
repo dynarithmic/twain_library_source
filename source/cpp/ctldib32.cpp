@@ -161,7 +161,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
 {
     std::unique_ptr<CTL_ImageIOHandler> pHandler;
     ImageInfo.IsPDF = false;
-    ImageInfo.IsBigTiff = dynarithmic::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
+    ImageInfo.IsBigTiff = IsFileTypeBigTiff(static_cast<CTL_TwainFileFormatEnum>(nFormat));
     switch (nFormat )
     {
         case BmpFormat:
@@ -324,7 +324,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
 {
     CTL_ImageIOHandlerPtr pHandler;
     ImageInfo.IsPDF = false;
-    ImageInfo.IsBigTiff = dynarithmic::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
+    ImageInfo.IsBigTiff = IsFileTypeBigTiff(static_cast<CTL_TwainFileFormatEnum>(nFormat));
     nStatus = DTWAIN_NO_ERROR;
     switch (nFormat)
     {
@@ -481,7 +481,7 @@ int CTL_TwainDib::WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int 
         if ( !bSaveFile)
         {
             // remove the file
-            dynarithmic::fileutils::delete_file(s.strName.c_str());
+            fileutils::delete_file(s.strName.c_str());
         }
     }
     else
@@ -493,7 +493,7 @@ int CTL_TwainDib::WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int 
 WORD CTL_TwainDib::PaletteSize (void  *pv)
 {
     const auto lpbi = static_cast<LPBITMAPINFOHEADER>(pv);
-    return static_cast<WORD>(dynarithmic::dib::palette_entries(*lpbi) * sizeof(RGBQUAD));
+    return static_cast<WORD>(dib::palette_entries(*lpbi) * sizeof(RGBQUAD));
 }
 
 void CTL_TwainDib::Init()
@@ -529,21 +529,21 @@ int CTL_TwainDib::GetDepth() const
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if ( !hDib )
         return -1;
-    dynarithmic::dib::LockedDib dibHandle(hDib);
+    dib::LockedDib dibHandle(hDib);
     return dibHandle.BitsPerPixel();
 }
 
 int CTL_TwainDib::GetBitsPerPixel() const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
-    dynarithmic::dib::LockedDib dibHandle(hDib);
+    dib::LockedDib dibHandle(hDib);
     return dibHandle.BitsPerPixel();
 }
 
 int CTL_TwainDib::GetWidth() const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
-    dynarithmic::dib::LockedDib dibHandle(hDib);
+    dib::LockedDib dibHandle(hDib);
     return dibHandle.Width();
 }
 
@@ -551,7 +551,7 @@ int CTL_TwainDib::GetWidth() const
 int CTL_TwainDib::GetHeight() const
 {
    const HANDLE hDib = m_TwainDibInfo.GetDib();
-   dynarithmic::dib::LockedDib dibHandle(hDib);
+   dib::LockedDib dibHandle(hDib);
    return dibHandle.Height();
 }
 
@@ -565,8 +565,8 @@ int CTL_TwainDib::GetNumColors()  const
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if ( !hDib )
         return -1;
-    dynarithmic::dib::LockedDib dibHandle(hDib);
-    return dynarithmic::dib::palette_entries(*dibHandle.Header());
+    dib::LockedDib dibHandle(hDib);
+    return dib::palette_entries(*dibHandle.Header());
 }
 
 std::optional<DWORD> CTL_TwainDib::GetBitsOffset() const
@@ -574,7 +574,7 @@ std::optional<DWORD> CTL_TwainDib::GetBitsOffset() const
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if ( hDib )
     {
-        dynarithmic::dib::LockedDib dibHandle(hDib);
+        dib::LockedDib dibHandle(hDib);
         auto ptr_bits = dibHandle.Bits();
         DWORD offset = static_cast<DWORD>(static_cast<BYTE*>(ptr_bits) - reinterpret_cast<BYTE*>(dibHandle.HeaderMutable()));
         return offset;
@@ -735,7 +735,7 @@ HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
     fileheader.bfReserved1 = 0;
     fileheader.bfReserved2 = 0;
     fileheader.bfOffBits = static_cast<DWORD>(sizeof(BITMAPFILEHEADER)) +
-        lpbi->biSize + dynarithmic::dib::effective_palette_entries(static_cast<uint16_t>(bpp)) * sizeof(RGBQUAD);
+        lpbi->biSize + dib::effective_palette_entries(static_cast<uint16_t>(bpp)) * sizeof(RGBQUAD);
 
     // we need to attach the bitmap header info onto the data
     const size_t totalSize = ImageMemoryHandler::GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
@@ -960,7 +960,7 @@ bool CTL_TwainDibArray::DeleteDibMemory(CTL_TwainDibPtr Dib)
     return false;
 }
 
-bool CTL_TwainDibArray::DeleteDibMemory(size_t nWhere )
+bool CTL_TwainDibArray::DeleteDibMemory(size_t nWhere ) const
 {
     m_TwainDibArray[nWhere]->Delete();
     return true;

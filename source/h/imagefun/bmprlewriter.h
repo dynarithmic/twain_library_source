@@ -22,111 +22,87 @@ OF THIRD PARTY RIGHTS.
 #define BMPRLEWRITER_H
 
 #include <windows.h>
-
 #include <cstdint>
-#include <cstdio>
-#include <cstring>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 #include <optional>
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 
-// ============================================================
-// Prepared 8-bpp DIB page for BMP-RLE8 output
-// ============================================================
-
-struct PreparedBmpRle8Page
+namespace dynarithmic
 {
-    uint32_t width = 0;
-    uint32_t height = 0;
-    uint16_t bitsPerPixel = 8;
-    uint32_t strideBytes = 0;
-    bool bottomUp = true;
+    // ============================================================
+    // Prepared 8-bpp DIB page for BMP-RLE8 output
+    // ============================================================
 
-    const uint8_t* bits = nullptr;
+    struct PreparedBmpRle8Page
+    {
+        uint32_t width = 0;
+        uint32_t height = 0;
+        uint16_t bitsPerPixel = 8;
+        uint32_t strideBytes = 0;
+        bool bottomUp = true;
 
-    const RGBQUAD* palette = nullptr;
-    uint32_t paletteEntries = 0;
+        const uint8_t* bits = nullptr;
 
-    int32_t xPelsPerMeter = 0;
-    int32_t yPelsPerMeter = 0;
-};
+        const RGBQUAD* palette = nullptr;
+        uint32_t paletteEntries = 0;
 
-// ============================================================
-// BMP RLE8 encoder
-// ============================================================
-class BmpRle8Writer
-{
-public:
-    BmpRle8Writer() = default;
+        int32_t xPelsPerMeter = 0;
+        int32_t yPelsPerMeter = 0;
+    };
 
-    ~BmpRle8Writer();
-    BmpRle8Writer(const BmpRle8Writer&) = delete;
-    BmpRle8Writer& operator=(const BmpRle8Writer&) = delete;
+    // ============================================================
+    // BMP RLE8 encoder
+    // ============================================================
+    class BmpRle8Writer
+    {
+        public:
+            BmpRle8Writer() = default;
 
-    bool Open(const std::wstring& filename);
-    bool SetPageInfo(const PreparedBmpRle8Page& page);
-    bool WriteCurrentPage();
-    void Close();
-    static std::optional<PreparedBmpRle8Page> MakePreparedBmpRle8Page(const dynarithmic::DibPageView& view);
+            ~BmpRle8Writer();
+            BmpRle8Writer(const BmpRle8Writer&) = delete;
+            BmpRle8Writer& operator=(const BmpRle8Writer&) = delete;
 
-private:
-    static bool ValidatePage(const PreparedBmpRle8Page& page);
-    void emit_byte(uint8_t b);
-    void emit_word(uint8_t a, uint8_t b);
-    bool encode_rle8();
-    static int RLEEncodeLineLikeFreeImage(uint8_t* target, const uint8_t* source, int size);
-    bool write_bmp_file() const;
+            bool Open(const std::wstring& filename);
+            bool SetPageInfo(const PreparedBmpRle8Page& page);
+            bool WriteCurrentPage();
+            void Close();
+            static std::optional<PreparedBmpRle8Page> MakePreparedBmpRle8Page(const dynarithmic::DibPageView& view);
 
-private:
-    FILE* file_ = nullptr;
-    std::wstring filename_;
+        private:
+            static bool ValidatePage(const PreparedBmpRle8Page& page);
+            void emit_byte(uint8_t b);
+            void emit_word(uint8_t a, uint8_t b);
+            bool encode_rle8();
+            static int RLEEncodeLineLikeFreeImage(uint8_t* target, const uint8_t* source, int size);
+            bool write_bmp_file() const;
 
-    PreparedBmpRle8Page currentPage_{};
-    bool hasPage_ = false;
+        private:
+            FILE* file_ = nullptr;
+            std::wstring filename_;
 
-    std::vector<uint8_t> encodedData_;
-    std::vector<uint8_t> lineEncodeBuffer_;
-};
+            PreparedBmpRle8Page currentPage_{};
+            bool hasPage_ = false;
 
-// ============================================================
-// Optional DTWAIN-style wrapper
-//   FirstPage = open + write image
-//   LastPage  = close
-// ============================================================
-class DTWAINBmpRle8Output
-{
-    public:
-        bool OnFirstPage(const std::wstring& filename, const PreparedBmpRle8Page& page);
-        bool OnLastPage();
+            std::vector<uint8_t> encodedData_;
+            std::vector<uint8_t> lineEncodeBuffer_;
+    };
 
-    private:
-        std::unique_ptr<BmpRle8Writer> writer_;
-};
+    // ============================================================
+    // Optional DTWAIN-style wrapper
+    //   FirstPage = open + write image
+    //   LastPage  = close
+    // ============================================================
+    class DTWAINBmpRle8Output
+    {
+        public:
+            bool OnFirstPage(const std::wstring& filename, const PreparedBmpRle8Page& page);
+            bool OnLastPage();
 
-#if 0
-/*
-Example usage:
-
-// Direct helper
-if (!WriteOneDibHandleToBmpRle8(L"output_rle8.bmp", hDib))
-    return false;
-
-// DTWAIN-style Model B wrapper
-{
-    LockedBmpRle8Page locked(hDib);
-    if (!locked.IsValid())
-        return false;
-
-    DTWAINBmpRle8Output output;
-    if (!output.OnFirstPage(L"output_rle8.bmp", locked.GetPage()))
-        return false;
-    if (!output.OnLastPage())
-        return false;
+        private:
+            std::unique_ptr<BmpRle8Writer> writer_;
+    };
 }
-*/
-#endif
 #endif

@@ -119,9 +119,8 @@ void CTL_TwainAppMgr::Destroy()
     if ( s_pGlobalAppMgr )
     {
         s_pGlobalAppMgr->DestroyAllTwainSessions();
-        s_pGlobalAppMgr->CloseLogFile();
         /* Use for this APP only */
-        s_pGlobalAppMgr->UnloadSourceManager();
+        CTL_TwainAppMgr::UnloadSourceManager();
     }
     s_pGlobalAppMgr.reset();
 }
@@ -429,15 +428,18 @@ LONG CTL_TwainAppMgr::DoCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwain
     return 0;
 }
 
-template <typename LayoutTriplet>
-static void GetLayoutComponents(LayoutTriplet* LayoutTrip, CTL_RealArray& rArray)
+namespace
 {
-    rArray.push_back(LayoutTrip->GetLeft());
-    rArray.push_back(LayoutTrip->GetTop());
-    rArray.push_back(LayoutTrip->GetRight());
-    rArray.push_back(LayoutTrip->GetBottom());
+    template <typename LayoutTriplet>
+    void GetLayoutComponents(LayoutTriplet* LayoutTrip, CTL_RealArray& rArray)
+    {
+        rArray.push_back(LayoutTrip->GetLeft());
+        rArray.push_back(LayoutTrip->GetTop());
+        rArray.push_back(LayoutTrip->GetRight());
+        rArray.push_back(LayoutTrip->GetBottom());
+    }
 }
-    
+
 bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_RealArray& rArray, TW_UINT16 GetType)
 {
     const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
@@ -731,8 +733,6 @@ bool CTL_TwainAppMgr::IsTwainMsg(MSG *pMsg, bool bFromUserQueue/*=false*/)
     // execute triplet
     bool retVal = false;
     const TW_UINT16 rc = processEvent.ExecuteEventHandler();
-    if ( rc != TWRC_NOTDSEVENT )
-        s_pGlobalAppMgr->WriteToLogFile( rc );
     switch (rc)
     {
         case TWRC_NOTDSEVENT:
@@ -1296,13 +1296,8 @@ bool CTL_TwainAppMgr::SetupMemXferDIB(CTL_ITwainSession* pSession, CTL_ITwainSou
         }
         break;
     }
-
-//    GlobalUnlock(hGlobal);
     return true;
 }
-
-
-
 
 int CTL_TwainAppMgr::StartTransfer( CTL_ITwainSession * /*pSession*/,
                                      CTL_ITwainSource *pSource,
@@ -1912,7 +1907,7 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
     if (!IsValidTwainSession(pSession))
         return { nullptr, nullptr, 0 };
 
-    if (!s_pGlobalAppMgr->IsSourceOpen(pSource))
+    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
         return { nullptr, nullptr, 0 };
 
     CTL_CapabilityQueryTriplet QT(pSession, pTempSource, static_cast<TW_UINT16>(nCap));
@@ -2226,19 +2221,6 @@ CTL_TwainAppMgr::CTL_TwainAppMgr(CTL_TwainDLLHandle *pHandle,
     m_lpDSMEntry = nullptr;
 }
 
-void CTL_TwainAppMgr::OpenLogFile(LPCSTR lpszFile)
-{
-}
-
-
-void CTL_TwainAppMgr::WriteToLogFile(int /*rc*/)
-{
-}
-
-void CTL_TwainAppMgr::CloseLogFile()
-{
-}
-
 void CTL_TwainAppMgr::DestroyAllTwainSessions()
 {
     std::for_each(m_arrTwainSession.begin(), m_arrTwainSession.end(), CTL_ITwainSession::Destroy);
@@ -2280,12 +2262,15 @@ CTL_StringType CTL_TwainAppMgr::GetLatestDSMVersion()
     return {};
 }
 
-template <typename ErrorCodeType>
-static int LoadSourceManagerImpl(boost::dll::shared_library& libloader, const CTL_StringType& fNameTotal)
+namespace
 {
-    ErrorCodeType ec;
-    libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
-    return ec.value();
+    template <typename ErrorCodeType>
+    int LoadSourceManagerImpl(boost::dll::shared_library& libloader, const CTL_StringType& fNameTotal)
+    {
+        ErrorCodeType ec;
+        libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
+        return ec.value();
+    }
 }
 
 bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )

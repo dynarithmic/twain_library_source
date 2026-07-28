@@ -21,18 +21,12 @@ OF THIRD PARTY RIGHTS.
 #ifndef GIFWRITER_H
 #define GIFWRITER_H
 
-#include <windows.h>
 #include <gif_lib.h>
-
 #include <cstdint>
-#include <cstdio>
-#include <cstring>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 #include <optional>
-#include "dibutil.h"
 #include "imagefilewriterbase.h"
 
 // ============================================================
@@ -41,93 +35,95 @@ OF THIRD PARTY RIGHTS.
 //   8-bpp indexed / grayscale DIB
 // ============================================================
 
-enum class GifPixelFlavor
+namespace dynarithmic
 {
-    Indexed8,
-    Gray8
-};
+    enum class GifPixelFlavor
+    {
+        Indexed8,
+        Gray8
+    };
 
-struct PreparedGifDibPage
-{
-    uint32_t width = 0;
-    uint32_t height = 0;
-    uint16_t bitsPerPixel = 8;
-    uint32_t strideBytes = 0;
-    bool bottomUp = true;
+    struct PreparedGifDibPage
+    {
+        uint32_t width = 0;
+        uint32_t height = 0;
+        uint16_t bitsPerPixel = 8;
+        uint32_t strideBytes = 0;
+        bool bottomUp = true;
 
-    GifPixelFlavor pixelFlavor = GifPixelFlavor::Indexed8;
-    const uint8_t* bits = nullptr;
+        GifPixelFlavor pixelFlavor = GifPixelFlavor::Indexed8;
+        const uint8_t* bits = nullptr;
 
-    // Optional palette from DIB
-    const RGBQUAD* palette = nullptr;
-    uint32_t paletteEntries = 0;
-};
+        // Optional palette from DIB
+        const RGBQUAD* palette = nullptr;
+        uint32_t paletteEntries = 0;
+    };
 
 
-struct GifTextMetadata
-{
-    std::string software;
-    std::string copyright;
-    std::string author;
-    std::string description;
-    std::string comment;
-};
+    struct GifTextMetadata
+    {
+        std::string software;
+        std::string copyright;
+        std::string author;
+        std::string description;
+        std::string comment;
+    };
 
-struct GifSessionOptions
-{
-    GifTextMetadata text;
-};
+    struct GifSessionOptions
+    {
+        GifTextMetadata text;
+    };
 
-// ============================================================
-// GIF writer
-// Single-image writer for DTWAIN-style first/last-page workflow
-// ============================================================
+    // ============================================================
+    // GIF writer
+    // Single-image writer for DTWAIN-style first/last-page workflow
+    // ============================================================
 
-class GifSessionWriter
-{
-    public:
-        GifSessionWriter() = default;
-        ~GifSessionWriter();
-        GifSessionWriter(const GifSessionWriter&) = delete;
-        GifSessionWriter& operator=(const GifSessionWriter&) = delete;
+    class GifSessionWriter
+    {
+        public:
+            GifSessionWriter() = default;
+            ~GifSessionWriter();
+            GifSessionWriter(const GifSessionWriter&) = delete;
+            GifSessionWriter& operator=(const GifSessionWriter&) = delete;
 
-        bool Open(const std::wstring& filename, const GifSessionOptions& sessionOptions);
-        bool SetPageInfo(const PreparedGifDibPage& page);
-        bool WriteCurrentPage();
-        void Close();
-        bool IsOpen() const noexcept;
-        static std::optional<PreparedGifDibPage> MakePreparedGifPage(const dynarithmic::DibPageView& view);
+            bool Open(const std::wstring& filename, const GifSessionOptions& sessionOptions);
+            bool SetPageInfo(const PreparedGifDibPage& page);
+            bool WriteCurrentPage();
+            void Close();
+            bool IsOpen() const noexcept;
+            static std::optional<PreparedGifDibPage> MakePreparedGifPage(const dynarithmic::DibPageView& view);
 
-    private:
-        static int gif_write_callback(GifFileType* gif, const GifByteType* data, int length);
-        static bool ValidatePage(const PreparedGifDibPage& page);
-        void prepare_color_map();
-        std::string build_comment_text() const;
-        bool write_comment_extensions();
+        private:
+            static int gif_write_callback(GifFileType* gif, const GifByteType* data, int length);
+            static bool ValidatePage(const PreparedGifDibPage& page);
+            void prepare_color_map();
+            std::string build_comment_text() const;
+            bool write_comment_extensions();
 
-    private:
-        FILE* file_ = nullptr;
-        GifFileType* gif_ = nullptr;
-        ColorMapObject* colorMap_ = nullptr;
+        private:
+            FILE* file_ = nullptr;
+            GifFileType* gif_ = nullptr;
+            ColorMapObject* colorMap_ = nullptr;
 
-        std::wstring filename_;
-        GifSessionOptions sessionOptions_{};
+            std::wstring filename_;
+            GifSessionOptions sessionOptions_{};
 
-        PreparedGifDibPage currentPage_{};
-        bool hasCurrentPage_ = false;
+            PreparedGifDibPage currentPage_{};
+            bool hasCurrentPage_ = false;
 
-        std::vector<uint8_t> rowBuffer_;
-};
+            std::vector<uint8_t> rowBuffer_;
+    };
 
-class DTWAINGifOutput
-{
-    public:
-        bool OnFirstPage(const std::wstring& filename, const GifSessionOptions& sessionOptions, const PreparedGifDibPage& page);
-        bool OnLastPage();
-        bool IsOpen() const noexcept;
+    class DTWAINGifOutput
+    {
+        public:
+            bool OnFirstPage(const std::wstring& filename, const GifSessionOptions& sessionOptions, const PreparedGifDibPage& page);
+            bool OnLastPage();
+            bool IsOpen() const noexcept;
 
-    private:
-        std::unique_ptr<GifSessionWriter> writer_;
-};
-
+        private:
+            std::unique_ptr<GifSessionWriter> writer_;
+    };
+}
 #endif

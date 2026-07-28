@@ -21,100 +21,100 @@ OF THIRD PARTY RIGHTS.
 #ifndef JPEGWRITER_H
 #define JPEGWRITER_H
 
+#include <windows.h>
 #include <string>
 #include <vector>
 #include <memory>
-#include <cstdio>
-#include <windows.h>
 #include <jpeglib.h>
 #include <optional>
-#include "dibutil.h"
 #include "imagefilewriterbase.h"
 
-// ============================================================
-// JPEG page model
-// Supports only:
-//   8 bpp  -> grayscale JPEG
-//   16 bpp -> grayscale JPEG (down-converted to 8-bit samples)
-//   24 bpp -> RGB JPEG
-//
-// Other source depths are assumed to have been resampled upstream
-// before reaching this writer.
-// ============================================================
-enum class JpegPixelFlavor
+namespace dynarithmic
 {
-    Gray8,
-    Gray16,
-    Bgr24
-};
+    // ============================================================
+    // JPEG page model
+    // Supports only:
+    //   8 bpp  -> grayscale JPEG
+    //   16 bpp -> grayscale JPEG (down-converted to 8-bit samples)
+    //   24 bpp -> RGB JPEG
+    //
+    // Other source depths are assumed to have been resampled upstream
+    // before reaching this writer.
+    // ============================================================
+    enum class JpegPixelFlavor
+    {
+        Gray8,
+        Gray16,
+        Bgr24
+    };
 
-struct PreparedJpegDibPage
-{
-    uint32_t width = 0;
-    uint32_t height = 0;
-    uint16_t bitsPerPixel = 0;
-    uint32_t strideBytes = 0;
-    bool bottomUp = true;
+    struct PreparedJpegDibPage
+    {
+        uint32_t width = 0;
+        uint32_t height = 0;
+        uint16_t bitsPerPixel = 0;
+        uint32_t strideBytes = 0;
+        bool bottomUp = true;
 
-    JpegPixelFlavor pixelFlavor = JpegPixelFlavor::Gray8;
-    const uint8_t* bits = nullptr;
-};
+        JpegPixelFlavor pixelFlavor = JpegPixelFlavor::Gray8;
+        const uint8_t* bits = nullptr;
+    };
 
-struct JpegTextMetadata
-{
-    std::string software;
-    std::string copyright;
-    std::string author;
-    std::string description;
-    std::string comment;
-};
+    struct JpegTextMetadata
+    {
+        std::string software;
+        std::string copyright;
+        std::string author;
+        std::string description;
+        std::string comment;
+    };
 
-struct JpegSessionOptions
-{
-    int quality = 75;
-    bool progressive = false;
-    JpegTextMetadata text;
-};
+    struct JpegSessionOptions
+    {
+        int quality = 75;
+        bool progressive = false;
+        JpegTextMetadata text;
+    };
 
-// ============================================================
-// JPEG writer
-// ============================================================
-class JpegSessionWriter
-{
-    public:
-        JpegSessionWriter() = default;
-        ~JpegSessionWriter();
-        JpegSessionWriter(const JpegSessionWriter&) = delete;
-        JpegSessionWriter& operator=(const JpegSessionWriter&) = delete;
-        bool Open(const std::wstring& filename, const JpegSessionOptions& options);
-        bool SetPageInfo(const PreparedJpegDibPage& page);
-        bool WriteCurrentPage();
-        void Close();
-        bool IsOpen() const noexcept;
-        static std::optional<PreparedJpegDibPage> MakePreparedJpegPage(const dynarithmic::DibPageView& view);
+    // ============================================================
+    // JPEG writer
+    // ============================================================
+    class JpegSessionWriter
+    {
+        public:
+            JpegSessionWriter() = default;
+            ~JpegSessionWriter();
+            JpegSessionWriter(const JpegSessionWriter&) = delete;
+            JpegSessionWriter& operator=(const JpegSessionWriter&) = delete;
+            bool Open(const std::wstring& filename, const JpegSessionOptions& options);
+            bool SetPageInfo(const PreparedJpegDibPage& page);
+            bool WriteCurrentPage();
+            void Close();
+            bool IsOpen() const noexcept;
+            static std::optional<PreparedJpegDibPage> MakePreparedJpegPage(const dynarithmic::DibPageView& view);
 
-    private:
-        static bool ValidatePage(const PreparedJpegDibPage& page);
-        static void append_metadata_line(std::string& out, const char* key, const std::string& value);
-        std::string build_comment_text() const;
-        void write_comment_markers(jpeg_compress_struct& cinfo);
+        private:
+            static bool ValidatePage(const PreparedJpegDibPage& page);
+            static void append_metadata_line(std::string& out, const char* key, const std::string& value);
+            std::string build_comment_text() const;
+            void write_comment_markers(jpeg_compress_struct& cinfo) const;
 
-    private:
-        FILE* file_ = nullptr;
-        std::wstring filename_;
-        JpegSessionOptions options_{};
-        PreparedJpegDibPage currentPage_{};
-        bool hasCurrentPage_ = false;
-        std::vector<uint8_t> rowBuffer_;
-};
+        private:
+            FILE* file_ = nullptr;
+            std::wstring filename_;
+            JpegSessionOptions options_{};
+            PreparedJpegDibPage currentPage_{};
+            bool hasCurrentPage_ = false;
+            std::vector<uint8_t> rowBuffer_;
+    };
 
-class DTWAINJpegOutput
-{
-    public:
-        bool OnFirstPage(const std::wstring& filename, const JpegSessionOptions& options, const PreparedJpegDibPage& page);
-        bool OnLastPage();
-    private:
-        std::unique_ptr<JpegSessionWriter> writer_;
-};
-
+    class DTWAINJpegOutput
+    {
+        public:
+            bool OnFirstPage(const std::wstring& filename, const JpegSessionOptions& options, const PreparedJpegDibPage& page);
+            bool OnLastPage();
+        private:
+            std::unique_ptr<JpegSessionWriter> writer_;
+    };
+}
 #endif
