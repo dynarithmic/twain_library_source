@@ -52,9 +52,7 @@
 #pragma  warning (disable : 4702)
 #pragma  warning (disable : 4996)
 #endif
-#include "a85encode.h"
-#include "ahexencode.h"
-#include "flateencode.h"
+#include "ctlencodeutils.h"
 #include "pdfencrypt.h"
 #include "tiffio.h"
 #include "logwriterutils.h"

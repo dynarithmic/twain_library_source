@@ -841,7 +841,7 @@ void PDFEncryptionAES::EncryptInternal(std::string_view dataIn, std::string& dat
         origDataAsUChars.insert(origDataAsUChars.end(), paddingToAdd, paddingToAdd + paddingByte);
     }
 
-    AES aes(keyLength); // The lower-level AES encryption instance
+    dynarithmic::AES aes(keyLength); // The lower-level AES encryption instance
     std::vector<unsigned char> vEncryptedData;
 
     if (aesMode == AESMode::AES_ECB)

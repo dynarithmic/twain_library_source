@@ -19,8 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "postscriptwriter.h"
-#include "a85encode.h"
-#include "flateencode.h"
+#include "ctlencodeutils.h"
 #include "zlib.h"
 
 static void PsRunLengthEncode(std::string_view input, std::string& output)
@@ -389,11 +388,11 @@ bool PsSessionWriter::WriteAscii85FlateImageData(const PreparedPsDibPage& page)
         return false;
 
     std::string flate;
-    if (FlateEncode(std::string_view(raw.data(), raw.size()), flate) != Z_OK)
+    if (dynarithmic::FlateEncode(std::string_view(raw.data(), raw.size()), flate) != Z_OK)
         return false;
 
     std::string encoded;
-    if (ASCII85Encode(std::string_view(flate.data(), flate.size()), encoded) != 1)
+    if (dynarithmic::ASCII85Encode(std::string_view(flate.data(), flate.size()), encoded) != 1)
         return false;
 
     if (!encoded.empty())
@@ -766,7 +765,7 @@ bool PsSessionWriter::WriteAscii85ImageData(const PreparedPsDibPage& page)
         return false;
 
     std::string encoded;
-    if (!ASCII85Encode(std::string_view(raw.data(), raw.size()), encoded) != 0)
+    if (!dynarithmic::ASCII85Encode(std::string_view(raw.data(), raw.size()), encoded) != 0)
         return false;
 
     if (!encoded.empty())
@@ -794,7 +793,7 @@ bool PsSessionWriter::WriteAscii85RunLengthImageData(const PreparedPsDibPage& pa
     PsRunLengthEncode(std::string_view(raw.data(), raw.size()), rle);
 
     std::string encoded;
-    if (!ASCII85Encode(std::string_view(rle.data(), rle.size()), encoded) != 0)
+    if (!dynarithmic::ASCII85Encode(std::string_view(rle.data(), rle.size()), encoded) != 0)
         return false;
 
     if (!encoded.empty())
