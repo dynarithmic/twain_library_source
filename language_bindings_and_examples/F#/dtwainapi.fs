@@ -1805,6 +1805,7 @@ module TwainAPI =
     let public DTWAIN_CHECKDLLVERGREATER = 2
     let public DTWAIN_CHECKDLLVERLESSEQ = 3
     let public DTWAIN_CHECKDLLVERGREATEREQ = 4
+    let public DTWAIN_RESOURCE_COPYRIGHT = 9700
 
     // Public state exposed after successful Load
     let mutable private IsLoaded = false

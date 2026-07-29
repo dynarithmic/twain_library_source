@@ -1675,6 +1675,7 @@ use constant DTWAIN_CHECKDLLVEREQUAL => 1;
 use constant DTWAIN_CHECKDLLVERGREATER => 2;
 use constant DTWAIN_CHECKDLLVERLESSEQ => 3;
 use constant DTWAIN_CHECKDLLVERGREATEREQ => 4;
+use constant DTWAIN_RESOURCE_COPYRIGHT => 9700;
 
 # DTWAIN function definitions. 
 my $dtwain_dllName = 'DTWAIN64.DLL';  # This is the placeholder for the DLL Name that will be loaded.
