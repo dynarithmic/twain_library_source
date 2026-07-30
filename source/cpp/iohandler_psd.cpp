@@ -21,6 +21,7 @@
 #include "psdwriter.h"
 #include "iohandler_psd.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

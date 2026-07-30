@@ -21,8 +21,9 @@
 #ifndef CTLENCODEUTILS_H
 #define CTLENCODEUTILS_H
 
-#include <string_view>
 #include <string>
+#include <string_view>
+#include <array>
 
 namespace dynarithmic
 {
@@ -33,31 +34,14 @@ namespace dynarithmic
             std::string EncodeA85(std::string_view strIn);
 
         private:
-            int count;
-            unsigned long width, pos, tuple;
+            int count = 0;
+            unsigned long width = 0;
+            unsigned long pos = 0;
+            unsigned long tuple = 0;
             void processA85char(unsigned c);
             void cleanup85();
             void encode(unsigned long, int count);
             std::string strOut;
-    };
-
-    class A85Decoder
-    {
-        private:
-            unsigned long pow85[5];
-            static void wput(std::string& output, unsigned long tuple, int nBytes);
-            std::string decode85() const;
-            std::string m_scratch;
-
-        public:
-            std::string DecodeA85(const std::string& strIn, bool checkPrefix = true, bool checkSuffix = false);
-            A85Decoder() {
-                pow85[0] = 85 * 85 * 85 * 85;
-                pow85[1] = 85 * 85 * 85;
-                pow85[2] = 85 * 85,
-                pow85[3] = 85;
-                pow85[4] = 1;
-            }
     };
 
     int FlateEncode(std::string_view inData, std::string& outData);

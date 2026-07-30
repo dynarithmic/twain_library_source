@@ -27,7 +27,7 @@ OF THIRD PARTY RIGHTS.
 using namespace dynarithmic;
 
 ////////////////////////////////////////////////////////
-// A85 Encode and Decode functions
+// A85 Encode function
 std::string A85Encoder::EncodeA85(std::string_view strIn)
 {
     strOut.clear();

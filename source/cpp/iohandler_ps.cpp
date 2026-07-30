@@ -20,6 +20,7 @@
  */
 #include "iohandler_ps.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

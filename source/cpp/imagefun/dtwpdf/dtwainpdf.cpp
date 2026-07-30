@@ -34,7 +34,7 @@
 #include <array>
 #include <unordered_map>
 #include <string_view>
-#include <time.h>
+#include <ctime>
 #include <boost/thread/thread_time.hpp>
 
 #include "dtwainpdf.h"

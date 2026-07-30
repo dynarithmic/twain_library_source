@@ -1,6 +1,6 @@
 #ifdef _WIN32
 #include "ctliface.h"
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "versioninfo.h"
 #include "dtwinverex.h"
 

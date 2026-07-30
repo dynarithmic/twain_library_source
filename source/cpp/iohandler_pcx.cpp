@@ -21,7 +21,7 @@
 #include "pcxwriter.h"
 #include "iohandler_pcx.h"
 #include "ctldib32ex.h"
-
+#include "ctlobstr.h"
 using namespace dynarithmic;
 int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {

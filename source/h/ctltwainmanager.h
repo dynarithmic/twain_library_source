@@ -25,7 +25,7 @@
 #include <map>
 #include <string>
 #include <string_view>
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "ctlarray.h"
 #include "ctltwainsession.h"
 #include "ctlenum.h"

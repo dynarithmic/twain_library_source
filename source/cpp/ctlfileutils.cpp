@@ -18,9 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-
+#include <windows.h>
 #include "ctlfileutils.h"
-#include <dtwain_filesystem.h>
+#include "dtwain_filesystem.h"
 
 namespace dynarithmic
 {

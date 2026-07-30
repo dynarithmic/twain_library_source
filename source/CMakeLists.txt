@@ -426,6 +426,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlsetgetcaps.h
         ${PROJECT_SOURCE_DIR}/h/ctlsourcedibs.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringconversion.h
+        ${PROJECT_SOURCE_DIR}/h/ctlstringdefs.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlsupport.h
         ${PROJECT_SOURCE_DIR}/h/ctlthreadutils.h
@@ -479,7 +480,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltr043.h
         ${PROJECT_SOURCE_DIR}/h/ctltr044.h
         ${PROJECT_SOURCE_DIR}/h/ctltr045.h
-        ${PROJECT_SOURCE_DIR}/h/ctltrall.h
         ${PROJECT_SOURCE_DIR}/h/ctltripletbase.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaincompliancy.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaindecoder.h

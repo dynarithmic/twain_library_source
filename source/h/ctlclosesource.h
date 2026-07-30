@@ -21,11 +21,12 @@
 #ifndef CTLCLOSESOURCE_H
 #define CTLCLOSESOURCE_H
 
-#include "ctliface.h"
-
 ///////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
 {
+    class CTL_TwainDLLHandle;
+    class CTL_ITwainSource;
+
     bool CloseSourceInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource);
 }
 #endif

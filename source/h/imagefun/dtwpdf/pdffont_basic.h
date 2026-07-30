@@ -29,7 +29,7 @@
 #include <utility>
 #include <set>
 #include "dtwpdft.h"
-#include "ctlobstr.h"
+
 namespace dynarithmic
 {
     class CTL_ITwainSource;
@@ -82,13 +82,13 @@ namespace dynarithmic
             void SetInvisible() { renderMode = 3; m_font.refNum = 1; }
     };
 
-    typedef std::shared_ptr<PDFTextElement> PDFTextElementPtr;
-    typedef std::list<PDFTextElementPtr> CTL_TEXTELEMENTPTRLIST;
-    typedef std::list<PDFTextElement*> CTL_TEXTELEMENTNAKEDPTRLIST;
-    typedef std::pair<std::unordered_set<PDFTextElement*>, std::list<PDFTextElement*>> CTL_TEXTELEMENTNAKEDPTRSETLIST;
-    typedef std::unordered_map<CTL_ITwainSource*, CTL_TEXTELEMENTNAKEDPTRSETLIST> CTL_TEXTELEMENTMAP;
-    typedef std::pair<CTL_TEXTELEMENTNAKEDPTRLIST::iterator,
-                                    CTL_TEXTELEMENTNAKEDPTRLIST::iterator> CTL_SEARCHABLENAKEDTEXTRANGE;
+    using PDFTextElementPtr = std::shared_ptr<PDFTextElement>;
+    using CTL_TEXTELEMENTPTRLIST = std::list<PDFTextElementPtr>;
+    using CTL_TEXTELEMENTNAKEDPTRLIST = std::list<PDFTextElement*>;
+    using CTL_TEXTELEMENTNAKEDPTRSETLIST = std::pair<std::unordered_set<PDFTextElement*>, std::list<PDFTextElement*>>;
+    using CTL_TEXTELEMENTMAP = std::unordered_map<CTL_ITwainSource*, CTL_TEXTELEMENTNAKEDPTRSETLIST>;
+    using CTL_SEARCHABLENAKEDTEXTRANGE = std::pair<CTL_TEXTELEMENTNAKEDPTRLIST::iterator,
+                                                   CTL_TEXTELEMENTNAKEDPTRLIST::iterator>;
     using CTL_SEARCHABLETEXTRANGE = CTL_SEARCHABLENAKEDTEXTRANGE;
 }
 #endif

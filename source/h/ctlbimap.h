@@ -22,7 +22,6 @@
 #define CTLBIMAP_H
 
 #include <map>
-#include <stdexcept>
 
 namespace dynarithmic
 {

@@ -28,8 +28,8 @@ OF THIRD PARTY RIGHTS.
     #include "..\aeslib\AES.h"
 #endif
 
-#include <ctlobstr.h>
-#include <ctlconstexprutils.h>
+#include "ctlstringdefs.h"
+#include "ctlconstexprutils.h"
 
 #define ENCRYPTION_OK           0
 #define ENCRYPTION_NOTSET       1

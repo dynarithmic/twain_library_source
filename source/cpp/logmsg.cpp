@@ -18,6 +18,7 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
+#include <windows.h>
 #include "date/date.h"
 #include <ctime>
 #include <cstdio>
@@ -28,7 +29,7 @@ OF THIRD PARTY RIGHTS.
 #endif
 #include <string>
 #include "logmsg.h"
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "ctlfileutils.h"
 #include "ctlthreadutils.h"
 

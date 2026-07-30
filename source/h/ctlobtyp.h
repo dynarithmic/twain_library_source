@@ -21,8 +21,10 @@
 #ifndef CTLOBTYP_H
 #define CTLOBTYP_H
 
+#include <windows.h>
 #include <memory>
-#include "ctlobstr.h"
+#include <string>
+#include <vector>
 #include "twain.h"
 
 ////////////////////////////////////////////////////////////////////////////

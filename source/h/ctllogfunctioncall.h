@@ -33,6 +33,7 @@
 #include "dtwain_resource_constants2.h"
 #include "ctlloadresources.h"
 #include "ctllogcalls.h"
+#include "ctlobstr.h"
 
 namespace dynarithmic
 {

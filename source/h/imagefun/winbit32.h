@@ -23,9 +23,10 @@
 
 #include <string>
 #include <fstream>
+#include <windows.h>
 #include "fltrect.h"
 #include "dibmulti.h"
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "dtwain_raii.h"
 #include "dtwain_filesystem.h"
 #include "blankpage.h"

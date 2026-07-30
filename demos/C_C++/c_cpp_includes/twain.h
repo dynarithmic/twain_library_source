@@ -154,6 +154,9 @@
 
 /* Win32 and Win64 systems */
 #if defined(TWH_CMP_MSC) | defined(TWH_CMP_BORLAND)
+    #ifndef HANDLE
+        #include <windows.h>
+    #endif
     typedef HANDLE  TW_HANDLE;
     typedef LPVOID  TW_MEMREF;
     typedef UINT_PTR TW_UINTPTR;

@@ -21,6 +21,7 @@
 #include "pngwriter.h"
 #include "iohandler_png.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

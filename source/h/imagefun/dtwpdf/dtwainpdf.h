@@ -33,7 +33,7 @@
 #include <pdfencrypt.h>
 #include <memory>
 #include "pdffont_basic.h"
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "tiffio.h"
 #include "ctliface.h"
 namespace dynarithmic

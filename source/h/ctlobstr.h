@@ -43,6 +43,7 @@
 #include <dtwain_filesystem.h>
 #include "dtwain_standard_defs.h"
 #include "ctlstringconversion.h"
+#include "ctlstringdefs.h"
 
 #ifndef _MAX_PATH
     #define _MAX_PATH 260
@@ -58,57 +59,19 @@
 
 namespace dynarithmic
 {
-    typedef std::vector<std::string> StringArray;
-    typedef std::vector<std::wstring> StringArrayW;
-    typedef std::stringstream StringStreamA;
-    typedef std::wstringstream StringStreamW;
-    typedef std::ostringstream StringStreamOutA;
-    typedef std::wostringstream StringStreamOutW;
-    typedef std::istringstream StringStreamInA;
-    typedef std::wistringstream StringStreamInW;
-    typedef std::wofstream  OutputFileStreamW;
-    typedef std::wostream   OutputBaseStreamW;
-    typedef std::ofstream  OutputFileStreamA;
-    typedef std::ostream   OutputBaseStreamA;
-    typedef std::ifstream InputFileStreamA;
-    typedef std::wifstream InputFileStreamW;
-    typedef std::wistream InputBaseStreamW;
-    typedef std::istream InputBaseStreamA;
-
     #ifdef UNICODE
-        typedef std::wstring        CTL_StringType;
-        typedef std::wstring_view   CTL_StringViewType;
-        typedef StringArrayW        CTL_StringArrayType;
-        typedef std::wostringstream CTL_StringStreamType;
-        typedef std::wistringstream CTL_StringStreamInType;
-        typedef std::wifstream      CTL_InputFileStreamType;
-        typedef std::wistream       CTL_InputBaseStreamType;
-        typedef std::wofstream      CTL_OutputFileStreamType;
-        typedef std::wostream       CTL_OutputBaseStreamType;
         struct ErrorStream
         {
             template <typename T>
             static void StreamMe(T t ) { std::wcerr << t; }
         };
     #else
-        typedef std::string         CTL_StringType;
-        typedef std::string_view    CTL_StringViewType;
-        typedef StringArray         CTL_StringArrayType;
-        typedef std::ostringstream  CTL_StringStreamType;
-        typedef std::istringstream  CTL_StringStreamInType;
-        typedef std::ifstream       CTL_InputFileStreamType;
-        typedef std::istream        CTL_InputBaseStreamType;
-        typedef std::ofstream       CTL_OutputFileStreamType;
-        typedef std::ostream        CTL_OutputBaseStreamType;
         struct ErrorStream
         {
             template <typename T>
             static void StreamMe(T t) { std::cerr << t; }
         };
-#endif
-
-    using CTL_StringTypeA = std::string;
-    using CTL_StringTypeW = std::wstring;
+    #endif
 
     #define LOCAL_STATIC static
     #define STRINGWRAPPER_QUALIFIER StringWrapper::

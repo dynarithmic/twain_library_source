@@ -20,6 +20,8 @@
  */
 #include "dtwaindefs.h"
 #include "OCRInterface.h"
+#include "ctlobstr.h"
+
 using namespace dynarithmic;
 
 OCRCapInfo& OCREngine::GetOCRCapInfo(LONG nCap) { return m_AllCapValues[nCap]; }

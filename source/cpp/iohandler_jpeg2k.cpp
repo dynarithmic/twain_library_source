@@ -21,6 +21,7 @@
 #include "jpeg2kwriter.h"
 #include "iohandler_jpeg2k.h"
 #include "ctldib32ex.h"
+#include "ctlobstr.h"
 
 using namespace dynarithmic;
 

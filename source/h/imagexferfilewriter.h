@@ -21,8 +21,9 @@ OF THIRD PARTY RIGHTS.
 #ifndef IMAGEXFERFILEWRITER_H
 #define IMAGEXFERFILEWRITER_H
 
-#include "ctlobstr.h"
+#include <windows.h>
 #include <memory>
+#include "ctlstringdefs.h"
 
 namespace dynarithmic
 {
