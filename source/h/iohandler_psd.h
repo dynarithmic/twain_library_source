@@ -28,7 +28,7 @@ namespace dynarithmic
     class CTL_PsdIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_PsdIOHandler() : CTL_ImageIOHandler()
+            CTL_PsdIOHandler()
             {
                 SetSaveArgs();
             }

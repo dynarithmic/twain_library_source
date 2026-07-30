@@ -155,7 +155,7 @@
 /* Win32 and Win64 systems */
 #if defined(TWH_CMP_MSC) | defined(TWH_CMP_BORLAND)
     #ifndef HANDLE
-        #include <windows.h>
+        #include <windows.h> /* Added by Dynarithmic Software 7/30/2026 */
     #endif
     typedef HANDLE  TW_HANDLE;
     typedef LPVOID  TW_MEMREF;
