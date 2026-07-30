@@ -62,6 +62,7 @@ BEGIN
             POPUP "PDF",                         
             BEGIN
                 MENUITEM "No Encryption"            IDM_ACQUIREFILE_PDF
+                MENUITEM "ASCII85 Encoding"         IDM_ACQUIREFILE_PDF_ASCII85
                 MENUITEM "40-BIT RC4 Encryption"    IDM_ACQUIREFILE_PDF_RC4_40BIT
                 MENUITEM "128-BIT RC4 Encryption"   IDM_ACQUIREFILE_PDF_RC4_128BIT
                 MENUITEM "128-BIT AES Encryption"   IDM_ACQUIREFILE_PDF_AES_128BIT

@@ -186,6 +186,7 @@ AllFileTypes g_allDTWAINFileTypes[] = {
         {IDM_ACQUIREFILE_PAINTSHOP              ,  DTWAIN_PSD },
         {IDM_ACQUIREFILE_PCX                    ,  DTWAIN_PCX },
         {IDM_ACQUIREFILE_PDF                    ,  DTWAIN_PDFMULTI },
+        {IDM_ACQUIREFILE_PDF_ASCII85            ,  DTWAIN_PDFMULTI },
         {IDM_ACQUIREFILE_PDF_RC4_40BIT          ,  DTWAIN_PDFMULTI },
         {IDM_ACQUIREFILE_PDF_RC4_128BIT         ,  DTWAIN_PDFMULTI },
         {IDM_ACQUIREFILE_PDF_AES_128BIT         ,  DTWAIN_PDFMULTI },
@@ -215,7 +216,7 @@ const UINT nFirstAcquireSourceID = IDM_ACQUIREFILESOURCE_WINDOWSBMP;
 const UINT nLastAcquireSourceID = IDM_ACQUIREFILESOURCE_DEJAVU;
 
 const UINT nFirstAcquireFileID = IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION;
-const UINT nLastAcquireFileID = IDM_ACQUIREFILE_PDF_AES_256BIT;
+const UINT nLastAcquireFileID = IDM_ACQUIREFILE_PDF_ASCII85;
 const UINT numDTWAINFileTypes = sizeof(g_allDTWAINFileTypes) / sizeof(g_allDTWAINFileTypes[0]);
 
 
@@ -788,7 +789,7 @@ void AcquireFile(BOOL bUseSource, LONG resourceID, LONG fileType)
     if (IsAcquirePDF(resourceID))
     {
         memset(&AllPDFInfo, 0, sizeof(PDFInfo));
-        DisplayPDFOptionsDlg(resourceID != IDM_ACQUIREFILE_PDF);
+        DisplayPDFOptionsDlg(resourceID != IDM_ACQUIREFILE_PDF && resourceID != IDM_ACQUIREFILE_PDF_ASCII85);
         DTWAIN_SetPDFAuthorA(g_CurrentSource, AllPDFInfo.szPDFAuthor);
         DTWAIN_SetPDFCreatorA(g_CurrentSource, AllPDFInfo.szPDFCreator);
         DTWAIN_SetPDFTitleA(g_CurrentSource, AllPDFInfo.szPDFTitle);
@@ -815,6 +816,11 @@ void AcquireFile(BOOL bUseSource, LONG resourceID, LONG fileType)
             DTWAIN_SetPDFAESEncryption(g_CurrentSource, DTWAIN_PDF_AES256, TRUE);
     }
 
+    else
+    if (resourceID == IDM_ACQUIREFILE_PDF_ASCII85)
+    {
+        DTWAIN_SetPDFASCIICompression(g_CurrentSource, TRUE);
+    }
     retValue = DisplayGetFileNameDlg();
     if (g_FileName[0] == 0 && retValue != IDCANCEL)
     {
@@ -1162,7 +1168,7 @@ LRESULT CALLBACK DisplayBlankThresholdProc(HWND hDlg, UINT message, WPARAM wPara
     return FALSE;
 }
 
-/* Dialog box to display source name to open */
+/* Dialog box to display PDF options */
 LRESULT CALLBACK PDFSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static const int ids[] = { IDC_edPDFTitle, IDC_edPDFSubject, IDC_edPDFAuthor,
@@ -1793,11 +1799,12 @@ BOOL IsAcquirePDF(int PDFType)
     switch (PDFType)
     {
         case IDM_ACQUIREFILE_PDF:
+        case IDM_ACQUIREFILE_PDF_ASCII85:
         case IDM_ACQUIREFILE_PDF_RC4_40BIT:
         case IDM_ACQUIREFILE_PDF_RC4_128BIT:
         case IDM_ACQUIREFILE_PDF_AES_128BIT:
         case IDM_ACQUIREFILE_PDF_AES_256BIT:
-        return TRUE;
+            return TRUE;
     }
     return FALSE;
 }
