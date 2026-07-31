@@ -415,6 +415,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlfilesave.h
         ${PROJECT_SOURCE_DIR}/h/ctlfileutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlguiddef.h
+        ${PROJECT_SOURCE_DIR}/h/ctlguidimpl.h
         ${PROJECT_SOURCE_DIR}/h/ctliface.h
         ${PROJECT_SOURCE_DIR}/h/ctlloadresources.h
         ${PROJECT_SOURCE_DIR}/h/ctllogcalls.h
@@ -489,6 +490,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltwainsession.h
         ${PROJECT_SOURCE_DIR}/h/ctltwainsource.h
         ${PROJECT_SOURCE_DIR}/h/ctlutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlwindowsimpl.h
         ${PROJECT_SOURCE_DIR}/h/dibinfox.h
         ${PROJECT_SOURCE_DIR}/h/dibmulti.h
         ${PROJECT_SOURCE_DIR}/h/dtwain.h

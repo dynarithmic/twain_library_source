@@ -40,6 +40,8 @@
 #include "ctldefsource.h"
 #include "ctlclosesource.h"
 #include "ctlguiddef.h"
+#include "ctlwindowsimpl.h"
+#include "ctlguidimpl.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
@@ -568,7 +570,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_GetDTWAINHandle()
 DTWAIN_BOOL SetLangResourcePath(LPCTSTR szPath)
 {
     LOG_FUNC_ENTRY_PARAMS((szPath))
-    CTL_StaticData::GetLanguageResourcePath() = StringWrapper::AddBackslashToDirectory(szPath);
+    CTL_StaticData::GetLanguageResourcePath() = WindowsAPIImplDef::AddBackslashToDirectory(szPath);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -838,7 +840,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx(HINSTANCE hInstance, LPCTST
 {
     LOG_FUNC_ENTRY_PARAMS((hInstance, szINIPath))
 
-    CTL_StaticData::GetINIPath() = StringWrapper::AddBackslashToDirectory(szINIPath);
+    CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
 
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLib(hInstance);
     LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
@@ -862,7 +864,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
 {
     LOG_FUNC_ENTRY_PARAMS((szINIPath))
-    CTL_StaticData::GetINIPath() = StringWrapper::AddBackslashToDirectory(szINIPath);
+    CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
     LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
     CATCH_BLOCK(nullptr)
@@ -900,7 +902,7 @@ DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& initOptions)
 #else
     auto& sAppName = CTL_StaticData::GetApplicationName();
     if ( sAppName.empty() )
-        sAppName = StringWrapper::GetModuleFileName(nullptr);
+        sAppName = WindowsAPIImplDef::GetModuleFileName(nullptr);
 #endif    
     LOG_FUNC_ENTRY_PARAMS(())
 
@@ -926,7 +928,7 @@ DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& initOptions)
         CTL_TwainDLLHandle* pHandle = pHandlePtr.get();
 
         // Associate a GUID with the handle
-        pHandle->GetGUID() = StringWrapperA::GenerateUUIDv4();
+        pHandle->GetGUID() = GenerateUUIDv4Impl<std::string>();
 
         if (!initOptions.createMinimalSetup)
         {
@@ -2332,7 +2334,7 @@ CTL_StringType dynarithmic::GetDTWAINDLLPath()
     auto& dllPath = CTL_StaticData::GetDLLPath();
     if (!dllPath.empty())
         return dllPath;
-    dllPath = StringWrapper::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle());
+    dllPath = WindowsAPIImplDef::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle());
 
     // Also remember the parent path.
     auto& dllParentPath = CTL_StaticData::GetDLLParentPath();

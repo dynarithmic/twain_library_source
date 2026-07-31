@@ -52,6 +52,7 @@
 #include "ctltr032.h"
 #include "ctltr039.h"
 #include "ctltr043.h"
+#include "ctlguidimpl.h"
 
 using namespace dynarithmic;
 
@@ -925,7 +926,7 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
         if ( szTempPath.empty() )
             return 0;
 
-        auto sGUID = StringWrapper::GetGUID();
+        auto sGUID = GetGUID();
         szTempPath += sGUID + _T(".IDT");
         StringWrapper::TrimAll(szTempPath);
         pSource->GetAcquireFileStatus().SetAcquireFileName(szTempPath);

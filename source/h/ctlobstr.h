@@ -73,76 +73,6 @@ namespace dynarithmic
         };
     #endif
 
-    #define LOCAL_STATIC static
-    #define STRINGWRAPPER_QUALIFIER StringWrapper::
-    #define STRINGWRAPPER_PREFIX StringWrapper::
-
-
-    namespace
-    {
-        struct WindowsWideFuncImpl
-        {
-            static UINT GetWindowsDirectory(LPWSTR lpBuffer, UINT uSize)
-            {
-                return ::GetWindowsDirectoryW(&lpBuffer[0], uSize);
-            }
-
-            static UINT GetSystemDirectory(LPWSTR lpBuffer, UINT uSize)
-            {
-                return ::GetSystemDirectoryW(&lpBuffer[0], uSize);
-            }
-
-            static DWORD GetModuleFileName(HMODULE hModule, LPWSTR lpBuffer, DWORD nSize)
-            {
-                return ::GetModuleFileNameW(hModule, &lpBuffer[0], nSize);
-            }
-        };
-
-        struct WindowsAnsiFuncImpl
-        {
-            static UINT GetWindowsDirectory(LPSTR lpBuffer, UINT uSize)
-            {
-                return ::GetWindowsDirectoryA(&lpBuffer[0], uSize);
-            }
-
-            static UINT GetSystemDirectory(LPSTR lpBuffer, UINT uSize)
-            {
-                return ::GetSystemDirectoryA(&lpBuffer[0], uSize);
-            }
-
-            static DWORD GetModuleFileName(HMODULE hModule, LPSTR lpBuffer, DWORD nSize)
-            {
-                return ::GetModuleFileNameA(hModule, &lpBuffer[0], nSize);
-            }
-        };
-
-        template <typename string_type, typename WinAPITraits>
-        struct WindowsAPIImpl
-        {
-            static UINT GetWindowsDirectoryImpl(string_type& buffer)
-            {
-                buffer.resize(_MAX_PATH);
-                auto nSize = WinAPITraits::GetWindowsDirectory(&buffer[0], _MAX_PATH);
-                buffer.resize(nSize);
-                return nSize;
-            }
-            static UINT GetSystemDirectoryImpl(string_type& buffer)
-            {
-                buffer.resize(_MAX_PATH);
-                auto nSize = WinAPITraits::GetSystemDirectory(&buffer[0], _MAX_PATH);
-                buffer.resize(nSize);
-                return nSize;
-            }
-            static DWORD GetModuleFileNameImpl(HMODULE hModule, string_type& lpFileName, DWORD nSize)
-            {
-                lpFileName.resize(nSize);
-                auto actualSize = WinAPITraits::GetModuleFileName(hModule, &lpFileName[0], nSize);
-                lpFileName.resize(std::min(nSize, actualSize));
-                return actualSize;
-            }
-        };
-    }
-
     struct ANSIStringTraits
     {
         using char_type = char;
@@ -158,7 +88,6 @@ namespace dynarithmic
         using baseinputstream_type = std::istream;
 
         using FILESYSTEM_PATHTYPE = filesys::path;
-        using winapiimpl_type = WindowsAPIImpl<string_type, WindowsAnsiFuncImpl>;
 
         template <typename T>
         static std::string PathGenericString(const T& x) { return x.generic_string(); }
@@ -237,30 +166,6 @@ namespace dynarithmic
             DTWAIN_SPRINTF_FUNC(buf, "%.*g", numDigitsPrecision, value);
             return buf;
         }
-
-        #ifdef _WIN32
-        #else
-        static UINT GetWindowsDirectoryImpl(char_type* buffer)
-        { getcwd(buffer, 8096); return 1; }
-        static UINT GetSystemDirectoryImpl(char_type* buffer)
-        { getcwd(buffer, 8096); return 1; }
-        static UINT GetWindowsDirectoryImpl(string_type& buffer)
-        {
-            buffer.resize(8096);
-            getcwd(&buffer[0], 8096); 
-            return 1;
-        }
-        static UINT GetSystemDirectoryImpl(string_type& buffer)
-        {
-            buffer.resize(8096);
-            getcwd(&buffer[0], 8096);
-            return 1;
-        }
-        static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
-        {
-            return 0; // ::GetModuleFileNameA(hModule, lpFileName, nSize);
-        }
-        #endif
     };
 
     struct UnicodeStringTraits
@@ -278,7 +183,6 @@ namespace dynarithmic
         using baseinputstream_type = std::wistream;
 
         using FILESYSTEM_PATHTYPE = filesys::path;
-        using winapiimpl_type = WindowsAPIImpl<string_type, WindowsWideFuncImpl>;
 
         template <typename T>
         static std::wstring PathGenericString(const T& x) { return x.generic_wstring(); }
@@ -359,37 +263,6 @@ namespace dynarithmic
             DTWAIN_SWPRINTF_FUNC(buf, L"%.*g", numDigitsPrecision, value);
             return buf;
         }
-
-        #ifdef _WIN32
-        #else
-        static UINT GetWindowsDirectoryImpl(char_type* buffer)
-        {
-            std::vector<char> buffer_temp(buffer, buffer + 8096);
-            getcwd(buffer_temp.data(), 8096);
-            std::transform(buffer_temp.begin(), buffer_temp.end(), buffer, [&](char ch) { return ch; });
-            return 1;
-        }
-        static UINT GetSystemDirectoryImpl(char_type* buffer)
-        {
-            return GetWindowsDirectoryImpl(buffer);
-        }
-
-        static UINT GetWindowsDirectoryImpl(string_type& buffer)
-        {
-            buffer.resize(8096);
-            return GetWindowsDirectoryImpl(&buffer[0]);
-        }
-        static UINT GetSystemDirectoryImpl(string_type& buffer)
-        {
-            buffer.resize(8096);
-            return GetSystemDirectoryImpl(&buffer[0]);
-        }
-
-        static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
-        {
-            return 0; // ::GetModuleFileNameA(hModule, lpFileName, nSize);
-        }
-        #endif
     };
 
     template <typename StringType, typename CharType, typename StringTraits>
@@ -841,111 +714,6 @@ namespace dynarithmic
             filesys::path full_path = dir / file;
             s = StringTraits::PathGenericString(full_path);
             return s;
-        }
-
-        static StringType GetWindowsDirectory()
-        {
-            StringType buffer;
-            const UINT retValue = StringTraits::winapiimpl_type::GetWindowsDirectoryImpl(buffer);
-            if ( retValue != 0 )
-                return buffer;
-            return {};
-        }
-
-        static StringType GetSystemDirectory()
-        {
-            StringType buffer;
-            const UINT retValue = StringTraits::winapiimpl_type::GetSystemDirectoryImpl(buffer);
-            if ( retValue != 0 )
-                return buffer;
-            return {};
-        }
-
-        static StringType GetModuleFileName(HMODULE hModule)
-        {
-            StringType buffer; 
-            const UINT retValue = StringTraits::winapiimpl_type::GetModuleFileNameImpl(hModule, buffer, 32767);
-            if (retValue != 0)
-                return buffer;
-            return {};
-        }
-
-        static StringType AddBackslashToDirectory(typename StringTraits::stringview_type pathName)
-        {
-            std::filesystem::path fsPath(pathName);
-            fsPath /= StringTraits::GetEmptyString();
-            if constexpr (std::is_same_v<std::string_view, StringTraits::stringview_type>)
-                return fsPath.string();
-            else
-                return fsPath.native();
-        }
-
-        static StringType RemoveBackslashFromDirectory(StringType pathName)
-        {
-            if (!pathName.empty())
-            {
-                if (pathName.back() == filesys::path::preferred_separator)
-                    pathName.pop_back();
-            }
-            return pathName;
-        }
-
-        static StringType GenerateUUIDv4()
-        {
-            using char_type = typename StringType::value_type;
-
-            static_assert(std::is_same_v<StringType, std::string> ||std::is_same_v<StringType, std::wstring>,
-                          "StringType must be std::string or std::wstring");
-
-            std::array<std::uint8_t, 16> bytes{};
-
-            std::random_device rd;
-            std::mt19937_64 gen(rd());
-
-            for (std::size_t i = 0; i < bytes.size(); i += 8)
-            {
-                const auto value = gen();
-
-                for (std::size_t j = 0; j < 8 && i + j < bytes.size(); ++j)
-                {
-                    bytes[i + j] =
-                        static_cast<std::uint8_t>((value >> (j * 8)) & 0xFF);
-                }
-            }
-
-            // UUID version 4
-            bytes[6] = static_cast<std::uint8_t>((bytes[6] & 0x0F) | 0x40);
-
-            // RFC 4122 variant
-            bytes[8] = static_cast<std::uint8_t>((bytes[8] & 0x3F) | 0x80);
-
-            constexpr char_type hex[] =
-            {
-                char_type('0'), char_type('1'), char_type('2'), char_type('3'),
-                char_type('4'), char_type('5'), char_type('6'), char_type('7'),
-                char_type('8'), char_type('9'), char_type('a'), char_type('b'),
-                char_type('c'), char_type('d'), char_type('e'), char_type('f')
-            };
-
-            std::array<char_type, 37> out{};
-            std::size_t pos = 0;
-
-            for (std::size_t i = 0; i < bytes.size(); ++i)
-            {
-                if (i == 4 || i == 6 || i == 8 || i == 10)
-                    out[pos++] = char_type('-');
-
-                out[pos++] = hex[(bytes[i] >> 4) & 0x0F];
-                out[pos++] = hex[bytes[i] & 0x0F];
-            }
-
-            out[pos] = char_type('\0');
-            return StringType(out.data());
-        }
-
-        static StringType GetGUID()
-        {
-            return StringTraits::GetLeftCurlyBrace() + GenerateUUIDv4() + StringTraits::GetRightCurlyBrace();
         }
 
         static StringType ConvertToAPIString(const StringType& origString)

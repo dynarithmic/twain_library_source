@@ -26,6 +26,7 @@
 #include "ctltr001.h"
 #include "ctltwainmanager.h"
 #include "ctltwainsource.h"
+#include "ctlguidimpl.h"
 
 using namespace dynarithmic;
 
@@ -144,7 +145,7 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
     auto iterFound = std::find_if(m_arrTwainSource.begin(), m_arrTwainSource.end(), SourceFinder(strProduct));
     if ( iterFound == m_arrTwainSource.end())
     {
-        auto uid = StringWrapperA::GenerateUUIDv4();
+        auto uid = GenerateUUIDv4Impl<std::string>();
         pSource->GetDTWAINHandle()->GetGUIDMap(GUID_SOURCES).Insert( uid, pSource );
         m_arrTwainSource.insert( pSource );
         auto iter = sourceStatusMap.insert({ pSource->GetProductNameA(), {} }).first;

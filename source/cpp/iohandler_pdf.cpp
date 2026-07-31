@@ -28,6 +28,7 @@
 #include "iohandler_bmp.h"
 #include "pdffun32.h"
 #include "ctldib32ex.h"
+#include "ctlguidimpl.h"
 
 using namespace dynarithmic;
 
@@ -338,7 +339,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                 // Make a JPEG from this info
                 if ( m_pDib->GetDepth() > 1 )
                 {
-                    szTempFile += StringWrapper::GetGUID() + _T(".JPG");
+                    szTempFile += GetGUID() + _T(".JPG");
                     auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
                     LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA);
 
@@ -359,7 +360,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                     // make a CCITTFaxDecode
                 {
                     DibMultiPageStruct dps = {};
-                    szTempFile += StringWrapper::GetGUID() + _T(".TIF");
+                    szTempFile += GetGUID() + _T(".TIF");
                     auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
 
                     LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA);
@@ -571,7 +572,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
         }
 
         // Now create a temp name
-        szTempPath += StringWrapper::GetGUID() + _T("TMP");
+        szTempPath += GetGUID() + _T("TMP");
         // If we need to convert the BPP to the one supported by the
         // OCR engine, do it now.
         HANDLE hNewDib= nullptr;

@@ -28,6 +28,7 @@
 #include "ctltwainmanager.h"
 #include "ctlfilesave.h"
 #include "ctldib32ex.h"
+#include "ctlguidimpl.h"
 
 #define DTWAIN_PAGEMISSINGSTR _T("<missing_page>")
 
@@ -594,7 +595,7 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
             RecordBadDuplexPage();
             return DTWAIN_ERR_FILEWRITE;
         }
-        szTempPath += StringWrapper::GetGUID() + _T(".TMP");
+        szTempPath += GetGUID() + _T(".TMP");
         filesys::path p{ szTempPath };
         std::ofstream fh;
         // save the raw dib data to this file.

@@ -24,6 +24,7 @@
 #include "ctlobstr.h"
 #include "errorcheck.h"
 #include "ctlfileutils.h"
+#include "ctlwindowsimpl.h"
 
 using namespace dynarithmic;
 
@@ -55,7 +56,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
     if (CreationFlags & DTWAIN_TEMPDIR_CREATEDIRECTORY)
     {
         bool bLogMessages = (CTL_StaticData::GetLogFilterFlags()) ? true : false;
-        CTL_StringType sTemp = StringWrapper::RemoveBackslashFromDirectory(szFilePath);
+        CTL_StringType sTemp = WindowsAPIImplDef::RemoveBackslashFromDirectory(szFilePath);
         auto dirCreated = dynarithmic::fileutils::create_directory(sTemp.c_str());
         if (!dirCreated.first)
         {
@@ -66,7 +67,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
             }
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
         }
-        pHandle->m_sTempFilePath = StringWrapper::AddBackslashToDirectory(sTemp);
+        pHandle->m_sTempFilePath = WindowsAPIImplDef::AddBackslashToDirectory(sTemp);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(false)

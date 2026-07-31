@@ -23,6 +23,7 @@
 #include "dtwaindefs.h"
 #include "dtwtype.h"
 #include "ctliface.h"
+#include "ctlguidimpl.h"
 
 namespace dynarithmic
 {
@@ -318,7 +319,7 @@ namespace dynarithmic
         if (pNewArray)
         {
             auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
-            guidMap.Insert(StringWrapperA::GenerateUUIDv4(), pNewArray);
+            guidMap.Insert(GetGUIDImpl<std::string>(), pNewArray);
         }
         return pNewArray;
     }

@@ -25,6 +25,7 @@
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "dtwstrfn.h"
+#include "ctlguidimpl.h"
 
 using namespace dynarithmic;
 static std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator>
@@ -401,7 +402,7 @@ namespace
             auto pPtr = std::make_shared<PDFTextElement>();
 
             auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_PDFTEXTELEMENTS);
-            guidMap.Insert(StringWrapperA::GenerateUUIDv4(), pPtr.get());
+            guidMap.Insert(GenerateUUIDv4Impl<std::string>(), pPtr.get());
 
             *pPtr = element;
             // Add to the global list
@@ -910,7 +911,7 @@ DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElementCopy(DTWAIN_PDFTEX
         DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     PDFTextElementPtr pPtr = std::make_shared<PDFTextElement>();
     auto& guidMap = pHandle->GetGUIDMap(GUID_PDFTEXTELEMENTS);
-    guidMap.Insert(StringWrapperA::GenerateUUIDv4(), pPtr.get());
+    guidMap.Insert(GenerateUUIDv4Impl<std::string>(), pPtr.get());
 
     auto it = CheckGlobalPDFTextElement(TextElement);
     DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PDFTEXTELEMENT, false, FUNC_MACRO);

@@ -21,6 +21,8 @@
 #include <windows.h>
 #include "ctlfileutils.h"
 #include "dtwain_filesystem.h"
+#include "ctlwindowsimpl.h"
+#include "ctlguidimpl.h"
 
 namespace dynarithmic
 {
@@ -55,9 +57,9 @@ namespace dynarithmic
             auto str = p2.string();
 #endif
             if (!bAddBackSlash)
-                str = StringWrapper::RemoveBackslashFromDirectory(str);
+                str = WindowsAPIImplDef::RemoveBackslashFromDirectory(str);
             else
-                str = StringWrapper::AddBackslashToDirectory(str);
+                str = WindowsAPIImplDef::AddBackslashToDirectory(str);
             return str;
         }
 
@@ -89,7 +91,7 @@ namespace dynarithmic
             if (bWithSeparator && !retVal.empty())
             {
                 CTL_StringType tempStr(retVal.begin(), retVal.end());
-                tempStr = StringWrapper::AddBackslashToDirectory(tempStr);
+                tempStr = WindowsAPIImplDef::AddBackslashToDirectory(tempStr);
                 return tempStr;
             }
             return { retVal.begin(), retVal.end() };
@@ -114,7 +116,7 @@ namespace dynarithmic
         bool directory_writeable(LPCTSTR filename)
         {
             auto parentDir = get_parent_directory(filename);
-            auto guidName = parentDir + StringWrapper::GetGUID();
+            auto guidName = parentDir + GetGUID();
             std::ofstream testStream(StringConversion::Convert_Native_To_Ansi(guidName, guidName.length()));
             if (testStream.is_open())
             {

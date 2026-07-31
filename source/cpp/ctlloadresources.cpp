@@ -23,7 +23,7 @@
 #include <queue>
 #include "ctliface.h"
 #include "ctlloadresources.h"
-
+#include "ctlwindowsimpl.h"
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "dtwain_verinfo.h"
@@ -223,8 +223,8 @@ namespace dynarithmic
         if (CTL_StaticData::GetResourcePath().empty())
             sPath = GetDTWAINExecutionPath();
         else
-            sPath = StringWrapper::RemoveBackslashFromDirectory(CTL_StaticData::GetResourcePath());
-        sPath = StringWrapper::AddBackslashToDirectory(sPath);
+            sPath = WindowsAPIImplDef::RemoveBackslashFromDirectory(CTL_StaticData::GetResourcePath());
+        sPath = WindowsAPIImplDef::AddBackslashToDirectory(sPath);
         auto& resourcePath = CTL_StaticData::GetResourcePath();
         if (resourcePath.empty())
             resourcePath = sPath;

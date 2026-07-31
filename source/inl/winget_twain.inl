@@ -21,6 +21,8 @@
 #ifndef WINGET_TWAIN_INL
 #define WINGET_TWAIN_INL
 #ifdef _WIN32
+#include "ctlwindowsimpl.h"
+
 static CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, 
                                             LPCTSTR strTwainDLLName,
                                             LPLONG pWhichSearch,
@@ -135,8 +137,8 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
     constexpr int boost_version_minor = (BOOST_VERSION / 100) % 1000;
     constexpr int boost_version_major = BOOST_VERSION / 100000;
 
-    dirNames[WinDirPos] = StringWrapper::GetWindowsDirectory();
-    dirNames[SysDirPos] = StringWrapper::GetSystemDirectory();
+    dirNames[WinDirPos] = WindowsAPIImplDef::GetWindowsDirectory();
+    dirNames[SysDirPos] = WindowsAPIImplDef::GetSystemDirectory();
     dirNames[SysPathPos] = {};
     dirNames[CurDirPos] = StringWrapper::SplitPath(dllPath)[StringWrapper::DIRECTORY_POS];
     auto& startupSearchOrder = CTL_StaticData::GetStartupDSMSearchOrder();
@@ -190,7 +192,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         strSet.insert(dirNameToUse);
 
         if (!dirNameToUse.empty())
-            fNameTotal = StringWrapper::AddBackslashToDirectory(dirNameToUse) + fName;
+            fNameTotal = WindowsAPIImplDef::AddBackslashToDirectory(dirNameToUse) + fName;
         else
             fNameTotal = fName;
 
