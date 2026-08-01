@@ -552,7 +552,7 @@ DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElement()
     LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     GenericAddPDFText(pSource, 
-                      StringWrapper::traits_type::GetEmptyString(), 
+                      _T(""),
                       0, 
                       0, 
                       _T("Helvetica"), 

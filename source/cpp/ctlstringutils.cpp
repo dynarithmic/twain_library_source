@@ -48,26 +48,19 @@ namespace timeutils
 
 namespace
 {
-    template <typename WrapperToUse, typename PointerType>
-    HANDLE ConvertToAPIString_Internal(PointerType lpOrigString)
-    {
-        if (!lpOrigString)
-            return NULL;
-        return WrapperToUse::ConvertToAPIStringEx(lpOrigString);
-    }
-
-    template <typename WrapperToUse, typename PointerTypeIn, typename PointerTypeOut>
-    LONG ConvertToAPIString_InternalEx(PointerTypeIn lpOrigString, PointerTypeOut outString, LONG nLength)
+    template <typename StringType, typename PointerTypeIn = StringType::value_type*,
+              typename PointerTypeOut = PointerTypeIn>
+    LONG ConvertToAPIString_InternalEx(const PointerTypeIn lpOrigString, PointerTypeOut outString, LONG nLength)
     {
         if (!lpOrigString)
             return 0;
-        auto retval = WrapperToUse::ConvertToAPIStringEx(lpOrigString);
+        auto retval = dynarithmic::ConvertToAPIStringEx<StringType>(lpOrigString);
         if (retval)
         {
             HandleRAII raii(retval);
             PointerTypeIn ptrData = (PointerTypeIn)raii.getData();
-            auto len = WrapperToUse::traits_type::Length(ptrData);
-            typename WrapperToUse::traits_type::string_type str(ptrData, len);
+            auto len = std::char_traits<StringType::value_type>::length(ptrData);
+            StringType str(ptrData, len);
             return StringWrapper::CopyInfoToCString(str, outString, nLength);
         }
         return 0;
@@ -77,7 +70,11 @@ namespace
 HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
 {
     LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-    auto retval = ConvertToAPIString_Internal<StringWrapper,LPCTSTR>(lpOrigString);
+#ifdef _UNICODE
+    auto retval = dynarithmic::ConvertToAPIStringEx<std::wstring>(lpOrigString);
+#else
+    auto retval = dynarithmic::ConvertToAPIStringEx<std::string>(lpOrigString);
+#endif
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK(nullptr)
 }
@@ -85,7 +82,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
 HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
 {
     LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-    auto retval = ConvertToAPIString_Internal<StringWrapperA,LPCSTR>(lpOrigString);
+    auto retval = dynarithmic::ConvertToAPIStringEx<std::string>(lpOrigString);
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK(nullptr)
 }
@@ -93,7 +90,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
 HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
 {
     LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-    auto retval = ConvertToAPIString_Internal<StringWrapperW,LPCWSTR>(lpOrigString);
+    auto retval = dynarithmic::ConvertToAPIStringEx<std::wstring>(lpOrigString);
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK(nullptr)
 }
@@ -101,7 +98,11 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
 LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOutString, LONG nSize)
 {
     LOG_FUNC_ENTRY_PARAMS((lpOrigString, lpOutString, nSize))
-    LONG retval = ConvertToAPIString_InternalEx<StringWrapper>(lpOrigString, lpOutString, nSize);
+#ifdef _UNICODE    
+    LONG retval = ConvertToAPIString_InternalEx<std::wstring>(lpOrigString, lpOutString, nSize);
+#else
+    LONG retval = ConvertToAPIString_InternalEx<std::string>(lpOrigString, lpOutString, nSize);
+#endif
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOutString))
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK(0)

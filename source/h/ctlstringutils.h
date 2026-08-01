@@ -24,6 +24,9 @@
 #include <string>
 #include <vector>
 #include <string_view>
+#include <iterator>
+#include <boost/algorithm/hex.hpp>
+#include <windows.h>
 
 // Widening string macros
 #define WIDEN2(x) L##x
@@ -77,6 +80,71 @@ namespace dynarithmic
         }
 
         return result;
+    }
+
+    template <typename StringType>
+    StringType StringFromUChars(const std::make_unsigned_t<typename StringType::value_type>* val, std::size_t nSize)
+    {
+        if (!val || nSize == 0)
+            return {};
+
+        return StringType(val, val + nSize);
+    }
+
+    template <typename StringType>
+    std::vector<std::make_unsigned_t<typename StringType::value_type>> 
+            UCharsFromString(typename std::basic_string_view<typename StringType::value_type> str)
+    {
+        return std::vector<std::make_unsigned_t<typename StringType::value_type>>(str.begin(), str.end());
+    }
+
+    template <typename StringType>
+    StringType HexStringFromUChars(const std::make_unsigned_t<typename StringType::value_type>* val, size_t nSize)
+    {
+        StringType hex_output_vector;
+        boost::algorithm::hex_lower(val, val + nSize, std::back_inserter(hex_output_vector));
+        return hex_output_vector;
+    }
+
+    template <typename StringType>
+    StringType ConvertToAPIString(const StringType& origString)
+    {
+        using CharType = StringType::value_type;
+
+        constexpr CharType CR = static_cast<CharType>('\r');
+        constexpr CharType LF = static_cast<CharType>('\n');
+
+        StringType result;
+        result.reserve(origString.size());
+
+        for (std::size_t i = 0; i < origString.size(); ++i)
+        {
+            if (origString[i] == LF &&
+                (i == 0 || origString[i - 1] != CR))
+            {
+                result.push_back(CR);
+            }
+
+            result.push_back(origString[i]);
+        }
+
+        return result;
+    }
+
+    template <typename StringType>
+    HANDLE ConvertToAPIStringEx(typename std::basic_string_view<typename StringType::value_type> origString)
+    {
+        constexpr size_t cSize = sizeof(typename StringType::value_type);
+        StringType newString = ConvertToAPIString<StringType>(origString.data());
+        HANDLE newHandle = GlobalAlloc(GHND | GMEM_ZEROINIT, newString.size() * cSize + cSize);
+        if (newHandle)
+        {
+            auto pData = (typename StringType::value_type*)GlobalLock(newHandle);
+            memcpy(pData, newString.data(), newString.size() * cSize);
+            GlobalUnlock(newHandle);
+            return newHandle;
+        }
+        return nullptr;
     }
 }
 #endif

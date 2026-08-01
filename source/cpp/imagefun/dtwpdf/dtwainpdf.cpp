@@ -2033,7 +2033,7 @@ void PdfDocument::SetEncryption(CTL_StringViewType ownerPassword,
 
     const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
     auto docIDHash = dynarithmic::MD5Hasher().GetHash(reinterpret_cast<const unsigned char*>(s.c_str()), s.size());
-    const std::string dID = dynarithmic::StringWrapperA::HexStringFromUChars(docIDHash.data(), docIDHash.size());
+    const std::string dID = dynarithmic::HexStringFromUChars<std::string>(docIDHash.data(), docIDHash.size());
     m_DocumentID[0] = dID;
     m_DocumentID[1] = dID;
 

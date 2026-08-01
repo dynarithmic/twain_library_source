@@ -55,7 +55,7 @@ namespace dynarithmic
                     {
                         std::string subPair = bracketedPairs.substr(pos + 1, pos2 - pos - 1);
                         StringWrapperA::TrimAll(subPair);
-                        if (StringWrapperA::IsEmpty(subPair))
+                        if (subPair.empty())
                             break;
                         std::istringstream strm(subPair);
                         uint16_t firstNum, secondNum;

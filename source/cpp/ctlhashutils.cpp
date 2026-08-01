@@ -22,6 +22,7 @@
 #include <ctlhashutils.h>
 #include <boost/hash2/sha2.hpp>
 #include <ctlobstr.h>
+#include "ctlstringutils.h"
 
 namespace dynarithmic
 {
@@ -65,7 +66,7 @@ namespace dynarithmic
 
     std::vector<unsigned char> SHA2Hash(const unsigned char* message, size_t messageLength, SHA2HashType hashType)
     {
-        return SHA2Hash(dynarithmic::StringWrapperA::StringFromUChars(message, messageLength), hashType);
+        return SHA2Hash(StringFromUChars<std::string>(message, messageLength), hashType);
     }
 
     void MD5Hasher::Add(const unsigned char* pData, size_t len)

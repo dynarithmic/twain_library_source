@@ -1464,10 +1464,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
 {
     LOG_FUNC_ENTRY_PARAMS((hWndMsgNotify, lpszDLLName))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if ( pHandle->m_bSessionAllocated )
+    if (pHandle->m_bSessionAllocated)
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
-
-    const CTL_StringType sDLLName = lpszDLLName?lpszDLLName:StringWrapper::traits_type::GetEmptyString();
+    CTL_StringType sDLLName;
+    if (lpszDLLName)
+        sDLLName = lpszDLLName;
 #ifdef _WIN32
     HWND hWndMsg;
     HINSTANCE hInstance;
@@ -2072,8 +2073,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderEx(LPCTSTR SearchOrder, LPCTSTR
     {
         if (!strValidString.empty())
         {
+
             pHandle->m_TwainDSMSearchOrderStr = strValidString;
-            pHandle->m_TwainDSMUserDirectory = UserDirectory ? UserDirectory : StringWrapper::traits_type::GetEmptyString();
+            pHandle->m_TwainDSMUserDirectory = UserDirectory ? UserDirectory : _T("");
             pHandle->m_TwainDSMSearchOrder = -1;
             CTL_StaticData::GetStartupDSMSearchOrder() =  strValidString;
             CTL_StaticData::GetStartupDSMSearchOrderDir() = UserDirectory ? UserDirectory : _T("");

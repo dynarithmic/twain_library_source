@@ -34,7 +34,7 @@ OF THIRD PARTY RIGHTS.
 #undef max
 #include "pdfencrypt.h"
 #include "ctlhashutils.h"
-#include "ctlobstr.h"
+#include "ctlstringutils.h"
 
 std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER
@@ -268,8 +268,8 @@ void PDFEncryption::SetupAllKeys(std::string_view DocID,
 
         // Create all of the information blocks that will be written to the PDF
         // file in the Encryption dictionary (U, O, UE, OE, Perms, and the file encryption key)
-        CreateAESV3Info(dynarithmic::StringWrapperA::StringFromUChars(ownerPassword.data(), ownerPassword.size()),
-                        dynarithmic::StringWrapperA::StringFromUChars(userPassword.data(), userPassword.size()),
+        CreateAESV3Info(dynarithmic::StringFromUChars<std::string>(ownerPassword.data(), ownerPassword.size()),
+                        dynarithmic::StringFromUChars<std::string>(userPassword.data(), userPassword.size()),
                         permissionsParam);
     }
 }
@@ -348,10 +348,10 @@ void PDFEncryption::ComputePermsKey(int permissions)
 
     // Use the encryption key for the AES-256 hash.
     std::string strPermsKey;
-    std::string strPermBlock = dynarithmic::StringWrapperA::StringFromUChars(PermBlock, 16);
+    std::string strPermBlock = dynarithmic::StringFromUChars<std::string>(PermBlock, 16);
     aes.EncryptAES256ECB(strPermBlock, strPermsKey);
 
-    m_PermsKey = dynarithmic::StringWrapperA::UCharsFromString(strPermsKey);
+    m_PermsKey = dynarithmic::UCharsFromString<std::string>(strPermsKey);
 
 }
 
@@ -367,21 +367,21 @@ void PDFEncryption::ComputeUserOrOwnerKeyAESV3(std::string_view pswd, // Passwor
     // step a)
     auto vSalt = dynarithmic::CreateRandomDigits(8);
     auto kSalt = dynarithmic::CreateRandomDigits(8); 
-    auto vSaltString = dynarithmic::StringWrapperA::StringFromUChars(vSalt.data(), 8);
-    auto kSaltString = dynarithmic::StringWrapperA::StringFromUChars(kSalt.data(), 8);
+    auto vSaltString = dynarithmic::StringFromUChars<std::string>(vSalt.data(), 8);
+    auto kSaltString = dynarithmic::StringFromUChars<std::string>(kSalt.data(), 8);
 
     // If we need to use the userkey, set the userString
     std::string userString;
     if (useUserKey)
-        userString = dynarithmic::StringWrapperA::StringFromUChars(m_UserKey.data(), m_UserKey.size());
+        userString = dynarithmic::StringFromUChars<std::string>(m_UserKey.data(), m_UserKey.size());
 
     // Generate hash for U or O
     auto hashValueOut = ComputeHashAESV3(pswd, vSaltString, userString);
 
-    auto KeyString = dynarithmic::StringWrapperA::StringFromUChars(hashValueOut.data(), hashValueOut.size()) +
+    auto KeyString = dynarithmic::StringFromUChars<std::string>(hashValueOut.data(), hashValueOut.size()) +
                                                                    vSaltString + kSaltString;
 
-    Key = dynarithmic::StringWrapperA::UCharsFromString(KeyString);
+    Key = dynarithmic::UCharsFromString<std::string>(KeyString);
 
     // Generate hash for UE or OE (step b)
     hashValueOut = ComputeHashAESV3(pswd, kSaltString, userString);
@@ -396,7 +396,7 @@ void PDFEncryption::ComputeUserOrOwnerKeyAESV3(std::string_view pswd, // Passwor
     aesEncrypt.SetIVAttached(false);
     std::string dataOut;
     aesEncrypt.EncryptAES256CBC(
-        dynarithmic::StringWrapperA::StringFromUChars(m_EncryptionKey.data(), m_EncryptionKey.size()), 
+        dynarithmic::StringFromUChars<std::string>(m_EncryptionKey.data(), m_EncryptionKey.size()), 
         dataOut);
 
     // done
@@ -429,7 +429,7 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string_view pswd,
     {
         // step b) -- Create the base string that will be repeated 64 times
         std::string oneValue = pswd.data() +
-            dynarithmic::StringWrapperA::StringFromUChars(K.data(), K.size()) 
+            dynarithmic::StringFromUChars<std::string>(K.data(), K.size()) 
             + uValue;
         std::string K1;
 
@@ -449,8 +449,8 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string_view pswd,
         // Start the encryption (AES-128 CBC)
         aesEncryptor.EncryptAES128CBC(K1, E);
 
-        auto ETemp = dynarithmic::StringWrapperA::UCharsFromString(E);
-        auto K1Temp = dynarithmic::StringWrapperA::UCharsFromString(K1);
+        auto ETemp = dynarithmic::UCharsFromString<std::string>(E);
+        auto K1Temp = dynarithmic::UCharsFromString<std::string>(K1);
 
         // step c) -- Take the first 16 bytes as an integer, modulo 3
         auto remainder = static_cast<int>(bigEndianBytesToInt(ETemp.data(), 16) % 3);
@@ -814,7 +814,7 @@ void PDFEncryptionAES::EncryptInternal(std::string_view dataIn, std::string& dat
                                        AESMode aesMode, AESKeyLength keyLength)
 {
     // Convert input string to byte array
-    std::vector<unsigned char> origDataAsUChars = dynarithmic::StringWrapperA::UCharsFromString(dataIn);
+    std::vector<unsigned char> origDataAsUChars = dynarithmic::UCharsFromString<std::string>(dataIn);
 
     // Adjust the input string, depending on the padding.
     unsigned char paddingByte = 0;
@@ -868,7 +868,7 @@ void PDFEncryptionAES::EncryptInternal(std::string_view dataIn, std::string& dat
         }
     }
     // Convert encrypted data to a std::string and we are done.
-    dataOut = dynarithmic::StringWrapperA::StringFromUChars(vEncryptedData.data(), vEncryptedData.size());
+    dataOut = dynarithmic::StringFromUChars<std::string>(vEncryptedData.data(), vEncryptedData.size());
 }
 
 PDFEncryption::UCHARArray PDFEncryptionAES::GetExtendedKey(int number, int generation)

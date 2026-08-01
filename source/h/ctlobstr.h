@@ -28,7 +28,6 @@
 #include <numeric>
 #include <type_traits>
 #include <boost/algorithm/string.hpp>
-#include <boost/algorithm/hex.hpp>
 #include <assert.h>
 #include <algorithm>
 #include <stdlib.h>
@@ -309,11 +308,6 @@ namespace dynarithmic
             str.replace(nPos, 1, 1, c);
         }
 
-        static bool IsEmpty(typename StringTraits::stringview_type str)
-        {
-            return str.empty();
-        }
-
         static bool IsAllSpace(typename StringTraits::stringview_type str)
         {
             return StringTraits::IsAllSpace(str.data());
@@ -321,7 +315,7 @@ namespace dynarithmic
 
         static void Empty(StringType &str )
         {
-            str = StringTraits::GetEmptyString();
+            str = {};
         }
 
         static StringType ReplaceAll(typename StringTraits::stringview_type strOrig, 
@@ -468,7 +462,7 @@ namespace dynarithmic
         }
 
         template <typename Container>
-        static StringType Join(const Container& ct, const StringType& seperator = StringTraits::GetEmptyString())
+        static StringType Join(const Container& ct, const StringType& seperator = {})
         {
             return Join(ct.begin(), ct.end(), seperator);
         }
@@ -488,7 +482,7 @@ namespace dynarithmic
         }
 
         template <typename Iter>
-        static StringType Join(Iter iter1, Iter iter2, const StringType& separator = StringTraits::GetEmptyString())
+        static StringType Join(Iter iter1, Iter iter2, const StringType& separator = {})
         {
             return std::accumulate(iter1, iter2, StringType(),
                 [&](const auto& str, typename std::iterator_traits<Iter>::value_type val)
@@ -614,31 +608,9 @@ namespace dynarithmic
             return s1?StringTraits::ToDouble(s1):defVal;
         }
 
-        static StringType StringFromUChars(const typename StringTraits::uchar_type* val, size_t nSize)
-        {
-            return StringType(val, val + nSize);
-        }
-
-        static StringType HexStringFromUChars(const typename StringTraits::uchar_type* val, size_t nSize)
-        {
-            StringType hex_output_vector;
-            boost::algorithm::hex_lower(val, val + nSize, std::back_inserter(hex_output_vector));
-            return hex_output_vector;
-        }
-
-        static std::vector<typename StringTraits::uchar_type> UCharsFromString(typename StringTraits::stringview_type str)
-        {
-            return std::vector<typename StringTraits::uchar_type>(str.begin(), str.end());
-        }
-
         static int ReverseFind(typename StringTraits::stringview_type str, CharType ch)
         {
             return static_cast<int>(str.rfind(ch));
-        }
-
-        static CharType* GetBuffer(const StringType& str)
-        {
-            return str.c_str();
         }
 
         static CharType* SafeStrcpy( CharType *pDest,
@@ -697,42 +669,16 @@ namespace dynarithmic
             return sArrType;
         }
 
-        static StringType GetFileNameFromPath(typename StringTraits::stringview_type str)
-        {
-            StringArrayType rArray;
-            SplitPath(str, rArray);
-            return rArray[NAME_POS] + StringType(".") + rArray[EXTENSION_POS];
-        }
-
         static StringType MakePath(const StringArrayType & rArray)
         {
-            if ( rArray.size() < 5 )
-                return StringTraits::GetEmptyString();
+            if (rArray.size() < 5)
+                return {};
             StringType s = rArray[NAME_POS] + rArray[EXTENSION_POS];
             const filesys::path dir(rArray[DIRECTORY_POS]);
             const filesys::path file = s; 
             filesys::path full_path = dir / file;
             s = StringTraits::PathGenericString(full_path);
             return s;
-        }
-
-        static StringType ConvertToAPIString(const StringType& origString)
-        {
-            return boost::algorithm::replace_all_copy(origString, StringTraits::GetNewLineString(), StringTraits::GetWindowsNewLineString());
-        }
-
-        static HANDLE ConvertToAPIStringEx(typename StringTraits::stringview_type origString)
-        {
-            StringType newString = ConvertToAPIString(origString.data());
-            HANDLE newHandle = GlobalAlloc(GHND | GMEM_ZEROINIT, newString.size() * sizeof(StringTraits::char_type) + sizeof(StringTraits::char_type));
-            if (newHandle)
-            {
-                typename StringTraits::char_type* pData = (typename StringTraits::char_type*)GlobalLock(newHandle);
-                memcpy(pData, newString.data(), newString.size() * sizeof(StringTraits::char_type));
-                GlobalUnlock(newHandle);
-                return newHandle;
-            }
-            return NULL;
         }
 
         static int TokenizeEx(const StringType& str,

@@ -418,7 +418,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                         {
                             SendFileAcquireError(pSource, pSession, DTWAIN_ERR_BAD_FILENAME, DTWAIN_TN_FILESAVECANCELLED,
                                                  StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
-                            acquireFileStatus.SetLastAcquiredFileName( StringWrapper::traits_type::GetEmptyString() );
+                            acquireFileStatus.SetLastAcquiredFileName({});
                         }
                         else
                         {
@@ -428,14 +428,14 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                                 // Error in copying the file
                                 SendFileAcquireError(pSource, pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
                                                      StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
-                                acquireFileStatus.SetLastAcquiredFileName( StringWrapper::traits_type::GetEmptyString() );
+                                acquireFileStatus.SetLastAcquiredFileName({});
                             }
                             else
                                 acquireFileStatus.SetLastAcquiredFileName( strTempFile );
 
                             // Remove the temporary file
                             if (dynarithmic::fileutils::delete_file(acquireFileStatus.GetAcquireFileName().c_str()))
-                                acquireFileStatus.SetAcquireFileName(StringWrapper::traits_type::GetEmptyString());
+                                acquireFileStatus.SetAcquireFileName({});
 
                         }
                         acquireFileStatus.SetLastAcquiredFileName( strTempFile );
