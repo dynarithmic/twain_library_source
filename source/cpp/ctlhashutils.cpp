@@ -22,6 +22,7 @@
 #include <ctlhashutils.h>
 #include <boost/hash2/sha2.hpp>
 #include "ctlstringutils.h"
+#include "ctlstringutilsx.h"
 
 namespace dynarithmic
 {

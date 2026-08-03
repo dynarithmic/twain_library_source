@@ -92,12 +92,59 @@ namespace dynarithmic
         return std::vector<std::make_unsigned_t<typename StringType::value_type>>(str.begin(), str.end());
     }
 
-    template <typename StringType>
-    StringType HexStringFromUChars(const std::make_unsigned_t<typename StringType::value_type>* val, size_t nSize)
+
+    template <typename StringType, typename ByteType>
+    StringType BytesToHex(const ByteType* data, std::size_t size)
     {
-        StringType hex_output_vector;
-        boost::algorithm::hex_lower(val, val + nSize, std::back_inserter(hex_output_vector));
-        return hex_output_vector;
+        using CharType = typename StringType::value_type;
+
+        static constexpr CharType hexDigits[] =
+        {
+            CharType('0'), CharType('1'), CharType('2'), CharType('3'),
+            CharType('4'), CharType('5'), CharType('6'), CharType('7'),
+            CharType('8'), CharType('9'), CharType('a'), CharType('b'),
+            CharType('c'), CharType('d'), CharType('e'), CharType('f')
+        };
+
+        StringType result;
+        result.reserve(size * 2);
+
+        for (std::size_t i = 0; i < size; ++i)
+        {
+            unsigned char ch = static_cast<unsigned char>(data[i]);
+
+            result.push_back(hexDigits[ch >> 4]);
+            result.push_back(hexDigits[ch & 0x0F]);
+        }
+
+        return result;
+    }
+    template <typename StringType>
+    StringType HexStringFromUChars(const std::make_unsigned_t<typename StringType::value_type>* val, 
+                                    size_t nSize)
+    {
+        using CharType = typename StringType::value_type;
+
+        static constexpr CharType hexDigits[] =
+        {
+            CharType('0'), CharType('1'), CharType('2'), CharType('3'),
+            CharType('4'), CharType('5'), CharType('6'), CharType('7'),
+            CharType('8'), CharType('9'), CharType('a'), CharType('b'),
+            CharType('c'), CharType('d'), CharType('e'), CharType('f')
+        };
+
+        StringType result;
+        result.reserve(nSize * 2);
+
+        for (std::size_t i = 0; i < nSize; ++i)
+        {
+            unsigned char ch = static_cast<unsigned char>(val[i]);
+
+            result.push_back(hexDigits[ch >> 4]);
+            result.push_back(hexDigits[ch & 0x0F]);
+        }
+
+        return result;
     }
 
     template <typename StringType>

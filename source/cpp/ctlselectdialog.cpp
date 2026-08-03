@@ -28,6 +28,7 @@
 
 using namespace dynarithmic;
 using namespace boost::logic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
@@ -86,12 +87,12 @@ namespace
             return vSourceNames;
 
         for (auto& sName : vSourceNames)
-            sName = dynarithmic::basicstringutils::TrimAll(sName);
+            sName = stringutils::TrimAll(sName);
 
         if (doInclude)
         {
             for (auto& sName : CS.aIncludeNames)
-                sName = dynarithmic::basicstringutils::TrimAll(sName);
+                sName = stringutils::TrimAll(sName);
 
             // Create a list of the names to include (extract only those names)            
             std::vector<CTL_StringType> vReturn2;
@@ -108,7 +109,7 @@ namespace
         if (doExclude)
         {
             for (auto& sName : CS.aExcludeNames)
-                sName = dynarithmic::basicstringutils::TrimAll(sName);
+                sName = stringutils::TrimAll(sName);
 
             // Create a list of the names to include if we remove the excluded names
             std::vector<CTL_StringType> vReturn2;
@@ -220,17 +221,17 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
     }
 
     if (opts.szIncludeNames)
-        dynarithmic::basicstringutils::Tokenize(opts.szIncludeNames, _T("|"), selectStruct.CS.aIncludeNames);
+        stringutils::Tokenize(opts.szIncludeNames, _T("|"), selectStruct.CS.aIncludeNames);
     if (opts.szExcludeNames)
-        dynarithmic::basicstringutils::Tokenize(opts.szExcludeNames, _T("|"), selectStruct.CS.aExcludeNames);
+        stringutils::Tokenize(opts.szExcludeNames, _T("|"), selectStruct.CS.aExcludeNames);
     if (opts.szNameMapping)
     {
         std::vector<CTL_StringType> mapPairs;
-        dynarithmic::basicstringutils::Tokenize(opts.szNameMapping, _T("|"), mapPairs);
+        stringutils::Tokenize(opts.szNameMapping, _T("|"), mapPairs);
         for (auto& m : mapPairs)
         {
             std::vector<CTL_StringType> onePair;
-            dynarithmic::basicstringutils::Tokenize(m, _T("="), onePair);
+            stringutils::Tokenize(m, _T("="), onePair);
             if (onePair.size() == 2)
                 selectStruct.CS.mapNames.insert({ onePair.front(), onePair.back() });
         }
@@ -396,7 +397,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
                 CTL_StringStreamType strm2;
                 auto nl = _T("\n");
                 strm2 << "----- " << GetResourceStringFromMap_Native(IDS_SOURCES_TEXT) <<
-                    dynarithmic::basicstringutils::JoinEx<CTL_StringType>(vNewSourceNames.begin(), vNewSourceNames.end(),
+                    stringutils::JoinEx<CTL_StringType>(vNewSourceNames.begin(), vNewSourceNames.end(),
                         [&](const CTL_StringType& str, const CTL_StringType& val)
                         {
                             CTL_StringStreamType strmInner;
@@ -412,7 +413,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
                 index = SendMessage(lstSources, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(sName.c_str()));
                 if (!DefName.empty())
                 {
-                    if (dynarithmic::basicstringutils::Compare<CTL_StringType>(sName, static_cast<LPCTSTR>(DefName.data())) == 0)
+                    if (stringutils::Compare<CTL_StringType>(sName, static_cast<LPCTSTR>(DefName.data())) == 0)
                         DefIndex = index;
                 }
             }

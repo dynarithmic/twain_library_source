@@ -24,6 +24,7 @@
 #include "errorcheck.h"
 #include "ctlfileutils.h"
 #include "ctlwindowsimpl.h"
+#include "ctlstringutilsx.h"
 
 using namespace dynarithmic;
 namespace stringutils = dynarithmic::basicstringutils;

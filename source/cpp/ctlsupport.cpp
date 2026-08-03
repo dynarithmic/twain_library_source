@@ -22,6 +22,7 @@
 #include "arrayfactory.h"
 #include "ctlsupport.h"
 #include "ctlsetgetcaps.h"
+#include "ctlstringutilsx.h"
 
 using namespace dynarithmic;
 

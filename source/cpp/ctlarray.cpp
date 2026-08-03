@@ -29,6 +29,7 @@
 #include "arrayfactory.h"
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 using CharType = CTL_StringType::value_type;
 
 namespace
@@ -1478,8 +1479,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloatString(DTWAIN_ARRAY pArray, LONG 
     double dValue;
     const DTWAIN_BOOL bRet = DTWAIN_ArrayGetAt(pArray, nWhere, &dValue);
     if (bRet)
-        dynarithmic::basicstringutils::SafeStrcpy(Val, 
-            dynarithmic::basicstringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
+        stringutils::SafeStrcpy(Val, 
+            stringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Val))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -1992,7 +1993,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetValueFloatString( DTWAIN_RANGE pArray, L
     double dValue;
     const DTWAIN_BOOL bRet = DTWAIN_RangeGetValueFloat(pArray, nWhich, &dValue);
     if ( bRet )
-        dynarithmic::basicstringutils::SafeStrcpy(pVal, dynarithmic::basicstringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
+        stringutils::SafeStrcpy(pVal, stringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVal))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -2118,8 +2119,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAllFloatString( DTWAIN_RANGE pArray, LPT
         for (int i = 0; i < 5; ++i)
         {
             if (vals[i])
-                dynarithmic::basicstringutils::SafeStrcpy(vals[i], 
-                            dynarithmic::basicstringutils::TrimDouble<CTL_StringType>(dValue[i]).c_str(), 255);
+                stringutils::SafeStrcpy(vals[i], 
+                            stringutils::TrimDouble<CTL_StringType>(dValue[i]).c_str(), 255);
         }
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((dLow, dUp, dStep, dDefault, dCurrent))
@@ -2193,7 +2194,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValueFloatString( DTWAIN_RANGE pArray
     double dValue;
     const DTWAIN_BOOL bRet = DTWAIN_RangeGetExpValueFloat(pArray,lPos,&dValue);
     if ( bRet )
-        dynarithmic::basicstringutils::SafeStrcpy(pVal, dynarithmic::basicstringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
+        stringutils::SafeStrcpy(pVal, stringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVal))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -2370,7 +2371,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValueFloatString( DTWAIN_RANGE pA
     double dOut;
     const DTWAIN_BOOL bRet = DTWAIN_RangeGetNearestValueFloat(pArray, dValue, &dOut,RoundType);
     if ( bRet )
-        dynarithmic::basicstringutils::SafeStrcpy(pOutput, dynarithmic::basicstringutils::TrimDouble<CTL_StringType>(dOut).c_str(), 255);
+        stringutils::SafeStrcpy(pOutput, stringutils::TrimDouble<CTL_StringType>(dOut).c_str(), 255);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pOutput))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -2434,7 +2435,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrameString(DTWAIN_ARRAY FrameArray, L
     for (size_t i = 0; i < vals.size(); ++i)
     {
         if ( vals[i] )
-            dynarithmic::basicstringutils::SafeStrcpy(vals[i], dynarithmic::basicstringutils::TrimDouble<CTL_StringType>(pr.second->m_FrameComponent[i]).c_str(), 255);
+            stringutils::SafeStrcpy(vals[i], stringutils::TrimDouble<CTL_StringType>(pr.second->m_FrameComponent[i]).c_str(), 255);
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pleft, ptop, pright, pbottom))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2662,7 +2663,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAllString(DTWAIN_FRAME Frame, LPTSTR Lef
     for (size_t i = 0; i < aFrameComponent.size(); ++i )
     {
         if ( vals[i])
-            dynarithmic::basicstringutils::SafeStrcpy(vals[i], dynarithmic::basicstringutils::TrimDouble<CTL_StringType>(aFrameComponent[i]).c_str(), 255);
+            stringutils::SafeStrcpy(vals[i], stringutils::TrimDouble<CTL_StringType>(aFrameComponent[i]).c_str(), 255);
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Left, Top, Right, Bottom))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2678,7 +2679,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValueString(DTWAIN_FRAME Frame, LONG nWh
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     if (Value)
     {
-        dynarithmic::basicstringutils::SafeStrcpy(Value, dynarithmic::basicstringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
+        stringutils::SafeStrcpy(Value, stringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Value))
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2875,7 +2876,7 @@ DTWAIN_ARRAY GenericArrayFloatToString(const CTL_TwainDLLHandle* pHandle,
         {
             StringType::value_type Value[256] = {};
             StringType sValue;
-            dynarithmic::basicstringutils::SafeStrcpy(Value, dynarithmic::basicstringutils::TrimDouble<StringType>(d).c_str(), 255);
+            stringutils::SafeStrcpy(Value, stringutils::TrimDouble<StringType>(d).c_str(), 255);
             sValue = Value;
             return sValue;
         });

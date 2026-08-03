@@ -23,6 +23,7 @@
 #include "cppfunc.h"
 #include "errorcheck.h"
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
@@ -191,7 +192,7 @@ namespace
         static constexpr auto newLine = dynarithmic::CharTraits<StringType::value_type>::NewLineString();
         const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<StringType>(Array);
-        StringType allValues = dynarithmic::basicstringutils::Join<StringType>(vData, newLine);
+        StringType allValues = stringutils::Join<StringType>(vData, newLine);
         fn(allValues, newLine);
     }
 

@@ -41,6 +41,8 @@
 #include "crc32_aux.h"
 #include "jpeglib.h"
 #include "ctlhashutils.h"
+#include "ctlstringutilsx.h"
+
 #undef Z_PREFIX
 #ifdef __MSL__
    #include <ctime>

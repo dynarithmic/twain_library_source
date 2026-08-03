@@ -18,29 +18,29 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltwainmanager.h"
-#include "errorcheck.h"
+#include "ctllogfunctioncall.h"
 #include "ctlstringutilsx.h"
-
-#ifdef _MSC_VER
-#pragma warning (disable:4702)
-#endif
 
 using namespace dynarithmic;
 
-LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG nSize)
+void ParamOutputter::LogType(std::string_view outStr, const char* ptr)
 {
-    LOG_FUNC_ENTRY_PARAMS((paperNumber, outName, nSize))
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto& pdfmediamap = CTL_StaticData::GetPDFMediaMap();
-    auto iter = pdfmediamap.find(paperNumber);
-    LONG nActualCharactersCopied = 0;
-    if (iter != pdfmediamap.end())
-    { 
-        CTL_StringType pageName = StringConversion::Convert_Ansi_To_Native(iter->second.first);
-        nActualCharactersCopied = dynarithmic::CopyInfoToCString(pageName, outName, nSize);
-    }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((outName))
-    LOG_FUNC_EXIT_NONAME_PARAMS(nActualCharactersCopied)
-    CATCH_BLOCK(-1)
+    // ptr must be a pointer to a valid null terminated string, or nullptr.
+    if (ptr)
+        strm << outStr << "=\"" << TruncateStringWithMore(ptr, 256)
+        << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")" << std::dec;
+    else
+        strm << outStr << "=(null)";
 }
+
+void ParamOutputter::LogType(std::string_view outStr, const wchar_t* ptr)
+{
+    // ptr must be a pointer to a valid null terminated string, or nullptr.
+    if (ptr)
+        strm << outStr << "=\"" <<
+        TruncateStringWithMore(StringConversion::Convert_WidePtr_To_Ansi(ptr), 256) <<
+        "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")" << std::dec;
+    else
+        strm << outStr << "=(null)";
+}
+

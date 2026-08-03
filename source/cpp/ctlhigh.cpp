@@ -32,11 +32,15 @@
 #include "errorcheck.h"
 #include "ctlsupport.h"
 #include "ctlsetgetcaps.h"
+#include "ctlstringutils.h"
+#include "ctlstringutilsx.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
+
 using CharType = CTL_StringType::value_type;
 
 typedef bool (*SetDoubleCapFn)(DTWAIN_SOURCE, LONG, double);
@@ -1048,7 +1052,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetDeviceCapByString(DTWAIN_SOURCE Source, LPTST
     DTWAIN_FLOAT tempR;
     const DTWAIN_BOOL retVal = fn(Source, &tempR);
     if ( retVal )
-        dynarithmic::basicstringutils::SafeStrcpy(strVal, dynarithmic::basicstringutils::TrimDouble<CTL_StringType>(tempR).c_str(), 255);
+        stringutils::SafeStrcpy(strVal, stringutils::TrimDouble<CTL_StringType>(tempR).c_str(), 255);
     return retVal;
 }
 

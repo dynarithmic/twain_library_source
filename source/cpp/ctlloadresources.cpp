@@ -32,6 +32,9 @@
 #include "dtwain_verinfo.h"
 #include "dtwstrfn.h"
 #include "crc32_aux.h"
+#include "ctlstringutilsx.h"
+
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace dynarithmic
 {
@@ -57,7 +60,7 @@ namespace dynarithmic
                     if (pos2 != std::string::npos)
                     {
                         std::string subPair = bracketedPairs.substr(pos + 1, pos2 - pos - 1);
-                        dynarithmic::basicstringutils::TrimAll(subPair);
+                        stringutils::TrimAll(subPair);
                         if (subPair.empty())
                             break;
                         std::istringstream strm(subPair);
@@ -188,7 +191,7 @@ namespace dynarithmic
                     if (!bReadFirstLine)
                     {
                         if (line.size() >= 3 && 
-                            dynarithmic::basicstringutils::StartsWith(std::string_view(line), std::string_view(BOMHeaderUTF)))
+                            stringutils::StartsWith(std::string_view(line), std::string_view(BOMHeaderUTF)))
                             line = line.substr(3);
                     }
                     bReadFirstLine = true;
@@ -199,14 +202,14 @@ namespace dynarithmic
                         if (resourceID == IDS_DTWAIN_APPTITLE || resourceID == IDS_DTWAIN_APPTITLE_HTML)
                             descr = StringConversion::Convert_Native_To_Ansi(
                                 CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, resourceID).second);
-                        dynarithmic::basicstringutils::TrimAll(descr);
-                        descr = dynarithmic::basicstringutils::ReplaceAll<std::string>(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
-                        descr = dynarithmic::basicstringutils::ReplaceAll<std::string>(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
+                        stringutils::TrimAll(descr);
+                        descr = stringutils::ReplaceAll<std::string>(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
+                        descr = stringutils::ReplaceAll<std::string>(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
                         if (resourceID == IDS_DTWAIN_APPTITLE)
-                            descr = dynarithmic::basicstringutils::ReplaceAll<std::string>(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                            descr = stringutils::ReplaceAll<std::string>(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
                         else
                         if (resourceID == IDS_DTWAIN_APPTITLE_HTML)
-                            descr = dynarithmic::basicstringutils::ReplaceAll<std::string>(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
+                            descr = stringutils::ReplaceAll<std::string>(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
                         resourceMap.insert({ resourceID, descr });
                     }
                 }
@@ -349,7 +352,7 @@ namespace dynarithmic
             ++curLine;
             try
             {
-                if (dynarithmic::basicstringutils::StartsWith(std::string_view(sCap), std::string_view("0x")))
+                if (stringutils::StartsWith(std::string_view(sCap), std::string_view("0x")))
                     lCap = std::stol(sCap, nullptr, 16);
                 else
                     lCap = std::stol(sCap);
@@ -364,7 +367,7 @@ namespace dynarithmic
 
             if (lCap == -1000 && capName == "END")
                 break;
-            bool isTWEIName = dynarithmic::basicstringutils::StartsWith(std::string_view(capName), 
+            bool isTWEIName = stringutils::StartsWith(std::string_view(capName), 
                                                                         std::string_view("TWEI_"));
             if (isTWEIName)
             {
@@ -401,10 +404,10 @@ namespace dynarithmic
             strm >> name;
             if ( pageType == -1 )
                 break;
-            name = dynarithmic::basicstringutils::TrimAll(name);
+            name = stringutils::TrimAll(name);
             std::string dimensions;
             std::getline(strm, dimensions);
-            dimensions = dynarithmic::basicstringutils::TrimAll(dimensions);
+            dimensions = stringutils::TrimAll(dimensions);
             mediamap.insert({ pageType, {name, dimensions } });
         }
 
@@ -420,7 +423,7 @@ namespace dynarithmic
                 break;
             std::string name;
             strm >> name;
-            name = dynarithmic::basicstringutils::TrimAll(name);
+            name = stringutils::TrimAll(name);
             std::vector<std::string> vExt;
             std::string ext;
             while (strm >> ext)
@@ -448,7 +451,7 @@ namespace dynarithmic
                 int64_t twainValue = 0;
                 try
                 {
-                    if (dynarithmic::basicstringutils::StartsWith(std::string_view(strTwainValue), std::string_view("0x")))
+                    if (stringutils::StartsWith(std::string_view(strTwainValue), std::string_view("0x")))
                         twainValue = stoll(strTwainValue, nullptr, 16);
                     else
                         twainValue = stoll(strTwainValue);
@@ -465,14 +468,14 @@ namespace dynarithmic
                 std::string name;
                 strm >> name;
                 std::replace(name.begin(), name.end(), '#', ' ');
-                name = dynarithmic::basicstringutils::TrimAll(name);
+                name = stringutils::TrimAll(name);
 
                 // Get all the names associated with this constant
                 std::vector<std::string> saNames;
                 if (twainValue == IDS_DTWAIN_APPTITLE || twainValue == IDS_DTWAIN_APPTITLE_HTML)
                     saNames.push_back(name);
                 else
-                    dynarithmic::basicstringutils::Tokenize(name, ", ", saNames);
+                    stringutils::Tokenize(name, ", ", saNames);
                 iter->second.insert({twainValue, saNames});
                 if (!bAllowDuplicate)
                 {
@@ -525,7 +528,7 @@ namespace dynarithmic
             if (pos == std::string::npos)
                 break;
             std::string sImageTypeName = totalLine.substr(0, pos);
-            dynarithmic::basicstringutils::TrimAll(sImageTypeName);
+            stringutils::TrimAll(sImageTypeName);
 
             // Get the bits-per-pixel that are "good"
             totalLine.erase(totalLine.begin(), totalLine.begin() + pos);
@@ -581,7 +584,7 @@ namespace dynarithmic
 
             // Parse the line containing the file save dialog information for the 
             // file type being saved
-            dynarithmic::basicstringutils::TokenizeQuoted(dynarithmic::basicstringutils::TrimAll(totalLine), " ", vParsedComponents);
+            stringutils::TokenizeQuoted(stringutils::TrimAll(totalLine), " ", vParsedComponents);
             if (vParsedComponents.size() != 5)
             {
                 retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
@@ -627,7 +630,7 @@ namespace dynarithmic
                 return false;
             }
             auto twainIDName = totalLine.substr(0, bracketPosStart);
-            dynarithmic::basicstringutils::TrimAll(twainIDName);
+            stringutils::TrimAll(twainIDName);
             auto compressionValuePr = CTL_StaticData::GetIDFromTwainName(twainIDName);
             if ( !compressionValuePr.first)
             {
@@ -638,12 +641,12 @@ namespace dynarithmic
             }
             auto compressionValue = compressionValuePr.second;
             auto allFileTypes = totalLine.substr(bracketPosStart+1);
-            dynarithmic::basicstringutils::TrimAll(allFileTypes);
+            stringutils::TrimAll(allFileTypes);
             allFileTypes.pop_back();
 
             // Parse the file types
             std::vector<std::string> sVector;
-            dynarithmic::basicstringutils::Tokenize(allFileTypes, " ", sVector);
+            stringutils::Tokenize(allFileTypes, " ", sVector);
             for (auto& str : sVector)
             {
                 auto oneVal = CTL_StaticData::GetIDFromTwainName(str);
@@ -764,10 +767,10 @@ namespace dynarithmic
             if (::LoadStringA(CTL_StaticData::GetDLLInstanceHandle(), i, szBuffer, DTWAIN_USERRES_MAXSIZE))
             {
                 std::string descr = szBuffer;
-                dynarithmic::basicstringutils::TrimAll(descr);
-                descr = dynarithmic::basicstringutils::ReplaceAll<std::string>(descr, "{short_version}", sVersion);
-                descr = dynarithmic::basicstringutils::ReplaceAll<std::string>(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
-                descr = dynarithmic::basicstringutils::ReplaceAll<std::string>(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                stringutils::TrimAll(descr);
+                descr = stringutils::ReplaceAll<std::string>(descr, "{short_version}", sVersion);
+                descr = stringutils::ReplaceAll<std::string>(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
+                descr = stringutils::ReplaceAll<std::string>(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
                 resourceMap.insert({ i, descr });
             }
         }

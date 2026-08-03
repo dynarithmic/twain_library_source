@@ -24,6 +24,7 @@
 #include "ctllogcalls.h"
 #include "logwriterutils.h"
 #include "ctltwainmanager.h"
+#include "ctlstringutilsx.h"
 
 using namespace dynarithmic;
 

@@ -22,6 +22,8 @@
 #include "errorcheck.h"
 #include "cppfunc.h"
 #include "arrayfactory.h"
+#include "ctlstringutilsx.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable : 4702)
 #pragma warning (disable : 4714)

@@ -26,6 +26,7 @@
 #include "errorcheck.h"
 #include "dtwstrfn.h"
 #include "ctlguidimpl.h"
+#include "ctlstringutilsx.h"
 
 using namespace dynarithmic;
 static std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator>

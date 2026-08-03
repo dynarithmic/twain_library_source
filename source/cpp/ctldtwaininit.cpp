@@ -42,6 +42,7 @@
 #include "ctlguiddef.h"
 #include "ctlwindowsimpl.h"
 #include "ctlguidimpl.h"
+#include "ctlstringutilsx.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
@@ -57,6 +58,7 @@
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
@@ -163,7 +165,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG l
     if ( bGotInfo )
     {
         StringArrayW sVersionArray;
-        dynarithmic::basicstringutils::Tokenize(info.FileVersion, L".", sVersionArray);
+        stringutils::Tokenize(info.FileVersion, L".", sVersionArray);
         LONG lpVersionVals[4] = {};
         if (sVersionArray.size() != 4)
             return false;
@@ -313,7 +315,7 @@ LONG DLLENTRY_DEF DTWAIN_GetLastError()
     // Test stuff
     std::string sTest = "VueScan TWAIN";
 
-    auto sNew = dynarithmic::basicstringutils::TrimAll(sTest);
+    auto sNew = stringutils::TrimAll(sTest);
 
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if ( !pHandle )
@@ -336,7 +338,7 @@ static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG n
     {
         // Copy the error number to the buffer if we haven't been able to find the 
         // resource string
-        sCopy = dynarithmic::basicstringutils::ToString<CTL_StringType>(resourceID);
+        sCopy = stringutils::ToString<CTL_StringType>(resourceID);
         if (resourceID != DTWAIN_ERR_WIN32_ERROR)
             return dynarithmic::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
     }
@@ -673,7 +675,7 @@ static bool CheckTwainAvailability(LPTSTR directories, LONG nMaxLen, LONG* maxCh
     auto retVal = IsTwainAvailableHelper(dirsToUse, maxLenToUse);
     if (maxCharsCopied)
         *maxCharsCopied = retVal;
-    dynarithmic::basicstringutils::Tokenize(dirsToUse, _T("|"), arr);
+    stringutils::Tokenize(dirsToUse, _T("|"), arr);
     for (auto& s : arr)
     {
         if (s != s_NullEntry)
@@ -730,7 +732,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen
     }
 
     CTL_StringType sDirs;
-    auto joinedString = dynarithmic::basicstringutils::Join<CTL_StringType>(availability.second, _T("|"));
+    auto joinedString = stringutils::Join<CTL_StringType>(availability.second, _T("|"));
     auto actualLengthCopied = dynarithmic::CopyInfoToCString(joinedString, directories, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
     LOG_FUNC_EXIT_NONAME_PARAMS(actualLengthCopied)
@@ -1587,7 +1589,7 @@ static DTWAIN_ARRAY GetFileTypes(CTL_TwainDLLHandle* pHandle, int nType)
         for (auto& pr : availableFileTypes)
         {
             auto val = pr.first;
-            if (dynarithmic::basicstringutils::EndsWith(std::string_view(pr.second.m_formatName), 
+            if (stringutils::EndsWith(std::string_view(pr.second.m_formatName), 
                 sNames[nType]))
                 factory->add_to_back(aFileTypes, &val, 1);
         }
@@ -1600,7 +1602,7 @@ static std::string GetFileTypeExtensionsInternal(int nType)
     const auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
     const auto iter = availableFileTypes.find(nType);
     if ( iter != availableFileTypes.end())
-        return dynarithmic::basicstringutils::Join<std::string>(iter->second.m_vExtensions, "|");
+        return stringutils::Join<std::string>(iter->second.m_vExtensions, "|");
     return {};
 }
 
@@ -2499,7 +2501,7 @@ CTL_StringType CheckSearchOrderString(CTL_StringType str)
     static std::set<TCHAR> setValidChars = {_T('C'),_T('W'),_T('O'),_T('U'), _T('S')};
     std::set<TCHAR> setDuplicates;
     CTL_StringType strOut;
-    dynarithmic::basicstringutils::MakeUpperCase(str);
+    stringutils::MakeUpperCase(str);
     std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](TCHAR ch)
         {
             bool isValidChar = false;
@@ -2818,7 +2820,7 @@ bool LoadGeneralResources(const SysInitializeOptions& initOptions)
             {
                 bool bWroteInfoToFile = false;
                 std::string sErr = StringConversion::Convert_Native_To_Ansi(
-                    dynarithmic::basicstringutils::ReplaceAll<CTL_StringType>(sAllErrors, _T("\r"), _T(" ")));
+                    stringutils::ReplaceAll<CTL_StringType>(sAllErrors, _T("\r"), _T(" ")));
                 if (initOptions.createErrorLog)
                 {
                     // Write the information to errorlog_*.txt located in the resource directory
@@ -2862,7 +2864,7 @@ void LoadSelectSourcePosition()
     if (pLastPos && pLastPos[0] != 0)
     {
         std::vector<CTL_StringTypeA> arr;
-        auto numTokens = dynarithmic::basicstringutils::Tokenize(pLastPos, " ", arr);
+        auto numTokens = stringutils::Tokenize(pLastPos, " ", arr);
         if (numTokens >= 2)
         {
             auto& lastPos = CTL_StaticData::GetSelectSourcePos();

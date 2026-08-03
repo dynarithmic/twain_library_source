@@ -278,6 +278,21 @@ namespace dynarithmic
             return str;
         }
 
+        template <typename CharT, typename Traits = std::char_traits<CharT>>
+        bool IEquals(std::basic_string_view<CharT, Traits> lhs,
+                     std::basic_string_view<CharT, Traits> rhs)
+        {
+            if (lhs.size() != rhs.size())
+                return false;
+
+            return std::equal(lhs.begin(), lhs.end(), rhs.begin(),
+                [](CharT c1, CharT c2)
+                {
+                    return CharTraits<CharT>::ToLower(c1) ==
+                        CharTraits<CharT>::ToLower(c2);
+                });
+        }
+
         template <typename StringType>
         int Compare(typename std::basic_string_view<typename StringType::value_type> str, 
                     const typename StringType::value_type* lpsz)
@@ -289,7 +304,9 @@ namespace dynarithmic
         bool CompareNoCase(typename std::basic_string_view<typename StringType::value_type> str, 
                            const typename StringType::value_type* lpsz)
         {
-            return boost::iequals(str, lpsz);
+            using StringView = std::basic_string_view<typename StringType::value_type>;
+            StringView vw(lpsz);
+            return IEquals(str, vw);
         }
 
         template <typename CharT>

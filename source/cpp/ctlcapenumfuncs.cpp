@@ -24,12 +24,14 @@
 #include "ctltmpl5.h"
 #include "ctllogcalls.h"
 #include "ctlarray.h"
+#include "ctlstringutilsx.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 /////////////////////////////////////////////////////////////////////////
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx(DTWAIN_SOURCE Source)
@@ -353,7 +355,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)
         }
         if (logFilterFlags && vFailed.size() > 1)
         {
-            auto sJoined = dynarithmic::basicstringutils::Join<std::string>(vFailed, "\n");
+            auto sJoined = stringutils::Join<std::string>(vFailed, "\n");
             LogWriterUtils::WriteMultiLineInfoIndentedA(sJoined, "\n");
         }
     }

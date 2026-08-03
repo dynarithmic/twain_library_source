@@ -21,6 +21,7 @@
 #include "ctliface.h"
 #include "transym_ocrinterface.h"
 #include "errorcheck.h"
+#include "ctlstringutilsx.h"
 
 namespace stringutils = dynarithmic::basicstringutils;
 

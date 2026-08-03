@@ -428,6 +428,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlstringconversion.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringdefs.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlstringutilsx.h
         ${PROJECT_SOURCE_DIR}/h/ctlsupport.h
         ${PROJECT_SOURCE_DIR}/h/ctlthreadutils.h
         ${PROJECT_SOURCE_DIR}/h/ctltimer.h
@@ -617,6 +618,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlimageinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlloggercallback.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctllogmessage.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctllogfunctioncall.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmanualduplex.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmaxacquires.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmultipagescan.cpp
@@ -716,7 +718,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlselectdialog.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcecompression.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcedetails.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlstringutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlstringutilsx.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlthreadutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltimeout.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltripletbase.cpp

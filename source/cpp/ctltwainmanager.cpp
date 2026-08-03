@@ -53,6 +53,7 @@
 #include "ctltr039.h"
 #include "ctltr043.h"
 #include "ctlguidimpl.h"
+#include "ctlstringutilsx.h"
 
 using namespace dynarithmic;
 namespace stringutils = dynarithmic::basicstringutils;

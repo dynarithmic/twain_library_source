@@ -21,6 +21,7 @@
 #include "cppfunc.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "ctlstringutilsx.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

@@ -35,6 +35,7 @@
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
@@ -44,7 +45,7 @@ namespace
         using CharType = T::value_type::value_type;
         for (auto& oneName : vect)
         {
-            if (dynarithmic::basicstringutils::IsAllSpace<CharType>(oneName.c_str()))
+            if (stringutils::IsAllSpace<CharType>(oneName.c_str()))
                 return true;
         }
         return false;
