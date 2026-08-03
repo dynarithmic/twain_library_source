@@ -40,7 +40,7 @@ namespace dynarithmic
             {
                 SetSessionPtr(pSession);
                 SetSourcePtr(pSource);
-                dynarithmic::basicstringutils::SafeStrcpy(m_SetupFileXfer.FileName,
+                stringutils::SafeStrcpy(m_SetupFileXfer.FileName,
                     StringConversion::Convert_Native_To_Ansi(strFileName).c_str(),
                     sizeof m_SetupFileXfer.FileName - 1);
 

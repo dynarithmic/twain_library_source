@@ -31,6 +31,7 @@
 #include "ctlguidimpl.h"
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
@@ -257,7 +258,7 @@ namespace
         //  c) All other text info fields are "static"
         std::vector<unsigned> PositionVec;
         StringArray strArray;
-        dynarithmic::basicstringutils::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
+        stringutils::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
         PDFStringToTextElement pMap;
         pMap.reserve(strArray.size());
         PDFTextElement element;
@@ -391,7 +392,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
             CTL_StringArrayType pathValues;
             dynarithmic::filenameutils::SplitPath(m_ImageInfoEx.szImageFileName, pathValues);
             szTempFile = m_ImageInfoEx.szImageFileName;
-            if ( dynarithmic::basicstringutils::CompareNoCase<CTL_StringType>(pathValues[dynarithmic::filenameutils::EXTENSION_POS], _T("TIF")))
+            if ( stringutils::CompareNoCase<CTL_StringType>(pathValues[dynarithmic::filenameutils::EXTENSION_POS], _T("TIF")))
                 PDFHandler.SetImageType(1);
             else
                 PDFHandler.SetImageType(0);

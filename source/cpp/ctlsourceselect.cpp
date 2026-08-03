@@ -34,6 +34,7 @@
 
 using namespace dynarithmic;
 using namespace boost::logic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 LONG DLLENTRY_DEF DTWAIN_SetTwainDialogFont(HFONT font)
 {
@@ -67,7 +68,7 @@ static LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOption
         if (retval != TRUE)
         {
             const LONG err = DTWAIN_ERR_SOURCE_COULD_NOT_OPEN;
-            CTL_StringType sProdName = dynarithmic::basicstringutils::QuoteString(p->GetProductName());
+            CTL_StringType sProdName = stringutils::QuoteString(p->GetProductName());
             DTWAIN_Check_Error_Condition_NoLogError_WithThrow(pHandle, [&]{return !retval; }, err, 
                                               StringConversion::Convert_Native_To_Ansi(sProdName, sProdName.length()).c_str(), err, FUNC_MACRO);
         }

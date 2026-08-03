@@ -25,6 +25,7 @@
 #include "ctltwaindecoder.h"
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 static std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix);
 static std::string DecodeData(CTL_TWAINTypeDecoder *pDecoder, TW_MEMREF pData, ErrorStructTypes sType);
@@ -349,7 +350,7 @@ std::string DecodeData(CTL_TWAINTypeDecoder* pDecoder, TW_MEMREF pData, ErrorStr
                 sBuffer <<
                 "\nTW_MEMREF <==> handle to window (HWND):\n{\n" <<
                 indenter << "HWND=" << *pHWND << "\n" <<
-                indenter << "Screen Pos.=" << dynarithmic::basicstringutils::Join<std::string>(aRect, ",") << "\n}";
+                indenter << "Screen Pos.=" << stringutils::Join<std::string>(aRect, ",") << "\n}";
             #endif
             }
             break;
@@ -451,7 +452,7 @@ std::string DecodeData(CTL_TWAINTypeDecoder* pDecoder, TW_MEMREF pData, ErrorStr
                         indenter << "ModalUI=" << (pUSERINTERFACE->ModalUI?"TRUE":"FALSE") << "\n" <<
                         indenter << "hParent=" << pUSERINTERFACE->hParent << "\n" <<
                         indenter << "hParent.Title=" << StringConversion::Convert_NativePtr_To_Ansi(sz) << "\n" <<
-                        indenter << "hParent.ScreenPos= {" << dynarithmic::basicstringutils::Join<std::string>(aRect, ",") << "}\n}";
+                        indenter << "hParent.ScreenPos= {" << stringutils::Join<std::string>(aRect, ",") << "}\n}";
             #endif
             }
             break;
@@ -780,7 +781,7 @@ std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups)
                 allGroups.push_back("Unknown (" + std::to_string(curGroup) + ")");
         }
     }
-    return dynarithmic::basicstringutils::Join<std::string>(allGroups, ", ");
+    return stringutils::Join<std::string>(allGroups, ", ");
 }
 
 std::string DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCSTR pMem)
@@ -855,5 +856,5 @@ std::string CTL_TWAINTypeDecoder::DecodeCapOperations(LONG nOps)
         if (nOps & nAllOps[i])
             vOps.push_back(sAllOps[i].data());
     }
-    return dynarithmic::basicstringutils::Join<std::string>(vOps, " | ");
+    return stringutils::Join<std::string>(vOps, " | ");
 }

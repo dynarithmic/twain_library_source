@@ -21,6 +21,7 @@
 #include "logwriterutils.h"
 #include "ctliface.h"
 #include "ctlstringutils.h"
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace dynarithmic
 {
@@ -75,7 +76,7 @@ namespace dynarithmic
     {
         #if DTWAIN_BUILD_LOGCALLSTACK == 1
         std::vector<CTL_StringTypeA> sArray;
-        dynarithmic::basicstringutils::Tokenize(s.data(), pszDelim, sArray, true);
+        stringutils::Tokenize(s.data(), pszDelim, sArray, true);
         for (auto& oneString : sArray)
             CTL_LogFunctionCallA(CTL_StaticData::GetLogFilterFlags(), oneString.c_str(), nWhich);
         #endif

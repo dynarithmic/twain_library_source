@@ -26,6 +26,7 @@
 #include "ctlwindowsimpl.h"
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG CreationFlags)
 {
@@ -62,7 +63,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
             if (bLogMessages)
             {
                 std::string sMessage = GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " + 
-                    dynarithmic::basicstringutils::QuoteString(dirCreated.second);
+                    stringutils::QuoteString(dirCreated.second);
                 LogWriterUtils::WriteLogInfoIndentedA(sMessage);
             }
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);

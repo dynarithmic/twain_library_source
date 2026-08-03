@@ -29,6 +29,7 @@
 #include <string>
 #include "logwriterutils.h"
 #include "ctlstringutils.h"
+#include "ctlstringutilsx.h"
 #include "ctlstringconversion.h"
 #include "dtwaindefs.h"
 #include "dtwain_resource_constants2.h"

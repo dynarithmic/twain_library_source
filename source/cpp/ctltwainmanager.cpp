@@ -55,6 +55,7 @@
 #include "ctlguidimpl.h"
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
     {TWCC_SUCCESS         ,IDS_ErrCCFalseAlarm},
@@ -928,7 +929,7 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
 
         auto sGUID = GetGUID();
         szTempPath += sGUID + _T(".IDT");
-        dynarithmic::basicstringutils::TrimAll(szTempPath);
+        stringutils::TrimAll(szTempPath);
         pSource->GetAcquireFileStatus().SetAcquireFileName(szTempPath);
     }
     else
@@ -2059,17 +2060,17 @@ CTL_CapStruct CTL_TwainAppMgr::GetGeneralCapInfo(LONG Cap)
 LONG CTL_TwainAppMgr::GetCapFromCapName(const char* szCapName)
 {
     std::string strCap = szCapName;
-    dynarithmic::basicstringutils::TrimAll(strCap);
-    dynarithmic::basicstringutils::MakeUpperCase(strCap);
+    stringutils::TrimAll(strCap);
+    stringutils::MakeUpperCase(strCap);
     if (strCap.empty())
         return TwainCap_INVALID;
 
     // Check if the cap name is CAP_CUSTOMBASE
-    if (dynarithmic::basicstringutils::StartsWith(std::string_view(strCap), std::string_view("CAP_CUSTOMBASE")))
+    if (stringutils::StartsWith(std::string_view(strCap), std::string_view("CAP_CUSTOMBASE")))
     {
         // Extract the integer portion
         StringArray sArray;
-        dynarithmic::basicstringutils::Tokenize(dynarithmic::basicstringutils::Mid<std::string>(strCap, 14), "+ ", sArray);
+        stringutils::Tokenize(stringutils::Mid<std::string>(strCap, 14), "+ ", sArray);
         const size_t nSize = sArray.size();
         if (nSize > 0)
         {
@@ -2096,7 +2097,7 @@ LONG CTL_TwainAppMgr::GetCapFromCapName(const char* szCapName)
     size_t count = 0;
     for (; count < startPrefix.size(); ++count)
     {
-        if (dynarithmic::basicstringutils::StartsWith(std::string_view(strCap), startPrefix[count]))
+        if (stringutils::StartsWith(std::string_view(strCap), startPrefix[count]))
         {
             // Get the id, given the TWAIN name
             auto retVal = CTL_StaticData::GetIDFromTwainName(strCap);
@@ -2183,11 +2184,11 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
         {
             filesys::path dllName(appMgr->GetDSMPath());
         #ifdef _UNICODE
-            auto lowerName = dynarithmic::basicstringutils::LowerCase(dllName.filename().native());
+            auto lowerName = stringutils::LowerCase(dllName.filename().native());
         #else
-            auto lowerName = dynarithmic::basicstringutils::LowerCase(dllName.filename().string());
+            auto lowerName = stringutils::LowerCase(dllName.filename().string());
         #endif
-            auto isSame = dynarithmic::basicstringutils::CompareNoCase<CTL_StringType>(lowerName, strTwainDLLName.c_str());
+            auto isSame = stringutils::CompareNoCase<CTL_StringType>(lowerName, strTwainDLLName.c_str());
             if (isSame)
                 return { true, appMgrPtr->GetDSMPath() };
         }
@@ -2374,7 +2375,7 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
         if ( rArray.empty() && logErrors)
         {
             std::string s1 = GetResourceStringFromMap(DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY1);
-            s1 += " - " + dynarithmic::basicstringutils::QuoteString(pSource->GetProductNameA());
+            s1 += " - " + stringutils::QuoteString(pSource->GetProductNameA());
             LogWriterUtils::WriteLogInfoIndentedA(s1);
         }
         if (!rArray.empty() && logErrors)
@@ -2386,7 +2387,7 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
             if (!bOk)
             {
                 std::string s1 = GetResourceStringFromMap(DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY2);
-                s1 += " - " + dynarithmic::basicstringutils::QuoteString(pSource->GetProductNameA());
+                s1 += " - " + stringutils::QuoteString(pSource->GetProductNameA());
                 LogWriterUtils::WriteLogInfoIndentedA(s1);
             }
         }

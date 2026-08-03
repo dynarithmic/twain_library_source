@@ -29,6 +29,8 @@
 #include "ctliface.h"
 #include "ctlstringutils.h"
 
+namespace stringutils = dynarithmic::basicstringutils;
+
 namespace dynarithmic
 {
     namespace fileutils
@@ -197,7 +199,7 @@ namespace dynarithmic
                 if ((strName + strFormat).length() > 8)
                 {
                     int nBase = 8 - nLenFormat;
-                    strName = dynarithmic::basicstringutils::Left<StringType>(strName, nBase) + strFormat;
+                    strName = stringutils::Left<StringType>(strName, nBase) + strFormat;
                 }
                 else
                     strName += strFormat;

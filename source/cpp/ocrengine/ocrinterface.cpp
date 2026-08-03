@@ -22,6 +22,8 @@
 #include "transym_ocrinterface.h"
 #include "errorcheck.h"
 
+namespace stringutils = dynarithmic::basicstringutils;
+
 #ifdef _MSC_VER
 #pragma warning (disable:4505)
 #endif
@@ -749,10 +751,10 @@ static bool NewOCRJob(const OCREngine *pEngine, LPCSTR szFileName)
 {
     std::string s1 = pEngine->GetCachedFile();
     std::string s2 = szFileName;
-    s1 = dynarithmic::basicstringutils::TrimAll(s1);
-    s1 = dynarithmic::basicstringutils::MakeLowerCase(s1);
-    s2 = dynarithmic::basicstringutils::TrimAll(s2);
-    s2 = dynarithmic::basicstringutils::MakeLowerCase(s2);
+    s1 = stringutils::TrimAll(s1);
+    s1 = stringutils::MakeLowerCase(s1);
+    s2 = stringutils::TrimAll(s2);
+    s2 = stringutils::MakeLowerCase(s2);
     return s1 != s2;
 }
 

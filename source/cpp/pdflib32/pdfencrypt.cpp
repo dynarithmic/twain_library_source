@@ -35,6 +35,7 @@ OF THIRD PARTY RIGHTS.
 #include "pdfencrypt.h"
 #include "ctlhashutils.h"
 #include "ctlstringutils.h"
+#include "ctlstringutilsx.h"
 
 std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER
@@ -42,6 +43,7 @@ std::string GetSystemTimeInMilliseconds();
 #endif
 
 using namespace boost::multiprecision;
+namespace stringutils = dynarithmic::basicstringutils;
 
 // Function to convert 16-byte big-endian char array to 16 byte integer
 static uint128_t bigEndianBytesToInt(const unsigned char* bytes, size_t numBytes)
