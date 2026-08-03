@@ -30,7 +30,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
     if ( pHandle )
     {
         const CTL_StringType sMsg = StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(IDS_DTWAIN_USERMSG_INDICATOR)) 
-                                    + StringTraits::GetSpace() + message;
+                                    + _T(' ') + message;
         LogWriterUtils::WriteLogInfo(sMsg);
         return TRUE;
     }

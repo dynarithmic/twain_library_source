@@ -41,7 +41,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, LPTSTR fileName, 
 {
     LOG_FUNC_ENTRY_PARAMS((Source, fileName, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG nTotalBytes = StringWrapper::CopyInfoToCString(pSource->GetAcquireFileStatusRef().GetActualFileName(), fileName, nMaxLen);
+    const LONG nTotalBytes = dynarithmic::CopyInfoToCString(pSource->GetAcquireFileStatusRef().GetActualFileName(), fileName, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((fileName))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK_LOG_PARAMS(-1)
@@ -52,7 +52,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, LPTSTR szName,
     LOG_FUNC_ENTRY_PARAMS((Source, szName, MaxLen))
     auto [pHandle, pSource] = VerifyHandles(Source);
     const CTL_StringType s = pSource->GetAcquireFileStatusRef().GetLastAcquiredFileName();
-    auto sLen = StringWrapper::CopyInfoToCString(s, szName, MaxLen);
+    auto sLen = dynarithmic::CopyInfoToCString(s, szName, MaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szName))
     LOG_FUNC_EXIT_NONAME_PARAMS((LONG)sLen)
     CATCH_BLOCK_LOG_PARAMS(-1L)

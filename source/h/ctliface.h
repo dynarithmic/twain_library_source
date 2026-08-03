@@ -31,6 +31,7 @@
 #include <functional>
 #include <array>
 #include <string_view>
+#include <deque>
 #include "ctltripletbase.h"
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
@@ -47,6 +48,7 @@
 #include "ctllogfunctioncall.h"
 #include "capinfomap.h"
 #include "ctlbimap.h"
+
 #ifdef _WIN32
     #include "winlibraryloader_impl.inl"
 #else

@@ -928,7 +928,7 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
 
         auto sGUID = GetGUID();
         szTempPath += sGUID + _T(".IDT");
-        StringWrapper::TrimAll(szTempPath);
+        dynarithmic::basicstringutils::TrimAll(szTempPath);
         pSource->GetAcquireFileStatus().SetAcquireFileName(szTempPath);
     }
     else
@@ -1504,7 +1504,7 @@ LPSTR CTL_TwainAppMgr::GetLastErrorString(LPSTR lpszBuffer, int nSize)
 LPSTR CTL_TwainAppMgr::GetErrorString(int nError, LPSTR lpszBuffer, int nSize)
 {
     if ( nError == s_nLastError )
-        StringWrapperA::CopyInfoToCString(s_strLastError, lpszBuffer, nSize);
+        dynarithmic::CopyInfoToCString(s_strLastError, lpszBuffer, nSize);
     else
         GetResourceStringA(nError, lpszBuffer, nSize);
     return lpszBuffer;
@@ -2059,17 +2059,17 @@ CTL_CapStruct CTL_TwainAppMgr::GetGeneralCapInfo(LONG Cap)
 LONG CTL_TwainAppMgr::GetCapFromCapName(const char* szCapName)
 {
     std::string strCap = szCapName;
-    StringWrapperA::TrimAll(strCap);
-    StringWrapperA::MakeUpperCase(strCap);
+    dynarithmic::basicstringutils::TrimAll(strCap);
+    dynarithmic::basicstringutils::MakeUpperCase(strCap);
     if (strCap.empty())
         return TwainCap_INVALID;
 
     // Check if the cap name is CAP_CUSTOMBASE
-    if (StringWrapperA::StartsWith(strCap, "CAP_CUSTOMBASE"))
+    if (dynarithmic::basicstringutils::StartsWith(std::string_view(strCap), std::string_view("CAP_CUSTOMBASE")))
     {
         // Extract the integer portion
         StringArray sArray;
-        StringWrapperA::Tokenize(StringWrapperA::Mid(strCap, 14), "+ ", sArray);
+        dynarithmic::basicstringutils::Tokenize(dynarithmic::basicstringutils::Mid<std::string>(strCap, 14), "+ ", sArray);
         const size_t nSize = sArray.size();
         if (nSize > 0)
         {
@@ -2096,7 +2096,7 @@ LONG CTL_TwainAppMgr::GetCapFromCapName(const char* szCapName)
     size_t count = 0;
     for (; count < startPrefix.size(); ++count)
     {
-        if (StringWrapperA::StartsWith(strCap, startPrefix[count].data()))
+        if (dynarithmic::basicstringutils::StartsWith(std::string_view(strCap), startPrefix[count]))
         {
             // Get the id, given the TWAIN name
             auto retVal = CTL_StaticData::GetIDFromTwainName(strCap);
@@ -2183,11 +2183,11 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
         {
             filesys::path dllName(appMgr->GetDSMPath());
         #ifdef _UNICODE
-            auto lowerName = StringWrapper::LowerCase(dllName.filename().native());
+            auto lowerName = dynarithmic::basicstringutils::LowerCase(dllName.filename().native());
         #else
-            auto lowerName = StringWrapper::LowerCase(dllName.filename().string());
+            auto lowerName = dynarithmic::basicstringutils::LowerCase(dllName.filename().string());
         #endif
-            auto isSame = StringWrapper::CompareNoCase(lowerName, strTwainDLLName.c_str());
+            auto isSame = dynarithmic::basicstringutils::CompareNoCase<CTL_StringType>(lowerName, strTwainDLLName.c_str());
             if (isSame)
                 return { true, appMgrPtr->GetDSMPath() };
         }
@@ -2374,7 +2374,7 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
         if ( rArray.empty() && logErrors)
         {
             std::string s1 = GetResourceStringFromMap(DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY1);
-            s1 += " - " + StringWrapperA::QuoteString(pSource->GetProductNameA());
+            s1 += " - " + dynarithmic::basicstringutils::QuoteString(pSource->GetProductNameA());
             LogWriterUtils::WriteLogInfoIndentedA(s1);
         }
         if (!rArray.empty() && logErrors)
@@ -2386,7 +2386,7 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
             if (!bOk)
             {
                 std::string s1 = GetResourceStringFromMap(DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY2);
-                s1 += " - " + StringWrapperA::QuoteString(pSource->GetProductNameA());
+                s1 += " - " + dynarithmic::basicstringutils::QuoteString(pSource->GetProductNameA());
                 LogWriterUtils::WriteLogInfoIndentedA(s1);
             }
         }

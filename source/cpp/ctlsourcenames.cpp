@@ -42,7 +42,7 @@ LONG DLLENTRY_DEF DTWAIN_GetNameFromCap(LONG nCapValue, LPTSTR szValue, LONG nMa
 {
     LOG_FUNC_ENTRY_PARAMS((nCapValue, szValue, nMaxLen))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG nTotalBytes = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(CTL_TwainAppMgr::GetCapNameFromCap(nCapValue)), szValue, nMaxLen);
+    const LONG nTotalBytes = dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(CTL_TwainAppMgr::GetCapNameFromCap(nCapValue)), szValue, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szValue))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(-1)

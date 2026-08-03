@@ -38,7 +38,7 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
     DTWAINArrayLowLevel_RAII raii(pHandle, Array);
     CTL_StringType sVal;
     pHandle->m_ArrayFactory->get_value(Array, 0, &sVal);
-    StringWrapper::CopyInfoToCString(sVal,sz,nLen);
+    dynarithmic::CopyInfoToCString(sVal,sz,nLen);
     return bRet;
 }
 

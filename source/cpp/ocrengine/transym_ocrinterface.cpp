@@ -499,7 +499,7 @@ void TransymOCR::SetAvailableCaps()
             StringArray strSplit;
 
             // Tokenize the comma delimited string
-            StringWrapperA::Tokenize(capsLongInfo[i].CommaDelValues, "," , strVals);
+            dynarithmic::basicstringutils::Tokenize(capsLongInfo[i].CommaDelValues, "," , strVals);
 
             const size_t numVals = strVals.size();
 
@@ -508,7 +508,7 @@ void TransymOCR::SetAvailableCaps()
             for ( size_t j = 0; j < numVals; ++j )
             {
                 // Get the split of the two values
-                StringWrapperA::Tokenize(strVals[j],":", strSplit);
+                dynarithmic::basicstringutils::Tokenize(strVals[j],":", strSplit);
                 LONG val1, val2;
                 val1 = strtol(strSplit[0].c_str(), &p, 0);
                 val2 = strtol(strSplit[1].c_str(), &p, 0);
@@ -575,7 +575,7 @@ void TransymOCR::SetAvailableCaps()
             StringArray strSplit;
 
             // Tokenize the comma delimited string
-            StringWrapperA::Tokenize(capsStringInfo[i].CommaDelValues,"," , strVals);
+            dynarithmic::basicstringutils::Tokenize(capsStringInfo[i].CommaDelValues,"," , strVals);
 
             const size_t numVals = strVals.size();
 
@@ -583,7 +583,7 @@ void TransymOCR::SetAvailableCaps()
             for ( size_t j = 0; j < numVals; ++j )
             {
                 // Get the split of the two values
-                StringWrapperA::Tokenize(strVals[j],":", strSplit);
+                dynarithmic::basicstringutils::Tokenize(strVals[j],":", strSplit);
                 std::string val1, val2;
                 val1 = strSplit[0];
                 val2 = strSplit[1];
@@ -804,7 +804,7 @@ bool TransymOCR::SetOCRVersionIdentity()
         {
             const VersionInfoA ver( hInst );
             StringArray aTokens;
-            StringWrapperA::Tokenize(ver.getFileVersionDotted(),".", aTokens);
+            dynarithmic::basicstringutils::Tokenize(ver.getFileVersionDotted(),".", aTokens);
             if ( aTokens.size() >= 2 )
             {
                 theIdentity.Version.MajorNum = atoi(aTokens[0].c_str());

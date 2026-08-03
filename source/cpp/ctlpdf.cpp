@@ -151,11 +151,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFJpegQuality(DTWAIN_SOURCE Source, LONG Qua
 }
 
 typedef DTWAIN_BOOL (DLLENTRY_DEF *SetPDFFn)(DTWAIN_SOURCE, LONG, DTWAIN_FLOAT, DTWAIN_FLOAT);
+using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
 
 static DTWAIN_BOOL SetPDFStringFunc(DTWAIN_SOURCE Source, LONG value, LPCTSTR val1, LPCTSTR val2, SetPDFFn fn)
 {
-    const DTWAIN_FLOAT value1 = StringWrapper::ToDouble(val1);
-    const DTWAIN_FLOAT value2 = StringWrapper::ToDouble(val2);
+    const DTWAIN_FLOAT value1 = dynarithmic::CharTraits<CharType>::ToDouble(val1);
+    const DTWAIN_FLOAT value2 = dynarithmic::CharTraits<CharType>::ToDouble(val2);
     return fn(Source, value, value1, value2);
 }
 
@@ -279,11 +280,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFOCRMode(DTWAIN_SOURCE Source, DTWAIN_BOOL 
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-template <typename wrapperType, typename strType, int tupleVal>
+template <typename strType, int tupleVal>
 static LONG GetType1FontInternal(int FontVal, strType szFont, LONG nChars)
 {
     auto st = GetType1FontNameFromType(FontVal);
-    return wrapperType::CopyInfoToCString(std::get<tupleVal>(st), szFont, nChars);
+    return dynarithmic::CopyInfoToCString(std::get<tupleVal>(st), szFont, nChars);
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG nChars)
@@ -292,9 +293,9 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG n
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     int numChars = 0;
     #ifdef _UNICODE
-    numChars = GetType1FontInternal<StringWrapperW, LPWSTR, 2>(FontVal, szFont, nChars); 
+    numChars = GetType1FontInternal<LPWSTR, 2>(FontVal, szFont, nChars); 
     #else
-       numChars = GetType1FontInternal<StringWrapperA, LPSTR, 1>(FontVal, szFont, nChars); 
+    numChars = GetType1FontInternal<LPSTR, 1>(FontVal, szFont, nChars); 
     #endif
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFont))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
@@ -305,7 +306,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameA(LONG FontVal, LPSTR szFont, LONG n
 {
     LOG_FUNC_ENTRY_PARAMS((FontVal, szFont, nChars))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    int numChars = GetType1FontInternal<StringWrapperA, LPSTR, 1>(FontVal, szFont, nChars);
+    int numChars = GetType1FontInternal<LPSTR, 1>(FontVal, szFont, nChars);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFont))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(-1)
@@ -315,7 +316,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG 
 {
     LOG_FUNC_ENTRY_PARAMS((FontVal, szFont, nChars))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    int numChars = GetType1FontInternal<StringWrapperW, LPWSTR, 2>(FontVal, szFont, nChars);
+    int numChars = GetType1FontInternal<LPWSTR, 2>(FontVal, szFont, nChars);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFont))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(-1)
@@ -480,11 +481,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szText, xPos, yPos, fontName, fontSize, colorRGB,
                               renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags))
-    const DTWAIN_FLOAT val1 = StringWrapper::ToDouble(fontSize);
-    const DTWAIN_FLOAT val2 = StringWrapper::ToDouble(scaling);
-    const DTWAIN_FLOAT val3 = StringWrapper::ToDouble(charSpacing);
-    const DTWAIN_FLOAT val4 = StringWrapper::ToDouble(wordSpacing);
-    const DTWAIN_FLOAT val5 = StringWrapper::ToDouble(strokeWidth);
+    const DTWAIN_FLOAT val1 = dynarithmic::CharTraits<CharType>::ToDouble(fontSize);
+    const DTWAIN_FLOAT val2 = dynarithmic::CharTraits<CharType>::ToDouble(scaling);
+    const DTWAIN_FLOAT val3 = dynarithmic::CharTraits<CharType>::ToDouble(charSpacing);
+    const DTWAIN_FLOAT val4 = dynarithmic::CharTraits<CharType>::ToDouble(wordSpacing);
+    const DTWAIN_FLOAT val5 = dynarithmic::CharTraits<CharType>::ToDouble(strokeWidth);
     auto retVal = DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, val1,
                                     colorRGB, renderMode, val2, val3, val4, val5, Flags);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
@@ -664,8 +665,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT Tex
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloatString(DTWAIN_PDFTEXTELEMENT TextElement, LPCTSTR val1, LPCTSTR val2, LONG Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, val2, Flags))
-    const DTWAIN_FLOAT value1 = StringWrapper::ToDouble(val1);
-    const DTWAIN_FLOAT value2 = StringWrapper::ToDouble(val2);
+    const DTWAIN_FLOAT value1 = dynarithmic::CharTraits<CharType>::ToDouble(val1);
+    const DTWAIN_FLOAT value2 = dynarithmic::CharTraits<CharType>::ToDouble(val2);
     auto retVal = DTWAIN_SetPDFTextElementFloat(TextElement, value1, value2, Flags);
     LOG_FUNC_EXIT_PARAMS(retVal)
     CATCH_BLOCK(false)
@@ -875,11 +876,11 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextEleme
     switch (Flags)
     {
         case DTWAIN_PDFTEXTELEMENT_FONTNAME:
-            retLength = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_font.m_fontName), lpszStr, maxLen);
+            retLength = dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_font.m_fontName), lpszStr, maxLen);
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TEXT:
-            retLength = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_text), lpszStr, maxLen);
+            retLength = dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_text), lpszStr, maxLen);
         break;
 
         default:

@@ -37,6 +37,7 @@
 #pragma warning (disable:4702)
 #endif
 using namespace dynarithmic;
+using CharType = CTL_StringType::value_type;
 
 typedef bool (*SetDoubleCapFn)(DTWAIN_SOURCE, LONG, double);
 typedef bool (*GetDoubleCapFn)(DTWAIN_SOURCE, LONG, double *);
@@ -252,7 +253,7 @@ namespace
         {
             std::string sVal;
             pHandle->m_ArrayFactory->get_value(ArrayValues, 0, &sVal);
-            StringWrapperA::CopyInfoToCString(sVal, value, nLen);
+            dynarithmic::CopyInfoToCString(sVal, value, nLen);
             return true;
         }
         return false;
@@ -377,7 +378,7 @@ namespace
         std::string valueTemp((NumChars)+1, '\0');
         auto retVal = GetStringCapability(Source, static_cast<TW_UINT16>(Cap), &valueTemp[0], NumChars, GetCurrentCapValues);
         valueTemp.resize(NumChars);
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, NumChars);
+        dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, NumChars);
         return retVal;
     }
 }
@@ -653,7 +654,7 @@ namespace
         std::string valueTemp((NumChars) + 1, '\0');\
         auto retval = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, fn); \
         valueTemp.resize(NumChars); \
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, NumChars); \
+        dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, NumChars); \
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         LOG_FUNC_EXIT_NONAME_PARAMS(retval) \
         CATCH_BLOCK(false) \
@@ -1030,13 +1031,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValues(DTWAIN_SOURCE Source, LPCTSTR c
 ///////////////// These functions are high-level capability functions ///////////////
 DTWAIN_BOOL dynarithmic::DTWAIN_SetDeviceCapByString(DTWAIN_SOURCE Source, LPCTSTR strVal, SetByStringFn fn)
 {
-    DTWAIN_FLOAT value = StringWrapper::ToDouble(strVal, 0.0);
+    using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
+    DTWAIN_FLOAT value = dynarithmic::CharTraits<CharType>::ToDouble(strVal, 0.0);
     return fn(Source, value);
 }
 
 DTWAIN_BOOL dynarithmic::DTWAIN_SetDeviceCapByString2(DTWAIN_SOURCE Source, LPCTSTR strVal, bool bExtra, SetByStringFn2 fn)
 {
-    DTWAIN_FLOAT value = StringWrapper::ToDouble(strVal, 0.0);
+    using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
+    DTWAIN_FLOAT value = dynarithmic::CharTraits<CharType>::ToDouble(strVal, 0.0);
     return fn(Source, value, bExtra);
 }
 
@@ -1045,7 +1048,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetDeviceCapByString(DTWAIN_SOURCE Source, LPTST
     DTWAIN_FLOAT tempR;
     const DTWAIN_BOOL retVal = fn(Source, &tempR);
     if ( retVal )
-        StringWrapper::SafeStrcpy(strVal, StringWrapper::TrimDouble(tempR).c_str(), 255);
+        dynarithmic::basicstringutils::SafeStrcpy(strVal, dynarithmic::basicstringutils::TrimDouble<CTL_StringType>(tempR).c_str(), 255);
     return retVal;
 }
 

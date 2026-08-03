@@ -21,7 +21,6 @@
 #include <string>
 
 #include "cppfunc.h"
-#include "ctlobstr.h"
 #include "errorcheck.h"
 #include "ctlfileutils.h"
 #include "ctlwindowsimpl.h"
@@ -62,7 +61,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
         {
             if (bLogMessages)
             {
-                std::string sMessage = GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " + StringWrapperA::QuoteString(dirCreated.second);
+                std::string sMessage = GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " + 
+                    dynarithmic::basicstringutils::QuoteString(dirCreated.second);
                 LogWriterUtils::WriteLogInfoIndentedA(sMessage);
             }
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
@@ -86,7 +86,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectory(LPTSTR szFilePath, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szFilePath, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG nRealLen = StringWrapper::CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
+    const LONG nRealLen = dynarithmic::CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFilePath))
     LOG_FUNC_EXIT_NONAME_PARAMS(nRealLen)
     CATCH_BLOCK(DTWAIN_FAILURE1)

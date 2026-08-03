@@ -286,7 +286,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapLabel(LONG lCapability, LPTSTR lpszLabel, LONG nM
 
     // Get the cap label (if this is supported)
     CTL_StringType label = GetCapLabelHelpInternal<MSG_GETLABEL>(pHandle, lCapability);
-    auto maxChars = StringWrapper::CopyInfoToCString(label, lpszLabel, nMaxLen);
+    auto maxChars = dynarithmic::CopyInfoToCString(label, lpszLabel, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszLabel))
     LOG_FUNC_EXIT_NONAME_PARAMS(maxChars)
     CATCH_BLOCK(0)
@@ -298,7 +298,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapHelp(LONG lCapability, LPTSTR lpszHelp, LONG nMax
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     // Get the cap help (if this is supported)
     CTL_StringType label = GetCapLabelHelpInternal<MSG_GETHELP>(pHandle, lCapability);
-    auto maxChars = StringWrapper::CopyInfoToCString(label, lpszHelp, nMaxLen);
+    auto maxChars = dynarithmic::CopyInfoToCString(label, lpszHelp, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszHelp))
     LOG_FUNC_EXIT_NONAME_PARAMS(maxChars)
     CATCH_BLOCK(0)
@@ -353,7 +353,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)
         }
         if (logFilterFlags && vFailed.size() > 1)
         {
-            auto sJoined = StringWrapperA::Join(vFailed, "\n");
+            auto sJoined = dynarithmic::basicstringutils::Join<std::string>(vFailed, "\n");
             LogWriterUtils::WriteMultiLineInfoIndentedA(sJoined, "\n");
         }
     }

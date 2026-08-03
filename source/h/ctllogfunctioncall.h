@@ -29,11 +29,11 @@
 #include <string>
 #include "logwriterutils.h"
 #include "ctlstringutils.h"
+#include "ctlstringconversion.h"
 #include "dtwaindefs.h"
 #include "dtwain_resource_constants2.h"
 #include "ctlloadresources.h"
 #include "ctllogcalls.h"
-#include "ctlobstr.h"
 
 namespace dynarithmic
 {
@@ -160,7 +160,7 @@ namespace dynarithmic
         ParamOutputter(std::string_view s, bool isReturnValue = false) :
             nWhich(0), m_bIsReturnValue(isReturnValue), m_bOutputAsString(false)
         {
-            StringWrapperA::Tokenize(s.data(), "(, )", aParamNames);
+            dynarithmic::basicstringutils::Tokenize(std::string(s), "(, )", aParamNames);
             if (!aParamNames.empty())
             {
                 if (!m_bIsReturnValue)

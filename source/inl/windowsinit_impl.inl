@@ -316,9 +316,11 @@ void dynarithmic::LogToDebugMonitorW(std::wstring sMsg)
 
 void dynarithmic::LogToDebugMonitor(CTL_StringType sMsg)
 {
-    if (sMsg.back() != StringWrapper::traits_type::GetNewLineChar())
-        sMsg.push_back(StringWrapper::traits_type::GetNewLineChar());
-    ::OutputDebugString(sMsg.c_str());
+#ifdef _UNICODE
+    dynarithmic::LogToDebugMonitorW(sMsg);
+#else
+    dynarithmic::LogToDebugMonitorA(sMsg);
+#endif
 }
 
 DTWAIN_BOOL dynarithmic::DTWAIN_SetCallbackProc(DTWAIN_CALLBACK fnCall, LONG nWhich)

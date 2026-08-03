@@ -64,7 +64,7 @@ CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
     m_AppIdTemp.Version.Language = static_cast<TW_UINT16>(pHandle->m_SessionStruct.nLanguage);
     m_AppIdTemp.Version.Country  = static_cast<TW_UINT16>(pHandle->m_SessionStruct.nCountry);
 
-    StringWrapperA::SafeStrcpy( m_AppIdTemp.Version.Info,
+    dynarithmic::basicstringutils::SafeStrcpy( m_AppIdTemp.Version.Info,
                                 StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szVersion).c_str(),
                                 sizeof m_AppIdTemp.Version.Info - 1 );
 
@@ -72,9 +72,9 @@ CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
     m_AppIdTemp.ProtocolMinor =    TWON_PROTOCOLMINOR;
     m_AppIdTemp.SupportedGroups =  DG_IMAGE | DG_CONTROL | DG_AUDIO | DF_APP2 | DF_DSM2 ;
 
-    StringWrapperA::SafeStrcpy( m_AppIdTemp.Manufacturer,  StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szManufact).c_str(), sizeof m_AppIdTemp.Manufacturer - 1 );
-    StringWrapperA::SafeStrcpy( m_AppIdTemp.ProductFamily, StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szFamily).c_str(), sizeof m_AppIdTemp.ProductFamily - 1 );
-    StringWrapperA::SafeStrcpy( m_AppIdTemp.ProductName,   StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szProduct).c_str(),sizeof m_AppIdTemp.ProductName - 1 );
+    dynarithmic::basicstringutils::SafeStrcpy( m_AppIdTemp.Manufacturer,  StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szManufact).c_str(), sizeof m_AppIdTemp.Manufacturer - 1 );
+    dynarithmic::basicstringutils::SafeStrcpy( m_AppIdTemp.ProductFamily, StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szFamily).c_str(), sizeof m_AppIdTemp.ProductFamily - 1 );
+    dynarithmic::basicstringutils::SafeStrcpy( m_AppIdTemp.ProductName,   StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szProduct).c_str(),sizeof m_AppIdTemp.ProductName - 1 );
     m_AppId = m_AppIdTemp;
     m_pSelectedSource = nullptr;
     m_bTwainMessageFlag = false;
@@ -400,7 +400,7 @@ CTL_ITwainSource* CTL_ITwainSession::IsSourceSelected(LPCTSTR pSourceName)
         {
             const TW_IDENTITY* pIdentity = pSource->GetSourceIDPtr();
             CTL_StringType strTemp = StringConversion::Convert_AnsiPtr_To_Native(pIdentity->ProductName);
-            StringWrapper::MakeUpperCase(StringWrapper::TrimAll(strTemp));
+            dynarithmic::basicstringutils::MakeUpperCase(dynarithmic::basicstringutils::TrimAll(strTemp));
             return strTemp == m_strProduct;
         }
     };
@@ -408,7 +408,7 @@ CTL_ITwainSource* CTL_ITwainSession::IsSourceSelected(LPCTSTR pSourceName)
     CTL_StringType strProduct;
     if (pSourceName)
         strProduct = pSourceName;
-    strProduct = StringWrapper::TrimAll(StringWrapper::MakeUpperCase(strProduct));
+    strProduct = dynarithmic::basicstringutils::TrimAll(dynarithmic::basicstringutils::MakeUpperCase(strProduct));
     const auto it =
         std::find_if(m_arrTwainSource.begin(), m_arrTwainSource.end(), ProductNameFinder(strProduct));
     if (it != m_arrTwainSource.end())

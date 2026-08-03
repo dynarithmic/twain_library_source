@@ -23,6 +23,9 @@
 
 #include "ctliface.h"
 #include "notimpl.h"
+#include <tchar.h>
+#include "ctlstringconversion.h"
+
 namespace dynarithmic
 {
     enum { ACQUIRENATIVE=1, ACQUIREBUFFERED, ACQUIREFILE, ACQUIRECLIPBOARD, ACQUIRENATIVEEX, ACQUIREBUFFEREDEX,
@@ -62,7 +65,7 @@ namespace dynarithmic
                              bool discardPages=false,
                              LONG fileType=-1,
                              LONG fileflags=0,
-                             LPCTSTR fileName= StringTraits::GetEmptyString(),
+                             LPCTSTR fileName = _T(""),
                              DTWAIN_ARRAY fList = nullptr) :
 
                              DLLHandle(hnd),

@@ -8,10 +8,11 @@ namespace dynarithmic
 {
     CTL_StringType GetVersionInfo()
     {
-        return GetVersionInfo(CTL_StaticData::GetDLLInstanceHandle(), 0, StringWrapper::traits_type::GetNewLineString());
+        return GetVersionInfo(CTL_StaticData::GetDLLInstanceHandle(), 0, _T("\n"));
     }
 
-    CTL_StringType GetVersionInfo(HMODULE dllModule, int indent, StringWrapper::traits_type::stringview_type crlf)
+    CTL_StringType GetVersionInfo(HMODULE dllModule, int indent, 
+                                  std::basic_string_view<CTL_StringType::value_type> crlf)
     {
         const VersionInfo vInfo(dllModule);
         CTL_StringStreamType strm;

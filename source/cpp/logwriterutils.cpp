@@ -74,8 +74,8 @@ namespace dynarithmic
     void LogWriterUtils::MultiLineWriter(std::string_view s, const char* pszDelim, int nWhich)
     {
         #if DTWAIN_BUILD_LOGCALLSTACK == 1
-        StringWrapperA::StringArrayType sArray;
-        StringWrapperA::Tokenize(s.data(), pszDelim, sArray, true);
+        std::vector<CTL_StringTypeA> sArray;
+        dynarithmic::basicstringutils::Tokenize(s.data(), pszDelim, sArray, true);
         for (auto& oneString : sArray)
             CTL_LogFunctionCallA(CTL_StaticData::GetLogFilterFlags(), oneString.c_str(), nWhich);
         #endif

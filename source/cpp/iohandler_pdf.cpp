@@ -257,7 +257,7 @@ namespace
         //  c) All other text info fields are "static"
         std::vector<unsigned> PositionVec;
         StringArray strArray;
-        StringWrapperA::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
+        dynarithmic::basicstringutils::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
         PDFStringToTextElement pMap;
         pMap.reserve(strArray.size());
         PDFTextElement element;
@@ -389,9 +389,9 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
         {
             // call splitpath
             CTL_StringArrayType pathValues;
-            StringWrapper::SplitPath(m_ImageInfoEx.szImageFileName, pathValues);
+            dynarithmic::filenameutils::SplitPath(m_ImageInfoEx.szImageFileName, pathValues);
             szTempFile = m_ImageInfoEx.szImageFileName;
-            if ( StringWrapper::CompareNoCase(pathValues[StringWrapper::EXTENSION_POS], _T("TIF")))
+            if ( dynarithmic::basicstringutils::CompareNoCase<CTL_StringType>(pathValues[dynarithmic::filenameutils::EXTENSION_POS], _T("TIF")))
                 PDFHandler.SetImageType(1);
             else
                 PDFHandler.SetImageType(0);

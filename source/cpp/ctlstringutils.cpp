@@ -61,7 +61,7 @@ namespace
             PointerTypeIn ptrData = (PointerTypeIn)raii.getData();
             auto len = std::char_traits<StringType::value_type>::length(ptrData);
             StringType str(ptrData, len);
-            return StringWrapper::CopyInfoToCString(str, outString, nLength);
+            return dynarithmic::CopyInfoToCString(str, outString, nLength);
         }
         return 0;
     }

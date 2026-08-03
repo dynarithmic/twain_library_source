@@ -20,7 +20,6 @@ OF THIRD PARTY RIGHTS.
 */
 #ifndef _WIN32
 #include <sys/utsname.h>
-#include "ctlobstr.h"
 #include "dtwinverex.h"
 
 namespace dynarithmic

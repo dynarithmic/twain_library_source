@@ -76,7 +76,8 @@ HANDLE DLLENTRY_DEF DTWAIN_RotateImage(HANDLE hDib, DTWAIN_FLOAT angle)
 HANDLE DLLENTRY_DEF DTWAIN_RotateImageString(HANDLE hDib, LPCTSTR angle)
 {
     LOG_FUNC_ENTRY_PARAMS((hDib, angle))
-    auto retDIB = DTWAIN_RotateImage(hDib, StringWrapper::ToDouble(angle));
+    using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
+    auto retDIB = DTWAIN_RotateImage(hDib, dynarithmic::CharTraits<CharType>::ToDouble(angle));
     LOG_FUNC_EXIT_NONAME_PARAMS(retDIB)
     CATCH_BLOCK(nullptr)
 }

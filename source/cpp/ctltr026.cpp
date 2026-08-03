@@ -32,6 +32,7 @@
 #include "ctlfilesave.h"
 #include "ctlsetgetcaps.h"
 #include "ctldib32ex.h"
+#include "ctlstringutils.h"
 
 using namespace dynarithmic;
 
@@ -413,7 +414,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     if ( lFlags & TWAINFileFlag_PROMPT )
                     {
                         CTL_StringType strTempFile = PromptForFileName(pSource->GetDTWAINHandle(), acquireFileStatus.GetAcquireFileFormat());
-                        StringWrapper::TrimAll(strTempFile);
+                        dynarithmic::basicstringutils::TrimAll(strTempFile);
                         if ( strTempFile.empty())
                         {
                             SendFileAcquireError(pSource, pSession, DTWAIN_ERR_BAD_FILENAME, DTWAIN_TN_FILESAVECANCELLED,
@@ -919,7 +920,7 @@ std::string CTL_ImageXferTriplet::GetPageFileName(const std::string &strBase, in
     StringArray aTokens;
     // Adjust name
 
-    StringWrapperA::Tokenize(strBase, ".", aTokens);
+    dynarithmic::basicstringutils::Tokenize(strBase, ".", aTokens);
 
     // Make sure that you take the "last" token
     const size_t nTokens = aTokens.size();
@@ -928,14 +929,14 @@ std::string CTL_ImageXferTriplet::GetPageFileName(const std::string &strBase, in
     if ( nTokens == 0 )
     {
         nLen = strBase.length();
-        strTemp = StringWrapperA::Left(strTemp, nLen -  nLenFormat ) + strFormat;
+        strTemp = dynarithmic::basicstringutils::Left<std::string>(strTemp, nLen -  nLenFormat ) + strFormat;
         return strTemp;
     }
 
     if ( nTokens == 1 )
     {
         nLen = aTokens[0].length();
-        strTemp = StringWrapperA::Left(aTokens[0], nLen - nLenFormat) + strFormat;
+        strTemp = dynarithmic::basicstringutils::Left<std::string>(aTokens[0], nLen - nLenFormat) + strFormat;
         return strTemp;
     }
 
@@ -947,7 +948,7 @@ std::string CTL_ImageXferTriplet::GetPageFileName(const std::string &strBase, in
             strTemp += ".";
         }
         nLen = strTemp.length();
-        strTemp = StringWrapperA::Left(strTemp,  nLen - 1 - nLenFormat);
+        strTemp = dynarithmic::basicstringutils::Left<std::string>(strTemp,  nLen - 1 - nLenFormat);
         strTemp += strFormat;
         strTemp += ".";
         strTemp += aTokens[nTokens-1];
