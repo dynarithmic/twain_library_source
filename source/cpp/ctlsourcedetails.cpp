@@ -22,22 +22,25 @@
 #include "../nlohmann/json.hpp"
 #include <string>
 #include <sstream>
+#include <boost/algorithm/string.hpp>
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
+#include "ctlstringutilsx.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
     template <typename Iter>
     std::string join_string(Iter it1, Iter it2, const char* val = ",")
     {
-        return StringWrapperA::Join(it1, it2, val);
+        return stringutils::Join<std::string>(it1, it2, val);
     }
 
     std::string remove_quotes(std::string s)
@@ -80,7 +83,7 @@ namespace
                         {
                             auto sConstantName = CTL_StaticData::GetTwainNameFromConstantA(twainConstantID, val).second;
                             std::vector<std::string> saParsedNames;
-                            StringWrapperA::Tokenize(sConstantName, ", ", saParsedNames);
+                            stringutils::Tokenize(sConstantName, ", ", saParsedNames);
                             for (auto& sName : saParsedNames)
                             {
                                 std::string sTotalName = "\"" + std::string(sName) + "\"";
@@ -167,7 +170,7 @@ namespace
         for (auto curFormat : vFileFormats)
         {
             auto sFileFormat = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, curFormat).second;
-            vRetVal.push_back(StringWrapperA::QuoteString(sFileFormat));
+            vRetVal.push_back(stringutils::QuoteString(sFileFormat));
         }
         return join_string(vRetVal.begin(), vRetVal.end());
     }
@@ -483,7 +486,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     char szSourceBuf[100];
     for (auto& curSource : allSources)
     {
-        StringWrapperA::SafeStrcpy(szSourceBuf, curSource.c_str(), 100);
+        stringutils::SafeStrcpy(szSourceBuf, curSource.c_str(), 100);
         CTL_TwainAppMgr::SendTwainMsgToWindow(&ts, nullptr, DTWAIN_TN_SOURCEDETAILS, reinterpret_cast<LPARAM>(szSourceBuf));
         std::string jColorInfo;
         std::string resUnitInfo;
@@ -623,7 +626,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                             std::transform(vNames.begin(), vNames.end(), std::back_inserter(vAdjustedNames),
                                 [&](auto& origName)
                                 {
-                                    if (!StringWrapperA::StartsWith(origName, oneData.prefix))
+                                    if (!stringutils::StartsWith(std::string_view(origName), 
+                                                                                   std::string_view(oneData.prefix)))
                                         return "\"" + origName + "\"";
                                     if (oneData.usefullName)
                                         return "\"" + origName + "\"";
@@ -650,7 +654,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         for (auto &pr : resMap)
                         {
                             auto buf = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWUN, pr.first).second;
-                            vSizeNames.push_back(StringWrapperA::LowerCase(buf).substr(5));
+                            vSizeNames.push_back(stringutils::LowerCase(buf).substr(5));
                         }
                         strm << "\"resolution-count\":" << resMap.size() << ",";
                         strm << "\"resolution-units\":";
@@ -924,7 +928,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indent
         details = StringConversion::Convert_Ansi_To_Native(generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor));
         pHandle->m_strSessionDetails = details;
     }
-    LONG retVal = StringWrapper::CopyInfoToCString(details, szBuf, nSize);
+    LONG retVal = dynarithmic::CopyInfoToCString(details, szBuf, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)
@@ -938,7 +942,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG 
     {
         CTL_StringArrayType vAllSourcesT;
         std::vector<std::string> vAllSources;
-        StringWrapper::TokenizeEx(szSources, _T("|"), vAllSourcesT, false);
+        stringutils::TokenizeEx((CTL_StringType)szSources, _T("|"), vAllSourcesT, false);
         for (auto& name : vAllSourcesT)
             vAllSources.push_back(StringConversion::Convert_Native_To_Ansi(name, name.length()));
         auto genDetails = generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor);
@@ -948,7 +952,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG 
         pHandle->m_strSourceDetails = genDetails;
         #endif
     }
-    LONG retVal = StringWrapper::CopyInfoToCString(pHandle->m_strSourceDetails, szBuf, nSize);
+    LONG retVal = dynarithmic::CopyInfoToCString(pHandle->m_strSourceDetails, szBuf, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)

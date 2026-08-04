@@ -21,26 +21,13 @@ OF THIRD PARTY RIGHTS.
 
 #include <string>
 #include <string_view>
-#include "a85encode.h"
+#include "ctlencodeutils.h"
+#include "zlib.h"
 
-namespace
-{
-    class A85Encoder
-    {
-        public:
-            A85Encoder() : count(0), width(72), pos(0), tuple(0) { }
-            std::string EncodeA85(std::string_view strIn);
+using namespace dynarithmic;
 
-        private:
-            int count;
-            unsigned long width, pos, tuple;
-            void processA85char(unsigned c);
-            void cleanup85();
-            void encode(unsigned long, int count);
-            std::string strOut;
-    };
-}
-
+////////////////////////////////////////////////////////
+// A85 Encode function
 std::string A85Encoder::EncodeA85(std::string_view strIn)
 {
     strOut.clear();
@@ -109,9 +96,71 @@ void A85Encoder::cleanup85(void)
     strOut += "~>";
 }
 
-int ASCII85Encode(std::string_view inData, std::string& outData)
+int dynarithmic::ASCII85Encode(std::string_view inData, std::string& outData)
 {
     A85Encoder encoder;
     outData = encoder.EncodeA85(inData);
     return 1;
+}
+//////////////////////////////////////////////////////
+// HexEncode utility
+int dynarithmic::ASCIIHexEncode(std::string_view inData, std::string& outData)
+{
+    outData.reserve(inData.size() * 2);
+    for (size_t i = 0; i < inData.size(); ++i)
+    {
+        auto pHexStr = "0123456789ABCDEF";
+        unsigned char ch = inData[i];
+        ch = ch >> 4;
+        unsigned int hival = ch;
+        unsigned int loval = inData[i] & 0x0F;
+        outData += pHexStr[hival];
+        outData += pHexStr[loval];
+    }
+    outData += '>';
+    return 1;
+}
+/////////////////////////////////////////////
+// Base64 Encode
+static constexpr char kBase64Table[] =
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+int dynarithmic::Base64Encode(const uint8_t* inData, std::string& out, size_t len)
+{
+    out.clear();
+    out.reserve(((len + 2) / 3) * 4);
+
+    for (size_t i = 0; i < len; i += 3)
+    {
+        uint32_t n = inData[i] << 16;
+        if (i + 1 < len)
+            n |= inData[i + 1] << 8;
+        if (i + 2 < len)
+            n |= inData[i + 2];
+
+        out.push_back(kBase64Table[(n >> 18) & 63]);
+        out.push_back(kBase64Table[(n >> 12) & 63]);
+
+        if (i + 1 < len)
+            out.push_back(kBase64Table[(n >> 6) & 63]);
+        else
+            out.push_back('=');
+
+        if (i + 2 < len)
+            out.push_back(kBase64Table[n & 63]);
+        else
+            out.push_back('=');
+    }
+
+    return static_cast<int>(out.size());
+}
+/////////////////////////////////////////////////
+// Flate Encode
+int dynarithmic::FlateEncode(std::string_view inData, std::string& outData)
+{
+    unsigned long compressedLen = static_cast<long>(static_cast<double>(inData.size()) * 1.2 + 12);
+    outData.resize(compressedLen);
+    const int result = compress2(reinterpret_cast<unsigned char*>(outData.data()), &compressedLen, reinterpret_cast<const unsigned char*>(inData.data()), static_cast<uLong>(inData.size()), 9);
+    outData.resize(compressedLen);
+    return result;
 }

@@ -27,6 +27,7 @@
     #pragma warning (disable : 4611)
 #endif
 
+using namespace dynarithmic;
 
 std::optional<PreparedIcoDibPage> IcoSessionWriter::MakePreparedIcoDibPage(const dynarithmic::DibPageView& view)
 {

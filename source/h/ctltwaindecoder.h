@@ -23,6 +23,9 @@
 
 #include <tuple>
 #include <unordered_map>
+#include <string>
+#include "twain.h"
+
 /* Structure types are as follows
    0 - NONE
    1 - TW_CUSTOMDSDATA

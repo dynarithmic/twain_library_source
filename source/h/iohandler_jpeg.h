@@ -29,7 +29,6 @@ namespace dynarithmic
     {
         public:
             CTL_JpegIOHandler(int Quality = 75, BOOL bJpegProgressive = FALSE) :
-                CTL_ImageIOHandler(),
                 m_nJpegQuality(Quality),
                 m_bJpegProgressive(bJpegProgressive) {
                 SetSaveArgs();

@@ -20,6 +20,8 @@
  */
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
+#include "ctlstringutilsx.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -36,7 +38,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG
     if (iter != pdfmediamap.end())
     { 
         CTL_StringType pageName = StringConversion::Convert_Ansi_To_Native(iter->second.first);
-        nActualCharactersCopied = StringWrapper::CopyInfoToCString(pageName, outName, nSize);
+        nActualCharactersCopied = dynarithmic::CopyInfoToCString(pageName, outName, nSize);
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((outName))
     LOG_FUNC_EXIT_NONAME_PARAMS(nActualCharactersCopied)

@@ -19,9 +19,10 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "jpegxrwriter.h"
-#include "imagefilewriterbase.h"
 
-std::optional<PreparedJxrDibPage> JxrSessionWriter::MakePreparedJxrPage(const dynarithmic::DibPageView& view)
+using namespace dynarithmic;
+
+std::optional<PreparedJxrDibPage> JxrSessionWriter::MakePreparedJxrPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;

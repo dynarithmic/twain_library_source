@@ -23,6 +23,7 @@
 #include "cppfunc.h"
 #include "errorcheck.h"
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
@@ -185,27 +186,25 @@ namespace
 #endif
     }
 
-    template <typename StringWrapperType, typename WriterFn>
+    template <typename StringType, typename WriterFn, typename StringViewType>
     void GenericDumpArrayString(DTWAIN_ARRAY Array, WriterFn fn)
     {
-        using string_type = typename StringWrapperType::traits_type::string_type;
-        static constexpr auto newLine = StringWrapperType::traits_type::GetNewLineString();
+        static constexpr auto newLine = dynarithmic::CharTraits<StringType::value_type>::NewLineString();
         const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        const auto& vData =
-            pHandle->m_ArrayFactory->underlying_container_t<string_type>(Array);
-        string_type allValues = StringWrapperType::Join(vData.begin(), vData.end(), newLine);
+        const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<StringType>(Array);
+        StringType allValues = stringutils::Join<StringType>(vData, newLine);
         fn(allValues, newLine);
     }
 
     void DumpArrayWideString(DTWAIN_ARRAY Array)
     {
-        GenericDumpArrayString<StringWrapperW, decltype(LogWriterUtils::WriteMultiLineInfoIndentedW)>
+        GenericDumpArrayString<CTL_StringTypeW, decltype(LogWriterUtils::WriteMultiLineInfoIndentedW), std::wstring_view>
             (Array, &LogWriterUtils::WriteMultiLineInfoIndentedW);
     }
 
     void DumpArrayAnsiString(DTWAIN_ARRAY Array)
     {
-        GenericDumpArrayString<StringWrapperA, decltype(LogWriterUtils::WriteMultiLineInfoIndentedA)>
+        GenericDumpArrayString<CTL_StringTypeA, decltype(LogWriterUtils::WriteMultiLineInfoIndentedA), std::string_view>
             (Array, &LogWriterUtils::WriteMultiLineInfoIndentedA);
     }
 

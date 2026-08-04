@@ -20,7 +20,9 @@
  */
 #include "pcxwriter.h"
 
-std::optional<PreparedPcxDibPage> PcxSessionWriter::MakePreparedPcxDibPage(const dynarithmic::DibPageView& view)
+using namespace dynarithmic;
+
+std::optional<PreparedPcxDibPage> PcxSessionWriter::MakePreparedPcxDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;
@@ -156,7 +158,7 @@ bool PcxSessionWriter::ValidatePage(const PreparedPcxDibPage& page)
     return page.bitsPerPixel == 1 || page.bitsPerPixel == 8 || page.bitsPerPixel == 24;
 }
 
-bool PcxSessionWriter::PatchDcxDirectory()
+bool PcxSessionWriter::PatchDcxDirectory() const
 {
     if (std::fseek(file_, 4, SEEK_SET) != 0)
         return false;
@@ -346,7 +348,7 @@ bool PcxSessionWriter::Write24Bpp(const PreparedPcxDibPage& page, uint16_t bytes
     return true;
 }
 
-bool PcxSessionWriter::Write256Palette(const PreparedPcxDibPage& page)
+bool PcxSessionWriter::Write256Palette(const PreparedPcxDibPage& page) const
 {
     static const uint8_t marker = 0x0C;
     if (std::fwrite(&marker, 1, 1, file_) != 1)
@@ -393,7 +395,7 @@ bool DTWAINPcxDcxOutput::OnFirstPage(const std::wstring& filename, const PcxSess
     return writer_->WritePage(page);
 }
 
-bool DTWAINPcxDcxOutput::OnNextPage(const PreparedPcxDibPage& page)
+bool DTWAINPcxDcxOutput::OnNextPage(const PreparedPcxDibPage& page) const
 {
     if (!writer_)
         return false;

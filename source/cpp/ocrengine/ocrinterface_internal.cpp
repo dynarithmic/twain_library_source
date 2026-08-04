@@ -20,7 +20,12 @@
  */
 #include "dtwaindefs.h"
 #include "OCRInterface.h"
+#include "ctlstringutils.h"
+#include "ctlstringconversion.h"
+#include <tchar.h>
+
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 OCRCapInfo& OCREngine::GetOCRCapInfo(LONG nCap) { return m_AllCapValues[nCap]; }
 
@@ -282,7 +287,7 @@ LONG dynarithmic::GetOCRInfo(OCREngine* pEngine, OCRINFOFUNC pFunc, LPTSTR szInf
     if (szInfo == nullptr)
         return static_cast<LONG>(nLen);
     const int nRealLen = (std::min)(static_cast<int>(nMaxLen), nLen);
-    StringTraits::CopyN(szInfo, pName.c_str(), nRealLen);
+    stringutils::CopyN(szInfo, pName.c_str(), nRealLen);
     szInfo[nRealLen] = _T('\0');
     return nRealLen;
 }

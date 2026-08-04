@@ -29,6 +29,7 @@
 #include <string>
 #include "logwriterutils.h"
 #include "ctlstringutils.h"
+#include "ctlstringconversion.h"
 #include "dtwaindefs.h"
 #include "dtwain_resource_constants2.h"
 #include "ctlloadresources.h"
@@ -48,26 +49,8 @@ namespace dynarithmic
         bool m_bOutputAsString;
 
     private:
-        void LogType(std::string_view outStr, const char* ptr)
-        {
-            // ptr must be a pointer to a valid null terminated string, or nullptr.
-            if (ptr)
-                strm << outStr << "=\"" << TruncateStringWithMore(ptr, 256)
-                     << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")" << std::dec;
-            else
-                strm << outStr << "=(null)";
-        }
-
-        void LogType(std::string_view outStr, const wchar_t* ptr)
-        {
-            // ptr must be a pointer to a valid null terminated string, or nullptr.
-            if (ptr)
-                strm << outStr << "=\"" << 
-                TruncateStringWithMore(StringConversion::Convert_WidePtr_To_Ansi(ptr), 256) <<
-                "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")" << std::dec;
-            else
-                strm << outStr << "=(null)";
-        }
+        void LogType(std::string_view outStr, const char* ptr);
+        void LogType(std::string_view outStr, const wchar_t* ptr);
 
         template <typename T>
         void LogType(std::string_view outStr, const T* ptr)
@@ -159,7 +142,7 @@ namespace dynarithmic
         ParamOutputter(std::string_view s, bool isReturnValue = false) :
             nWhich(0), m_bIsReturnValue(isReturnValue), m_bOutputAsString(false)
         {
-            StringWrapperA::Tokenize(s.data(), "(, )", aParamNames);
+            dynarithmic::basicstringutils::Tokenize(std::string(s), "(, )", aParamNames);
             if (!aParamNames.empty())
             {
                 if (!m_bIsReturnValue)

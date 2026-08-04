@@ -19,6 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "pnmwriter.h"
+using namespace dynarithmic;
 
 std::optional<PreparedPnmDibPage> PnmSessionWriter::MakePreparedPnmDibPage(const dynarithmic::DibPageView& view)
 {
@@ -210,7 +211,7 @@ bool PnmSessionWriter::WriteHeader()
     return true;
 }
 
-bool PnmSessionWriter::WriteCommentLines(const std::string& text)
+bool PnmSessionWriter::WriteCommentLines(const std::string& text) const
 {
     size_t start = 0;
 
@@ -289,7 +290,7 @@ const uint8_t* PnmSessionWriter::GetSourceRow(uint32_t y) const
     return currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
 }
 
-bool PnmSessionWriter::WritePbmPlain()
+bool PnmSessionWriter::WritePbmPlain() const
 {
 //    const uint32_t packedBytes = (currentPage_.width + 7u) / 8u;
 
@@ -356,7 +357,7 @@ bool PnmSessionWriter::WritePbmRaw()
     return true;
 }
 
-bool PnmSessionWriter::WriteGray8Plain()
+bool PnmSessionWriter::WriteGray8Plain() const
 {
     for (uint32_t y = 0; y < currentPage_.height; ++y)
     {
@@ -381,7 +382,7 @@ bool PnmSessionWriter::WriteGray8Plain()
     return true;
 }
 
-bool PnmSessionWriter::WriteGray8Raw()
+bool PnmSessionWriter::WriteGray8Raw() const
 {
     for (uint32_t y = 0; y < currentPage_.height; ++y)
     {
@@ -394,7 +395,7 @@ bool PnmSessionWriter::WriteGray8Raw()
     return true;
 }
 
-bool PnmSessionWriter::WriteGray16Plain()
+bool PnmSessionWriter::WriteGray16Plain() const
 {
     for (uint32_t y = 0; y < currentPage_.height; ++y)
     {
@@ -445,7 +446,7 @@ bool PnmSessionWriter::WriteGray16Raw()
     return true;
 }
 
-bool PnmSessionWriter::WriteRgb24Plain()
+bool PnmSessionWriter::WriteRgb24Plain() const
 {
     for (uint32_t y = 0; y < currentPage_.height; ++y)
     {
@@ -501,7 +502,7 @@ bool PnmSessionWriter::WriteRgb24Raw()
     return true;
 }
 
-bool PnmSessionWriter::WriteRgba32AsRgbPlain()
+bool PnmSessionWriter::WriteRgba32AsRgbPlain() const
 {
     for (uint32_t y = 0; y < currentPage_.height; ++y)
     {

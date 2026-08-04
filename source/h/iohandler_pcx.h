@@ -29,7 +29,7 @@ namespace dynarithmic
     class CTL_PcxIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_PcxIOHandler() : CTL_ImageIOHandler(), m_nFormat{} {};
+            CTL_PcxIOHandler() : m_nFormat{} {}
             CTL_PcxIOHandler(CTL_TwainDib* pDib, int nFormat, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
                 m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
 

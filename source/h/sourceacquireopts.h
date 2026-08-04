@@ -23,6 +23,9 @@
 
 #include "ctliface.h"
 #include "notimpl.h"
+#include <tchar.h>
+#include "ctlstringconversion.h"
+
 namespace dynarithmic
 {
     enum { ACQUIRENATIVE=1, ACQUIREBUFFERED, ACQUIREFILE, ACQUIRECLIPBOARD, ACQUIRENATIVEEX, ACQUIREBUFFEREDEX,
@@ -48,8 +51,8 @@ namespace dynarithmic
         DTWAIN_ARRAY  FileList; //
         bool bUseClipboard = false;
 
-        SourceAcquireOptions(DTWAIN_HANDLE hnd=NULL,
-                             DTWAIN_SOURCE src=NULL,
+        SourceAcquireOptions(DTWAIN_HANDLE hnd = nullptr,
+                             DTWAIN_SOURCE src = nullptr,
                              LONG pixType=0,
                              LONG maxPages=0,
                              LONG transferMode=0,
@@ -58,12 +61,12 @@ namespace dynarithmic
                              bool isUIOnly = false,
                              int whichTrans=0,
                              LONG status=0,
-                             DTWAIN_ARRAY uArray=NULL,
+                             DTWAIN_ARRAY uArray = nullptr,
                              bool discardPages=false,
                              LONG fileType=-1,
                              LONG fileflags=0,
-                             LPCTSTR fileName= StringTraits::GetEmptyString(),
-                             DTWAIN_ARRAY fList=NULL) :
+                             LPCTSTR fileName = _T(""),
+                             DTWAIN_ARRAY fList = nullptr) :
 
                              DLLHandle(hnd),
                              Source(src),

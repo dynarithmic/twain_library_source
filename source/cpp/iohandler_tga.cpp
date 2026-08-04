@@ -21,6 +21,7 @@
 #include "tgawriter.h"
 #include "iohandler_tga.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

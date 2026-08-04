@@ -1749,6 +1749,7 @@ Class DTWAINAPI
     Public Const DTWAIN_CHECKDLLVERGREATER As Integer = 2
     Public Const DTWAIN_CHECKDLLVERLESSEQ As Integer = 3
     Public Const DTWAIN_CHECKDLLVERGREATEREQ As Integer = 4
+    Public Const DTWAIN_RESOURCE_COPYRIGHT As Integer = 9700
 
     Public Delegate Function DTwainCallback(WParam As IntPtr, LParam As IntPtr, UserData As IntPtr) As IntPtr
     Public Delegate Function DTwainCallback64(WParam As IntPtr, LParam As IntPtr, UserData As IntPtr) As IntPtr

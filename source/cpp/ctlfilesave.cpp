@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctlfilesave.h"
-
+#include "ctliface.h"
 using namespace dynarithmic;
 
 CTL_StringType dynarithmic::PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_TwainFileFormatEnum nFileAcquireType)
@@ -69,7 +69,7 @@ CTL_StringType dynarithmic::PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_T
             pOfn->lpfnHook = pHandle->m_pSaveAsDlgProc;
             pOfn->Flags |= OFN_ENABLEHOOK;
             pOfn->lCustData = reinterpret_cast<LPARAM>(&pHandle->m_CustomPlacement);
-            if (!StringWrapperA::IsEmpty(sTitleAnsi))
+            if (!sTitleAnsi.empty())
             {
                 sActualTitle = StringConversion::Convert_Ansi_To_Native(sTitleAnsi);
                 pOfn->lpstrTitle = sActualTitle.c_str();

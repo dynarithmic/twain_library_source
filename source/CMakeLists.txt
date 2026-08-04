@@ -410,22 +410,25 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctldib.h
         ${PROJECT_SOURCE_DIR}/h/ctldib32.h
         ${PROJECT_SOURCE_DIR}/h/ctldib32ex.h
+        ${PROJECT_SOURCE_DIR}/h/ctlencodeutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlenum.h
         ${PROJECT_SOURCE_DIR}/h/ctlfilesave.h
         ${PROJECT_SOURCE_DIR}/h/ctlfileutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlguiddef.h
+        ${PROJECT_SOURCE_DIR}/h/ctlguidimpl.h
         ${PROJECT_SOURCE_DIR}/h/ctliface.h
         ${PROJECT_SOURCE_DIR}/h/ctlloadresources.h
         ${PROJECT_SOURCE_DIR}/h/ctllogcalls.h
         ${PROJECT_SOURCE_DIR}/h/ctllogfunctioncall.h
         ${PROJECT_SOURCE_DIR}/h/ctllogsourcecaps.h
-        ${PROJECT_SOURCE_DIR}/h/ctlobstr.h
         ${PROJECT_SOURCE_DIR}/h/ctlobtyp.h
         ${PROJECT_SOURCE_DIR}/h/ctlrandnumutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlsetgetcaps.h
         ${PROJECT_SOURCE_DIR}/h/ctlsourcedibs.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringconversion.h
+        ${PROJECT_SOURCE_DIR}/h/ctlstringdefs.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlstringutilsx.h
         ${PROJECT_SOURCE_DIR}/h/ctlsupport.h
         ${PROJECT_SOURCE_DIR}/h/ctlthreadutils.h
         ${PROJECT_SOURCE_DIR}/h/ctltimer.h
@@ -478,7 +481,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltr043.h
         ${PROJECT_SOURCE_DIR}/h/ctltr044.h
         ${PROJECT_SOURCE_DIR}/h/ctltr045.h
-        ${PROJECT_SOURCE_DIR}/h/ctltrall.h
         ${PROJECT_SOURCE_DIR}/h/ctltripletbase.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaincompliancy.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaindecoder.h
@@ -488,6 +490,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltwainsession.h
         ${PROJECT_SOURCE_DIR}/h/ctltwainsource.h
         ${PROJECT_SOURCE_DIR}/h/ctlutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlwindowsimpl.h
         ${PROJECT_SOURCE_DIR}/h/dibinfox.h
         ${PROJECT_SOURCE_DIR}/h/dibmulti.h
         ${PROJECT_SOURCE_DIR}/h/dtwain.h
@@ -571,10 +574,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/versioninfo.h
         ${PROJECT_SOURCE_DIR}/h/winconst.h
         ${PROJECT_SOURCE_DIR}/h/aeslib/AES.h
-        ${PROJECT_SOURCE_DIR}/h/pdflib32/a85encode.h
-        ${PROJECT_SOURCE_DIR}/h/pdflib32/ahexencode.h
-        ${PROJECT_SOURCE_DIR}/h/pdflib32/base64encode.h
-        ${PROJECT_SOURCE_DIR}/h/pdflib32/flateencode.h
         ${PROJECT_SOURCE_DIR}/h/pdflib32/pdfencrypt.h
         ${PROJECT_SOURCE_DIR}/h/pdflib32/pdflib32.h
         ${PROJECT_SOURCE_DIR}/h/ImageFun/dtwpdf/pdffont_basic.h
@@ -612,12 +611,14 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctldtwaininit.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctldtwainmem2.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlduplex.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlencodeutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlflipbmp.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlgetcapinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlimageerrorskip.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlimageinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlloggercallback.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctllogmessage.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctllogfunctioncall.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmanualduplex.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmaxacquires.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmultipagescan.cpp
@@ -638,7 +639,6 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcescale.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceselect.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsrceoj.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr040.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwaindllhandle.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainmsgloop.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctluicontrollable.cpp
@@ -656,6 +656,10 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctltr035.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr037.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr038.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr040.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr041.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr042.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr043.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlobtyp.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlunicodeimpl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlhigh.cpp
@@ -669,7 +673,6 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/dtwinver/Getwinver.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlflog.cpp
   ${PROJECT_SOURCE_DIR}/cpp/logmsg.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/a85decoder.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltempdir.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface_internal.cpp
@@ -715,12 +718,9 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlselectdialog.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcecompression.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcedetails.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlstringutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlstringutilsx.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlthreadutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltimeout.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr041.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr042.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr043.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltripletbase.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwaincompliancy.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwaindecoder.cpp
@@ -761,10 +761,6 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/linux_versioninfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/logwriterutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrselect.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/pdflib32/a85encode.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/pdflib32/ahexencode.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/pdflib32/base64encode.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/pdflib32/flateencode.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdfencrypt.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdflib32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/stdafx.cpp

@@ -21,6 +21,7 @@
 #include "iohandler_wmf.h"
 #include "metafilewriter.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

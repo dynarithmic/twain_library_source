@@ -32,6 +32,7 @@
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 static void TestAndCachePixelTypes(CTL_ITwainSource *p);
 static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
@@ -200,7 +201,8 @@ void dynarithmic::LogSourceCapabilities(CTL_ITwainSource* pSource, bool bUseLogF
             else
             {
                 sName += _T("    ");
-                sName += StringConversion::Convert_Ansi_To_Native(StringWrapperA::Join(VecString, "\n    "));
+                sName += StringConversion::Convert_Ansi_To_Native(
+                    stringutils::Join<std::string>(VecString, "\n    "));
             }
             sName += _T("\n}");
 
@@ -233,7 +235,7 @@ void TestAndCachePixelTypes(CTL_ITwainSource* p)
         if (CTL_StaticData::GetLogFilterFlags())
         {
             std::string s1 = GetResourceStringFromMap(pr.second);
-            s1 += " - " + StringWrapperA::QuoteString(p->GetProductNameA());
+            s1 += " - " + stringutils::QuoteString(p->GetProductNameA());
             LogWriterUtils::WriteLogInfoIndentedA(s1);
         }
     }

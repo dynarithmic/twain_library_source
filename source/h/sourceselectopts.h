@@ -125,7 +125,7 @@ namespace dynarithmic
         const CTL_StringType strTemp(lpszFiles);
         std::vector<CTL_StringType> strArray;
 
-        const int nTokens = StringWrapper::TokenizeQuoted(strTemp, szParseDelim.c_str(), strArray);
+        const int nTokens = dynarithmic::basicstringutils::TokenizeQuoted(strTemp, szParseDelim.c_str(), strArray);
         factory->clear(*pArray);
         std::for_each(strArray.begin(), strArray.begin() + nTokens, [&](CTL_StringType& s)
         {

@@ -23,7 +23,7 @@
 #ifndef LOGWRITERUTILS_H
 #define LOGWRITERUTILS_H
 
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 
 #define LOG_INDENT_CONSOLE 0
 #define LOG_NO_INDENT   1

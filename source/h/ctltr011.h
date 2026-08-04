@@ -80,7 +80,7 @@ namespace dynarithmic
                 TW_UINT16 nItemType = GetEffectiveItemType(pTwainContainer->ItemType);
 
                 // Get sizeof each item in Twain container
-                const int nItemSize = dynarithmic::GetTwainItemSize(nItemType);
+                const int nItemSize = GetTwainItemSize(nItemType);
 
                 // Unknown item type.  Do error condition here??
                 if (nItemSize == 0)

@@ -18,6 +18,9 @@ DTWAIN Version changes
 
 - Update DTWAIN versioning to add build number to version string 
   (e.g. 5.9.3.x, where "x" is the build number for version 5.9.3)
+
+- Update DTWDEMO program to allow acquiring to PDF files using various
+  PDF options (PDF Author, Title, etc.), as well as using PDF encryption.
  
 
 5.9.2 Update 1

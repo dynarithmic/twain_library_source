@@ -28,6 +28,7 @@
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 enum
 {
@@ -399,7 +400,7 @@ bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart
     std::vector<TCHAR> szCurDir(256, 0);
     bool bRes = FSDirectory(pSource, szStart, CHANGE_DIRECTORY).first;
     TW_MEMREF Context = nullptr;
-    StringWrapper::SafeStrcpy(&szCurDir[0], szStart);
+    stringutils::SafeStrcpy(&szCurDir[0], szStart);
     TW_FILESYSTEM *pFS = pSource->GetFileSystem();
 
     // Get the first file in the directory
@@ -551,7 +552,7 @@ FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHan
         if (nWhich != GET_CLOSE)
         {
             returnedContext = pFS->Context;
-            StringWrapper::SafeStrcpy(sDir, StringConversion::Convert_AnsiPtr_To_Native(pFS->OutputName).c_str());
+            stringutils::SafeStrcpy(sDir, StringConversion::Convert_AnsiPtr_To_Native(pFS->OutputName).c_str());
         }
     }
     return { bRet, returnedContext };

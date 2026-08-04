@@ -28,8 +28,10 @@
 #include "iohandler_bmp.h"
 #include "pdffun32.h"
 #include "ctldib32ex.h"
+#include "ctlguidimpl.h"
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
@@ -256,7 +258,7 @@ namespace
         //  c) All other text info fields are "static"
         std::vector<unsigned> PositionVec;
         StringArray strArray;
-        StringWrapperA::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
+        stringutils::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
         PDFStringToTextElement pMap;
         pMap.reserve(strArray.size());
         PDFTextElement element;
@@ -338,7 +340,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                 // Make a JPEG from this info
                 if ( m_pDib->GetDepth() > 1 )
                 {
-                    szTempFile += StringWrapper::GetGUID() + _T(".JPG");
+                    szTempFile += GetGUID() + _T(".JPG");
                     auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
                     LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA);
 
@@ -359,7 +361,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                     // make a CCITTFaxDecode
                 {
                     DibMultiPageStruct dps = {};
-                    szTempFile += StringWrapper::GetGUID() + _T(".TIF");
+                    szTempFile += GetGUID() + _T(".TIF");
                     auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
 
                     LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA);
@@ -388,9 +390,9 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
         {
             // call splitpath
             CTL_StringArrayType pathValues;
-            StringWrapper::SplitPath(m_ImageInfoEx.szImageFileName, pathValues);
+            dynarithmic::filenameutils::SplitPath(m_ImageInfoEx.szImageFileName, pathValues);
             szTempFile = m_ImageInfoEx.szImageFileName;
-            if ( StringWrapper::CompareNoCase(pathValues[StringWrapper::EXTENSION_POS], _T("TIF")))
+            if ( stringutils::CompareNoCase<CTL_StringType>(pathValues[dynarithmic::filenameutils::EXTENSION_POS], _T("TIF")))
                 PDFHandler.SetImageType(1);
             else
                 PDFHandler.SetImageType(0);
@@ -571,7 +573,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
         }
 
         // Now create a temp name
-        szTempPath += StringWrapper::GetGUID() + _T("TMP");
+        szTempPath += GetGUID() + _T("TMP");
         // If we need to convert the BPP to the one supported by the
         // OCR engine, do it now.
         HANDLE hNewDib= nullptr;

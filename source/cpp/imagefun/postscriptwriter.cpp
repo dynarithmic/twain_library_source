@@ -19,62 +19,66 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "postscriptwriter.h"
-#include "a85encode.h"
-#include "flateencode.h"
+#include "ctlencodeutils.h"
 #include "zlib.h"
 
-static void PsRunLengthEncode(std::string_view input, std::string& output)
+using namespace dynarithmic;
+
+namespace
 {
-    output.clear();
-
-    const auto* src = reinterpret_cast<const uint8_t*>(input.data());
-    const size_t n = input.size();
-
-    size_t i = 0;
-
-    while (i < n)
+    static void PsRunLengthEncode(std::string_view input, std::string& output)
     {
-        // Detect repeated run, max 128 bytes.
-        size_t run = 1;
-        while (i + run < n && run < 128 && src[i + run] == src[i])
-            ++run;
+        output.clear();
 
-        if (run >= 3)
-        {
-            // Repeated run:
-            // length byte = 257 - run length
-            // followed by repeated byte
-            output.push_back(static_cast<char>(257 - run));
-            output.push_back(static_cast<char>(src[i]));
-            i += run;
-        }
-        else
-        {
-            // Literal run:
-            // collect up to 128 bytes, stopping before next repeated run >= 3
-            const size_t literalStart = i;
-            size_t literalLen = 0;
+        const auto* src = reinterpret_cast<const uint8_t*>(input.data());
+        const size_t n = input.size();
 
-            while (i < n && literalLen < 128)
+        size_t i = 0;
+
+        while (i < n)
+        {
+            // Detect repeated run, max 128 bytes.
+            size_t run = 1;
+            while (i + run < n && run < 128 && src[i + run] == src[i])
+                ++run;
+
+            if (run >= 3)
             {
-                run = 1;
-                while (i + run < n && run < 128 && src[i + run] == src[i])
-                    ++run;
-
-                if (run >= 3)
-                    break;
-
-                ++i;
-                ++literalLen;
+                // Repeated run:
+                // length byte = 257 - run length
+                // followed by repeated byte
+                output.push_back(static_cast<char>(257 - run));
+                output.push_back(static_cast<char>(src[i]));
+                i += run;
             }
+            else
+            {
+                // Literal run:
+                // collect up to 128 bytes, stopping before next repeated run >= 3
+                const size_t literalStart = i;
+                size_t literalLen = 0;
 
-            output.push_back(static_cast<char>(literalLen - 1));
-            output.append(reinterpret_cast<const char*>(src + literalStart), literalLen);
+                while (i < n && literalLen < 128)
+                {
+                    run = 1;
+                    while (i + run < n && run < 128 && src[i + run] == src[i])
+                        ++run;
+
+                    if (run >= 3)
+                        break;
+
+                    ++i;
+                    ++literalLen;
+                }
+
+                output.push_back(static_cast<char>(literalLen - 1));
+                output.append(reinterpret_cast<const char*>(src + literalStart), literalLen);
+            }
         }
-    }
 
-    // PostScript RunLengthDecode EOD marker.
-    output.push_back(static_cast<char>(128));
+        // PostScript RunLengthDecode EOD marker.
+        output.push_back(static_cast<char>(128));
+    }
 }
 
 std::optional<PreparedPsDibPage> PsSessionWriter::MakePreparedPsDibPage(const dynarithmic::DibPageView& view)
@@ -202,7 +206,7 @@ bool PsSessionWriter::ValidatePage(const PreparedPsDibPage& page)
         page.bitsPerPixel == 32;
 }
 
-bool PsSessionWriter::WriteDocumentHeader()
+bool PsSessionWriter::WriteDocumentHeader() const
 {
     const char* levelText = options_.level == PsLevel::Level1 ? "1.0" : "2.0";
 
@@ -224,14 +228,14 @@ bool PsSessionWriter::WriteDocumentHeader()
     return true;
 }
 
-bool PsSessionWriter::WritePageHeader(const PreparedPsDibPage&)
+bool PsSessionWriter::WritePageHeader(const PreparedPsDibPage&) const
 {
     return std::fprintf(file_,
         "%%%%Page: %u %u\n",
         pageCount_, pageCount_) >= 0;
 }
 
-bool PsSessionWriter::WritePageSetup(const PreparedPsDibPage& page)
+bool PsSessionWriter::WritePageSetup(const PreparedPsDibPage& page) const
 {
     const double imageWpts = (static_cast<double>(page.width) / page.xDpi) * 72.0;
     const double imageHpts = (static_cast<double>(page.height) / page.yDpi) * 72.0;
@@ -270,7 +274,7 @@ bool PsSessionWriter::WritePageSetup(const PreparedPsDibPage& page)
         x, y, drawW, drawH) >= 0;
 }
 
-const char* PsSessionWriter::ColorSpaceName(const PreparedPsDibPage& page) const
+const char* PsSessionWriter::ColorSpaceName(const PreparedPsDibPage& page)
 {
     switch (page.pixelFlavor)
     {
@@ -286,7 +290,7 @@ const char* PsSessionWriter::ColorSpaceName(const PreparedPsDibPage& page) const
     return "/DeviceRGB";
 }
 
-uint32_t PsSessionWriter::Components(const PreparedPsDibPage& page) const
+uint32_t PsSessionWriter::Components(const PreparedPsDibPage& page)
 {
     switch (page.pixelFlavor)
     {
@@ -302,7 +306,7 @@ uint32_t PsSessionWriter::Components(const PreparedPsDibPage& page) const
     return 3;
 }
 
-uint32_t PsSessionWriter::BitsPerComponent(const PreparedPsDibPage& page) const
+uint32_t PsSessionWriter::BitsPerComponent(const PreparedPsDibPage& page)
 {
     switch (page.pixelFlavor)
     {
@@ -389,11 +393,11 @@ bool PsSessionWriter::WriteAscii85FlateImageData(const PreparedPsDibPage& page)
         return false;
 
     std::string flate;
-    if (FlateEncode(std::string_view(raw.data(), raw.size()), flate) != Z_OK)
+    if (dynarithmic::FlateEncode(std::string_view(raw.data(), raw.size()), flate) != Z_OK)
         return false;
 
     std::string encoded;
-    if (ASCII85Encode(std::string_view(flate.data(), flate.size()), encoded) != 1)
+    if (dynarithmic::ASCII85Encode(std::string_view(flate.data(), flate.size()), encoded) != 1)
         return false;
 
     if (!encoded.empty())
@@ -453,7 +457,7 @@ bool PsSessionWriter::WriteLevel1Image(const PreparedPsDibPage& page)
 
     return WriteHexImageData(page);
 }
-const uint8_t* PsSessionWriter::SourceRow(const PreparedPsDibPage& page, uint32_t y) const
+const uint8_t* PsSessionWriter::SourceRow(const PreparedPsDibPage& page, uint32_t y)
 {
     const uint32_t srcY = page.bottomUp ? (page.height - 1 - y) : y;
     return page.bits + static_cast<size_t>(srcY) * page.strideBytes;
@@ -759,14 +763,14 @@ bool PsSessionWriter::BuildRawImageData(const PreparedPsDibPage& page, std::stri
     return false;
 }
 
-bool PsSessionWriter::WriteAscii85ImageData(const PreparedPsDibPage& page)
+bool PsSessionWriter::WriteAscii85ImageData(const PreparedPsDibPage& page) const
 {
     std::string raw;
     if (!BuildRawImageData(page, raw))
         return false;
 
     std::string encoded;
-    if (!ASCII85Encode(std::string_view(raw.data(), raw.size()), encoded) != 0)
+    if (!dynarithmic::ASCII85Encode(std::string_view(raw.data(), raw.size()), encoded) != 0)
         return false;
 
     if (!encoded.empty())
@@ -784,7 +788,7 @@ bool PsSessionWriter::WriteAscii85ImageData(const PreparedPsDibPage& page)
     return true;
 }
 
-bool PsSessionWriter::WriteAscii85RunLengthImageData(const PreparedPsDibPage& page)
+bool PsSessionWriter::WriteAscii85RunLengthImageData(const PreparedPsDibPage& page) const
 {
     std::string raw;
     if (!BuildRawImageData(page, raw))
@@ -794,7 +798,7 @@ bool PsSessionWriter::WriteAscii85RunLengthImageData(const PreparedPsDibPage& pa
     PsRunLengthEncode(std::string_view(raw.data(), raw.size()), rle);
 
     std::string encoded;
-    if (!ASCII85Encode(std::string_view(rle.data(), rle.size()), encoded) != 0)
+    if (!dynarithmic::ASCII85Encode(std::string_view(rle.data(), rle.size()), encoded) != 0)
         return false;
 
     if (!encoded.empty())
@@ -831,7 +835,7 @@ bool DTWAINPsOutput::OnFirstPage(const std::wstring& filename, const PsSessionOp
     return writer_->WritePage(page);
 }
 
-bool DTWAINPsOutput::OnNextPage(const PreparedPsDibPage& page)
+bool DTWAINPsOutput::OnNextPage(const PreparedPsDibPage& page) const
 {
     if (!writer_)
         return false;

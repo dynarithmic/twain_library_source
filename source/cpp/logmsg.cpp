@@ -18,17 +18,19 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
+#include <windows.h>
 #include "date/date.h"
 #include <ctime>
 #include <cstdio>
 #include <sstream>
+#include <iostream>
 #ifdef _WIN32
 #else
 #include <dlfcn.h>
 #endif
 #include <string>
 #include "logmsg.h"
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "ctlfileutils.h"
 #include "ctlthreadutils.h"
 
@@ -377,8 +379,8 @@ bool CLogSystem::Flush()
 std::string CLogSystem::GetBaseName(std::string_view path) const
 {
     StringArray rArray;
-    StringWrapperA::SplitPath(path.data(), rArray);
-    return rArray[StringWrapper::NAME_POS];
+    dynarithmic::filenameutils::SplitPath(path, rArray);
+    return rArray[dynarithmic::filenameutils::NAME_POS];
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -386,8 +388,8 @@ std::string CLogSystem::GetBaseName(std::string_view path) const
 std::string CLogSystem::GetBaseDir(std::string_view path) const
 {
     StringArray rArray;
-    StringWrapperA::SplitPath(path.data(), rArray);
-    return rArray[StringWrapper::DIRECTORY_POS];
+    dynarithmic::filenameutils::SplitPath(path, rArray);
+    return rArray[dynarithmic::filenameutils::DIRECTORY_POS];
 }
 
 void CLogSystem::OutputDebugStringFull(std::string_view s)

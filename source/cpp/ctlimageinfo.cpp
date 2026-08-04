@@ -27,6 +27,8 @@
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
+using CharType = CTL_StringType::value_type;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
                                                 LPTSTR XResolution,
@@ -47,8 +49,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
     const DTWAIN_BOOL retVal = DTWAIN_GetImageInfo(Source, &tempX, &tempY, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression);
     if (retVal)
     {
-        StringWrapper::SafeStrcpy(XResolution, StringWrapper::TrimDouble(tempX).c_str(), 255);
-        StringWrapper::SafeStrcpy(YResolution, StringWrapper::TrimDouble(tempY).c_str(), 255);
+        stringutils::SafeStrcpy(XResolution, stringutils::TrimDouble<CTL_StringType>(tempX).c_str(), 255);
+        stringutils::SafeStrcpy(YResolution, stringutils::TrimDouble<CTL_StringType>(tempY).c_str(), 255);
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)

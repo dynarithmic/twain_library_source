@@ -32,8 +32,10 @@
 #include "ctlfilesave.h"
 #include "ctlsetgetcaps.h"
 #include "ctldib32ex.h"
+#include "ctlstringutils.h"
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 static void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
                                 LONG Error, LONG ErrorMsg, const std::string_view extraInfo = {});
@@ -413,12 +415,12 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     if ( lFlags & TWAINFileFlag_PROMPT )
                     {
                         CTL_StringType strTempFile = PromptForFileName(pSource->GetDTWAINHandle(), acquireFileStatus.GetAcquireFileFormat());
-                        StringWrapper::TrimAll(strTempFile);
+                        stringutils::TrimAll(strTempFile);
                         if ( strTempFile.empty())
                         {
                             SendFileAcquireError(pSource, pSession, DTWAIN_ERR_BAD_FILENAME, DTWAIN_TN_FILESAVECANCELLED,
                                                  StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
-                            acquireFileStatus.SetLastAcquiredFileName( StringWrapper::traits_type::GetEmptyString() );
+                            acquireFileStatus.SetLastAcquiredFileName({});
                         }
                         else
                         {
@@ -428,14 +430,14 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                                 // Error in copying the file
                                 SendFileAcquireError(pSource, pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
                                                      StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
-                                acquireFileStatus.SetLastAcquiredFileName( StringWrapper::traits_type::GetEmptyString() );
+                                acquireFileStatus.SetLastAcquiredFileName({});
                             }
                             else
                                 acquireFileStatus.SetLastAcquiredFileName( strTempFile );
 
                             // Remove the temporary file
                             if (dynarithmic::fileutils::delete_file(acquireFileStatus.GetAcquireFileName().c_str()))
-                                acquireFileStatus.SetAcquireFileName(StringWrapper::traits_type::GetEmptyString());
+                                acquireFileStatus.SetAcquireFileName({});
 
                         }
                         acquireFileStatus.SetLastAcquiredFileName( strTempFile );
@@ -919,7 +921,7 @@ std::string CTL_ImageXferTriplet::GetPageFileName(const std::string &strBase, in
     StringArray aTokens;
     // Adjust name
 
-    StringWrapperA::Tokenize(strBase, ".", aTokens);
+    stringutils::Tokenize(strBase, ".", aTokens);
 
     // Make sure that you take the "last" token
     const size_t nTokens = aTokens.size();
@@ -928,14 +930,14 @@ std::string CTL_ImageXferTriplet::GetPageFileName(const std::string &strBase, in
     if ( nTokens == 0 )
     {
         nLen = strBase.length();
-        strTemp = StringWrapperA::Left(strTemp, nLen -  nLenFormat ) + strFormat;
+        strTemp = stringutils::Left<std::string>(strTemp, nLen -  nLenFormat ) + strFormat;
         return strTemp;
     }
 
     if ( nTokens == 1 )
     {
         nLen = aTokens[0].length();
-        strTemp = StringWrapperA::Left(aTokens[0], nLen - nLenFormat) + strFormat;
+        strTemp = stringutils::Left<std::string>(aTokens[0], nLen - nLenFormat) + strFormat;
         return strTemp;
     }
 
@@ -947,7 +949,7 @@ std::string CTL_ImageXferTriplet::GetPageFileName(const std::string &strBase, in
             strTemp += ".";
         }
         nLen = strTemp.length();
-        strTemp = StringWrapperA::Left(strTemp,  nLen - 1 - nLenFormat);
+        strTemp = stringutils::Left<std::string>(strTemp,  nLen - 1 - nLenFormat);
         strTemp += strFormat;
         strTemp += ".";
         strTemp += aTokens[nTokens-1];

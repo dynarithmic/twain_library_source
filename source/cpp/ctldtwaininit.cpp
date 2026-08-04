@@ -40,6 +40,9 @@
 #include "ctldefsource.h"
 #include "ctlclosesource.h"
 #include "ctlguiddef.h"
+#include "ctlwindowsimpl.h"
+#include "ctlguidimpl.h"
+#include "ctlstringutilsx.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
@@ -55,6 +58,7 @@
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
@@ -161,7 +165,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG l
     if ( bGotInfo )
     {
         StringArrayW sVersionArray;
-        StringWrapperW::Tokenize(info.FileVersion, L".", sVersionArray);
+        stringutils::Tokenize(info.FileVersion, L".", sVersionArray);
         LONG lpVersionVals[4] = {};
         if (sVersionArray.size() != 4)
             return false;
@@ -311,7 +315,7 @@ LONG DLLENTRY_DEF DTWAIN_GetLastError()
     // Test stuff
     std::string sTest = "VueScan TWAIN";
 
-    auto sNew = StringWrapperA::TrimAll(sTest);
+    auto sNew = stringutils::TrimAll(sTest);
 
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if ( !pHandle )
@@ -334,9 +338,9 @@ static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG n
     {
         // Copy the error number to the buffer if we haven't been able to find the 
         // resource string
-        sCopy = StringWrapper::ToString(resourceID);
+        sCopy = stringutils::ToString<CTL_StringType>(resourceID);
         if (resourceID != DTWAIN_ERR_WIN32_ERROR)
-            return StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
+            return dynarithmic::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
     }
     nBytes = DTWAIN_USERRES_MAXSIZE;
     resourceID = actualResourceID;
@@ -369,7 +373,7 @@ static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG n
     #else
         sCopy += StringConversion::Convert_Ansi_To_Native(szTemp.data(), szTemp.size());
     #endif
-    return StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
+    return dynarithmic::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
 }
 
 LONG DLLENTRY_DEF  DTWAIN_GetResourceString(LONG ResourceID, LPTSTR lpszBuffer, LONG nMaxLen)
@@ -568,7 +572,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_GetDTWAINHandle()
 DTWAIN_BOOL SetLangResourcePath(LPCTSTR szPath)
 {
     LOG_FUNC_ENTRY_PARAMS((szPath))
-    CTL_StaticData::GetLanguageResourcePath() = StringWrapper::AddBackslashToDirectory(szPath);
+    CTL_StaticData::GetLanguageResourcePath() = WindowsAPIImplDef::AddBackslashToDirectory(szPath);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -671,7 +675,7 @@ static bool CheckTwainAvailability(LPTSTR directories, LONG nMaxLen, LONG* maxCh
     auto retVal = IsTwainAvailableHelper(dirsToUse, maxLenToUse);
     if (maxCharsCopied)
         *maxCharsCopied = retVal;
-    StringWrapper::Tokenize(dirsToUse, _T("|"), arr);
+    stringutils::Tokenize(dirsToUse, _T("|"), arr);
     for (auto& s : arr)
     {
         if (s != s_NullEntry)
@@ -728,8 +732,8 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen
     }
 
     CTL_StringType sDirs;
-    auto joinedString = StringWrapper::Join(availability.second, _T("|"));
-    auto actualLengthCopied = StringWrapper::CopyInfoToCString(joinedString, directories, nMaxLen);
+    auto joinedString = stringutils::Join<CTL_StringType>(availability.second, _T("|"));
+    auto actualLengthCopied = dynarithmic::CopyInfoToCString(joinedString, directories, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
     LOG_FUNC_EXIT_NONAME_PARAMS(actualLengthCopied)
     CATCH_BLOCK(0)
@@ -781,7 +785,7 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullName(LONG DSMType, LPTSTR szDLLName, LONG nMa
 
     CTL_StringType sDLLName;
     std::copy(strToSet->begin(), strToSet->end(), std::back_inserter(sDLLName));
-    nTotalBytes = StringWrapper::CopyInfoToCString(sDLLName, szDLLName, nMaxLen);
+    nTotalBytes = dynarithmic::CopyInfoToCString(sDLLName, szDLLName, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLName, pWhichSearch))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(0)
@@ -791,7 +795,7 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPath(LPTSTR szDLLName, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szDLLName, nMaxLen))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto retVal = StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMPath(), szDLLName, nMaxLen);
+    auto retVal = dynarithmic::CopyInfoToCString(CTL_TwainAppMgr::GetDSMPath(), szDLLName, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLName))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(-1)
@@ -801,7 +805,7 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfo(LPTSTR szDLLInfo, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szDLLInfo, nMaxLen))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto retVal = StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMVersionInfo(), szDLLInfo, nMaxLen);
+    auto retVal = dynarithmic::CopyInfoToCString(CTL_TwainAppMgr::GetDSMVersionInfo(), szDLLInfo, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLInfo))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(-1)
@@ -838,7 +842,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx(HINSTANCE hInstance, LPCTST
 {
     LOG_FUNC_ENTRY_PARAMS((hInstance, szINIPath))
 
-    CTL_StaticData::GetINIPath() = StringWrapper::AddBackslashToDirectory(szINIPath);
+    CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
 
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLib(hInstance);
     LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
@@ -862,7 +866,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
 {
     LOG_FUNC_ENTRY_PARAMS((szINIPath))
-    CTL_StaticData::GetINIPath() = StringWrapper::AddBackslashToDirectory(szINIPath);
+    CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
     LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
     CATCH_BLOCK(nullptr)
@@ -900,7 +904,7 @@ DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& initOptions)
 #else
     auto& sAppName = CTL_StaticData::GetApplicationName();
     if ( sAppName.empty() )
-        sAppName = StringWrapper::GetModuleFileName(nullptr);
+        sAppName = WindowsAPIImplDef::GetModuleFileName(nullptr);
 #endif    
     LOG_FUNC_ENTRY_PARAMS(())
 
@@ -926,7 +930,7 @@ DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& initOptions)
         CTL_TwainDLLHandle* pHandle = pHandlePtr.get();
 
         // Associate a GUID with the handle
-        pHandle->GetGUID() = StringWrapperA::GenerateUUIDv4();
+        pHandle->GetGUID() = GenerateUUIDv4Impl<std::string>();
 
         if (!initOptions.createMinimalSetup)
         {
@@ -1462,10 +1466,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
 {
     LOG_FUNC_ENTRY_PARAMS((hWndMsgNotify, lpszDLLName))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if ( pHandle->m_bSessionAllocated )
+    if (pHandle->m_bSessionAllocated)
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
-
-    const CTL_StringType sDLLName = lpszDLLName?lpszDLLName:StringWrapper::traits_type::GetEmptyString();
+    CTL_StringType sDLLName;
+    if (lpszDLLName)
+        sDLLName = lpszDLLName;
 #ifdef _WIN32
     HWND hWndMsg;
     HINSTANCE hInstance;
@@ -1575,7 +1580,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
 
 static DTWAIN_ARRAY GetFileTypes(CTL_TwainDLLHandle* pHandle, int nType)
 {
-    constexpr const char *sNames[] = { "","-Single","-Multi" };
+    constexpr std::array<std::string_view, 3> sNames = { "","-Single","-Multi" };
     DTWAIN_ARRAY aFileTypes = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0).second;
     if (aFileTypes)
     {
@@ -1584,7 +1589,8 @@ static DTWAIN_ARRAY GetFileTypes(CTL_TwainDLLHandle* pHandle, int nType)
         for (auto& pr : availableFileTypes)
         {
             auto val = pr.first;
-            if (StringWrapperA::EndsWith(pr.second.m_formatName, sNames[nType]))
+            if (stringutils::EndsWith(std::string_view(pr.second.m_formatName), 
+                sNames[nType]))
                 factory->add_to_back(aFileTypes, &val, 1);
         }
     }
@@ -1596,7 +1602,7 @@ static std::string GetFileTypeExtensionsInternal(int nType)
     const auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
     const auto iter = availableFileTypes.find(nType);
     if ( iter != availableFileTypes.end())
-        return StringWrapperA::Join(iter->second.m_vExtensions, "|");
+        return stringutils::Join<std::string>(iter->second.m_vExtensions, "|");
     return {};
 }
 
@@ -1617,7 +1623,7 @@ static LONG GetFileTypeInfo(Fn infoFn, int nType, LPTSTR lpszName, LONG nMaxLen)
     if (!str.empty())
     {
         const CTL_StringType str2 = StringConversion::Convert_Ansi_To_Native(str, str.size());
-        realLen = StringWrapper::CopyInfoToCString(str2, lpszName, nMaxLen);
+        realLen = dynarithmic::CopyInfoToCString(str2, lpszName, nMaxLen);
     }
     return realLen;
 }
@@ -1742,8 +1748,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     if ( !pHandle->m_bSessionAllocated )
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
-    StringTraitsA::string_type sClosingDSM = dynarithmic::GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DSM) + "\n";
-    StringTraitsA::string_type sClosingTwainSession = dynarithmic::GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_TWAIN_SESSION) + "\n";
+    CTL_StringTypeA sClosingDSM = dynarithmic::GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DSM) + "\n";
+    CTL_StringTypeA sClosingTwainSession = dynarithmic::GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_TWAIN_SESSION) + "\n";
 
     // Close any sources
     pHandle->m_pTwainSession->DestroyAllSources();
@@ -1785,7 +1791,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         {
             if (logFilterFlags)
             {
-                StringTraitsA::string_type sClosingManager = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DTWAIN_MANAGER);
+                CTL_StringTypeA sClosingManager = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DTWAIN_MANAGER);
                 LogWriterUtils::WriteLogInfoIndentedA(sClosingManager);
             }
         }
@@ -2070,8 +2076,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderEx(LPCTSTR SearchOrder, LPCTSTR
     {
         if (!strValidString.empty())
         {
+
             pHandle->m_TwainDSMSearchOrderStr = strValidString;
-            pHandle->m_TwainDSMUserDirectory = UserDirectory ? UserDirectory : StringWrapper::traits_type::GetEmptyString();
+            pHandle->m_TwainDSMUserDirectory = UserDirectory ? UserDirectory : _T("");
             pHandle->m_TwainDSMSearchOrder = -1;
             CTL_StaticData::GetStartupDSMSearchOrder() =  strValidString;
             CTL_StaticData::GetStartupDSMSearchOrderDir() = UserDirectory ? UserDirectory : _T("");
@@ -2086,10 +2093,10 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrderEx(LPTSTR SearchOrder, LPTSTR UserDire
 {
     LOG_FUNC_ENTRY_PARAMS((SearchOrder, UserDirectory))
     if (SearchOrder)
-        StringWrapper::CopyInfoToCString(CTL_StaticData::GetStartupDSMSearchOrder(), SearchOrder, 6);
+        dynarithmic::CopyInfoToCString(CTL_StaticData::GetStartupDSMSearchOrder(), SearchOrder, 6);
 
     LONG nSize = static_cast<LONG>(CTL_StaticData::GetStartupDSMSearchOrderDir().size() + 1);
-    LONG retSize = StringWrapper::CopyInfoToCString(CTL_StaticData::GetStartupDSMSearchOrderDir(), UserDirectory, nSize);
+    LONG retSize = dynarithmic::CopyInfoToCString(CTL_StaticData::GetStartupDSMSearchOrderDir(), UserDirectory, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((SearchOrder, UserDirectory))
     LOG_FUNC_EXIT_NONAME_PARAMS(retSize)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -2199,7 +2206,7 @@ std::string GetStaticLibVer()
 LONG DLLENTRY_DEF DTWAIN_GetVersionString(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
-    const LONG RetVal = StringWrapper::CopyInfoToCString(GetVersionString(), lpszVer, nLength);
+    const LONG RetVal = dynarithmic::CopyInfoToCString(GetVersionString(), lpszVer, nLength);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
@@ -2208,7 +2215,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionString(LPTSTR lpszVer, LONG nLength)
 LONG DLLENTRY_DEF DTWAIN_GetLibraryPath(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
-    const LONG RetVal = StringWrapper::CopyInfoToCString(GetDTWAINDLLPath(), lpszVer, nLength);
+    const LONG RetVal = dynarithmic::CopyInfoToCString(GetDTWAINDLLPath(), lpszVer, nLength);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
@@ -2217,7 +2224,7 @@ LONG DLLENTRY_DEF DTWAIN_GetLibraryPath(LPTSTR lpszVer, LONG nLength)
 LONG DLLENTRY_DEF DTWAIN_GetShortVersionString(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
-    const LONG RetVal = StringWrapper::CopyInfoToCString(GetDTWAINDLLVersionInfoStr(), lpszVer, nLength);
+    const LONG RetVal = dynarithmic::CopyInfoToCString(GetDTWAINDLLVersionInfoStr(), lpszVer, nLength);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
@@ -2226,7 +2233,7 @@ LONG DLLENTRY_DEF DTWAIN_GetShortVersionString(LPTSTR lpszVer, LONG nLength)
 LONG DLLENTRY_DEF DTWAIN_GetVersionInfo(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
-    const LONG RetVal = StringWrapper::CopyInfoToCString(GetVersionInfo(), lpszVer, nLength);
+    const LONG RetVal = dynarithmic::CopyInfoToCString(GetVersionInfo(), lpszVer, nLength);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
@@ -2261,7 +2268,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwai
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
         LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
     }
-    auto numChars = StringWrapper::CopyInfoToCString(ret.second, lpszOut, nSize);
+    auto numChars = dynarithmic::CopyInfoToCString(ret.second, lpszOut, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(-1)
@@ -2272,7 +2279,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantEx(LONG lConstantType, LONG lTw
     LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
-    auto numChars = StringWrapper::CopyInfoToCString(ret.second, lpszOut, nSize);
+    auto numChars = dynarithmic::CopyInfoToCString(ret.second, lpszOut, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(0)
@@ -2303,15 +2310,15 @@ LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(LPTSTR lpszBuffer, LONG nMaxLen)
     {
         if (pHandle->m_sWindowsVersionInfo.empty())
         {
-            RetVal = StringWrapper::CopyInfoToCString(GetWinVersion(), lpszBuffer, nMaxLen);
+            RetVal = dynarithmic::CopyInfoToCString(GetWinVersion(), lpszBuffer, nMaxLen);
             if (lpszBuffer)
                 pHandle->m_sWindowsVersionInfo = lpszBuffer;
         }
         else
-            RetVal = StringWrapper::CopyInfoToCString(pHandle->m_sWindowsVersionInfo, lpszBuffer, nMaxLen);
+            RetVal = dynarithmic::CopyInfoToCString(pHandle->m_sWindowsVersionInfo, lpszBuffer, nMaxLen);
     }
     else
-        RetVal = StringWrapper::CopyInfoToCString(GetWinVersion(), lpszBuffer, nMaxLen);
+        RetVal = dynarithmic::CopyInfoToCString(GetWinVersion(), lpszBuffer, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
@@ -2332,7 +2339,7 @@ CTL_StringType dynarithmic::GetDTWAINDLLPath()
     auto& dllPath = CTL_StaticData::GetDLLPath();
     if (!dllPath.empty())
         return dllPath;
-    dllPath = StringWrapper::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle());
+    dllPath = WindowsAPIImplDef::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle());
 
     // Also remember the parent path.
     auto& dllParentPath = CTL_StaticData::GetDLLParentPath();
@@ -2494,7 +2501,7 @@ CTL_StringType CheckSearchOrderString(CTL_StringType str)
     static std::set<TCHAR> setValidChars = {_T('C'),_T('W'),_T('O'),_T('U'), _T('S')};
     std::set<TCHAR> setDuplicates;
     CTL_StringType strOut;
-    StringWrapper::MakeUpperCase(str);
+    stringutils::MakeUpperCase(str);
     std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](TCHAR ch)
         {
             bool isValidChar = false;
@@ -2812,7 +2819,8 @@ bool LoadGeneralResources(const SysInitializeOptions& initOptions)
             else
             {
                 bool bWroteInfoToFile = false;
-                std::string sErr = StringConversion::Convert_Native_To_Ansi(StringWrapper::ReplaceAll(sAllErrors, _T("\r"), _T(" ")));
+                std::string sErr = StringConversion::Convert_Native_To_Ansi(
+                    stringutils::ReplaceAll<CTL_StringType>(sAllErrors, _T("\r"), _T(" ")));
                 if (initOptions.createErrorLog)
                 {
                     // Write the information to errorlog_*.txt located in the resource directory
@@ -2855,8 +2863,8 @@ void LoadSelectSourcePosition()
         CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SELECTSOURCEPOS_KEY).data(), "");
     if (pLastPos && pLastPos[0] != 0)
     {
-        StringWrapperA::StringArrayType arr;
-        auto numTokens = StringWrapperA::Tokenize(pLastPos, " ", arr);
+        std::vector<CTL_StringTypeA> arr;
+        auto numTokens = stringutils::Tokenize(pLastPos, " ", arr);
         if (numTokens >= 2)
         {
             auto& lastPos = CTL_StaticData::GetSelectSourcePos();
@@ -2871,35 +2879,6 @@ void LoadSelectSourcePosition()
         }
     }
 }
-
-#ifdef DTWAIN_LIB
-void GetVersionFromResource(LPLONG lMajor, LPLONG lMinor, LPLONG patch)
-{
-    // split on the "."
-    CTL_StringArrayType aStr;
-    CTL_StringType ver = _T(DTWAIN_VERINFO_BASEVERSION);
-    ver += _T(DTWAIN_PATCHLEVEL_VERSION);
-    StringWrapper::Tokenize(ver, _T("."), aStr, true);
-    if ( aStr.size() == 4 )
-    {
-        if ( lMajor )
-            *lMajor = _ttoi(aStr[0].c_str());
-        if ( lMinor )
-            *lMinor = _ttoi(aStr[1].c_str());
-        if ( patch )
-            *patch = _ttoi(aStr[3].c_str());
-    }
-    else
-    {
-        if ( lMajor )
-            *lMajor = 0;
-        if ( lMinor )
-            *lMinor = 0;
-        if ( patch )
-            *patch = 0;
-    }
-}
-#endif
 
 #ifdef _WIN32
 #include "windowsinit_impl.inl"

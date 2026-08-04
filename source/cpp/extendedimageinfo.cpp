@@ -1286,7 +1286,7 @@ std::pair<bool, int> dynarithmic::GetExtImageInfoDataInternal(CTL_ITwainSource* 
             // Log this condition.  We *may* still get the data, even though TWAIN spec was violated.
             if (CTL_StaticData::GetLogFilterFlags())
             {
-                StringTraitsA::string_type sBadType = GetResourceStringFromMap(IDS_DTWAIN_ERROR_REPORTED_TYPE_MISMATCH);
+                CTL_StringTypeA sBadType = GetResourceStringFromMap(IDS_DTWAIN_ERROR_REPORTED_TYPE_MISMATCH);
                 sBadType += "  Extended Image Info Value: " + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, nWhich).second;
                 sBadType += " - {Device Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeReportedByDevice).second;
                 sBadType += ", Twain Required Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeRequiredByTWAIN).second + "}";

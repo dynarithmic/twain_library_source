@@ -22,6 +22,8 @@
 #include <array>
 #include "tgawriter.h"
 
+using namespace dynarithmic;
+
 std::optional<PreparedTgaDibPage> TgaSessionWriter::MakePreparedTgaDibPage(const dynarithmic::DibPageView& view)
 {
     if (!view.bits)
@@ -116,7 +118,7 @@ bool TgaSessionWriter::WriteCurrentPage()
         return WriteImageRaw();
 }
 
-bool TgaSessionWriter::WriteExtensionAreaWithComments()
+bool TgaSessionWriter::WriteExtensionAreaWithComments() const
 {
     const uint32_t extensionOffset =
         static_cast<uint32_t>(std::ftell(file_));
@@ -267,7 +269,7 @@ uint8_t TgaSessionWriter::GetImageDescriptor() const
     return desc;
 }
 
-bool TgaSessionWriter::WriteColorMap()
+bool TgaSessionWriter::WriteColorMap() const
 {
     if (!UsesColorMap())
         return true;
@@ -375,7 +377,7 @@ bool TgaSessionWriter::PixelsEqual(const uint8_t* a, const uint8_t* b, uint32_t 
     return std::memcmp(a, b, pixelBytes) == 0;
 }
 
-bool TgaSessionWriter::WriteRleRow(const uint8_t* row, uint32_t width, uint32_t pixelBytes)
+bool TgaSessionWriter::WriteRleRow(const uint8_t* row, uint32_t width, uint32_t pixelBytes) const
 {
     uint32_t x = 0;
 

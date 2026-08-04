@@ -23,7 +23,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_set>
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "ctlenum.h"
 #include "ctltwainsource.h"
 #include "ctltwainidentity.h"

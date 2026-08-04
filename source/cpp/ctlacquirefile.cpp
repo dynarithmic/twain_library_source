@@ -35,28 +35,30 @@
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
-    template <typename T, typename SW>
+    template <typename T>
     bool CheckForAnyBlankNames(const T& vect)
     {
+        using CharType = T::value_type::value_type;
         for (auto& oneName : vect)
         {
-            if (SW::IsAllSpace(oneName))
+            if (stringutils::IsAllSpace<CharType>(oneName.c_str()))
                 return true;
         }
         return false;
     }
 
-    template <typename StringType, typename StringArrayType, typename StringWrapperType, typename CopyFn>
+    template <typename StringType, typename CopyFn>
     int CheckValidNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aFileNames, LPDTWAIN_ARRAY tempNames, CopyFn fn)
     {
         int bRetval = DTWAIN_NO_ERROR;
         auto& vect = pHandle->m_ArrayFactory->underlying_container_t<StringType>(aFileNames);
         if (!vect.empty())
         {
-            if (!CheckForAnyBlankNames<StringArrayType, StringWrapperType>(vect))
+            if (!CheckForAnyBlankNames<std::vector<StringType>>(vect))
             {
                 auto retVal = dynarithmic::CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
                 if (!retVal.second)
@@ -136,12 +138,12 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
         if (idx == 1)
         {
             // Check for empty array and for blank entries (both are not allowed)
-            bRetval = CheckValidNames<std::string, StringArray, StringWrapperA>(pHandle, aFileNames, &tempNames, &ArrayCopyAnsiToNative);
+            bRetval = CheckValidNames<std::string>(pHandle, aFileNames, &tempNames, &ArrayCopyAnsiToNative);
         }
         else
         {
             // Check for empty array and for blank entries (both are not allowed)
-            bRetval = CheckValidNames<std::wstring, StringArrayW, StringWrapperW>(pHandle, aFileNames, &tempNames, &ArrayCopyWideToNative);
+            bRetval = CheckValidNames<std::wstring>(pHandle, aFileNames, &tempNames, &ArrayCopyWideToNative);
         }
         if (tempNames)
             arrayToUse = tempNames;

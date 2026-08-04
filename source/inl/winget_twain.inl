@@ -21,6 +21,9 @@
 #ifndef WINGET_TWAIN_INL
 #define WINGET_TWAIN_INL
 #ifdef _WIN32
+#include "ctlwindowsimpl.h"
+#include "ctlfileutils.h"
+
 static CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, 
                                             LPCTSTR strTwainDLLName,
                                             LPLONG pWhichSearch,
@@ -113,15 +116,15 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
 
     // make sure we get only the file name.  If a directory path
     // is given in the strTwainDLLName argument, it is ignored.
-    StringWrapper::StringArrayType fComponents;
-    StringWrapper::SplitPath(strTwainDLLName, fComponents);
-    const auto fName = fComponents[StringWrapper::NAME_POS] + fComponents[StringWrapper::EXTENSION_POS];
+    std::vector<CTL_StringType> fComponents;
+    dynarithmic::filenameutils::SplitPath(strTwainDLLName, fComponents);
+    const auto fName = fComponents[dynarithmic::filenameutils::NAME_POS] + fComponents[dynarithmic::filenameutils::EXTENSION_POS];
 
     // we first search the Windows directory.
     // if TWAIN isn't found there, check system directory.
     // if not there, then use the Windows path search logic
     std::set<CTL_StringType> strSet;
-    static constexpr std::array<std::tuple<StringWrapper::traits_type::char_type, int, int>, 5> searchMap = { {
+    static constexpr std::array<std::tuple<CTL_StringType::value_type, int, int>, 5> searchMap = { {
         {_T('C'),CurDirPos, DTWAIN_TWAINDSMSEARCH_C},
         {_T('W'),WinDirPos, DTWAIN_TWAINDSMSEARCH_W},
         {_T('S'),SysDirPos, DTWAIN_TWAINDSMSEARCH_S},
@@ -135,10 +138,10 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
     constexpr int boost_version_minor = (BOOST_VERSION / 100) % 1000;
     constexpr int boost_version_major = BOOST_VERSION / 100000;
 
-    dirNames[WinDirPos] = StringWrapper::GetWindowsDirectory();
-    dirNames[SysDirPos] = StringWrapper::GetSystemDirectory();
+    dirNames[WinDirPos] = WindowsAPIImplDef::GetWindowsDirectory();
+    dirNames[SysDirPos] = WindowsAPIImplDef::GetSystemDirectory();
     dirNames[SysPathPos] = {};
-    dirNames[CurDirPos] = StringWrapper::SplitPath(dllPath)[StringWrapper::DIRECTORY_POS];
+    dirNames[CurDirPos] = dynarithmic::filenameutils::SplitPath(dllPath)[dynarithmic::filenameutils::DIRECTORY_POS];
     auto& startupSearchOrder = CTL_StaticData::GetStartupDSMSearchOrder();
     auto& startupSearchOrderDir = CTL_StaticData::GetStartupDSMSearchOrderDir();
     CTL_StringType dirToUse = pHandle->m_TwainDSMUserDirectory;
@@ -148,7 +151,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         searchOrderToUse = startupSearchOrder;
         dirToUse = startupSearchOrderDir;
     }
-    dirNames[UserDefPos] = StringWrapper::SplitPath(dirToUse)[StringWrapper::DIRECTORY_POS];
+    dirNames[UserDefPos] = dynarithmic::filenameutils::SplitPath(dirToUse)[dynarithmic::filenameutils::DIRECTORY_POS];
 
     struct SetErrorModeRAII
     {
@@ -190,7 +193,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         strSet.insert(dirNameToUse);
 
         if (!dirNameToUse.empty())
-            fNameTotal = StringWrapper::AddBackslashToDirectory(dirNameToUse) + fName;
+            fNameTotal = WindowsAPIImplDef::AddBackslashToDirectory(dirNameToUse) + fName;
         else
             fNameTotal = fName;
 
@@ -226,7 +229,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
             if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" failed with error code: ");
-                msg += StringWrapper::ToString(loadReturnCode.second);
+                msg += stringutils::ToString<CTL_StringType>(loadReturnCode.second);
                 LogWriterUtils::WriteLogInfo(msg);
             }
             continue;
@@ -259,7 +262,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
                 LogWriterUtils::WriteLogInfo(msg);
             }
             // We need the full module name
-            fNameTotal = StringWrapper::traits_type::PathGenericString(libloader.location());
+            fNameTotal = dynarithmic::filenameutils::PathGenericString<CTL_StringType>(libloader.location());
             if (pModule)
             {
                 if (bLeaveLoaded)

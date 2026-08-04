@@ -21,7 +21,7 @@
 #ifndef CTLDEFSOURCE_H
 #define CTLDEFSOURCE_H
 
-#include "ctliface.h"
+#include "ctlstringdefs.h"
 
 namespace dynarithmic
 {

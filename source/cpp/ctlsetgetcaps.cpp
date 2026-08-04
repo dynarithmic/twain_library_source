@@ -239,7 +239,7 @@ namespace
 
         CHECK_IF_CAP_SUPPORTED(pSource, pHandle, lCap, false)
 
-            LONG overrideDataType = nDataType;
+        LONG overrideDataType = nDataType;
         if (bOverrideDataType)
             overrideDataType = 0xFFFF;
 

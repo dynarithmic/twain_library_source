@@ -34,13 +34,15 @@
 #include <array>
 #include <unordered_map>
 #include <string_view>
-#include <time.h>
+#include <ctime>
 #include <boost/thread/thread_time.hpp>
 
 #include "dtwainpdf.h"
 #include "crc32_aux.h"
 #include "jpeglib.h"
 #include "ctlhashutils.h"
+#include "ctlstringutilsx.h"
+
 #undef Z_PREFIX
 #ifdef __MSL__
    #include <ctime>
@@ -52,9 +54,7 @@
 #pragma  warning (disable : 4702)
 #pragma  warning (disable : 4996)
 #endif
-#include "a85encode.h"
-#include "ahexencode.h"
-#include "flateencode.h"
+#include "ctlencodeutils.h"
 #include "pdfencrypt.h"
 #include "tiffio.h"
 #include "logwriterutils.h"
@@ -2035,7 +2035,7 @@ void PdfDocument::SetEncryption(CTL_StringViewType ownerPassword,
 
     const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
     auto docIDHash = dynarithmic::MD5Hasher().GetHash(reinterpret_cast<const unsigned char*>(s.c_str()), s.size());
-    const std::string dID = dynarithmic::StringWrapperA::HexStringFromUChars(docIDHash.data(), docIDHash.size());
+    const std::string dID = dynarithmic::HexStringFromUChars<std::string>(docIDHash.data(), docIDHash.size());
     m_DocumentID[0] = dID;
     m_DocumentID[1] = dID;
 

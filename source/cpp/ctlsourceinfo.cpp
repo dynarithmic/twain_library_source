@@ -21,6 +21,7 @@
 #include "cppfunc.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "ctlstringutilsx.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -74,7 +75,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR lpszO
     auto [pHandle, pSource] = VerifyHandles(Source);
     const TW_VERSION *pV = pSource->GetVersion();
     CTL_StringType pName = StringConversion::Convert_AnsiPtr_To_Native(pV->Info);
-    auto nLen = StringWrapper::CopyInfoToCString(pName, lpszOut, nSize);
+    auto nLen = dynarithmic::CopyInfoToCString(pName, lpszOut, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
     LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
@@ -85,7 +86,7 @@ LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, LPTSTR szSourceI
     LOG_FUNC_ENTRY_PARAMS((Source, szSourceInfo, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(Source);
     auto sAllInfo = StringConversion::Convert_Ansi_To_Native(pSource->GetSourceInfoFormatted(indentFactor));
-    auto nLen = StringWrapper::CopyInfoToCString(sAllInfo, szSourceInfo, nMaxLen);
+    auto nLen = dynarithmic::CopyInfoToCString(sAllInfo, szSourceInfo, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szSourceInfo))
     LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
@@ -93,7 +94,7 @@ LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, LPTSTR szSourceI
 
 LONG dynarithmic::GetSourceInfo(CTL_ITwainSource *p,SOURCEINFOFUNC pFunc,LPTSTR szInfo, LONG nMaxLen)
 {
-    return StringWrapper::CopyInfoToCString((p->*pFunc)(), szInfo, nMaxLen);
+    return dynarithmic::CopyInfoToCString((p->*pFunc)(), szInfo, nMaxLen);
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetSourceVersionNumber( DTWAIN_SOURCE Source, LPLONG pMajor, LPLONG pMinor)

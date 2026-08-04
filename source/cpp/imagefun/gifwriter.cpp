@@ -19,6 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "gifwriter.h"
+using namespace dynarithmic;
 
  // ============================================================
  // GIF writer

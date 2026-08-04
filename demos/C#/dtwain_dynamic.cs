@@ -1820,6 +1820,7 @@
         public const int DTWAIN_CHECKDLLVERGREATER = 2;
         public const int DTWAIN_CHECKDLLVERLESSEQ = 3;
         public const int DTWAIN_CHECKDLLVERGREATEREQ = 4;
+        public const int DTWAIN_RESOURCE_COPYRIGHT = 9700;
         // string type constants
         // these include room for the strings and a null char
         public enum TWSTR : int

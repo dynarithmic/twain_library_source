@@ -646,7 +646,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         if ( nCount > 0 )
         {
             auto strTemp = factory->get_value<CTL_StringType>(pDTWAINArray, 0); 
-            strAcquireFile = StringWrapper::CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
+            strAcquireFile = dynarithmic::filenameutils::CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
         }
         else
             strAcquireFile.clear();
@@ -671,7 +671,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
             bNameAvailable = factory->get_value(pDTWAINArray, nCount-1, &strTemp)?true:false;
             if ( !bNameAvailable )
                 return strAcquireFile;
-            return StringWrapper::GetPageFileName( strTemp, nCurImage, lFlags & DTWAIN_USELONGNAME?true:false );
+            return dynarithmic::filenameutils::GetPageFileName( strTemp, nCurImage, lFlags & DTWAIN_USELONGNAME?true:false );
         }
         else
             return strTemp;
@@ -1106,7 +1106,7 @@ void CTL_ITwainSource::RetrieveExtendedCaps()
 
 bool CTL_ITwainSource::InitFileAutoIncrementData(CTL_StringType sName)
 {
-    m_nCurFileNum = StringWrapper::GetInitialFileNumber(std::move(sName), m_nFileDigits);
+    m_nCurFileNum = dynarithmic::filenameutils::GetInitialFileNumber(std::move(sName), m_nFileDigits);
     m_nStartFileNum = m_nCurFileNum;
     return true;
 }

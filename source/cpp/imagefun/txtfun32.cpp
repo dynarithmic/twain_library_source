@@ -24,6 +24,7 @@
 #include "winbit32.h"
 #include "iohandler_bmp.h"
 #include "iohandler_tiff.h"
+#include "ctlguidimpl.h"
 
 using namespace dynarithmic;
 bool CTextImageHandler::OpenOutputFile(LPCTSTR pFileName)
@@ -114,7 +115,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         if ( szTempPath.empty() )
             return DTWAIN_ERR_FILEWRITE;
 
-        szTempPath += StringWrapper::GetGUID() +  _T("OCR");
+        szTempPath += GetGUID() +  _T("OCR");
 
         LogWriterUtils::WriteLogInfo(GetResourceStringFromMap_Native(IDS_LOGMSG_TEMPIMAGEFILETEXT) + _T(" ") + szTempPath + _T("\n"));
 

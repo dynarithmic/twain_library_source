@@ -21,7 +21,7 @@
 #ifndef CTLGUIDDEF_H
 #define CTLGUIDDEF_H
 
-#include <array>
+#include <string>
 #include "ctlbimap.h"
 
 namespace dynarithmic

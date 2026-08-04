@@ -21,11 +21,13 @@
 #include <string>
 
 #include "cppfunc.h"
-#include "ctlobstr.h"
 #include "errorcheck.h"
 #include "ctlfileutils.h"
+#include "ctlwindowsimpl.h"
+#include "ctlstringutilsx.h"
 
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG CreationFlags)
 {
@@ -55,18 +57,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
     if (CreationFlags & DTWAIN_TEMPDIR_CREATEDIRECTORY)
     {
         bool bLogMessages = (CTL_StaticData::GetLogFilterFlags()) ? true : false;
-        CTL_StringType sTemp = StringWrapper::RemoveBackslashFromDirectory(szFilePath);
+        CTL_StringType sTemp = WindowsAPIImplDef::RemoveBackslashFromDirectory(szFilePath);
         auto dirCreated = dynarithmic::fileutils::create_directory(sTemp.c_str());
         if (!dirCreated.first)
         {
             if (bLogMessages)
             {
-                std::string sMessage = GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " + StringWrapperA::QuoteString(dirCreated.second);
+                std::string sMessage = GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " + 
+                    stringutils::QuoteString(dirCreated.second);
                 LogWriterUtils::WriteLogInfoIndentedA(sMessage);
             }
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
         }
-        pHandle->m_sTempFilePath = StringWrapper::AddBackslashToDirectory(sTemp);
+        pHandle->m_sTempFilePath = WindowsAPIImplDef::AddBackslashToDirectory(sTemp);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(false)
@@ -85,7 +88,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectory(LPTSTR szFilePath, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szFilePath, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG nRealLen = StringWrapper::CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
+    const LONG nRealLen = dynarithmic::CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFilePath))
     LOG_FUNC_EXIT_NONAME_PARAMS(nRealLen)
     CATCH_BLOCK(DTWAIN_FAILURE1)

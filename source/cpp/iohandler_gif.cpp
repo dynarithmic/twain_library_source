@@ -21,6 +21,7 @@
 #include "gifwriter.h"
 #include "iohandler_gif.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

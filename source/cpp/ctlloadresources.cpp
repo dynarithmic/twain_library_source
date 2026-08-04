@@ -21,14 +21,20 @@
 #include <sstream>
 #include <string_view>
 #include <queue>
+#include <fstream>
+#include <string>
+#include <boost/algorithm/string.hpp>
 #include "ctliface.h"
 #include "ctlloadresources.h"
-
+#include "ctlwindowsimpl.h"
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "dtwain_verinfo.h"
 #include "dtwstrfn.h"
 #include "crc32_aux.h"
+#include "ctlstringutilsx.h"
+
+namespace stringutils = dynarithmic::basicstringutils;
 
 namespace dynarithmic
 {
@@ -54,8 +60,8 @@ namespace dynarithmic
                     if (pos2 != std::string::npos)
                     {
                         std::string subPair = bracketedPairs.substr(pos + 1, pos2 - pos - 1);
-                        StringWrapperA::TrimAll(subPair);
-                        if (StringWrapperA::IsEmpty(subPair))
+                        stringutils::TrimAll(subPair);
+                        if (subPair.empty())
                             break;
                         std::istringstream strm(subPair);
                         uint16_t firstNum, secondNum;
@@ -184,7 +190,8 @@ namespace dynarithmic
                     // Read the BOM header if it already exists
                     if (!bReadFirstLine)
                     {
-                        if (line.size() >= 3 && StringWrapperA::StartsWith(line, BOMHeaderUTF))
+                        if (line.size() >= 3 && 
+                            stringutils::StartsWith(std::string_view(line), std::string_view(BOMHeaderUTF)))
                             line = line.substr(3);
                     }
                     bReadFirstLine = true;
@@ -195,14 +202,14 @@ namespace dynarithmic
                         if (resourceID == IDS_DTWAIN_APPTITLE || resourceID == IDS_DTWAIN_APPTITLE_HTML)
                             descr = StringConversion::Convert_Native_To_Ansi(
                                 CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, resourceID).second);
-                        StringWrapperA::TrimAll(descr);
-                        descr = StringWrapperA::ReplaceAll(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
-                        descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
+                        stringutils::TrimAll(descr);
+                        descr = stringutils::ReplaceAll<std::string>(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
+                        descr = stringutils::ReplaceAll<std::string>(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
                         if (resourceID == IDS_DTWAIN_APPTITLE)
-                            descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                            descr = stringutils::ReplaceAll<std::string>(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
                         else
-                            if (resourceID == IDS_DTWAIN_APPTITLE_HTML)
-                                descr = StringWrapperA::ReplaceAll(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
+                        if (resourceID == IDS_DTWAIN_APPTITLE_HTML)
+                            descr = stringutils::ReplaceAll<std::string>(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
                         resourceMap.insert({ resourceID, descr });
                     }
                 }
@@ -223,8 +230,8 @@ namespace dynarithmic
         if (CTL_StaticData::GetResourcePath().empty())
             sPath = GetDTWAINExecutionPath();
         else
-            sPath = StringWrapper::RemoveBackslashFromDirectory(CTL_StaticData::GetResourcePath());
-        sPath = StringWrapper::AddBackslashToDirectory(sPath);
+            sPath = WindowsAPIImplDef::RemoveBackslashFromDirectory(CTL_StaticData::GetResourcePath());
+        sPath = WindowsAPIImplDef::AddBackslashToDirectory(sPath);
         auto& resourcePath = CTL_StaticData::GetResourcePath();
         if (resourcePath.empty())
             resourcePath = sPath;
@@ -253,7 +260,7 @@ namespace dynarithmic
         auto sPath = CreateResourceFileName(DTWAINRESOURCEINFOFILE);
         retValue.resourcePath = sPath;
         auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath, sPath.length());
-        StringWrapperA::traits_type::inputfile_type ifs(sPathA);
+        std::ifstream ifs(sPathA);
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = ifs ? true : false;
         
         // Test for the INI file existing
@@ -345,7 +352,7 @@ namespace dynarithmic
             ++curLine;
             try
             {
-                if (StringWrapperA::StartsWith(sCap, "0x"))
+                if (stringutils::StartsWith(std::string_view(sCap), std::string_view("0x")))
                     lCap = std::stol(sCap, nullptr, 16);
                 else
                     lCap = std::stol(sCap);
@@ -360,7 +367,8 @@ namespace dynarithmic
 
             if (lCap == -1000 && capName == "END")
                 break;
-            bool isTWEIName = StringWrapperA::StartsWith(capName, "TWEI_");
+            bool isTWEIName = stringutils::StartsWith(std::string_view(capName), 
+                                                                        std::string_view("TWEI_"));
             if (isTWEIName)
             {
                 extendedImageInfoMap.insert({ lCap ,capName });
@@ -396,10 +404,10 @@ namespace dynarithmic
             strm >> name;
             if ( pageType == -1 )
                 break;
-            name = StringWrapperA::TrimAll(name);
+            name = stringutils::TrimAll(name);
             std::string dimensions;
             std::getline(strm, dimensions);
-            dimensions = StringWrapperA::TrimAll(dimensions);
+            dimensions = stringutils::TrimAll(dimensions);
             mediamap.insert({ pageType, {name, dimensions } });
         }
 
@@ -415,7 +423,7 @@ namespace dynarithmic
                 break;
             std::string name;
             strm >> name;
-            name = StringWrapperA::TrimAll(name);
+            name = stringutils::TrimAll(name);
             std::vector<std::string> vExt;
             std::string ext;
             while (strm >> ext)
@@ -443,7 +451,7 @@ namespace dynarithmic
                 int64_t twainValue = 0;
                 try
                 {
-                    if (StringWrapperA::StartsWith(strTwainValue, "0x"))
+                    if (stringutils::StartsWith(std::string_view(strTwainValue), std::string_view("0x")))
                         twainValue = stoll(strTwainValue, nullptr, 16);
                     else
                         twainValue = stoll(strTwainValue);
@@ -460,14 +468,14 @@ namespace dynarithmic
                 std::string name;
                 strm >> name;
                 std::replace(name.begin(), name.end(), '#', ' ');
-                name = StringWrapperA::TrimAll(name);
+                name = stringutils::TrimAll(name);
 
                 // Get all the names associated with this constant
                 std::vector<std::string> saNames;
                 if (twainValue == IDS_DTWAIN_APPTITLE || twainValue == IDS_DTWAIN_APPTITLE_HTML)
                     saNames.push_back(name);
                 else
-                    StringWrapperA::Tokenize(name, ", ", saNames);
+                    stringutils::Tokenize(name, ", ", saNames);
                 iter->second.insert({twainValue, saNames});
                 if (!bAllowDuplicate)
                 {
@@ -520,7 +528,7 @@ namespace dynarithmic
             if (pos == std::string::npos)
                 break;
             std::string sImageTypeName = totalLine.substr(0, pos);
-            StringWrapperA::TrimAll(sImageTypeName);
+            stringutils::TrimAll(sImageTypeName);
 
             // Get the bits-per-pixel that are "good"
             totalLine.erase(totalLine.begin(), totalLine.begin() + pos);
@@ -576,7 +584,7 @@ namespace dynarithmic
 
             // Parse the line containing the file save dialog information for the 
             // file type being saved
-            StringWrapperA::TokenizeQuoted(StringWrapperA::TrimAll(totalLine), " ", vParsedComponents);
+            stringutils::TokenizeQuoted(stringutils::TrimAll(totalLine), " ", vParsedComponents);
             if (vParsedComponents.size() != 5)
             {
                 retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
@@ -622,7 +630,7 @@ namespace dynarithmic
                 return false;
             }
             auto twainIDName = totalLine.substr(0, bracketPosStart);
-            StringWrapperA::TrimAll(twainIDName);
+            stringutils::TrimAll(twainIDName);
             auto compressionValuePr = CTL_StaticData::GetIDFromTwainName(twainIDName);
             if ( !compressionValuePr.first)
             {
@@ -633,12 +641,12 @@ namespace dynarithmic
             }
             auto compressionValue = compressionValuePr.second;
             auto allFileTypes = totalLine.substr(bracketPosStart+1);
-            StringWrapperA::TrimAll(allFileTypes);
+            stringutils::TrimAll(allFileTypes);
             allFileTypes.pop_back();
 
             // Parse the file types
             std::vector<std::string> sVector;
-            StringWrapperA::Tokenize(allFileTypes, " ", sVector);
+            stringutils::Tokenize(allFileTypes, " ", sVector);
             for (auto& str : sVector)
             {
                 auto oneVal = CTL_StaticData::GetIDFromTwainName(str);
@@ -686,20 +694,20 @@ namespace dynarithmic
     size_t GetResourceStringA(UINT nResNumber, LPSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
-        return StringWrapperA::CopyInfoToCString(str, buffer, bufSize);
+        return dynarithmic::CopyInfoToCString(str, buffer, bufSize);
     }
 
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
         auto native_str = StringConversion::Convert_Ansi_To_Wide(str);
-        return StringWrapperW::CopyInfoToCString(native_str, buffer, bufSize);
+        return dynarithmic::CopyInfoToCString(native_str, buffer, bufSize);
     }
 
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
-        return StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(str), buffer, bufSize);
+        return dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(str), buffer, bufSize);
     }
 
     CTL_StringType GetResourceStringFromMap_Native(LONG nResourceID)
@@ -759,10 +767,10 @@ namespace dynarithmic
             if (::LoadStringA(CTL_StaticData::GetDLLInstanceHandle(), i, szBuffer, DTWAIN_USERRES_MAXSIZE))
             {
                 std::string descr = szBuffer;
-                StringWrapperA::TrimAll(descr);
-                descr = StringWrapperA::ReplaceAll(descr, "{short_version}", sVersion);
-                descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
-                descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                stringutils::TrimAll(descr);
+                descr = stringutils::ReplaceAll<std::string>(descr, "{short_version}", sVersion);
+                descr = stringutils::ReplaceAll<std::string>(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
+                descr = stringutils::ReplaceAll<std::string>(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
                 resourceMap.insert({ i, descr });
             }
         }

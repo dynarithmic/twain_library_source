@@ -20,6 +20,8 @@
  */
 #include "psdwriter.h"
 
+using namespace dynarithmic;
+
 std::optional<PreparedPsdDibPage> PsdSessionWriter::MakePreparedPsdDibPage(const dynarithmic::DibPageView& view)
 {
     if (!view.bits)
@@ -127,7 +129,7 @@ bool PsdSessionWriter::ValidatePage(const PreparedPsdDibPage& page)
         page.strideBytes > 0;
 }
 
-bool PsdSessionWriter::WriteHeader()
+bool PsdSessionWriter::WriteHeader() const
 {
     static const uint8_t sig[4] = { '8', 'B', 'P', 'S' };
     if (std::fwrite(sig, 1, 4, file_) != 4)
@@ -158,7 +160,7 @@ bool PsdSessionWriter::WriteHeader()
     return true;
 }
 
-bool PsdSessionWriter::WriteColorModeDataSection()
+bool PsdSessionWriter::WriteColorModeDataSection() const
 {
     return dynarithmic::psd::write_u32_be(file_, 0);
 }
@@ -236,7 +238,7 @@ bool PsdSessionWriter::WriteImageResourcesSection()
     return true;
 }
 
-bool PsdSessionWriter::WriteLayerAndMaskSection()
+bool PsdSessionWriter::WriteLayerAndMaskSection() const
 {
     return dynarithmic::psd::write_u32_be(file_, 0);
 }

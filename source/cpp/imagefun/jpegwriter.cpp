@@ -22,6 +22,8 @@
 #include "jpegwriter.h"
 #include "imagefilewriterbase.h"
 
+using namespace dynarithmic;
+
 std::optional<PreparedJpegDibPage> JpegSessionWriter::MakePreparedJpegPage(const dynarithmic::DibPageView& view)
 {
     if (!view.bits)
@@ -255,7 +257,7 @@ std::string JpegSessionWriter::build_comment_text() const
     return text;
 }
 
-void JpegSessionWriter::write_comment_markers(jpeg_compress_struct& cinfo)
+void JpegSessionWriter::write_comment_markers(jpeg_compress_struct& cinfo) const
 {
     const std::string text = build_comment_text();
     if (text.empty())

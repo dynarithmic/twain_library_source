@@ -21,14 +21,19 @@
 #include <webp/mux.h>
 #include "webpwriter.h"
 
-static int WebPWriterCallback(const uint8_t* data, size_t data_size, const WebPPicture* picture)
-{
-    if (!data || !picture || !picture->custom_ptr)
-        return 0;
+using namespace dynarithmic;
 
-    auto* ctx = static_cast<WebPMemoryWriterContext*>(picture->custom_ptr);
-    ctx->data.insert(ctx->data.end(), data, data + data_size);
-    return 1;
+namespace
+{
+    int WebPWriterCallback(const uint8_t* data, size_t data_size, const WebPPicture* picture)
+    {
+        if (!data || !picture || !picture->custom_ptr)
+            return 0;
+
+        auto* ctx = static_cast<WebPMemoryWriterContext*>(picture->custom_ptr);
+        ctx->data.insert(ctx->data.end(), data, data + data_size);
+        return 1;
+    }
 }
 
 std::optional<PreparedWebPDibPage> WebPSessionWriter::MakePreparedWebPDibPage(const dynarithmic::DibPageView& view)

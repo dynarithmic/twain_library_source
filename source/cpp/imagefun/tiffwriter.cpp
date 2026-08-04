@@ -30,186 +30,190 @@
 #include "tiffwriter.h"
 #include "dtwaindefs.h"
 
-// ============================================================
-// Internal helpers
-// ============================================================
-static uint16_t to_libtiff_compression(TiffCompression c)
+using namespace dynarithmic;
+
+namespace
 {
-    switch (c)
+    // ============================================================
+    // Internal helpers
+    // ============================================================
+    uint16_t to_libtiff_compression(TiffCompression c)
     {
-        case TiffCompression::None:     return COMPRESSION_NONE;
-        case TiffCompression::Group3:   return COMPRESSION_CCITTFAX3;
-        case TiffCompression::Group4:   return COMPRESSION_CCITTFAX4;
-        case TiffCompression::Lzw:      return COMPRESSION_LZW;
-        case TiffCompression::Flate:    return COMPRESSION_ADOBE_DEFLATE;
-        case TiffCompression::PackBits: return COMPRESSION_PACKBITS;
-        case TiffCompression::Jpeg:     return COMPRESSION_JPEG;
-    }
-    return COMPRESSION_NONE;
-}
-
-static std::string build_tiff_open_mode(const TiffSessionOptions& opt)
-{
-    std::string mode = "w";
-
-    // ClassicTIFF vs BigTIFF
-    mode += (opt.containerFormat == TiffContainerFormat::BigTiff) ? '8' : '4';
-
-    // Optional endianness
-    if (opt.littleEndian)
-        mode += 'l';
-    else if (opt.bigEndian)
-        mode += 'b';
-
-    // Fill-order mode flag
-    mode += opt.fillOrderLsbToMsb ? 'L' : 'B';
-
-    return mode;
-}
-
-static PageTagInfo describe_page_tags(const PreparedTiffDibPage& page, const TiffPageSettings& settings)
-{
-    PageTagInfo info{};
-
-    switch (page.pixelFlavor)
-    {
-        case PixelFlavor::BW1:
-            info.samplesPerPixel = 1;
-            info.bitsPerSample = 1;
-            info.photometric = PHOTOMETRIC_MINISWHITE;
-            info.writeColorMap = false;
-            break;
-
-        case PixelFlavor::Gray8:
-            info.samplesPerPixel = 1;
-            info.bitsPerSample = 8;
-            info.photometric = PHOTOMETRIC_MINISBLACK;
-            info.writeColorMap = false;
-            break;
-
-        case PixelFlavor::Palette8:
-            info.samplesPerPixel = 1;
-            info.bitsPerSample = 8;
-            info.photometric = PHOTOMETRIC_PALETTE;
-            info.writeColorMap = true;
-            break;
-
-        case PixelFlavor::Gray16:
-            info.samplesPerPixel = 1;
-            info.bitsPerSample = 16;
-            info.photometric = PHOTOMETRIC_MINISBLACK;
-            info.writeColorMap = false;
-            break;
-
-        case PixelFlavor::Bgr24:
-        case PixelFlavor::Bgra32:
-            info.samplesPerPixel = 3;
-            info.bitsPerSample = 8;
-            info.photometric = PHOTOMETRIC_RGB;
-            info.writeColorMap = false;
-            break;
+        switch (c)
+        {
+            case TiffCompression::None:     return COMPRESSION_NONE;
+            case TiffCompression::Group3:   return COMPRESSION_CCITTFAX3;
+            case TiffCompression::Group4:   return COMPRESSION_CCITTFAX4;
+            case TiffCompression::Lzw:      return COMPRESSION_LZW;
+            case TiffCompression::Flate:    return COMPRESSION_ADOBE_DEFLATE;
+            case TiffCompression::PackBits: return COMPRESSION_PACKBITS;
+            case TiffCompression::Jpeg:     return COMPRESSION_JPEG;
+        }
+        return COMPRESSION_NONE;
     }
 
-    return info;
-}
-
-static size_t calc_output_row_size(const PreparedTiffDibPage& page, const PageTagInfo& tagInfo)
-{
-    if (tagInfo.bitsPerSample == 1 && tagInfo.samplesPerPixel == 1)
-        return static_cast<size_t>((page.width + 7) / 8);
-
-    return static_cast<size_t>(page.width) *
-        static_cast<size_t>(tagInfo.samplesPerPixel) *
-        static_cast<size_t>(tagInfo.bitsPerSample / 8);
-}
-
-static bool convert_row(const PreparedTiffDibPage& page,
-                        const TiffPageSettings& settings,
-                        const uint8_t* src,
-                        uint8_t* dst,
-                        size_t dstSize)
-{
-    switch (page.pixelFlavor)
+    std::string build_tiff_open_mode(const TiffSessionOptions& opt)
     {
-        case PixelFlavor::BW1:
-        {
-            const size_t n = static_cast<size_t>((page.width + 7) / 8);
-            if (dstSize < n)
-                return false;
+        std::string mode = "w";
 
-            std::memcpy(dst, src, n);
+        // ClassicTIFF vs BigTIFF
+        mode += (opt.containerFormat == TiffContainerFormat::BigTiff) ? '8' : '4';
 
-            if (settings.invertBilevelBits)
-            {
-                for (size_t i = 0; i < n; ++i)
-                    dst[i] = static_cast<uint8_t>(~dst[i]);
-            }
-            return true;
-        }
+        // Optional endianness
+        if (opt.littleEndian)
+            mode += 'l';
+        else if (opt.bigEndian)
+            mode += 'b';
 
-        case PixelFlavor::Gray8:
-        case PixelFlavor::Palette8:
-        {
-            const size_t n = static_cast<size_t>(page.width);
-            if (dstSize < n)
-                return false;
+        // Fill-order mode flag
+        mode += opt.fillOrderLsbToMsb ? 'L' : 'B';
 
-            std::memcpy(dst, src, n);
-            return true;
-        }
-
-        case PixelFlavor::Gray16:
-        {
-            const size_t n = static_cast<size_t>(page.width) * 2;
-            if (dstSize < n)
-                return false;
-
-            std::memcpy(dst, src, n);
-            return true;
-        }
-
-        case PixelFlavor::Bgr24:
-        {
-            const size_t n = static_cast<size_t>(page.width) * 3;
-            if (dstSize < n)
-                return false;
-
-            for (uint32_t x = 0; x < page.width; ++x)
-            {
-                const uint8_t b = src[x * 3 + 0];
-                const uint8_t g = src[x * 3 + 1];
-                const uint8_t r = src[x * 3 + 2];
-
-                dst[x * 3 + 0] = r;
-                dst[x * 3 + 1] = g;
-                dst[x * 3 + 2] = b;
-            }
-            return true;
-        }
-
-        case PixelFlavor::Bgra32:
-        {
-            const size_t n = static_cast<size_t>(page.width) * 3;
-            if (dstSize < n)
-                return false;
-
-            for (uint32_t x = 0; x < page.width; ++x)
-            {
-                const uint8_t b = src[x * 4 + 0];
-                const uint8_t g = src[x * 4 + 1];
-                const uint8_t r = src[x * 4 + 2];
-                // alpha ignored
-
-                dst[x * 3 + 0] = r;
-                dst[x * 3 + 1] = g;
-                dst[x * 3 + 2] = b;
-            }
-            return true;
-        }
+        return mode;
     }
-    return false;
-}
 
+    PageTagInfo describe_page_tags(const PreparedTiffDibPage& page, const TiffPageSettings& settings)
+    {
+        PageTagInfo info{};
+
+        switch (page.pixelFlavor)
+        {
+            case PixelFlavor::BW1:
+                info.samplesPerPixel = 1;
+                info.bitsPerSample = 1;
+                info.photometric = PHOTOMETRIC_MINISWHITE;
+                info.writeColorMap = false;
+                break;
+
+            case PixelFlavor::Gray8:
+                info.samplesPerPixel = 1;
+                info.bitsPerSample = 8;
+                info.photometric = PHOTOMETRIC_MINISBLACK;
+                info.writeColorMap = false;
+                break;
+
+            case PixelFlavor::Palette8:
+                info.samplesPerPixel = 1;
+                info.bitsPerSample = 8;
+                info.photometric = PHOTOMETRIC_PALETTE;
+                info.writeColorMap = true;
+                break;
+
+            case PixelFlavor::Gray16:
+                info.samplesPerPixel = 1;
+                info.bitsPerSample = 16;
+                info.photometric = PHOTOMETRIC_MINISBLACK;
+                info.writeColorMap = false;
+                break;
+
+            case PixelFlavor::Bgr24:
+            case PixelFlavor::Bgra32:
+                info.samplesPerPixel = 3;
+                info.bitsPerSample = 8;
+                info.photometric = PHOTOMETRIC_RGB;
+                info.writeColorMap = false;
+                break;
+        }
+
+        return info;
+    }
+
+    size_t calc_output_row_size(const PreparedTiffDibPage& page, const PageTagInfo& tagInfo)
+    {
+        if (tagInfo.bitsPerSample == 1 && tagInfo.samplesPerPixel == 1)
+            return static_cast<size_t>((page.width + 7) / 8);
+
+        return static_cast<size_t>(page.width) *
+            static_cast<size_t>(tagInfo.samplesPerPixel) *
+            static_cast<size_t>(tagInfo.bitsPerSample / 8);
+    }
+
+    bool convert_row(const PreparedTiffDibPage& page,
+                    const TiffPageSettings& settings,
+                    const uint8_t* src,
+                    uint8_t* dst,
+                    size_t dstSize)
+    {
+        switch (page.pixelFlavor)
+        {
+            case PixelFlavor::BW1:
+            {
+                const size_t n = static_cast<size_t>((page.width + 7) / 8);
+                if (dstSize < n)
+                    return false;
+
+                std::memcpy(dst, src, n);
+
+                if (settings.invertBilevelBits)
+                {
+                    for (size_t i = 0; i < n; ++i)
+                        dst[i] = static_cast<uint8_t>(~dst[i]);
+                }
+                return true;
+            }
+
+            case PixelFlavor::Gray8:
+            case PixelFlavor::Palette8:
+            {
+                const size_t n = static_cast<size_t>(page.width);
+                if (dstSize < n)
+                    return false;
+
+                std::memcpy(dst, src, n);
+                return true;
+            }
+
+            case PixelFlavor::Gray16:
+            {
+                const size_t n = static_cast<size_t>(page.width) * 2;
+                if (dstSize < n)
+                    return false;
+
+                std::memcpy(dst, src, n);
+                return true;
+            }
+
+            case PixelFlavor::Bgr24:
+            {
+                const size_t n = static_cast<size_t>(page.width) * 3;
+                if (dstSize < n)
+                    return false;
+
+                for (uint32_t x = 0; x < page.width; ++x)
+                {
+                    const uint8_t b = src[x * 3 + 0];
+                    const uint8_t g = src[x * 3 + 1];
+                    const uint8_t r = src[x * 3 + 2];
+
+                    dst[x * 3 + 0] = r;
+                    dst[x * 3 + 1] = g;
+                    dst[x * 3 + 2] = b;
+                }
+                return true;
+            }
+
+            case PixelFlavor::Bgra32:
+            {
+                const size_t n = static_cast<size_t>(page.width) * 3;
+                if (dstSize < n)
+                    return false;
+
+                for (uint32_t x = 0; x < page.width; ++x)
+                {
+                    const uint8_t b = src[x * 4 + 0];
+                    const uint8_t g = src[x * 4 + 1];
+                    const uint8_t r = src[x * 4 + 2];
+                    // alpha ignored
+
+                    dst[x * 3 + 0] = r;
+                    dst[x * 3 + 1] = g;
+                    dst[x * 3 + 2] = b;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+}
 // ============================================================
 // TiffSessionWriter
 // ============================================================
@@ -380,7 +384,7 @@ bool TiffSessionWriter::ValidateCurrentPage() const
     return false;
 }
 
-bool TiffSessionWriter::SetCommonTags(const PageTagInfo& tagInfo)
+bool TiffSessionWriter::SetCommonTags(const PageTagInfo& tagInfo) const
 {
     uint16_t photometric = tagInfo.photometric;
 
@@ -427,7 +431,7 @@ bool TiffSessionWriter::SetCommonTags(const PageTagInfo& tagInfo)
     return true;
 }
 
-bool TiffSessionWriter::SetCompressionTags(const PageTagInfo& tagInfo)
+bool TiffSessionWriter::SetCompressionTags(const PageTagInfo& tagInfo) const
 {
     TIFFSetField(tif_, TIFFTAG_COMPRESSION,
         to_libtiff_compression(currentPageSettings_.compression));
@@ -501,7 +505,7 @@ bool TiffSessionWriter::SetCompressionTags(const PageTagInfo& tagInfo)
     return true;
 }
 
-bool TiffSessionWriter::SetPaletteTags(uint16_t bitsPerSample)
+bool TiffSessionWriter::SetPaletteTags(uint16_t bitsPerSample) const
 {
     if (!currentPage_.palette || currentPage_.paletteEntries == 0)
         return false;
