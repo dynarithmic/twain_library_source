@@ -556,7 +556,7 @@ namespace dynarithmic
                 {CTL_ArraySourceType, arrayTag::SourceType},
                 {CTL_ArrayToHandleArray, arrayTag::ArrayOfArrayOfVoidPtrType},
                 {CTL_ArrayFrameSingleType, arrayTag::FrameSingleType} } };
-            auto iter = dynarithmic::generic_array_finder_if(mapArrayTypeToTag, [&](const auto& pr) { return pr.first == arrayType; });
+            auto iter = generic_array_finder_if(mapArrayTypeToTag, [&](const auto& pr) { return pr.first == arrayType; });
             if (iter.first)
                 return mapArrayTypeToTag[iter.second].second;
             return arrayTag::UnknownType;
@@ -581,7 +581,7 @@ namespace dynarithmic
                 {arrayTag::ArrayOfArrayOfVoidPtrType,           CTL_ArrayToHandleArray},
                 {arrayTag::FrameSingleType,                     CTL_ArrayDTWAINFrameType}}};
 
-            auto iter = dynarithmic::generic_array_finder_if(mapTagToArrayType, [&](const auto& pr) { return pr.first == tag; });
+            auto iter = generic_array_finder_if(mapTagToArrayType, [&](const auto& pr) { return pr.first == tag; });
             if (iter.first)
                 return mapTagToArrayType[iter.second].second;
             return CTL_ArrayInvalid;

@@ -47,27 +47,27 @@ TW_UINT16 CTL_FileSystemTriplet::CreateDirectory(const CTL_StringType& sDir)
 
 TW_UINT16 CTL_FileSystemTriplet::CopyFile(const CTL_StringType& sInput, const CTL_StringType& sOutput)
 {
-    strcpy(m_FileSystem.InputName, StringConversion::Convert_Native_To_Ansi(sInput).c_str());
-    strcpy(m_FileSystem.OutputName, StringConversion::Convert_Native_To_Ansi(sOutput).c_str());
+    strcpy(m_FileSystem.InputName, stringconversion::Convert_Native_To_Ansi(sInput).c_str());
+    strcpy(m_FileSystem.OutputName, stringconversion::Convert_Native_To_Ansi(sOutput).c_str());
     return ExecuteIt(MSG_COPY);
 }
 
 TW_UINT16 CTL_FileSystemTriplet::ChangeDirectoryHelper(const CTL_StringType& sDir, TW_UINT16 Msg)
 {
-    strcpy(m_FileSystem.InputName, StringConversion::Convert_Native_To_Ansi(sDir).c_str());
+    strcpy(m_FileSystem.InputName, stringconversion::Convert_Native_To_Ansi(sDir).c_str());
     return ExecuteIt(Msg);
 }
 
 TW_UINT16 CTL_FileSystemTriplet::DeleteFile(const CTL_StringType& sDir, bool bRecursive)
 {
-    strcpy(m_FileSystem.InputName, StringConversion::Convert_Native_To_Ansi(sDir).c_str());
+    strcpy(m_FileSystem.InputName, stringconversion::Convert_Native_To_Ansi(sDir).c_str());
     m_FileSystem.Recursive = bRecursive?TRUE:FALSE;
     return ExecuteIt(MSG_DELETE);
 }
 
 TW_UINT16 CTL_FileSystemTriplet::FormatMedia(const CTL_StringType& sDir)
 {
-    strcpy(m_FileSystem.InputName, StringConversion::Convert_Native_To_Ansi(sDir).c_str());
+    strcpy(m_FileSystem.InputName, stringconversion::Convert_Native_To_Ansi(sDir).c_str());
     return ExecuteIt(MSG_FORMATMEDIA);
 }
 
@@ -85,7 +85,7 @@ TW_UINT16 CTL_FileSystemTriplet::GetNextFile(TW_MEMREF Context)
 
 TW_UINT16 CTL_FileSystemTriplet::GetInfo(const CTL_StringType& sDir)
 {
-    strcpy(m_FileSystem.InputName, StringConversion::Convert_Native_To_Ansi(sDir).c_str());
+    strcpy(m_FileSystem.InputName, stringconversion::Convert_Native_To_Ansi(sDir).c_str());
     return ExecuteIt(MSG_GETINFO);
 }
 
@@ -103,8 +103,8 @@ const TW_FILESYSTEM& CTL_FileSystemTriplet::GetTWFileSystem() const
 TW_UINT16 CTL_FileSystemTriplet::Rename(const CTL_StringType& sInput, const CTL_StringType& sOutput)
 {
     // Assume that this will be done after GETFIRSTFILE or previous GETNEXTFILE
-    strcpy(m_FileSystem.InputName, StringConversion::Convert_Native_To_Ansi(sInput).c_str());
-    strcpy(m_FileSystem.OutputName, StringConversion::Convert_Native_To_Ansi(sOutput).c_str());
+    strcpy(m_FileSystem.InputName, stringconversion::Convert_Native_To_Ansi(sInput).c_str());
+    strcpy(m_FileSystem.OutputName, stringconversion::Convert_Native_To_Ansi(sOutput).c_str());
     return ExecuteIt(MSG_RENAME);
 }
 

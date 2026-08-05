@@ -20,77 +20,81 @@
  */
 #include "ctlfilesave.h"
 #include "ctliface.h"
-using namespace dynarithmic;
 
-CTL_StringType dynarithmic::PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_TwainFileFormatEnum nFileAcquireType)
+namespace dynarithmic
 {
-    CTL_StringType szFilter;
-    LPCTSTR szExt = nullptr;
-
-    auto& filesaveMap = CTL_StaticData::GetFileSaveMap();
-    const auto it = filesaveMap.find(static_cast<int>(nFileAcquireType));
-    if (it != filesaveMap.end())
+    CTL_StringType PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_TwainFileFormatEnum nFileAcquireType)
     {
-        szFilter = it->second.GetTotalFilter();
-        szExt = it->second.GetExtension().c_str();
-    }
-    else
-    {
-        CTL_StringStreamType strm;
-        strm << nFileAcquireType << _T(" format");
-        szFilter = strm.str();
-        szFilter.append(_T("*\0\0"), 3);
-        szExt = _T(".");
-    }
-#ifdef _WIN32
-    TCHAR szFile[1024] = {};
-    // prompt for filename
+        CTL_StringType szFilter;
+        LPCTSTR szExt = nullptr;
 
-    OPENFILENAME ofn = {};
-    OPENFILENAME* pOfn = &ofn;
-
-    if (pHandle->m_pofn)
-        pOfn = pHandle->m_pofn.get();
-    szFile[0] = _T('\0');
-    pOfn->lStructSize = sizeof(OPENFILENAME);
-    const auto sTitle = pHandle->m_CustomPlacement.sTitle;
-    auto sTitleAnsi = StringConversion::Convert_Wide_To_Ansi(sTitle);
-    CTL_StringType sActualTitle;
-    if (pOfn == &ofn)
-    {
-        pOfn->hwndOwner = nullptr;
-        pOfn->lpstrFilter = szFilter.data();
-        pOfn->lpstrFile = szFile;
-        pOfn->nMaxFile = sizeof szFile - 5;
-        pOfn->Flags = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY |
-            OFN_NOREADONLYRETURN | OFN_EXPLORER;
-        if (pHandle->m_CustomPlacement.nOptions != 0)
+        auto& filesaveMap = CTL_StaticData::GetFileSaveMap();
+        const auto it = filesaveMap.find(static_cast<int>(nFileAcquireType));
+        if (it != filesaveMap.end())
         {
-            pOfn->lpfnHook = pHandle->m_pSaveAsDlgProc;
-            pOfn->Flags |= OFN_ENABLEHOOK;
-            pOfn->lCustData = reinterpret_cast<LPARAM>(&pHandle->m_CustomPlacement);
-            if (!sTitleAnsi.empty())
+            szFilter = it->second.GetTotalFilter();
+            szExt = it->second.GetExtension().c_str();
+        }
+        else
+        {
+            CTL_StringStreamType strm;
+            strm << nFileAcquireType << _T(" format");
+            szFilter = strm.str();
+            szFilter.append(_T("*\0\0"), 3);
+            szExt = _T(".");
+        }
+#ifdef _WIN32
+        TCHAR szFile[1024] = {};
+        // prompt for filename
+
+        OPENFILENAME ofn = {};
+        OPENFILENAME* pOfn = &ofn;
+
+        if (pHandle->m_pofn)
+            pOfn = pHandle->m_pofn.get();
+        szFile[0] = _T('\0');
+        pOfn->lStructSize = sizeof(OPENFILENAME);
+        const auto sTitle = pHandle->m_CustomPlacement.sTitle;
+        auto sTitleAnsi = basicstringutils::Narrow(sTitle);
+        CTL_StringType sActualTitle;
+        if (pOfn == &ofn)
+        {
+            pOfn->hwndOwner = nullptr;
+            pOfn->lpstrFilter = szFilter.data();
+            pOfn->lpstrFile = szFile;
+            pOfn->nMaxFile = sizeof szFile - 5;
+            pOfn->Flags = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY |
+                OFN_NOREADONLYRETURN | OFN_EXPLORER;
+            if (pHandle->m_CustomPlacement.nOptions != 0)
             {
-                sActualTitle = StringConversion::Convert_Ansi_To_Native(sTitleAnsi);
-                pOfn->lpstrTitle = sActualTitle.c_str();
+                pOfn->lpfnHook = pHandle->m_pSaveAsDlgProc;
+                pOfn->Flags |= OFN_ENABLEHOOK;
+                pOfn->lCustData = reinterpret_cast<LPARAM>(&pHandle->m_CustomPlacement);
+                if (!sTitleAnsi.empty())
+                {
+                    sActualTitle = stringconversion::Convert_Ansi_To_Native(sTitleAnsi);
+                    pOfn->lpstrTitle = sActualTitle.c_str();
+                }
             }
         }
-    }
 
-    if (!GetSaveFileName(pOfn))
-    {
-        return {};                    // user canceled dialog
-    }
+        if (!GetSaveFileName(pOfn))
+        {
+            return {};                    // user canceled dialog
+        }
 
-    // supply default extension - GetOpenFileName doesn't seem to do it!
-    int nExt = pOfn->nFileExtension;
-    if (nExt && !szFile[nExt])
-    {
-        // no extension
-        lstrcat(szFile, szExt);
-    }
-    return szFile;
+        // supply default extension - GetOpenFileName doesn't seem to do it!
+        int nExt = pOfn->nFileExtension;
+        if (nExt && !szFile[nExt])
+        {
+            // no extension
+            lstrcat(szFile, szExt);
+        }
+        return szFile;
 #else
-    return {};
+        return {};
 #endif
+    }
 }
+
+

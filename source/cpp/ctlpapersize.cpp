@@ -37,8 +37,8 @@ LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG
     LONG nActualCharactersCopied = 0;
     if (iter != pdfmediamap.end())
     { 
-        CTL_StringType pageName = StringConversion::Convert_Ansi_To_Native(iter->second.first);
-        nActualCharactersCopied = dynarithmic::CopyInfoToCString(pageName, outName, nSize);
+        CTL_StringType pageName = stringconversion::Convert_Ansi_To_Native(iter->second.first);
+        nActualCharactersCopied = CopyInfoToCString(pageName, outName, nSize);
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((outName))
     LOG_FUNC_EXIT_NONAME_PARAMS(nActualCharactersCopied)

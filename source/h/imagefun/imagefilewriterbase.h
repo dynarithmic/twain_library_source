@@ -80,7 +80,7 @@ namespace dynarithmic
 
             case 8:
             {
-                if (theView.palette && dynarithmic::dib::is_grayscale_palette( theView.palette, theView.paletteEntries))
+                if (theView.palette && dib::is_grayscale_palette( theView.palette, theView.paletteEntries))
                     return DibPixelFlavor::Gray8;
                 return DibPixelFlavor::Indexed8;
             }

@@ -39,8 +39,8 @@ using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleString(DTWAIN_SOURCE Source, LPCTSTR xscale, LPCTSTR yscale)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, xscale, yscale))
-    const DTWAIN_FLOAT xValue = dynarithmic::CharTraits<CharType>::ToDouble(xscale, 100);
-    const DTWAIN_FLOAT yValue = dynarithmic::CharTraits<CharType>::ToDouble(yscale, 100);
+    const DTWAIN_FLOAT xValue = CharTraits<CharType>::ToDouble(xscale, 100);
+    const DTWAIN_FLOAT yValue = CharTraits<CharType>::ToDouble(yscale, 100);
     const DTWAIN_BOOL retVal = DTWAIN_SetAcquireImageScale(Source, xValue, yValue);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)

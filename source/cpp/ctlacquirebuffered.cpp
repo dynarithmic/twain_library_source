@@ -150,43 +150,46 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBufferedTileModeSupported(DTWAIN_SOURCE Source
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
+namespace dynarithmic
 {
-    LOG_FUNC_ENTRY_PARAMS((opts))
-    const DTWAIN_SOURCE Source = opts.getSource();
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
-
-    if (pSource->IsTileModeOn())
+    DTWAIN_ACQUIRE DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
     {
-        // Set the ICAP_TILES capability on here
-        auto retValue = dynarithmic::CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retValue.second; }, retValue.first, -1, FUNC_MACRO);
-        auto arr = retValue.second;
-        DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arr);
-        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
-        vValues[0] = 1;
-        bool bTilesSet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, -1, FUNC_MACRO);
+        LOG_FUNC_ENTRY_PARAMS((opts))
+        const DTWAIN_SOURCE Source = opts.getSource();
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const auto pHandle = pSource->GetDTWAINHandle();
+
+        if (pSource->IsTileModeOn())
+        {
+            // Set the ICAP_TILES capability on here
+            auto retValue = CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retValue.second; }, retValue.first, -1, FUNC_MACRO);
+            auto arr = retValue.second;
+            DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arr);
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
+            vValues[0] = 1;
+            bool bTilesSet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, -1, FUNC_MACRO);
+        }
+
+        LONG compressionType;
+
+        if (!DTWAIN_GetCompressionType(Source, &compressionType, TRUE))
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, -1, FUNC_MACRO);
+
+        pSource->SetCompressionType(compressionType);
+        opts.setActualAcquireType(TWAINAcquireType_Buffer);
+        if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
+            return LLAcquireImage(opts);
+        auto pr = StartModalMessageLoop(pSource, opts);
+        DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] 
+            { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
+        if (pr.first != DTWAIN_NO_ERROR)
+        {
+            CTL_TwainAppMgr::DisableUserInterface(pSource);
+            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
+        CATCH_BLOCK(DTWAIN_FAILURE1)
     }
-
-    LONG compressionType;
-
-    if (!DTWAIN_GetCompressionType(Source, &compressionType, TRUE))
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, -1, FUNC_MACRO);
-
-    pSource->SetCompressionType(compressionType);
-    opts.setActualAcquireType(TWAINAcquireType_Buffer);
-    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
-        return LLAcquireImage(opts);
-    auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
-    DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] 
-        { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
-    if (pr.first != DTWAIN_NO_ERROR)
-    {
-        CTL_TwainAppMgr::DisableUserInterface(pSource);
-        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
 }

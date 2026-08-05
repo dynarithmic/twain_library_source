@@ -57,7 +57,7 @@ int CTL_PBMIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     opts.fixBilevelPolarity = true;
 
     opts.comment = GetCopyrightString();
-    std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring filename = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToPnm(filename, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

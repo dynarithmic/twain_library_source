@@ -41,73 +41,193 @@ static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM /*w*/, L
     return TRUE;
 }
 
-
-bool dynarithmic::CenterWindow(HWND hWnd, HWND hParent)
+namespace
 {
-
-    if (!hParent)
-        hParent = GetDesktopWindow();
-
-    RECT rcChild;
-    RECT rcParent;
-
-    GetWindowRect(hWnd, &rcChild);     // SCREEN coords
-    GetWindowRect(hParent, &rcParent); // SCREEN coords
-
-    int childW = rcChild.right - rcChild.left;
-    int childH = rcChild.bottom - rcChild.top;
-
-    int parentW = rcParent.right - rcParent.left;
-    int parentH = rcParent.bottom - rcParent.top;
-
-    int x = rcParent.left + (parentW - childW) / 2;
-    int y = rcParent.top + (parentH - childH) / 2;
-
-    SetWindowPos(hWnd,NULL,x,y,0,0,SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
-    return true;
+    struct LogWin_DestroyTraits
+    {
+        static void Destroy(LPSTR p)
+        {
+            if (p)
+                LocalFree(p);
+        }
+    };
 }
 
-static HMONITOR GetPreferredMonitor(HWND hDialog, int options)
+using LogMsg_RAII = DTWAIN_RAII<LPSTR, LogWin_DestroyTraits>;
+
+namespace
 {
-    if (options & DTWAIN_DLG_CONSOLEASPARENT)
+    HMONITOR GetPreferredMonitor(HWND hDialog, int options)
     {
-        HWND hConsole = GetConsoleWindow();
-        if (hConsole)
+        if (options & DTWAIN_DLG_CONSOLEASPARENT)
         {
-            return MonitorFromWindow(hConsole,MONITOR_DEFAULTTONEAREST);
+            HWND hConsole = GetConsoleWindow();
+            if (hConsole)
+            {
+                return MonitorFromWindow(hConsole, MONITOR_DEFAULTTONEAREST);
+            }
+        }
+
+        return MonitorFromWindow(hDialog, MONITOR_DEFAULTTONEAREST);
+    }
+
+    void CenterWindowOnMonitor(HWND hWnd, HMONITOR hMonitor)
+    {
+        MONITORINFO mi = { sizeof(mi) };
+        GetMonitorInfo(hMonitor, &mi);
+
+        RECT rcWork = mi.rcWork;
+
+        RECT rcWindow;
+        GetWindowRect(hWnd, &rcWindow);
+
+        int windowWidth = rcWindow.right - rcWindow.left;
+        int windowHeight = rcWindow.bottom - rcWindow.top;
+
+        int x = rcWork.left +
+            ((rcWork.right - rcWork.left) - windowWidth) / 2;
+
+        int y = rcWork.top +
+            ((rcWork.bottom - rcWork.top) - windowHeight) / 2;
+
+        SetWindowPos(hWnd, NULL, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+}
+
+namespace dynarithmic
+{
+    bool CenterWindow(HWND hWnd, HWND hParent)
+    {
+        if (!hParent)
+            hParent = GetDesktopWindow();
+
+        RECT rcChild;
+        RECT rcParent;
+
+        GetWindowRect(hWnd, &rcChild);     // SCREEN coords
+        GetWindowRect(hParent, &rcParent); // SCREEN coords
+
+        int childW = rcChild.right - rcChild.left;
+        int childH = rcChild.bottom - rcChild.top;
+
+        int parentW = rcParent.right - rcParent.left;
+        int parentH = rcParent.bottom - rcParent.top;
+
+        int x = rcParent.left + (parentW - childW) / 2;
+        int y = rcParent.top + (parentH - childH) / 2;
+
+        SetWindowPos(hWnd, NULL, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+        return true;
+    }
+
+    void CenterWindowSmart(HWND hWnd, int options)
+    {
+        HMONITOR hMonitor = GetPreferredMonitor(hWnd, options);
+        CenterWindowOnMonitor(hWnd, hMonitor);
+    }
+
+    void DTWAIN_InvokeCallback(int nWhich, DTWAIN_HANDLE p, DTWAIN_SOURCE pSource, WPARAM lData1, LPARAM lData2)
+    {
+        DTWAIN_CALLBACK cProc;
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(p);
+        if (pHandle)
+        {
+            switch (nWhich)
+            {
+                case DTWAIN_CallbackMESSAGE:
+                    cProc = pHandle->m_CallbackMsg;
+                    break;
+                case DTWAIN_CallbackERROR:
+                    cProc = pHandle->m_CallbackError;
+                    break;
+                default:
+                    return;
+            }
+
+            if (!cProc)
+                return;
+
+            (*cProc)(pHandle, pSource, lData1, lData2);
         }
     }
 
-    return MonitorFromWindow(hDialog,MONITOR_DEFAULTTONEAREST);
+    std::string LogWin32Error(DWORD lastError)
+    {
+        LPSTR lpMsgBuf = nullptr;
+
+        FormatMessageA(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+            nullptr,
+            lastError,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPSTR)&lpMsgBuf,
+            0,
+            nullptr
+        );
+
+        LogMsg_RAII raiiFree(lpMsgBuf);
+
+        // Display the string.
+        std::string sError = lpMsgBuf;
+        while (!sError.empty())
+        {
+            if (std::iscntrl(sError.back()))
+                sError.pop_back();
+            else
+                break;
+        }
+        StringStreamA strm;
+        strm << "Win32 Error: " << lastError << " (" << sError << ")";
+        LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+
+        return strm.str();
+    }
+
+    void LogToDebugMonitorA(std::string sMsg)
+    {
+        if (sMsg.back() != '\n')
+            sMsg.push_back('\n');
+        OutputDebugStringA(sMsg.c_str());
+    }
+
+    void LogToDebugMonitorW(std::wstring sMsg)
+    {
+        if (sMsg.back() != L'\n')
+            sMsg.push_back(L'\n');
+        OutputDebugStringW(sMsg.c_str());
+    }
+
+    void LogToDebugMonitor(CTL_StringType sMsg)
+    {
+#ifdef _UNICODE
+        LogToDebugMonitorW(sMsg);
+#else
+        LogToDebugMonitorA(sMsg);
+#endif
+    }
+
+    DTWAIN_BOOL DTWAIN_SetCallbackProc(DTWAIN_CALLBACK fnCall, LONG nWhich)
+    {
+        LOG_FUNC_ENTRY_PARAMS((fnCall, nWhich))
+            // See if DLL Handle exists
+            auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        switch (nWhich)
+        {
+            case DTWAIN_CallbackERROR:
+                pHandle->m_CallbackError = fnCall;
+                break;
+
+            case DTWAIN_CallbackMESSAGE:
+                pHandle->m_CallbackMsg = fnCall;
+                break;
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+            CATCH_BLOCK(false)
+    }
 }
 
-static void CenterWindowOnMonitor(HWND hWnd, HMONITOR hMonitor)
-{
-    MONITORINFO mi = { sizeof(mi) };
-    GetMonitorInfo(hMonitor, &mi);
 
-    RECT rcWork = mi.rcWork;
 
-    RECT rcWindow;
-    GetWindowRect(hWnd, &rcWindow);
-
-    int windowWidth = rcWindow.right - rcWindow.left;
-    int windowHeight = rcWindow.bottom - rcWindow.top;
-
-    int x = rcWork.left +
-        ((rcWork.right - rcWork.left) - windowWidth) / 2;
-
-    int y = rcWork.top +
-        ((rcWork.bottom - rcWork.top) - windowHeight) / 2;
-
-    SetWindowPos(hWnd,NULL,x,y,0,0,SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
-};
-
-void dynarithmic::CenterWindowSmart(HWND hWnd, int options)
-{
-    HMONITOR hMonitor = GetPreferredMonitor(hWnd, options);
-    CenterWindowOnMonitor(hWnd, hMonitor);
-}
 
 ////////// Function to subclass the window ////////////////////////
 WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn /*=NULL*/)
@@ -161,30 +281,6 @@ static HWND CreateTwainWindow(CTL_TwainDLLHandle * /*pHandle*/,
     return hwnd;
 }
 
-void dynarithmic::DTWAIN_InvokeCallback(int nWhich, DTWAIN_HANDLE p, DTWAIN_SOURCE pSource, WPARAM lData1, LPARAM lData2)
-{
-    DTWAIN_CALLBACK cProc;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(p);
-    if (pHandle)
-    {
-        switch (nWhich)
-        {
-            case DTWAIN_CallbackMESSAGE:
-                cProc = pHandle->m_CallbackMsg;
-                break;
-            case DTWAIN_CallbackERROR:
-                cProc = pHandle->m_CallbackError;
-                break;
-            default:
-                return;
-        }
-
-        if (!cProc)
-            return;
-
-        (*cProc)(pHandle, pSource, lData1, lData2);
-    }
-}
 
 void RegisterTwainWindowClass()
 {
@@ -246,48 +342,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
 }
 #endif
 
-struct LogWin_DestroyTraits
-{
-    static void Destroy(LPSTR p)
-    {
-        if (p)
-            LocalFree(p);
-    }
-};
-
-using LogMsg_RAII = DTWAIN_RAII<LPSTR, LogWin_DestroyTraits>;
-
-std::string dynarithmic::LogWin32Error(DWORD lastError)
-{
-    LPSTR lpMsgBuf = nullptr;
-
-    FormatMessageA(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-        nullptr,
-        lastError,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-        (LPSTR)&lpMsgBuf,
-        0,
-        nullptr
-    );
-
-    LogMsg_RAII raiiFree(lpMsgBuf);
-
-    // Display the string.
-    std::string sError = lpMsgBuf;
-    while (!sError.empty())
-    {
-        if (std::iscntrl(sError.back()))
-            sError.pop_back();
-        else
-            break;
-    }
-    StringStreamA strm;
-    strm << "Win32 Error: " << lastError << " (" << sError << ")";
-    LogWriterUtils::WriteLogInfoIndentedA(strm.str());
-
-    return strm.str();
-}
 
 void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, std::string_view s)
 {
@@ -300,47 +354,6 @@ void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, std::string_view s)
     MessageBoxA(nullptr, st.c_str(), "DTWAIN Error", MB_ICONSTOP);
 }
 
-void dynarithmic::LogToDebugMonitorA(std::string sMsg)
-{
-    if (sMsg.back() != '\n')
-        sMsg.push_back('\n');
-    OutputDebugStringA(sMsg.c_str());
-}
-
-void dynarithmic::LogToDebugMonitorW(std::wstring sMsg)
-{
-    if (sMsg.back() != L'\n')
-        sMsg.push_back(L'\n');
-    OutputDebugStringW(sMsg.c_str());
-}
-
-void dynarithmic::LogToDebugMonitor(CTL_StringType sMsg)
-{
-#ifdef _UNICODE
-    dynarithmic::LogToDebugMonitorW(sMsg);
-#else
-    dynarithmic::LogToDebugMonitorA(sMsg);
-#endif
-}
-
-DTWAIN_BOOL dynarithmic::DTWAIN_SetCallbackProc(DTWAIN_CALLBACK fnCall, LONG nWhich)
-{
-    LOG_FUNC_ENTRY_PARAMS((fnCall, nWhich))
-    // See if DLL Handle exists
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    switch (nWhich)
-    {
-        case DTWAIN_CallbackERROR:
-            pHandle->m_CallbackError = fnCall;
-            break;
-
-        case DTWAIN_CallbackMESSAGE:
-            pHandle->m_CallbackMsg = fnCall;
-            break;
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle, LONG xPos, LONG yPos, LONG nFlags)
 {
@@ -356,7 +369,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle,
         pHandle->m_CustomPlacement.nOptions = nFlags;
         pHandle->m_CustomPlacement.hWndParent = hWndParent;
         if (szTitle)
-            pHandle->m_CustomPlacement.sTitle = StringConversion::Convert_NativePtr_To_Wide(szTitle);
+            pHandle->m_CustomPlacement.sTitle = stringconversion::Convert_NativePtr_To_Wide(szTitle);
         else
             pHandle->m_CustomPlacement.sTitle.clear();
     }

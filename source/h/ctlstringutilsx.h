@@ -32,9 +32,6 @@ namespace dynarithmic
     // the text "More".
     std::string TruncateStringWithMore(std::string_view origString, size_t maxLen);
 
-    // Create a file using the data and time within the file name
-    std::string CreateFileNameWithDateTime(std::string_view prefix, std::string_view ext, bool useUTC=false);
-
     // Convert a string into a byte array
     std::vector<unsigned char> HexStringToByteArray(std::string_view hexString);
 
@@ -145,47 +142,6 @@ namespace dynarithmic
         }
 
         return result;
-    }
-
-    template <typename StringType>
-    StringType ConvertToAPIString(const StringType& origString)
-    {
-        using CharType = StringType::value_type;
-
-        constexpr CharType CR = static_cast<CharType>('\r');
-        constexpr CharType LF = static_cast<CharType>('\n');
-
-        StringType result;
-        result.reserve(origString.size());
-
-        for (std::size_t i = 0; i < origString.size(); ++i)
-        {
-            if (origString[i] == LF &&
-                (i == 0 || origString[i - 1] != CR))
-            {
-                result.push_back(CR);
-            }
-
-            result.push_back(origString[i]);
-        }
-
-        return result;
-    }
-
-    template <typename StringType>
-    HANDLE ConvertToAPIStringEx(typename std::basic_string_view<typename StringType::value_type> origString)
-    {
-        constexpr size_t cSize = sizeof(typename StringType::value_type);
-        StringType newString = ConvertToAPIString<StringType>(origString.data());
-        HANDLE newHandle = GlobalAlloc(GHND | GMEM_ZEROINIT, newString.size() * cSize + cSize);
-        if (newHandle)
-        {
-            auto pData = (typename StringType::value_type*)GlobalLock(newHandle);
-            memcpy(pData, newString.data(), newString.size() * cSize);
-            GlobalUnlock(newHandle);
-            return newHandle;
-        }
-        return nullptr;
     }
 
     // If szInfo is nullptr, only the computed length is returned.

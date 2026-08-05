@@ -72,7 +72,7 @@ void * CTL_CapabilitySetTripletBase::PreEncode()
     size_t nAggSize = GetAggregateSize();
     if ( nAggSize == 0 )
         nAggSize = 1;
-    const auto dMem = static_cast<DWORD>(nContainerSize + dynarithmic::GetTwainItemSize(m_nTwainType) * nAggSize);
+    const auto dMem = static_cast<DWORD>(nContainerSize + GetTwainItemSize(m_nTwainType) * nAggSize);
     auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
     pCap->hContainer = sessionHandle->m_TwainMemoryFunc->AllocateMemory(dMem );
     return sessionHandle->m_TwainMemoryFunc->LockMemory( pCap->hContainer );
@@ -115,7 +115,7 @@ void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData
         // Note that pVal->Item actually points to the entire allocated memory block
         // set up by the PreEncode() call, and is not a memory overwrite.
         void* pItem = &pVal->Item;
-        memcpy(pItem, TempString, dynarithmic::GetTwainItemSize( pVal->ItemType) );
+        memcpy(pItem, TempString, GetTwainItemSize( pVal->ItemType) );
     }
     else
     if (IsTwainUnicodeStringType(pVal->ItemType))
@@ -128,11 +128,11 @@ void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData
         // Note that pVal->Item actually points to the entire allocated memory block
         // set up by the PreEncode() call, and is not a memory overwrite.
         void* pItem = &pVal->Item;
-        memcpy(pItem, TempString, dynarithmic::GetTwainItemSize( pVal->ItemType) );
+        memcpy(pItem, TempString, GetTwainItemSize( pVal->ItemType) );
     }
     else
         // Copy data to TW_CONTAINER
-        memcpy(&pVal->Item, pData, dynarithmic::GetTwainItemSize( pVal->ItemType) );
+        memcpy(&pVal->Item, pData, GetTwainItemSize( pVal->ItemType) );
 }
 
 void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
@@ -153,7 +153,7 @@ void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
         TW_STR1024 TempString = {0};
         auto ptrString = static_cast<std::string*>(pData);
         std::copy(ptrString->begin(), ptrString->end(), TempString);
-        memcpy(&pArray->ItemList[valuePos], TempString, dynarithmic::GetTwainItemSize( pArray->ItemType) );
+        memcpy(&pArray->ItemList[valuePos], TempString, GetTwainItemSize( pArray->ItemType) );
     }
     else
         memcpy( &pArray->ItemList[valuePos], pData, nItemSize );
@@ -166,7 +166,7 @@ void CTL_CapabilitySetTripletBase::EncodeRange(pTW_RANGE pVal,
                                                void *pData3) const
 {
     pVal->ItemType = GetTwainType();
-    const size_t nItemSize = dynarithmic::GetTwainItemSize( pVal->ItemType );
+    const size_t nItemSize = GetTwainItemSize( pVal->ItemType );
 
     if ( IsTwainFix32Type(pVal->ItemType))
     {
@@ -197,7 +197,7 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
                                                     void *pData)
 {
     // Get size of datatype
-    const TW_UINT16 nItemSize = dynarithmic::GetTwainItemSize( pArray->ItemType );
+    const TW_UINT16 nItemSize = GetTwainItemSize( pArray->ItemType );
     if ( IsTwainFix32Type(pArray->ItemType))
     {
         // floats are stored as doubles in CTL
@@ -211,7 +211,7 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
         TW_STR1024 TempString = {0};
         const auto pStrData = static_cast<std::string*>(pData);
         std::copy(pStrData->begin(), pStrData->end(), TempString);
-        memcpy(&pArray->ItemList[valuePos], TempString, dynarithmic::GetTwainItemSize( pArray->ItemType) );
+        memcpy(&pArray->ItemList[valuePos], TempString, GetTwainItemSize( pArray->ItemType) );
     }
     else
         memcpy( &pArray->ItemList[valuePos], pData, nItemSize );

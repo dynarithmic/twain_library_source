@@ -156,8 +156,8 @@ using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
 
 static DTWAIN_BOOL SetPDFStringFunc(DTWAIN_SOURCE Source, LONG value, LPCTSTR val1, LPCTSTR val2, SetPDFFn fn)
 {
-    const DTWAIN_FLOAT value1 = dynarithmic::CharTraits<CharType>::ToDouble(val1);
-    const DTWAIN_FLOAT value2 = dynarithmic::CharTraits<CharType>::ToDouble(val2);
+    const DTWAIN_FLOAT value1 = CharTraits<CharType>::ToDouble(val1);
+    const DTWAIN_FLOAT value2 = CharTraits<CharType>::ToDouble(val2);
     return fn(Source, value, value1, value2);
 }
 
@@ -285,7 +285,7 @@ template <typename strType, int tupleVal>
 static LONG GetType1FontInternal(int FontVal, strType szFont, LONG nChars)
 {
     auto st = GetType1FontNameFromType(FontVal);
-    return dynarithmic::CopyInfoToCString(std::get<tupleVal>(st), szFont, nChars);
+    return CopyInfoToCString(std::get<tupleVal>(st), szFont, nChars);
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG nChars)
@@ -370,14 +370,14 @@ namespace
         constexpr size_t numDefVals = std::size(defVals);
         constexpr size_t numDefValsDOUBLE = std::size(defValsDOUBLE);
 
-        element.m_text = StringConversion::Convert_NativePtr_To_Ansi(szText);
+        element.m_text = stringconversion::Convert_NativePtr_To_Ansi(szText);
         element.xpos = xPos;
         element.ypos = yPos;
         std::string sFontName = "Helvetica";
         if (!fontName)
             element.m_font.m_fontName = sFontName;
         else
-            element.m_font.m_fontName = StringConversion::Convert_NativePtr_To_Ansi(fontName);
+            element.m_font.m_fontName = stringconversion::Convert_NativePtr_To_Ansi(fontName);
 
         for (const auto& defVal : defVals)
         {
@@ -403,7 +403,7 @@ namespace
         {
             auto pPtr = std::make_shared<PDFTextElement>();
 
-            auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_PDFTEXTELEMENTS);
+            auto& guidMap = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal())->GetGUIDMap(GUID_PDFTEXTELEMENTS);
             guidMap.Insert(GenerateUUIDv4Impl<std::string>(), pPtr.get());
 
             *pPtr = element;
@@ -439,10 +439,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_P
     auto validElement = CheckGlobalPDFTextElement(TextElement);
     DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return !validElement.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     GenericAddPDFText(pSource,
-                        StringConversion::Convert_Ansi_To_Native(pElement->m_text).c_str(),
+                        stringconversion::Convert_Ansi_To_Native(pElement->m_text).c_str(),
                         static_cast<LONG>(pElement->xpos),
                         static_cast<LONG>(pElement->ypos),
-                        StringConversion::Convert_Ansi_To_Native(pElement->m_font.m_fontName).c_str(),
+                        stringconversion::Convert_Ansi_To_Native(pElement->m_font.m_fontName).c_str(),
                         pElement->fontSize,
                         static_cast<LONG>(pElement->colorRGB),
                         static_cast<LONG>(pElement->renderMode),
@@ -482,11 +482,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szText, xPos, yPos, fontName, fontSize, colorRGB,
                               renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags))
-    const DTWAIN_FLOAT val1 = dynarithmic::CharTraits<CharType>::ToDouble(fontSize);
-    const DTWAIN_FLOAT val2 = dynarithmic::CharTraits<CharType>::ToDouble(scaling);
-    const DTWAIN_FLOAT val3 = dynarithmic::CharTraits<CharType>::ToDouble(charSpacing);
-    const DTWAIN_FLOAT val4 = dynarithmic::CharTraits<CharType>::ToDouble(wordSpacing);
-    const DTWAIN_FLOAT val5 = dynarithmic::CharTraits<CharType>::ToDouble(strokeWidth);
+    const DTWAIN_FLOAT val1 = CharTraits<CharType>::ToDouble(fontSize);
+    const DTWAIN_FLOAT val2 = CharTraits<CharType>::ToDouble(scaling);
+    const DTWAIN_FLOAT val3 = CharTraits<CharType>::ToDouble(charSpacing);
+    const DTWAIN_FLOAT val4 = CharTraits<CharType>::ToDouble(wordSpacing);
+    const DTWAIN_FLOAT val5 = CharTraits<CharType>::ToDouble(strokeWidth);
     auto retVal = DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, val1,
                                     colorRGB, renderMode, val2, val3, val4, val5, Flags);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
@@ -666,8 +666,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT Tex
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloatString(DTWAIN_PDFTEXTELEMENT TextElement, LPCTSTR val1, LPCTSTR val2, LONG Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, val2, Flags))
-    const DTWAIN_FLOAT value1 = dynarithmic::CharTraits<CharType>::ToDouble(val1);
-    const DTWAIN_FLOAT value2 = dynarithmic::CharTraits<CharType>::ToDouble(val2);
+    const DTWAIN_FLOAT value1 = CharTraits<CharType>::ToDouble(val1);
+    const DTWAIN_FLOAT value2 = CharTraits<CharType>::ToDouble(val2);
     auto retVal = DTWAIN_SetPDFTextElementFloat(TextElement, value1, value2, Flags);
     LOG_FUNC_EXIT_PARAMS(retVal)
     CATCH_BLOCK(false)
@@ -731,11 +731,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementString(DTWAIN_PDFTEXTELEMENT Te
     switch (Flags)
     {
         case DTWAIN_PDFTEXTELEMENT_FONTNAME:
-            pPtr->m_font.m_fontName = StringConversion::Convert_NativePtr_To_Ansi(val1);
+            pPtr->m_font.m_fontName = stringconversion::Convert_NativePtr_To_Ansi(val1);
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TEXT:
-            pPtr->m_text = StringConversion::Convert_NativePtr_To_Ansi(val1);
+            pPtr->m_text = stringconversion::Convert_NativePtr_To_Ansi(val1);
         break;
 
         default:
@@ -877,11 +877,11 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextEleme
     switch (Flags)
     {
         case DTWAIN_PDFTEXTELEMENT_FONTNAME:
-            retLength = dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_font.m_fontName), lpszStr, maxLen);
+            retLength = CopyInfoToCString(stringconversion::Convert_Ansi_To_Native(pPtr->m_font.m_fontName), lpszStr, maxLen);
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TEXT:
-            retLength = dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_text), lpszStr, maxLen);
+            retLength = CopyInfoToCString(stringconversion::Convert_Ansi_To_Native(pPtr->m_text), lpszStr, maxLen);
         break;
 
         default:

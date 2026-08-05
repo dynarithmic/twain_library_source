@@ -170,9 +170,9 @@ namespace dynarithmic
         TW_UINT16    GetProtocolMinor() const { return m_SourceId.get_protocol_minor(); }
         TW_UINT32    GetSupportedGroups() const { return m_SourceId.get_supported_groups(); }
 #ifdef UNICODE
-        CTL_StringType GetManufacturer() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_manufacturer()); }
-        CTL_StringType GetProductFamily() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_product_family()); }
-        CTL_StringType GetProductName() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_product_name()); }
+        CTL_StringType GetManufacturer() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_manufacturer()); }
+        CTL_StringType GetProductFamily() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_product_family()); }
+        CTL_StringType GetProductName() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_product_name()); }
 #else
         CTL_StringType GetManufacturer() const { return m_SourceId.get_manufacturer(); }
         CTL_StringType GetProductFamily() const { return m_SourceId.get_product_family(); }
@@ -181,9 +181,9 @@ namespace dynarithmic
         std::string GetManufacturerA() const { return m_SourceId.get_manufacturer(); }
         std::string GetProductFamilyA() const { return m_SourceId.get_product_family(); }
         std::string GetProductNameA() const { return m_SourceId.get_product_name(); }
-        std::wstring GetManufacturerW() const { return StringConversion::Convert_Ansi_To_Wide(m_SourceId.get_manufacturer()); }
-        std::wstring GetProductFamilyW() const { return StringConversion::Convert_Ansi_To_Wide(m_SourceId.get_product_family()); }
-        std::wstring GetProductNameW() const { return StringConversion::Convert_Ansi_To_Wide(m_SourceId.get_product_name()); }
+        std::wstring GetManufacturerW() const { return basicstringutils::Widen(m_SourceId.get_manufacturer()); }
+        std::wstring GetProductFamilyW() const { return basicstringutils::Widen(m_SourceId.get_product_family()); }
+        std::wstring GetProductNameW() const { return basicstringutils::Widen(m_SourceId.get_product_name()); }
 
         std::string GetSourceInfo() const { return m_SourceId.to_json(); }
         std::string GetSourceInfoFormatted(int indentFactor) const { return m_SourceId.to_json_formatted(indentFactor);  }

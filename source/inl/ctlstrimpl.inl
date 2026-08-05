@@ -68,14 +68,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValuesW(DTWAIN_SOURCE Source, LPCWSTR 
 #ifdef _UNICODE
     return DTWAIN_EnumSourceValues(Source, capName, pArray, expandIfRange);
 #else
-    return DTWAIN_EnumSourceValues(Source, StringConversion::Convert_WidePtr_To_Native(capName).c_str(), pArray, expandIfRange);
+    return DTWAIN_EnumSourceValues(Source, stringconversion::Convert_WidePtr_To_Native(capName).c_str(), pArray, expandIfRange);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValuesA(DTWAIN_SOURCE Source, LPCSTR capName, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL expandIfRange)
 {
 #ifdef _UNICODE
-    return DTWAIN_EnumSourceValues(Source, StringConversion::Convert_AnsiPtr_To_Native(capName).c_str(), pArray, expandIfRange);
+    return DTWAIN_EnumSourceValues(Source, stringconversion::Convert_AnsiPtr_To_Native(capName).c_str(), pArray, expandIfRange);
 #else
     return DTWAIN_EnumSourceValues(Source, capName, pArray, expandIfRange);
 #endif
@@ -84,7 +84,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValuesA(DTWAIN_SOURCE Source, LPCSTR c
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireFileA(DTWAIN_SOURCE Source, LPCSTR lpszFile, LONG lFileType, LONG lFileFlags, LONG PixelType, LONG lMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
 {
 #ifdef _UNICODE
-    return DTWAIN_AcquireFile(Source, StringConversion::Convert_AnsiPtr_To_Native(lpszFile).c_str(), lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
+    return DTWAIN_AcquireFile(Source, stringconversion::Convert_AnsiPtr_To_Native(lpszFile).c_str(), lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
 #else
     return DTWAIN_AcquireFile(Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
 #endif
@@ -95,14 +95,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireFileW(DTWAIN_SOURCE Source, LPCWSTR lpszF
 #ifdef _UNICODE
     return DTWAIN_AcquireFile(Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
 #else
-    return DTWAIN_AcquireFile(Source, StringConversion::Convert_WidePtr_To_Native(lpszFile).c_str(), lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
+    return DTWAIN_AcquireFile(Source, stringconversion::Convert_WidePtr_To_Native(lpszFile).c_str(), lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFileA(DTWAIN_SOURCE Source, LPCSTR lpszFile, LONG lFileFlags, LONG lMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
 {
 #ifdef _UNICODE
-    return DTWAIN_AcquireAudioFile(Source, StringConversion::Convert_AnsiPtr_To_Native(lpszFile).c_str(), lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
+    return DTWAIN_AcquireAudioFile(Source, stringconversion::Convert_AnsiPtr_To_Native(lpszFile).c_str(), lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
 #else
     return DTWAIN_AcquireAudioFile(Source, lpszFile, lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
 #endif
@@ -113,7 +113,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFileW(DTWAIN_SOURCE Source, LPCWSTR 
 #ifdef _UNICODE
     return DTWAIN_AcquireAudioFile(Source, lpszFile, lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
 #else
-    return DTWAIN_AcquireAudioFile(Source, StringConversion::Convert_WidePtr_To_Native(lpszFile).c_str(), lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
+    return DTWAIN_AcquireAudioFile(Source, stringconversion::Convert_WidePtr_To_Native(lpszFile).c_str(), lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
 #endif
 }
 
@@ -122,14 +122,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddFileToAppendW(LPCWSTR szFile)
 #ifdef _UNICODE
     return DTWAIN_AddFileToAppend(szFile);
 #else
-    return DTWAIN_AddFileToAppend(StringConversion::Convert_WidePtr_To_Native(szFile).c_str());
+    return DTWAIN_AddFileToAppend(stringconversion::Convert_WidePtr_To_Native(szFile).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddFileToAppendA(LPCSTR szFile)
 {
 #ifdef _UNICODE
-    return DTWAIN_AddFileToAppend(StringConversion::Convert_AnsiPtr_To_Native(szFile).c_str());
+    return DTWAIN_AddFileToAppend(stringconversion::Convert_AnsiPtr_To_Native(szFile).c_str());
 #else
     return DTWAIN_AddFileToAppend(szFile);
 #endif
@@ -140,14 +140,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, LPCWSTR szText
 #ifdef _UNICODE
     return DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
 #else
-    return DTWAIN_AddPDFText(Source, StringConversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos, StringConversion::Convert_WidePtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
+    return DTWAIN_AddPDFText(Source, stringconversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos, stringconversion::Convert_WidePtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags)
 {
 #ifdef _UNICODE
-    return DTWAIN_AddPDFText(Source, StringConversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos, StringConversion::Convert_AnsiPtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
+    return DTWAIN_AddPDFText(Source, stringconversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos, stringconversion::Convert_AnsiPtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
 #else
     return DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
 #endif
@@ -156,7 +156,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddStringA(DTWAIN_ARRAY pArray, LPCSTR Val)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArrayAddString(pArray, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str());
+    return DTWAIN_ArrayAddString(pArray, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str());
 #else
     return DTWAIN_ArrayAddString(pArray, Val);
 #endif
@@ -167,14 +167,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddStringW(DTWAIN_ARRAY pArray, LPCWSTR Val
 #ifdef _UNICODE
     return DTWAIN_ArrayAddString(pArray, Val);
 #else
-    return DTWAIN_ArrayAddString(pArray, StringConversion::Convert_WidePtr_To_Native(Val).c_str());
+    return DTWAIN_ArrayAddString(pArray, stringconversion::Convert_WidePtr_To_Native(Val).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddStringNA(DTWAIN_ARRAY pArray, LPCSTR Val, LONG num)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArrayAddStringN(pArray, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
+    return DTWAIN_ArrayAddStringN(pArray, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
 #else
     return DTWAIN_ArrayAddStringN(pArray, Val, num);
 #endif
@@ -185,14 +185,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddStringNW(DTWAIN_ARRAY pArray, LPCWSTR Va
 #ifdef _UNICODE
     return DTWAIN_ArrayAddStringN(pArray, Val, num);
 #else
-    return DTWAIN_ArrayAddStringN(pArray, StringConversion::Convert_WidePtr_To_Native(Val).c_str(), num);
+    return DTWAIN_ArrayAddStringN(pArray, stringconversion::Convert_WidePtr_To_Native(Val).c_str(), num);
 #endif
 }
 
 LONG DLLENTRY_DEF DTWAIN_ArrayFindStringA(DTWAIN_ARRAY pArray, LPCSTR pString)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArrayFindString(pArray, StringConversion::Convert_AnsiPtr_To_Native(pString).c_str());
+    return DTWAIN_ArrayFindString(pArray, stringconversion::Convert_AnsiPtr_To_Native(pString).c_str());
 #else
     return DTWAIN_ArrayFindString(pArray, pString);
 #endif
@@ -203,7 +203,7 @@ LONG DLLENTRY_DEF DTWAIN_ArrayFindStringW(DTWAIN_ARRAY pArray, LPCWSTR pString)
 #ifdef _UNICODE
     return DTWAIN_ArrayFindString(pArray, pString);
 #else
-    return DTWAIN_ArrayFindString(pArray, StringConversion::Convert_WidePtr_To_Native(pString).c_str());
+    return DTWAIN_ArrayFindString(pArray, stringconversion::Convert_WidePtr_To_Native(pString).c_str());
 #endif
 }
 
@@ -232,7 +232,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtStringW(DTWAIN_ARRAY pArray, LONG nWhe
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR pVal)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArrayInsertAtString(pArray, nWhere, StringConversion::Convert_AnsiPtr_To_Native(pVal).c_str());
+    return DTWAIN_ArrayInsertAtString(pArray, nWhere, stringconversion::Convert_AnsiPtr_To_Native(pVal).c_str());
 #else
     return DTWAIN_ArrayInsertAtString(pArray, nWhere, pVal);
 #endif
@@ -243,14 +243,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtStringW(DTWAIN_ARRAY pArray, LONG n
 #ifdef _UNICODE
     return DTWAIN_ArrayInsertAtString(pArray, nWhere, pVal);
 #else
-    return DTWAIN_ArrayInsertAtString(pArray, nWhere, StringConversion::Convert_WidePtr_To_Native(pVal).c_str());
+    return DTWAIN_ArrayInsertAtString(pArray, nWhere, stringconversion::Convert_WidePtr_To_Native(pVal).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtStringNA(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR Val, LONG num)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
+    return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
 #else
     return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, Val, num);
 #endif
@@ -261,7 +261,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtStringNW(DTWAIN_ARRAY pArray, LONG 
 #ifdef _UNICODE
     return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, Val, num);
 #else
-    return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, StringConversion::Convert_WidePtr_To_Native(Val).c_str(), num);
+    return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, stringconversion::Convert_WidePtr_To_Native(Val).c_str(), num);
 #endif
 }
 
@@ -270,14 +270,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtStringW(DTWAIN_ARRAY pArray, LONG nWhe
 #ifdef _UNICODE
     return DTWAIN_ArraySetAtString(pArray, nWhere, pStr);
 #else
-    return DTWAIN_ArraySetAtString(pArray, nWhere, StringConversion::Convert_WidePtr_To_Native(pStr).c_str());
+    return DTWAIN_ArraySetAtString(pArray, nWhere, stringconversion::Convert_WidePtr_To_Native(pStr).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR pStr)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArraySetAtString(pArray, nWhere, StringConversion::Convert_AnsiPtr_To_Native(pStr).c_str());
+    return DTWAIN_ArraySetAtString(pArray, nWhere, stringconversion::Convert_AnsiPtr_To_Native(pStr).c_str());
 #else
     return DTWAIN_ArraySetAtString(pArray, nWhere, pStr);
 #endif
@@ -288,14 +288,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCRW(DTWAIN_OCRENGINE Engine, LPCWSTR szF
 #ifdef _UNICODE
     return DTWAIN_ExecuteOCR(Engine, szFileName, nStartPage, nEndPage);
 #else
-    return DTWAIN_ExecuteOCR(Engine, StringConversion::Convert_WidePtr_To_Native(szFileName).c_str(), nStartPage, nEndPage);
+    return DTWAIN_ExecuteOCR(Engine, stringconversion::Convert_WidePtr_To_Native(szFileName).c_str(), nStartPage, nEndPage);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCRA(DTWAIN_OCRENGINE Engine, LPCSTR szFileName, LONG nStartPage, LONG nEndPage)
 {
 #ifdef _UNICODE
-    return DTWAIN_ExecuteOCR(Engine, StringConversion::Convert_AnsiPtr_To_Native(szFileName).c_str(), nStartPage, nEndPage);
+    return DTWAIN_ExecuteOCR(Engine, stringconversion::Convert_AnsiPtr_To_Native(szFileName).c_str(), nStartPage, nEndPage);
 #else
     return DTWAIN_ExecuteOCR(Engine, szFileName, nStartPage, nEndPage);
 #endif
@@ -404,7 +404,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBrightnessStringA(DTWAIN_SOURCE Source, LPSTR
 LONG DLLENTRY_DEF DTWAIN_GetCapFromNameA(LPCSTR szName)
 {
 #ifdef _UNICODE
-    return DTWAIN_GetCapFromName(StringConversion::Convert_AnsiPtr_To_Native(szName).c_str());
+    return DTWAIN_GetCapFromName(stringconversion::Convert_AnsiPtr_To_Native(szName).c_str());
 #else
     return DTWAIN_GetCapFromName(szName);
 #endif
@@ -415,7 +415,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapFromNameW(LPCWSTR szName)
 #ifdef _UNICODE
     return DTWAIN_GetCapFromName(szName);
 #else
-    return DTWAIN_GetCapFromName(StringConversion::Convert_WidePtr_To_Native(szName).c_str());
+    return DTWAIN_GetCapFromName(stringconversion::Convert_WidePtr_To_Native(szName).c_str());
 #endif
 }
 
@@ -648,14 +648,14 @@ LONG DLLENTRY_DEF DTWAIN_GetExtCapFromNameW(LPCWSTR szName)
 #ifdef _UNICODE
     return DTWAIN_GetExtCapFromName(szName);
 #else
-    return DTWAIN_GetExtCapFromName(StringConversion::Convert_WidePtr_To_Native(szName).c_str());
+    return DTWAIN_GetExtCapFromName(stringconversion::Convert_WidePtr_To_Native(szName).c_str());
 #endif
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetExtCapFromNameA(LPCSTR szName)
 {
 #ifdef _UNICODE
-    return DTWAIN_GetExtCapFromName(StringConversion::Convert_AnsiPtr_To_Native(szName).c_str());
+    return DTWAIN_GetExtCapFromName(stringconversion::Convert_AnsiPtr_To_Native(szName).c_str());
 #else
     return DTWAIN_GetExtCapFromName(szName);
 #endif
@@ -1332,7 +1332,7 @@ LONG DLLENTRY_DEF DTWAIN_GetShortVersionStringA(LPSTR lpszVer, LONG nLength)
 LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainNameA(LPCSTR lpszBuffer)
 {
 #ifdef _UNICODE
-    return DTWAIN_GetConstantFromTwainName(StringConversion::Convert_AnsiPtr_To_Native(lpszBuffer).c_str());
+    return DTWAIN_GetConstantFromTwainName(stringconversion::Convert_AnsiPtr_To_Native(lpszBuffer).c_str());
 #else
     return DTWAIN_GetConstantFromTwainName(lpszBuffer);
 #endif
@@ -1343,7 +1343,7 @@ LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainNameW(LPCWSTR lpszBuffer)
 #ifdef _UNICODE
     return DTWAIN_GetConstantFromTwainName(lpszBuffer);
 #else
-    return DTWAIN_GetConstantFromTwainName(StringConversion::Convert_WidePtr_To_Native(lpszBuffer).c_str());
+    return DTWAIN_GetConstantFromTwainName(stringconversion::Convert_WidePtr_To_Native(lpszBuffer).c_str());
 #endif
 }
 
@@ -1465,14 +1465,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitImageFileAppendW(LPCWSTR szFile, LONG fType)
 #ifdef _UNICODE
     return DTWAIN_InitImageFileAppend(szFile, fType);
 #else
-    return DTWAIN_InitImageFileAppend(StringConversion::Convert_WidePtr_To_Native(szFile).c_str(), fType);
+    return DTWAIN_InitImageFileAppend(stringconversion::Convert_WidePtr_To_Native(szFile).c_str(), fType);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitImageFileAppendA(LPCSTR szFile, LONG fType)
 {
 #ifdef _UNICODE
-    return DTWAIN_InitImageFileAppend(StringConversion::Convert_AnsiPtr_To_Native(szFile).c_str(), fType);
+    return DTWAIN_InitImageFileAppend(stringconversion::Convert_AnsiPtr_To_Native(szFile).c_str(), fType);
 #else
     return DTWAIN_InitImageFileAppend(szFile, fType);
 #endif
@@ -1481,7 +1481,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitImageFileAppendA(LPCSTR szFile, LONG fType)
 LONG DLLENTRY_DEF DTWAIN_IsDIBBlankStringA(HANDLE hDib, LPCSTR threshold)
 {
 #ifdef _UNICODE
-    return DTWAIN_IsDIBBlankString(hDib, StringConversion::Convert_AnsiPtr_To_Native(threshold).c_str());
+    return DTWAIN_IsDIBBlankString(hDib, stringconversion::Convert_AnsiPtr_To_Native(threshold).c_str());
 #else
     return DTWAIN_IsDIBBlankString(hDib, threshold);
 #endif
@@ -1492,7 +1492,7 @@ LONG DLLENTRY_DEF DTWAIN_IsDIBBlankStringW(HANDLE hDib, LPCWSTR threshold)
 #ifdef _UNICODE
     return DTWAIN_IsDIBBlankString(hDib, threshold);
 #else
-    return DTWAIN_IsDIBBlankString(hDib, StringConversion::Convert_WidePtr_To_Native(threshold).c_str());
+    return DTWAIN_IsDIBBlankString(hDib, stringconversion::Convert_WidePtr_To_Native(threshold).c_str());
 #endif
 }
 
@@ -1501,14 +1501,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesW(LPCWSTR sLangDLL)
 #ifdef _UNICODE
     return DTWAIN_LoadCustomStringResources(sLangDLL);
 #else
-    return DTWAIN_LoadCustomStringResources(StringConversion::Convert_WidePtr_To_Native(sLangDLL).c_str());
+    return DTWAIN_LoadCustomStringResources(stringconversion::Convert_WidePtr_To_Native(sLangDLL).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesA(LPCSTR sLangDLL)
 {
 #ifdef _UNICODE
-    return DTWAIN_LoadCustomStringResources(StringConversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str());
+    return DTWAIN_LoadCustomStringResources(stringconversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str());
 #else
     return DTWAIN_LoadCustomStringResources(sLangDLL);
 #endif
@@ -1519,14 +1519,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesExW(LPCWSTR sLangDLL, D
 #ifdef _UNICODE
     return DTWAIN_LoadCustomStringResourcesEx(sLangDLL, bClear);
 #else
-    return DTWAIN_LoadCustomStringResourcesEx(StringConversion::Convert_WidePtr_To_Native(sLangDLL).c_str(), bClear);
+    return DTWAIN_LoadCustomStringResourcesEx(stringconversion::Convert_WidePtr_To_Native(sLangDLL).c_str(), bClear);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesExA(LPCSTR sLangDLL, DTWAIN_BOOL bClear)
 {
 #ifdef _UNICODE
-    return DTWAIN_LoadCustomStringResourcesEx(StringConversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str(), bClear);
+    return DTWAIN_LoadCustomStringResourcesEx(stringconversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str(), bClear);
 #else
     return DTWAIN_LoadCustomStringResourcesEx(sLangDLL, bClear);
 #endif
@@ -1537,14 +1537,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessageW(LPCWSTR message)
 #ifdef _UNICODE
     return DTWAIN_LogMessage(message);
 #else
-    return DTWAIN_LogMessage(StringConversion::Convert_WidePtr_To_Native(message).c_str());
+    return DTWAIN_LogMessage(stringconversion::Convert_WidePtr_To_Native(message).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessageA(LPCSTR message)
 {
 #ifdef _UNICODE
-    return DTWAIN_LogMessage(StringConversion::Convert_AnsiPtr_To_Native(message).c_str());
+    return DTWAIN_LogMessage(stringconversion::Convert_AnsiPtr_To_Native(message).c_str());
 #else
     return DTWAIN_LogMessage(message);
 #endif
@@ -1555,14 +1555,14 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByNameW(LPCWSTR lpszName)
 #ifdef _UNICODE
     return DTWAIN_SelectOCREngineByName(lpszName);
 #else
-    return DTWAIN_SelectOCREngineByName(StringConversion::Convert_WidePtr_To_Native(lpszName).c_str());
+    return DTWAIN_SelectOCREngineByName(stringconversion::Convert_WidePtr_To_Native(lpszName).c_str());
 #endif
 }
 
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByNameA(LPCSTR lpszName)
 {
 #ifdef _UNICODE
-    return DTWAIN_SelectOCREngineByName(StringConversion::Convert_AnsiPtr_To_Native(lpszName).c_str());
+    return DTWAIN_SelectOCREngineByName(stringconversion::Convert_AnsiPtr_To_Native(lpszName).c_str());
 #else
     return DTWAIN_SelectOCREngineByName(lpszName);
 #endif
@@ -1571,7 +1571,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByNameA(LPCSTR lpszName)
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2A(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos, LONG nOptions)
 {
 #ifdef _UNICODE
-    return DTWAIN_SelectSource2(hWndParent, szTitle?StringConversion::Convert_AnsiPtr_To_Native(szTitle).c_str(): nullptr, xPos, yPos, nOptions);
+    return DTWAIN_SelectSource2(hWndParent, szTitle?stringconversion::Convert_AnsiPtr_To_Native(szTitle).c_str(): nullptr, xPos, yPos, nOptions);
 #else
     return DTWAIN_SelectSource2(hWndParent, szTitle, xPos, yPos, nOptions);
 #endif
@@ -1583,7 +1583,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2W(HWND hWndParent, LPCWSTR szTitl
     return DTWAIN_SelectSource2(hWndParent, szTitle, xPos, yPos, nOptions);
 #else
     return DTWAIN_SelectSource2(hWndParent, 
-                                szTitle?StringConversion::Convert_WidePtr_To_Native(szTitle).c_str():NULL, xPos, yPos, nOptions);
+                                szTitle?stringconversion::Convert_WidePtr_To_Native(szTitle).c_str():NULL, xPos, yPos, nOptions);
 #endif
 }
 
@@ -1592,10 +1592,10 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2ExA(HWND hWndParent, LPCSTR szTit
 {
 #ifdef _UNICODE
     return DTWAIN_SelectSource2Ex(hWndParent, 
-                                  szTitle?StringConversion::Convert_AnsiPtr_To_Native(szTitle).c_str(): nullptr, xPos, yPos, 
-                                  szIncludeNames?StringConversion::Convert_AnsiPtr_To_Native(szIncludeNames).c_str(): nullptr, 
-                                  szExcludeNames?StringConversion::Convert_AnsiPtr_To_Native(szExcludeNames).c_str(): nullptr,
-                                  szNameMapping?StringConversion::Convert_AnsiPtr_To_Native(szNameMapping).c_str(): nullptr,
+                                  szTitle?stringconversion::Convert_AnsiPtr_To_Native(szTitle).c_str(): nullptr, xPos, yPos, 
+                                  szIncludeNames?stringconversion::Convert_AnsiPtr_To_Native(szIncludeNames).c_str(): nullptr, 
+                                  szExcludeNames?stringconversion::Convert_AnsiPtr_To_Native(szExcludeNames).c_str(): nullptr,
+                                  szNameMapping?stringconversion::Convert_AnsiPtr_To_Native(szNameMapping).c_str(): nullptr,
                                   nOptions);
 #else
     return DTWAIN_SelectSource2Ex(hWndParent, szTitle, xPos, yPos, szIncludeNames, szExcludeNames, szNameMapping, nOptions);
@@ -1608,11 +1608,11 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2ExW(HWND hWndParent, LPCWSTR szTi
     return DTWAIN_SelectSource2Ex(hWndParent, szTitle, xPos, yPos, szIncludeNames, szExcludeNames, szNameMapping, nOptions);
 #else
     return DTWAIN_SelectSource2Ex(hWndParent, 
-                                  szTitle ? StringConversion::Convert_WidePtr_To_Native(szTitle).c_str() : NULL,
+                                  szTitle ? stringconversion::Convert_WidePtr_To_Native(szTitle).c_str() : NULL,
                                   xPos, yPos,
-                                  szIncludeNames ? StringConversion::Convert_WidePtr_To_Native(szIncludeNames).c_str() : NULL,
-                                  szExcludeNames ? StringConversion::Convert_WidePtr_To_Native(szExcludeNames).c_str() : NULL,
-                                  szNameMapping ? StringConversion::Convert_WidePtr_To_Native(szNameMapping).c_str() : NULL,
+                                  szIncludeNames ? stringconversion::Convert_WidePtr_To_Native(szIncludeNames).c_str() : NULL,
+                                  szExcludeNames ? stringconversion::Convert_WidePtr_To_Native(szExcludeNames).c_str() : NULL,
+                                  szNameMapping ? stringconversion::Convert_WidePtr_To_Native(szNameMapping).c_str() : NULL,
                                   nOptions);
 #endif
 }
@@ -1622,14 +1622,14 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameW(LPCWSTR lpszName)
 #ifdef _UNICODE
     return DTWAIN_SelectSourceByName(lpszName);
 #else
-    return DTWAIN_SelectSourceByName(StringConversion::Convert_WidePtr_To_Native(lpszName).c_str());
+    return DTWAIN_SelectSourceByName(stringconversion::Convert_WidePtr_To_Native(lpszName).c_str());
 #endif
 }
 
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameA(LPCSTR lpszName)
 {
 #ifdef _UNICODE
-    return DTWAIN_SelectSourceByName(StringConversion::Convert_AnsiPtr_To_Native(lpszName).c_str());
+    return DTWAIN_SelectSourceByName(stringconversion::Convert_AnsiPtr_To_Native(lpszName).c_str());
 #else
     return DTWAIN_SelectSourceByName(lpszName);
 #endif
@@ -1640,14 +1640,14 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameWithOpenW(LPCWSTR lpszName, 
 #ifdef _UNICODE
     return DTWAIN_SelectSourceByNameWithOpen(lpszName, bOpen);
 #else
-    return DTWAIN_SelectSourceByNameWithOpen(StringConversion::Convert_WidePtr_To_Native(lpszName).c_str(), bOpen);
+    return DTWAIN_SelectSourceByNameWithOpen(stringconversion::Convert_WidePtr_To_Native(lpszName).c_str(), bOpen);
 #endif
 }
 
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameWithOpenA(LPCSTR lpszName, DTWAIN_BOOL bOpen)
 {
 #ifdef _UNICODE
-    return DTWAIN_SelectSourceByNameWithOpen(StringConversion::Convert_AnsiPtr_To_Native(lpszName).c_str(), bOpen);
+    return DTWAIN_SelectSourceByNameWithOpen(stringconversion::Convert_AnsiPtr_To_Native(lpszName).c_str(), bOpen);
 #else
     return DTWAIN_SelectSourceByNameWithOpen(lpszName, bOpen);
 #endif
@@ -1658,14 +1658,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2StringW(DTWAIN_SOURCE Source, LPC
 #ifdef _UNICODE
     return DTWAIN_SetAcquireArea2String(Source, left, top, right, bottom, lUnit, Flags);
 #else
-    return DTWAIN_SetAcquireArea2String(Source, StringConversion::Convert_WidePtr_To_Native(left).c_str(), StringConversion::Convert_WidePtr_To_Native(top).c_str(), StringConversion::Convert_WidePtr_To_Native(right).c_str(), StringConversion::Convert_WidePtr_To_Native(bottom).c_str(), lUnit, Flags);
+    return DTWAIN_SetAcquireArea2String(Source, stringconversion::Convert_WidePtr_To_Native(left).c_str(), stringconversion::Convert_WidePtr_To_Native(top).c_str(), stringconversion::Convert_WidePtr_To_Native(right).c_str(), stringconversion::Convert_WidePtr_To_Native(bottom).c_str(), lUnit, Flags);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2StringA(DTWAIN_SOURCE Source, LPCSTR left, LPCSTR top, LPCSTR right, LPCSTR bottom, LONG lUnit, LONG Flags)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetAcquireArea2String(Source, StringConversion::Convert_AnsiPtr_To_Native(left).c_str(), StringConversion::Convert_AnsiPtr_To_Native(top).c_str(), StringConversion::Convert_AnsiPtr_To_Native(right).c_str(), StringConversion::Convert_AnsiPtr_To_Native(bottom).c_str(), lUnit, Flags);
+    return DTWAIN_SetAcquireArea2String(Source, stringconversion::Convert_AnsiPtr_To_Native(left).c_str(), stringconversion::Convert_AnsiPtr_To_Native(top).c_str(), stringconversion::Convert_AnsiPtr_To_Native(right).c_str(), stringconversion::Convert_AnsiPtr_To_Native(bottom).c_str(), lUnit, Flags);
 #else
     return DTWAIN_SetAcquireArea2String(Source, left, top, right, bottom, lUnit, Flags);
 #endif
@@ -1674,7 +1674,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2StringA(DTWAIN_SOURCE Source, LPC
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleStringA(DTWAIN_SOURCE Source, LPCSTR xscale, LPCSTR yscale)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetAcquireImageScaleString(Source, StringConversion::Convert_AnsiPtr_To_Native(xscale).c_str(), StringConversion::Convert_AnsiPtr_To_Native(yscale).c_str());
+    return DTWAIN_SetAcquireImageScaleString(Source, stringconversion::Convert_AnsiPtr_To_Native(xscale).c_str(), stringconversion::Convert_AnsiPtr_To_Native(yscale).c_str());
 #else
     return DTWAIN_SetAcquireImageScaleString(Source, xscale, yscale);
 #endif
@@ -1685,7 +1685,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleStringW(DTWAIN_SOURCE Source
 #ifdef _UNICODE
     return DTWAIN_SetAcquireImageScaleString(Source, xscale, yscale);
 #else
-    return DTWAIN_SetAcquireImageScaleString(Source, StringConversion::Convert_WidePtr_To_Native(xscale).c_str(), StringConversion::Convert_WidePtr_To_Native(yscale).c_str());
+    return DTWAIN_SetAcquireImageScaleString(Source, stringconversion::Convert_WidePtr_To_Native(xscale).c_str(), stringconversion::Convert_WidePtr_To_Native(yscale).c_str());
 #endif
 }
 
@@ -1694,14 +1694,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAppInfoW(LPCWSTR szVerStr, LPCWSTR szManu, LP
 #ifdef _UNICODE
     return DTWAIN_SetAppInfo(szVerStr, szManu, szProdFam, szProdName);
 #else
-    return DTWAIN_SetAppInfo(StringConversion::Convert_WidePtr_To_Native(szVerStr).c_str(), StringConversion::Convert_WidePtr_To_Native(szManu).c_str(), StringConversion::Convert_WidePtr_To_Native(szProdFam).c_str(), StringConversion::Convert_WidePtr_To_Native(szProdName).c_str());
+    return DTWAIN_SetAppInfo(stringconversion::Convert_WidePtr_To_Native(szVerStr).c_str(), stringconversion::Convert_WidePtr_To_Native(szManu).c_str(), stringconversion::Convert_WidePtr_To_Native(szProdFam).c_str(), stringconversion::Convert_WidePtr_To_Native(szProdName).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAppInfoA(LPCSTR szVerStr, LPCSTR szManu, LPCSTR szProdFam, LPCSTR szProdName)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetAppInfo(StringConversion::Convert_AnsiPtr_To_Native(szVerStr).c_str(), StringConversion::Convert_AnsiPtr_To_Native(szManu).c_str(), StringConversion::Convert_AnsiPtr_To_Native(szProdFam).c_str(), StringConversion::Convert_AnsiPtr_To_Native(szProdName).c_str());
+    return DTWAIN_SetAppInfo(stringconversion::Convert_AnsiPtr_To_Native(szVerStr).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szManu).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szProdFam).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szProdName).c_str());
 #else
     return DTWAIN_SetAppInfo(szVerStr, szManu, szProdFam, szProdName);
 #endif
@@ -1710,7 +1710,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAppInfoA(LPCSTR szVerStr, LPCSTR szManu, LPCS
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAuthorA(DTWAIN_SOURCE Source, LPCSTR szAuthor)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetAuthor(Source, StringConversion::Convert_AnsiPtr_To_Native(szAuthor).c_str());
+    return DTWAIN_SetAuthor(Source, stringconversion::Convert_AnsiPtr_To_Native(szAuthor).c_str());
 #else
     return DTWAIN_SetAuthor(Source, szAuthor);
 #endif
@@ -1721,14 +1721,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAuthorW(DTWAIN_SOURCE Source, LPCWSTR szAutho
 #ifdef _UNICODE
     return DTWAIN_SetAuthor(Source, szAuthor);
 #else
-    return DTWAIN_SetAuthor(Source, StringConversion::Convert_WidePtr_To_Native(szAuthor).c_str());
+    return DTWAIN_SetAuthor(Source, stringconversion::Convert_WidePtr_To_Native(szAuthor).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionStringA(DTWAIN_SOURCE Source, LPCSTR threshold, LONG autodetect_option, DTWAIN_BOOL bSet)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetBlankPageDetectionString(Source, StringConversion::Convert_AnsiPtr_To_Native(threshold).c_str(), autodetect_option, bSet);
+    return DTWAIN_SetBlankPageDetectionString(Source, stringconversion::Convert_AnsiPtr_To_Native(threshold).c_str(), autodetect_option, bSet);
 #else
     return DTWAIN_SetBlankPageDetectionString(Source, threshold, autodetect_option, bSet);
 #endif
@@ -1739,14 +1739,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionStringW(DTWAIN_SOURCE Sourc
 #ifdef _UNICODE
     return DTWAIN_SetBlankPageDetectionString(Source, threshold, autodetect_option, bSet);
 #else
-    return DTWAIN_SetBlankPageDetectionString(Source, StringConversion::Convert_WidePtr_To_Native(threshold).c_str(), autodetect_option, bSet);
+    return DTWAIN_SetBlankPageDetectionString(Source, stringconversion::Convert_WidePtr_To_Native(threshold).c_str(), autodetect_option, bSet);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionExStringA(DTWAIN_SOURCE Source, LPCSTR threshold, LONG autodetect_option, LONG detectOpts, DTWAIN_BOOL bSet)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetBlankPageDetectionExString(Source, StringConversion::Convert_AnsiPtr_To_Native(threshold).c_str(), autodetect_option, detectOpts, bSet);
+    return DTWAIN_SetBlankPageDetectionExString(Source, stringconversion::Convert_AnsiPtr_To_Native(threshold).c_str(), autodetect_option, detectOpts, bSet);
 #else
     return DTWAIN_SetBlankPageDetectionExString(Source, threshold, autodetect_option, detectOpts, bSet);
 #endif
@@ -1757,14 +1757,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionExStringW(DTWAIN_SOURCE Sou
 #ifdef _UNICODE
     return DTWAIN_SetBlankPageDetectionExString(Source, threshold, autodetect_option, detectOpts, bSet);
 #else
-    return DTWAIN_SetBlankPageDetectionExString(Source, StringConversion::Convert_WidePtr_To_Native(threshold).c_str(), autodetect_option, detectOpts, bSet);
+    return DTWAIN_SetBlankPageDetectionExString(Source, stringconversion::Convert_WidePtr_To_Native(threshold).c_str(), autodetect_option, detectOpts, bSet);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBrightnessStringA(DTWAIN_SOURCE Source, LPCSTR Contrast)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetBrightnessString(Source, StringConversion::Convert_AnsiPtr_To_Native(Contrast).c_str());
+    return DTWAIN_SetBrightnessString(Source, stringconversion::Convert_AnsiPtr_To_Native(Contrast).c_str());
 #else
     return DTWAIN_SetBrightnessString(Source, Contrast);
 #endif
@@ -1775,7 +1775,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBrightnessStringW(DTWAIN_SOURCE Source, LPCWS
 #ifdef _UNICODE
     return DTWAIN_SetBrightnessString(Source, Contrast);
 #else
-    return DTWAIN_SetBrightnessString(Source, StringConversion::Convert_WidePtr_To_Native(Contrast).c_str());
+    return DTWAIN_SetBrightnessString(Source, stringconversion::Convert_WidePtr_To_Native(Contrast).c_str());
 #endif
 }
 
@@ -1784,14 +1784,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCameraW(DTWAIN_SOURCE Source, LPCWSTR szCamer
 #ifdef _UNICODE
     return DTWAIN_SetCamera(Source, szCamera);
 #else
-    return DTWAIN_SetCamera(Source, StringConversion::Convert_WidePtr_To_Native(szCamera).c_str());
+    return DTWAIN_SetCamera(Source, stringconversion::Convert_WidePtr_To_Native(szCamera).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCameraA(DTWAIN_SOURCE Source, LPCSTR szCamera)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetCamera(Source, StringConversion::Convert_AnsiPtr_To_Native(szCamera).c_str());
+    return DTWAIN_SetCamera(Source, stringconversion::Convert_AnsiPtr_To_Native(szCamera).c_str());
 #else
     return DTWAIN_SetCamera(Source, szCamera);
 #endif
@@ -1800,7 +1800,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCameraA(DTWAIN_SOURCE Source, LPCSTR szCamera
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCaptionA(DTWAIN_SOURCE Source, LPCSTR Caption)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetCaption(Source, StringConversion::Convert_AnsiPtr_To_Native(Caption).c_str());
+    return DTWAIN_SetCaption(Source, stringconversion::Convert_AnsiPtr_To_Native(Caption).c_str());
 #else
     return DTWAIN_SetCaption(Source, Caption);
 #endif
@@ -1811,14 +1811,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCaptionW(DTWAIN_SOURCE Source, LPCWSTR Captio
 #ifdef _UNICODE
     return DTWAIN_SetCaption(Source, Caption);
 #else
-    return DTWAIN_SetCaption(Source, StringConversion::Convert_WidePtr_To_Native(Caption).c_str());
+    return DTWAIN_SetCaption(Source, stringconversion::Convert_WidePtr_To_Native(Caption).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetContrastStringA(DTWAIN_SOURCE Source, LPCSTR Contrast)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetContrastString(Source, StringConversion::Convert_AnsiPtr_To_Native(Contrast).c_str());
+    return DTWAIN_SetContrastString(Source, stringconversion::Convert_AnsiPtr_To_Native(Contrast).c_str());
 #else
     return DTWAIN_SetContrastString(Source, Contrast);
 #endif
@@ -1829,14 +1829,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetContrastStringW(DTWAIN_SOURCE Source, LPCWSTR
 #ifdef _UNICODE
     return DTWAIN_SetContrastString(Source, Contrast);
 #else
-    return DTWAIN_SetContrastString(Source, StringConversion::Convert_WidePtr_To_Native(Contrast).c_str());
+    return DTWAIN_SetContrastString(Source, stringconversion::Convert_WidePtr_To_Native(Contrast).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceTimeDateA(DTWAIN_SOURCE Source, LPCSTR szTimeDate)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetDeviceTimeDate(Source, StringConversion::Convert_AnsiPtr_To_Native(szTimeDate).c_str());
+    return DTWAIN_SetDeviceTimeDate(Source, stringconversion::Convert_AnsiPtr_To_Native(szTimeDate).c_str());
 #else
     return DTWAIN_SetDeviceTimeDate(Source, szTimeDate);
 #endif
@@ -1847,7 +1847,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceTimeDateW(DTWAIN_SOURCE Source, LPCWSTR
 #ifdef _UNICODE
     return DTWAIN_SetDeviceTimeDate(Source, szTimeDate);
 #else
-    return DTWAIN_SetDeviceTimeDate(Source, StringConversion::Convert_WidePtr_To_Native(szTimeDate).c_str());
+    return DTWAIN_SetDeviceTimeDate(Source, stringconversion::Convert_WidePtr_To_Native(szTimeDate).c_str());
 #endif
 }
 
@@ -1856,14 +1856,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePosW(HWND hWndParent, LPCWSTR szTitle
 #ifdef _UNICODE
     return DTWAIN_SetFileSavePos(hWndParent, szTitle, xPos, yPos, nFlags);
 #else
-    return DTWAIN_SetFileSavePos(hWndParent, StringConversion::Convert_WidePtr_To_Native(szTitle).c_str(), xPos, yPos, nFlags);
+    return DTWAIN_SetFileSavePos(hWndParent, stringconversion::Convert_WidePtr_To_Native(szTitle).c_str(), xPos, yPos, nFlags);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePosA(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos, LONG nFlags)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetFileSavePos(hWndParent, StringConversion::Convert_AnsiPtr_To_Native(szTitle).c_str(), xPos, yPos, nFlags);
+    return DTWAIN_SetFileSavePos(hWndParent, stringconversion::Convert_AnsiPtr_To_Native(szTitle).c_str(), xPos, yPos, nFlags);
 #else
     return DTWAIN_SetFileSavePos(hWndParent, szTitle, xPos, yPos, nFlags);
 #endif
@@ -1874,14 +1874,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetHalftoneW(DTWAIN_SOURCE Source, LPCWSTR lpHal
 #ifdef _UNICODE
     return DTWAIN_SetHalftone(Source, lpHalftone);
 #else
-    return DTWAIN_SetHalftone(Source, StringConversion::Convert_WidePtr_To_Native(lpHalftone).c_str());
+    return DTWAIN_SetHalftone(Source, stringconversion::Convert_WidePtr_To_Native(lpHalftone).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetHalftoneA(DTWAIN_SOURCE Source, LPCSTR lpHalftone)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetHalftone(Source, StringConversion::Convert_AnsiPtr_To_Native(lpHalftone).c_str());
+    return DTWAIN_SetHalftone(Source, stringconversion::Convert_AnsiPtr_To_Native(lpHalftone).c_str());
 #else
     return DTWAIN_SetHalftone(Source, lpHalftone);
 #endif
@@ -1890,7 +1890,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetHalftoneA(DTWAIN_SOURCE Source, LPCSTR lpHalf
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetHighlightStringA(DTWAIN_SOURCE Source, LPCSTR Highlight)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetHighlightString(Source, StringConversion::Convert_AnsiPtr_To_Native(Highlight).c_str());
+    return DTWAIN_SetHighlightString(Source, stringconversion::Convert_AnsiPtr_To_Native(Highlight).c_str());
 #else
     return DTWAIN_SetHighlightString(Source, Highlight);
 #endif
@@ -1901,7 +1901,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetHighlightStringW(DTWAIN_SOURCE Source, LPCWST
 #ifdef _UNICODE
     return DTWAIN_SetHighlightString(Source, Highlight);
 #else
-    return DTWAIN_SetHighlightString(Source, StringConversion::Convert_WidePtr_To_Native(Highlight).c_str());
+    return DTWAIN_SetHighlightString(Source, stringconversion::Convert_WidePtr_To_Native(Highlight).c_str());
 #endif
 }
 
@@ -1910,14 +1910,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFAuthorW(DTWAIN_SOURCE Source, LPCWSTR lpAu
 #ifdef _UNICODE
     return DTWAIN_SetPDFAuthor(Source, lpAuthor);
 #else
-    return DTWAIN_SetPDFAuthor(Source, StringConversion::Convert_WidePtr_To_Native(lpAuthor).c_str());
+    return DTWAIN_SetPDFAuthor(Source, stringconversion::Convert_WidePtr_To_Native(lpAuthor).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFAuthorA(DTWAIN_SOURCE Source, LPCSTR lpAuthor)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPDFAuthor(Source, StringConversion::Convert_AnsiPtr_To_Native(lpAuthor).c_str());
+    return DTWAIN_SetPDFAuthor(Source, stringconversion::Convert_AnsiPtr_To_Native(lpAuthor).c_str());
 #else
     return DTWAIN_SetPDFAuthor(Source, lpAuthor);
 #endif
@@ -1928,14 +1928,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFCreatorW(DTWAIN_SOURCE Source, LPCWSTR lpC
 #ifdef _UNICODE
     return DTWAIN_SetPDFCreator(Source, lpCreator);
 #else
-    return DTWAIN_SetPDFCreator(Source, StringConversion::Convert_WidePtr_To_Native(lpCreator).c_str());
+    return DTWAIN_SetPDFCreator(Source, stringconversion::Convert_WidePtr_To_Native(lpCreator).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFCreatorA(DTWAIN_SOURCE Source, LPCSTR lpCreator)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPDFCreator(Source, StringConversion::Convert_AnsiPtr_To_Native(lpCreator).c_str());
+    return DTWAIN_SetPDFCreator(Source, stringconversion::Convert_AnsiPtr_To_Native(lpCreator).c_str());
 #else
     return DTWAIN_SetPDFCreator(Source, lpCreator);
 #endif
@@ -1946,14 +1946,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionW(DTWAIN_SOURCE Source, DTWAIN_B
 #ifdef _UNICODE
     return DTWAIN_SetPDFEncryption(Source, bUseEncryption, lpszUser, lpszOwner, Permissions, UseStrongEncryption);
 #else
-    return DTWAIN_SetPDFEncryption(Source, bUseEncryption, StringConversion::Convert_WidePtr_To_Native(lpszUser).c_str(), StringConversion::Convert_WidePtr_To_Native(lpszOwner).c_str(), Permissions, UseStrongEncryption);
+    return DTWAIN_SetPDFEncryption(Source, bUseEncryption, stringconversion::Convert_WidePtr_To_Native(lpszUser).c_str(), stringconversion::Convert_WidePtr_To_Native(lpszOwner).c_str(), Permissions, UseStrongEncryption);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionA(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCSTR lpszUser, LPCSTR lpszOwner, DWORD Permissions, DTWAIN_BOOL UseStrongEncryption)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPDFEncryption(Source, bUseEncryption, StringConversion::Convert_AnsiPtr_To_Native(lpszUser).c_str(), StringConversion::Convert_AnsiPtr_To_Native(lpszOwner).c_str(), Permissions, UseStrongEncryption);
+    return DTWAIN_SetPDFEncryption(Source, bUseEncryption, stringconversion::Convert_AnsiPtr_To_Native(lpszUser).c_str(), stringconversion::Convert_AnsiPtr_To_Native(lpszOwner).c_str(), Permissions, UseStrongEncryption);
 #else
     return DTWAIN_SetPDFEncryption(Source, bUseEncryption, lpszUser, lpszOwner, Permissions, UseStrongEncryption);
 #endif
@@ -1962,7 +1962,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionA(DTWAIN_SOURCE Source, DTWAIN_B
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFKeywordsA(DTWAIN_SOURCE Source, LPCSTR lpKeyWords)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPDFKeywords(Source, StringConversion::Convert_AnsiPtr_To_Native(lpKeyWords).c_str());
+    return DTWAIN_SetPDFKeywords(Source, stringconversion::Convert_AnsiPtr_To_Native(lpKeyWords).c_str());
 #else
     return DTWAIN_SetPDFKeywords(Source, lpKeyWords);
 #endif
@@ -1973,14 +1973,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFKeywordsW(DTWAIN_SOURCE Source, LPCWSTR lp
 #ifdef _UNICODE
     return DTWAIN_SetPDFKeywords(Source, lpKeyWords);
 #else
-    return DTWAIN_SetPDFKeywords(Source, StringConversion::Convert_WidePtr_To_Native(lpKeyWords).c_str());
+    return DTWAIN_SetPDFKeywords(Source, stringconversion::Convert_WidePtr_To_Native(lpKeyWords).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageScaleStringA(DTWAIN_SOURCE Source, LONG nOptions, LPCSTR xScale, LPCSTR yScale)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPDFPageScaleString(Source, nOptions, StringConversion::Convert_AnsiPtr_To_Native(xScale).c_str(), StringConversion::Convert_AnsiPtr_To_Native(yScale).c_str());
+    return DTWAIN_SetPDFPageScaleString(Source, nOptions, stringconversion::Convert_AnsiPtr_To_Native(xScale).c_str(), stringconversion::Convert_AnsiPtr_To_Native(yScale).c_str());
 #else
     return DTWAIN_SetPDFPageScaleString(Source, nOptions, xScale, yScale);
 #endif
@@ -1991,14 +1991,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageScaleStringW(DTWAIN_SOURCE Source, LON
 #ifdef _UNICODE
     return DTWAIN_SetPDFPageScaleString(Source, nOptions, xScale, yScale);
 #else
-    return DTWAIN_SetPDFPageScaleString(Source, nOptions, StringConversion::Convert_WidePtr_To_Native(xScale).c_str(), StringConversion::Convert_WidePtr_To_Native(yScale).c_str());
+    return DTWAIN_SetPDFPageScaleString(Source, nOptions, stringconversion::Convert_WidePtr_To_Native(xScale).c_str(), stringconversion::Convert_WidePtr_To_Native(yScale).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageSizeStringA(DTWAIN_SOURCE Source, LONG PageSize, LPCSTR CustomWidth, LPCSTR CustomHeight)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPDFPageSizeString(Source, PageSize, StringConversion::Convert_AnsiPtr_To_Native(CustomWidth).c_str(), StringConversion::Convert_AnsiPtr_To_Native(CustomHeight).c_str());
+    return DTWAIN_SetPDFPageSizeString(Source, PageSize, stringconversion::Convert_AnsiPtr_To_Native(CustomWidth).c_str(), stringconversion::Convert_AnsiPtr_To_Native(CustomHeight).c_str());
 #else
     return DTWAIN_SetPDFPageSizeString(Source, PageSize, CustomWidth, CustomHeight);
 #endif
@@ -2009,7 +2009,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageSizeStringW(DTWAIN_SOURCE Source, LONG
 #ifdef _UNICODE
     return DTWAIN_SetPDFPageSizeString(Source, PageSize, CustomWidth, CustomHeight);
 #else
-    return DTWAIN_SetPDFPageSizeString(Source, PageSize, StringConversion::Convert_WidePtr_To_Native(CustomWidth).c_str(), StringConversion::Convert_WidePtr_To_Native(CustomHeight).c_str());
+    return DTWAIN_SetPDFPageSizeString(Source, PageSize, stringconversion::Convert_WidePtr_To_Native(CustomWidth).c_str(), stringconversion::Convert_WidePtr_To_Native(CustomHeight).c_str());
 #endif
 }
 
@@ -2018,14 +2018,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFProducerW(DTWAIN_SOURCE Source, LPCWSTR lp
 #ifdef _UNICODE
     return DTWAIN_SetPDFProducer(Source, lpProducer);
 #else
-    return DTWAIN_SetPDFProducer(Source, StringConversion::Convert_WidePtr_To_Native(lpProducer).c_str());
+    return DTWAIN_SetPDFProducer(Source, stringconversion::Convert_WidePtr_To_Native(lpProducer).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFProducerA(DTWAIN_SOURCE Source, LPCSTR lpProducer)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPDFProducer(Source, StringConversion::Convert_AnsiPtr_To_Native(lpProducer).c_str());
+    return DTWAIN_SetPDFProducer(Source, stringconversion::Convert_AnsiPtr_To_Native(lpProducer).c_str());
 #else
     return DTWAIN_SetPDFProducer(Source, lpProducer);
 #endif
@@ -2034,7 +2034,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFProducerA(DTWAIN_SOURCE Source, LPCSTR lpP
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFSubjectA(DTWAIN_SOURCE Source, LPCSTR lpSubject)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPDFSubject(Source, StringConversion::Convert_AnsiPtr_To_Native(lpSubject).c_str());
+    return DTWAIN_SetPDFSubject(Source, stringconversion::Convert_AnsiPtr_To_Native(lpSubject).c_str());
 #else
     return DTWAIN_SetPDFSubject(Source, lpSubject);
 #endif
@@ -2045,7 +2045,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFSubjectW(DTWAIN_SOURCE Source, LPCWSTR lpS
 #ifdef _UNICODE
     return DTWAIN_SetPDFSubject(Source, lpSubject);
 #else
-    return DTWAIN_SetPDFSubject(Source, StringConversion::Convert_WidePtr_To_Native(lpSubject).c_str());
+    return DTWAIN_SetPDFSubject(Source, stringconversion::Convert_WidePtr_To_Native(lpSubject).c_str());
 #endif
 }
 
@@ -2054,14 +2054,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTitleW(DTWAIN_SOURCE Source, LPCWSTR lpTit
 #ifdef _UNICODE
     return DTWAIN_SetPDFTitle(Source, lpTitle);
 #else
-    return DTWAIN_SetPDFTitle(Source, StringConversion::Convert_WidePtr_To_Native(lpTitle).c_str());
+    return DTWAIN_SetPDFTitle(Source, stringconversion::Convert_WidePtr_To_Native(lpTitle).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTitleA(DTWAIN_SOURCE Source, LPCSTR lpTitle)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPDFTitle(Source, StringConversion::Convert_AnsiPtr_To_Native(lpTitle).c_str());
+    return DTWAIN_SetPDFTitle(Source, stringconversion::Convert_AnsiPtr_To_Native(lpTitle).c_str());
 #else
     return DTWAIN_SetPDFTitle(Source, lpTitle);
 #endif
@@ -2072,14 +2072,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPostScriptTitleW(DTWAIN_SOURCE Source, LPCWST
 #ifdef _UNICODE
     return DTWAIN_SetPostScriptTitle(Source, szTitle);
 #else
-    return DTWAIN_SetPostScriptTitle(Source, StringConversion::Convert_WidePtr_To_Native(szTitle).c_str());
+    return DTWAIN_SetPostScriptTitle(Source, stringconversion::Convert_WidePtr_To_Native(szTitle).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPostScriptTitleA(DTWAIN_SOURCE Source, LPCSTR szTitle)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPostScriptTitle(Source, StringConversion::Convert_AnsiPtr_To_Native(szTitle).c_str());
+    return DTWAIN_SetPostScriptTitle(Source, stringconversion::Convert_AnsiPtr_To_Native(szTitle).c_str());
 #else
     return DTWAIN_SetPostScriptTitle(Source, szTitle);
 #endif
@@ -2090,14 +2090,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterSuffixStringW(DTWAIN_SOURCE Source, LP
 #ifdef _UNICODE
     return DTWAIN_SetPrinterSuffixString(Source, Suffix);
 #else
-    return DTWAIN_SetPrinterSuffixString(Source, StringConversion::Convert_WidePtr_To_Native(Suffix).c_str());
+    return DTWAIN_SetPrinterSuffixString(Source, stringconversion::Convert_WidePtr_To_Native(Suffix).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterSuffixStringA(DTWAIN_SOURCE Source, LPCSTR Suffix)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPrinterSuffixString(Source, StringConversion::Convert_AnsiPtr_To_Native(Suffix).c_str());
+    return DTWAIN_SetPrinterSuffixString(Source, stringconversion::Convert_AnsiPtr_To_Native(Suffix).c_str());
 #else
     return DTWAIN_SetPrinterSuffixString(Source, Suffix);
 #endif
@@ -2108,14 +2108,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResolutionStringW(DTWAIN_SOURCE Source, LPCWS
 #ifdef _UNICODE
     return DTWAIN_SetResolutionString(Source, Resolution);
 #else
-    return DTWAIN_SetResolutionString(Source, StringConversion::Convert_WidePtr_To_Native(Resolution).c_str());
+    return DTWAIN_SetResolutionString(Source, stringconversion::Convert_WidePtr_To_Native(Resolution).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResolutionStringA(DTWAIN_SOURCE Source, LPCSTR Resolution)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetResolutionString(Source, StringConversion::Convert_AnsiPtr_To_Native(Resolution).c_str());
+    return DTWAIN_SetResolutionString(Source, stringconversion::Convert_AnsiPtr_To_Native(Resolution).c_str());
 #else
     return DTWAIN_SetResolutionString(Source, Resolution);
 #endif
@@ -2124,7 +2124,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResolutionStringA(DTWAIN_SOURCE Source, LPCST
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetRotationStringA(DTWAIN_SOURCE Source, LPCSTR Rotation)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetRotationString(Source, StringConversion::Convert_AnsiPtr_To_Native(Rotation).c_str());
+    return DTWAIN_SetRotationString(Source, stringconversion::Convert_AnsiPtr_To_Native(Rotation).c_str());
 #else
     return DTWAIN_SetRotationString(Source, Rotation);
 #endif
@@ -2135,7 +2135,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetRotationStringW(DTWAIN_SOURCE Source, LPCWSTR
 #ifdef _UNICODE
     return DTWAIN_SetRotationString(Source, Rotation);
 #else
-    return DTWAIN_SetRotationString(Source, StringConversion::Convert_WidePtr_To_Native(Rotation).c_str());
+    return DTWAIN_SetRotationString(Source, stringconversion::Convert_WidePtr_To_Native(Rotation).c_str());
 #endif
 }
 
@@ -2144,14 +2144,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetSaveFileNameW(DTWAIN_SOURCE Source, LPCWSTR f
 #ifdef _UNICODE
     return DTWAIN_SetSaveFileName(Source, fName);
 #else
-    return DTWAIN_SetSaveFileName(Source, StringConversion::Convert_WidePtr_To_Native(fName).c_str());
+    return DTWAIN_SetSaveFileName(Source, stringconversion::Convert_WidePtr_To_Native(fName).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetSaveFileNameA(DTWAIN_SOURCE Source, LPCSTR fName)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetSaveFileName(Source, StringConversion::Convert_AnsiPtr_To_Native(fName).c_str());
+    return DTWAIN_SetSaveFileName(Source, stringconversion::Convert_AnsiPtr_To_Native(fName).c_str());
 #else
     return DTWAIN_SetSaveFileName(Source, fName);
 #endif
@@ -2160,7 +2160,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetSaveFileNameA(DTWAIN_SOURCE Source, LPCSTR fN
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetShadowStringA(DTWAIN_SOURCE Source, LPCSTR Shadow)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetShadowString(Source, StringConversion::Convert_AnsiPtr_To_Native(Shadow).c_str());
+    return DTWAIN_SetShadowString(Source, stringconversion::Convert_AnsiPtr_To_Native(Shadow).c_str());
 #else
     return DTWAIN_SetShadowString(Source, Shadow);
 #endif
@@ -2171,7 +2171,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetShadowStringW(DTWAIN_SOURCE Source, LPCWSTR S
 #ifdef _UNICODE
     return DTWAIN_SetShadowString(Source, Shadow);
 #else
-    return DTWAIN_SetShadowString(Source, StringConversion::Convert_WidePtr_To_Native(Shadow).c_str());
+    return DTWAIN_SetShadowString(Source, stringconversion::Convert_WidePtr_To_Native(Shadow).c_str());
 #endif
 }
 
@@ -2180,14 +2180,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryW(LPCWSTR szFilePath)
 #ifdef _UNICODE
     return DTWAIN_SetTempFileDirectory(szFilePath);
 #else
-    return DTWAIN_SetTempFileDirectory(StringConversion::Convert_WidePtr_To_Native(szFilePath).c_str());
+    return DTWAIN_SetTempFileDirectory(stringconversion::Convert_WidePtr_To_Native(szFilePath).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryA(LPCSTR szFilePath)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetTempFileDirectory(StringConversion::Convert_AnsiPtr_To_Native(szFilePath).c_str());
+    return DTWAIN_SetTempFileDirectory(stringconversion::Convert_AnsiPtr_To_Native(szFilePath).c_str());
 #else
     return DTWAIN_SetTempFileDirectory(szFilePath);
 #endif
@@ -2198,16 +2198,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderExW(LPCWSTR szFilePath, LPCWSTR
 #ifdef _UNICODE
     return DTWAIN_SetDSMSearchOrderEx(szFilePath, szUserPath);
 #else
-    return DTWAIN_SetDSMSearchOrderEx(StringConversion::Convert_WidePtr_To_Native(szFilePath).c_str(),
-                                      szUserPath?StringConversion::Convert_WidePtr_To_Native(szUserPath).c_str():nullptr);
+    return DTWAIN_SetDSMSearchOrderEx(stringconversion::Convert_WidePtr_To_Native(szFilePath).c_str(),
+                                      szUserPath?stringconversion::Convert_WidePtr_To_Native(szUserPath).c_str():nullptr);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderExA(LPCSTR szFilePath, LPCSTR szUserPath)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetDSMSearchOrderEx(StringConversion::Convert_AnsiPtr_To_Native(szFilePath).c_str(),
-                                      szUserPath ? StringConversion::Convert_AnsiPtr_To_Native(szUserPath).c_str() : nullptr);
+    return DTWAIN_SetDSMSearchOrderEx(stringconversion::Convert_AnsiPtr_To_Native(szFilePath).c_str(),
+                                      szUserPath ? stringconversion::Convert_AnsiPtr_To_Native(szUserPath).c_str() : nullptr);
 #else
     return DTWAIN_SetDSMSearchOrderEx(szFilePath, szUserPath);
 #endif
@@ -2218,14 +2218,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePathW(LPCWSTR szFilePath)
 #ifdef _UNICODE
     return DTWAIN_SetResourcePath(szFilePath);
 #else
-    return DTWAIN_SetResourcePath(StringConversion::Convert_WidePtr_To_Native(szFilePath).c_str());
+    return DTWAIN_SetResourcePath(stringconversion::Convert_WidePtr_To_Native(szFilePath).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePathA(LPCSTR szFilePath)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetResourcePath(StringConversion::Convert_AnsiPtr_To_Native(szFilePath).c_str());
+    return DTWAIN_SetResourcePath(stringconversion::Convert_AnsiPtr_To_Native(szFilePath).c_str());
 #else
     return DTWAIN_SetResourcePath(szFilePath);
 #endif
@@ -2234,7 +2234,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePathA(LPCSTR szFilePath)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetThresholdStringA(DTWAIN_SOURCE Source, LPCSTR Threshold, DTWAIN_BOOL bSetBitDepthReduction)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetThresholdString(Source, StringConversion::Convert_AnsiPtr_To_Native(Threshold).c_str(), bSetBitDepthReduction);
+    return DTWAIN_SetThresholdString(Source, stringconversion::Convert_AnsiPtr_To_Native(Threshold).c_str(), bSetBitDepthReduction);
 #else
     return DTWAIN_SetThresholdString(Source, Threshold, bSetBitDepthReduction);
 #endif
@@ -2245,14 +2245,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetThresholdStringW(DTWAIN_SOURCE Source, LPCWST
 #ifdef _UNICODE
     return DTWAIN_SetThresholdString(Source, Threshold, bSetBitDepthReduction);
 #else
-    return DTWAIN_SetThresholdString(Source, StringConversion::Convert_WidePtr_To_Native(Threshold).c_str(), bSetBitDepthReduction);
+    return DTWAIN_SetThresholdString(Source, stringconversion::Convert_WidePtr_To_Native(Threshold).c_str(), bSetBitDepthReduction);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetTwainLog(LogFlags, StringConversion::Convert_AnsiPtr_To_Native(lpszLogFile).c_str());
+    return DTWAIN_SetTwainLog(LogFlags, stringconversion::Convert_AnsiPtr_To_Native(lpszLogFile).c_str());
 #else
     return DTWAIN_SetTwainLog(LogFlags, lpszLogFile);
 #endif
@@ -2263,7 +2263,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile
 #ifdef _UNICODE
     return DTWAIN_SetTwainLog(LogFlags, lpszLogFile);
 #else
-    return DTWAIN_SetTwainLog(LogFlags, StringConversion::Convert_WidePtr_To_Native(lpszLogFile).c_str());
+    return DTWAIN_SetTwainLog(LogFlags, stringconversion::Convert_WidePtr_To_Native(lpszLogFile).c_str());
 #endif
 }
 
@@ -2272,14 +2272,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetXResolutionStringW(DTWAIN_SOURCE Source, LPCW
 #ifdef _UNICODE
     return DTWAIN_SetXResolutionString(Source, Resolution);
 #else
-    return DTWAIN_SetXResolutionString(Source, StringConversion::Convert_WidePtr_To_Native(Resolution).c_str());
+    return DTWAIN_SetXResolutionString(Source, stringconversion::Convert_WidePtr_To_Native(Resolution).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetXResolutionStringA(DTWAIN_SOURCE Source, LPCSTR Resolution)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetXResolutionString(Source, StringConversion::Convert_AnsiPtr_To_Native(Resolution).c_str());
+    return DTWAIN_SetXResolutionString(Source, stringconversion::Convert_AnsiPtr_To_Native(Resolution).c_str());
 #else
     return DTWAIN_SetXResolutionString(Source, Resolution);
 #endif
@@ -2290,14 +2290,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetYResolutionStringW(DTWAIN_SOURCE Source, LPCW
 #ifdef _UNICODE
     return DTWAIN_SetYResolutionString(Source, Resolution);
 #else
-    return DTWAIN_SetYResolutionString(Source, StringConversion::Convert_WidePtr_To_Native(Resolution).c_str());
+    return DTWAIN_SetYResolutionString(Source, stringconversion::Convert_WidePtr_To_Native(Resolution).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetYResolutionStringA(DTWAIN_SOURCE Source, LPCSTR Resolution)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetYResolutionString(Source, StringConversion::Convert_AnsiPtr_To_Native(Resolution).c_str());
+    return DTWAIN_SetYResolutionString(Source, stringconversion::Convert_AnsiPtr_To_Native(Resolution).c_str());
 #else
     return DTWAIN_SetYResolutionString(Source, Resolution);
 #endif
@@ -2308,14 +2308,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLL
 #ifdef _UNICODE
     return DTWAIN_StartTwainSession(hWndMsg, lpszDLLName);
 #else
-    return DTWAIN_StartTwainSession(hWndMsg, StringConversion::Convert_WidePtr_To_Native(lpszDLLName).c_str());
+    return DTWAIN_StartTwainSession(hWndMsg, stringconversion::Convert_WidePtr_To_Native(lpszDLLName).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSessionA(HWND hWndMsg, LPCSTR lpszDLLName)
 {
 #ifdef _UNICODE
-    return DTWAIN_StartTwainSession(hWndMsg, StringConversion::Convert_AnsiPtr_To_Native(lpszDLLName).c_str());
+    return DTWAIN_StartTwainSession(hWndMsg, stringconversion::Convert_AnsiPtr_To_Native(lpszDLLName).c_str());
 #else
     return DTWAIN_StartTwainSession(hWndMsg, lpszDLLName);
 #endif
@@ -2324,7 +2324,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSessionA(HWND hWndMsg, LPCSTR lpszDLLN
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeExA(LPCSTR szINIPath)
 {
 #ifdef _UNICODE
-    return DTWAIN_SysInitializeEx(StringConversion::Convert_AnsiPtr_To_Native(szINIPath).c_str());
+    return DTWAIN_SysInitializeEx(stringconversion::Convert_AnsiPtr_To_Native(szINIPath).c_str());
 #else
     return DTWAIN_SysInitializeEx(szINIPath);
 #endif
@@ -2335,7 +2335,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeExW(LPCWSTR szINIPath)
 #ifdef _UNICODE
     return DTWAIN_SysInitializeEx(szINIPath);
 #else
-    return DTWAIN_SysInitializeEx(StringConversion::Convert_WidePtr_To_Native(szINIPath).c_str());
+    return DTWAIN_SysInitializeEx(stringconversion::Convert_WidePtr_To_Native(szINIPath).c_str());
 #endif
 }
 
@@ -2344,14 +2344,14 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR s
 #ifdef _UNICODE
     return DTWAIN_SysInitializeEx2(szINIPath, szImageDLLPath, szLangResourcePath);
 #else
-    return DTWAIN_SysInitializeEx2(StringConversion::Convert_WidePtr_To_Native(szINIPath).c_str(), StringConversion::Convert_WidePtr_To_Native(szImageDLLPath).c_str(), StringConversion::Convert_WidePtr_To_Native(szLangResourcePath).c_str());
+    return DTWAIN_SysInitializeEx2(stringconversion::Convert_WidePtr_To_Native(szINIPath).c_str(), stringconversion::Convert_WidePtr_To_Native(szImageDLLPath).c_str(), stringconversion::Convert_WidePtr_To_Native(szLangResourcePath).c_str());
 #endif
 }
 
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath)
 {
 #ifdef _UNICODE
-    return DTWAIN_SysInitializeEx2(StringConversion::Convert_AnsiPtr_To_Native(szINIPath).c_str(), StringConversion::Convert_AnsiPtr_To_Native(szImageDLLPath).c_str(), StringConversion::Convert_AnsiPtr_To_Native(szLangResourcePath).c_str());
+    return DTWAIN_SysInitializeEx2(stringconversion::Convert_AnsiPtr_To_Native(szINIPath).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szImageDLLPath).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szLangResourcePath).c_str());
 #else
     return DTWAIN_SysInitializeEx2(szINIPath, szImageDLLPath, szLangResourcePath);
 #endif
@@ -2362,14 +2362,14 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibExW(HINSTANCE hInstance, LPCWS
 #ifdef _UNICODE
     return DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
 #else
-    return DTWAIN_SysInitializeLibEx(hInstance, StringConversion::Convert_WidePtr_To_Native(szINIPath).c_str());
+    return DTWAIN_SysInitializeLibEx(hInstance, stringconversion::Convert_WidePtr_To_Native(szINIPath).c_str());
 #endif
 }
 
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibExA(HINSTANCE hInstance, LPCSTR szINIPath)
 {
 #ifdef _UNICODE
-    return DTWAIN_SysInitializeLibEx(hInstance, StringConversion::Convert_AnsiPtr_To_Native(szINIPath).c_str());
+    return DTWAIN_SysInitializeLibEx(hInstance, stringconversion::Convert_AnsiPtr_To_Native(szINIPath).c_str());
 #else
     return DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
 #endif
@@ -2380,14 +2380,14 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx2W(HINSTANCE hInstance, LPCW
 #ifdef _UNICODE
     return DTWAIN_SysInitializeLibEx2(hInstance, szINIPath, szImageDLLPath, szLangResourcePath);
 #else
-    return DTWAIN_SysInitializeLibEx2(hInstance, StringConversion::Convert_WidePtr_To_Native(szINIPath).c_str(), StringConversion::Convert_WidePtr_To_Native(szImageDLLPath).c_str(), StringConversion::Convert_WidePtr_To_Native(szLangResourcePath).c_str());
+    return DTWAIN_SysInitializeLibEx2(hInstance, stringconversion::Convert_WidePtr_To_Native(szINIPath).c_str(), stringconversion::Convert_WidePtr_To_Native(szImageDLLPath).c_str(), stringconversion::Convert_WidePtr_To_Native(szLangResourcePath).c_str());
 #endif
 }
 
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx2A(HINSTANCE hInstance, LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath)
 {
 #ifdef _UNICODE
-    return DTWAIN_SysInitializeLibEx2(hInstance, StringConversion::Convert_AnsiPtr_To_Native(szINIPath).c_str(), StringConversion::Convert_AnsiPtr_To_Native(szImageDLLPath).c_str(), StringConversion::Convert_AnsiPtr_To_Native(szLangResourcePath).c_str());
+    return DTWAIN_SysInitializeLibEx2(hInstance, stringconversion::Convert_AnsiPtr_To_Native(szINIPath).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szImageDLLPath).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szLangResourcePath).c_str());
 #else
     return DTWAIN_SysInitializeLibEx2(hInstance, szINIPath, szImageDLLPath, szLangResourcePath);
 #endif
@@ -2396,7 +2396,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx2A(HINSTANCE hInstance, LPCS
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoubleFeedDetectLengthStringA(DTWAIN_SOURCE Source, LPCSTR szLength)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetDoubleFeedDetectLengthString(Source, StringConversion::Convert_AnsiPtr_To_Native(szLength).c_str());
+    return DTWAIN_SetDoubleFeedDetectLengthString(Source, stringconversion::Convert_AnsiPtr_To_Native(szLength).c_str());
 #else
     return DTWAIN_SetDoubleFeedDetectLengthString(Source, szLength);
 #endif
@@ -2407,7 +2407,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoubleFeedDetectLengthStringW(DTWAIN_SOURCE S
 #ifdef _UNICODE
     return DTWAIN_SetDoubleFeedDetectLengthString(Source, szLength);
 #else
-    return DTWAIN_SetDoubleFeedDetectLengthString(Source, StringConversion::Convert_WidePtr_To_Native(szLength).c_str());
+    return DTWAIN_SetDoubleFeedDetectLengthString(Source, stringconversion::Convert_WidePtr_To_Native(szLength).c_str());
 #endif
 }
 
@@ -2416,14 +2416,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT T
 #ifdef _UNICODE
     return DTWAIN_SetPDFTextElementString(TextElement, szString, Flags);
 #else
-    return DTWAIN_SetPDFTextElementString(TextElement, StringConversion::Convert_WidePtr_To_Native(szString).c_str(), Flags);
+    return DTWAIN_SetPDFTextElementString(TextElement, stringconversion::Convert_WidePtr_To_Native(szString).c_str(), Flags);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPCSTR szString, LONG Flags)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetPDFTextElementString(TextElement, StringConversion::Convert_AnsiPtr_To_Native(szString).c_str(), Flags);
+    return DTWAIN_SetPDFTextElementString(TextElement, stringconversion::Convert_AnsiPtr_To_Native(szString).c_str(), Flags);
 #else
     return DTWAIN_SetPDFTextElementString(TextElement, szString, Flags);
 #endif
@@ -2473,11 +2473,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAllFloatStringW(DTWAIN_RANGE pArray, LPC
     return DTWAIN_RangeSetAllFloatString(pArray, dLow, dUp, dStep, dDefault, dCurrent);
 #else
     return DTWAIN_RangeSetAllFloatString(pArray,
-                                         StringConversion::Convert_WidePtr_To_Native(dLow).c_str(),
-                                         StringConversion::Convert_WidePtr_To_Native(dUp).c_str(),
-                                         StringConversion::Convert_WidePtr_To_Native(dStep).c_str(),
-                                         StringConversion::Convert_WidePtr_To_Native(dDefault).c_str(),
-                                         StringConversion::Convert_WidePtr_To_Native(dCurrent).c_str());
+                                         stringconversion::Convert_WidePtr_To_Native(dLow).c_str(),
+                                         stringconversion::Convert_WidePtr_To_Native(dUp).c_str(),
+                                         stringconversion::Convert_WidePtr_To_Native(dStep).c_str(),
+                                         stringconversion::Convert_WidePtr_To_Native(dDefault).c_str(),
+                                         stringconversion::Convert_WidePtr_To_Native(dCurrent).c_str());
 #endif
 }
 
@@ -2489,11 +2489,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAllFloatStringA(DTWAIN_RANGE pArray, LPC
 {
 #ifdef _UNICODE
     return DTWAIN_RangeSetAllFloatString(pArray,
-                                         StringConversion::Convert_AnsiPtr_To_Native(dLow).c_str(),
-                                         StringConversion::Convert_AnsiPtr_To_Native(dUp).c_str(),
-                                         StringConversion::Convert_AnsiPtr_To_Native(dStep).c_str(),
-                                         StringConversion::Convert_AnsiPtr_To_Native(dDefault).c_str(),
-                                         StringConversion::Convert_AnsiPtr_To_Native(dCurrent).c_str());
+                                         stringconversion::Convert_AnsiPtr_To_Native(dLow).c_str(),
+                                         stringconversion::Convert_AnsiPtr_To_Native(dUp).c_str(),
+                                         stringconversion::Convert_AnsiPtr_To_Native(dStep).c_str(),
+                                         stringconversion::Convert_AnsiPtr_To_Native(dDefault).c_str(),
+                                         stringconversion::Convert_AnsiPtr_To_Native(dCurrent).c_str());
 #else
     return DTWAIN_RangeSetAllFloatString(pArray, dLow, dUp, dStep, dDefault, dCurrent);
 #endif
@@ -2504,7 +2504,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValueFloatStringW(DTWAIN_RANGE pArray, L
 #ifdef _UNICODE
     return DTWAIN_RangeSetValueFloatString(pArray, nWhich, dValue);
 #else
-    return DTWAIN_RangeSetValueFloatString(pArray, nWhich, StringConversion::Convert_WidePtr_To_Native(dValue).c_str());
+    return DTWAIN_RangeSetValueFloatString(pArray, nWhich, stringconversion::Convert_WidePtr_To_Native(dValue).c_str());
 #endif
 }
 
@@ -2512,7 +2512,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValueFloatStringW(DTWAIN_RANGE pArray, L
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValueFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue)
 {
 #ifdef _UNICODE
-    return DTWAIN_RangeSetValueFloatString(pArray, nWhich, StringConversion::Convert_AnsiPtr_To_Native(dValue).c_str());
+    return DTWAIN_RangeSetValueFloatString(pArray, nWhich, stringconversion::Convert_AnsiPtr_To_Native(dValue).c_str());
 #else
     return DTWAIN_RangeSetValueFloatString(pArray, nWhich, dValue);
 #endif
@@ -2525,7 +2525,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValueFloatStringW(DTWAIN_RANGE pA
 #else
     std::string arg(128, 0);
     DTWAIN_BOOL retVal = DTWAIN_RangeGetNearestValueFloatString(pArray,
-                                               StringConversion::Convert_WidePtr_To_Native(dIn).c_str(),
+                                               stringconversion::Convert_WidePtr_To_Native(dIn).c_str(),
                                                &arg[0], RoundType);
     return null_terminator_copier(get_view(arg), dOut, retVal);
 #endif
@@ -2536,7 +2536,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValueFloatStringA(DTWAIN_RANGE pA
 #ifdef _UNICODE
     std::wstring arg(128, 0);
     const DTWAIN_BOOL retVal = DTWAIN_RangeGetNearestValueFloatString(pArray,
-                                                                   StringConversion::Convert_AnsiPtr_To_Native(dIn).c_str(),
+                                                                   stringconversion::Convert_AnsiPtr_To_Native(dIn).c_str(),
                                                                    &arg[0], RoundType);
     return null_terminator_copier(get_view(arg), dOut, retVal);
 #else
@@ -2572,7 +2572,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPosFloatStringW(DTWAIN_RANGE pArray, LPC
     return DTWAIN_RangeGetPosFloatString(pArray, Val, pPos);
 #else
     return DTWAIN_RangeGetPosFloatString(pArray, 
-                                         StringConversion::Convert_WidePtr_To_Native(Val).c_str(),
+                                         stringconversion::Convert_WidePtr_To_Native(Val).c_str(),
                                          pPos);
 #endif
 }
@@ -2581,7 +2581,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPosFloatStringA(DTWAIN_RANGE pArray, LPC
 {
 #ifdef _UNICODE
     return DTWAIN_RangeGetPosFloatString(pArray, 
-                                         StringConversion::Convert_AnsiPtr_To_Native(Val).c_str(),
+                                         stringconversion::Convert_AnsiPtr_To_Native(Val).c_str(),
                                          pPos);
 #else
     return DTWAIN_RangeGetPosFloatString(pArray, Val, pPos);
@@ -2615,14 +2615,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValueStringW(DTWAIN_FRAME Frame, LONG nW
 #ifdef _UNICODE
     return DTWAIN_FrameSetValueString(Frame, nWhich, Value);
 #else
-    return DTWAIN_FrameSetValueString(Frame, nWhich, StringConversion::Convert_WidePtr_To_Native(Value).c_str());
+    return DTWAIN_FrameSetValueString(Frame, nWhich, stringconversion::Convert_WidePtr_To_Native(Value).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValueStringA(DTWAIN_FRAME Frame, LONG nWhich, LPCSTR Value)
 {
 #ifdef _UNICODE
-    return DTWAIN_FrameSetValueString(Frame, nWhich, StringConversion::Convert_AnsiPtr_To_Native(Value).c_str());
+    return DTWAIN_FrameSetValueString(Frame, nWhich, stringconversion::Convert_AnsiPtr_To_Native(Value).c_str());
 #else
     return DTWAIN_FrameSetValueString(Frame, nWhich, Value);
 #endif
@@ -2634,10 +2634,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllStringW(DTWAIN_FRAME Frame, LPCWSTR L
     return DTWAIN_FrameSetAllString(Frame, Left, Top, Right, Bottom);
 #else
     return DTWAIN_FrameSetAllString(Frame,
-                                    StringConversion::Convert_WidePtr_To_Native(Left).c_str(),
-                                    StringConversion::Convert_WidePtr_To_Native(Top).c_str(),
-                                    StringConversion::Convert_WidePtr_To_Native(Right).c_str(),
-                                    StringConversion::Convert_WidePtr_To_Native(Bottom).c_str());
+                                    stringconversion::Convert_WidePtr_To_Native(Left).c_str(),
+                                    stringconversion::Convert_WidePtr_To_Native(Top).c_str(),
+                                    stringconversion::Convert_WidePtr_To_Native(Right).c_str(),
+                                    stringconversion::Convert_WidePtr_To_Native(Bottom).c_str());
 #endif
 }
 
@@ -2645,10 +2645,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllStringA(DTWAIN_FRAME Frame, LPCSTR Le
 {
 #ifdef _UNICODE
     return DTWAIN_FrameSetAllString(Frame,
-                                    StringConversion::Convert_AnsiPtr_To_Native(Left).c_str(),
-                                    StringConversion::Convert_AnsiPtr_To_Native(Top).c_str(),
-                                    StringConversion::Convert_AnsiPtr_To_Native(Right).c_str(),
-                                    StringConversion::Convert_AnsiPtr_To_Native(Bottom).c_str());
+                                    stringconversion::Convert_AnsiPtr_To_Native(Left).c_str(),
+                                    stringconversion::Convert_AnsiPtr_To_Native(Top).c_str(),
+                                    stringconversion::Convert_AnsiPtr_To_Native(Right).c_str(),
+                                    stringconversion::Convert_AnsiPtr_To_Native(Bottom).c_str());
 #else
     return DTWAIN_FrameSetAllString(Frame, Left, Top, Right, Bottom);
 #endif
@@ -2710,20 +2710,20 @@ DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreateStringW(LPCWSTR Left, LPCWSTR Top, L
 #ifdef _UNICODE
     return DTWAIN_FrameCreateString(Left, Top, Right, Bottom);
 #else
-    return DTWAIN_FrameCreateString(StringConversion::Convert_WidePtr_To_Native(Left).c_str(),
-                                    StringConversion::Convert_WidePtr_To_Native(Top).c_str(),
-                                    StringConversion::Convert_WidePtr_To_Native(Right).c_str(),
-                                    StringConversion::Convert_WidePtr_To_Native(Bottom).c_str());
+    return DTWAIN_FrameCreateString(stringconversion::Convert_WidePtr_To_Native(Left).c_str(),
+                                    stringconversion::Convert_WidePtr_To_Native(Top).c_str(),
+                                    stringconversion::Convert_WidePtr_To_Native(Right).c_str(),
+                                    stringconversion::Convert_WidePtr_To_Native(Bottom).c_str());
 #endif
 }
 
 DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreateStringA(LPCSTR Left, LPCSTR Top, LPCSTR Right, LPCSTR Bottom)
 {
 #ifdef _UNICODE
-    return DTWAIN_FrameCreateString(StringConversion::Convert_AnsiPtr_To_Native(Left).c_str(),
-                                    StringConversion::Convert_AnsiPtr_To_Native(Top).c_str(),
-                                    StringConversion::Convert_AnsiPtr_To_Native(Right).c_str(),
-                                    StringConversion::Convert_AnsiPtr_To_Native(Bottom).c_str());
+    return DTWAIN_FrameCreateString(stringconversion::Convert_AnsiPtr_To_Native(Left).c_str(),
+                                    stringconversion::Convert_AnsiPtr_To_Native(Top).c_str(),
+                                    stringconversion::Convert_AnsiPtr_To_Native(Right).c_str(),
+                                    stringconversion::Convert_AnsiPtr_To_Native(Bottom).c_str());
 #else
     return DTWAIN_FrameCreateString(Left, Top, Right, Bottom);
 #endif
@@ -2800,7 +2800,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsA(LPCSTR lpszSources, LPSTR lpszBuf, LO
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetSourceDetails(StringConversion::Convert_AnsiPtr_To_Native(lpszSources).c_str(),
+    const LONG retVal = DTWAIN_GetSourceDetails(stringconversion::Convert_AnsiPtr_To_Native(lpszSources).c_str(),
                                                 (nLength > 0 && lpszBuf) ? &args[0] : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
     return null_terminator_copier(get_view(args), lpszBuf, retVal);
 #else
@@ -2814,7 +2814,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsW(LPCWSTR lpszSources, LPWSTR lpszBuf, 
     return DTWAIN_GetSourceDetails(lpszSources, lpszBuf, nLength, indentFactor, bRefresh);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetSourceDetails(StringConversion::Convert_WidePtr_To_Ansi(lpszSources).c_str(),
+    const LONG retVal = DTWAIN_GetSourceDetails(basicstringutils::Narrow(lpszSources).c_str(),
                                                 (nLength > 0 && lpszBuf) ? &args[0] : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
     return null_terminator_copier(get_view(args), lpszBuf, retVal);
 #endif
@@ -2845,7 +2845,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionCopyrightW(LPWSTR lpszApp, LONG nLength)
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2A(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos, LONG nOptions)
 {
 #ifdef _UNICODE
-    return DTWAIN_SelectOCREngine2(hWndParent, szTitle ? StringConversion::Convert_AnsiPtr_To_Native(szTitle).c_str() : nullptr, xPos, yPos, nOptions);
+    return DTWAIN_SelectOCREngine2(hWndParent, szTitle ? stringconversion::Convert_AnsiPtr_To_Native(szTitle).c_str() : nullptr, xPos, yPos, nOptions);
 #else
     return DTWAIN_SelectOCREngine2(hWndParent, szTitle, xPos, yPos, nOptions);
 #endif
@@ -2857,7 +2857,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2W(HWND hWndParent, LPCWSTR 
     return DTWAIN_SelectOCREngine2(hWndParent, szTitle, xPos, yPos, nOptions);
 #else
     return DTWAIN_SelectOCREngine2(hWndParent, 
-                                szTitle?StringConversion::Convert_WidePtr_To_Native(szTitle).c_str():NULL, xPos, yPos, nOptions);
+                                szTitle?stringconversion::Convert_WidePtr_To_Native(szTitle).c_str():NULL, xPos, yPos, nOptions);
 #endif
 }
 
@@ -2866,10 +2866,10 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2ExA(HWND hWndParent, LPCSTR
 {
 #ifdef _UNICODE
     return DTWAIN_SelectOCREngine2Ex(hWndParent,
-        szTitle ? StringConversion::Convert_AnsiPtr_To_Native(szTitle).c_str() : nullptr, xPos, yPos,
-        szIncludeNames ? StringConversion::Convert_AnsiPtr_To_Native(szIncludeNames).c_str() : nullptr,
-        szExcludeNames ? StringConversion::Convert_AnsiPtr_To_Native(szExcludeNames).c_str() : nullptr,
-        szNameMapping ? StringConversion::Convert_AnsiPtr_To_Native(szNameMapping).c_str() : nullptr,
+        szTitle ? stringconversion::Convert_AnsiPtr_To_Native(szTitle).c_str() : nullptr, xPos, yPos,
+        szIncludeNames ? stringconversion::Convert_AnsiPtr_To_Native(szIncludeNames).c_str() : nullptr,
+        szExcludeNames ? stringconversion::Convert_AnsiPtr_To_Native(szExcludeNames).c_str() : nullptr,
+        szNameMapping ? stringconversion::Convert_AnsiPtr_To_Native(szNameMapping).c_str() : nullptr,
         nOptions);
 #else
     return DTWAIN_SelectOCREngine2Ex(hWndParent, szTitle, xPos, yPos, szIncludeNames, szExcludeNames, szNameMapping, nOptions);
@@ -2882,11 +2882,11 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectOCREngine2ExW(HWND hWndParent, LPCWSTR s
     return DTWAIN_SelectOCREngine2Ex(hWndParent, szTitle, xPos, yPos, szIncludeNames, szExcludeNames, szNameMapping, nOptions);
 #else
     return DTWAIN_SelectOCREngine2Ex(hWndParent,
-        szTitle ? StringConversion::Convert_WidePtr_To_Native(szTitle).c_str() : NULL,
+        szTitle ? stringconversion::Convert_WidePtr_To_Native(szTitle).c_str() : NULL,
         xPos, yPos,
-        szIncludeNames ? StringConversion::Convert_WidePtr_To_Native(szIncludeNames).c_str() : NULL,
-        szExcludeNames ? StringConversion::Convert_WidePtr_To_Native(szExcludeNames).c_str() : NULL,
-        szNameMapping ? StringConversion::Convert_WidePtr_To_Native(szNameMapping).c_str() : NULL,
+        szIncludeNames ? stringconversion::Convert_WidePtr_To_Native(szIncludeNames).c_str() : NULL,
+        szExcludeNames ? stringconversion::Convert_WidePtr_To_Native(szExcludeNames).c_str() : NULL,
+        szNameMapping ? stringconversion::Convert_WidePtr_To_Native(szNameMapping).c_str() : NULL,
         nOptions);
 #endif
 }
@@ -2896,14 +2896,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExW(LPCWSTR sLangDLL, DTWAIN
 #ifdef _UNICODE
     return DTWAIN_SetTempFileDirectoryEx(sLangDLL, bClear);
 #else
-    return DTWAIN_SetTempFileDirectoryEx(StringConversion::Convert_WidePtr_To_Native(sLangDLL).c_str(), bClear);
+    return DTWAIN_SetTempFileDirectoryEx(stringconversion::Convert_WidePtr_To_Native(sLangDLL).c_str(), bClear);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExA(LPCSTR sLangDLL, DTWAIN_BOOL bClear)
 {
 #ifdef _UNICODE
-    return DTWAIN_SetTempFileDirectoryEx(StringConversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str(), bClear);
+    return DTWAIN_SetTempFileDirectoryEx(stringconversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str(), bClear);
 #else
     return DTWAIN_SetTempFileDirectoryEx(sLangDLL, bClear);
 #endif
@@ -2913,7 +2913,7 @@ LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExA(LPCSTR lpOrigString, LPSTR lpOutS
 {
 #ifdef _UNICODE
     std::wstring arg(nSize + 1, 0);
-    const DTWAIN_BOOL retVal = DTWAIN_ConvertToAPIStringEx(StringConversion::Convert_AnsiPtr_To_Native(lpOrigString).c_str(),
+    const DTWAIN_BOOL retVal = DTWAIN_ConvertToAPIStringEx(stringconversion::Convert_AnsiPtr_To_Native(lpOrigString).c_str(),
                                                           lpOutString?&arg[0]:nullptr, nSize);
     return null_terminator_copier(get_view(arg), lpOutString, retVal);
 #else
@@ -2927,7 +2927,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ConvertToAPIStringExW(LPCWSTR lpOrigString, LPWS
     return DTWAIN_ConvertToAPIStringEx(lpOrigString, lpOutString, nSize);
 #else
     std::string arg(nSize + 1, 0);
-    DTWAIN_BOOL retVal = DTWAIN_ConvertToAPIStringEx(StringConversion::Convert_WidePtr_To_Native(lpOrigString).c_str(),
+    DTWAIN_BOOL retVal = DTWAIN_ConvertToAPIStringEx(stringconversion::Convert_WidePtr_To_Native(lpOrigString).c_str(),
                                                     lpOutString?&arg[0]:nullptr, nSize);
     return null_terminator_copier(get_view(arg), lpOutString, retVal);
 #endif
@@ -2968,10 +2968,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameStringA(DTWAIN_ARRAY FrameArray, 
 {
 #ifdef _UNICODE
     return DTWAIN_ArraySetAtFrameString(FrameArray, nWhere, 
-                                        left?StringConversion::Convert_AnsiPtr_To_Native(left).c_str():nullptr,
-                                        top ? StringConversion::Convert_AnsiPtr_To_Native(top).c_str() : nullptr,
-                                        right? StringConversion::Convert_AnsiPtr_To_Native(right).c_str() : nullptr,
-                                        bottom?StringConversion::Convert_AnsiPtr_To_Native(bottom).c_str():nullptr);
+                                        left?stringconversion::Convert_AnsiPtr_To_Native(left).c_str():nullptr,
+                                        top ? stringconversion::Convert_AnsiPtr_To_Native(top).c_str() : nullptr,
+                                        right? stringconversion::Convert_AnsiPtr_To_Native(right).c_str() : nullptr,
+                                        bottom?stringconversion::Convert_AnsiPtr_To_Native(bottom).c_str():nullptr);
 
 #else
     return DTWAIN_ArraySetAtFrameString(FrameArray, nWhere, left, top, right, bottom);
@@ -2985,10 +2985,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameStringW(DTWAIN_ARRAY FrameArray, 
     return DTWAIN_ArraySetAtFrameString(FrameArray, nWhere, left, top, right, bottom);
 #else
     return DTWAIN_ArraySetAtFrameString(FrameArray, nWhere, 
-                                        left?StringConversion::Convert_WidePtr_To_Native(left).c_str():nullptr,
-                                        top ? StringConversion::Convert_WidePtr_To_Native(top).c_str() : nullptr,
-                                        right? StringConversion::Convert_WidePtr_To_Native(right).c_str() : nullptr,
-                                        bottom?StringConversion::Convert_WidePtr_To_Native(bottom).c_str():nullptr);
+                                        left?stringconversion::Convert_WidePtr_To_Native(left).c_str():nullptr,
+                                        top ? stringconversion::Convert_WidePtr_To_Native(top).c_str() : nullptr,
+                                        right? stringconversion::Convert_WidePtr_To_Native(right).c_str() : nullptr,
+                                        bottom?stringconversion::Convert_WidePtr_To_Native(bottom).c_str():nullptr);
 #endif
 }
 
@@ -2997,14 +2997,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFloatStringW(DTWAIN_RANGE pArray, LONG
 #ifdef _UNICODE
     return DTWAIN_ArraySetAtFloatString(pArray, nWhich, dValue);
 #else
-    return DTWAIN_ArraySetAtFloatString(pArray, nWhich, StringConversion::Convert_WidePtr_To_Native(dValue).c_str());
+    return DTWAIN_ArraySetAtFloatString(pArray, nWhich, stringconversion::Convert_WidePtr_To_Native(dValue).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArraySetAtFloatString(pArray, nWhich, StringConversion::Convert_AnsiPtr_To_Native(dValue).c_str());
+    return DTWAIN_ArraySetAtFloatString(pArray, nWhich, stringconversion::Convert_AnsiPtr_To_Native(dValue).c_str());
 #else
     return DTWAIN_ArraySetAtFloatString(pArray, nWhich, dValue);
 #endif
@@ -3037,14 +3037,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringW(DTWAIN_RANGE pArray, L
 #ifdef _UNICODE
     return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, dValue);
 #else
-    return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, StringConversion::Convert_WidePtr_To_Native(dValue).c_str());
+    return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, stringconversion::Convert_WidePtr_To_Native(dValue).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, StringConversion::Convert_AnsiPtr_To_Native(dValue).c_str());
+    return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, stringconversion::Convert_AnsiPtr_To_Native(dValue).c_str());
 #else
     return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, dValue);
 #endif
@@ -3055,14 +3055,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringNW(DTWAIN_ARRAY pArray, 
 #ifdef _UNICODE
     return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, Val, num);
 #else
-    return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, StringConversion::Convert_WidePtr_To_Native(Val).c_str(), num);
+    return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, stringconversion::Convert_WidePtr_To_Native(Val).c_str(), num);
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringNA(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR Val, LONG num)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
+    return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
 #else
     return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, Val, num);
 #endif
@@ -3073,16 +3073,16 @@ LONG DLLENTRY_DEF DTWAIN_ArrayFindFloatStringW(DTWAIN_ARRAY pArray, LPCWSTR Val,
 #ifdef _UNICODE
     return DTWAIN_ArrayFindFloatString(pArray, Val, Tolerance);
 #else
-    return DTWAIN_ArrayFindFloatString(pArray, StringConversion::Convert_WidePtr_To_Native(Val).c_str(), 
-                                       StringConversion::Convert_WidePtr_To_Native(Tolerance).c_str());
+    return DTWAIN_ArrayFindFloatString(pArray, stringconversion::Convert_WidePtr_To_Native(Val).c_str(), 
+                                       stringconversion::Convert_WidePtr_To_Native(Tolerance).c_str());
 #endif
 }
 
 LONG DLLENTRY_DEF DTWAIN_ArrayFindFloatStringA(DTWAIN_ARRAY pArray, LPCSTR Val, LPCSTR Tolerance)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArrayFindFloatString(pArray, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str(),
-                                        StringConversion::Convert_AnsiPtr_To_Native(Tolerance).c_str());
+    return DTWAIN_ArrayFindFloatString(pArray, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str(),
+                                        stringconversion::Convert_AnsiPtr_To_Native(Tolerance).c_str());
 #else
     return DTWAIN_ArrayFindFloatString(pArray, Val, Tolerance);
 #endif
@@ -3093,14 +3093,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringW(DTWAIN_ARRAY pArray, LPCWST
 #ifdef _UNICODE
     return DTWAIN_ArrayAddFloatString(pArray, Val);
 #else
-    return DTWAIN_ArrayAddFloatString(pArray, StringConversion::Convert_WidePtr_To_Native(Val).c_str());
+    return DTWAIN_ArrayAddFloatString(pArray, stringconversion::Convert_WidePtr_To_Native(Val).c_str());
 #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringA(DTWAIN_ARRAY pArray, LPCSTR Val)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArrayAddFloatString(pArray, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str());
+    return DTWAIN_ArrayAddFloatString(pArray, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str());
 #else
     return DTWAIN_ArrayAddFloatString(pArray, Val);
 #endif
@@ -3111,7 +3111,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringNW(DTWAIN_ARRAY pArray, LPCWS
 #ifdef _UNICODE
     return DTWAIN_ArrayAddFloatStringN(pArray, Val, num);
 #else
-    return DTWAIN_ArrayAddFloatStringN(pArray, StringConversion::Convert_WidePtr_To_Native(Val).c_str(), num);
+    return DTWAIN_ArrayAddFloatStringN(pArray, stringconversion::Convert_WidePtr_To_Native(Val).c_str(), num);
 #endif
 
 }
@@ -3119,7 +3119,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringNW(DTWAIN_ARRAY pArray, LPCWS
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringNA(DTWAIN_ARRAY pArray, LPCSTR Val, LONG num)
 {
 #ifdef _UNICODE
-    return DTWAIN_ArrayAddFloatStringN(pArray, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
+    return DTWAIN_ArrayAddFloatStringN(pArray, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
 #else
     return DTWAIN_ArrayAddFloatStringN(pArray, Val, num);
 #endif
@@ -3130,8 +3130,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloatStringA(DTWAIN_PDFTEXTELEM
 {
 #ifdef _UNICODE
     return DTWAIN_SetPDFTextElementFloatString(TextElement,
-                                               StringConversion::Convert_AnsiPtr_To_Native(val1).c_str(),
-                                               StringConversion::Convert_AnsiPtr_To_Native(val2).c_str(),
+                                               stringconversion::Convert_AnsiPtr_To_Native(val1).c_str(),
+                                               stringconversion::Convert_AnsiPtr_To_Native(val2).c_str(),
                                                Flags);
 #else
     return DTWAIN_SetPDFTextElementFloatString(TextElement, val1, val2, Flags);
@@ -3144,8 +3144,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloatStringW(DTWAIN_PDFTEXTELEM
     return DTWAIN_SetPDFTextElementFloatString(TextElement, val1, val2, Flags);
 #else
     return DTWAIN_SetPDFTextElementFloatString(TextElement,
-                                                 StringConversion::Convert_WidePtr_To_Native(val1).c_str(),
-                                               StringConversion::Convert_WidePtr_To_Native(val2).c_str(),
+                                                 stringconversion::Convert_WidePtr_To_Native(val1).c_str(),
+                                               stringconversion::Convert_WidePtr_To_Native(val2).c_str(),
                                                Flags);
 #endif
 }
@@ -3156,13 +3156,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, LPCSTR s
 {
 #ifdef _UNICODE
     return DTWAIN_AddPDFTextString(Source,
-        StringConversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos,
-        StringConversion::Convert_AnsiPtr_To_Native(fontName).c_str(),
-        StringConversion::Convert_AnsiPtr_To_Native(fontSize).c_str(), colorRGB, renderMode,
-        StringConversion::Convert_AnsiPtr_To_Native(scaling).c_str(),
-        StringConversion::Convert_AnsiPtr_To_Native(charSpacing).c_str(),
-        StringConversion::Convert_AnsiPtr_To_Native(wordSpacing).c_str(), 
-        StringConversion::Convert_AnsiPtr_To_Native(strokeWidth).c_str(), Flags);
+        stringconversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos,
+        stringconversion::Convert_AnsiPtr_To_Native(fontName).c_str(),
+        stringconversion::Convert_AnsiPtr_To_Native(fontSize).c_str(), colorRGB, renderMode,
+        stringconversion::Convert_AnsiPtr_To_Native(scaling).c_str(),
+        stringconversion::Convert_AnsiPtr_To_Native(charSpacing).c_str(),
+        stringconversion::Convert_AnsiPtr_To_Native(wordSpacing).c_str(), 
+        stringconversion::Convert_AnsiPtr_To_Native(strokeWidth).c_str(), Flags);
 #else
     return DTWAIN_AddPDFTextString(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, 
                                    renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
@@ -3179,13 +3179,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR 
                                    renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
 #else
     return DTWAIN_AddPDFTextString(Source,
-        StringConversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos,
-        StringConversion::Convert_WidePtr_To_Native(fontName).c_str(),
-        StringConversion::Convert_WidePtr_To_Native(fontSize).c_str(), colorRGB, renderMode,
-        StringConversion::Convert_WidePtr_To_Native(scaling).c_str(),
-        StringConversion::Convert_WidePtr_To_Native(charSpacing).c_str(),
-        StringConversion::Convert_WidePtr_To_Native(wordSpacing).c_str(), 
-        StringConversion::Convert_WidePtr_To_Native(strokeWidth).c_str(),
+        stringconversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos,
+        stringconversion::Convert_WidePtr_To_Native(fontName).c_str(),
+        stringconversion::Convert_WidePtr_To_Native(fontSize).c_str(), colorRGB, renderMode,
+        stringconversion::Convert_WidePtr_To_Native(scaling).c_str(),
+        stringconversion::Convert_WidePtr_To_Native(charSpacing).c_str(),
+        stringconversion::Convert_WidePtr_To_Native(wordSpacing).c_str(), 
+        stringconversion::Convert_WidePtr_To_Native(strokeWidth).c_str(),
         Flags);
 #endif
 }
@@ -3197,8 +3197,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextExW(DTWAIN_SOURCE Source, LPCWSTR szTe
     return DTWAIN_AddPDFTextEx(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
 #else
     return DTWAIN_AddPDFTextEx(Source, 
-                               StringConversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos, 
-                               StringConversion::Convert_WidePtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
+                               stringconversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos, 
+                               stringconversion::Convert_WidePtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
 #endif
 }
 
@@ -3208,7 +3208,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextExA(DTWAIN_SOURCE Source, LPCSTR szTex
 )
 {
 #ifdef _UNICODE
-    return DTWAIN_AddPDFTextEx(Source, StringConversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos, StringConversion::Convert_AnsiPtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, 
+    return DTWAIN_AddPDFTextEx(Source, stringconversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos, stringconversion::Convert_AnsiPtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, 
         scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
 #else
     return DTWAIN_AddPDFTextEx(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
@@ -3270,7 +3270,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDSMSearchOrderExW(LPWSTR SearchDirectory, LPW
 HANDLE DLLENTRY_DEF DTWAIN_RotateImageStringA(HANDLE hDib, LPCSTR angle)
 {
 #ifdef _UNICODE
-    return DTWAIN_RotateImageString(hDib, StringConversion::Convert_AnsiPtr_To_Native(angle).c_str());
+    return DTWAIN_RotateImageString(hDib, stringconversion::Convert_AnsiPtr_To_Native(angle).c_str());
 #else
     return DTWAIN_RotateImageString(hDib, angle);
 #endif
@@ -3281,7 +3281,7 @@ HANDLE DLLENTRY_DEF DTWAIN_RotateImageStringW(HANDLE hDib, LPCWSTR angle)
 #ifdef _UNICODE
     return DTWAIN_RotateImageString(hDib, angle);
 #else
-    return DTWAIN_RotateImageString(hDib, StringConversion::Convert_WidePtr_To_Native(angle).c_str());
+    return DTWAIN_RotateImageString(hDib, stringconversion::Convert_WidePtr_To_Native(angle).c_str());
 #endif
 }
 

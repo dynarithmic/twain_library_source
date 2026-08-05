@@ -29,7 +29,7 @@
 #include "ctlguidimpl.h"
 
 using namespace dynarithmic;
-namespace stringutils = dynarithmic::basicstringutils;
+namespace stringutils = basicstringutils;
 
 //////////////////// CTL_ITwainSession functions /////////////////////////////
 CTL_ITwainSession*  CTL_ITwainSession::Create(CTL_TwainDLLHandle *pHandle,
@@ -66,16 +66,16 @@ CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
     m_AppIdTemp.Version.Country  = static_cast<TW_UINT16>(pHandle->m_SessionStruct.nCountry);
 
     stringutils::SafeStrcpy( m_AppIdTemp.Version.Info,
-                                StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szVersion).c_str(),
+                                stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szVersion).c_str(),
                                 sizeof m_AppIdTemp.Version.Info - 1 );
 
     m_AppIdTemp.ProtocolMajor =    TWON_PROTOCOLMAJOR;
     m_AppIdTemp.ProtocolMinor =    TWON_PROTOCOLMINOR;
     m_AppIdTemp.SupportedGroups =  DG_IMAGE | DG_CONTROL | DG_AUDIO | DF_APP2 | DF_DSM2 ;
 
-    stringutils::SafeStrcpy( m_AppIdTemp.Manufacturer,  StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szManufact).c_str(), sizeof m_AppIdTemp.Manufacturer - 1 );
-    stringutils::SafeStrcpy( m_AppIdTemp.ProductFamily, StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szFamily).c_str(), sizeof m_AppIdTemp.ProductFamily - 1 );
-    stringutils::SafeStrcpy( m_AppIdTemp.ProductName,   StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szProduct).c_str(),sizeof m_AppIdTemp.ProductName - 1 );
+    stringutils::SafeStrcpy( m_AppIdTemp.Manufacturer,  stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szManufact).c_str(), sizeof m_AppIdTemp.Manufacturer - 1 );
+    stringutils::SafeStrcpy( m_AppIdTemp.ProductFamily, stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szFamily).c_str(), sizeof m_AppIdTemp.ProductFamily - 1 );
+    stringutils::SafeStrcpy( m_AppIdTemp.ProductName,   stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szProduct).c_str(),sizeof m_AppIdTemp.ProductName - 1 );
     m_AppId = m_AppIdTemp;
     m_pSelectedSource = nullptr;
     m_bTwainMessageFlag = false;
@@ -400,7 +400,7 @@ CTL_ITwainSource* CTL_ITwainSession::IsSourceSelected(LPCTSTR pSourceName)
         bool operator()(CTL_ITwainSource* pSource) const
         {
             const TW_IDENTITY* pIdentity = pSource->GetSourceIDPtr();
-            CTL_StringType strTemp = StringConversion::Convert_AnsiPtr_To_Native(pIdentity->ProductName);
+            CTL_StringType strTemp = stringconversion::Convert_AnsiPtr_To_Native(pIdentity->ProductName);
             stringutils::MakeUpperCase(stringutils::TrimAll(strTemp));
             return strTemp == m_strProduct;
         }

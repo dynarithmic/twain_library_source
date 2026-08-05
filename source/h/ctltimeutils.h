@@ -18,29 +18,23 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "gifwriter.h"
-#include "iohandler_gif.h"
-#include "ctldib32ex.h"
-#include "ctlstringconversion.h"
+#ifndef CTLTIMEUTILS_H
+#define CTLTIMEUTILS_H
 
-using namespace dynarithmic;
+#include <ctime>
 
-int CTL_GifIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
+namespace dynarithmic
 {
-    GifSessionOptions opts;
-    opts.text.software = GetCopyrightString();
-
-    LockedDibPage locked(m_pDib->GetHandle());
-    if (!locked.IsValid())
-        return DTWAIN_ERR_DIB;
-
-    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
-    DTWAINGifOutput output;
-    auto pageData = GifSessionWriter::MakePreparedGifPage(locked.GetView());
-    if (!pageData.has_value() || !output.OnFirstPage(fName, opts, pageData.value()))
-        return DTWAIN_ERR_FILEWRITE;
-
-    if (!output.OnLastPage())
-        return DTWAIN_ERR_FILEWRITE;
-    return DTWAIN_NO_ERROR;
+    namespace timeutils
+    {
+        inline bool GetLocalTime(std::time_t value, std::tm& result)
+        {
+#ifdef _WIN32
+            return ::localtime_s(&result, &value) == 0;
+#else
+            return ::localtime_r(&value, &result) != nullptr;
+#endif
+        }
+    }
 }
+#endif

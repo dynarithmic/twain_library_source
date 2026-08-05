@@ -25,7 +25,7 @@
 #include "ctltwaindecoder.h"
 
 using namespace dynarithmic;
-namespace stringutils = dynarithmic::basicstringutils;
+namespace stringutils = basicstringutils;
 
 static std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix);
 static std::string DecodeData(CTL_TWAINTypeDecoder *pDecoder, TW_MEMREF pData, ErrorStructTypes sType);
@@ -211,19 +211,19 @@ std::string CTL_TWAINTypeDecoder::DecodePDFTextElement(PDFTextElement *pEl)
 std::string CTL_TWAINTypeDecoder::DecodeTWAINReturnCode(TW_UINT16 retCode)
 {
     return DecodeTWAINCode(retCode, IDS_TWRC_ERRORSTART,
-                           dynarithmic::GetErrorString_Internal(DTWAIN_ERR_UNKNOWN_TWAIN_RC));
+                           GetErrorString_Internal(DTWAIN_ERR_UNKNOWN_TWAIN_RC));
 }
 
 std::string CTL_TWAINTypeDecoder::DecodeTWAINReturnCodeCC(TW_UINT16 retCode)
 {
     return DecodeTWAINCode(retCode, IDS_TWCC_ERRORSTART,
-                           dynarithmic::GetErrorString_Internal(DTWAIN_ERR_UNKNOWN_TWAIN_CC));
+                           GetErrorString_Internal(DTWAIN_ERR_UNKNOWN_TWAIN_CC));
 }
 
 std::string CTL_TWAINTypeDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, std::string_view defMessage)
 {
     const TW_UINT16 actualCode = retCode + errStart;
-    const auto it = dynarithmic::generic_array_finder_if(mapTwainDSMReturnCodes, [&](const auto& pr) { return pr.first == actualCode; });
+    const auto it = generic_array_finder_if(mapTwainDSMReturnCodes, [&](const auto& pr) { return pr.first == actualCode; });
     if (it.first)
         return mapTwainDSMReturnCodes[it.second].second;
     return defMessage.data();
@@ -258,8 +258,8 @@ std::string DecodeData(CTL_TWAINTypeDecoder* pDecoder, TW_MEMREF pData, ErrorStr
                             "BatteryMinutes=" << pDEVICEEVENT->BatteryMinutes << "\n" <<
                             "BatteryPercentage=" << pDEVICEEVENT->BatteryPercentage << "\n" <<
                             "PowerSupply=" << pDEVICEEVENT->PowerSupply << "\n" <<
-                            "XResolution=" << dynarithmic::Fix32ToFloat(pDEVICEEVENT->XResolution) << "\n" <<
-                            "YResolution=" << dynarithmic::Fix32ToFloat(pDEVICEEVENT->YResolution) << "\n" <<
+                            "XResolution=" << Fix32ToFloat(pDEVICEEVENT->XResolution) << "\n" <<
+                            "YResolution=" << Fix32ToFloat(pDEVICEEVENT->YResolution) << "\n" <<
                             "FlashUsed2=" << pDEVICEEVENT->FlashUsed2 << "\n" <<
                             "AutomaticCapture=" << pDEVICEEVENT->AutomaticCapture << "\n" <<
                             "TimeBeforeFirstCapture=" << pDEVICEEVENT->TimeBeforeFirstCapture << "\n" <<
@@ -430,7 +430,7 @@ std::string DecodeData(CTL_TWAINTypeDecoder* pDecoder, TW_MEMREF pData, ErrorStr
                 auto pSTATUS = static_cast<pTW_STATUS>(pData);
                 std::string sConditionCode = "(Unknown)";
                 uint32_t finderValue = IDS_TWCC_ERRORSTART + pSTATUS->ConditionCode;
-                auto it = dynarithmic::generic_array_finder_if(mapTwainDSMReturnCodes, [&](const auto& pr) { return pr.first == finderValue; });
+                auto it = generic_array_finder_if(mapTwainDSMReturnCodes, [&](const auto& pr) { return pr.first == finderValue; });
                 if (it.first)
                     sConditionCode = std::string() + mapTwainDSMReturnCodes[it.second].second + "";
                 sBuffer << "\nTW_MEMREF <==> TW_STATUS:\n{\n" <<
@@ -451,7 +451,7 @@ std::string DecodeData(CTL_TWAINTypeDecoder* pDecoder, TW_MEMREF pData, ErrorStr
                         indenter << "ShowUI=" <<  (pUSERINTERFACE->ShowUI?"TRUE":"FALSE") << "\n" <<
                         indenter << "ModalUI=" << (pUSERINTERFACE->ModalUI?"TRUE":"FALSE") << "\n" <<
                         indenter << "hParent=" << pUSERINTERFACE->hParent << "\n" <<
-                        indenter << "hParent.Title=" << StringConversion::Convert_NativePtr_To_Ansi(sz) << "\n" <<
+                        indenter << "hParent.Title=" << stringconversion::Convert_NativePtr_To_Ansi(sz) << "\n" <<
                         indenter << "hParent.ScreenPos= {" << stringutils::Join<std::string>(aRect, ",") << "}\n}";
             #endif
             }
@@ -774,7 +774,7 @@ std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups)
         const unsigned int curGroup = static_cast<TW_UINT32>(1) << i;
         if ( SupportedGroups & curGroup )
         {
-            auto it = dynarithmic::generic_array_finder_if(mapSupportedGroups, [&](const auto& pr) { return pr.first == curGroup; });
+            auto it = generic_array_finder_if(mapSupportedGroups, [&](const auto& pr) { return pr.first == curGroup; });
             if ( it.first)
                 allGroups.push_back(mapSupportedGroups[it.second].second);
             else

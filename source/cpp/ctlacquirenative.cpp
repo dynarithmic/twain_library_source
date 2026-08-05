@@ -54,19 +54,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG Pixel
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireNative(SourceAcquireOptions& opts)
+namespace dynarithmic
 {
-    opts.setActualAcquireType(TWAINAcquireType_Native);
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
-    const auto pHandle = pSource->GetDTWAINHandle();
-    if ( pHandle->m_lAcquireMode == DTWAIN_MODELESS )
-         return LLAcquireImage(opts);
-    auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
-    DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
-    if (pr.first != DTWAIN_NO_ERROR)
+    DTWAIN_ACQUIRE DTWAIN_LLAcquireNative(SourceAcquireOptions& opts)
     {
-        CTL_TwainAppMgr::DisableUserInterface(pSource);
-        return DTWAIN_FAILURE1;
+        opts.setActualAcquireType(TWAINAcquireType_Native);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+        const auto pHandle = pSource->GetDTWAINHandle();
+        if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
+            return LLAcquireImage(opts);
+        auto pr = StartModalMessageLoop(pSource, opts);
+        DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
+        if (pr.first != DTWAIN_NO_ERROR)
+        {
+            CTL_TwainAppMgr::DisableUserInterface(pSource);
+            return DTWAIN_FAILURE1;
+        }
+        return pr.second;
     }
-    return pr.second;
 }

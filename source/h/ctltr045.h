@@ -95,7 +95,7 @@ namespace dynarithmic
             const std::vector<std::string>&  GetStrings() const noexcept { return m_aStrings; }
             TW_UINT16 Execute() override
             {
-                auto retValue = dynarithmic::GetCapabilityValues(nullptr, GetCapabilityBuffer()->Cap, MSG_GETLABELENUM,
+                auto retValue = GetCapabilityValues(nullptr, GetCapabilityBuffer()->Cap, MSG_GETLABELENUM,
                     DTWAIN_CONTARRAY, 1, TWTY_STR255, m_aStrings);
                 if (retValue.second == TWRC_SUCCESS)
                     m_bIsSupported = true;

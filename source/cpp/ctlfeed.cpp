@@ -36,6 +36,52 @@ typedef bool (CTL_ITwainSource::*IsEnabledFunc)() const;
 
 namespace
 {
+    bool IsFeederLoaded(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY aFeederLoaded)
+    {
+        BOOL retval = GetCapValuesEx2_Internal(pSource, CAP_FEEDERLOADED, DTWAIN_CAPGETCURRENT,
+            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aFeederLoaded);
+        if (retval)
+        {
+            auto& vValues = pSource->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(*aFeederLoaded);
+            if (!vValues.empty())
+                return vValues.front();
+        }
+        return false;
+    }
+}
+
+namespace dynarithmic
+{
+    int FeederWait(CTL_ITwainSource* pSource)
+    {
+        if (!pSource->IsFeederEnabledMode())
+            return DTWAIN_TN_FEEDERNOTENABLED;
+        if (!pSource->IsCapInSupportedList(CAP_FEEDERLOADED))
+            return DTWAIN_TN_FEEDERNOTSUPPORTED;
+        auto timeoutval = pSource->GetFeederWaitTime();
+        if (timeoutval == 0)
+            return DTWAIN_NO_ERROR;
+        const TwainTimer theTimer;
+        DTWAIN_ARRAY aFeederLoaded = {};
+        DTWAINArrayLowLevelPtr_RAII raii2(pSource->GetDTWAINHandle(), &aFeederLoaded);
+
+        while (!IsFeederLoaded(pSource, &aFeederLoaded))
+        {
+            if (timeoutval != DTWAIN_WAIT_INFINITE)
+            {
+                if (theTimer.elapsed() > timeoutval)
+                {
+                    return DTWAIN_TN_FEEDERTIMEOUT;
+                }
+            }
+            std::this_thread::sleep_for(1ms);
+        }
+        return DTWAIN_NO_ERROR;
+    }
+}
+
+namespace
+{
     bool IsFeederEnabledFunc(DTWAIN_SOURCE Source, IsEnabledFunc Func)
     {
         CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
@@ -352,46 +398,5 @@ LONG DLLENTRY_DEF DTWAIN_GetFeederFuncs(DTWAIN_SOURCE Source)
     CATCH_BLOCK(0)
 }
 
-namespace
-{
-    bool IsFeederLoaded(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY aFeederLoaded)
-    {
-        BOOL retval = GetCapValuesEx2_Internal(pSource, CAP_FEEDERLOADED, DTWAIN_CAPGETCURRENT,
-            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aFeederLoaded);
-        if (retval)
-        {
-            auto& vValues = pSource->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(*aFeederLoaded);
-            if (!vValues.empty())
-                return vValues.front();
-        }
-        return false;
-    }
-}
 
-int dynarithmic::FeederWait(CTL_ITwainSource *pSource)
-{
-    if (!pSource->IsFeederEnabledMode())
-        return DTWAIN_TN_FEEDERNOTENABLED;
-    if (!pSource->IsCapInSupportedList(CAP_FEEDERLOADED))
-        return DTWAIN_TN_FEEDERNOTSUPPORTED;
-    auto timeoutval = pSource->GetFeederWaitTime();
-    if (timeoutval == 0)
-        return DTWAIN_NO_ERROR;
-    const dynarithmic::TwainTimer theTimer;
-    DTWAIN_ARRAY aFeederLoaded = {};
-    DTWAINArrayLowLevelPtr_RAII raii2(pSource->GetDTWAINHandle(), &aFeederLoaded);
-
-    while (!IsFeederLoaded(pSource, &aFeederLoaded))
-    {
-        if (timeoutval != DTWAIN_WAIT_INFINITE)
-        {
-            if (theTimer.elapsed() > timeoutval)
-            {
-                return DTWAIN_TN_FEEDERTIMEOUT;
-            }
-        }
-        std::this_thread::sleep_for(1ms);
-    }
-    return DTWAIN_NO_ERROR;
-}
 ///////////////////////////////////////////////////////////
