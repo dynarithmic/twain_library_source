@@ -18,27 +18,30 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
-static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM /*w*/, LPARAM lParam)
+namespace
 {
-    switch (msg)
+    UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM /*w*/, LPARAM lParam)
     {
-    case WM_INITDIALOG:
-    {
-        // Get the parameters
-        const HWND ThisWnd = GetParent(hWnd);
-        const OPENFILENAME *pofs = reinterpret_cast<OPENFILENAME *>(lParam);
-        CustomPlacement *pCS = reinterpret_cast<CustomPlacement *>(pofs->lCustData);
-        if (pCS->nOptions & DTWAIN_DLG_CENTER_SCREEN)
-            CenterWindow(ThisWnd, nullptr);
-        else
-            if (pCS->nOptions & DTWAIN_DLG_CENTER)
-                CenterWindow(ThisWnd, pCS->hWndParent);
-            else
-                SetWindowPos(ThisWnd, nullptr, pCS->xpos, pCS->ypos, 0, 0, SWP_NOSIZE);
+        switch (msg)
+        {
+            case WM_INITDIALOG:
+            {
+                // Get the parameters
+                const HWND ThisWnd = GetParent(hWnd);
+                const OPENFILENAME* pofs = reinterpret_cast<OPENFILENAME*>(lParam);
+                CustomPlacement* pCS = reinterpret_cast<CustomPlacement*>(pofs->lCustData);
+                if (pCS->nOptions & DTWAIN_DLG_CENTER_SCREEN)
+                    CenterWindow(ThisWnd, nullptr);
+                else
+                if (pCS->nOptions & DTWAIN_DLG_CENTER)
+                    CenterWindow(ThisWnd, pCS->hWndParent);
+                else
+                    SetWindowPos(ThisWnd, nullptr, pCS->xpos, pCS->ypos, 0, 0, SWP_NOSIZE);
+        }
+            break;
+        }
+        return TRUE;
     }
-    break;
-    }
-    return TRUE;
 }
 
 namespace
@@ -91,6 +94,60 @@ namespace
             ((rcWork.bottom - rcWork.top) - windowHeight) / 2;
 
         SetWindowPos(hWnd, NULL, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+
+    HWND CreateTwainWindow(CTL_TwainDLLHandle * /*pHandle*/,
+        HINSTANCE hInstance/*=NULL*/,
+        HWND hWndParent)
+    {
+        if (hInstance == nullptr)
+            hInstance = CTL_StaticData::GetDLLInstanceHandle();
+        HWND hWndP;
+        if (!hWndParent)
+            hWndP = GetDesktopWindow();
+        else
+            hWndP = hWndParent;
+
+        RECT rect;
+
+        GetWindowRect(hWndP, &rect);
+        const HWND hwnd = CreateWindow(_T("DTWAINWindowClass"),              // class
+            _T("Twain Window"),                 // title
+            WS_OVERLAPPED | WS_POPUP | WS_CAPTION | WS_EX_TOOLWINDOW,    // style
+            0, 0,   // x, y
+            100, 100,   // width, height
+            hWndParent ? hWndP : NULL,
+            NULL,                            // hmenu
+            hInstance,
+            NULL);                          // lpvparam
+        return hwnd;
+    }
+
+    void RegisterTwainWindowClass()
+    {
+        CTL_StaticData::GetRegisteredMessage() = ::RegisterWindowMessage(REGISTERED_DTWAIN_MSG);
+        WNDCLASS wndclass;
+        memset(&wndclass, 0, sizeof(WNDCLASS));
+    #ifdef DTWAIN_LIB
+        wndclass.style = 0;
+    #else
+        wndclass.style = CS_GLOBALCLASS;
+    #endif
+        wndclass.lpfnWndProc = DTWAIN_WindowProc;
+        wndclass.cbClsExtra = 0;
+        wndclass.cbWndExtra = 0;
+        wndclass.hInstance = CTL_StaticData::GetDLLInstanceHandle();
+        wndclass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+        wndclass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+        wndclass.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
+        wndclass.lpszMenuName = nullptr;
+        wndclass.lpszClassName = _T("DTWAINWindowClass");
+        RegisterClass(&wndclass);
+    }
+
+    void UnregisterTwainWindowClass()
+    {
+        UnregisterClass(_T("DTWAINWindowClass"), static_cast<HINSTANCE>(CTL_StaticData::GetDLLInstanceHandle()));
     }
 }
 
@@ -222,92 +279,13 @@ namespace dynarithmic
                 break;
         }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
-            CATCH_BLOCK(false)
+        CATCH_BLOCK(false)
     }
 }
 
 
 
 
-////////// Function to subclass the window ////////////////////////
-WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn /*=NULL*/)
-{
-    WNDPROC wProc = nullptr;
-    WNDPROC wProcToUse = nullptr;
-    if (wProcIn == nullptr)
-        wProcToUse = static_cast<WNDPROC>(DTWAIN_WindowProc);
-    else
-        wProcToUse = wProcIn;
-    if (IsWindow(hWnd))
-    {
-        if (reinterpret_cast<WNDPROC>(::GetWindowLongPtr(hWnd, GWLP_WNDPROC)) != wProcToUse)
-        {
-            wProc = TWSubclassWindow(hWnd, wProcToUse);
-            if (!wProc)
-                LogWin32Error(GetLastError());
-        }
-    }
-    // Already equal, so return the original
-    else
-        wProc = wProcToUse;
-    return wProc;
-}
-
-
-static HWND CreateTwainWindow(CTL_TwainDLLHandle * /*pHandle*/,
-    HINSTANCE hInstance/*=NULL*/,
-    HWND hWndParent)
-{
-    if (hInstance == nullptr)
-        hInstance = CTL_StaticData::GetDLLInstanceHandle();
-    HWND hWndP;
-    if (!hWndParent)
-        hWndP = GetDesktopWindow();
-    else
-        hWndP = hWndParent;
-
-    RECT rect;
-
-    GetWindowRect(hWndP, &rect);
-    const HWND hwnd = CreateWindow(_T("DTWAINWindowClass"),              // class
-        _T("Twain Window"),                 // title
-        WS_OVERLAPPED | WS_POPUP | WS_CAPTION | WS_EX_TOOLWINDOW,    // style
-        0, 0,   // x, y
-        100, 100,   // width, height
-        hWndParent ? hWndP : NULL,
-        NULL,                            // hmenu
-        hInstance,
-        NULL);                          // lpvparam
-    return hwnd;
-}
-
-
-void RegisterTwainWindowClass()
-{
-    CTL_StaticData::GetRegisteredMessage() = ::RegisterWindowMessage(REGISTERED_DTWAIN_MSG);
-    WNDCLASS wndclass;
-    memset(&wndclass, 0, sizeof(WNDCLASS));
-#ifdef DTWAIN_LIB
-    wndclass.style = 0;
-#else
-    wndclass.style = CS_GLOBALCLASS;
-#endif
-    wndclass.lpfnWndProc = DTWAIN_WindowProc;
-    wndclass.cbClsExtra = 0;
-    wndclass.cbWndExtra = 0;
-    wndclass.hInstance = CTL_StaticData::GetDLLInstanceHandle();
-    wndclass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-    wndclass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wndclass.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
-    wndclass.lpszMenuName = nullptr;
-    wndclass.lpszClassName = _T("DTWAINWindowClass");
-    RegisterClass(&wndclass);
-}
-
-void UnregisterTwainWindowClass()
-{
-    UnregisterClass(_T("DTWAINWindowClass"), static_cast<HINSTANCE>(CTL_StaticData::GetDLLInstanceHandle()));
-}
 
 #ifndef DTWAIN_LIB
 BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
@@ -342,18 +320,43 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
 }
 #endif
 
-
-void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, std::string_view s)
+namespace
 {
-    StringStreamA strm;
-    if (!func)
-        func = "(Uninitialized DTWAIN DLL)";
-    strm << "DTWAIN Function " << func << " returned error code " << nError << std::endl << std::endl;
-    strm << s.data();
-    const std::string st = strm.str();
-    MessageBoxA(nullptr, st.c_str(), "DTWAIN Error", MB_ICONSTOP);
-}
+    ////////// Function to subclass the window ////////////////////////
+    WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn /*=NULL*/)
+    {
+        WNDPROC wProc = nullptr;
+        WNDPROC wProcToUse = nullptr;
+        if (wProcIn == nullptr)
+            wProcToUse = static_cast<WNDPROC>(DTWAIN_WindowProc);
+        else
+            wProcToUse = wProcIn;
+        if (IsWindow(hWnd))
+        {
+            if (reinterpret_cast<WNDPROC>(::GetWindowLongPtr(hWnd, GWLP_WNDPROC)) != wProcToUse)
+            {
+                wProc = TWSubclassWindow(hWnd, wProcToUse);
+                if (!wProc)
+                    LogWin32Error(GetLastError());
+            }
+        }
+        // Already equal, so return the original
+        else
+            wProc = wProcToUse;
+        return wProc;
+    }
 
+    void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, std::string_view s)
+    {
+        StringStreamA strm;
+        if (!func)
+            func = "(Uninitialized DTWAIN DLL)";
+        strm << "DTWAIN Function " << func << " returned error code " << nError << std::endl << std::endl;
+        strm << s.data();
+        const std::string st = strm.str();
+        MessageBoxA(nullptr, st.c_str(), "DTWAIN Error", MB_ICONSTOP);
+    }
+}
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle, LONG xPos, LONG yPos, LONG nFlags)
 {
