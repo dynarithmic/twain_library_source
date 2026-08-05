@@ -23,39 +23,42 @@
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace dynarithmic;
 
-CTL_CapInfoMapPtr dynarithmic::GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p)
+namespace dynarithmic
 {
-    // Check if the capability is supported
-    const auto strProdName = p->GetProductName();
-
-    // Find where capability setting is
-    int nWhere;
-    FindFirstValue(strProdName, &pHandle->m_aSourceCapInfo, &nWhere);
-    if (nWhere == -1)
-        return CTL_CapInfoMapPtr();
-
-    // Get the cap array values
-    const CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
-    CTL_CapInfoMapPtr pArray = std::get<1>(Info);
-    return pArray;
-}
-
-CTL_CapInfo* dynarithmic::GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap)
-{
-    const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, p);
-    CTL_CapInfo* CapInfo = nullptr;
-    if (!pArray)
+    CTL_CapInfoMapPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p)
     {
+        // Check if the capability is supported
+        const auto strProdName = p->GetProductName();
+
+        // Find where capability setting is
+        int nWhere;
+        FindFirstValue(strProdName, &pHandle->m_aSourceCapInfo, &nWhere);
+        if (nWhere == -1)
+            return CTL_CapInfoMapPtr();
+
+        // Get the cap array values
+        const CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
+        CTL_CapInfoMapPtr pArray = std::get<1>(Info);
+        return pArray;
+    }
+
+    CTL_CapInfo* GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap)
+    {
+        const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, p);
+        CTL_CapInfo* CapInfo = nullptr;
+        if (!pArray)
+        {
+            return nullptr;
+        }
+        const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
+        if (iter != pArray->end())
+        {
+            CapInfo = &iter->second;
+            CapInfo->SetValid(true);
+            return CapInfo;
+        }
         return nullptr;
     }
-    const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
-    if (iter != pArray->end())
-    {
-        CapInfo = &iter->second;
-        CapInfo->SetValid(true);
-        return CapInfo;
-    }
-    return nullptr;
 }
+

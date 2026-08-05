@@ -66,7 +66,7 @@ int CTL_WebpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
     opts.text.copyright = GetCopyrightString();
 
-    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToWebP(fName, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

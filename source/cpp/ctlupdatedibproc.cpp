@@ -46,7 +46,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DeleteDIB(HANDLE Dib)
         ImageMemoryHandler::GlobalUnlock(Dib);
     auto ret = ImageMemoryHandler::GlobalFree(Dib);
     if ( ret != NULL )
-        dynarithmic::LogWin32Error(ImageMemoryHandler::GetLastError());
+        LogWin32Error(ImageMemoryHandler::GetLastError());
     LOG_FUNC_EXIT_NONAME_PARAMS(ret == NULL?TRUE:FALSE)
     CATCH_BLOCK(FALSE)
 }

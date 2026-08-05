@@ -28,7 +28,7 @@
 #endif
 
 using namespace dynarithmic;
-namespace stringutils = dynarithmic::basicstringutils;
+namespace stringutils = basicstringutils;
 
 enum
 {
@@ -552,7 +552,7 @@ FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHan
         if (nWhich != GET_CLOSE)
         {
             returnedContext = pFS->Context;
-            stringutils::SafeStrcpy(sDir, StringConversion::Convert_AnsiPtr_To_Native(pFS->OutputName).c_str());
+            stringutils::SafeStrcpy(sDir, stringconversion::Convert_AnsiPtr_To_Native(pFS->OutputName).c_str());
         }
     }
     return { bRet, returnedContext };

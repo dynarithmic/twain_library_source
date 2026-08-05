@@ -33,7 +33,7 @@
 #endif
 
 using namespace dynarithmic;
-namespace stringutils = dynarithmic::basicstringutils;
+namespace stringutils = basicstringutils;
 
 namespace
 {
@@ -925,10 +925,10 @@ LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indent
         std::vector<std::string> vAllSources;
         for (auto& theSource : vBuf)
             vAllSources.push_back(theSource->GetProductNameA());
-        details = StringConversion::Convert_Ansi_To_Native(generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor));
+        details = stringconversion::Convert_Ansi_To_Native(generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor));
         pHandle->m_strSessionDetails = details;
     }
-    LONG retVal = dynarithmic::CopyInfoToCString(details, szBuf, nSize);
+    LONG retVal = CopyInfoToCString(details, szBuf, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)
@@ -944,15 +944,15 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG 
         std::vector<std::string> vAllSources;
         stringutils::TokenizeEx((CTL_StringType)szSources, _T("|"), vAllSourcesT, false);
         for (auto& name : vAllSourcesT)
-            vAllSources.push_back(StringConversion::Convert_Native_To_Ansi(name, name.length()));
+            vAllSources.push_back(stringconversion::Convert_Native_To_Ansi(name, name.length()));
         auto genDetails = generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor);
         #ifdef UNICODE
-        pHandle->m_strSourceDetails = StringConversion::Convert_Ansi_To_Native(genDetails, genDetails.length());
+        pHandle->m_strSourceDetails = stringconversion::Convert_Ansi_To_Native(genDetails, genDetails.length());
         #else
         pHandle->m_strSourceDetails = genDetails;
         #endif
     }
-    LONG retVal = dynarithmic::CopyInfoToCString(pHandle->m_strSourceDetails, szBuf, nSize);
+    LONG retVal = CopyInfoToCString(pHandle->m_strSourceDetails, szBuf, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)

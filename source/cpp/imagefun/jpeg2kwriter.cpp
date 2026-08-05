@@ -28,7 +28,7 @@
 
 using namespace dynarithmic;
 
-std::optional<PreparedJpeg2000DibPage> Jpeg2000SessionWriter::MakePreparedJpeg2000Page(const dynarithmic::DibPageView& view)
+std::optional<PreparedJpeg2000DibPage> Jpeg2000SessionWriter::MakePreparedJpeg2000Page(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;
@@ -173,7 +173,7 @@ bool Jpeg2000SessionWriter::WriteCurrentPage()
         opj_codec_set_threads(codec, options_.numThreads);
     }
 
-    const std::string narrow = dynarithmic::StringConversion::Convert_Wide_To_Ansi(filename_);
+    const std::string narrow = basicstringutils::Narrow(filename_);
     opj_stream_t* stream =
         opj_stream_create_default_file_stream(narrow.c_str(), OPJ_FALSE);
 

@@ -19,7 +19,7 @@ namespace dynarithmic
     CTL_StringType GetVersionInfo();
     CTL_StringType GetVersionInfo(HMODULE dllModule, int indent,
                                     std::basic_string_view<CTL_StringType::value_type> crlf =
-                                    dynarithmic::CharTraits<CTL_StringType::value_type>::NewLineString());
+                                    CharTraits<CTL_StringType::value_type>::NewLineString());
     bool GetDLLVersionNumbersSmall(HMODULE dllModule, VersionNumbersSmall& info);
 }
 #endif

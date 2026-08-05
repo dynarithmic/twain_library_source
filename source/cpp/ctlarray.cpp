@@ -27,9 +27,179 @@
 #include "dtwstrfn.h"
 #include "dtwain_float_utils.h"
 #include "arrayfactory.h"
-
+#include "ctliface.h"
 using namespace dynarithmic;
-namespace stringutils = dynarithmic::basicstringutils;
+
+namespace
+{
+    LONG ArrayTypeInternal(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
+}
+
+namespace dynarithmic
+{
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize)
+    {
+        if (nInitialSize < 0)
+            return { DTWAIN_ERR_INVALID_PARAM, nullptr };
+
+        switch (nEnumType)
+        {
+        case DTWAIN_ARRAYINT16:
+        case DTWAIN_ARRAYINT32:
+        case DTWAIN_ARRAYUINT16:
+        case DTWAIN_ARRAYUINT32:
+            nEnumType = DTWAIN_ARRAYLONG;
+            break;
+
+        case DTWAIN_ARRAYINT64:
+        case DTWAIN_ARRAYUINT64:
+            nEnumType = DTWAIN_ARRAYLONG64;
+            break;
+
+        default:;
+        }
+        int dummy = 0;
+        DTWAIN_ARRAY retArray = {};
+        if (nEnumType == DTWAIN_ARRAYFRAME)
+        {
+            retArray = VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_frame(0, 0, 0, 0));
+            if (retArray)
+            {
+                auto& vect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(retArray);
+                vect.resize(nInitialSize);
+            }
+        }
+        else
+            retArray = VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_array(static_cast<CTL_ArrayType>(nEnumType), &dummy, nInitialSize));
+        if (retArray)
+            return { DTWAIN_NO_ERROR, retArray };
+        return { DTWAIN_ERR_BAD_ARRAY, nullptr };
+    }
+
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize)
+    {
+        const LONG lType = GetCapArrayType(pHandle, pSource, lCapType);
+        if (lType == DTWAIN_FAILURE1)
+            return { DTWAIN_ERR_BAD_CONTAINER, nullptr };
+        return CreateArrayFromFactory(pHandle, lType, lSize);
+    }
+
+    DTWAIN_ARRAY CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source)
+    {
+        const LONG lType = CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(Source));
+        DTWAIN_ARRAY Dest = CreateArrayFromFactory(pHandle, lType, 0).second;
+        if (Dest)
+            pHandle->m_ArrayFactory->copy(Dest, Source);
+        return Dest;
+    }
+
+    void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
+    {
+        pHandle->m_ArrayFactory->destroy(pArray);
+    }
+
+    void SetArrayValueFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant)
+    {
+        if (!pVariant)
+            return;
+        const auto& factory = pHandle->m_ArrayFactory;
+        const int enumType = factory->tag_type(pArray);
+        switch (enumType)
+        {
+            // Do something special for strings
+        case CTL_ArrayFactory::arrayTag::WStringType:
+        {
+            std::wstring sVal = static_cast<LPCWSTR>(pVariant);
+            factory->set_value(pArray, lPos, &sVal);
+        }
+        break;
+        case CTL_ArrayFactory::arrayTag::StringType:
+        {
+            std::string sVal = static_cast<LPCSTR>(pVariant);
+            factory->set_value(pArray, lPos, &sVal);
+        }
+        break;
+        default:
+            factory->set_value(pArray, lPos, pVariant);
+        }
+    }
+
+    // Safely "move" an existing array to a new array.
+    bool MoveArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource)
+    {
+        // The source must be an existing DTWAIN_ARRAY
+        bool bSourceArrayExists = pHandle->m_ArrayFactory->is_valid(*aSource);
+        if (!bSourceArrayExists)
+            return false;
+
+        // If source and destination are the same, nothing to do.
+        bool bDestinationArrayExists = pHandle->m_ArrayFactory->is_valid(*aDestination);
+        if (bDestinationArrayExists && (*aDestination == *aSource))
+            return true;
+
+        // Destroy the destination if it exists.
+        if (bDestinationArrayExists)
+            pHandle->m_ArrayFactory->destroy(*aDestination);
+
+        // Set destination equal to source, and null out the source.
+        // Setting the source to null ensures that any subsequent calls
+        // to destroy the source will essentially be a no-op.
+        *aDestination = *aSource;
+        *aSource = nullptr;
+        return true;
+    }
+
+    DTWAIN_FRAME CreateFrameArray(const CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom)
+    {
+        return VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_frame(Left, Top, Right, Bottom));
+    }
+
+    void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame)
+    {
+        pHandle->m_ArrayFactory->destroy(Frame);
+    }
+
+    bool TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil)
+    {
+        double ValOut[4];
+        TW_FIX32 ValIn[4];
+        ValIn[0] = pTwain.Left;
+        ValIn[1] = pTwain.Top;
+        ValIn[2] = pTwain.Right;
+        ValIn[3] = pTwain.Bottom;
+
+        std::transform(ValIn, ValIn + 4, ValOut, Fix32ToFloat);
+        if ( !DTWAIN_FrameSetAll(pDdtwil, ValOut[0], ValOut[1], ValOut[2], ValOut[3]) )
+            return false;
+        return true;
+    }
+
+    LONG DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pArray))
+        const LONG Ret = ArrayTypeInternal(pHandle, pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+        CATCH_BLOCK(DTWAIN_FAILURE1)
+    }
+
+    bool DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain)
+    {
+        double Val[4];
+        pTW_FIX32 pVal[4];
+        pVal[0] = &pTwain->Left;
+        pVal[1] = &pTwain->Top;
+        pVal[2] = &pTwain->Right;
+        pVal[3] = &pTwain->Bottom;
+
+        if ( !DTWAIN_FrameGetAll(pDdtwil, static_cast<LPDTWAIN_FLOAT>(&Val[0]), static_cast<LPDTWAIN_FLOAT>(&Val[1]), static_cast<LPDTWAIN_FLOAT>(&Val[2]), static_cast<LPDTWAIN_FLOAT>(&Val[3])))
+            return false;
+        for ( int i = 0; i < 4; i++ )
+            *pVal[i] = FloatToFix32( static_cast<float>(Val[i]) );
+        return true;
+    }
+}
+
+namespace stringutils = basicstringutils;
 using CharType = CTL_StringType::value_type;
 
 namespace
@@ -161,6 +331,16 @@ namespace
             return { DTWAIN_NO_ERROR, {} };
         }
     };
+
+    LONG ArrayTypeInternal(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
+    {
+        // Check if array exists
+        const auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
+        if (checkStatus.Check(pHandle).first != DTWAIN_NO_ERROR)
+            LOG_FUNC_EXIT_NONAME_PARAMS(-1)
+        return CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(pArray));
+    }
+
 
     template <typename RangeType, typename ZeroCheckFn>
     std::pair<bool, int> GeneralRangeCheck(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, ZeroCheckFn chkFn, size_t nWhichItem = 0)
@@ -417,12 +597,12 @@ namespace
 
         if (!checkStatus.IsAnsiArray())
         {
-            auto sTemp = StringConversion::Convert_NativePtr_To_Wide(pVal);
+            auto sTemp = stringconversion::Convert_NativePtr_To_Wide(pVal);
             GenericStringInserter<std::wstring, LPCWSTR, 0>(pHandle, pArray, nWhere, sTemp.c_str(), num);
         }
         else
         {
-            auto sTemp = StringConversion::Convert_NativePtr_To_Ansi(pVal);
+            auto sTemp = stringconversion::Convert_NativePtr_To_Ansi(pVal);
             GenericStringInserter<std::string, LPCSTR, 0>(pHandle, pArray, nWhere, sTemp.c_str(), num);
         }
         return true;
@@ -448,15 +628,6 @@ namespace
             pBuffer[DTWAIN_RANGEDEFAULT] = *static_cast<Traits*>(pDefault);
         if (valueCurrent)
             pBuffer[DTWAIN_RANGECURRENT] = *static_cast<Traits*>(valueCurrent);
-    }
-
-    LONG ArrayTypeInternal(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
-    {
-        // Check if array exists
-        const auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
-        if (checkStatus.Check(pHandle).first != DTWAIN_NO_ERROR)
-            LOG_FUNC_EXIT_NONAME_PARAMS(-1)
-        return CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(pArray));
     }
 
     int CheckArrayFrameValues(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, DTWAIN_FRAME frame)
@@ -594,103 +765,6 @@ namespace
     }
 }
 
-void dynarithmic::DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame)
-{
-    pHandle->m_ArrayFactory->destroy(Frame);
-}
-
-void dynarithmic::DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
-{
-    pHandle->m_ArrayFactory->destroy(pArray);
-}
-
-std::pair<int, DTWAIN_ARRAY> dynarithmic::CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize)
-{
-    if (nInitialSize < 0)
-        return { DTWAIN_ERR_INVALID_PARAM, nullptr };
-
-    switch (nEnumType)
-    {
-        case DTWAIN_ARRAYINT16:
-        case DTWAIN_ARRAYINT32:
-        case DTWAIN_ARRAYUINT16:
-        case DTWAIN_ARRAYUINT32:
-            nEnumType = DTWAIN_ARRAYLONG;
-        break;
-
-        case DTWAIN_ARRAYINT64:
-        case DTWAIN_ARRAYUINT64:
-            nEnumType = DTWAIN_ARRAYLONG64;
-        break;
-
-        default:;
-    }
-    int dummy = 0;
-    DTWAIN_ARRAY retArray = {};
-    if (nEnumType == DTWAIN_ARRAYFRAME)
-    {
-        retArray = VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_frame(0, 0, 0, 0));
-        if (retArray)
-        {
-            auto& vect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(retArray);
-            vect.resize(nInitialSize);
-        }
-    }
-    else
-        retArray = VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_array(static_cast<CTL_ArrayType>(nEnumType), &dummy, nInitialSize));
-    if ( retArray )
-        return { DTWAIN_NO_ERROR, retArray };
-    return { DTWAIN_ERR_BAD_ARRAY, nullptr };
-}
-
-DTWAIN_ARRAY dynarithmic::CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source)
-{
-    const LONG lType = CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(Source));
-    DTWAIN_ARRAY Dest = CreateArrayFromFactory(pHandle, lType, 0).second;
-    if (Dest)
-        pHandle->m_ArrayFactory->copy(Dest, Source);
-    return Dest;
-}
-
-void dynarithmic::SetArrayValueFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant)
-{
-    if (!pVariant)
-        return;
-    const auto& factory = pHandle->m_ArrayFactory;
-    const int enumType = factory->tag_type(pArray);
-    switch (enumType)
-    {
-        // Do something special for strings
-        case CTL_ArrayFactory::arrayTag::WStringType:
-        {
-            std::wstring sVal = static_cast<LPCWSTR>(pVariant);
-            factory->set_value(pArray, lPos, &sVal);
-        }
-        break;
-        case CTL_ArrayFactory::arrayTag::StringType:
-        {
-            std::string sVal = static_cast<LPCSTR>(pVariant);
-            factory->set_value(pArray, lPos, &sVal);
-        }
-        break;
-        default:
-            factory->set_value(pArray, lPos, pVariant);
-    }
-}
-
-DTWAIN_FRAME dynarithmic::CreateFrameArray(const CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom)
-{
-    return VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_frame(Left, Top, Right, Bottom));
-}
-
-std::pair<int, DTWAIN_ARRAY> dynarithmic::CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize)
-{
-    const LONG lType = dynarithmic::GetCapArrayType(pHandle, pSource, lCapType);
-    if (lType == DTWAIN_FAILURE1)
-        return { DTWAIN_ERR_BAD_CONTAINER, nullptr };
-    return CreateArrayFromFactory(pHandle, lType, lSize);
-}
-
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayInit()
 {
     LOG_FUNC_ENTRY_PARAMS(())
@@ -730,30 +804,6 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromType(DTWAIN_SOURCE Source, LONG 
 	CATCH_BLOCK(nullptr)
 }
 
-// Safely "move" an existing array to a new array.
-bool dynarithmic::MoveArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource)
-{
-    // The source must be an existing DTWAIN_ARRAY
-    bool bSourceArrayExists = pHandle->m_ArrayFactory->is_valid(*aSource);
-    if (!bSourceArrayExists)
-        return false;
-
-    // If source and destination are the same, nothing to do.
-    bool bDestinationArrayExists = pHandle->m_ArrayFactory->is_valid(*aDestination);
-    if (bDestinationArrayExists && (*aDestination == *aSource))
-        return true;
-
-    // Destroy the destination if it exists.
-    if (bDestinationArrayExists)
-        pHandle->m_ArrayFactory->destroy(*aDestination);
-
-    // Set destination equal to source, and null out the source.
-    // Setting the source to null ensures that any subsequent calls
-    // to destroy the source will essentially be a no-op.
-    *aDestination = *aSource;
-    *aSource = nullptr;
-    return true;
-}
 
 LONG DLLENTRY_DEF DTWAIN_ArrayGetType(DTWAIN_ARRAY pArray)
 {
@@ -764,13 +814,6 @@ LONG DLLENTRY_DEF DTWAIN_ArrayGetType(DTWAIN_ARRAY pArray)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
-LONG dynarithmic::DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
-{
-    LOG_FUNC_ENTRY_PARAMS((pArray))
-    const LONG Ret = ArrayTypeInternal(pHandle, pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
-}
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateCopy(DTWAIN_ARRAY Source)
 {
@@ -873,7 +916,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatN( DTWAIN_ARRAY pArray, DTWAIN_FLOA
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringN( DTWAIN_ARRAY pArray, LPCTSTR Val, LONG num )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, Val, num))
-    double dVal = dynarithmic::CharTraits<CharType>::ToDouble(Val);
+    double dVal = CharTraits<CharType>::ToDouble(Val);
     auto bRet = DTWAIN_ArrayAddFloatN(pArray, dVal, num);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -987,7 +1030,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloat(DTWAIN_ARRAY pArray, DTWAIN_FLOAT 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatString(DTWAIN_ARRAY pArray, LPCTSTR Val )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, Val))
-    double dVal = dynarithmic::CharTraits<CharType>::ToDouble(Val);
+    double dVal = CharTraits<CharType>::ToDouble(Val);
     auto bRet = DTWAIN_ArrayAddFloat(pArray, dVal);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -1188,7 +1231,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloat(DTWAIN_ARRAY pArray, LONG nWh
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatString(DTWAIN_ARRAY pArray, LONG nWhere, LPCTSTR Val)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, Val))
-    double dValue = dynarithmic::CharTraits<CharType>::ToDouble(Val);
+    double dValue = CharTraits<CharType>::ToDouble(Val);
     const DTWAIN_BOOL bRet = DTWAIN_ArrayInsertAtFloat(pArray, nWhere, dValue);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -1522,10 +1565,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWher
     bool bRet = false;
     if (checkStatus.IsAnsiArray())
         bRet = StringGetterEx<CTL_StringTypeA, CTL_StringType>(pHandle, pArray, nWhere, pStr, 
-                                [](const CTL_StringTypeA& val) {return StringConversion::Convert_Ansi_To_Native(val); });
+                                [](const CTL_StringTypeA& val) {return stringconversion::Convert_Ansi_To_Native(val); });
     else
         bRet = StringGetterEx<CTL_StringTypeW, CTL_StringType>(pHandle, pArray, nWhere, pStr,
-                                [](const CTL_StringTypeW& val) {return StringConversion::Convert_Wide_To_Native(val); });
+                                [](const CTL_StringTypeW& val) {return stringconversion::Convert_Wide_To_Native(val); });
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStr))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -1624,8 +1667,8 @@ LONG DLLENTRY_DEF DTWAIN_ArrayFindFloat( DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, 
 LONG DLLENTRY_DEF DTWAIN_ArrayFindFloatString( DTWAIN_ARRAY pArray, LPCTSTR Val, LPCTSTR Tolerance )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, Val, Tolerance))
-    double dVal = dynarithmic::CharTraits<CharType>::ToDouble(Val);
-    double dTol = dynarithmic::CharTraits<CharType>::ToDouble(Tolerance);
+    double dVal = CharTraits<CharType>::ToDouble(Val);
+    double dTol = CharTraits<CharType>::ToDouble(Tolerance);
     LONG FoundPos = DTWAIN_ArrayFindFloat(pArray, dVal, dTol);
     LOG_FUNC_EXIT_NONAME_PARAMS(FoundPos)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -1677,7 +1720,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatN(DTWAIN_ARRAY pArray, LONG nW
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCTSTR Val, LONG num)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, Val, num))
-    double dValue = dynarithmic::CharTraits<CharType>::ToDouble(Val);
+    double dValue = CharTraits<CharType>::ToDouble(Val);
     const DTWAIN_BOOL bRet = DTWAIN_ArrayInsertAtN(pArray,nWhere,&dValue,num);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -1793,7 +1836,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFloat(DTWAIN_ARRAY pArray, LONG nWhere
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFloatString(DTWAIN_ARRAY pArray, LONG nWhere, LPCTSTR Val)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, Val))
-    double dVal = dynarithmic::CharTraits<CharType>::ToDouble(Val);
+    double dVal = CharTraits<CharType>::ToDouble(Val);
     const DTWAIN_BOOL bRet = DTWAIN_ArraySetAt(pArray, nWhere, &dVal);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -1811,13 +1854,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtString(DTWAIN_ARRAY pArray, LONG nWher
 
     if (!checkStatus.IsAnsiArray())
     {
-        auto sTemp = StringConversion::Convert_NativePtr_To_Wide(pStr);
-        dynarithmic::SetArrayValueFromFactory(pHandle, pArray, nWhere, (LPVOID)sTemp.data());
+        auto sTemp = stringconversion::Convert_NativePtr_To_Wide(pStr);
+        SetArrayValueFromFactory(pHandle, pArray, nWhere, (LPVOID)sTemp.data());
     }
     else
     {
-        auto sTemp = StringConversion::Convert_NativePtr_To_Ansi(pStr);
-        dynarithmic::SetArrayValueFromFactory(pHandle, pArray, nWhere, (LPVOID)sTemp.data());
+        auto sTemp = stringconversion::Convert_NativePtr_To_Ansi(pStr);
+        SetArrayValueFromFactory(pHandle, pArray, nWhere, (LPVOID)sTemp.data());
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -1949,7 +1992,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValueFloat( DTWAIN_RANGE pArray, LONG nW
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValueFloatString( DTWAIN_RANGE pArray, LONG nWhich, LPCTSTR Val)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhich, Val))
-    const double d = dynarithmic::CharTraits<CharType>::ToDouble(Val);
+    const double d = CharTraits<CharType>::ToDouble(Val);
     const DTWAIN_BOOL bRet = DTWAIN_RangeSetValueFloat(pArray,nWhich, d);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -2047,7 +2090,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAllFloatString(DTWAIN_RANGE pArray, LPCT
     double d[5];
     LPCTSTR* vals[] = {&dLow, &dUp, &dStep, &dDefault, &dCurrent};
     for (int i = 0; i < 5; ++i )
-      d[i] = dynarithmic::CharTraits<CharType>::ToDouble(*vals[i]);
+      d[i] = CharTraits<CharType>::ToDouble(*vals[i]);
     const DTWAIN_BOOL bRet = DTWAIN_RangeSetAllFloat(pArray, d[0], d[1], d[2], d[3], d[4]);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -2238,7 +2281,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPosFloatString( DTWAIN_RANGE pArray, LPC
     DTWAIN_BOOL bRet = TRUE;
     if ( Val && pPos)
     {
-        const double d = dynarithmic::CharTraits<CharType>::ToDouble(Val);
+        const double d = CharTraits<CharType>::ToDouble(Val);
         bRet = DTWAIN_RangeGetPosFloat(pArray, d, pPos);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pPos))
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -2367,7 +2410,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValueFloatString( DTWAIN_RANGE pA
     if ( !dIn || !pOutput )
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-    const double dValue = dynarithmic::CharTraits<CharType>::ToDouble(dIn);
+    const double dValue = CharTraits<CharType>::ToDouble(dIn);
     double dOut;
     const DTWAIN_BOOL bRet = DTWAIN_RangeGetNearestValueFloat(pArray, dValue, &dOut,RoundType);
     if ( bRet )
@@ -2383,7 +2426,7 @@ DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreate(DTWAIN_FLOAT Left, DTWAIN_FLOAT Top
 {
     LOG_FUNC_ENTRY_PARAMS((Left, Top, Right, Bottom))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
-    const auto newFrame = dynarithmic::CreateFrameArray(pHandle, Left, Top, Right, Bottom);
+    const auto newFrame = CreateFrameArray(pHandle, Left, Top, Right, Bottom);
     LOG_FUNC_EXIT_NONAME_PARAMS(newFrame)
     CATCH_BLOCK(nullptr)
 }
@@ -2479,7 +2522,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameString(DTWAIN_ARRAY FrameArray, L
     auto vOne = pr.second;
     for (int i = 0; i < 4; ++i)
     {
-        aComponents[i] = dynarithmic::CharTraits<CharType>::ToDouble(aValues[i]);
+        aComponents[i] = CharTraits<CharType>::ToDouble(aValues[i]);
         if ( aValues[i] )
             vOne->m_FrameComponent[aDimensions[i]] = aComponents[i];
     }
@@ -2621,10 +2664,10 @@ DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreateString(LPCTSTR Left, LPCTSTR Top, LP
 {
     LOG_FUNC_ENTRY_PARAMS((Left, Top, Right, Bottom))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
-    const double leftD    = dynarithmic::CharTraits<CharType>::ToDouble(Left);
-    const double topD     = dynarithmic::CharTraits<CharType>::ToDouble(Top);
-    const double rightD   = dynarithmic::CharTraits<CharType>::ToDouble(Right);
-    const double bottomD  = dynarithmic::CharTraits<CharType>::ToDouble(Bottom);
+    const double leftD    = CharTraits<CharType>::ToDouble(Left);
+    const double topD     = CharTraits<CharType>::ToDouble(Top);
+    const double rightD   = CharTraits<CharType>::ToDouble(Right);
+    const double bottomD  = CharTraits<CharType>::ToDouble(Bottom);
     const DTWAIN_FRAME newFrame = CreateFrameArray(pHandle, leftD, topD, rightD, bottomD);
     LOG_FUNC_EXIT_NONAME_PARAMS(newFrame)
     CATCH_BLOCK(nullptr)
@@ -2643,7 +2686,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllString(DTWAIN_FRAME Frame, LPCTSTR Le
     auto& pPtr = vOne.front();
     for (int i = 0; i < 4; ++i)
     {
-        aComponents[i] = dynarithmic::CharTraits<CharType>::ToDouble(aValues[i]);
+        aComponents[i] = CharTraits<CharType>::ToDouble(aValues[i]);
         if ( aValues[i] )
             pPtr.m_FrameComponent[aDimensions[i]] = aComponents[i];
     }
@@ -2691,7 +2734,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValueString(DTWAIN_FRAME Frame, LONG nWh
     LOG_FUNC_ENTRY_PARAMS((Frame, nWhich, Value))
     if (Value)
     {
-        const double dFrameComponent = dynarithmic::CharTraits<CharType>::ToDouble(Value);
+        const double dFrameComponent = CharTraits<CharType>::ToDouble(Value);
         const DTWAIN_BOOL bRet = DTWAIN_FrameSetValue(Frame, nWhich, dFrameComponent);
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     }
@@ -2921,7 +2964,7 @@ DTWAIN_ARRAY GenericArrayStringToFloat(const CTL_TwainDLLHandle* pHandle,
     // convert string to double
     std::transform(vIn, vIn + Count, vOut, [&](const auto& str)
         {
-            return dynarithmic::CharTraits<CTL_StringType::value_type>::ToDouble(str.c_str());
+            return CharTraits<CTL_StringType::value_type>::ToDouble(str.c_str());
         });
     retVal = DTWAIN_NO_ERROR;
     return VOID_TO_DTWAIN_ARRAY(aDouble);
@@ -3001,36 +3044,6 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayStringToFloat(DTWAIN_ARRAY StringArray)
     CATCH_BLOCK(nullptr)
 }
 
-bool dynarithmic::DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain)
-{
-    double Val[4];
-    pTW_FIX32 pVal[4];
-    pVal[0] = &pTwain->Left;
-    pVal[1] = &pTwain->Top;
-    pVal[2] = &pTwain->Right;
-    pVal[3] = &pTwain->Bottom;
-
-    if ( !DTWAIN_FrameGetAll(pDdtwil, static_cast<LPDTWAIN_FLOAT>(&Val[0]), static_cast<LPDTWAIN_FLOAT>(&Val[1]), static_cast<LPDTWAIN_FLOAT>(&Val[2]), static_cast<LPDTWAIN_FLOAT>(&Val[3])))
-        return false;
-    for ( int i = 0; i < 4; i++ )
-        *pVal[i] = dynarithmic::FloatToFix32( static_cast<float>(Val[i]) );
-    return true;
-}
-
-bool dynarithmic::TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil)
-{
-    double ValOut[4];
-    TW_FIX32 ValIn[4];
-    ValIn[0] = pTwain.Left;
-    ValIn[1] = pTwain.Top;
-    ValIn[2] = pTwain.Right;
-    ValIn[3] = pTwain.Bottom;
-
-    std::transform(ValIn, ValIn + 4, ValOut, dynarithmic::Fix32ToFloat);
-    if ( !DTWAIN_FrameSetAll(pDdtwil, ValOut[0], ValOut[1], ValOut[2], ValOut[3]) )
-        return false;
-    return true;
-}
 
 LONG DLLENTRY_DEF DTWAIN_GetNumAcquisitions(DTWAIN_ARRAY aAcq)
 {
@@ -3054,7 +3067,7 @@ LONG DLLENTRY_DEF DTWAIN_GetNumAcquiredImages( DTWAIN_ARRAY aAcq, LONG nWhich )
 }
 
 
-void dynarithmic::SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib )
+void SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib )
 {
     const int nDibs = GetNumAcquiredImages(pHandle, aAcq, nWhichAcq );
     if (nWhichDib >= nDibs)
@@ -3165,7 +3178,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY theArray, DTWAIN_BOO
     const auto checkStatus = ArrayChecker().SetArray1(theArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if (checkStatus.Check(pHandle).first != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    dynarithmic::DumpArrayContents(theArray, 0, true, bAsUnsigned?true:false);
+    DumpArrayContents(theArray, 0, true, bAsUnsigned?true:false);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(0)
 }

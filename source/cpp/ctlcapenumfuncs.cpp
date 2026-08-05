@@ -31,7 +31,7 @@
 #endif
 
 using namespace dynarithmic;
-namespace stringutils = dynarithmic::basicstringutils;
+namespace stringutils = basicstringutils;
 
 /////////////////////////////////////////////////////////////////////////
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx(DTWAIN_SOURCE Source)
@@ -200,7 +200,7 @@ namespace
         CTL_CapabilityLabelHelpTriplet<msgType> LabelHelpTrip(pHandle->m_pTwainSession, static_cast<TW_UINT16>(lCapability));
         auto rc = LabelHelpTrip.Execute();
         if (rc == TWRC_SUCCESS)
-            return StringConversion::Convert_Ansi_To_Native(LabelHelpTrip.GetString());
+            return stringconversion::Convert_Ansi_To_Native(LabelHelpTrip.GetString());
         return {};
     }
 }
@@ -288,7 +288,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapLabel(LONG lCapability, LPTSTR lpszLabel, LONG nM
 
     // Get the cap label (if this is supported)
     CTL_StringType label = GetCapLabelHelpInternal<MSG_GETLABEL>(pHandle, lCapability);
-    auto maxChars = dynarithmic::CopyInfoToCString(label, lpszLabel, nMaxLen);
+    auto maxChars = CopyInfoToCString(label, lpszLabel, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszLabel))
     LOG_FUNC_EXIT_NONAME_PARAMS(maxChars)
     CATCH_BLOCK(0)
@@ -300,7 +300,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapHelp(LONG lCapability, LPTSTR lpszHelp, LONG nMax
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     // Get the cap help (if this is supported)
     CTL_StringType label = GetCapLabelHelpInternal<MSG_GETHELP>(pHandle, lCapability);
-    auto maxChars = dynarithmic::CopyInfoToCString(label, lpszHelp, nMaxLen);
+    auto maxChars = CopyInfoToCString(label, lpszHelp, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszHelp))
     LOG_FUNC_EXIT_NONAME_PARAMS(maxChars)
     CATCH_BLOCK(0)
@@ -314,7 +314,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCapLabels(LONG lCapability)
     DTWAIN_ARRAY arrayRet = {};
     auto rc = Trip.Execute();
     if (rc == TWRC_SUCCESS)
-        arrayRet = dynarithmic::CreateArrayFromContainer<std::vector<std::string>>(pHandle, Trip.GetStrings());
+        arrayRet = CreateArrayFromContainer<std::vector<std::string>>(pHandle, Trip.GetStrings());
     LOG_FUNC_EXIT_NONAME_PARAMS(arrayRet)
     CATCH_BLOCK(nullptr)
 }

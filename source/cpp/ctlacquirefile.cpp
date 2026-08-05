@@ -35,7 +35,7 @@
 #endif
 
 using namespace dynarithmic;
-namespace stringutils = dynarithmic::basicstringutils;
+namespace stringutils = basicstringutils;
 
 namespace
 {
@@ -60,7 +60,7 @@ namespace
         {
             if (!CheckForAnyBlankNames<std::vector<StringType>>(vect))
             {
-                auto retVal = dynarithmic::CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
+                auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
                 if (!retVal.second)
                     bRetval = retVal.first;
                 else
@@ -216,27 +216,30 @@ LONG DLLENTRY_DEF DTWAIN_GetFileSavePageCount(DTWAIN_SOURCE Source)
     CATCH_BLOCK_LOG_PARAMS(-1)
 }
 
-DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
+namespace dynarithmic
 {
-    LOG_FUNC_ENTRY_PARAMS((opts))
-    const DTWAIN_ARRAY FileList = opts.getFileList();
-    if (FileList)
-        opts.setFileFlags(opts.getFileFlags() | DTWAIN_USELIST);
-    if ( opts.getAcquireType() != TWAINAcquireType_AudioFile)
-        opts.setActualAcquireType(TWAINAcquireType_File);
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
-    const auto pHandle = pSource->GetDTWAINHandle();
-    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
-        return LLAcquireImage(opts);
-    auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
-    DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
-    if (pr.first != DTWAIN_NO_ERROR)
+    DTWAIN_ACQUIRE DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
     {
-        CTL_TwainAppMgr::DisableUserInterface(pSource);
-        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+        LOG_FUNC_ENTRY_PARAMS((opts))
+        const DTWAIN_ARRAY FileList = opts.getFileList();
+        if (FileList)
+            opts.setFileFlags(opts.getFileFlags() | DTWAIN_USELIST);
+        if ( opts.getAcquireType() != TWAINAcquireType_AudioFile)
+            opts.setActualAcquireType(TWAINAcquireType_File);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+        const auto pHandle = pSource->GetDTWAINHandle();
+        if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
+            return LLAcquireImage(opts);
+        auto pr = StartModalMessageLoop(pSource, opts);
+        DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
+        if (pr.first != DTWAIN_NO_ERROR)
+        {
+            CTL_TwainAppMgr::DisableUserInterface(pSource);
+            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
+        CATCH_BLOCK(DTWAIN_FAILURE1)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
 namespace
@@ -258,109 +261,111 @@ namespace
     {
         return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
             GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " +
-            StringConversion::Convert_NativePtr_To_Ansi(fileName.data());
+            stringconversion::Convert_NativePtr_To_Ansi(fileName.data());
     }
 }
 
-bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
+namespace dynarithmic
 {
-    LOG_FUNC_ENTRY_PARAMS((opts))
-    auto *pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
-
-    DumpArrayContents(opts.getFileList(), 0, false, false);
-    #ifdef _UNICODE
-        auto vTest = FileListToVector<std::wstring>(opts);
-    #else
-        auto vTest = FileListToVector<std::string>(opts);
-    #endif
-
-    opts.setDiscardDibs(!(opts.getFileFlags() & DTWAIN_NODELETEDIBS));
-    opts.setAcquireType(AcquireType);
-
-    // set the auto create directory if indicated
-    bool bCreateDir = opts.getFileFlags() & DTWAIN_CREATE_DIRECTORY;
-    pSource->SetFileAutoCreateDirectory(bCreateDir);
-
-    // if the auto-create is not on, let's do a quick test to see if the file can be written to the
-    // directory specified.
-    const auto pHandle = pSource->GetDTWAINHandle();
-
-    // Set the total file saving page count to 0
-    pSource->GetAcquireFileStatusRef().SetFileSavePageCount(0);
-
-    bool bUsePrompt = opts.getFileFlags() & DTWAIN_USEPROMPT;
-    if (!bUsePrompt)
+    bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
     {
-        // The following loop makes sure that all the files specified have directories that are writable
-        for (auto& fileName : vTest)
+        LOG_FUNC_ENTRY_PARAMS((opts))
+        auto *pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+
+        DumpArrayContents(opts.getFileList(), 0, false, false);
+        #ifdef _UNICODE
+            auto vTest = FileListToVector<std::wstring>(opts);
+        #else
+            auto vTest = FileListToVector<std::string>(opts);
+        #endif
+
+        opts.setDiscardDibs(!(opts.getFileFlags() & DTWAIN_NODELETEDIBS));
+        opts.setAcquireType(AcquireType);
+
+        // set the auto create directory if indicated
+        bool bCreateDir = opts.getFileFlags() & DTWAIN_CREATE_DIRECTORY;
+        pSource->SetFileAutoCreateDirectory(bCreateDir);
+
+        // if the auto-create is not on, let's do a quick test to see if the file can be written to the
+        // directory specified.
+        const auto pHandle = pSource->GetDTWAINHandle();
+
+        // Set the total file saving page count to 0
+        pSource->GetAcquireFileStatusRef().SetFileSavePageCount(0);
+
+        bool bUsePrompt = opts.getFileFlags() & DTWAIN_USEPROMPT;
+        if (!bUsePrompt)
         {
-            if (!bCreateDir)
+            // The following loop makes sure that all the files specified have directories that are writable
+            for (auto& fileName : vTest)
             {
-                // Check for existing writable directory
-                if (!dynarithmic::fileutils::directory_writeable(fileName.c_str()))
+                if (!bCreateDir)
                 {
-                    LogWriterUtils::WriteLogInfoIndentedA(GetDirectoryCreationError(dynarithmic::fileutils::get_parent_directory(fileName.c_str(), false)));
-                    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{ return true; }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
-                }
-            }
-            else
-            {
-                if (!dynarithmic::fileutils::parent_directory_exists(fileName.c_str()).first)
-                {
-                    auto testDir = dynarithmic::fileutils::get_parent_directory(fileName.c_str(), false);
-
-                    // auto-create the directory
-                    const auto dirCreated = dynarithmic::fileutils::create_directory(testDir.c_str());
-
-                    if (!dirCreated.first)
+                    // Check for existing writable directory
+                    if (!fileutils::directory_writeable(fileName.c_str()))
                     {
-                        // directory creation failed for one of the files.  
-                        LogWriterUtils::WriteLogInfoIndentedA(GetDirectoryCreationError(testDir));
-                        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]
-                            { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
+                        LogWriterUtils::WriteLogInfoIndentedA(GetDirectoryCreationError(fileutils::get_parent_directory(fileName.c_str(), false)));
+                        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{ return true; }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
+                    }
+                }
+                else
+                {
+                    if (!fileutils::parent_directory_exists(fileName.c_str()).first)
+                    {
+                        auto testDir = fileutils::get_parent_directory(fileName.c_str(), false);
+
+                        // auto-create the directory
+                        const auto dirCreated = fileutils::create_directory(testDir.c_str());
+
+                        if (!dirCreated.first)
+                        {
+                            // directory creation failed for one of the files.  
+                            LogWriterUtils::WriteLogInfoIndentedA(GetDirectoryCreationError(testDir));
+                            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]
+                                { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
+                        }
                     }
                 }
             }
         }
-    }
-    const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
-    if (opts.getStatus() < 0 && !aDibs)
-    {
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    }
+        const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
+        if (opts.getStatus() < 0 && !aDibs)
+        {
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
 
-    bool bRetval = false;
-    if (aDibs)
-    {
+        bool bRetval = false;
+        if (aDibs)
+        {
+            if (pHandle->m_lAcquireMode == DTWAIN_MODAL)
+            {
+                if (!(opts.getFileFlags() & DTWAIN_NODELETEDIBS))
+                {
+                    DestroyAcquisitionArray(pHandle, aDibs, TRUE);
+                    pSource->ResetAcquisitionAttempts(nullptr);
+                }
+                else
+                {
+                    pSource->SetUserAcquisitionArray(aDibs);
+                    pSource->SetAcquisitionAttempts(nullptr);
+                }
+            }
+            bRetval = true;
+        }
+
         if (pHandle->m_lAcquireMode == DTWAIN_MODAL)
         {
-            if (!(opts.getFileFlags() & DTWAIN_NODELETEDIBS))
-            {
-                dynarithmic::DestroyAcquisitionArray(pHandle, aDibs, TRUE);
-                pSource->ResetAcquisitionAttempts(nullptr);
-            }
+            if (!aDibs)
+                bRetval = false;
             else
-            {
-                pSource->SetUserAcquisitionArray(aDibs);
-                pSource->SetAcquisitionAttempts(nullptr);
-            }
+            if (opts.getStatus() == DTWAIN_TN_ACQUIREDONE)
+                bRetval = true;
         }
-        bRetval = true;
-    }
-
-    if (pHandle->m_lAcquireMode == DTWAIN_MODAL)
-    {
-        if (!aDibs)
-            bRetval = false;
         else
-        if (opts.getStatus() == DTWAIN_TN_ACQUIREDONE)
-            bRetval = true;
+        if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
+            pSource->m_pUserPtr = nullptr;
+
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+        CATCH_BLOCK(false)
     }
-    else
-    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
-        pSource->m_pUserPtr = nullptr;
-
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
-    CATCH_BLOCK(false)
 }
-

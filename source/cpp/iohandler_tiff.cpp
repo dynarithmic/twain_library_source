@@ -115,7 +115,7 @@ int CTL_TiffIOHandler::WriteOneTiffPage(LPCTSTR path, HANDLE bitmap, const DibMu
     TiffSessionOptions tiffOptions;
 
     // Set the big tiff option if this is a big TIFF file
-    if (dynarithmic::IsFileTypeBigTiff(static_cast<CTL_TwainFileFormatEnum>(GetTiffFormat())))
+    if (IsFileTypeBigTiff(static_cast<CTL_TwainFileFormatEnum>(GetTiffFormat())))
         tiffOptions.containerFormat = TiffContainerFormat::BigTiff;
 
     // Get the DIB
@@ -170,7 +170,7 @@ int CTL_TiffIOHandler::WriteOneTiffPage(LPCTSTR path, HANDLE bitmap, const DibMu
     if (!multiPageStruct || multiPageStruct->Stage == 0 || multiPageStruct->Stage == DIB_MULTI_FIRST)
     {
         // If first page or if single page TIFF, write first page
-        const std::wstring fnameW = StringConversion::Convert_NativePtr_To_Wide(path);
+        const std::wstring fnameW = stringconversion::Convert_NativePtr_To_Wide(path);
 
         tiffOptions.software = GetCopyrightString();
 
@@ -210,8 +210,8 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if (isFirstPage)
     {
         // Attempt to delete the file
-        if (!dynarithmic::fileutils::delete_file(sActualFileName.c_str()))
-            LogWriterUtils::WriteLogInfoIndentedA("Could not delete existing file " + StringConversion::Convert_Native_To_Ansi(sActualFileName));
+        if (!fileutils::delete_file(sActualFileName.c_str()))
+            LogWriterUtils::WriteLogInfoIndentedA("Could not delete existing file " + stringconversion::Convert_Native_To_Ansi(sActualFileName));
     }
 
     auto retVal = WriteOneTiffPage(sActualFileName.c_str(), m_pDib->GetHandle(), pMultiPageStruct);

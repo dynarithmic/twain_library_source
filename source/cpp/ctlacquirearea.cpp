@@ -184,10 +184,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetTy
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2String(DTWAIN_SOURCE Source, LPCTSTR left, LPCTSTR top, LPCTSTR right, LPCTSTR bottom, LONG Unit, LONG flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
-    const DTWAIN_FLOAT val1 = dynarithmic::CharTraits<CharType>::ToDouble(left);
-    const DTWAIN_FLOAT val2 = dynarithmic::CharTraits<CharType>::ToDouble(top);
-    const DTWAIN_FLOAT val3 = dynarithmic::CharTraits<CharType>::ToDouble(right);
-    const DTWAIN_FLOAT val4 = dynarithmic::CharTraits<CharType>::ToDouble(bottom);
+    const DTWAIN_FLOAT val1 = CharTraits<CharType>::ToDouble(left);
+    const DTWAIN_FLOAT val2 = CharTraits<CharType>::ToDouble(top);
+    const DTWAIN_FLOAT val3 = CharTraits<CharType>::ToDouble(right);
+    const DTWAIN_FLOAT val4 = CharTraits<CharType>::ToDouble(bottom);
     const DTWAIN_BOOL bRet = DTWAIN_SetAcquireArea2(Source, val1, val2, val3, val4, Unit, flags);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -220,7 +220,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTS
             if (pStr[i])
             {
                 std::string sResult = strm.str();
-                dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sResult), 
+                CopyInfoToCString(stringconversion::Convert_Ansi_To_Native(sResult), 
                                                pStr[i], static_cast<int32_t>(sResult.size()) + 1);
             }
             strm.str("");

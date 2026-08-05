@@ -154,7 +154,7 @@ namespace dynarithmic
             void Close();
             bool IsOpen() const noexcept;
             std::size_t GetPageIndex() const noexcept;
-            static std::optional<PreparedTiffDibPage> MakePreparedTiffDibPage(const dynarithmic::DibPageView& view);
+            static std::optional<PreparedTiffDibPage> MakePreparedTiffDibPage(const DibPageView& view);
 
 
         private:

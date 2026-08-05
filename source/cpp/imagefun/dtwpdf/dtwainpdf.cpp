@@ -156,11 +156,11 @@ std::string CreateIDString(std::string_view sName, std::string& ID1, std::string
     sprintf(szBuf, "%s-%s", sNow.c_str(), sName.data());
     WRITE_TO_LOG()
     std::vector<unsigned char> hash = 
-        dynarithmic::MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf), strlen(szBuf));
+        MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf), strlen(szBuf));
     hash.resize(32,'\0');
     WRITE_TO_LOG()
     std::vector<unsigned char> version = 
-        dynarithmic::MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf2), strlen(szBuf2));
+        MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf2), strlen(szBuf2));
     version.resize(32,'\0');
     WRITE_TO_LOG()
     std::string hexHash;
@@ -281,7 +281,7 @@ static int EncodeVectorStream(const std::vector<char>& InputStream,
                         { PdfDocument::AHEX_COMPRESS, ASCIIHexEncode},
                         { PdfDocument::FLATE_COMPRESS, FlateEncode },}};
 
-    auto iter = dynarithmic::generic_array_finder_if(compress_fn, [&](const auto& pr) { return pr.first == compresstype; });
+    auto iter = generic_array_finder_if(compress_fn, [&](const auto& pr) { return pr.first == compresstype; });
     if ( iter.first)
     {
         auto fnCall = compress_fn[iter.second].second;
@@ -480,7 +480,7 @@ bool PdfDocument::OpenNewPDFFile(CTL_StringType sFile)
     m_sOutputFileName = std::move(sFile);
     WRITE_TO_LOG()
     // Get the document ID for this file
-    CreateIDString(StringConversion::Convert_Native_To_Ansi(m_sOutputFileName), m_DocumentID[0], m_DocumentID[1]);
+    CreateIDString(stringconversion::Convert_Native_To_Ansi(m_sOutputFileName), m_DocumentID[0], m_DocumentID[1]);
     WRITE_TO_LOG()
     return true;
 }
@@ -1622,7 +1622,7 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
 
     // First open the image file (this will always be a JPEG file
     // Open the file -- why is this a memory leak?
-    if ((infile = fopen(StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb")) == nullptr)
+    if ((infile = fopen(stringconversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb")) == nullptr)
         return false;
     {
         // Setup the decompression options
@@ -1662,7 +1662,7 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
     size_t nMaxRead = 50000;
     m_vImgStream.resize(nMaxRead);
 
-    if ((infile = fopen (StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb")) == nullptr)
+    if ((infile = fopen (stringconversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb")) == nullptr)
         return false;
     size_t nCount;
 
@@ -1694,7 +1694,7 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
 
 bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*/, int& dpix, int& dpiy)
 {
-    TIFF* image = TIFFOpen(StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb");
+    TIFF* image = TIFFOpen(stringconversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb");
     if (!image)
         return false;
 
@@ -2007,8 +2007,8 @@ void PdfDocument::SetEncryption(CTL_StringViewType ownerPassword,
                                 bool isAESEncrypted,
                                 uint32_t nKeyLength)
 {
-    m_EncryptionPassword[OWNER_PASSWORD] = StringConversion::Convert_NativePtr_To_Ansi(ownerPassword.data());
-    m_EncryptionPassword[USER_PASSWORD] = StringConversion::Convert_NativePtr_To_Ansi(userPassword.data());
+    m_EncryptionPassword[OWNER_PASSWORD] = stringconversion::Convert_NativePtr_To_Ansi(ownerPassword.data());
+    m_EncryptionPassword[USER_PASSWORD] = stringconversion::Convert_NativePtr_To_Ansi(userPassword.data());
     m_nPermissions = permissions;
     m_bIsStrongEncryption = bIsStrongEncryption || isAESEncrypted || nKeyLength == 32;
     m_bIsAESEncrypted = isAESEncrypted;
@@ -2034,8 +2034,8 @@ void PdfDocument::SetEncryption(CTL_StringViewType ownerPassword,
     }
 
     const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
-    auto docIDHash = dynarithmic::MD5Hasher().GetHash(reinterpret_cast<const unsigned char*>(s.c_str()), s.size());
-    const std::string dID = dynarithmic::HexStringFromUChars<std::string>(docIDHash.data(), docIDHash.size());
+    auto docIDHash = MD5Hasher().GetHash(reinterpret_cast<const unsigned char*>(s.c_str()), s.size());
+    const std::string dID = HexStringFromUChars<std::string>(docIDHash.data(), docIDHash.size());
     m_DocumentID[0] = dID;
     m_DocumentID[1] = dID;
 

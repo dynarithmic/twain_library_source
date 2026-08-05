@@ -34,18 +34,6 @@
 
 using namespace dynarithmic;
 
-namespace timeutils
-{
-    bool GetLocalTime(std::time_t value, std::tm& result)
-    {
-    #ifdef _WIN32
-        return ::localtime_s(&result, &value) == 0;
-    #else
-        return ::localtime_r(&value, &result) != nullptr;
-    #endif
-    }
-}
-
 namespace
 {
     template <typename StringType, typename PointerTypeIn = StringType::value_type*,
@@ -61,7 +49,7 @@ namespace
             PointerTypeIn ptrData = (PointerTypeIn)raii.getData();
             auto len = std::char_traits<StringType::value_type>::length(ptrData);
             StringType str(ptrData, len);
-            return dynarithmic::CopyInfoToCString(str, outString, nLength);
+            return CopyInfoToCString(str, outString, nLength);
         }
         return 0;
     }
@@ -130,46 +118,6 @@ namespace dynarithmic
 
         // Just return the original string
         return origString.data();
-    }
-
-    std::string CreateFileNameWithDateTime(std::string_view prefix, std::string_view ext, bool useUTC)
-    {
-        using namespace std::chrono;
-        const auto now = system_clock::now();
-        std::string result(prefix);
-
-        if (useUTC)
-        {
-            const auto utcMilliseconds = duration_cast<milliseconds>(now.time_since_epoch()).count();
-            result += std::to_string(utcMilliseconds);
-        }
-        else
-        {
-            const auto localmilliseconds = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
-            const std::time_t timeValue = system_clock::to_time_t(now);
-
-            std::tm localTime{};
-            if (!timeutils::GetLocalTime(timeValue, localTime))
-                return {};
-
-            std::ostringstream os;
-
-            os << std::put_time(&localTime, "%Y-%m-%d_%H-%M-%S")
-                << '_'
-                << std::setw(3)
-                << std::setfill('0')
-                << localmilliseconds.count();
-
-            result += os.str();
-        }
-
-        if (!ext.empty())
-        {
-            result += '.';
-            result.append(ext.data(), ext.size());
-        }
-
-        return result;
     }
 
     // Function to convert a two-character hex string to a byte

@@ -34,7 +34,7 @@ LONG DLLENTRY_DEF  DTWAIN_GetCapFromName(LPCTSTR szName)
     LOG_FUNC_ENTRY_PARAMS((szName))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !szName; }, DTWAIN_ERR_INVALID_PARAM, 0L, FUNC_MACRO);
-    const LONG Cap = CTL_TwainAppMgr::GetCapFromCapName(StringConversion::Convert_NativePtr_To_Ansi(szName).c_str());
+    const LONG Cap = CTL_TwainAppMgr::GetCapFromCapName(stringconversion::Convert_NativePtr_To_Ansi(szName).c_str());
     DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return Cap == TwainCap_INVALID; }, DTWAIN_ERR_BAD_CAP, 0L, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS((long)Cap)
     CATCH_BLOCK(0)
@@ -44,7 +44,7 @@ LONG DLLENTRY_DEF DTWAIN_GetNameFromCap(LONG nCapValue, LPTSTR szValue, LONG nMa
 {
     LOG_FUNC_ENTRY_PARAMS((nCapValue, szValue, nMaxLen))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG nTotalBytes = dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(CTL_TwainAppMgr::GetCapNameFromCap(nCapValue)), szValue, nMaxLen);
+    const LONG nTotalBytes = CopyInfoToCString(stringconversion::Convert_Ansi_To_Native(CTL_TwainAppMgr::GetCapNameFromCap(nCapValue)), szValue, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szValue))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(-1)
