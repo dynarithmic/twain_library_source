@@ -27,7 +27,7 @@
 #include "ctlstringutilsx.h"
 
 using namespace dynarithmic;
-namespace stringutils = basicstringutils;
+namespace stringutils = dynarithmic::basicstringutils;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG CreationFlags)
 {
@@ -58,7 +58,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
     {
         bool bLogMessages = (CTL_StaticData::GetLogFilterFlags()) ? true : false;
         CTL_StringType sTemp = WindowsAPIImplDef::RemoveBackslashFromDirectory(szFilePath);
-        auto dirCreated = fileutils::create_directory(sTemp.c_str());
+        auto dirCreated = dynarithmic::fileutils::create_directory(sTemp.c_str());
         if (!dirCreated.first)
         {
             if (bLogMessages)
@@ -88,7 +88,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectory(LPTSTR szFilePath, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szFilePath, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG nRealLen = CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
+    const LONG nRealLen = dynarithmic::CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFilePath))
     LOG_FUNC_EXIT_NONAME_PARAMS(nRealLen)
     CATCH_BLOCK(DTWAIN_FAILURE1)

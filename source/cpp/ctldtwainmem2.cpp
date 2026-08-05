@@ -52,7 +52,7 @@ namespace
             HANDLE h = ImageMemoryHandler::GlobalAlloc(GHND, memSize);
             #ifdef WIN32
             if (!h)
-                LogWin32Error(ImageMemoryHandler::GetLastError());
+                dynarithmic::LogWin32Error(ImageMemoryHandler::GetLastError());
             #endif
             return h;
         }

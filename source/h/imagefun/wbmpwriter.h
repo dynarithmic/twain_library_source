@@ -75,7 +75,7 @@ namespace dynarithmic
         bool WriteCurrentPage();
         void Close();
         bool IsOpen() const noexcept;
-        static std::optional<PreparedWbmpDibPage> MakePreparedWbmpDibPage(const DibPageView& view);
+        static std::optional<PreparedWbmpDibPage> MakePreparedWbmpDibPage(const dynarithmic::DibPageView& view);
 
 
     private:

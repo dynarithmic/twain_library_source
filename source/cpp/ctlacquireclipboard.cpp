@@ -69,9 +69,9 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG 
     if (nTransferMode == DTWAIN_USENATIVE)
         actualAcquireMode = ACQUIRENATIVEEX;
 
-    bool bRet = AcquireHelper(pHandle, pSource, actualAcquireMode, bDiscardDibs, 
-                              nTransferMode, true, 
-                              aDibs, PixelType, nMaxPages, bShowUI,nullptr, pStatus).second;
+    bool bRet = dynarithmic::AcquireHelper(pHandle, pSource, actualAcquireMode, bDiscardDibs, 
+                                       nTransferMode, true, 
+                                       aDibs, PixelType, nMaxPages, bShowUI,nullptr, pStatus).second;
     if (bRet)
     {
         LONG numAcquisitions = DTWAIN_GetNumAcquisitions(aDibs);

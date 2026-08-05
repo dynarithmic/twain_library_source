@@ -72,7 +72,7 @@ int CTL_Jpeg2KIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
     opts.useJP2Container = false;   // J2K codestream
     opts.compressionRate = 16.0f;   // match FreeImage default
 
-    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     opts.text.copyright = GetCopyrightString();
 

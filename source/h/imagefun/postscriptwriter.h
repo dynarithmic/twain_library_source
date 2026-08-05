@@ -104,7 +104,7 @@ namespace dynarithmic
             bool Open(const std::wstring& filename, const PsSessionOptions& options);
             bool WritePage(const PreparedPsDibPage& page);
             bool Close();
-            static std::optional<PreparedPsDibPage> MakePreparedPsDibPage(const DibPageView& view);
+            static std::optional<PreparedPsDibPage> MakePreparedPsDibPage(const dynarithmic::DibPageView& view);
 
         private:
             static bool ValidatePage(const PreparedPsDibPage& page);

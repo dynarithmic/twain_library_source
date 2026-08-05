@@ -55,10 +55,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG 
     auto val = pSource->IsAudioTransferSupported();
     DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
 
-    auto ret = AcquireHelper(pHandle, pSource, 
-                             ACQUIREAUDIONATIVEEX, false, 
-                             0, false, Acquisitions, 
-                             0, nMaxAudioClips, bShowUI, nullptr, pStatus);
+    auto ret = dynarithmic::AcquireHelper(pHandle, pSource, 
+                                                    ACQUIREAUDIONATIVEEX, false, 
+                                                  0, false, Acquisitions, 
+                                                      0, nMaxAudioClips, bShowUI, nullptr, pStatus);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(ret.second)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -82,7 +82,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR l
     fileOps.fileList = nullptr;
     fileOps.fileName = lpszFile;
     
-    const bool bRetval = AcquireHelper(pHandle, pSource, 
+    const bool bRetval = dynarithmic::AcquireHelper(pHandle, pSource, 
         ACQUIREAUDIOFILE,false,0,false,
         nullptr,0,nMaxAudioClips,bShowUI, &fileOps, pStatus).second;
 
@@ -91,17 +91,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR l
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-namespace dynarithmic
+DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireAudioNative(SourceAcquireOptions& opts)
 {
-    DTWAIN_ACQUIRE DTWAIN_LLAcquireAudioNative(SourceAcquireOptions& opts)
-    {
-        opts.setActualAcquireType(TWAINAcquireType_AudioNative);
-        return LLAcquireImage(opts);
-    }
-
-    DTWAIN_ACQUIRE DTWAIN_LLAcquireAudioFile(SourceAcquireOptions& opts)
-    {
-        opts.setActualAcquireType(TWAINAcquireType_AudioFile);
-        return DTWAIN_LLAcquireFile(opts);
-    }
+    opts.setActualAcquireType(TWAINAcquireType_AudioNative);
+    return LLAcquireImage(opts);
 }
+
+DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireAudioFile(SourceAcquireOptions& opts)
+{
+    opts.setActualAcquireType(TWAINAcquireType_AudioFile);
+    return DTWAIN_LLAcquireFile(opts);
+}
+

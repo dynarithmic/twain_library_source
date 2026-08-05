@@ -49,12 +49,12 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteLogInfoW(std::wstring_view s, bool bFlush)
     {
-        WriteLogInfoA(basicstringutils::Narrow(s.data()), bFlush);
+        WriteLogInfoA(StringConversion::Convert_Wide_To_Ansi(s.data()), bFlush);
     }
 
     void LogWriterUtils::WriteLogInfo(CTL_StringViewType s, bool bFlush)
     {
-        WriteLogInfoA(stringconversion::Convert_NativePtr_To_Ansi(s.data()));
+        WriteLogInfoA(StringConversion::Convert_NativePtr_To_Ansi(s.data()));
     }
 
     void LogWriterUtils::WriteLogInfoIndentedA(std::string_view s)
@@ -66,12 +66,12 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteLogInfoIndentedW(std::wstring_view s)
     {
-        WriteLogInfoIndentedA(basicstringutils::Narrow(s.data()));
+        WriteLogInfoIndentedA(StringConversion::Convert_WidePtr_To_Ansi(s.data()));
     }
 
     void LogWriterUtils::WriteLogInfoIndented(CTL_StringViewType s)
     {
-        WriteLogInfoIndentedA(stringconversion::Convert_NativePtr_To_Ansi(s.data()));
+        WriteLogInfoIndentedA(StringConversion::Convert_NativePtr_To_Ansi(s.data()));
     }
 
     void LogWriterUtils::MultiLineWriter(std::string_view s, const char* pszDelim, int nWhich)
@@ -86,8 +86,8 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteMultiLineInfo(CTL_StringViewType s, const CTL_StringType::traits_type::char_type* pszDelim)
     {
-        WriteMultiLineInfoA(stringconversion::Convert_NativePtr_To_Ansi(s.data()), 
-                            stringconversion::Convert_NativePtr_To_Ansi(pszDelim).c_str());
+        WriteMultiLineInfoA(StringConversion::Convert_NativePtr_To_Ansi(s.data()), 
+                            StringConversion::Convert_NativePtr_To_Ansi(pszDelim).c_str());
     }
 
     void LogWriterUtils::WriteMultiLineInfoA(std::string_view s, const char* pszDelim)
@@ -97,14 +97,14 @@ namespace dynarithmic
     
     void LogWriterUtils::WriteMultiLineInfoW(std::wstring_view s, const wchar_t* pszDelim)
     {
-        WriteMultiLineInfoA(basicstringutils::Narrow(s.data()),
-                            basicstringutils::Narrow(pszDelim).c_str());
+        WriteMultiLineInfoA(StringConversion::Convert_WidePtr_To_Ansi(s.data()),
+                            StringConversion::Convert_WidePtr_To_Ansi(pszDelim).c_str());
     }
 
     void LogWriterUtils::WriteMultiLineInfoIndented(CTL_StringViewType s, const CTL_StringType::traits_type::char_type* pszDelim)
     {
-        WriteMultiLineInfoIndentedA(stringconversion::Convert_NativePtr_To_Ansi(s.data()),
-                                    stringconversion::Convert_NativePtr_To_Ansi(pszDelim).c_str());
+        WriteMultiLineInfoIndentedA(StringConversion::Convert_NativePtr_To_Ansi(s.data()),
+                                    StringConversion::Convert_NativePtr_To_Ansi(pszDelim).c_str());
     }
     
     void LogWriterUtils::WriteMultiLineInfoIndentedA(std::string_view s, const char* pszDelim)
@@ -114,7 +114,7 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteMultiLineInfoIndentedW(std::wstring_view s, const wchar_t* pszDelim)
     {
-        WriteMultiLineInfoIndentedA(basicstringutils::Narrow(s.data()),
-                                    basicstringutils::Narrow(pszDelim).c_str());
+        WriteMultiLineInfoIndentedA(StringConversion::Convert_WidePtr_To_Ansi(s.data()),
+                                    StringConversion::Convert_WidePtr_To_Ansi(pszDelim).c_str());
     }
 }

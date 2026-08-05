@@ -56,7 +56,7 @@ int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     opts.quality = m_ImageInfoEx.IsPDF ? m_ImageInfoEx.nPDFJpegQuality : m_ImageInfoEx.nJpegQuality;
     opts.progressive = m_ImageInfoEx.bProgressiveJpeg;
     opts.text.copyright = GetCopyrightString();
-    std::wstring sFileName = stringconversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToJpeg(sFileName, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

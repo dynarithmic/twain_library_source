@@ -51,7 +51,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
         SetType = DTWAIN_CAPRESET;
     else
     {
-        LONG nBits = countOneBits(static_cast<uint32_t>(DeviceEvents));
+        LONG nBits = dynarithmic::countOneBits(static_cast<uint32_t>(DeviceEvents));
         if (nBits == 0)
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
@@ -136,7 +136,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPDWORD l
     DTWAIN_ARRAY arr = {};
     DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arr);
     const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pHandle, arr);
-    MoveArray(pHandle, pArray, &arr);
+    dynarithmic::MoveArray(pHandle, pArray, &arr);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpEvent))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)

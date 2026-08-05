@@ -57,7 +57,7 @@ int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 {
     HANDLE hDib = hDib = m_pDib->GetHandle();
 
-    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     TgaSessionOptions opts{};
     opts.useRle = m_ImageInfoEx.IsRLE;

@@ -34,7 +34,7 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
     SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
 
-    std::wstring filename = stringconversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     if ( bIsFirstPage )
     {

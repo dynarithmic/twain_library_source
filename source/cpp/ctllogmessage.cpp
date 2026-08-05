@@ -29,7 +29,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if ( pHandle )
     {
-        const CTL_StringType sMsg = stringconversion::Convert_Ansi_To_Native(GetResourceStringFromMap(IDS_DTWAIN_USERMSG_INDICATOR)) 
+        const CTL_StringType sMsg = StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(IDS_DTWAIN_USERMSG_INDICATOR)) 
                                     + _T(' ') + message;
         LogWriterUtils::WriteLogInfo(sMsg);
         return TRUE;

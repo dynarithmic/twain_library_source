@@ -31,7 +31,7 @@ bool CTextImageHandler::OpenOutputFile(LPCTSTR pFileName)
 {
     if (m_MultiPageStruct.Stage == DIB_MULTI_FIRST || m_MultiPageStruct.Stage == 0)
     {
-        m_fileName = stringconversion::Convert_NativePtr_To_Ansi(pFileName);
+        m_fileName = StringConversion::Convert_NativePtr_To_Ansi(pFileName);
         m_hFile = std::make_unique<std::ofstream>(m_fileName, std::ios::binary);
         if (m_hFile.get())
             return true;
@@ -78,7 +78,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
             {
                 // Always delete the temporary file
                 if (m_pTextPageInfo && !m_pTextPageInfo->szTempFile.empty())
-                    fileutils::delete_file(m_pTextPageInfo->szTempFile.c_str());
+                    dynarithmic::fileutils::delete_file(m_pTextPageInfo->szTempFile.c_str());
 
                 m_pTextPageInfo.reset();
                 try
@@ -101,7 +101,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
 
         // Open the file
         LPCTSTR fileName = reinterpret_cast<LPCTSTR>(path);
-        std::string fNameStr = stringconversion::Convert_NativePtr_To_Ansi(fileName);
+        std::string fNameStr = StringConversion::Convert_NativePtr_To_Ansi(fileName);
         auto isOk = OpenOutputFile(fileName);
         if (!isOk)
             return DTWAIN_ERR_FILEOPEN;
@@ -124,7 +124,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         if ( m_InputFormat == DTWAIN_BMP)
             m_pTextPageInfo->m_pOrigHandler.reset(new CTL_BmpIOHandler(m_pDib, m_ImageInfoEx));
         else
-        if ( IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(m_InputFormat)))
+        if ( dynarithmic::IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(m_InputFormat)))
         {
             m_ImageInfoEx.IsOCRTempImage = true;
             m_pTextPageInfo->m_pOrigHandler.reset(new CTL_TiffIOHandler(m_pDib, m_InputFormat, m_ImageInfoEx));

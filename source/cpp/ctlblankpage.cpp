@@ -26,14 +26,13 @@
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 using namespace dynarithmic;
-
-using CharType = TCHAR;
+using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionExString(DTWAIN_SOURCE Source, LPCTSTR threshold,
                                                               LONG autodetect, LONG detectOpts, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, detectOpts, bSet))
-    const DTWAIN_FLOAT val1 = CharTraits<CharType>::ToDouble(threshold, 100.0);
+    const DTWAIN_FLOAT val1 = dynarithmic::CharTraits<CharType>::ToDouble(threshold, 100.0);
     const DTWAIN_BOOL bRet = DTWAIN_SetBlankPageDetectionEx(Source, val1, autodetect, detectOpts, bSet);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -43,7 +42,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionString(DTWAIN_SOURCE Source
                                                             LONG autodetect, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, bSet))
-    const DTWAIN_FLOAT val1 = CharTraits<CharType>::ToDouble(threshold, 100.0);
+    const DTWAIN_FLOAT val1 = dynarithmic::CharTraits<CharType>::ToDouble(threshold, 100.0);
     const DTWAIN_BOOL bRet = DTWAIN_SetBlankPageDetection(Source, val1, autodetect, bSet);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -101,7 +100,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBlankPageDetectionOn(DTWAIN_SOURCE Source)
 LONG DLLENTRY_DEF DTWAIN_IsDIBBlankString(HANDLE hDib, LPCTSTR threshold)
 {
     LOG_FUNC_ENTRY_PARAMS((hDib, threshold))
-    const DTWAIN_FLOAT val = CharTraits<CharType>::ToDouble(threshold, 100.0);
+    const DTWAIN_FLOAT val = dynarithmic::CharTraits<CharType>::ToDouble(threshold, 100.0);
     const LONG retval = DTWAIN_IsDIBBlank(hDib, val);
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK(0)

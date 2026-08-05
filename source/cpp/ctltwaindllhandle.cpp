@@ -182,13 +182,13 @@ std::pair<bool, std::string> CTL_StaticData::GetTwainNameFromConstantA(int lCons
 std::pair<bool, CTL_StringType> CTL_StaticData::GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant)
 {
     auto pr = CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant);
-    return { pr.first, stringconversion::Convert_Ansi_To_Native(pr.second) };
+    return { pr.first, StringConversion::Convert_Ansi_To_Native(pr.second) };
 }
 
 std::pair<bool, std::wstring> CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant)
 {
     auto pr = CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant);
-    return { pr.first, basicstringutils::Widen(pr.second) };
+    return { pr.first, StringConversion::Convert_Ansi_To_Wide(pr.second) };
 }
 
 CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string_view sLang)
@@ -219,31 +219,30 @@ std::pair<bool, TwainConstantType> CTL_StaticData::GetIDFromTwainName(std::strin
     return { false, (std::numeric_limits<TwainConstantType>::min)() };
 }
 
-namespace dynarithmic
+/////////////////////////////////////////////////////////////////////////
+// static definitions
+CTL_TwainDLLHandle* dynarithmic::FindHandle(HWND hWnd, bool bIsDisplay)
 {
-    CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay)
-    {
-        auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
-        const auto it = std::find_if(threadMap.begin(), threadMap.end(),
-            [&](auto& ptr)
-            {
-                if (bIsDisplay)
-                    return false;
-                return ptr.second.get() && ptr.second.get()->m_hWndTwain == hWnd;
-            });
-        if (it != threadMap.end())
-            return it->second.get();
-        return nullptr;
-    }
+    auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+    const auto it = std::find_if(threadMap.begin(), threadMap.end(),
+                                 [&](auto& ptr)
+                                 {
+                                     if ( bIsDisplay)
+                                         return false;
+                                     return ptr.second.get() && ptr.second.get()->m_hWndTwain == hWnd;
+                                 });
+    if (it != threadMap.end())
+        return it->second.get();
+    return nullptr;
+}
 
-    CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst)
-    {
-        auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
-        const auto it = std::find_if(threadMap.begin(), threadMap.end(),
-            [&](auto& ptr)
-            { return ptr.second.get() && ptr.second.get()->m_hInstance == hInst; });
-        if (it != threadMap.end())
-            return it->second.get();
-        return nullptr;
-    }
+CTL_TwainDLLHandle* dynarithmic::FindHandle(HINSTANCE hInst)
+{
+    auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+    const auto it = std::find_if(threadMap.begin(), threadMap.end(),
+                                 [&](auto& ptr)
+                                 { return ptr.second.get() && ptr.second.get()->m_hInstance == hInst; });
+    if (it != threadMap.end())
+        return it->second.get();
+    return nullptr;
 }

@@ -145,7 +145,7 @@ namespace dynarithmic
             << L", bDiscardDibs=" << src.bDiscardDibs
             << L", lFileType=" << src.lFileType
             << L", lFileFlags=" << src.lFileFlags
-            << L", lpszFile=" << (src.lpszFile ? stringconversion::Convert_NativePtr_To_Wide(src.lpszFile) : nuller)
+            << L", lpszFile=" << (src.lpszFile ? StringConversion::Convert_NativePtr_To_Wide(src.lpszFile) : nuller)
             << L", FileList=" << src.FileList;
         return strm;
     }
@@ -167,7 +167,7 @@ namespace dynarithmic
             << ", bDiscardDibs=" << src.bDiscardDibs
             << ", lFileType=" << src.lFileType
             << ", lFileFlags=" << src.lFileFlags
-            << ", lpszFile=" << (src.lpszFile ? stringconversion::Convert_NativePtr_To_Ansi(src.lpszFile) : nuller)
+            << ", lpszFile=" << (src.lpszFile ? StringConversion::Convert_NativePtr_To_Ansi(src.lpszFile) : nuller)
             << ", FileList=" << src.FileList;
         return strm;
     }

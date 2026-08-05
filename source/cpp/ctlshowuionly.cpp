@@ -26,15 +26,6 @@
 #pragma warning (disable:4702)
 #endif
 
-namespace dynarithmic
-{
-    void LLSetupUIOnly(CTL_ITwainSource* pSource)
-    {
-        // show the interface -- this is where we may get a message right away in the loop
-        CTL_TwainAppMgr::ShowUserInterface(pSource, false, true);
-    }
-}
-
 using namespace dynarithmic;
 
 // This function allows the user to only show the UI
@@ -81,7 +72,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     {
         SourceAcquireOptions opts;
         opts.setIsUIIOnly(true);
-        auto pr = StartModalMessageLoop(pSource, opts);
+        auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, false, FUNC_MACRO);
     }
 
@@ -89,3 +80,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
+void dynarithmic::LLSetupUIOnly(CTL_ITwainSource* pSource)
+{
+    // show the interface -- this is where we may get a message right away in the loop
+    CTL_TwainAppMgr::ShowUserInterface(pSource, false, true);
+}

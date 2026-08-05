@@ -64,7 +64,7 @@ int CTL_SVGIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     // Get the comment string (copyright information)
     opts.comment = CTL_StaticData::GetAppTitleHTML(); 
 
-    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToSvg(fName, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

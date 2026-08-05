@@ -28,88 +28,6 @@
 #include <cppfunc.h>
 #include <errorcheck.h>
 
-namespace dynarithmic
-{
-    std::pair<int, DTWAIN_ACQUIRE> StartModalMessageLoop(CTL_ITwainSource* pSource, SourceAcquireOptions& opts)
-    {
-        if (!pSource)
-            return { false, -1 };
-
-        const auto pHandle = pSource->GetDTWAINHandle();
-        if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
-            return { true, 0 };
-
-
-        // Start a message loop here
-        // TWAIN 1.x loop implementation
-        TwainMessageLoopV1 v1Impl(pHandle);
-
-        // TWAIN 2.x loop implementation
-        TwainMessageLoopV2 v2Impl(pHandle);
-
-        // default to version 1
-        TwainMessageLoopImpl* pImpl = &v1Impl;
-
-        // check for version 2 implementation
-        if (CTL_TwainAppMgr::IsVersion2DSMUsed())
-        {
-            // assign the callback procedure
-            CTL_DSMCallbackTripletRegister callbackSetter(CTL_TwainAppMgr::GetCurrentSession(), pSource, &TwainMessageLoopV2::TwainVersion2MsgProc);
-            if (callbackSetter.Execute() == TWRC_SUCCESS)
-                pImpl = &v2Impl;
-        }
-
-        // do any prep work before we loop
-        pImpl->PrepareLoop();
-        pImpl->SetAcquireOptions(opts);
-        int retCode = pImpl->PerformMessageLoop(pSource, opts.getIsUIOnly());
-        if (pSource->IsShutdownAcquire())
-            return { retCode, -1 };
-        return { retCode, pImpl->GetAcquireNum() };
-    }
-    
-void DTWAIN_AcquireProc(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE, WPARAM Data1, LPARAM)
-{
-    const auto p = static_cast<CTL_TwainDLLHandle *>(DLLHandle);
-
-    switch (Data1)
-    {
-        case DTWAIN_TN_ACQUIRESTARTED:
-            p->m_bTransferDone = false;
-            p->m_bSourceClosed = false;
-            p->m_lLastAcqError = 0;
-            break;
-
-        case DTWAIN_TN_ACQUIREDONE:
-            p->m_lLastAcqError = DTWAIN_TN_ACQUIREDONE;
-            break;
-
-        case DTWAIN_TN_ACQUIREFAILED:
-            p->m_lLastAcqError = DTWAIN_TN_ACQUIREFAILED;
-            break;
-
-        case DTWAIN_TN_ACQUIRECANCELLED:
-            p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
-            break;
-
-        case DTWAIN_AcquireSourceClosed:
-            break;
-
-        case DTWAIN_TN_UICLOSED:
-            if (p->m_lLastAcqError == 0)
-                p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
-            break;
-
-        case DTWAIN_AcquireTerminated:
-            p->m_bTransferDone = true;
-            p->m_bSourceClosed = true;
-            if (p->m_lLastAcqError == 0)
-                p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
-            break;
-    }
-}
-
-}
 using namespace dynarithmic;
 
 std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
@@ -199,6 +117,43 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopEnabled(DTWAIN_SOURCE Source)
 }
 
 
+std::pair<int, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(CTL_ITwainSource* pSource, SourceAcquireOptions& opts)
+{
+    if (!pSource)
+        return { false, -1 };
+
+    const auto pHandle = pSource->GetDTWAINHandle();
+    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
+        return { true, 0 };
+
+
+    // Start a message loop here
+    // TWAIN 1.x loop implementation
+    TwainMessageLoopV1 v1Impl(pHandle);
+
+    // TWAIN 2.x loop implementation
+    TwainMessageLoopV2 v2Impl(pHandle);
+
+    // default to version 1
+    TwainMessageLoopImpl* pImpl = &v1Impl;
+
+    // check for version 2 implementation
+    if (CTL_TwainAppMgr::IsVersion2DSMUsed())
+    {
+        // assign the callback procedure
+        CTL_DSMCallbackTripletRegister callbackSetter(CTL_TwainAppMgr::GetCurrentSession(), pSource, &TwainMessageLoopV2::TwainVersion2MsgProc);
+        if (callbackSetter.Execute() == TWRC_SUCCESS)
+            pImpl = &v2Impl;
+    }
+
+    // do any prep work before we loop
+    pImpl->PrepareLoop();
+    pImpl->SetAcquireOptions(opts);
+    int retCode = pImpl->PerformMessageLoop(pSource, opts.getIsUIOnly());
+    if (pSource->IsShutdownAcquire())
+        return { retCode, -1 };
+    return { retCode, pImpl->GetAcquireNum() };
+}
 
 bool TwainMessageLoopImpl::IsSourceOpen(CTL_ITwainSource* pSource)
 {
@@ -408,3 +363,43 @@ bool TwainMessageLoopV2::IsSourceOpen(CTL_ITwainSource* pSource)
     return !s_MessageQueue.empty() || TwainMessageLoopImpl::IsSourceOpen(pSource);
 }
 
+void dynarithmic::DTWAIN_AcquireProc(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE, WPARAM Data1, LPARAM)
+{
+    const auto p = static_cast<CTL_TwainDLLHandle *>(DLLHandle);
+
+    switch (Data1)
+    {
+        case DTWAIN_TN_ACQUIRESTARTED:
+            p->m_bTransferDone = false;
+            p->m_bSourceClosed = false;
+            p->m_lLastAcqError = 0;
+            break;
+
+        case DTWAIN_TN_ACQUIREDONE:
+            p->m_lLastAcqError = DTWAIN_TN_ACQUIREDONE;
+            break;
+
+        case DTWAIN_TN_ACQUIREFAILED:
+            p->m_lLastAcqError = DTWAIN_TN_ACQUIREFAILED;
+            break;
+
+        case DTWAIN_TN_ACQUIRECANCELLED:
+            p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
+            break;
+
+        case DTWAIN_AcquireSourceClosed:
+            break;
+
+        case DTWAIN_TN_UICLOSED:
+            if (p->m_lLastAcqError == 0)
+                p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
+            break;
+
+        case DTWAIN_AcquireTerminated:
+            p->m_bTransferDone = true;
+            p->m_bSourceClosed = true;
+            if (p->m_lLastAcqError == 0)
+                p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
+            break;
+    }
+}

@@ -37,7 +37,7 @@ using namespace dynarithmic;
 
 
 // Lower level routines
-static FloatRect Normalize(const dib::LockedDib& hDib, const FloatRect& ActualRect, const FloatRect& RequestedRect,
+static FloatRect Normalize(const dynarithmic::dib::LockedDib& hDib, const FloatRect& ActualRect, const FloatRect& RequestedRect,
                            int sourceunit, int destunit, int dpi)
 {
     static constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
@@ -137,7 +137,7 @@ HANDLE CDibInterface::NormalizeDib(HANDLE hDib, bool bReturnCopy /* = false */ )
     if (!hDib)
         return nullptr;
     {
-        dib::LockedDib dibHandle(hDib);
+        dynarithmic::dib::LockedDib dibHandle(hDib);
 
         BYTE* pImage = const_cast<BYTE*>(dibHandle.HeaderAsBytePtr());
         UINT32 width, height, bpp;
@@ -150,7 +150,7 @@ HANDLE CDibInterface::NormalizeDib(HANDLE hDib, bool bReturnCopy /* = false */ )
         if (!hNewDib)
             return hDib;
 
-        dib::LockedDib dibHandle2(hNewDib);
+        dynarithmic::dib::LockedDib dibHandle2(hNewDib);
 
         // Compute the stride for the old bitmap
         const LONG OldStride = dibHandle.StrideBytes();
@@ -183,8 +183,8 @@ HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=
     height = abs(height);
 
     int dib_size = sizeof(BITMAPINFOHEADER);
-    dib_size += sizeof(RGBQUAD) * dib::effective_palette_entries(bpp);
-    dib_size += dib::effective_width(width, bpp) * height;
+    dib_size += sizeof(RGBQUAD) * dynarithmic::dib::effective_palette_entries(bpp);
+    dib_size += dynarithmic::dib::effective_width(width, bpp) * height;
 
     const HANDLE hDib = ImageMemoryHandler::GlobalAlloc (GHND | GMEM_ZEROINIT, dib_size);
 
@@ -200,7 +200,7 @@ HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=
         bih->biPlanes           = 1;
         bih->biCompression      = 0;
         bih->biBitCount         = static_cast<WORD>(bpp);
-        bih->biClrUsed          = dib::effective_palette_entries(bpp);
+        bih->biClrUsed          = dynarithmic::dib::effective_palette_entries(bpp);
         bih->biClrImportant     = bih->biClrUsed;
 
         if(palette != nullptr)
@@ -222,17 +222,17 @@ HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=
 
 HANDLE CDibInterface::NegateDIB(HANDLE hDib)
 {
-    return dib::NegateDib(hDib);
+    return dynarithmic::dib::NegateDib(hDib);
 }
 
 HANDLE CDibInterface::ResampleDIB(HANDLE hDib, long newx, long newy)
 {
-    return dib::ResizeDib(hDib, newx, newy);
+    return dynarithmic::dib::ResizeDib(hDib, newx, newy);
 }
 
 HANDLE CDibInterface::ResampleDIB(HANDLE hDib, double xscale, double yscale)
 {
-    dib::LockedDib dibHandle(hDib);
+    dynarithmic::dib::LockedDib dibHandle(hDib);
     UINT32 wid, ht;
 
     // Get Width
@@ -248,7 +248,7 @@ HANDLE CDibInterface::ResampleDIB(HANDLE hDib, double xscale, double yscale)
 
 HANDLE CDibInterface::IncreaseDecreaseBpp(HANDLE hDib, long newbpp, bool bIncrease)
 {
-    dib::LockedDib dibHandle(hDib);
+    dynarithmic::dib::LockedDib dibHandle(hDib);
     uint32_t bpp = dibHandle.BitsPerPixel();
 
     // RGB to Gray (24 -> 8) special routine
@@ -259,15 +259,15 @@ HANDLE CDibInterface::IncreaseDecreaseBpp(HANDLE hDib, long newbpp, bool bIncrea
     }
 
     if (bIncrease)
-        return dib::IncreaseDibBpp(hDib, newbpp);
-    return dib::DecreaseDibBpp(hDib, newbpp);
+        return dynarithmic::dib::IncreaseDibBpp(hDib, newbpp);
+    return dynarithmic::dib::DecreaseDibBpp(hDib, newbpp);
 }
 
 HANDLE CDibInterface::RotateDIB(HANDLE hDib, float angle)
 {
     if (!hDib)
         return nullptr;
-    return dib::Rotate(hDib, angle);
+    return dynarithmic::dib::Rotate(hDib, angle);
 }
 
 HANDLE CDibInterface::IncreaseBpp(HANDLE hDib, long newbpp)
@@ -285,7 +285,7 @@ HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const 
 {
     retval = IS_ERR_OK;
 
-    dib::LockedDib dibHandle(handle);
+    dynarithmic::dib::LockedDib dibHandle(handle);
 
     const UINT32 width = dibHandle.Width();
     const UINT32 height = dibHandle.Height();
@@ -334,7 +334,7 @@ HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const 
         endy = tmp;
     }
 
-    return dib::CropDib(handle, startx, starty, endx, endy);
+    return dynarithmic::dib::CropDib(handle, startx, starty, endx, endy);
 }
 
 // Test for blank page here
@@ -356,8 +356,8 @@ bool CDibInterface::CloseOutputFile()
 
 bool CDibInterface::IsGrayScale(HANDLE hDib, int bpp)
 {
-    dib::LockedDib dibHandle(hDib);
-    return dib::is_grayscale_palette(dibHandle.Palette(), dibHandle.PaletteEntries());
+    dynarithmic::dib::LockedDib dibHandle(hDib);
+    return dynarithmic::dib::is_grayscale_palette(dibHandle.Palette(), dibHandle.PaletteEntries());
 }
 
 HBITMAP CDibInterface::DIBToBitmap(HANDLE hDIB, HPALETTE hPal)
@@ -366,7 +366,7 @@ HBITMAP CDibInterface::DIBToBitmap(HANDLE hDIB, HPALETTE hPal)
 
     if (!hDIB)
         return nullptr;
-    dib::LockedDib dibHandle(hDIB);
+    dynarithmic::dib::LockedDib dibHandle(hDIB);
     const BYTE* lpDIBBits = dibHandle.Bits();
     HDC hDC = GetDC(nullptr);
 

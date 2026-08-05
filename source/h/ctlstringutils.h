@@ -27,6 +27,8 @@
 #include <iterator>
 #include <algorithm>
 #include <numeric>
+#include <boost/algorithm/hex.hpp>
+#include <boost/algorithm/string.hpp>
 #include <windows.h>
 #include <cctype>
 #include <cwctype>
@@ -80,7 +82,7 @@ namespace dynarithmic
         static constexpr char* Space() { return " "; }
         static constexpr char* EmptyString() { return ""; }
         static constexpr char* NewLineString() { return "\n"; }
-        static constexpr char* DateTimeString() { return "%Y-%m-%d_%H-%M-%S"; }
+
         static size_t Length(const char* s) { return std::char_traits<char>::length(s); }
 
     };
@@ -117,41 +119,12 @@ namespace dynarithmic
         static constexpr wchar_t* Space() { return L" "; }
         static constexpr wchar_t* EmptyString() { return L""; }
         static constexpr wchar_t* NewLineString() { return L"\n"; }
-        static constexpr wchar_t* DateTimeString() { return L"%Y-%m-%d_%H-%M-%S"; }
 
         static size_t Length(const wchar_t* s) { return std::char_traits<wchar_t>::length(s); }
     };
 
     namespace basicstringutils
     {
-        inline std::wstring Widen(std::string_view s, size_t len)
-        {
-            std::wstring ws;
-            ws.reserve(len);
-            for (size_t i = 0; i < len; ++i)
-                ws.push_back(static_cast<wchar_t>(s[i]));
-            return ws;
-        }
-
-        inline std::wstring Widen(std::string_view s)
-        {
-            return Widen(s, s.size());
-        }
-
-        inline std::string Narrow(std::wstring_view ws, size_t len)
-        {
-            std::string s;
-            s.reserve(ws.size());
-            for (size_t i = 0; i < len; ++i)
-                s.push_back(static_cast<char>(ws[i]));
-            return s;
-        }
-
-        inline std::string Narrow(std::wstring_view s)
-        {
-            return Narrow(s, s.size());
-        }
-
         template <typename CharType>
         bool IsAllSpace(const CharType* src)
         {

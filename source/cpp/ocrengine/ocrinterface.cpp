@@ -21,8 +21,9 @@
 #include "ctliface.h"
 #include "transym_ocrinterface.h"
 #include "errorcheck.h"
-#include "ctlstringdefs.h"
 #include "ctlstringutilsx.h"
+
+namespace stringutils = dynarithmic::basicstringutils;
 
 #ifdef _MSC_VER
 #pragma warning (disable:4505)
@@ -39,60 +40,28 @@ static BOOL CALLBACK ChildEnumFontProc(HWND hWnd, LPARAM lParam)
     return TRUE;
 }
 
-namespace dynarithmic
+std::pair<CTL_TwainDLLHandle*, OCREngine*> dynarithmic::VerifyOCRHandles(DTWAIN_OCRENGINE Engine /*=nullptr*/)
 {
-    void LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
-    {
-        pHandle->m_OCRProdNameToEngine.clear();
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    if (!Engine)
+        return { pHandle, nullptr };
 
-        const OCREnginePtr pInterface = std::make_shared<TransymOCR>(pHandle);
-        if (pInterface->IsInitialized())
-            pHandle->m_OCRInterfaceArray.push_back(pInterface);
+    const auto pEngine = reinterpret_cast<OCREngine*>(Engine);
 
-        // Add other engines here.
+    // check if Engine exists
+    if (OCREngineExists(pHandle, pEngine))
+        return { pHandle, pEngine };
+    pHandle->m_lLastError = DTWAIN_ERR_OCR_INVALIDENGINE;
+    throw DTWAINException(DTWAIN_ERR_OCR_INVALIDENGINE);
+}
 
-        // Call virtuals to set up the product names.
-        auto it = pHandle->m_OCRInterfaceArray.begin();
-        while (it != pHandle->m_OCRInterfaceArray.end())
-        {
-            (*it)->SetOCRVersionIdentity();
-            pHandle->m_OCRProdNameToEngine.insert({(*it)->GetProductName(), *it});
-            ++it;
-        }
-
-        // Set first OCR engine to be the default engine
-        if (!pHandle->m_OCRInterfaceArray.empty())
-            pHandle->m_pOCRDefaultEngine = *pHandle->m_OCRInterfaceArray.begin();
-    }
-
-    void UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
-    {
-        pHandle->m_OCRInterfaceArray.clear();
-    }
-
-    std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandles(DTWAIN_OCRENGINE Engine /*=nullptr*/)
-    {
-        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-        if (!Engine)
-            return { pHandle, nullptr };
-
-        const auto pEngine = reinterpret_cast<OCREngine*>(Engine);
-
-        // check if Engine exists
-        if (OCREngineExists(pHandle, pEngine))
-            return { pHandle, pEngine };
-        pHandle->m_lLastError = DTWAIN_ERR_OCR_INVALIDENGINE;
-        throw DTWAINException(DTWAIN_ERR_OCR_INVALIDENGINE);
-    }
-
-    std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine)
-    {
-        auto [pHandle, pEngine] = VerifyOCRHandles(Engine);
-        if (Engine)
-            return { pHandle, pEngine };
-        pHandle->m_lLastError = DTWAIN_ERR_OCR_INVALIDENGINE;
-        throw DTWAINException(DTWAIN_ERR_OCR_INVALIDENGINE);
-    }
+std::pair<CTL_TwainDLLHandle*, OCREngine*> dynarithmic::VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine)
+{
+    auto [pHandle, pEngine] = VerifyOCRHandles(Engine);
+    if (Engine)
+        return { pHandle, pEngine };
+    pHandle->m_lLastError = DTWAIN_ERR_OCR_INVALIDENGINE;
+    throw DTWAINException(DTWAIN_ERR_OCR_INVALIDENGINE);
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
@@ -251,7 +220,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetOCRManufacturer(DTWAIN_OCRENGINE Engine,LPTSTR szM
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, szMan, nMaxLen))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetManufacturer),
+    const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetManufacturer),
                                 szMan, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szMan))
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
@@ -262,7 +231,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetOCRProductFamily(DTWAIN_OCRENGINE Engine,LPTSTR sz
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, szProdFamily, nMaxLen))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductFamily), szProdFamily, nMaxLen);
+    const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductFamily), szProdFamily, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProdFamily))
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -272,7 +241,7 @@ LONG  DLLENTRY_DEF DTWAIN_GetOCRProductName(DTWAIN_OCRENGINE Engine,LPTSTR szPro
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, szProdName, nMaxLen))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductName), szProdName, nMaxLen);
+    const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductName), szProdName, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProdName))
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -592,7 +561,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfo(DTWAIN_OCRENGINE Engine, LPTSTR buffe
     LOG_FUNC_ENTRY_PARAMS((Engine, buffer, maxBufSize))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
     std::string sVersion = pEngine->GetOCRVersionInfo();
-    const auto retVal = CopyInfoToCString(stringconversion::Convert_Ansi_To_Native(sVersion), buffer, maxBufSize);
+    const auto retVal = dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVersion), buffer, maxBufSize);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)
 }
@@ -643,6 +612,35 @@ bool OCRIsActive(const OCREngine* pEngine)
 {
     return pEngine->IsActivated();
 }
+void dynarithmic::LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
+{
+    pHandle->m_OCRProdNameToEngine.clear();
+
+    const OCREnginePtr pInterface = std::make_shared<TransymOCR>(pHandle);
+    if (pInterface->IsInitialized())
+        pHandle->m_OCRInterfaceArray.push_back(pInterface);
+
+    // Add other engines here.
+
+    // Call virtuals to set up the product names.
+    auto it = pHandle->m_OCRInterfaceArray.begin();
+    while (it != pHandle->m_OCRInterfaceArray.end())
+    {
+        (*it)->SetOCRVersionIdentity();
+        pHandle->m_OCRProdNameToEngine.insert({(*it)->GetProductName(), *it});
+        ++it;
+    }
+
+    // Set first OCR engine to be the default engine
+    if (!pHandle->m_OCRInterfaceArray.empty())
+        pHandle->m_pOCRDefaultEngine = *pHandle->m_OCRInterfaceArray.begin();
+}
+
+void dynarithmic::UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
+{
+    pHandle->m_OCRInterfaceArray.clear();
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
 {
     LOG_FUNC_ENTRY_PARAMS(())
@@ -744,7 +742,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRErrorString(DTWAIN_OCRENGINE Engine, LONG lError,
         const LONG retval = DTWAIN_GetErrorString(lError, lpszBuffer, nMaxLen);
         LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     }
-    const LONG nTotalBytes = CopyInfoToCString(stringconversion::Convert_Ansi_To_Native(pEngine->GetErrorString(lError)), lpszBuffer, nMaxLen);
+    const LONG nTotalBytes = dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pEngine->GetErrorString(lError)), lpszBuffer, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(-1)
@@ -754,10 +752,10 @@ static bool NewOCRJob(const OCREngine *pEngine, LPCSTR szFileName)
 {
     std::string s1 = pEngine->GetCachedFile();
     std::string s2 = szFileName;
-    s1 = basicstringutils::TrimAll(s1);
-    s1 = basicstringutils::MakeLowerCase(s1);
-    s2 = basicstringutils::TrimAll(s2);
-    s2 = basicstringutils::MakeLowerCase(s2);
+    s1 = stringutils::TrimAll(s1);
+    s1 = stringutils::MakeLowerCase(s1);
+    s2 = stringutils::TrimAll(s2);
+    s2 = stringutils::MakeLowerCase(s2);
     return s1 != s2;
 }
 

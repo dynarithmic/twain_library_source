@@ -88,7 +88,7 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
             continue;
 
         // "Remove" the items by adding to the set
-        if (GetTwainItemSize(pInfo->ItemType) * pInfo->NumItems > sizeof(TW_HANDLE))
+        if (dynarithmic::GetTwainItemSize(pInfo->ItemType) * pInfo->NumItems > sizeof(TW_HANDLE))
         {
             TW_HANDLE SubHandle = reinterpret_cast<TW_HANDLE>(pInfo->Item);
             if (pInfo->ItemType == TWTY_HANDLE)
@@ -238,7 +238,7 @@ std::pair<bool, int32_t> CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, in
         Info.ReturnCode == TWRC_DATANOTAVAILABLE)
         return { false, Info.ReturnCode == TWRC_INFONOTSUPPORTED ? DTWAIN_ERR_UNSUPPORTED_EXTINFO : DTWAIN_ERR_UNAVAILABLE_EXTINFO };
 
-    const TW_UINT16 nSize = GetTwainItemSize(Info.ItemType);
+    const TW_UINT16 nSize = dynarithmic::GetTwainItemSize(Info.ItemType);
     if (Data && (nSize * Info.NumItems > sizeof(TW_HANDLE)))
     {
         TW_HANDLE SubHandle = reinterpret_cast<TW_HANDLE>(Info.Item);

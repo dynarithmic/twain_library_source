@@ -263,7 +263,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_nFeederWaitTimeOption(DTWAIN_FEEDER_TERMINATE)
 {
     if (lpszProduct)
-        m_SourceId.set_product_name(stringconversion::Convert_NativePtr_To_Ansi(lpszProduct));
+        m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
 
     // Image information default values
     m_ImageInfoEx.nJpegQuality = 75;
@@ -289,7 +289,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_ImageInfoEx.IsCreateDirectory = false;
     m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, 0);
     m_pExtendedImageInformation = std::make_unique<ExtendedImageInformation>(this);
-    SetPDFValue(PDFPRODUCERKEY,  stringconversion::Convert_Ansi_To_Native(CTL_StaticData::GetAppTitle()));
+    SetPDFValue(PDFPRODUCERKEY,  StringConversion::Convert_Ansi_To_Native(CTL_StaticData::GetAppTitle()));
 }
 
 void CTL_ITwainSource::Reset() const
@@ -625,7 +625,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         nCurImage = 0;
 
     if ( GetCurrentJobControl() != TWJC_NONE &&
-        IsFileTypeMultiPage(m_AcquireFileStatus.GetAcquireFileFormat()) &&
+        dynarithmic::IsFileTypeMultiPage(m_AcquireFileStatus.GetAcquireFileFormat()) &&
         IsJobFileHandlingOn())
     {
         // Get the next job number if multipage and job control
@@ -646,7 +646,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         if ( nCount > 0 )
         {
             auto strTemp = factory->get_value<CTL_StringType>(pDTWAINArray, 0); 
-            strAcquireFile = filenameutils::CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
+            strAcquireFile = dynarithmic::filenameutils::CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
         }
         else
             strAcquireFile.clear();
@@ -671,7 +671,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
             bNameAvailable = factory->get_value(pDTWAINArray, nCount-1, &strTemp)?true:false;
             if ( !bNameAvailable )
                 return strAcquireFile;
-            return filenameutils::GetPageFileName( strTemp, nCurImage, lFlags & DTWAIN_USELONGNAME?true:false );
+            return dynarithmic::filenameutils::GetPageFileName( strTemp, nCurImage, lFlags & DTWAIN_USELONGNAME?true:false );
         }
         else
             return strTemp;
@@ -1106,7 +1106,7 @@ void CTL_ITwainSource::RetrieveExtendedCaps()
 
 bool CTL_ITwainSource::InitFileAutoIncrementData(CTL_StringType sName)
 {
-    m_nCurFileNum = filenameutils::GetInitialFileNumber(std::move(sName), m_nFileDigits);
+    m_nCurFileNum = dynarithmic::filenameutils::GetInitialFileNumber(std::move(sName), m_nFileDigits);
     m_nStartFileNum = m_nCurFileNum;
     return true;
 }
@@ -1192,7 +1192,7 @@ void CTL_ITwainSource::DeleteDuplexFiles(int nWhich)
     else
         pData = &m_DuplexFileData.second;
     for_each(pData->begin(), pData->end(), [](const sDuplexFileData& Data) 
-        {fileutils::delete_file(Data.sFileName.c_str()); });
+        {dynarithmic::fileutils::delete_file(Data.sFileName.c_str()); });
 }
 
 unsigned long CTL_ITwainSource::GetNumDuplexFiles(int nWhich) const
@@ -1215,6 +1215,11 @@ void CTL_ITwainSource::ProcessMultipageFile()
         const ImageXferFileWriter FileWriter(nullptr, m_pSession ,this);
         FileWriter.CloseMultiPageDibFile(GetMutiPageScanMode() != DTWAIN_FILESAVE_MANUALSAVE);
     }
+}
+
+bool isIntCap(DTWAIN_SOURCE Source, LONG nCap)
+{
+    return dynarithmic::IsTwainIntegralType(static_cast<TW_UINT16>(DTWAIN_GetCapDataType(Source, nCap)));
 }
 
 template <typename T>
@@ -1252,10 +1257,10 @@ DTWAIN_ARRAY CTL_ITwainSource::getCapCachedValues(TW_UINT16 lCap, LONG getType)
     if (iter == mapToUse->end() )
         return nullptr;
     const container_values& cValues = (*iter).second;
-    if (IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
+    if (dynarithmic::IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
         return PopulateArray<CTL_ArrayFactory::tagged_array_long>(cValues.m_data, this, lCap);
     else
-    if ( IsTwainFix32Type(static_cast<TW_UINT16>(cValues.m_dataType)))
+    if ( dynarithmic::IsTwainFix32Type(static_cast<TW_UINT16>(cValues.m_dataType)))
         return PopulateArray<CTL_ArrayFactory::tagged_array_double>(cValues.m_data, this, lCap);
     return nullptr;
 }
@@ -1270,8 +1275,8 @@ bool CTL_ITwainSource::setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LO
     if (iter != mapToUse->end())
         return true;
     container_values cValues;
-    cValues.m_dataType = GetCapDataType(this, lCap);
-    if (IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
+    cValues.m_dataType = dynarithmic::GetCapDataType(this, lCap);
+    if (dynarithmic::IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
     {
         const bool retVal = PopulateCache<CTL_ArrayFactory::tagged_array_long>(m_pDLLHandle, array, cValues.m_data);
         if (retVal)

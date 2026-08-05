@@ -34,7 +34,7 @@ int CTL_GifIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!locked.IsValid())
         return DTWAIN_ERR_DIB;
 
-    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
     DTWAINGifOutput output;
     auto pageData = GifSessionWriter::MakePreparedGifPage(locked.GetView());
     if (!pageData.has_value() || !output.OnFirstPage(fName, opts, pageData.value()))

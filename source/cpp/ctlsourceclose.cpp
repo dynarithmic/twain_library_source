@@ -68,28 +68,26 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-namespace dynarithmic
+
+bool dynarithmic::CloseSourceInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource)
 {
-    bool CloseSourceInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource)
+    const auto sProductName = pSource->GetProductName();
+    bool bRetval = DTWAIN_CloseSourceUnconditional(pHandle, pSource) ? true : false;
+    if (bRetval)
     {
-        const auto sProductName = pSource->GetProductName();
-        bool bRetval = DTWAIN_CloseSourceUnconditional(pHandle, pSource) ? true : false;
-        if (bRetval)
-        {
-            pHandle->m_mapStringToSource.erase(sProductName);
-            pHandle->m_aFeederSources.erase(reinterpret_cast<DTWAIN_SOURCE>(pSource));
-        }
-        std::string sProductNameA = stringconversion::Convert_Native_To_Ansi(sProductName);
-        auto& sourceMap = CTL_StaticData::GetSourceStatusMap();
-        auto iter = sourceMap.find(sProductNameA);
-        if (iter != sourceMap.end())
-        {
-            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, false);
-            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, false);
-            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
-            iter->second.SetSourceHandle({});
-            iter->second.SetThreadID({});
-        }
-        return bRetval;
+        pHandle->m_mapStringToSource.erase(sProductName);
+        pHandle->m_aFeederSources.erase(reinterpret_cast<DTWAIN_SOURCE>(pSource));
     }
+    std::string sProductNameA = StringConversion::Convert_Native_To_Ansi(sProductName);
+    auto& sourceMap = CTL_StaticData::GetSourceStatusMap();
+    auto iter = sourceMap.find(sProductNameA);
+    if (iter != sourceMap.end())
+    {
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, false);
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, false);
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
+        iter->second.SetSourceHandle({});
+        iter->second.SetThreadID({});
+    }
+    return bRetval;
 }

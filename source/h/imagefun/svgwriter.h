@@ -59,7 +59,7 @@ namespace dynarithmic
             bool Close();
             bool IsOpen() const noexcept;
             bool SetPageInfo(const PreparedSvgDibPage& page);
-            static std::optional<PreparedSvgDibPage> MakePreparedSvgPage(const DibPageView& view);
+            static std::optional<PreparedSvgDibPage> MakePreparedSvgPage(const dynarithmic::DibPageView& view);
 
         private:
             static bool ValidatePage(const PreparedSvgDibPage& page);

@@ -200,7 +200,7 @@ namespace dynarithmic
                     {
                         getline(strm, descr);
                         if (resourceID == IDS_DTWAIN_APPTITLE || resourceID == IDS_DTWAIN_APPTITLE_HTML)
-                            descr = stringconversion::Convert_Native_To_Ansi(
+                            descr = StringConversion::Convert_Native_To_Ansi(
                                 CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, resourceID).second);
                         stringutils::TrimAll(descr);
                         descr = stringutils::ReplaceAll<std::string>(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
@@ -216,7 +216,7 @@ namespace dynarithmic
                 allLanguages[szLangName].insert(resourceMap.begin(), resourceMap.end());
                 CTL_StaticData::SetCurrentLanguageResourceKey(szLangName);
                 auto& info = CTL_StaticData::GetGeneralResourceInfo();
-                info.sResourceName = stringconversion::Convert_AnsiPtr_To_Native(szLangName);
+                info.sResourceName = StringConversion::Convert_AnsiPtr_To_Native(szLangName);
                 info.bIsFromRC = false;
             }
             return open;
@@ -259,7 +259,7 @@ namespace dynarithmic
         int structtype, retcode, successcode;
         auto sPath = CreateResourceFileName(DTWAINRESOURCEINFOFILE);
         retValue.resourcePath = sPath;
-        auto sPathA = stringconversion::Convert_Native_To_Ansi(sPath, sPath.length());
+        auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath, sPath.length());
         std::ifstream ifs(sPathA);
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = ifs ? true : false;
         
@@ -288,7 +288,7 @@ namespace dynarithmic
         if (!goodVersion)
         {
             retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = false;
-            retValue.errorMessage = stringconversion::Convert_Ansi_To_Native(totalLine);
+            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(totalLine);
             return false;
         }
         else
@@ -606,9 +606,9 @@ namespace dynarithmic
             }
 
             fileSaveMap[fileType] = { fileType,
-                stringconversion::Convert_Ansi_To_Native(vParsedComponents[2]),
-                stringconversion::Convert_Ansi_To_Native(vParsedComponents[3]),
-                stringconversion::Convert_Ansi_To_Native(vParsedComponents[4]) };
+                StringConversion::Convert_Ansi_To_Native(vParsedComponents[2]),
+                StringConversion::Convert_Ansi_To_Native(vParsedComponents[3]),
+                StringConversion::Convert_Ansi_To_Native(vParsedComponents[4]) };
         }
 
         // Now read in the Twain compression -> image type mapping
@@ -655,7 +655,7 @@ namespace dynarithmic
         }
 
         // Check the CRC value
-        CTL_StaticData::GetResourceVersion() = stringconversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
+        CTL_StaticData::GetResourceVersion() = StringConversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
         bool doResourceCheck = iniInterface->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
                                                           CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_RESOURCECHECK_ITEM).data(), true);
         if (doResourceCheck)
@@ -675,7 +675,7 @@ namespace dynarithmic
     {
         std::vector<std::string> ret;
         const auto sPath = CreateResourceFileName(DTWAINLANGRESOURCENAMESFILE);
-        const std::string sPathA = stringconversion::Convert_Native_To_Ansi(sPath, sPath.length());
+        const std::string sPathA = StringConversion::Convert_Native_To_Ansi(sPath, sPath.length());
         std::ifstream ifs(sPathA);
         if (!ifs)
             return ret;
@@ -694,25 +694,25 @@ namespace dynarithmic
     size_t GetResourceStringA(UINT nResNumber, LPSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
-        return CopyInfoToCString(str, buffer, bufSize);
+        return dynarithmic::CopyInfoToCString(str, buffer, bufSize);
     }
 
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
-        auto native_str = basicstringutils::Widen(str);
-        return CopyInfoToCString(native_str, buffer, bufSize);
+        auto native_str = StringConversion::Convert_Ansi_To_Wide(str);
+        return dynarithmic::CopyInfoToCString(native_str, buffer, bufSize);
     }
 
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
-        return CopyInfoToCString(stringconversion::Convert_Ansi_To_Native(str), buffer, bufSize);
+        return dynarithmic::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(str), buffer, bufSize);
     }
 
     CTL_StringType GetResourceStringFromMap_Native(LONG nResourceID)
     {
-        return stringconversion::Convert_Ansi_To_Native(GetResourceStringFromMap(nResourceID));
+        return StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(nResourceID));
     }
 
     std::string& GetResourceStringFromMap(LONG nResourceID)
@@ -785,7 +785,7 @@ namespace dynarithmic
     std::string GetResourceFileNameA(LPCSTR lpszName, LPCTSTR szPrefix)
     {
         const auto resPath = CreateResourceFileName(szPrefix);
-        const std::string sPathA = stringconversion::Convert_Native_To_Ansi(resPath);
+        const std::string sPathA = StringConversion::Convert_Native_To_Ansi(resPath);
         return sPathA + lpszName + (std::string)".txt";
     }
 

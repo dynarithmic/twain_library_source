@@ -22,16 +22,14 @@
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "ctltr025.h"
-#include "ctlstringdefs.h"
-
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
-namespace stringutils = dynarithmic::basicstringutils;
-using CharType = TCHAR;
-
 using namespace dynarithmic;
+namespace stringutils = dynarithmic::basicstringutils;
+using CharType = CTL_StringType::value_type;
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
                                                 LPTSTR XResolution,
                                                 LPTSTR YResolution,

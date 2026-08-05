@@ -150,7 +150,7 @@ namespace dynarithmic
         bool SetPageInfo(const PreparedIcoDibPage& page);
         bool WriteCurrentPage();
         void Close();
-        static std::optional<PreparedIcoDibPage> MakePreparedIcoDibPage(const DibPageView& view);
+        static std::optional<PreparedIcoDibPage> MakePreparedIcoDibPage(const dynarithmic::DibPageView& view);
 
     private:
         static bool ValidatePage(const PreparedIcoDibPage& page);

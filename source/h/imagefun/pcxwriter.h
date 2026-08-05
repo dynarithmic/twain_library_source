@@ -163,7 +163,7 @@ namespace dynarithmic
             static bool ValidatePage(const PreparedPcxDibPage& page);
             bool PatchDcxDirectory() const;
             bool WriteOnePcx(const PreparedPcxDibPage& page);
-            static void FillMonoPalette(pcx::PcxHeader& hdr, const PreparedPcxDibPage& page);
+            static void FillMonoPalette(dynarithmic::pcx::PcxHeader& hdr, const PreparedPcxDibPage& page);
             bool Write1Bpp(const PreparedPcxDibPage& page, uint16_t bytesPerLine);
             bool Write8Bpp(const PreparedPcxDibPage& page, uint16_t bytesPerLine);
             bool Write24Bpp(const PreparedPcxDibPage& page, uint16_t bytesPerLine);

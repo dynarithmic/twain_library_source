@@ -69,7 +69,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByName(LPCTSTR lpszName)
     LOG_FUNC_ENTRY_PARAMS((lpszName))
     auto [pHandle, pEngine] = VerifyOCRHandles();
 
-    const std::string sName = stringconversion::Convert_NativePtr_To_Ansi(lpszName);
+    const std::string sName = StringConversion::Convert_NativePtr_To_Ansi(lpszName);
 
     // Get the OCR engine associated with the name
     const auto it = pHandle->m_OCRProdNameToEngine.find(sName);

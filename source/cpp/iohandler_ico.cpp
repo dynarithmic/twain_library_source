@@ -58,7 +58,7 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!hDib)
         return DTWAIN_ERR_DIB;
 
-    dib::LockedDib dibHandle(m_pDib->GetHandle());
+    dynarithmic::dib::LockedDib dibHandle(m_pDib->GetHandle());
     auto height = dibHandle.Height();
     auto width = dibHandle.Width();
 
@@ -76,10 +76,10 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
             return DTWAIN_ERR_INVALIDICONFORMAT;
     }
 
-    if (!fileutils::parent_directory_exists(szFile).first)
+    if (!dynarithmic::fileutils::parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
 
-    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!m_ImageInfoEx.IsVistaIcon)
     {

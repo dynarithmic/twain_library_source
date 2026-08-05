@@ -142,17 +142,17 @@ namespace dynarithmic
         ParamOutputter(std::string_view s, bool isReturnValue = false) :
             nWhich(0), m_bIsReturnValue(isReturnValue), m_bOutputAsString(false)
         {
-            basicstringutils::Tokenize(std::string(s), "(, )", aParamNames);
+            dynarithmic::basicstringutils::Tokenize(std::string(s), "(, )", aParamNames);
             if (!aParamNames.empty())
             {
                 if (!m_bIsReturnValue)
                     strm << "(";
                 else
-                    strm << s << " " << GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+                    strm << s << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
             }
             else
             if (m_bIsReturnValue)
-                strm << " " << GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+                strm << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
         }
 
         ParamOutputter& setOutputAsString(bool bSet) noexcept
@@ -180,7 +180,7 @@ namespace dynarithmic
                 else
                 {
                     if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                        strm << basicstringutils::Narrow(val).c_str();
+                        strm << StringConversion::Convert_WidePtr_To_Ansi(val).c_str();
                     else
                         strm << val;
                 }
@@ -216,7 +216,7 @@ namespace dynarithmic
                 else
                 {
                     if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                        strm << dynarithmic::basicstringutils::Narrow(t).c_str();
+                        strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
                     else
                         strm << t;
                 }
@@ -310,7 +310,7 @@ namespace dynarithmic
             if (t)
             {
                 if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                    strm << basicstringutils::Narrow(t).c_str();
+                    strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
                 else
                     strm << outStr << "=" << t;
             }
@@ -332,7 +332,7 @@ namespace dynarithmic
             if (!m_bIsReturnValue)
                 strm << "(";
             else
-                strm << " " << GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+                strm << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
             outputParam(std::forward<Args>(theArgs)...);
         }
 
@@ -352,7 +352,7 @@ namespace dynarithmic
                     strm << "(null)";
                 else
                 if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                    strm << basicstringutils::Narrow(t).c_str();
+                    strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
                 else
                     strm << t;
             }
@@ -395,10 +395,10 @@ namespace dynarithmic
     template <typename TupleType>
     std::string CTL_LogFunctionCallAndParamsIn_String(LONG filterFlags, LPCSTR pFuncName, std::string_view paramList, TupleType theArgs)
     {
-        if (GetLogFilterFlags() & filterFlags)
+        if (dynarithmic::GetLogFilterFlags() & filterFlags)
         {
-            ParamOutputter pm(paramList);
-            return CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_IN) +
+            dynarithmic::ParamOutputter pm(paramList);
+            return dynarithmic::CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_IN) +
                                                      pm.processTupleArguments(theArgs, paramList, true, false); 
         }
         return {};
@@ -407,17 +407,17 @@ namespace dynarithmic
     template <typename TupleType>
     void CTL_LogFunctionCallAndParamsIn(LONG filterFlags, LPCSTR pFuncName, std::string_view paramList, TupleType theArgs)
     {
-        if (GetLogFilterFlags() & filterFlags)
-            LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallAndParamsIn_String(filterFlags, pFuncName, paramList, theArgs));
+        if (dynarithmic::GetLogFilterFlags() & filterFlags)
+            dynarithmic::LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallAndParamsIn_String(filterFlags, pFuncName, paramList, theArgs));
     }
 
     template <typename TupleType>
     std::string CTL_LogFunctionCallAndParamsOut_String(LONG filterFlags, LPCSTR pFuncName, TupleType theArgs)
     {
-        if (GetLogFilterFlags() & filterFlags)
+        if (dynarithmic::GetLogFilterFlags() & filterFlags)
         {
-            ParamOutputter pm("", true);
-            return CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_OUT) +
+            dynarithmic::ParamOutputter pm("", true);
+            return dynarithmic::CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_OUT) +
                                                     pm.processTupleArguments(theArgs, "", false, false);
         }
         return {};
@@ -426,19 +426,19 @@ namespace dynarithmic
     template <typename TupleType>
     void CTL_LogFunctionCallAndParamsOut(LONG filterFlags, LPCSTR pFuncName, TupleType theArgs)
     {
-        if (GetLogFilterFlags() & filterFlags)
-            LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallAndParamsOut_String(filterFlags, pFuncName, theArgs));
+        if (dynarithmic::GetLogFilterFlags() & filterFlags)
+            dynarithmic::LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallAndParamsOut_String(filterFlags, pFuncName, theArgs));
     }
 
     template <typename TupleType>
     void CTL_LogFunctionDerefParams(LPCSTR pFuncName, std::string_view paramList, TupleType theArgs)
     {
-        if (GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
+        if (dynarithmic::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
         {
-            ParamOutputter pm(paramList);
-            std::string s = CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_USELAST) +
+            dynarithmic::ParamOutputter pm(paramList);
+            std::string s = dynarithmic::CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_USELAST) +
                             pm.processTupleArguments(theArgs, paramList, true, true); 
-            LogWriterUtils::WriteLogInfoA(s);
+            dynarithmic::LogWriterUtils::WriteLogInfoA(s);
         }
     }
 }

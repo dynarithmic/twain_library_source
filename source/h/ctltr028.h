@@ -41,7 +41,7 @@ namespace dynarithmic
                 SetSessionPtr(pSession);
                 SetSourcePtr(pSource);
                 stringutils::SafeStrcpy(m_SetupFileXfer.FileName,
-                    stringconversion::Convert_Native_To_Ansi(strFileName).c_str(),
+                    StringConversion::Convert_Native_To_Ansi(strFileName).c_str(),
                     sizeof m_SetupFileXfer.FileName - 1);
 
                 m_SetupFileXfer.Format = static_cast<TW_UINT16>(FileFormat);
@@ -104,7 +104,7 @@ namespace dynarithmic
                 return rc;
             }
 
-            CTL_StringType GetFileName() const { return stringconversion::Convert_AnsiPtr_To_Native(m_SetupFileXfer.FileName); }
+            CTL_StringType GetFileName() const { return StringConversion::Convert_AnsiPtr_To_Native(m_SetupFileXfer.FileName); }
             CTL_TwainFileFormatEnum  GetFileFormat() const { return static_cast<CTL_TwainFileFormatEnum>(m_SetupFileXfer.Format); }
 
         private:

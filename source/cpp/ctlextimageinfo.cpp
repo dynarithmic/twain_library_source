@@ -77,7 +77,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, 
         // cached list of supported TWEI_x values.
         auto& vVect = pS->GetSupportedExtImageInfos();
         DTWAIN_ARRAY ThisArray = CreateArrayFromContainer<std::vector<LONG>>(pHandle, vVect);
-        MoveArray(pHandle, Array, &ThisArray);
+        dynarithmic::MoveArray(pHandle, Array, &ThisArray);
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)

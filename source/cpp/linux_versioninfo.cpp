@@ -36,7 +36,7 @@ namespace dynarithmic
             "  Version: " << test.version <<
             "  Machine: " << test.machine <<
             "  Domain Name: " << test.domainname;
-        return stringconversion::Convert_Ansi_To_Native(strm.str());
+        return StringConversion::Convert_Ansi_To_Native(strm.str());
     }
 }
 #endif
