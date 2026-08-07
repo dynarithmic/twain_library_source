@@ -35,6 +35,11 @@ namespace
     LONG ArrayTypeInternal(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
 }
 
+namespace
+{
+    LONG GetNumAcquiredImages(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhich);
+}
+
 namespace dynarithmic
 {
     std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize)
@@ -196,6 +201,16 @@ namespace dynarithmic
         for ( int i = 0; i < 4; i++ )
             *pVal[i] = FloatToFix32( static_cast<float>(Val[i]) );
         return true;
+    }
+
+    void SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib)
+    {
+        const int nDibs = GetNumAcquiredImages(pHandle, aAcq, nWhichAcq );
+        if (nWhichDib >= nDibs)
+            return;
+        auto& factory = pHandle->m_ArrayFactory;
+        DTWAIN_ARRAY aDib = VOID_TO_DTWAIN_ARRAY(factory->get_value(aAcq, nWhichAcq, nullptr));
+        factory->set_value(aDib, nWhichDib, theDib);
     }
 }
 
@@ -710,21 +725,6 @@ namespace
             DTWAIN_ERR_INDEX_BOUNDS, false, FUNC_MACRO, true,
             { CreateIndexErrorMsg(pHandle, aFix32, lPos) });
         return true;
-    }
-
-    LONG GetNumAcquiredImages(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhich)
-    {
-        LONG lError;
-        if ((lError = IsValidAcqArray(pHandle, aAcq)) < 0)
-            return lError;
-        const auto& factory = pHandle->m_ArrayFactory;
-        LONG lCount = static_cast<LONG>(factory->size(aAcq));
-        if (nWhich >= lCount)
-            return DTWAIN_FAILURE1;
-
-        DTWAIN_ARRAY aDib = VOID_TO_DTWAIN_ARRAY(factory->get_value(aAcq, nWhich, nullptr));
-        lCount = static_cast<LONG>(factory->size(aDib));
-        return lCount;
     }
 
     template <typename T>
@@ -2970,6 +2970,24 @@ DTWAIN_ARRAY GenericArrayStringToFloat(const CTL_TwainDLLHandle* pHandle,
     return VOID_TO_DTWAIN_ARRAY(aDouble);
 }
 
+namespace 
+{
+    LONG GetNumAcquiredImages(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhich)
+    {
+        LONG lError;
+        if ((lError = IsValidAcqArray(pHandle, aAcq)) < 0)
+            return lError;
+        const auto& factory = pHandle->m_ArrayFactory;
+        LONG lCount = static_cast<LONG>(factory->size(aAcq));
+        if (nWhich >= lCount)
+            return DTWAIN_FAILURE1;
+
+        DTWAIN_ARRAY aDib = VOID_TO_DTWAIN_ARRAY(factory->get_value(aAcq, nWhich, nullptr));
+        lCount = static_cast<LONG>(factory->size(aDib));
+        return lCount;
+    }
+}
+
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayFloatToANSIString(DTWAIN_ARRAY FloatArray)
 {
     LOG_FUNC_ENTRY_PARAMS((FloatArray))
@@ -3064,17 +3082,6 @@ LONG DLLENTRY_DEF DTWAIN_GetNumAcquiredImages( DTWAIN_ARRAY aAcq, LONG nWhich )
     LONG lCount = GetNumAcquiredImages(pHandle, aAcq, nWhich);
     LOG_FUNC_EXIT_NONAME_PARAMS(lCount)
     CATCH_BLOCK(DTWAIN_FAILURE1)
-}
-
-
-void SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib )
-{
-    const int nDibs = GetNumAcquiredImages(pHandle, aAcq, nWhichAcq );
-    if (nWhichDib >= nDibs)
-        return;
-    auto& factory = pHandle->m_ArrayFactory;
-    DTWAIN_ARRAY aDib = VOID_TO_DTWAIN_ARRAY(factory->get_value(aAcq, nWhichAcq, nullptr));
-    factory->set_value(aDib, nWhichDib, theDib);
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_GetAcquiredImage(DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib)

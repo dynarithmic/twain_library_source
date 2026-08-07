@@ -23,7 +23,6 @@
 #include <string>
 #include <string_view>
 #include <sstream>
-#include <boost/dll/runtime_symbol_info.hpp>
 #include <set>
 #include <vector>
 

@@ -45,83 +45,123 @@ std::string GetSystemTimeInMilliseconds();
 using namespace boost::multiprecision;
 namespace stringutils = dynarithmic::basicstringutils;
 
-// Function to convert 16-byte big-endian char array to 16 byte integer
-static uint128_t bigEndianBytesToInt(const unsigned char* bytes, size_t numBytes)
+namespace
 {
-    uint128_t value = 0;
+    unsigned char ConvertToHex(unsigned char hi, unsigned char lo);
+    // Function to convert 16-byte big-endian char array to 16 byte integer
+    uint128_t bigEndianBytesToInt(const unsigned char* bytes, size_t numBytes)
+    {
+        uint128_t value = 0;
 
-    // Iterate through the bytes and shift them into the value
-    // Big-endian means the most significant byte is first (at index 0)
-    for (size_t i = 0; i < numBytes; ++i) { // For an 16-byte (128-bit) integer
-        value = (value << 8) | bytes[i];
+        // Iterate through the bytes and shift them into the value
+        // Big-endian means the most significant byte is first (at index 0)
+        for (size_t i = 0; i < numBytes; ++i) { // For an 16-byte (128-bit) integer
+            value = (value << 8) | bytes[i];
+        }
+        return value;
     }
-    return value;
-}
 
-template <typename T>
-void ArrayCopy(const T& input_array, int start, T& output_array, int output_start, int nBytes)
-{
-    std::copy(input_array.begin() + start,
-                            input_array.begin() + start + nBytes,
-                            output_array.begin() + output_start);
-}
+    template <typename T>
+    void ArrayCopy(const T& input_array, int start, T& output_array, int output_start, int nBytes)
+    {
+        std::copy(input_array.begin() + start,
+            input_array.begin() + start + nBytes,
+            output_array.begin() + output_start);
+    }
 
-static unsigned char ConvertToHex(unsigned char hi, unsigned char lo);
-static PDFEncryption::UCHARArray StringToHexArray(const std::string& sSource);
-static PDFEncryption::UCHARArray StringToByteArray(const std::string& sSource);
-
-class ARCFOUREncryption
-{
-    private:
-        PDFEncryption::UCHARArray state;
-        int x;
-        int y;
-
-    public:
-        ARCFOUREncryption() : state(256), x{}, y{} {}
-        void prepareARCFOURKey(const PDFEncryption::UCHARArray& key)
-        { prepareARCFOURKey(key, 0, static_cast<int>(key.size())); }
-
-        void prepareARCFOURKey(const PDFEncryption::UCHARArray& key, int off, int len)
+    PDFEncryption::UCHARArray StringToHexArray(const std::string& sSource)
+    {
+        PDFEncryption::UCHARArray aDest(sSource.size() / 2);
+        const int nLen = static_cast<int>(sSource.size());
+        int j = 0;
+        for ( int i = 0; i < nLen; i+=2, j++ )
         {
-            int index1 = 0;
-            int index2 = 0;
-            for (int k = 0; k < 256; ++k)
-                state[k] = static_cast<unsigned char>(k);
-            x = 0;
-            y = 0;
-            for (int k = 0; k < 256; ++k)
-            {
-                index2 = key[index1 + off] + state[k] + index2 & 255;
-                unsigned char tmp = state[k];
-                state[k] = state[index2];
-                state[index2] = tmp;
-                index1 = (index1 + 1) % len;
-            }
+            aDest[j] = ConvertToHex(sSource[i], sSource[i+1]);
         }
+        return aDest;
+    }
 
-       void encryptARCFOUR(const PDFEncryption::UCHARArray& dataIn, int off, int len, PDFEncryption::UCHARArray& dataOut, int offOut)
-       {
-           const int length = len + off;
-           for (int k = off; k < length; ++k)
+    PDFEncryption::UCHARArray StringToByteArray(const std::string& sSource)
+    {
+        PDFEncryption::UCHARArray aDest(sSource.size());
+        const int nLen = static_cast<int>(sSource.size());
+        for ( int i = 0; i < nLen; ++i )
+            aDest[i] = sSource[i];
+        return aDest;
+    }
+
+    unsigned char ConvertToHex(unsigned char hi, unsigned char lo)
+    {
+        char retval;
+        int temp = toupper(hi);
+        if ( temp >= '0' && temp <= '9' )
+            retval = (temp - '0') << 4;
+        else
+            retval = (temp - 'A' + 10) << 4;
+
+        temp = toupper(lo);
+        if ( temp >= '0' && temp <= '9' )
+            retval += temp - '0';
+        else
+            retval += temp - 'A' + 10;
+        return retval;
+    }
+}
+
+namespace
+{
+    class ARCFOUREncryption
+    {
+        private:
+            PDFEncryption::UCHARArray state;
+            int x;
+            int y;
+
+        public:
+            ARCFOUREncryption() : state(256), x{}, y{} {}
+            void prepareARCFOURKey(const PDFEncryption::UCHARArray& key)
+            { prepareARCFOURKey(key, 0, static_cast<int>(key.size())); }
+
+            void prepareARCFOURKey(const PDFEncryption::UCHARArray& key, int off, int len)
             {
-                x = x + 1 & 255;
-                y = state[x] + y & 255;
-                unsigned char tmp = state[x];
-                state[x] = state[y];
-                state[y] = tmp;
-                dataOut[k - off + offOut] = static_cast<unsigned char>(dataIn[k] ^ state[state[x] + state[y] & 255]);
+                int index1 = 0;
+                int index2 = 0;
+                for (int k = 0; k < 256; ++k)
+                    state[k] = static_cast<unsigned char>(k);
+                x = 0;
+                y = 0;
+                for (int k = 0; k < 256; ++k)
+                {
+                    index2 = key[index1 + off] + state[k] + index2 & 255;
+                    unsigned char tmp = state[k];
+                    state[k] = state[index2];
+                    state[index2] = tmp;
+                    index1 = (index1 + 1) % len;
+                }
             }
-        }
 
-        void encryptARCFOUR(PDFEncryption::UCHARArray& data, int off, int len)
-        { encryptARCFOUR(data, off, len, data, off); }
+           void encryptARCFOUR(const PDFEncryption::UCHARArray& dataIn, int off, int len, PDFEncryption::UCHARArray& dataOut, int offOut)
+           {
+               const int length = len + off;
+               for (int k = off; k < length; ++k)
+                {
+                    x = x + 1 & 255;
+                    y = state[x] + y & 255;
+                    unsigned char tmp = state[x];
+                    state[x] = state[y];
+                    state[y] = tmp;
+                    dataOut[k - off + offOut] = static_cast<unsigned char>(dataIn[k] ^ state[state[x] + state[y] & 255]);
+                }
+            }
 
-        void encryptARCFOUR(const PDFEncryption::UCHARArray& dataIn, PDFEncryption::UCHARArray& dataOut)
-        { encryptARCFOUR(dataIn, 0, static_cast<int>(dataIn.size()), dataOut, 0); }
+            void encryptARCFOUR(PDFEncryption::UCHARArray& data, int off, int len)
+            { encryptARCFOUR(data, off, len, data, off); }
 
-        void encryptARCFOUR(PDFEncryption::UCHARArray& data)
-        { encryptARCFOUR(data, 0, static_cast<int>(data.size()), data, 0); }
+            void encryptARCFOUR(const PDFEncryption::UCHARArray& dataIn, PDFEncryption::UCHARArray& dataOut)
+            { encryptARCFOUR(dataIn, 0, static_cast<int>(dataIn.size()), dataOut, 0); }
+
+            void encryptARCFOUR(PDFEncryption::UCHARArray& data)
+            { encryptARCFOUR(data, 0, static_cast<int>(data.size()), data, 0); }
     };
 
     class IVGenerator
@@ -154,44 +194,8 @@ class ARCFOUREncryption
                 return b;
             }
     };
-
-unsigned char ConvertToHex(unsigned char hi, unsigned char lo)
-{
-    char retval;
-    int temp = toupper(hi);
-    if ( temp >= '0' && temp <= '9' )
-        retval = (temp - '0') << 4;
-    else
-        retval = (temp - 'A' + 10) << 4;
-
-    temp = toupper(lo);
-    if ( temp >= '0' && temp <= '9' )
-        retval += temp - '0';
-    else
-        retval += temp - 'A' + 10;
-    return retval;
 }
 
-static PDFEncryption::UCHARArray StringToHexArray(const std::string& sSource)
-{
-    PDFEncryption::UCHARArray aDest(sSource.size() / 2);
-    const int nLen = static_cast<int>(sSource.size());
-    int j = 0;
-    for ( int i = 0; i < nLen; i+=2, j++ )
-    {
-        aDest[j] = ConvertToHex(sSource[i], sSource[i+1]);
-    }
-    return aDest;
-}
-
-static PDFEncryption::UCHARArray StringToByteArray(const std::string& sSource)
-{
-    PDFEncryption::UCHARArray aDest(sSource.size());
-    const int nLen = static_cast<int>(sSource.size());
-    for ( int i = 0; i < nLen; ++i )
-        aDest[i] = sSource[i];
-    return aDest;
-}
 
 unsigned char PDFEncryption::pad[] =
 {
