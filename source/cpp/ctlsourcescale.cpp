@@ -27,10 +27,13 @@
 
 using namespace dynarithmic;
 
-static bool SetImageScale(CTL_ITwainSource *p, DTWAIN_FLOAT xscale, DTWAIN_FLOAT yscale)
+namespace
 {
-    p->SetImageScale(xscale, yscale, true);
-    return true;
+    bool SetImageScale(CTL_ITwainSource* p, DTWAIN_FLOAT xscale, DTWAIN_FLOAT yscale)
+    {
+        p->SetImageScale(xscale, yscale, true);
+        return true;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////

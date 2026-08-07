@@ -37,9 +37,40 @@
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;
 
-static void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
-                                LONG Error, LONG ErrorMsg, const std::string_view extraInfo = {});
-static bool IsState7InfoNeeded(CTL_ITwainSource *pSource);
+namespace
+{
+    void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
+                              LONG Error, LONG ErrorMsg, std::string_view extraInfo)
+    {
+        CTL_TwainAppMgr::SetError(Error, extraInfo.data(), true);
+        if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_DTWAINERRORS)
+        {
+            char szBuf[DTWAIN_USERRES_MAXSIZE + 1];
+            CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
+            LogWriterUtils::WriteLogInfoIndentedA(szBuf);
+        }
+        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, static_cast<WPARAM>(ErrorMsg), reinterpret_cast<LPARAM>(pSource));
+    }
+
+    bool IsState7InfoNeeded(CTL_ITwainSource *pSource)
+    {
+        bool bRetval = false;
+        DTWAIN_ARRAY A = nullptr;
+        DTWAINScopedLogControllerExclude scopedLog(DTWAIN_LOG_ERRORMSGBOX);
+        const auto pHandle = pSource->GetDTWAINHandle();
+        if ( GetCapValuesEx2_Internal(pSource, ICAP_UNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &A))
+        {
+            if (A)
+            {
+                DTWAINArrayLowLevel_RAII raii(pHandle, A);
+                const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
+                if (!vValues.empty())
+                    bRetval = vValues[0] > 0;
+            }
+        }
+        return bRetval;
+    }
+}
 
 CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
                                            CTL_ITwainSource* pSource,
@@ -1266,25 +1297,6 @@ bool CTL_ImageXferTriplet::ResampleDib(CTL_ITwainSession * /*pSession*/,
     return false;
 }
 
-
-bool CTL_ImageXferTriplet::ChangeBpp(CTL_ITwainSession*,
-                                     const CTL_ITwainSource* pSource,
-                                     const CTL_TwainDibPtr& CurDib)
-{
-    const LONG bpp = pSource->GetForcedImageBpp();
-    bool bRetval = false;
-    if ( bpp != 0 )
-    {
-        const int depth = CurDib->GetDepth();
-        if ( bpp > depth )
-            bRetval = CurDib->IncreaseBpp(bpp);
-        else
-        if (bpp < depth)
-            bRetval = CurDib->DecreaseBpp(bpp);
-    }
-    return bRetval;
-}
-
 int CTL_ImageXferTriplet::ProcessBlankPage(CTL_ITwainSession *pSession,
                                            CTL_ITwainSource *pSource,
                                            const CTL_TwainDibPtr& CurDib,
@@ -1382,19 +1394,6 @@ CTL_TwainFileFormatEnum CTL_ImageXferTriplet::GetFileTypeFromCompression(int nCo
 
     }
     return TWAINFileFormat_RAW;
-}
-
-void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
-                          LONG Error, LONG ErrorMsg, std::string_view extraInfo)
-{
-    CTL_TwainAppMgr::SetError(Error, extraInfo.data(), true);
-    if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_DTWAINERRORS)
-    {
-        char szBuf[DTWAIN_USERRES_MAXSIZE + 1];
-        CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
-        LogWriterUtils::WriteLogInfoIndentedA(szBuf);
-    }
-    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, static_cast<WPARAM>(ErrorMsg), reinterpret_cast<LPARAM>(pSource));
 }
 
 void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DTWAINImageInfoEx* ImageInfo)
@@ -1503,11 +1502,10 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
 
 
     typedef bool (*AdjustFn)(CTL_ITwainSession*, const CTL_ITwainSource*, const CTL_TwainDibPtr&);
-    std::array<AdjustFn, 4> adjfn = { &CTL_ImageXferTriplet::ChangeBpp, &CTL_ImageXferTriplet::CropDib,
+    std::array<AdjustFn, 3> adjfn = { &CTL_ImageXferTriplet::CropDib,
                                       &CTL_ImageXferTriplet::ResampleDib, &CTL_ImageXferTriplet::NegateDib };
 
-    constexpr const char *msg[] = { "Bitmap after change to bits-per-pixel: \n",
-                                    "Bitmap after cropping: \n",
+    constexpr const char *msg[] = { "Bitmap after cropping: \n",
                                     "Bitmap after resampling: \n",
                                     "Bitmap after negating image: \n" };
 
@@ -1626,22 +1624,4 @@ HANDLE CTL_ImageXferTriplet::ProcessUserUpdatingDIB(size_t nLastDib, int notific
     return m_hDataHandle;
 }
 
-bool IsState7InfoNeeded(CTL_ITwainSource *pSource)
-{
-    bool bRetval = false;
-    DTWAIN_ARRAY A = nullptr;
-    DTWAINScopedLogControllerExclude scopedLog(DTWAIN_LOG_ERRORMSGBOX);
-    const auto pHandle = pSource->GetDTWAINHandle();
-    if ( GetCapValuesEx2_Internal(pSource, ICAP_UNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &A))
-    {
-        if (A)
-        {
-            DTWAINArrayLowLevel_RAII raii(pHandle, A);
-            const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
-            if (!vValues.empty())
-                bRetval = vValues[0] > 0;
-        }
-    }
-    return bRetval;
-}
 ///////////////////////////////////////////////////////////////////////////

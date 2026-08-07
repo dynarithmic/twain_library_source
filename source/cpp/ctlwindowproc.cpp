@@ -33,6 +33,13 @@ using namespace dynarithmic;
 
 namespace
 {
+    void SetNotification(CTL_TwainDLLHandle* pHandle, bool& notification, DTWAIN_BOOL bSet)
+    {
+        // See if DLL Handle exists
+        DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+        notification = (bSet?true:false);
+    }
+
     template <typename CallbackType, typename UserType>
     LRESULT CallOneCallback(CallbackType Fn, WPARAM wParam, LPARAM lParam, UserType UserData)
     {
@@ -185,13 +192,6 @@ namespace
     {
         return;
     }
-}
-
-static void SetNotification(CTL_TwainDLLHandle* pHandle, bool& notification, DTWAIN_BOOL bSet)
-{
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    notification = (bSet?true:false);
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetRegisteredMsg()

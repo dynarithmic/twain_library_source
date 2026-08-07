@@ -256,8 +256,6 @@ namespace dynarithmic
         DTWAIN_ARRAY GetFileEnumerator() const { return m_pFileEnumerator; }
         void         SetTransferDone(bool bDone) { m_bTransferDone = bDone; }
         bool         GetTransferDone() const { return m_bTransferDone; }
-        void         SetCapCacheValue(LONG lCap, double dValue, bool bTurnOn);
-        double       GetCapCacheValue(LONG lCap, LONG* pTurnOn) const;
         bool         IsAcquireStarted() const { return m_bAcquireStarted; }
         void         SetAcquireStarted(bool bSet) { m_bAcquireStarted = bSet; }
         void         SetModal(bool bSet) { m_bDialogModal = bSet; }
@@ -402,9 +400,7 @@ namespace dynarithmic
         // Extended image info functions
         bool         IsExtendedImageInfoSupported() const { return m_bExtendedImageInfoSupported; }
         void         SetExtendedImageInfoSupported(bool bSet) { m_bExtendedImageInfoSupported = bSet; }
-        bool         InitExtImageInfo(int nNum);
         bool         GetExtImageInfo(bool bExecute);
-        bool         AddExtImageInfo(TW_INFO Info) const;
         bool         EnumExtImageInfo(CTL_IntArray& r);
         TW_INFO      GetExtImageInfoItem(int nItem, int nSearch) const;
         std::pair<bool, int32_t> GetExtImageInfoData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pNumChars = nullptr) const;
@@ -413,7 +409,6 @@ namespace dynarithmic
 
         bool         DestroyExtImageInfo();
         bool         IsExtendedCapNegotiable(LONG nCap);
-        bool         AddCapToExtendedCapList(LONG nCap);
         bool         ExtendedCapsRetrieved() const { return m_bExtendedCapsRetrieved; }
         void         SetExtendedCapsRetrieved(bool bSet) { m_bExtendedCapsRetrieved = bSet; }
         CapList& GetExtendedCapCache() { return m_aExtendedCaps; }
@@ -467,8 +462,6 @@ namespace dynarithmic
         void         SetImageInfoRetrieved(bool bSet) { m_bImageInfoRetrieved = bSet; }
         bool         IsImageInfoRetrieved() const { return m_bImageInfoRetrieved; }
         void         ProcessMultipageFile();
-        LONG         GetForcedImageBpp() const { return m_nForcedBpp; }
-        void         SetForcedImageBpp(LONG bpp) { m_nForcedBpp = bpp; }
         void         SetFileIncompleteSaveMode(bool bSaveIncomplete) { m_bIsFileSaveIncomplete = bSaveIncomplete; }
         bool         IsFileIncompleteSave() const { return m_bIsFileSaveIncomplete; }
         bool         IsBlankPageDetectionOn() const {
@@ -680,7 +673,6 @@ namespace dynarithmic
         bool            m_bProcessingPixelInfo;
         bool            m_bSkipImageInfoErrors;
         bool            m_bDoublePageCountOnDuplex;
-        LONG            m_nForcedBpp;
         bool            m_bTileMode;
         std::vector<int> m_aTransferMechanisms;
         std::vector<TW_UINT32> m_aSupportedDATS;

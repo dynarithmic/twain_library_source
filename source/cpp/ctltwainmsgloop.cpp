@@ -68,90 +68,89 @@ namespace dynarithmic
         return { retCode, pImpl->GetAcquireNum() };
     }
     
-void DTWAIN_AcquireProc(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE, WPARAM Data1, LPARAM)
-{
-    const auto p = static_cast<CTL_TwainDLLHandle *>(DLLHandle);
-
-    switch (Data1)
+    void DTWAIN_AcquireProc(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE, WPARAM Data1, LPARAM)
     {
-        case DTWAIN_TN_ACQUIRESTARTED:
-            p->m_bTransferDone = false;
-            p->m_bSourceClosed = false;
-            p->m_lLastAcqError = 0;
-            break;
+        const auto p = static_cast<CTL_TwainDLLHandle *>(DLLHandle);
 
-        case DTWAIN_TN_ACQUIREDONE:
-            p->m_lLastAcqError = DTWAIN_TN_ACQUIREDONE;
-            break;
+        switch (Data1)
+        {
+            case DTWAIN_TN_ACQUIRESTARTED:
+                p->m_bTransferDone = false;
+                p->m_bSourceClosed = false;
+                p->m_lLastAcqError = 0;
+                break;
 
-        case DTWAIN_TN_ACQUIREFAILED:
-            p->m_lLastAcqError = DTWAIN_TN_ACQUIREFAILED;
-            break;
+            case DTWAIN_TN_ACQUIREDONE:
+                p->m_lLastAcqError = DTWAIN_TN_ACQUIREDONE;
+                break;
 
-        case DTWAIN_TN_ACQUIRECANCELLED:
-            p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
-            break;
+            case DTWAIN_TN_ACQUIREFAILED:
+                p->m_lLastAcqError = DTWAIN_TN_ACQUIREFAILED;
+                break;
 
-        case DTWAIN_AcquireSourceClosed:
-            break;
-
-        case DTWAIN_TN_UICLOSED:
-            if (p->m_lLastAcqError == 0)
+            case DTWAIN_TN_ACQUIRECANCELLED:
                 p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
-            break;
+                break;
 
-        case DTWAIN_AcquireTerminated:
-            p->m_bTransferDone = true;
-            p->m_bSourceClosed = true;
-            if (p->m_lLastAcqError == 0)
-                p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
-            break;
+            case DTWAIN_AcquireSourceClosed:
+                break;
+
+            case DTWAIN_TN_UICLOSED:
+                if (p->m_lLastAcqError == 0)
+                    p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
+                break;
+
+            case DTWAIN_AcquireTerminated:
+                p->m_bTransferDone = true;
+                p->m_bSourceClosed = true;
+                if (p->m_lLastAcqError == 0)
+                    p->m_lLastAcqError = DTWAIN_TN_ACQUIRECANCELLED;
+                break;
+        }
+    }
+
+    bool DTWAIN_ShouldUseGetMessage()
+    {
+        if (!CTL_StaticData::IsTestForGetMessage())
+            return false;
+
+        MSG msg;
+
+        // 1) If no window belongs to this thread, likely script host
+        DWORD thisThread = GetCurrentThreadId();
+        bool hasWindow = false;
+
+        EnumThreadWindows(thisThread,
+            [](HWND, LPARAM lParam) -> BOOL
+            {
+                *reinterpret_cast<bool*>(lParam) = true;
+                return FALSE;
+            },
+            reinterpret_cast<LPARAM>(&hasWindow));
+
+        if (!hasWindow)
+            return true; // safer to block
+
+
+        // 2) Probe message responsiveness WITHOUT timing
+        constexpr int kProbeCount = 3;  // small, deterministic
+
+        for (int i = 0; i < kProbeCount; ++i)
+        {
+            if (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
+                return false; // messages are flowing, so PeekMessage loop OK
+
+            WaitMessage(); // cooperative yield (debugger-safe)
+        }
+
+        // No messages after several real waits, so prefer GetMessage
+        return true;
     }
 }
 
-}
 using namespace dynarithmic;
 
 std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
-
-static bool DTWAIN_ShouldUseGetMessage()
-{
-    if (!CTL_StaticData::IsTestForGetMessage())
-        return false;
-
-    MSG msg;
-
-    // 1) If no window belongs to this thread, likely script host
-    DWORD thisThread = GetCurrentThreadId();
-    bool hasWindow = false;
-
-    EnumThreadWindows(thisThread,
-        [](HWND, LPARAM lParam) -> BOOL
-        {
-            *reinterpret_cast<bool*>(lParam) = true;
-            return FALSE;
-        },
-        reinterpret_cast<LPARAM>(&hasWindow));
-
-    if (!hasWindow)
-        return true; // safer to block
-
-
-    // 2) Probe message responsiveness WITHOUT timing
-    constexpr int kProbeCount = 3;  // small, deterministic
-
-    for (int i = 0; i < kProbeCount; ++i)
-    {
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
-            return false; // messages are flowing, so PeekMessage loop OK
-
-        WaitMessage(); // cooperative yield (debugger-safe)
-    }
-
-    // No messages after several real waits, so prefer GetMessage
-    return true;
-}
-
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePeekMessageLoop(DTWAIN_SOURCE Source, BOOL bSet)
 {

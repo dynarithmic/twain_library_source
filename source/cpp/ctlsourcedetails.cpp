@@ -368,546 +368,549 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
     return resMap;
 }
 
-static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
+namespace
 {
-    const auto pHandle = pSource->GetDTWAINHandle();
-    auto pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
-    AllCapInfo allCapInfo;
-    AllCapInfoMap& capInfo = allCapInfo.m_infoMap;
-
-    // get the capabilities
-    DTWAIN_ARRAY aAllCaps = DTWAIN_EnumSupportedCapsEx2(pActualSource);
-    DTWAINArrayPtr_RAII aAllCapsraii(pHandle, &aAllCaps);
-    auto& vCapBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aAllCaps);
-
-    DTWAIN_ARRAY aExtendedCaps = DTWAIN_EnumExtendedCapsEx(pActualSource);
-    DTWAINArrayPtr_RAII aExtendedraii(pHandle, &aExtendedCaps);
-    std::vector<LONG> vExtBuf;
-    if ( aExtendedCaps )
-        vExtBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aExtendedCaps);
-
-    DTWAIN_ARRAY aCustomCaps = DTWAIN_EnumCustomCapsEx(pActualSource);
-    DTWAINArrayPtr_RAII aCustomraii(pHandle, &aCustomCaps);
-    std::vector<LONG> vCustomBuf;
-    if ( aCustomCaps)
-        vCustomBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCustomCaps);
-
-    // Fill in the general info
-    for (auto capVal : vCapBuf)
+    AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
     {
-        auto sz = CTL_TwainAppMgr::GetCapNameFromCap(capVal);
-        std::string quouteString = "\"" + sz + "\"";
-        auto iter = capInfo.insert({ capVal, {quouteString, capVal, "\"standard\""}}).first;
-        iter->second.capName = sz;
-        iter->second.value = capVal;
-        iter->second.capType = "\"standard\"";
-    }
+        const auto pHandle = pSource->GetDTWAINHandle();
+        auto pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pSource);
+        AllCapInfo allCapInfo;
+        AllCapInfoMap& capInfo = allCapInfo.m_infoMap;
 
-    // Fill in extended cap info
-    for (auto capVal : vExtBuf)
-    {
-        auto iter = capInfo.find(capVal);
-        if ( iter != capInfo.end())
-            iter->second.capType = "\"standard, extended\"";
-    }
+        // get the capabilities
+        DTWAIN_ARRAY aAllCaps = DTWAIN_EnumSupportedCapsEx2(pActualSource);
+        DTWAINArrayPtr_RAII aAllCapsraii(pHandle, &aAllCaps);
+        auto& vCapBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aAllCaps);
 
-    // Fill in custom cap info
-    for (auto capVal : vCustomBuf)
-    {
-        auto iter = capInfo.find(capVal);
-        if (iter != capInfo.end())
-            iter->second.capType = "\"custom\"";
-        // Check if this is also an extended cap
-        auto iter2 = std::find(vExtBuf.begin(), vExtBuf.end(), capVal);
-        if ( iter2 != vExtBuf.end())
-            iter->second.capType = "\"custom, extended\"";
-    }
-    allCapInfo.mapCounts = {vCapBuf.size(), vExtBuf.size(), vCustomBuf.size()};
-    return allCapInfo;
-}
+        DTWAIN_ARRAY aExtendedCaps = DTWAIN_EnumExtendedCapsEx(pActualSource);
+        DTWAINArrayPtr_RAII aExtendedraii(pHandle, &aExtendedCaps);
+        std::vector<LONG> vExtBuf;
+        if ( aExtendedCaps )
+            vExtBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aExtendedCaps);
 
+        DTWAIN_ARRAY aCustomCaps = DTWAIN_EnumCustomCapsEx(pActualSource);
+        DTWAINArrayPtr_RAII aCustomraii(pHandle, &aCustomCaps);
+        std::vector<LONG> vCustomBuf;
+        if ( aCustomCaps)
+            vCustomBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCustomCaps);
 
-static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std::string>& allSources, LONG indentFactor, bool bWeOpenSource=false)
-{
-    static constexpr int numOneValueDeviceInfo = 12;
-    static constexpr int numImageInfoString = 13;
-    const auto pHandle = ts.GetTwainDLLHandle();
-    using boost::algorithm::join;
-    using json = nlohmann::ordered_json;
-
-    struct capabilityInfo
-    {
-        std::string name;
-        int value;
-        capabilityInfo(std::string n = "", int val = 0) : name(n), value(val) {}
-    };
-
-    struct sUniquePtrRAII
-    {
-        std::unique_ptr<CTL_ITwainSource*>* m_ptr;
-        bool m_bReleaseOnDestruction;
-        sUniquePtrRAII(std::unique_ptr<CTL_ITwainSource*>* p, bool isReleaseOnDestruction)
-            : m_ptr(p), m_bReleaseOnDestruction(isReleaseOnDestruction) {}
-        ~sUniquePtrRAII()
+        // Fill in the general info
+        for (auto capVal : vCapBuf)
         {
-            if (m_bReleaseOnDestruction)
-                (*m_ptr).release();
+            auto sz = CTL_TwainAppMgr::GetCapNameFromCap(capVal);
+            std::string quouteString = "\"" + sz + "\"";
+            auto iter = capInfo.insert({ capVal, {quouteString, capVal, "\"standard\""}}).first;
+            iter->second.capName = sz;
+            iter->second.value = capVal;
+            iter->second.capType = "\"standard\"";
         }
-    };
-    std::vector<capabilityInfo> vCapabilityInfo;
 
-    json glob_json;
-    glob_json["dtwain-version"] = DTWAIN_VERINFO_FILEVERSION;
-    glob_json["session-twain-identity"] = json::parse(CTL_TwainIdentity(ts.GetAppIDPtr()).to_json());
-    glob_json["device-count"] = allSources.size();
-    json array_twain_identity;
-    json array_source_names;
-    std::vector<std::string> sNames = allSources;
-    glob_json["device-names"] = sNames;
-    std::string jsonString;
-    std::array<std::string, numImageInfoString> imageInfoString;
-    std::array<std::string, numOneValueDeviceInfo> deviceInfoString;
-
-    struct SourceSelectStatusRAII
-    {
-        bool m_bSelectStatus;
-        CTL_TwainDLLHandle* m_pHandle;
-        SourceSelectStatusRAII(CTL_TwainDLLHandle* pHandle, bool bStatus) : m_pHandle(pHandle),  m_bSelectStatus(bStatus) {}
-        ~SourceSelectStatusRAII() 
-        { 
-            m_pHandle->m_bOpenSourceOnSelect = m_bSelectStatus;
+        // Fill in extended cap info
+        for (auto capVal : vExtBuf)
+        {
+            auto iter = capInfo.find(capVal);
+            if ( iter != capInfo.end())
+                iter->second.capType = "\"standard, extended\"";
         }
-    };
 
-    SourceSelectStatusRAII sourceSelectraii(pHandle, pHandle->m_bOpenSourceOnSelect);
-    pHandle->m_bOpenSourceOnSelect = false;
+        // Fill in custom cap info
+        for (auto capVal : vCustomBuf)
+        {
+            auto iter = capInfo.find(capVal);
+            if (iter != capInfo.end())
+                iter->second.capType = "\"custom\"";
+            // Check if this is also an extended cap
+            auto iter2 = std::find(vExtBuf.begin(), vExtBuf.end(), capVal);
+            if ( iter2 != vExtBuf.end())
+                iter->second.capType = "\"custom, extended\"";
+        }
+        allCapInfo.mapCounts = {vCapBuf.size(), vExtBuf.size(), vCustomBuf.size()};
+        return allCapInfo;
+    }
 
-    auto& sourceStatusMap = CTL_StaticData::GetSourceStatusMap();
-    char szSourceBuf[100];
-    for (auto& curSource : allSources)
+
+    std::string generate_details(CTL_ITwainSession& ts, const std::vector<std::string>& allSources, LONG indentFactor, bool bWeOpenSource=false)
     {
-        stringutils::SafeStrcpy(szSourceBuf, curSource.c_str(), 100);
-        CTL_TwainAppMgr::SendTwainMsgToWindow(&ts, nullptr, DTWAIN_TN_SOURCEDETAILS, reinterpret_cast<LPARAM>(szSourceBuf));
-        std::string jColorInfo;
-        std::string resUnitInfo;
-        std::string capabilityString;
-        deviceInfoString[0] = "\"feeder-supported\":false";
-        deviceInfoString[1] = "\"feeder-sensitive\":false";
-        deviceInfoString[2] = "\"ui-controllable\":false";
-        deviceInfoString[3] = "\"autobright-supported\":false";
-        deviceInfoString[4] = "\"autodeskew-supported\":false";
-        deviceInfoString[5] = "\"imprinter-supported\":false";
-        deviceInfoString[6] = "\"duplex-supported\":false";
-        deviceInfoString[7] = "\"jobcontrol-supported\":false";
-        deviceInfoString[8] = "\"transparencyunit-supported\":false";
-        deviceInfoString[9] = "\"extendedimageinfo-supported\":false"; 
-        deviceInfoString[10] = "\"filesystem-supported\":false";
-        deviceInfoString[11] = "\"progressindicator-supported\":false";
-        bool devOpen[] = { false, false };
+        static constexpr int numOneValueDeviceInfo = 12;
+        static constexpr int numImageInfoString = 13;
+        const auto pHandle = ts.GetTwainDLLHandle();
+        using boost::algorithm::join;
+        using json = nlohmann::ordered_json;
 
-        // Check if we need to select and open the source to see
-        // the details
-        bool bMustClose = false;
-        bool bNullSource = false;
-        CTL_ITwainSource* pCurrentSourcePtr = nullptr;
-
-        auto iter = sourceStatusMap.find(curSource);
-        if (iter == sourceStatusMap.end())
+        struct capabilityInfo
         {
-            jsonString = CTL_TwainIdentity().to_json();
-            bNullSource = true;
-        }            
+            std::string name;
+            int value;
+            capabilityInfo(std::string n = "", int val = 0) : name(n), value(val) {}
+        };
 
-        if ( !bNullSource )
+        struct sUniquePtrRAII
         {
-            if (iter->second.IsClosed() || iter->second.IsUnknown())
+            std::unique_ptr<CTL_ITwainSource*>* m_ptr;
+            bool m_bReleaseOnDestruction;
+            sUniquePtrRAII(std::unique_ptr<CTL_ITwainSource*>* p, bool isReleaseOnDestruction)
+                : m_ptr(p), m_bReleaseOnDestruction(isReleaseOnDestruction) {}
+            ~sUniquePtrRAII()
             {
-                DTWAIN_SOURCE tempSource = DTWAIN_SelectSourceByNameA(curSource.c_str());
-                if (tempSource)
+                if (m_bReleaseOnDestruction)
+                    (*m_ptr).release();
+            }
+        };
+        std::vector<capabilityInfo> vCapabilityInfo;
+
+        json glob_json;
+        glob_json["dtwain-version"] = DTWAIN_VERINFO_FILEVERSION;
+        glob_json["session-twain-identity"] = json::parse(CTL_TwainIdentity(ts.GetAppIDPtr()).to_json());
+        glob_json["device-count"] = allSources.size();
+        json array_twain_identity;
+        json array_source_names;
+        std::vector<std::string> sNames = allSources;
+        glob_json["device-names"] = sNames;
+        std::string jsonString;
+        std::array<std::string, numImageInfoString> imageInfoString;
+        std::array<std::string, numOneValueDeviceInfo> deviceInfoString;
+
+        struct SourceSelectStatusRAII
+        {
+            bool m_bSelectStatus;
+            CTL_TwainDLLHandle* m_pHandle;
+            SourceSelectStatusRAII(CTL_TwainDLLHandle* pHandle, bool bStatus) : m_pHandle(pHandle),  m_bSelectStatus(bStatus) {}
+            ~SourceSelectStatusRAII() 
+            { 
+                m_pHandle->m_bOpenSourceOnSelect = m_bSelectStatus;
+            }
+        };
+
+        SourceSelectStatusRAII sourceSelectraii(pHandle, pHandle->m_bOpenSourceOnSelect);
+        pHandle->m_bOpenSourceOnSelect = false;
+
+        auto& sourceStatusMap = CTL_StaticData::GetSourceStatusMap();
+        char szSourceBuf[100];
+        for (auto& curSource : allSources)
+        {
+            stringutils::SafeStrcpy(szSourceBuf, curSource.c_str(), 100);
+            CTL_TwainAppMgr::SendTwainMsgToWindow(&ts, nullptr, DTWAIN_TN_SOURCEDETAILS, reinterpret_cast<LPARAM>(szSourceBuf));
+            std::string jColorInfo;
+            std::string resUnitInfo;
+            std::string capabilityString;
+            deviceInfoString[0] = "\"feeder-supported\":false";
+            deviceInfoString[1] = "\"feeder-sensitive\":false";
+            deviceInfoString[2] = "\"ui-controllable\":false";
+            deviceInfoString[3] = "\"autobright-supported\":false";
+            deviceInfoString[4] = "\"autodeskew-supported\":false";
+            deviceInfoString[5] = "\"imprinter-supported\":false";
+            deviceInfoString[6] = "\"duplex-supported\":false";
+            deviceInfoString[7] = "\"jobcontrol-supported\":false";
+            deviceInfoString[8] = "\"transparencyunit-supported\":false";
+            deviceInfoString[9] = "\"extendedimageinfo-supported\":false"; 
+            deviceInfoString[10] = "\"filesystem-supported\":false";
+            deviceInfoString[11] = "\"progressindicator-supported\":false";
+            bool devOpen[] = { false, false };
+
+            // Check if we need to select and open the source to see
+            // the details
+            bool bMustClose = false;
+            bool bNullSource = false;
+            CTL_ITwainSource* pCurrentSourcePtr = nullptr;
+
+            auto iter = sourceStatusMap.find(curSource);
+            if (iter == sourceStatusMap.end())
+            {
+                jsonString = CTL_TwainIdentity().to_json();
+                bNullSource = true;
+            }            
+
+            if ( !bNullSource )
+            {
+                if (iter->second.IsClosed() || iter->second.IsUnknown())
                 {
-                    pCurrentSourcePtr = reinterpret_cast<CTL_ITwainSource*>(tempSource);
-                    bMustClose = true;
-                    DTWAIN_OpenSource(tempSource);
+                    DTWAIN_SOURCE tempSource = DTWAIN_SelectSourceByNameA(curSource.c_str());
+                    if (tempSource)
+                    {
+                        pCurrentSourcePtr = reinterpret_cast<CTL_ITwainSource*>(tempSource);
+                        bMustClose = true;
+                        DTWAIN_OpenSource(tempSource);
+                    }
+                }
+                else
+                {
+                    // Source already opened
+                    DTWAIN_SOURCE openedSource = reinterpret_cast<DTWAIN_SOURCE>(iter->second.GetSourceHandle());
+                    pCurrentSourcePtr = reinterpret_cast<CTL_ITwainSource*>(openedSource);
                 }
             }
-            else
-            {
-                // Source already opened
-                DTWAIN_SOURCE openedSource = reinterpret_cast<DTWAIN_SOURCE>(iter->second.GetSourceHandle());
-                pCurrentSourcePtr = reinterpret_cast<CTL_ITwainSource*>(openedSource);
-            }
-        }
 
-        SourceCloserRAII closer(pCurrentSourcePtr, bMustClose);
+            SourceCloserRAII closer(pCurrentSourcePtr, bMustClose);
 
-        auto curIter = sourceStatusMap.find(curSource);
-        if (bNullSource || curIter != sourceStatusMap.end())
-        {
-            if (bNullSource || curIter->second.IsSelected())
+            auto curIter = sourceStatusMap.find(curSource);
+            if (bNullSource || curIter != sourceStatusMap.end())
             {
-                devOpen[0] = !bNullSource;
-                if (!bNullSource && curIter->second.IsOpen())
+                if (bNullSource || curIter->second.IsSelected())
                 {
-                    devOpen[1] = true;
-                    jsonString = pCurrentSourcePtr->GetSourceInfo();
-                    jColorInfo = "\"color-info\":{";
-                    std::ostringstream strm;
-                    std::ostringstream strm2;
-                    std::string allbdepths;
-
-                    // Get the pixel information
+                    devOpen[0] = !bNullSource;
+                    if (!bNullSource && curIter->second.IsOpen())
                     {
-                        auto pixInfo = get_pixel_bitdepth_info(pCurrentSourcePtr);
-                        std::vector<LONG> allPixInfo;
-                        std::vector<std::string> vPixNames;
-                        std::vector<std::string> vPixNamesEx;
-                        for (auto& pr : pixInfo)
+                        devOpen[1] = true;
+                        jsonString = pCurrentSourcePtr->GetSourceInfo();
+                        jColorInfo = "\"color-info\":{";
+                        std::ostringstream strm;
+                        std::ostringstream strm2;
+                        std::string allbdepths;
+
+                        // Get the pixel information
                         {
-                            allPixInfo.push_back(pr.first);
-                            auto sName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, pr.first).second;
-                            vPixNames.push_back(sName);
-                            vPixNamesEx.push_back("\"" + vPixNames.back() + "\"");
+                            auto pixInfo = get_pixel_bitdepth_info(pCurrentSourcePtr);
+                            std::vector<LONG> allPixInfo;
+                            std::vector<std::string> vPixNames;
+                            std::vector<std::string> vPixNamesEx;
+                            for (auto& pr : pixInfo)
+                            {
+                                allPixInfo.push_back(pr.first);
+                                auto sName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, pr.first).second;
+                                vPixNames.push_back(sName);
+                                vPixNamesEx.push_back("\"" + vPixNames.back() + "\"");
+                            }
+                            strm << "\"num-colors\":" << pixInfo.size() << ",";
+                            jColorInfo += strm.str();
+
+                            strm.str("");
+                            std::string joinStr = join_string(vPixNamesEx.begin(), vPixNamesEx.end());
+                            strm << "\"color-types\":[" << joinStr << "],";
+
+                            strm2 << "\"bitdepth-info\":{";
+                            int depthCount = 0;
+                            for (auto& pr : pixInfo)
+                            {
+                                strm2 << "\"" << vPixNames[depthCount] << "\":[";
+                                std::string bdepthStr = join_string(pr.second.begin(), pr.second.end());
+                                strm2 << bdepthStr << "],";
+                                ++depthCount;
+                            }
+                            allbdepths = strm2.str();
+                            allbdepths.pop_back();
+                            allbdepths += "}";
                         }
-                        strm << "\"num-colors\":" << pixInfo.size() << ",";
-                        jColorInfo += strm.str();
 
-                        strm.str("");
-                        std::string joinStr = join_string(vPixNamesEx.begin(), vPixNamesEx.end());
-                        strm << "\"color-types\":[" << joinStr << "],";
+                        jColorInfo += strm.str() + allbdepths + "},";
 
-                        strm2 << "\"bitdepth-info\":{";
-                        int depthCount = 0;
-                        for (auto& pr : pixInfo)
+                        struct TwainDataItems
                         {
-                            strm2 << "\"" << vPixNames[depthCount] << "\":[";
-                            std::string bdepthStr = join_string(pr.second.begin(), pr.second.end());
-                            strm2 << bdepthStr << "],";
-                            ++depthCount;
-                        }
-                        allbdepths = strm2.str();
-                        allbdepths.pop_back();
-                        allbdepths += "}";
-                    }
+                            LONG cap;
+                            LONG capConstant;
+                            const char* name;
+                            int prefixCount;
+                            const char* prefix;
+                            bool usefullName;
+                        };
 
-                    jColorInfo += strm.str() + allbdepths + "},";
-
-                    struct TwainDataItems
-                    {
-                        LONG cap;
-                        LONG capConstant;
-                        const char* name;
-                        int prefixCount;
-                        const char* prefix;
-                        bool usefullName;
-                    };
-
-                    static constexpr std::array<TwainDataItems, 6> otherData = { {
-                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_", true },
-                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_", true },
-                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_", true },
-                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5, "TWEI_", true},
-                        { CAP_SUPPORTEDDATS,DTWAIN_CONSTANT_DAT, "\"supported-dat-types\":", 4, "DAT_", true },
-                        { ICAP_COMPRESSION, DTWAIN_CONSTANT_TWCP, "\"filecompression-types\":", 5, "TWCP_", true }
-                    } };
-                    for (auto& oneData : otherData)
-                    {
-                        strm2.str("");
-                        {
-                            std::vector<std::string> vNames;
-                            if ( oneData.cap == CAP_SUPPORTEDDATS)
-                                vNames = getDGDATNamesFromConstants(pCurrentSourcePtr);
-                            else
-                            if (oneData.cap == ICAP_COMPRESSION)
-                                vNames = getCompressionNames(pCurrentSourcePtr);
-                            else
-                                vNames = getNamesFromConstants(pCurrentSourcePtr, oneData.cap, oneData.capConstant, [](LONG v) { return v; });
-                            std::string allSizes;
-                            std::vector<std::string> vAdjustedNames;
-                            std::transform(vNames.begin(), vNames.end(), std::back_inserter(vAdjustedNames),
-                                [&](auto& origName)
-                                {
-                                    if (!stringutils::StartsWith(std::string_view(origName), 
-                                                                                   std::string_view(oneData.prefix)))
-                                        return "\"" + origName + "\"";
-                                    if (oneData.usefullName)
-                                        return "\"" + origName + "\"";
-                                    return "\"" +  origName.substr(oneData.prefixCount) + "\"";
-                                });
-                            std::sort(vAdjustedNames.begin(), vAdjustedNames.end());
-                            std::string resultStr = join_string(vAdjustedNames.begin(), vAdjustedNames.end());
-                            if (!vNames.empty())
-                                strm2 << oneData.name << "[" << resultStr << "],";
-                            else
-                                strm2 << oneData.name << "\"<unsupported>\",";
-                            allSizes = strm2.str();
-                            jColorInfo += allSizes;
-                        }
-                    }
-
-                    // get the resolution info
-                    {
-                        auto resMap = getResolutionInfo(pCurrentSourcePtr);
-
-                        std::vector<std::string> vSizeNames;
-                        strm.str("");
-                        strm << "\"resolution-info\": {";
-                        for (auto &pr : resMap)
-                        {
-                            auto buf = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWUN, pr.first).second;
-                            vSizeNames.push_back(stringutils::LowerCase(buf).substr(5));
-                        }
-                        strm << "\"resolution-count\":" << resMap.size() << ",";
-                        strm << "\"resolution-units\":";
-
-                        std::vector<std::string> unitNameV;
-                        std::transform(vSizeNames.begin(), vSizeNames.end(), std::back_inserter(unitNameV),
-                            [](auto& p) { return "\"" + p + "\""; });
-                        std::string unitNameStr = "[" + join_string(unitNameV.begin(), unitNameV.end(), ",") + "]";
-                        strm << unitNameStr << ",";
-
-                        int i = 0;
-                        std::string resolutionTotalStr;
-                        for (auto& pr : resMap)
+                        static constexpr std::array<TwainDataItems, 6> otherData = { {
+                            { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_", true },
+                            { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_", true },
+                            { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_", true },
+                            { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5, "TWEI_", true},
+                            { CAP_SUPPORTEDDATS,DTWAIN_CONSTANT_DAT, "\"supported-dat-types\":", 4, "DAT_", true },
+                            { ICAP_COMPRESSION, DTWAIN_CONSTANT_TWCP, "\"filecompression-types\":", 5, "TWCP_", true }
+                        } };
+                        for (auto& oneData : otherData)
                         {
                             strm2.str("");
-                            if (i > 0)
-                                strm2 << ",";
-                            strm2 << "\"resolution-" << remove_quotes(unitNameV[i]) << "\": {";
+                            {
+                                std::vector<std::string> vNames;
+                                if ( oneData.cap == CAP_SUPPORTEDDATS)
+                                    vNames = getDGDATNamesFromConstants(pCurrentSourcePtr);
+                                else
+                                if (oneData.cap == ICAP_COMPRESSION)
+                                    vNames = getCompressionNames(pCurrentSourcePtr);
+                                else
+                                    vNames = getNamesFromConstants(pCurrentSourcePtr, oneData.cap, oneData.capConstant, [](LONG v) { return v; });
+                                std::string allSizes;
+                                std::vector<std::string> vAdjustedNames;
+                                std::transform(vNames.begin(), vNames.end(), std::back_inserter(vAdjustedNames),
+                                    [&](auto& origName)
+                                    {
+                                        if (!stringutils::StartsWith(std::string_view(origName), 
+                                                                                       std::string_view(oneData.prefix)))
+                                            return "\"" + origName + "\"";
+                                        if (oneData.usefullName)
+                                            return "\"" + origName + "\"";
+                                        return "\"" +  origName.substr(oneData.prefixCount) + "\"";
+                                    });
+                                std::sort(vAdjustedNames.begin(), vAdjustedNames.end());
+                                std::string resultStr = join_string(vAdjustedNames.begin(), vAdjustedNames.end());
+                                if (!vNames.empty())
+                                    strm2 << oneData.name << "[" << resultStr << "],";
+                                else
+                                    strm2 << oneData.name << "\"<unsupported>\",";
+                                allSizes = strm2.str();
+                                jColorInfo += allSizes;
+                            }
+                        }
 
-                            if (pr.second.m_bIsRange)
-                                strm2 << "\"data-type\":\"range\",";
+                        // get the resolution info
+                        {
+                            auto resMap = getResolutionInfo(pCurrentSourcePtr);
+
+                            std::vector<std::string> vSizeNames;
+                            strm.str("");
+                            strm << "\"resolution-info\": {";
+                            for (auto &pr : resMap)
+                            {
+                                auto buf = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWUN, pr.first).second;
+                                vSizeNames.push_back(stringutils::LowerCase(buf).substr(5));
+                            }
+                            strm << "\"resolution-count\":" << resMap.size() << ",";
+                            strm << "\"resolution-units\":";
+
+                            std::vector<std::string> unitNameV;
+                            std::transform(vSizeNames.begin(), vSizeNames.end(), std::back_inserter(unitNameV),
+                                [](auto& p) { return "\"" + p + "\""; });
+                            std::string unitNameStr = "[" + join_string(unitNameV.begin(), unitNameV.end(), ",") + "]";
+                            strm << unitNameStr << ",";
+
+                            int i = 0;
+                            std::string resolutionTotalStr;
+                            for (auto& pr : resMap)
+                            {
+                                strm2.str("");
+                                if (i > 0)
+                                    strm2 << ",";
+                                strm2 << "\"resolution-" << remove_quotes(unitNameV[i]) << "\": {";
+
+                                if (pr.second.m_bIsRange)
+                                    strm2 << "\"data-type\":\"range\",";
+                                else
+                                    strm2 << "\"data-type\":\"discrete\",";
+                                strm2 << "\"data-values\":[" << join_string(pr.second.m_AllRes.begin(), pr.second.m_AllRes.end()) << "]}";
+                                resolutionTotalStr += strm2.str();
+                                ++i;
+                            }
+
+                            resUnitInfo = strm.str() + resolutionTotalStr + "},";
+                        }
+
+                        static constexpr int SPECIAL_FILESYSTEM = -999;
+                        static constexpr std::array<int, 11> imageInfoCaps = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
+                                                              ICAP_THRESHOLD, ICAP_ROTATION, ICAP_ORIENTATION, ICAP_OVERSCAN, ICAP_HALFTONES, SPECIAL_FILESYSTEM };
+                        static constexpr std::array<std::string_view, 11> imageInfoCapsStr = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
+                            "\"highlight-values\":", "\"shadow-values\":", "\"threshold-values\":",
+                            "\"rotation-values\":", "\"orientation-values\":", "\"overscan-values\":", "\"halftone-values\":", "\"filesystem-camera-values\":" };
+                        DTWAIN_SOURCE pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pCurrentSourcePtr);
+                        for (size_t curImageCap = 0; curImageCap < imageInfoCaps.size(); ++curImageCap)
+                        {
+                            strm.str("");
+                            strm << imageInfoCapsStr[curImageCap];
+                            if (imageInfoCaps[curImageCap] == ICAP_ORIENTATION)
+                                create_stream<LONG>(strm, pActualSource, ICAP_ORIENTATION, DTWAIN_CONSTANT_TWOR, true);
                             else
-                                strm2 << "\"data-type\":\"discrete\",";
-                            strm2 << "\"data-values\":[" << join_string(pr.second.m_AllRes.begin(), pr.second.m_AllRes.end()) << "]}";
-                            resolutionTotalStr += strm2.str();
-                            ++i;
+                            if (imageInfoCaps[curImageCap] == ICAP_OVERSCAN)
+                                create_stream<LONG>(strm, pActualSource, ICAP_OVERSCAN, DTWAIN_CONSTANT_TWOV, true);
+                            else
+                            if (imageInfoCaps[curImageCap] == ICAP_HALFTONES)
+                                create_stream_from_strings<DefaultStringFnGetter>(strm, pActualSource, ICAP_HALFTONES);
+                            else
+                            if ( imageInfoCaps[curImageCap] == SPECIAL_FILESYSTEM)
+                            {
+                                create_stream_from_strings<CameraSystemStringFnGetter>(strm, pActualSource, 0);
+                            }
+                            else
+                                create_stream<double>(strm, pActualSource, imageInfoCaps[curImageCap], 0);
+                            imageInfoString[curImageCap] = strm.str();
                         }
 
-                        resUnitInfo = strm.str() + resolutionTotalStr + "},";
-                    }
+                        strm2.str("");
+                        // get the capability string
+                        auto capInfo = getAllCapInfo(pCurrentSourcePtr);
+                        std::vector<OneCapInfo> vCapInfos;
+                        for ( auto& pr : capInfo.m_infoMap )
+                            vCapInfos.push_back(pr.second);
+                        std::sort(vCapInfos.begin(), vCapInfos.end(),
+                            [&](const auto& val1, const auto& val2) { return val1.capName < val2.capName;  });
+                        for (auto& oneVal : vCapInfos)
+                            strm2 << "{ \"name\":\"" << oneVal.capName << "\",\"value\":" << oneVal.value << ",\"type\":" << oneVal.capType << "},";
+                        capabilityString = strm2.str();
+                        capabilityString.pop_back();
+                        capabilityString = "[" + capabilityString + "]";
 
-                    static constexpr int SPECIAL_FILESYSTEM = -999;
-                    static constexpr std::array<int, 11> imageInfoCaps = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
-                                                          ICAP_THRESHOLD, ICAP_ROTATION, ICAP_ORIENTATION, ICAP_OVERSCAN, ICAP_HALFTONES, SPECIAL_FILESYSTEM };
-                    static constexpr std::array<std::string_view, 11> imageInfoCapsStr = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
-                        "\"highlight-values\":", "\"shadow-values\":", "\"threshold-values\":",
-                        "\"rotation-values\":", "\"orientation-values\":", "\"overscan-values\":", "\"halftone-values\":", "\"filesystem-camera-values\":" };
-                    DTWAIN_SOURCE pActualSource = reinterpret_cast<DTWAIN_SOURCE>(pCurrentSourcePtr);
-                    for (size_t curImageCap = 0; curImageCap < imageInfoCaps.size(); ++curImageCap)
-                    {
+                        std::ostringstream tempStrm;
+                        tempStrm << "\"capability-count\":[{\"all\":" << capInfo.mapCounts[0] << ","
+                            "\"custom\":" << capInfo.mapCounts[2] << ","
+                            "\"extended\":" << capInfo.mapCounts[1] << "}],\"capability-values\":" << capabilityString;
+                        imageInfoString[11] = tempStrm.str();
+
+                        // Get the filetype info
+                        tempStrm.str("");
+                        static constexpr std::array<std::string_view, 29> fileTypes = {
+                                                                "\"bmp (rle compression)\",",
+                                                                "\"bmp\",",
+                                                                "\"dcx\",",
+                                                                "\"emf\",",
+                                                                "\"gif\",",
+                                                                "\"ico\",",
+                                                                "\"jp2 (jpeg-2000)\",",
+                                                                "\"jpeg-xr\",",
+                                                                "\"jpeg\",",
+                                                                "\"pcx\",",
+                                                                "\"pdf\",",
+                                                                "\"png\",",
+                                                                "\"ps1 (Postscript 1)\",",
+                                                                "\"ps2 (Postscript 2)\",",
+                                                                "\"psd\",",
+                                                                "\"svg\",",
+                                                                "\"svgz\",",
+                                                                "\"tga (rle compression)\",",
+                                                                "\"tga\",",
+                                                                "\"tiff (flate compression)\",",
+                                                                "\"tiff (group 3 fax compression)\",",
+                                                                "\"tiff (group 4 fax compression)\",",
+                                                                "\"tiff (jpeg compression)\",",
+                                                                "\"tiff (lzw compression)\",",
+                                                                "\"tiff (no compression)\",",
+                                                                "\"tiff (packbits compression)\",",
+                                                                "\"wbmp\",",
+                                                                "\"webp\",",
+                                                                "\"wmf\"" };
+                        std::string allFileTypes;
+                        for (auto s : fileTypes)
+                            allFileTypes += s.data();
+                        std::string customTypes = get_source_file_types(pActualSource); 
+                        if (!customTypes.empty())
+                        {
+                            allFileTypes += "," + customTypes;
+                        }
+
+                        tempStrm << "\"filetype-info\":[" << allFileTypes << "]";
+                        imageInfoString[12] = tempStrm.str();
+
                         strm.str("");
-                        strm << imageInfoCapsStr[curImageCap];
-                        if (imageInfoCaps[curImageCap] == ICAP_ORIENTATION)
-                            create_stream<LONG>(strm, pActualSource, ICAP_ORIENTATION, DTWAIN_CONSTANT_TWOR, true);
-                        else
-                        if (imageInfoCaps[curImageCap] == ICAP_OVERSCAN)
-                            create_stream<LONG>(strm, pActualSource, ICAP_OVERSCAN, DTWAIN_CONSTANT_TWOV, true);
-                        else
-                        if (imageInfoCaps[curImageCap] == ICAP_HALFTONES)
-                            create_stream_from_strings<DefaultStringFnGetter>(strm, pActualSource, ICAP_HALFTONES);
-                        else
-                        if ( imageInfoCaps[curImageCap] == SPECIAL_FILESYSTEM)
+
+                        static constexpr std::array<int, numOneValueDeviceInfo> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
+                                                                                            ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
+                                                                                            CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 
+                                                                                            0, CAP_INDICATORS};
+
+                        std::array<std::string, numOneValueDeviceInfo> deviceInfoCapsStr;
+                        std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());
+                        for (auto& s : deviceInfoCapsStr)
+                            s.resize(s.size() - 5);
+                        for (size_t curDevice = 0; curDevice < deviceInfoCaps.size(); ++curDevice)
                         {
-                            create_stream_from_strings<CameraSystemStringFnGetter>(strm, pActualSource, 0);
-                        }
-                        else
-                            create_stream<double>(strm, pActualSource, imageInfoCaps[curImageCap], 0);
-                        imageInfoString[curImageCap] = strm.str();
-                    }
-
-                    strm2.str("");
-                    // get the capability string
-                    auto capInfo = getAllCapInfo(pCurrentSourcePtr);
-                    std::vector<OneCapInfo> vCapInfos;
-                    for ( auto& pr : capInfo.m_infoMap )
-                        vCapInfos.push_back(pr.second);
-                    std::sort(vCapInfos.begin(), vCapInfos.end(),
-                        [&](const auto& val1, const auto& val2) { return val1.capName < val2.capName;  });
-                    for (auto& oneVal : vCapInfos)
-                        strm2 << "{ \"name\":\"" << oneVal.capName << "\",\"value\":" << oneVal.value << ",\"type\":" << oneVal.capType << "},";
-                    capabilityString = strm2.str();
-                    capabilityString.pop_back();
-                    capabilityString = "[" + capabilityString + "]";
-
-                    std::ostringstream tempStrm;
-                    tempStrm << "\"capability-count\":[{\"all\":" << capInfo.mapCounts[0] << ","
-                        "\"custom\":" << capInfo.mapCounts[2] << ","
-                        "\"extended\":" << capInfo.mapCounts[1] << "}],\"capability-values\":" << capabilityString;
-                    imageInfoString[11] = tempStrm.str();
-
-                    // Get the filetype info
-                    tempStrm.str("");
-                    static constexpr std::array<std::string_view, 29> fileTypes = {
-                                                            "\"bmp (rle compression)\",",
-                                                            "\"bmp\",",
-                                                            "\"dcx\",",
-                                                            "\"emf\",",
-                                                            "\"gif\",",
-                                                            "\"ico\",",
-                                                            "\"jp2 (jpeg-2000)\",",
-                                                            "\"jpeg-xr\",",
-                                                            "\"jpeg\",",
-                                                            "\"pcx\",",
-                                                            "\"pdf\",",
-                                                            "\"png\",",
-                                                            "\"ps1 (Postscript 1)\",",
-                                                            "\"ps2 (Postscript 2)\",",
-                                                            "\"psd\",",
-                                                            "\"svg\",",
-                                                            "\"svgz\",",
-                                                            "\"tga (rle compression)\",",
-                                                            "\"tga\",",
-                                                            "\"tiff (flate compression)\",",
-                                                            "\"tiff (group 3 fax compression)\",",
-                                                            "\"tiff (group 4 fax compression)\",",
-                                                            "\"tiff (jpeg compression)\",",
-                                                            "\"tiff (lzw compression)\",",
-                                                            "\"tiff (no compression)\",",
-                                                            "\"tiff (packbits compression)\",",
-                                                            "\"wbmp\",",
-                                                            "\"webp\",",
-                                                            "\"wmf\"" };
-                    std::string allFileTypes;
-                    for (auto s : fileTypes)
-                        allFileTypes += s.data();
-                    std::string customTypes = get_source_file_types(pActualSource); 
-                    if (!customTypes.empty())
-                    {
-                        allFileTypes += "," + customTypes;
-                    }
-
-                    tempStrm << "\"filetype-info\":[" << allFileTypes << "]";
-                    imageInfoString[12] = tempStrm.str();
-
-                    strm.str("");
-
-                    static constexpr std::array<int, numOneValueDeviceInfo> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
-                                                                                        ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                                                                                        CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 
-                                                                                        0, CAP_INDICATORS};
-
-                    std::array<std::string, numOneValueDeviceInfo> deviceInfoCapsStr;
-                    std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());
-                    for (auto& s : deviceInfoCapsStr)
-                        s.resize(s.size() - 5);
-                    for (size_t curDevice = 0; curDevice < deviceInfoCaps.size(); ++curDevice)
-                    {
-                        if (curDevice > 0)
-                            strm << ",";
-                        bool value = false;
-                        if (deviceInfoCaps[curDevice] == ICAP_EXTIMAGEINFO)
-                            value = DTWAIN_IsExtImageInfoSupported(pActualSource) ? true : false;
-                        else
-                        if (deviceInfoCaps[curDevice] == CAP_FEEDERENABLED)
-                            value = DTWAIN_IsFeederSupported(pActualSource) ? true : false;
-                        else
-                        if (deviceInfoCaps[curDevice] == CAP_UICONTROLLABLE)
-                            value = DTWAIN_IsUIControllable(pActualSource) ? true : false;
-                        else
-                        if (deviceInfoCaps[curDevice] == CAP_PRINTER)
-                        {
-                            DTWAIN_ARRAY aPrinter = nullptr;
-                            DTWAIN_GetCapValuesEx2(pActualSource, CAP_PRINTER, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aPrinter);
-                            DTWAINArrayPtr_RAII aPrinterRaii(pHandle, &aPrinter);
-                            if ( aPrinter )
+                            if (curDevice > 0)
+                                strm << ",";
+                            bool value = false;
+                            if (deviceInfoCaps[curDevice] == ICAP_EXTIMAGEINFO)
+                                value = DTWAIN_IsExtImageInfoSupported(pActualSource) ? true : false;
+                            else
+                            if (deviceInfoCaps[curDevice] == CAP_FEEDERENABLED)
+                                value = DTWAIN_IsFeederSupported(pActualSource) ? true : false;
+                            else
+                            if (deviceInfoCaps[curDevice] == CAP_UICONTROLLABLE)
+                                value = DTWAIN_IsUIControllable(pActualSource) ? true : false;
+                            else
+                            if (deviceInfoCaps[curDevice] == CAP_PRINTER)
                             {
-                                auto& vBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aPrinter);
-                                value = (!vBuf.empty() && vBuf.front() != TWDX_NONE);
+                                DTWAIN_ARRAY aPrinter = nullptr;
+                                DTWAIN_GetCapValuesEx2(pActualSource, CAP_PRINTER, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aPrinter);
+                                DTWAINArrayPtr_RAII aPrinterRaii(pHandle, &aPrinter);
+                                if ( aPrinter )
+                                {
+                                    auto& vBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aPrinter);
+                                    value = (!vBuf.empty() && vBuf.front() != TWDX_NONE);
+                                }
                             }
-                        }
-                        else
-                        if (deviceInfoCaps[curDevice] == CAP_JOBCONTROL)
-                        {
-                            auto vValue = DTWAIN_EnumJobControlsEx(pActualSource);
-                            DTWAINArrayPtr_RAII aJob(pHandle, &vValue);
-                            if (vValue)
+                            else
+                            if (deviceInfoCaps[curDevice] == CAP_JOBCONTROL)
                             {
-                                auto& vBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(vValue);
-                                value = (!vBuf.empty() && vBuf.front() != TWJC_NONE);
+                                auto vValue = DTWAIN_EnumJobControlsEx(pActualSource);
+                                DTWAINArrayPtr_RAII aJob(pHandle, &vValue);
+                                if (vValue)
+                                {
+                                    auto& vBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(vValue);
+                                    value = (!vBuf.empty() && vBuf.front() != TWJC_NONE);
+                                }
                             }
+                            else
+                            if ( deviceInfoCaps[curDevice] == 0)
+                            {
+                                // This is a place holder for file system support
+                                value = DTWAIN_IsFileSystemSupported(pActualSource);
+                            }
+                            else
+                                value = DTWAIN_IsCapSupported(pActualSource, deviceInfoCaps[curDevice]) ? true : false;
+                            strm << deviceInfoCapsStr[curDevice] << (value ? "true" : "false");
+                            deviceInfoString[curDevice] = strm.str();
                         }
-                        else
-                        if ( deviceInfoCaps[curDevice] == 0)
-                        {
-                            // This is a place holder for file system support
-                            value = DTWAIN_IsFileSystemSupported(pActualSource);
-                        }
-                        else
-                            value = DTWAIN_IsCapSupported(pActualSource, deviceInfoCaps[curDevice]) ? true : false;
-                        strm << deviceInfoCapsStr[curDevice] << (value ? "true" : "false");
-                        deviceInfoString[curDevice] = strm.str();
-                    }
-                }
-                else
-                {
-                    if ( bNullSource )
-                    {
-                        CTL_TwainIdentity ti;
-                        ti.set_product_name(curSource);
-                        jsonString = ti.to_json();
                     }
                     else
-                        jsonString = pCurrentSourcePtr->GetSourceInfo();
-                    jColorInfo = "\"color-info\":\"<not available>\",";
-                    resUnitInfo = "\"resolution-info\":\"<not available>\",";
-                    imageInfoString[0] = "\"brightness-values\":\"<not available>\"";
-                    imageInfoString[1] = "\"contrast-values\":\"<not available>\"";
-                    imageInfoString[2] = "\"gamma-values\":\"<not available>\"";
-                    imageInfoString[3] = "\"highlight-values\":\"<not available>\"";
-                    imageInfoString[4] = "\"shadow-values\":\"<not available>\"";
-                    imageInfoString[5] = "\"threshold-values\":\"<not available>\"";
-                    imageInfoString[6] = "\"rotation-values\":\"<not available>\"";
-                    imageInfoString[7] = "\"orientation-values\":\"<not available>\"";
-                    imageInfoString[8] = "\"overscan-values\":\"<not available>\"";
-                    imageInfoString[9] = "\"halftone-values\":\"<not available>\"";
-                    imageInfoString[10] = "\"capability-info\":\"<not available>\"";
-                    imageInfoString[11] = "\"filetype-info\":\"<not available>\"";
-                    imageInfoString[12] = "\"filesystem-info\":\"<not available>\"";
+                    {
+                        if ( bNullSource )
+                        {
+                            CTL_TwainIdentity ti;
+                            ti.set_product_name(curSource);
+                            jsonString = ti.to_json();
+                        }
+                        else
+                            jsonString = pCurrentSourcePtr->GetSourceInfo();
+                        jColorInfo = "\"color-info\":\"<not available>\",";
+                        resUnitInfo = "\"resolution-info\":\"<not available>\",";
+                        imageInfoString[0] = "\"brightness-values\":\"<not available>\"";
+                        imageInfoString[1] = "\"contrast-values\":\"<not available>\"";
+                        imageInfoString[2] = "\"gamma-values\":\"<not available>\"";
+                        imageInfoString[3] = "\"highlight-values\":\"<not available>\"";
+                        imageInfoString[4] = "\"shadow-values\":\"<not available>\"";
+                        imageInfoString[5] = "\"threshold-values\":\"<not available>\"";
+                        imageInfoString[6] = "\"rotation-values\":\"<not available>\"";
+                        imageInfoString[7] = "\"orientation-values\":\"<not available>\"";
+                        imageInfoString[8] = "\"overscan-values\":\"<not available>\"";
+                        imageInfoString[9] = "\"halftone-values\":\"<not available>\"";
+                        imageInfoString[10] = "\"capability-info\":\"<not available>\"";
+                        imageInfoString[11] = "\"filetype-info\":\"<not available>\"";
+                        imageInfoString[12] = "\"filesystem-info\":\"<not available>\"";
 
-                    std::string sStatus = "false";
-                    if ( bNullSource )
-                        sStatus = "<not available>";
-                    deviceInfoString[0] = "\"feeder-supported\":\"" + sStatus + "\"";
-                    deviceInfoString[1] = "\"feeder-sensitive\":\"" + sStatus + "\""; 
-                    deviceInfoString[2] = "\"ui-controllable\":\"" + sStatus + "\""; 
-                    deviceInfoString[3] = "\"autobright-supported\":\"" + sStatus + "\""; 
-                    deviceInfoString[4] = "\"autodeskew-supported\":\"" + sStatus + "\""; 
-                    deviceInfoString[5] = "\"imprinter-supported\":\"" + sStatus + "\""; 
-                    deviceInfoString[6] = "\"duplex-supported\":\"" + sStatus + "\""; 
-                    deviceInfoString[7] = "\"jobcontrol-supported\":\"" + sStatus + "\""; 
-                    deviceInfoString[8] = "\"transparencyunit-supported\":\"" + sStatus + "\""; 
-                    deviceInfoString[9] = "\"extendedimageinfo-supported\":\"" + sStatus + "\"";
-                    deviceInfoString[10] = "\"filesystem-supported\":\"" + sStatus + "\"";
-                    deviceInfoString[11] = "\"progressindicator-supported\":\"" + sStatus + "\"";
-                }
-                std::string partString = "\"device-name\":\"" + curSource + "\",";
-                std::string strStatus;
-                if (devOpen[0] && devOpen[1])
-                    strStatus = "\"<selected, opened>\"";
-                else
-                if (!devOpen[0] && !devOpen[1])
-                {
-                    if ( bNullSource )
-                        strStatus = "\"<not installed/detected>\"";
+                        std::string sStatus = "false";
+                        if ( bNullSource )
+                            sStatus = "<not available>";
+                        deviceInfoString[0] = "\"feeder-supported\":\"" + sStatus + "\"";
+                        deviceInfoString[1] = "\"feeder-sensitive\":\"" + sStatus + "\""; 
+                        deviceInfoString[2] = "\"ui-controllable\":\"" + sStatus + "\""; 
+                        deviceInfoString[3] = "\"autobright-supported\":\"" + sStatus + "\""; 
+                        deviceInfoString[4] = "\"autodeskew-supported\":\"" + sStatus + "\""; 
+                        deviceInfoString[5] = "\"imprinter-supported\":\"" + sStatus + "\""; 
+                        deviceInfoString[6] = "\"duplex-supported\":\"" + sStatus + "\""; 
+                        deviceInfoString[7] = "\"jobcontrol-supported\":\"" + sStatus + "\""; 
+                        deviceInfoString[8] = "\"transparencyunit-supported\":\"" + sStatus + "\""; 
+                        deviceInfoString[9] = "\"extendedimageinfo-supported\":\"" + sStatus + "\"";
+                        deviceInfoString[10] = "\"filesystem-supported\":\"" + sStatus + "\"";
+                        deviceInfoString[11] = "\"progressindicator-supported\":\"" + sStatus + "\"";
+                    }
+                    std::string partString = "\"device-name\":\"" + curSource + "\",";
+                    std::string strStatus;
+                    if (devOpen[0] && devOpen[1])
+                        strStatus = "\"<selected, opened>\"";
                     else
-                        strStatus = "\"<error>\"";
-                }
-                else
-                if (devOpen[0] && !devOpen[1])
-                    strStatus = "\"<selected, open_error>\"";
+                    if (!devOpen[0] && !devOpen[1])
+                    {
+                        if ( bNullSource )
+                            strStatus = "\"<not installed/detected>\"";
+                        else
+                            strStatus = "\"<error>\"";
+                    }
+                    else
+                    if (devOpen[0] && !devOpen[1])
+                        strStatus = "\"<selected, open_error>\"";
 
-                partString += "\"device-status\":" + strStatus + ",";
-                std::string imageInfoStringVal = join_string(imageInfoString.begin(), imageInfoString.end()) + ",";
-                std::string deviceInfoStringVal = join_string(deviceInfoString.begin(), deviceInfoString.end()) + ",";
-                if (jsonString.empty())
-                    jsonString = " }";
-                jsonString = "{" + partString + jColorInfo + resUnitInfo + imageInfoStringVal + deviceInfoStringVal + jsonString.substr(1);
-                array_twain_identity.push_back(json::parse(jsonString));
+                    partString += "\"device-status\":" + strStatus + ",";
+                    std::string imageInfoStringVal = join_string(imageInfoString.begin(), imageInfoString.end()) + ",";
+                    std::string deviceInfoStringVal = join_string(deviceInfoString.begin(), deviceInfoString.end()) + ",";
+                    if (jsonString.empty())
+                        jsonString = " }";
+                    jsonString = "{" + partString + jColorInfo + resUnitInfo + imageInfoStringVal + deviceInfoStringVal + jsonString.substr(1);
+                    array_twain_identity.push_back(json::parse(jsonString));
+                }
             }
         }
+        glob_json["device-info"] = array_twain_identity;
+        return glob_json.dump(indentFactor);
     }
-    glob_json["device-info"] = array_twain_identity;
-    return glob_json.dump(indentFactor);
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh)

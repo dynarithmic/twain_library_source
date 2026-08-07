@@ -190,7 +190,7 @@ namespace dynarithmic
         if (!(logFilterFlags & DTWAIN_LOG_DTWAINERRORS))
             return;
         static constexpr int MaxMessage = DTWAIN_USERRES_MAXSIZE;
-        char szBuf[MaxMessage + 1];
+        char szBuf[MaxMessage + 1]{};
         if (!pHandle)
             DTWAIN_GetErrorStringA(DTWAIN_ERR_BAD_HANDLE, szBuf, MaxMessage);
         else
@@ -202,8 +202,8 @@ namespace dynarithmic
         if (logFilterFlags & DTWAIN_LOG_ERRORMSGBOX && pHandle)
             LogDTWAINErrorToMsgBox(pHandle->m_lLastError, pFunc, s);
         else
-            if (!pHandle && logFilterFlags & DTWAIN_LOG_INITFAILURE)
-                LogDTWAINErrorToMsgBox(DTWAIN_ERR_BAD_HANDLE, nullptr, s);
+        if (!pHandle && logFilterFlags & DTWAIN_LOG_INITFAILURE)
+            LogDTWAINErrorToMsgBox(DTWAIN_ERR_BAD_HANDLE, nullptr, s);
     }
 
     CTL_StringType GetVersionString()
@@ -212,47 +212,42 @@ namespace dynarithmic
         if (!verString.empty())
             return verString;
 
-        LONG lMajor, lMinor, lVersionType, lPatch;
-        // Write the version info
-        if (DTWAIN_GetVersionInternal(&lMajor, &lMinor, &lVersionType, &lPatch))
+        constexpr LONG lVersionType = DTWAIN_OPENSOURCE_VERSION | GetDTWAINVersionType();
+        std::string s;
+        const char* sBits = "[32-bit]";
+        if (lVersionType & DTWAIN_64BIT_VERSION)
+            sBits = "[64-bit]";
+
+        s += std::string(" ") + DTWAIN_VCRUNTIME_CHARSET;
+
+        if (lVersionType & DTWAIN_DEVELOP_VERSION)
+            s += " [Debug]";
+        else
+            s += " [Release]";
+
+        s += DTWAIN_BUILD_LOGGINGNAME;
+        s += DTWAIN_VCRUNTIME_BUILDNAME;
+        s += " ";
+        s += sBits;
+        StringStreamA strm;
+        std::string sStatic;
+        if (DTWAIN_GetStaticLibVersion() != 0)
         {
-            std::string s;
-            const char* sBits = "[32-bit]";
-            if (lVersionType & DTWAIN_64BIT_VERSION)
-                sBits = "[64-bit]";
-
-            s += std::string(" ") + DTWAIN_VCRUNTIME_CHARSET;
-
-            if (lVersionType & DTWAIN_DEVELOP_VERSION)
-                s += " [Debug]";
-            else
-                s += " [Release]";
-
-            s += DTWAIN_BUILD_LOGGINGNAME;
-            s += DTWAIN_VCRUNTIME_BUILDNAME;
-            s += " ";
-            s += sBits;
-            StringStreamA strm;
-            std::string sStatic;
-            if (DTWAIN_GetStaticLibVersion() != 0)
-            {
-                sStatic += "Compiler used: " + GetStaticLibVer();
-                sStatic += "\n";
-            }
-
-            auto appName = stringconversion::Convert_Native_To_Ansi(CTL_StaticData::GetApplicationName());
-            strm << sStatic << "Dynarithmic TWAIN Library, Version " << DTWAIN_VERINFO_FILEVERSION << " " << s << "\n" <<
-                "Shared Library path : " << stringconversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
-            strm << "\nUsing Resource file (twaininfo.txt) version: " << DTWAIN_TEXTRESOURCE_FILEVERSION;
-            strm << "\nResource file path: " << stringconversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourcePath());
-            strm << "\nText Resource Language: " << stringconversion::Convert_Native_To_Ansi(CTL_StaticData::GetGeneralResourceInfo().sResourceName);
-            if (CTL_StaticData::GetGeneralResourceInfo().bIsFromRC)
-                strm << " (Text resources are directly from DTWAIN DLL and not from a text resource file)";
-            strm << "\nApplication Name: " << appName;
-            verString = stringconversion::Convert_Ansi_To_Native(strm.str());
-            return verString;
+            sStatic += "Compiler used: " + GetStaticLibVer();
+            sStatic += "\n";
         }
-        return {};
+
+        auto appName = stringconversion::Convert_Native_To_Ansi(CTL_StaticData::GetApplicationName());
+        strm << sStatic << "Dynarithmic TWAIN Library, Version " << DTWAIN_VERINFO_FILEVERSION << " " << s << "\n" <<
+            "Shared Library path : " << stringconversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
+        strm << "\nUsing Resource file (twaininfo.txt) version: " << DTWAIN_TEXTRESOURCE_FILEVERSION;
+        strm << "\nResource file path: " << stringconversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourcePath());
+        strm << "\nText Resource Language: " << stringconversion::Convert_Native_To_Ansi(CTL_StaticData::GetGeneralResourceInfo().sResourceName);
+        if (CTL_StaticData::GetGeneralResourceInfo().bIsFromRC)
+            strm << " (Text resources are directly from DTWAIN DLL and not from a text resource file)";
+        strm << "\nApplication Name: " << appName;
+        verString = stringconversion::Convert_Ansi_To_Native(strm.str());
+        return verString;
     }
 
     CTL_StringType GetDTWAINExecutionPath()
@@ -964,10 +959,6 @@ namespace
             #endif
         }
     }
-    CTL_StringType GetDTWAINInternalBuildNumber()
-    {
-        return stringconversion::Convert_AnsiPtr_To_Native(DTWAIN_BUILDVERSION);
-    }
 
     DTWAIN_HANDLE SysInitializeHelper(const SysInitializeOptions& initOptions)
     {
@@ -1272,10 +1263,7 @@ namespace
         if ( lVersionType )
             *lVersionType = nDistr | GetDTWAINVersionType();
         if (lBuildNumber)
-        {
-            auto str = GetDTWAINInternalBuildNumber();
-            *lBuildNumber = std::stoi(str);
-        }
+            *lBuildNumber = modRet[3];
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -2059,7 +2047,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
     CTL_StaticData::GetLogger().SetDLLHandle(pHandle);
 
     // If the log flags have not specified what to log
-    // then log callstack and general TWAIN send/receive info.
+    // then log call stack and general TWAIN send/receive info.
     LONG allFlags = DTWAIN_LOG_ALL;
     if ( (LogFlags != 0) && (LogFlags & allFlags) == 0)  
         LogFlags |= (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_DECODE_SOURCE | DTWAIN_LOG_DECODE_DEST | DTWAIN_LOG_MISCELLANEOUS);

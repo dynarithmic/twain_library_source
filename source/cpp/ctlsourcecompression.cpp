@@ -31,30 +31,33 @@
 using namespace dynarithmic;
 
 // Sets the ICAP_XFERMECH and ICAP_COMPRESSION caps with the Mode and lFileType values
-static bool ImageFileFormatCapHandler(CTL_ITwainSource* pSource, CTL_TwainDLLHandle* pHandle, LONG lFileType, LONG Mode)
+namespace
 {
-    static constexpr std::array<LONG, 2> aOnePassXferMech = { TWSX_NATIVE, TWSX_MEMORY };
-    std::array<std::pair<LONG, LONG>, 2> capsToSet = { { {ICAP_XFERMECH, Mode}, {ICAP_IMAGEFILEFORMAT, lFileType} } };
-    for (auto& val : capsToSet)
+    bool ImageFileFormatCapHandler(CTL_ITwainSource* pSource, CTL_TwainDLLHandle* pHandle, LONG lFileType, LONG Mode)
     {
-        DTWAIN_ARRAY tempArray1 = CreateArrayFromCap(pHandle, nullptr, val.first, 1).second;
-        if (!tempArray1)
-            return false;
-        DTWAINArrayLowLevel_RAII raii1(pHandle, tempArray1);
-        auto& tempBuffer1 = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempArray1);
-        tempBuffer1[0] = val.second;
+        static constexpr std::array<LONG, 2> aOnePassXferMech = { TWSX_NATIVE, TWSX_MEMORY };
+        std::array<std::pair<LONG, LONG>, 2> capsToSet = { { {ICAP_XFERMECH, Mode}, {ICAP_IMAGEFILEFORMAT, lFileType} } };
+        for (auto& val : capsToSet)
+        {
+            DTWAIN_ARRAY tempArray1 = CreateArrayFromCap(pHandle, nullptr, val.first, 1).second;
+            if (!tempArray1)
+                return false;
+            DTWAINArrayLowLevel_RAII raii1(pHandle, tempArray1);
+            auto& tempBuffer1 = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempArray1);
+            tempBuffer1[0] = val.second;
 
-        // Set the capability
-        bool bOk = SetCapValuesEx2_Internal(pSource, val.first, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, tempArray1);
-        if (!bOk)
-            return false;
+            // Set the capability
+            bool bOk = SetCapValuesEx2_Internal(pSource, val.first, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, tempArray1);
+            if (!bOk)
+                return false;
 
-        // Don't set the file format if the transfer mechanism is one where the file type is not needed
-        if (val.first == ICAP_XFERMECH && 
-            std::find(aOnePassXferMech.begin(), aOnePassXferMech.end(), Mode) != aOnePassXferMech.end())
-            return bOk;
+            // Don't set the file format if the transfer mechanism is one where the file type is not needed
+            if (val.first == ICAP_XFERMECH &&
+                std::find(aOnePassXferMech.begin(), aOnePassXferMech.end(), Mode) != aOnePassXferMech.end())
+                return bOk;
+        }
+        return true;
     }
-    return true;
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetFileCompressionType(DTWAIN_SOURCE Source)

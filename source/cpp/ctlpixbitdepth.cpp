@@ -75,9 +75,6 @@ namespace
         const DTWAIN_BOOL bRet = SetCapValuesEx2_Internal(pSource, ICAP_PIXELTYPE, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array);
         if (bRet)
         {
-            // Set the source value in the cache
-            pSource->SetCapCacheValue(ICAP_PIXELTYPE, static_cast<double>(PixelType), TRUE);
-
             // Test if bit depth is desired to be set
             DTWAIN_BOOL bSetBitDepth = TRUE;
             if (BitDepth == DTWAIN_DEFAULT)
@@ -160,11 +157,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, LONG BitDepth,
         if ( !bRet )
         {
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return true;}, DTWAIN_ERR_INVALID_BITDEPTH, false, FUNC_MACRO);
-        }
-        else
-        {
-           // Set the source value in the cache
-            pSource->SetCapCacheValue(ICAP_BITDEPTH, static_cast<double>(BitDepth), TRUE);
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)

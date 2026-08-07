@@ -176,7 +176,6 @@ namespace
 
         auto* pExtendedImageInfo = pTheSource->GetExtendedImageInfo();
         pExtendedImageInfo->SetInfoRetrieved(false);
-        pTheSource->InitExtImageInfo(0);
         return pExtendedImageInfo->BeginRetrieval();
     }
 }

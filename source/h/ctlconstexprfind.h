@@ -26,7 +26,7 @@
 namespace dynarithmic
 {
     template <typename Arr, typename Fn>
-    static constexpr std::pair<bool, unsigned> generic_array_finder_if(const Arr& theArray, Fn fn)
+    constexpr std::pair<bool, unsigned> generic_array_finder_if(const Arr& theArray, Fn fn)
     {
         // C++ 20 has constexpr std::find_if
         #if ((defined(_MSVC_LANG) && _MSVC_LANG >= 202002L ) || __cplusplus >= 202002L)
@@ -44,7 +44,7 @@ namespace dynarithmic
     }
 
     template <typename Arr, typename Val>
-    static constexpr std::pair<bool, unsigned> generic_array_finder(const Arr& theArray, const Val& value)
+    constexpr std::pair<bool, unsigned> generic_array_finder(const Arr& theArray, const Val& value)
     {
         return generic_array_finder_if(theArray, [&](const Val& val) { return val == value; });
     }

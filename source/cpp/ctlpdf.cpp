@@ -29,9 +29,37 @@
 #include "ctlstringutilsx.h"
 
 using namespace dynarithmic;
-static std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator>
-    CheckGlobalPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement);
 
+namespace
+{
+    std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckGlobalPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement)
+    {
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_NOTHROW | DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_SETLASTERROR);
+        // Get the list of created text elements from global list
+        auto& textElementList = CTL_StaticData::GetPDFTextElementList();
+
+        // First check if DLL handle is valid
+        if (!pHandle)
+            return { false, textElementList.end() };
+
+        // Return immediately if the TextElement is nullptr
+        if (!TextElement)
+            return { false, textElementList.end() };
+
+        auto foundIt =
+            std::find_if(textElementList.begin(), textElementList.end(), [&](auto& spTheList) { return spTheList.get() == TextElement; });
+        if (foundIt != textElementList.end())
+            return { true, foundIt };
+        return { false, textElementList.end() };
+    }
+
+    template <typename strType, int tupleVal>
+    LONG GetType1FontInternal(int FontVal, strType szFont, LONG nChars)
+    {
+        auto st = GetType1FontNameFromType(FontVal);
+        return CopyInfoToCString(std::get<tupleVal>(st), szFont, nChars);
+    }
+}
 
 static constexpr std::array<LONG, 8> aPDFFloatTypes = {
                                                      DTWAIN_PDFTEXTELEMENT_SCALINGXY,
@@ -281,12 +309,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFOCRMode(DTWAIN_SOURCE Source, DTWAIN_BOOL 
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-template <typename strType, int tupleVal>
-static LONG GetType1FontInternal(int FontVal, strType szFont, LONG nChars)
-{
-    auto st = GetType1FontNameFromType(FontVal);
-    return CopyInfoToCString(std::get<tupleVal>(st), szFont, nChars);
-}
 
 LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG nChars)
 {
@@ -492,6 +514,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source,
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source,
                                              LPCTSTR szText, 
                                              LONG xPos, 
@@ -926,26 +949,6 @@ DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElementCopy(DTWAIN_PDFTEX
     CATCH_BLOCK(nullptr)
 }
 
-std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckGlobalPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement)
-{
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_NOTHROW | DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_SETLASTERROR);
-    // Get the list of created text elements from global list
-    auto& textElementList = CTL_StaticData::GetPDFTextElementList();
-
-    // First check if DLL handle is valid
-    if (!pHandle)
-        return { false, textElementList.end() };
-
-	// Return immediately if the TextElement is nullptr
-	if (!TextElement)
-		return { false, textElementList.end() };
-
-    auto foundIt = 
-        std::find_if(textElementList.begin(), textElementList.end(), [&](auto& spTheList) { return spTheList.get() == TextElement; });
-    if (foundIt != textElementList.end())
-        return { true, foundIt };
-    return { false, textElementList.end() };
-}
 
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPolarity(DTWAIN_SOURCE Source, LONG Polarity)

@@ -20,7 +20,7 @@ namespace dynarithmic
         return strm.str();
     }
 
-    static std::wstring MakeVersionString(DWORD ms, DWORD ls)
+    std::wstring MakeVersionString(DWORD ms, DWORD ls)
     {
         return std::to_wstring(HIWORD(ms)) + L"." +
             std::to_wstring(LOWORD(ms)) + L"." +
@@ -35,11 +35,7 @@ namespace dynarithmic
 
         std::wstring modulePath(32768, L'\0');
 
-        DWORD len = GetModuleFileNameW(
-            hModule,
-            modulePath.data(),
-            static_cast<DWORD>(modulePath.size())
-        );
+        DWORD len = GetModuleFileNameW(hModule,modulePath.data(),static_cast<DWORD>(modulePath.size()));
 
         if (len == 0 || len >= modulePath.size())
             return false;
@@ -55,11 +51,7 @@ namespace dynarithmic
         std::wstring versionData;
         versionData.resize((size + sizeof(wchar_t) - 1) / sizeof(wchar_t));
 
-        if (!GetFileVersionInfoW(
-            modulePath.c_str(),
-            0,
-            size,
-            versionData.data()))
+        if (!GetFileVersionInfoW(modulePath.c_str(),0,size,versionData.data()))
         {
             return false;
         }
@@ -67,11 +59,7 @@ namespace dynarithmic
         VS_FIXEDFILEINFO* fixedInfo = nullptr;
         UINT fixedInfoSize = 0;
 
-        if (!VerQueryValueW(
-            versionData.data(),
-            L"\\",
-            reinterpret_cast<LPVOID*>(&fixedInfo),
-            &fixedInfoSize))
+        if (!VerQueryValueW(versionData.data(),L"\\",reinterpret_cast<LPVOID*>(&fixedInfo),&fixedInfoSize))
         {
             return false;
         }
@@ -82,15 +70,9 @@ namespace dynarithmic
         if (fixedInfo->dwSignature != 0xFEEF04BD)
             return false;
 
-        out.FileVersion = MakeVersionString(
-            fixedInfo->dwFileVersionMS,
-            fixedInfo->dwFileVersionLS
-        );
+        out.FileVersion = MakeVersionString(fixedInfo->dwFileVersionMS,fixedInfo->dwFileVersionLS);
 
-        out.ProductVersion = MakeVersionString(
-            fixedInfo->dwProductVersionMS,
-            fixedInfo->dwProductVersionLS
-        );
+        out.ProductVersion = MakeVersionString(fixedInfo->dwProductVersionMS,fixedInfo->dwProductVersionLS);
 
         return true;
     }
