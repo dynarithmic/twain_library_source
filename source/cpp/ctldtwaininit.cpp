@@ -213,41 +213,38 @@ namespace dynarithmic
             return verString;
 
         constexpr LONG lVersionType = DTWAIN_OPENSOURCE_VERSION | GetDTWAINVersionType();
-        std::string s;
-        const char* sBits = "[32-bit]";
+        CTL_StringType s;
+        const TCHAR* sBits = _T("[32-bit]");
         if (lVersionType & DTWAIN_64BIT_VERSION)
-            sBits = "[64-bit]";
+            sBits = _T("[64-bit]");
 
-        s += std::string(" ") + DTWAIN_VCRUNTIME_CHARSET;
+        s += CTL_StringType(_T(" ")) + _T(DTWAIN_VCRUNTIME_CHARSET);
 
         if (lVersionType & DTWAIN_DEVELOP_VERSION)
-            s += " [Debug]";
+            s += _T(" [Debug]");
         else
-            s += " [Release]";
+            s += _T(" [Release]");
 
-        s += DTWAIN_BUILD_LOGGINGNAME;
-        s += DTWAIN_VCRUNTIME_BUILDNAME;
-        s += " ";
+        s += _T(DTWAIN_BUILD_LOGGINGNAME);
+        s += _T(DTWAIN_VCRUNTIME_BUILDNAME);
+        s += _T(" ");
         s += sBits;
-        StringStreamA strm;
-        std::string sStatic;
-        if (DTWAIN_GetStaticLibVersion() != 0)
-        {
-            sStatic += "Compiler used: " + GetStaticLibVer();
-            sStatic += "\n";
-        }
 
-        auto appName = stringconversion::Convert_Native_To_Ansi(CTL_StaticData::GetApplicationName());
-        strm << sStatic << "Dynarithmic TWAIN Library, Version " << DTWAIN_VERINFO_FILEVERSION << " " << s << "\n" <<
-            "Shared Library path : " << stringconversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
-        strm << "\nUsing Resource file (twaininfo.txt) version: " << DTWAIN_TEXTRESOURCE_FILEVERSION;
-        strm << "\nResource file path: " << stringconversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourcePath());
-        strm << "\nText Resource Language: " << stringconversion::Convert_Native_To_Ansi(CTL_StaticData::GetGeneralResourceInfo().sResourceName);
+        auto appName = CTL_StaticData::GetApplicationName();
+        CTL_StringType sOut;
+        sOut += _T("Dynarithmic TWAIN Library, Version ");
+        sOut += _T(DTWAIN_VERINFO_FILEVERSION);
+        sOut += _T(' ') + s + _T('\n');
+        sOut += _T("Shared Library path : ") + GetDTWAINDLLPath();
+        sOut += _T("\nUsing Resource file (twaininfo.txt) version: ");
+        sOut += _T(DTWAIN_TEXTRESOURCE_FILEVERSION);
+        sOut += _T("\nResource file path: ") + CTL_StaticData::GetResourcePath();
+        sOut += _T("\nText Resource Language: ") + CTL_StaticData::GetGeneralResourceInfo().sResourceName;
         if (CTL_StaticData::GetGeneralResourceInfo().bIsFromRC)
-            strm << " (Text resources are directly from DTWAIN DLL and not from a text resource file)";
-        strm << "\nApplication Name: " << appName;
-        verString = stringconversion::Convert_Ansi_To_Native(strm.str());
-        return verString;
+            sOut += _T(" (Text resources are directly from DTWAIN DLL and not from a text resource file)");
+        sOut += _T("\nApplication Name: ") + appName;
+        verString = sOut;
+        return sOut;
     }
 
     CTL_StringType GetDTWAINExecutionPath()
