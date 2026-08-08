@@ -1350,32 +1350,34 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG l
     if (lBuildNumber == 0)
         versionVals[3] = 0;
 
-    long totalVerNum = versionVals[0] * 10000 +
-                       versionVals[1] * 1000 + 
-                       versionVals[2] * 100 + 
-                       versionVals[3];
+    std::array<int, 4> userVals = { lMajor, lMinor, lPatchLevel, lBuildNumber };
 
-    long inputVerNum = (std::min)(lMajor, 20L) * 10000 + (std::min)(lMinor, 20L) * 1000 + 
-                        (std::min)(lPatchLevel, 20L) * 100 + (std::min)(99L, lBuildNumber);
+    int compareResults = -1;
+    if (versionVals > userVals)
+        compareResults = 1;
+    else
+    if (versionVals == userVals)
+        compareResults = 0;
+
     switch ( MatchType )
     {
         case DTWAIN_CHECKDLLVERLESS:
-            bMatchOk = totalVerNum < inputVerNum;
+            bMatchOk = (compareResults == -1);
         break;
         case DTWAIN_CHECKDLLVEREQUAL:
-            bMatchOk = totalVerNum == inputVerNum;
+            bMatchOk = (compareResults == 0);
         break;
         case DTWAIN_CHECKDLLVERGREATER:
-            bMatchOk = totalVerNum > inputVerNum;
+            bMatchOk = (compareResults == 1);
         break;
         case DTWAIN_CHECKDLLVERLESSEQ:
-            bMatchOk = totalVerNum <= inputVerNum;
+            bMatchOk = (compareResults == -1 || compareResults == 0);
         break;
         case DTWAIN_CHECKDLLVERGREATEREQ:
-            bMatchOk = totalVerNum >= inputVerNum;
+            bMatchOk = (compareResults == 1 || compareResults == 0);
         break;
         default:
-            bMatchOk = totalVerNum == inputVerNum;
+            bMatchOk = (compareResults == 0);
         break;
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(bMatchOk)
