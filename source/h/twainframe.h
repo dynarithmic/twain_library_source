@@ -108,5 +108,24 @@ namespace dynarithmic
             m_FrameComponent[FRAMEBOTTOM] = bottom;
         }
     };
+
+    inline bool operator == (TW_FRAME lhs, TW_FRAME rhs)
+    {
+        return std::tie(lhs.Bottom.Frac, lhs.Bottom.Whole,
+            lhs.Left.Frac, lhs.Left.Whole,
+            lhs.Right.Frac, lhs.Right.Whole,
+            lhs.Top.Frac, lhs.Top.Whole)
+            ==
+            std::tie(rhs.Bottom.Frac, rhs.Bottom.Whole,
+                rhs.Left.Frac, rhs.Left.Whole,
+                rhs.Right.Frac, rhs.Right.Whole,
+                rhs.Top.Frac, rhs.Top.Whole);
+    }
+
+    inline bool operator!=(TW_FRAME f1, TW_FRAME f2)
+    {
+        return !(operator==(f1, f2));
+    }
+
 }
 #endif // TWAINFRAME_H
