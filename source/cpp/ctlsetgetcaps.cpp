@@ -26,10 +26,31 @@
 #include "errorcheck.h"
 #include "ctlutils.h"
 #include "ctlsetgetcaps.h"
+#include "ctlarraydumper.h"
+#include "ctlcapcontainerfuncs.h"
+#include "ctldtwainhandle.h"
+
 using namespace dynarithmic;
 
 namespace
 {
+    template <int CapInfoIdx>
+    void SetCapabilityInfo(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LONG value, LONG lCap)
+    {
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, pSource);
+
+        // Get the cap array values
+        const auto iter = pArray->find(static_cast<TW_UINT16>(lCap));
+        if (iter != pArray->end())
+        {
+            CTL_CapInfo* CapInfo = &iter->second;
+
+            // Replace the cap information with the updated information
+            std::get<CapInfoIdx>(*CapInfo) = value;
+        }
+    }
+
     template <typename T, typename ConvertTo = T>
     struct NullGetCapConverter
     {

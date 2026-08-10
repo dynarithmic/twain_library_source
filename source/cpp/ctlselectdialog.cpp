@@ -23,30 +23,15 @@
 #include "sourceselectopts.h"
 #include "errorcheck.h"
 #include "ctlstringutils.h"
+#include "monitorutils.h"
 
 using namespace dynarithmic;
 using namespace boost::logic;
 namespace stringutils = basicstringutils;
 
+#ifdef _WIN32
 namespace
 {
-    HWND GetEffectiveConsoleWindow()
-    {
-        // 1) Already attached?
-        HWND hwnd = GetConsoleWindow();
-        if (hwnd)
-            return hwnd;
-
-        // 2) Try attaching to parent console
-        if (AttachConsole(ATTACH_PARENT_PROCESS))
-        {
-            hwnd = GetConsoleWindow();
-            if (hwnd)
-                return hwnd;
-        }
-        return NULL;
-    }
-
     void DisplayLocalString(HWND hWnd, int nID, int resID)
     {
         std::string sText;
@@ -63,7 +48,6 @@ namespace
         }
     }
 
-#ifdef _WIN32
     /////////////////////////////////////////////////////////////////////////////////
     /// TWAIN Dialog procedure
     BOOL CALLBACK ChildEnumFontProc(HWND hWnd, LPARAM lParam)
@@ -180,7 +164,6 @@ namespace
             }
         }
     }
-
 }
 
 namespace dynarithmic

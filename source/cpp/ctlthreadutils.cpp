@@ -23,10 +23,12 @@
 #include <boost/lexical_cast.hpp>
 #include "ctliface.h"
 #include "ctlthreadutils.h"
+#include "cppfunc.h"
+#include "ctldtwainhandle.h"
 
 namespace dynarithmic
 {
-    static CTL_ThreadMap::iterator getThreadIdIter()
+    CTL_ThreadMap::iterator getThreadIdIter()
     {
         auto& threadMap = CTL_StaticData::GetThreadMap();
         std::string threadId = boost::lexical_cast<std::string>(std::this_thread::get_id());
@@ -51,4 +53,50 @@ namespace dynarithmic
         auto iter = getThreadIdIter();
         return iter->first;
     }
+}
+
+using namespace dynarithmic;
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartThread( DTWAIN_HANDLE DLLHandle )
+{
+    LOG_FUNC_ENTRY_PARAMS((DLLHandle))
+    if (!CTL_StaticData::IsUsingMultipleThreads())
+        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+    auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+    auto iter = std::find_if(threadMap.begin(),threadMap.end(), [&](const auto& pr) 
+                                { return pr.second.get() == static_cast<CTL_TwainDLLHandle*>(DLLHandle); });
+    if ( iter != threadMap.end())
+        AssociateThreadToTwainDLL(iter->second, getThreadId());
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndThread( DTWAIN_HANDLE DLLHandle )
+{
+    LOG_FUNC_ENTRY_PARAMS((DLLHandle))
+    if ( !CTL_StaticData::IsUsingMultipleThreads())
+        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+    auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+    if ( threadMap.size() == 1)
+        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto iter = std::find_if(threadMap.begin(), threadMap.end(),[&](const auto& pr)
+        { return pr.second.get() == static_cast<CTL_TwainDLLHandle*>(DLLHandle); });
+
+    if (iter != threadMap.end() && 
+        iter->first == getThreadId())
+    {
+        threadMap.erase(iter);
+        LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+    }
+    LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet)
+{
+    LOG_FUNC_ENTRY_PARAMS((bSet))
+    CTL_StaticData::SetUseMultipleThreads(bSet ? true : false);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK(false)
 }

@@ -23,68 +23,16 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlutils.h"
+#include "ctlcapcollect.h"
+#include "ctlcapcontainerfuncs.h"
+#include "ctliface.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
-namespace dynarithmic
-{
-    LONG GetCapDataType(CTL_ITwainSource* pSource, LONG nCap)
-    {
-        auto nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<TW_UINT16>(nCap), pSource);
-        if (nDataType == (std::numeric_limits<int>::min)())
-            return DTWAIN_FAILURE1;
-        return nDataType;
-    }
-
-    LONG GetCapArrayType(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nCap)
-    {
-        const LONG lDataType = GetCapDataType(pSource, nCap);
-        if (lDataType == DTWAIN_FAILURE1)
-            return DTWAIN_FAILURE1;
-        const TW_UINT16 nDataType = static_cast<TW_UINT16>(lDataType);
-        return GetArrayTypeFromCapType(nDataType);
-    }
-}
-
 using namespace dynarithmic;
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetCapContainerEx2(LONG nCap, DTWAIN_BOOL bSetContainer)
-{
-    LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer))
-    DTWAIN_ARRAY theArray = {};
-    DTWAIN_GetCapContainerEx(nCap, bSetContainer, &theArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(theArray)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer, LPDTWAIN_ARRAY pArray)
-{
-    LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer, pArray))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, 0L, FUNC_MACRO);
-    DTWAIN_ARRAY pDTWAINArray = retVal.second;
-    DTWAINArrayLowLevelPtr_RAII raii(pHandle, &pDTWAINArray);
-
-    if (nCap < CAP_CUSTOMBASE)
-    {
-        auto& factory = pHandle->m_ArrayFactory;
-        LONG lValue = static_cast<LONG>(CTL_TwainAppMgr::GetContainerTypesFromCap(static_cast<TW_UINT16 >(nCap),
-                                                                                  bSetContainer ? true : false));
-        auto& vLong = factory->underlying_container_t<LONG>(pDTWAINArray);
-        for (int i = 1; i <= 16; i++)
-        {
-            if (lValue & (1 << (i - 1)))
-                vLong.push_back(i);
-        }
-    }
-    MoveArray(pHandle, pArray, &pDTWAINArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(0xFFFFFFFF)
-    CATCH_BLOCK_LOG_PARAMS(0)
-}
 
 namespace
 {
@@ -104,32 +52,25 @@ namespace
     }
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG lCapType)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, nCap, lCapType))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    LONG ret = GetCapContainer(pSource, nCap, lCapType);
-    LOG_FUNC_EXIT_NONAME_PARAMS(ret)
-    CATCH_BLOCK_LOG_PARAMS(0)
-}
-
-
-LONG DLLENTRY_DEF DTWAIN_GetCapDataType(DTWAIN_SOURCE Source, LONG nCap)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, nCap))
-
-    // Give the test criteria, since it is ok for Source to be NULL
-    int flags = DTWAIN_VERIFY_DLLHANDLE;
-    if (Source)
-        flags |= DTWAIN_VERIFY_SOURCEHANDLE;
-    auto [pHandle, pSource] = VerifyHandles(Source, flags);
-    auto nDataType = GetCapDataType(pSource, nCap);
-    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nDataType)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
-}
-
 namespace dynarithmic
 {
+    LONG GetCapDataType(CTL_ITwainSource* pSource, LONG nCap)
+    {
+        auto nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<TW_UINT16>(nCap), pSource);
+        if (nDataType == (std::numeric_limits<int>::min)())
+            return DTWAIN_FAILURE1;
+        return nDataType;
+    }
+
+    LONG GetCapArrayType(CTL_ITwainSource* pSource, LONG nCap)
+    {
+        const LONG lDataType = GetCapDataType(pSource, nCap);
+        if (lDataType == DTWAIN_FAILURE1)
+            return DTWAIN_FAILURE1;
+        const TW_UINT16 nDataType = static_cast<TW_UINT16>(lDataType);
+        return GetArrayTypeFromCapType(nDataType);
+    }
+
     LONG GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCapType)
     {
         if (!pSource->IsCapInSupportedList(static_cast<TW_UINT16>(nCap)))
@@ -209,6 +150,69 @@ namespace dynarithmic
     }
 }
 
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetCapContainerEx2(LONG nCap, DTWAIN_BOOL bSetContainer)
+{
+    LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer))
+    DTWAIN_ARRAY theArray = {};
+    DTWAIN_GetCapContainerEx(nCap, bSetContainer, &theArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(theArray)
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer, LPDTWAIN_ARRAY pArray)
+{
+    LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer, pArray))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, 0L, FUNC_MACRO);
+    DTWAIN_ARRAY pDTWAINArray = retVal.second;
+    DTWAINArrayLowLevelPtr_RAII raii(pHandle, &pDTWAINArray);
+
+    if (nCap < CAP_CUSTOMBASE)
+    {
+        auto& factory = pHandle->m_ArrayFactory;
+        LONG lValue = static_cast<LONG>(CTL_TwainAppMgr::GetContainerTypesFromCap(static_cast<TW_UINT16 >(nCap),
+                                                                                  bSetContainer ? true : false));
+        auto& vLong = factory->underlying_container_t<LONG>(pDTWAINArray);
+        for (int i = 1; i <= 16; i++)
+        {
+            if (lValue & (1 << (i - 1)))
+                vLong.push_back(i);
+        }
+    }
+    MoveArray(pHandle, pArray, &pDTWAINArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(0xFFFFFFFF)
+    CATCH_BLOCK_LOG_PARAMS(0)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG lCapType)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, nCap, lCapType))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    LONG ret = GetCapContainer(pSource, nCap, lCapType);
+    LOG_FUNC_EXIT_NONAME_PARAMS(ret)
+    CATCH_BLOCK_LOG_PARAMS(0)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetCapDataType(DTWAIN_SOURCE Source, LONG nCap)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, nCap))
+
+    // Give the test criteria, since it is ok for Source to be NULL
+    int flags = DTWAIN_VERIFY_DLLHANDLE;
+    if (Source)
+        flags |= DTWAIN_VERIFY_SOURCEHANDLE;
+    auto [pHandle, pSource] = VerifyHandles(Source, flags);
+    auto nDataType = GetCapDataType(pSource, nCap);
+    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nDataType)
+    CATCH_BLOCK(DTWAIN_FAILURE1)
+}
+
+namespace dynarithmic
+{
+}
+
 
 LONG DLLENTRY_DEF DTWAIN_GetCapArrayType(DTWAIN_SOURCE Source, LONG nCap)
 {
@@ -218,7 +222,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapArrayType(DTWAIN_SOURCE Source, LONG nCap)
     if (Source)
         flags |= DTWAIN_VERIFY_SOURCEHANDLE;
     auto [pHandle, pSource] = VerifyHandles(Source, flags);
-    auto retValue = GetCapArrayType(pHandle, pSource, nCap);
+    auto retValue = GetCapArrayType(pSource, nCap);
     LOG_FUNC_EXIT_NONAME_PARAMS(retValue)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

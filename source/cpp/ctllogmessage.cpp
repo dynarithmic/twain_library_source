@@ -21,6 +21,7 @@
 
 #include "ctliface.h"
 #include "logwriterutils.h"
+#include "ctldtwainhandle.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)

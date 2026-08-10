@@ -21,6 +21,7 @@
 #include "winbit32.h"
 #include "ctliface.h"
 #include "cppfunc.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

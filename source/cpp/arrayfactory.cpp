@@ -25,36 +25,38 @@
 #include "ctliface.h"
 #include "ctlguidimpl.h"
 
-namespace dynarithmic
+using namespace dynarithmic;
+
+namespace
 {
-    namespace
+    template <typename ArraySourceT, typename ConversionFunc>
+    void ArrayToNativeArray(CTL_TwainDLLHandle* pHandle,
+        DTWAIN_ARRAY ArraySource,
+        DTWAIN_ARRAY ArrayDest,
+        int ArraySourceType,
+        ConversionFunc fn)
     {
-        template <typename ArraySourceT, typename ConversionFunc>
-        void ArrayToNativeArray(CTL_TwainDLLHandle* pHandle,
-            DTWAIN_ARRAY ArraySource,
-            DTWAIN_ARRAY ArrayDest,
-            int ArraySourceType,
-            ConversionFunc fn)
+        const auto& factory = pHandle->m_ArrayFactory;
+        const auto TypeSource = factory->tag_type(CTL_ArrayFactory::from_void(ArraySource));
+        const auto TypeDest = factory->tag_type(CTL_ArrayFactory::from_void(ArrayDest));
+        if (TypeSource != ArraySourceType)
+            return;
+        if (!(TypeDest == CTL_ArrayFactory::arrayTag::StringType || TypeDest == CTL_ArrayFactory::arrayTag::WStringType))
+            return;
+        const auto theSourceTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArraySource));
+        const auto theDestTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArrayDest));
+        auto& vSource = factory->underlying_container_t<typename ArraySourceT::value_type>(theSourceTag);
+        for (auto& str : vSource)
         {
-            const auto& factory = pHandle->m_ArrayFactory;
-            const auto TypeSource = factory->tag_type(CTL_ArrayFactory::from_void(ArraySource));
-            const auto TypeDest = factory->tag_type(CTL_ArrayFactory::from_void(ArrayDest));
-            if (TypeSource != ArraySourceType)
-                return;
-            if (!(TypeDest == CTL_ArrayFactory::arrayTag::StringType || TypeDest == CTL_ArrayFactory::arrayTag::WStringType))
-                return;
-            const auto theSourceTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArraySource));
-            const auto theDestTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArrayDest));
-            auto& vSource = factory->underlying_container_t<typename ArraySourceT::value_type>(theSourceTag);
-            for (auto& str : vSource)
-            {
-                CTL_StringType sVal;
-                sVal = fn(str);
-                factory->add_to_back(theDestTag, &sVal, 1);
-            }
+            CTL_StringType sVal;
+            sVal = fn(str);
+            factory->add_to_back(theDestTag, &sVal, 1);
         }
     }
+}
 
+namespace dynarithmic
+{
     void ArrayCopyWideToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
     {
         ArrayToNativeArray<CTL_ArrayFactory::tagged_array_wstring>(pHandle, ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::WStringType,

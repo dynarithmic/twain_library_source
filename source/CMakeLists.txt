@@ -391,6 +391,7 @@ set(DTWAIN_MISCELLANEOUS_FILES
 
 set(MAIN_HEADERS 
         ${PROJECT_SOURCE_DIR}/h/acquisitionarray.h
+        ${PROJECT_SOURCE_DIR}/h/aeslib/AES.h
         ${PROJECT_SOURCE_DIR}/h/ansiwideconverter_generic.h
         ${PROJECT_SOURCE_DIR}/h/ansiwideconverter_win32.h
         ${PROJECT_SOURCE_DIR}/h/arrayfactory.h
@@ -399,8 +400,12 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/capinfomap.h
         ${PROJECT_SOURCE_DIR}/h/capstruc.h
         ${PROJECT_SOURCE_DIR}/h/cppfunc.h
+        ${PROJECT_SOURCE_DIR}/h/crc32_aux.h
         ${PROJECT_SOURCE_DIR}/h/ctlarray.h
+        ${PROJECT_SOURCE_DIR}/h/ctlarraydumper.h
         ${PROJECT_SOURCE_DIR}/h/ctlbimap.h
+        ${PROJECT_SOURCE_DIR}/h/ctlcapcollect.h
+        ${PROJECT_SOURCE_DIR}/h/ctlcapcontainerfuncs.h
         ${PROJECT_SOURCE_DIR}/h/ctlclosesource.h
         ${PROJECT_SOURCE_DIR}/h/ctlcntry.h
         ${PROJECT_SOURCE_DIR}/h/ctlconstexprfind.h
@@ -410,10 +415,13 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctldib.h
         ${PROJECT_SOURCE_DIR}/h/ctldib32.h
         ${PROJECT_SOURCE_DIR}/h/ctldib32ex.h
+        ${PROJECT_SOURCE_DIR}/h/ctldtwainhandle.h
         ${PROJECT_SOURCE_DIR}/h/ctlencodeutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlenum.h
+        ${PROJECT_SOURCE_DIR}/h/ctlfeed.h
         ${PROJECT_SOURCE_DIR}/h/ctlfilesave.h
         ${PROJECT_SOURCE_DIR}/h/ctlfileutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlgetversion.h
         ${PROJECT_SOURCE_DIR}/h/ctlguiddef.h
         ${PROJECT_SOURCE_DIR}/h/ctlguidimpl.h
         ${PROJECT_SOURCE_DIR}/h/ctliface.h
@@ -424,7 +432,11 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlobtyp.h
         ${PROJECT_SOURCE_DIR}/h/ctlrandnumutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlsetgetcaps.h
+        ${PROJECT_SOURCE_DIR}/h/ctlshowuionly.h
+        ${PROJECT_SOURCE_DIR}/h/ctlsourceacquire.h
         ${PROJECT_SOURCE_DIR}/h/ctlsourcedibs.h
+        ${PROJECT_SOURCE_DIR}/h/ctlsourceselect.h
+        ${PROJECT_SOURCE_DIR}/h/ctlsourceinfo.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringconversion.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringdefs.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringutils.h
@@ -485,13 +497,17 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltripletbase.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaincompliancy.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaindecoder.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwaindllpath.h
         ${PROJECT_SOURCE_DIR}/h/ctltwainidentity.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwainlogging.h
         ${PROJECT_SOURCE_DIR}/h/ctltwainmanager.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwainmemoryimpl.h
         ${PROJECT_SOURCE_DIR}/h/ctltwainmsgloop.h
         ${PROJECT_SOURCE_DIR}/h/ctltwainsession.h
         ${PROJECT_SOURCE_DIR}/h/ctltwainsource.h
         ${PROJECT_SOURCE_DIR}/h/ctlutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlwindowsimpl.h
+        ${PROJECT_SOURCE_DIR}/h/windowsinit_impl.h
         ${PROJECT_SOURCE_DIR}/h/dibinfox.h
         ${PROJECT_SOURCE_DIR}/h/dibmulti.h
         ${PROJECT_SOURCE_DIR}/h/dtwain.h
@@ -513,13 +529,14 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/dtwpdft.h
         ${PROJECT_SOURCE_DIR}/h/dtwstrfn.h
         ${PROJECT_SOURCE_DIR}/h/dtwtype.h
+        ${PROJECT_SOURCE_DIR}/h/enumeratornode.h
         ${PROJECT_SOURCE_DIR}/h/errorcheck.h
         ${PROJECT_SOURCE_DIR}/h/extendedimageinfo.h
         ${PROJECT_SOURCE_DIR}/h/funcmac.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/bmprlewriter.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/dibutil.h
-        ${PROJECT_SOURCE_DIR}/h/crc32_aux.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/dtwpdf/dtwainpdf.h
+        ${PROJECT_SOURCE_DIR}/h/ImageFun/dtwpdf/pdffont_basic.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/gifwriter.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/icowriter.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/imagefilewriterbase.h
@@ -564,9 +581,12 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/iohandler_wmf.h
         ${PROJECT_SOURCE_DIR}/h/logmsg.h
         ${PROJECT_SOURCE_DIR}/h/logwriterutils.h
+        ${PROJECT_SOURCE_DIR}/h/monitorutils.h
         ${PROJECT_SOURCE_DIR}/h/notimpl.h
         ${PROJECT_SOURCE_DIR}/h/ocrengine/ocrinterface.h
         ${PROJECT_SOURCE_DIR}/h/ocrengine/transym_ocrinterface.h
+        ${PROJECT_SOURCE_DIR}/h/pdflib32/pdfencrypt.h
+        ${PROJECT_SOURCE_DIR}/h/pdflib32/pdflib32.h
         ${PROJECT_SOURCE_DIR}/h/sourceacquireopts.h
         ${PROJECT_SOURCE_DIR}/h/sourceselectopts.h
         ${PROJECT_SOURCE_DIR}/h/twain.h
@@ -574,10 +594,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/twainframe.h
         ${PROJECT_SOURCE_DIR}/h/versioninfo.h
         ${PROJECT_SOURCE_DIR}/h/winconst.h
-        ${PROJECT_SOURCE_DIR}/h/aeslib/AES.h
-        ${PROJECT_SOURCE_DIR}/h/pdflib32/pdfencrypt.h
-        ${PROJECT_SOURCE_DIR}/h/pdflib32/pdflib32.h
-        ${PROJECT_SOURCE_DIR}/h/ImageFun/dtwpdf/pdffont_basic.h
 )
 
 set(MAIN_INL
@@ -595,42 +611,73 @@ set(MAIN_INL
 
 set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/aeslib/AES.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/arrayfactory.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/crc32_aux.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquirearea.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlacquireaudio.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquirebuffered.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquireclipboard.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquirefile.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquirenative.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlarray.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlarraydumper.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlblankpage.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlbufferstrip.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcalldsmproc.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcapcollect.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcapcontainerfuncs.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcapenumfuncs.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcapsupport.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcompressionsize.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlcustomdsdata.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctldeviceevents.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctldevnt.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctldib32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctldtwaininit.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctldtwainmem2.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlduplex.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlencodeutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlerrorbuffer.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlerrorcallback.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlextimageinfo.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlfeed.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlfileappend.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlfilesave.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlfiletypes.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlfileutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlflipbmp.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlflog.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlgetcapinfo.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlgetmetrics.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlgetversion.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlhashutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlhigh.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlimageerrorskip.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlimageinfo.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctljob.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctljpeg.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlloadresources.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctllogfunctioncall.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlloggercallback.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctllogmessage.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctllogfunctioncall.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmanualduplex.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmaxacquires.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmultipagescan.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlobtyp.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlpapersize.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlpatchsupport.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlpdf.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlpixbitdepth.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlprinter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlresourcestring.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsavefilename.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlselectdialog.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsetgetcaps.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlshowuionly.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceacquire.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceclose.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlsourcecompression.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlsourcedetails.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcedibs.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceenum.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceinfo.cpp
@@ -640,10 +687,12 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcescale.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceselect.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsrceoj.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltwaindllhandle.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltwainmsgloop.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctluicontrollable.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctluienabled.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlstringutilsx.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlsupport.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltempdir.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlthreadutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltiff.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltimeout.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr008.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr010.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr011.cpp
@@ -661,81 +710,32 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctltr041.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr042.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr043.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlobtyp.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlunicodeimpl.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlhigh.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctljob.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlfeed.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctldevnt.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlsupport.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlverifysourcehandle.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/imagexferfilewriter.cpp
-  ${PROJECT_SOURCE_DIR}/dtwinver/Dtwinver.cpp
-  ${PROJECT_SOURCE_DIR}/dtwinver/Getwinver.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlflog.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/logmsg.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltempdir.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface_internal.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/transym_ocrinterface.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctljpeg.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltiff.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctldib32.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_base.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_bmp.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_gif.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_ico.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpeg.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpeg2k.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_pcx.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_pdf.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_png.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_ps.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_psd.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_text.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_tga.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_tiff.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_wbmp.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_wmf.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/imagefun/winbit32.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlpdf.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/imagefun/pdffun32.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/imagefun/dtwpdf/dtwainpdf.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/arrayfactory.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlacquireaudio.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlarraydumper.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlbufferstrip.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlcustomdsdata.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlerrorbuffer.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlerrorcallback.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlextimageinfo.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlfileappend.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlfilesave.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlfileutils.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlgetmetrics.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlhashutils.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlloadresources.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlpapersize.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlselectdialog.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlsourcecompression.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlsourcedetails.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlstringutilsx.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlthreadutils.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltimeout.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltripletbase.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwainappinfo.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwainavailable.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwaincompliancy.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwaindecoder.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwaindllhandle.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwaindllpath.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwaindsm.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainfilesystem.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainidentity.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwainlogging.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainmanager.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwainmsgloop.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainsession.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainsource.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctluicontrollable.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctluienabled.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlunicodeimpl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlupdatedibproc.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlverifysourcehandle.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlwindowproc.cpp
   ${PROJECT_SOURCE_DIR}/cpp/extendedimageinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/bmprlewriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/ctldibblank.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/dibutil.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagefun/dtwpdf/dtwainpdf.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/gifwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/icowriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/imagefilewriterbase.cpp
@@ -744,6 +744,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpegxrwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/metafilewriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/pcxwriter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagefun/pdffun32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/pngwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/pnmwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/postscriptwriter.cpp
@@ -755,18 +756,43 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/txtfun32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/wbmpwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/webpwriter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagefun/winbit32.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagexferfilewriter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_base.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_bmp.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_gif.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_ico.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpeg.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpeg2k.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpegxr.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_pbm.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_pcx.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_pdf.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_png.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_ps.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_psd.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_svg.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_text.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_tga.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_tiff.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_wbmp.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_webp.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_wmf.cpp
   ${PROJECT_SOURCE_DIR}/cpp/linux_versioninfo.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/logmsg.cpp
   ${PROJECT_SOURCE_DIR}/cpp/logwriterutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/monitorutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface_internal.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrselect.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/transym_ocrinterface.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdfencrypt.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdflib32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/stdafx.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/windowsinit_impl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windows_versioninfo.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/crc32_aux.cpp
+  ${PROJECT_SOURCE_DIR}/dtwinver/Dtwinver.cpp
+  ${PROJECT_SOURCE_DIR}/dtwinver/Getwinver.cpp
 )
 
 set(LIBGIF_SOURCES

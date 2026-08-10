@@ -22,6 +22,7 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "ctldtwainhandle.h"
 
 using namespace dynarithmic;
 

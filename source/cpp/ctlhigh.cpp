@@ -34,13 +34,26 @@
 #include "ctlsetgetcaps.h"
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 namespace stringutils = dynarithmic::basicstringutils;
 
-namespace dynarithmic
+typedef DTWAIN_BOOL (DLLENTRY_DEF *SetByStringFn)(DTWAIN_SOURCE, DTWAIN_FLOAT);
+typedef DTWAIN_BOOL (DLLENTRY_DEF *SetByStringFn2)(DTWAIN_SOURCE, DTWAIN_FLOAT, DTWAIN_BOOL);
+typedef DTWAIN_BOOL (DLLENTRY_DEF *GetByStringFn)(DTWAIN_SOURCE, LPDTWAIN_FLOAT);
+typedef DTWAIN_BOOL (*CapSetterByStringFn)(DTWAIN_SOURCE, LPCTSTR, SetByStringFn);
+typedef bool (*SetDoubleCapFn)(DTWAIN_SOURCE, LONG, double);
+typedef bool (*GetDoubleCapFn)(DTWAIN_SOURCE, LONG, double *);
+typedef LONG (*GetCapValuesFn)(DTWAIN_SOURCE, LPDTWAIN_ARRAY, LONG, DTWAIN_BOOL);
+
+using CharType = dynarithmic::CTL_StringType::value_type;
+
+using namespace dynarithmic;
+
+namespace
 {
     ///////////////// These functions are high-level capability functions ///////////////
     DTWAIN_BOOL DTWAIN_SetDeviceCapByString(DTWAIN_SOURCE Source, LPCTSTR strVal, SetByStringFn fn)
@@ -66,14 +79,6 @@ namespace dynarithmic
         return retVal;
     }
 }
-
-using namespace dynarithmic;
-
-using CharType = CTL_StringType::value_type;
-
-typedef bool (*SetDoubleCapFn)(DTWAIN_SOURCE, LONG, double);
-typedef bool (*GetDoubleCapFn)(DTWAIN_SOURCE, LONG, double *);
-typedef LONG (*GetCapValuesFn)(DTWAIN_SOURCE, LPDTWAIN_ARRAY, LONG, DTWAIN_BOOL);
 
 namespace
 {
@@ -322,7 +327,7 @@ namespace
     LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, LONG GetType, DTWAIN_BOOL bExpandRange)
     {
         LOG_FUNC_ENTRY_PARAMS((Source, pArray, lCap, bExpandRange))
-            auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
         LONG nValues = 0;
 

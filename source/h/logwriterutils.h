@@ -24,6 +24,7 @@
 #define LOGWRITERUTILS_H
 
 #include "ctlstringdefs.h"
+#include "dtwain_standard_defs.h"
 
 #define LOG_INDENT_CONSOLE 0
 #define LOG_NO_INDENT   1
@@ -54,6 +55,11 @@ namespace dynarithmic
         private:
             static void MultiLineWriter(std::string_view s, const char* pszDelim, int nWhich);
     };
+
+    class CTL_TwainDLLHandle;
+    void OutputDTWAINError(const CTL_TwainDLLHandle *pHandle, LPCSTR pFunc=nullptr);
+    void OutputDTWAINErrorA(const CTL_TwainDLLHandle *pHandle, LPCSTR pFunc=nullptr);
+    void OutputDTWAINErrorW(const CTL_TwainDLLHandle *pHandle, LPCWSTR pFunc=nullptr);
 }
 #endif
 

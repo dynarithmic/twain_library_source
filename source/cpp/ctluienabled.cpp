@@ -25,6 +25,7 @@
 #include "ctliface.h"
 #include "dtwtype.h"
 #include "winconst.h"
+#include "ctldtwainhandle.h"
 
 using namespace dynarithmic;
 

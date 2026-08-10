@@ -23,6 +23,7 @@
 #pragma warning (disable:4702)
 #endif
 #include "cppfunc.h"
+#include "ctldtwainhandle.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "dtwtype.h"

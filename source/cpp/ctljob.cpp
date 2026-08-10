@@ -23,6 +23,7 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
+#include "ctldtwainhandle.h"
 
 using namespace dynarithmic;
 

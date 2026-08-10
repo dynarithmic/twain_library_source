@@ -23,6 +23,8 @@
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
 #include "acquisitionarray.h"
+#include "ctldtwainhandle.h"
+#include "ctlsourceacquire.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif

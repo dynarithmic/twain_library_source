@@ -22,18 +22,12 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlstringutilsx.h"
+#include "ctldtwainhandle.h"
+#include "ctlsourceinfo.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-
-namespace dynarithmic
-{
-    LONG GetSourceInfo(CTL_ITwainSource *p,SOURCEINFOFUNC pFunc,LPTSTR szInfo, LONG nMaxLen)
-    {
-        return CopyInfoToCString((p->*pFunc)(), szInfo, nMaxLen);
-    }
-}
 
 using namespace dynarithmic;
 
@@ -51,7 +45,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceManufacturer( DTWAIN_SOURCE Source, LPTSTR s
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szMan, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG Ret = GetSourceInfo(pSource, &CTL_ITwainSource::GetManufacturer, szMan, nMaxLen);
+    const LONG Ret = GetSourceInfoImpl(pSource, &CTL_ITwainSource::GetManufacturer, szMan, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szMan))
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
@@ -61,7 +55,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceProductFamily( DTWAIN_SOURCE Source, LPTSTR 
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szProduct, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG Ret = GetSourceInfo(pSource, &CTL_ITwainSource::GetProductFamily, szProduct, nMaxLen);
+    const LONG Ret = GetSourceInfoImpl(pSource, &CTL_ITwainSource::GetProductFamily, szProduct, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProduct))
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
@@ -71,7 +65,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceProductName(DTWAIN_SOURCE Source,LPTSTR szPr
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szProduct, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG Ret = GetSourceInfo(pSource, &CTL_ITwainSource::GetProductName, szProduct, nMaxLen);
+    const LONG Ret = GetSourceInfoImpl(pSource, &CTL_ITwainSource::GetProductName, szProduct, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProduct))
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)

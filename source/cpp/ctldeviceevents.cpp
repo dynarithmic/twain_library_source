@@ -23,6 +23,7 @@
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
 #include "ctlutils.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

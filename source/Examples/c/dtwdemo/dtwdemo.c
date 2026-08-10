@@ -309,6 +309,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     /* Call function to determine the DTWAIN version */
     DTWAIN_GetVersion(&nMajorVer, &nMinorVer, &nDTwainType);
 
+    DTWAIN_CheckDLLVersion(5, 9, 2, 0, DTWAIN_CHECKDLLVEREQUAL);
+    DTWAIN_CheckDLLVersion(5, 9, 3, 9, DTWAIN_CHECKDLLVEREQUAL);
+    DTWAIN_CheckDLLVersion(3, 9, 3, 9, DTWAIN_CHECKDLLVERGREATER);
+    DTWAIN_CheckDLLVersion(5, 9, 3, 100, DTWAIN_CHECKDLLVERLESSEQ);
+
     /* Create a PDF text element for usage when acquiring to a PDF file */
     g_PDFTextElement = DTWAIN_CreatePDFTextElement();
 

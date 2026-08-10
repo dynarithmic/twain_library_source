@@ -27,6 +27,9 @@
 #include "../simpleini/simpleini.h"
 #include "ctlthreadutils.h"
 #include <boost/logic/tribool.hpp>
+#include "ctldtwainhandle.h"
+#include "ctlsourceselect.h"
+#include "ctlsourceinfo.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -183,11 +186,11 @@ namespace
             if (DefSource)
             {
                 SourceCloserRAII sourcecloser(reinterpret_cast<CTL_ITwainSource*>(DefSource), true); 
-                LONG nCharacters = GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, nullptr, 0);
+                LONG nCharacters = GetSourceInfoImpl(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, nullptr, 0);
                 if (nCharacters > 0)
                 {
                     DefName.resize(nCharacters);
-                    GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, DefName.data(), nCharacters);
+                    GetSourceInfoImpl(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, DefName.data(), nCharacters);
                     if (bLogMessages)
                         LogWriterUtils::WriteLogInfoIndentedA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...");
                 }
@@ -209,7 +212,7 @@ namespace
             std::transform(vValues.begin(), vValues.end(), std::back_inserter(vSourceNames),
                 [&](CTL_ITwainSourcePtr ptr)
                 {
-                    GetSourceInfo(ptr, &CTL_ITwainSource::GetProductName, ProdName, 255);
+                    GetSourceInfoImpl(ptr, &CTL_ITwainSource::GetProductName, ProdName, 255);
                     return ProdName;
                 });
         }

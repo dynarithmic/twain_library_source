@@ -27,6 +27,7 @@
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
 #include "ctltimer.h"
+#include "ctldtwainhandle.h"
 
 using namespace dynarithmic;
 using namespace std::chrono_literals;

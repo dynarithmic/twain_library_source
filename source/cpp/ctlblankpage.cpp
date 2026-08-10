@@ -25,6 +25,7 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
 using namespace dynarithmic;
 
 using CharType = TCHAR;

@@ -22,6 +22,7 @@
 #include "ctltwainmanager.h"
 #include "ctlclosesource.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif

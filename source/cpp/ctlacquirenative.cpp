@@ -27,6 +27,8 @@
 #pragma warning (disable:4702)
 #endif
 #include <errorcheck.h>
+#include "ctldtwainhandle.h"
+#include "ctlsourceacquire.h"
 using namespace dynarithmic;
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)

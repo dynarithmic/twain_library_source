@@ -23,7 +23,45 @@
 #include "cppfunc.h"
 #include "ctliface.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
 using namespace dynarithmic;
+
+LONG DLLENTRY_DEF DTWAIN_GetLastError()
+{
+    LOG_FUNC_ENTRY_PARAMS(())
+
+    // Test stuff
+    std::string sTest = "VueScan TWAIN";
+
+    auto sNew = basicstringutils::TrimAll(sTest);
+
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
+    if ( !pHandle )
+    {
+        LONG err = DTWAIN_ERR_BAD_HANDLE;
+        if (!CTL_StaticData::ResourcesLoaded())
+            err = CTL_StaticData::GetResourceLoadError();
+        LOG_FUNC_EXIT_NONAME_PARAMS(err)
+    }
+    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_lLastError)
+    CATCH_BLOCK(DTWAIN_ERR_BAD_HANDLE)
+}
+
+LONG DLLENTRY_DEF DTWAIN_SetLastError(LONG nError)
+{
+    LOG_FUNC_ENTRY_PARAMS((nError))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
+    if (!pHandle)
+    {
+        LONG err = DTWAIN_ERR_BAD_HANDLE;
+        if (!CTL_StaticData::ResourcesLoaded())
+            err = DTWAIN_ERR_RESOURCES_NOT_FOUND;
+        LOG_FUNC_EXIT_NONAME_PARAMS(err)
+    }
+    pHandle->m_lLastError = nError;
+    LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_NO_ERROR)
+    CATCH_BLOCK(-1)
+}
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
 {

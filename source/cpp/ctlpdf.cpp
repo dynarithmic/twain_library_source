@@ -27,6 +27,7 @@
 #include "dtwstrfn.h"
 #include "ctlguidimpl.h"
 #include "ctlstringutilsx.h"
+#include "ctldtwainhandle.h"
 
 using namespace dynarithmic;
 

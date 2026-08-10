@@ -23,6 +23,7 @@
 
 #include "cppfunc.h"
 #include "ctliface.h"
+#include "ctldtwainhandle.h"
 
 using namespace dynarithmic;
 

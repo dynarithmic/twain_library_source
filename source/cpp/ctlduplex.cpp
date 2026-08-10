@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
+#include "ctldtwainhandle.h"
 using namespace dynarithmic;
 
 namespace

@@ -24,6 +24,7 @@
 #include "winbit32.h"
 #include "logwriterutils.h"
 #include "ctldib32ex.h"
+#include "ctltwainlogging.h"
 
 using namespace dynarithmic;
 

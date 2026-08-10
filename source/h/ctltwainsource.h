@@ -44,6 +44,15 @@
 
 namespace dynarithmic
 {
+    // RAII class to close a TWAIN source locally
+    struct SourceCloserRAII
+    {
+        CTL_ITwainSource* p;
+        bool bMustClose;
+        SourceCloserRAII(CTL_ITwainSource* pSource, bool bClose);
+        ~SourceCloserRAII();
+    };
+
     typedef boost::container::flat_map<TW_UINT16, short int> CapToStateMap;
     typedef boost::container::flat_set<TW_UINT16> CapList;
     typedef std::vector<TW_UINT16> JobControlList;

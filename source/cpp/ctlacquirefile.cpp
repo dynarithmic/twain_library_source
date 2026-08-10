@@ -29,6 +29,9 @@
 
 #include "cppfunc.h"
 #include "sourceselectopts.h"
+#include "ctlarraydumper.h"
+#include "ctldtwainhandle.h"
+#include "ctlsourceacquire.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #pragma warning (disable:4714)
@@ -92,6 +95,26 @@ namespace
                 bFileGood = false;
         }
         return bFileGood;
+    }
+
+    template <typename T>
+    std::vector<T> FileListToVector(SourceAcquireOptions& opts)
+    {
+        std::vector<T> allNames;
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
+        auto fileList = opts.getFileList();
+        if (fileList)
+            allNames = pHandle->m_ArrayFactory->underlying_container_t<T>(fileList);
+        else
+            allNames.push_back(opts.getFileName());
+        return allNames;
+    }
+
+    std::string GetDirectoryCreationError(CTL_StringViewType fileName)
+    {
+        return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
+            GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " +
+            stringconversion::Convert_NativePtr_To_Ansi(fileName.data());
     }
 }
 
@@ -240,33 +263,7 @@ namespace dynarithmic
         LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
         CATCH_BLOCK(DTWAIN_FAILURE1)
     }
-}
 
-namespace
-{
-    template <typename T>
-    std::vector<T> FileListToVector(SourceAcquireOptions& opts)
-    {
-        std::vector<T> allNames;
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
-        auto fileList = opts.getFileList();
-        if (fileList)
-            allNames = pHandle->m_ArrayFactory->underlying_container_t<T>(fileList);
-        else
-            allNames.push_back(opts.getFileName());
-        return allNames;
-    }
-
-    std::string GetDirectoryCreationError(CTL_StringViewType fileName)
-    {
-        return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
-            GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " +
-            stringconversion::Convert_NativePtr_To_Ansi(fileName.data());
-    }
-}
-
-namespace dynarithmic
-{
     bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
     {
         LOG_FUNC_ENTRY_PARAMS((opts))
@@ -368,4 +365,6 @@ namespace dynarithmic
         LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
         CATCH_BLOCK(false)
     }
+
 }
+

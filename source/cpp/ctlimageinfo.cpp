@@ -23,6 +23,7 @@
 #include "errorcheck.h"
 #include "ctltr025.h"
 #include "ctlstringdefs.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

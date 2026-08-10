@@ -25,6 +25,7 @@
 #include "iohandler_bmp.h"
 #include "iohandler_tiff.h"
 #include "ctlguidimpl.h"
+#include "ctltwaindllpath.h"
 
 using namespace dynarithmic;
 bool CTextImageHandler::OpenOutputFile(LPCTSTR pFileName)

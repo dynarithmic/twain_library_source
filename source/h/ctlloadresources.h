@@ -40,6 +40,10 @@ namespace dynarithmic
     bool LoadLanguageResourceA(std::string_view lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear);
     bool LoadLanguageResourceA(std::string_view lpszName, bool bClear);
     bool LoadLanguageResourceFromRC();
+    size_t GetResourceStringA(UINT nResNumber, LPSTR buffer, LONG bufSize);
+    size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize);
+    size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize);
+    std::string GetErrorString_Internal(int nError);
 
     struct ResourceLoadingInfo
     {

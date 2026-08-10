@@ -22,6 +22,7 @@
 #include "ctltwainmanager.h"
 #include "ctltr041.h"
 #include "ctliface.h"
+#include "ctldtwainhandle.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif

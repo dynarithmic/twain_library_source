@@ -27,6 +27,9 @@
 #endif
 #include <cppfunc.h>
 #include <errorcheck.h>
+#include "ctlshowuionly.h"
+#include "ctldtwainhandle.h"
+#include "ctlsourceacquire.h"
 
 namespace dynarithmic
 {
@@ -406,4 +409,60 @@ bool TwainMessageLoopV2::IsSourceOpen(CTL_ITwainSource* pSource)
 {
     return !s_MessageQueue.empty() || TwainMessageLoopImpl::IsSourceOpen(pSource);
 }
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable)
+{
+    LOG_FUNC_ENTRY_PARAMS((bEnable))
+    auto& bTest = CTL_StaticData::IsTestForGetMessage();
+    bTest = (bEnable ? true : false);
+    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+    CATCH_BLOCK(0)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopDetectionOn(VOID_PROTOTYPE)
+{
+    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_EXIT_NONAME_PARAMS(CTL_StaticData::IsTestForGetMessage()?TRUE:FALSE)
+    CATCH_BLOCK(0)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainMsg(MSG *pMsg)
+{
+    LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG((pMsg))
+
+    // Ensure we don't log low-level TWAIN calls when 
+    // for DTWAIN_IsTwainMsg unless user specifies this.
+
+    // This remembers the old flags when restoring at the
+    // return of this function.
+    struct FlagRAII
+    {
+        LONG oldFlags = 0;
+        FlagRAII(LONG oFlags) : oldFlags(oFlags) {}
+        ~FlagRAII()
+        {
+            CTL_StaticData::GetLogFilterFlags() = oldFlags;
+        }
+    };
+
+    auto& logFlags = CTL_StaticData::GetLogFilterFlags();
+    FlagRAII raii(logFlags);
+
+    // Turn off low-level TWAIN logging if no logging for
+    // IsTwainMsg
+    if (!(logFlags & DTWAIN_LOG_ISTWAINMSG))
+        logFlags = logFlags & ~DTWAIN_LOG_LOWLEVELTWAIN;
+
+    if (!TwainMessageLoopV2::s_MessageQueue.empty())
+    {
+        MSG msg = TwainMessageLoopV2::s_MessageQueue.front();
+        TwainMessageLoopV2::s_MessageQueue.pop();
+        CTL_TwainAppMgr::IsTwainMsg(&msg, true);  // make sure we perform what we need to do for TWAIN 2.x.
+    }
+    // make sure we perform any default message handling here.
+    const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsTwainMsg( pMsg, false );
+    LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(bRet)
+    CATCH_BLOCK(false)
+}
+
 

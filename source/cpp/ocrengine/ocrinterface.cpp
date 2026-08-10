@@ -23,6 +23,7 @@
 #include "errorcheck.h"
 #include "ctlstringdefs.h"
 #include "ctlstringutilsx.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4505)
@@ -633,10 +634,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LP
 
 bool OCREngineExists(CTL_TwainDLLHandle* pHandle, OCREngine* pEngine)
 {
-    return
-        std::find_if(pHandle->m_OCRInterfaceArray.begin(),
-        pHandle->m_OCRInterfaceArray.end(),
-        SmartPointerFinder<OCREnginePtr>(pEngine)) != pHandle->m_OCRInterfaceArray.end();
+    auto iter = std::find_if(pHandle->m_OCRInterfaceArray.begin(),
+                             pHandle->m_OCRInterfaceArray.end(),
+                            [&](auto& curEngine) { return curEngine.get() == pEngine; });
+
+    return iter != pHandle->m_OCRInterfaceArray.end();
 }
 
 bool OCRIsActive(const OCREngine* pEngine)

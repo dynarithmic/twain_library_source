@@ -18,10 +18,13 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <functional>
 #include <algorithm>
 #include "cppfunc.h"
-#include "errorcheck.h"
+#include "ctlarraydumper.h"
+#include "twainframe.h"
+#include "ctltwainsource.h"
+#include "ctltwainmanager.h"
+#include "ctltwainlogging.h"
 
 namespace stringutils = dynarithmic::basicstringutils;
 using namespace dynarithmic;
@@ -315,6 +318,6 @@ namespace dynarithmic
             case DTWAIN_ARRAYHANDLE:
                 DumpArrayHandles(Array);
                 break;
-            }
         }
+    }
 }

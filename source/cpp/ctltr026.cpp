@@ -33,6 +33,7 @@
 #include "ctlsetgetcaps.h"
 #include "ctldib32ex.h"
 #include "ctlstringutils.h"
+#include "ctltwainlogging.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;

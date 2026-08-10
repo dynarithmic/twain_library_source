@@ -24,6 +24,7 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctlsetgetcaps.h"
+#include "ctlcapcontainerfuncs.h"
 
 ///////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
@@ -131,5 +132,11 @@ namespace dynarithmic
         }
         return 0;
     }
+
+    bool GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, LONG Cap, LONG GetType);
+    bool EnumSupported(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG Cap);
+    bool SetSupportArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY Array, LONG Cap);
+    bool GetSupportArray(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, LONG Cap, LONG GetType=DTWAIN_CAPGET);
+    LONG CheckEnabled(DTWAIN_SOURCE Source, LONG CapVal);
 }
 #endif

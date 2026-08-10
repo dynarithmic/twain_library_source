@@ -22,7 +22,10 @@
 #include "ctltr038.h"
 #include "twain.h"
 #include "extendedimageinfo.h"
+#include "ctlarraydumper.h"
+#include "ctldtwainhandle.h"
 using namespace dynarithmic;
+
 /* These functions can only be used in State 7   (when DTWAIN_TN_TRANSFERDONE notification is sent).
    This means that only languages that can utilize DTWAIN_SetCallback or can intercept Window's
    messages can use these functions. */

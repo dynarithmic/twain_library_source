@@ -25,6 +25,8 @@
 #include "ctllogcalls.h"
 #include "ctlarray.h"
 #include "ctlstringutilsx.h"
+#include "ctlcapcollect.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

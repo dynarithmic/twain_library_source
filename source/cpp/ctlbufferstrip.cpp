@@ -21,6 +21,7 @@
 #include <cstdio>
 #include "cppfunc.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred )

@@ -22,6 +22,8 @@
 #include "ctliface.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
+#include "ctlsourcedibs.h"
 
 using namespace dynarithmic;
 
@@ -277,6 +279,29 @@ DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_GetCallback64()
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn64)
     CATCH_BLOCK(nullptr)
 }
+
+LONG DLLENTRY_DEF DTWAIN_CallCallback(WPARAM wParam, LPARAM lParam, LONG UserData)
+{
+    LOG_FUNC_ENTRY_PARAMS((wParam, lParam, UserData))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LONG RetVal = 1;
+    if (pHandle->m_pCallbackFn)
+        RetVal = static_cast<LONG>((*pHandle->m_pCallbackFn)(wParam, lParam, UserData));
+    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
+    CATCH_BLOCK(0)
+}
+
+LONG DLLENTRY_DEF DTWAIN_CallCallback64(WPARAM wParam, LPARAM lParam, LONGLONG UserData)
+{
+    LOG_FUNC_ENTRY_PARAMS((wParam, lParam, UserData))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LONG RetVal = 1;
+    if (pHandle->m_pCallbackFn64)
+        RetVal = static_cast<LONG>((*pHandle->m_pCallbackFn64)(wParam, lParam, UserData));
+    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
+    CATCH_BLOCK(0)
+}
+
 
 namespace
 {

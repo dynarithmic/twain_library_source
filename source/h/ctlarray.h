@@ -30,10 +30,10 @@
 #include "dtwaindefs.h"
 #include "arrayfactory.h"
 
-typedef std::vector<int>            CTL_IntArray;
-typedef std::vector<TW_UINT16>      CTL_TwainCapArray;
-typedef std::vector<double>         CTL_RealArray;
-typedef std::vector<HANDLE>         CTL_HDIBArray;
+using CTL_IntArray = std::vector<int>;
+using CTL_TwainCapArray = std::vector<TW_UINT16>;
+using CTL_RealArray = std::vector<double>;
+using CTL_HDIBArray = std::vector<HANDLE>;
 
 #define DTWAIN_ARRAY_TO_VOID(p)   ((void*)(p))
 #define VOID_TO_DTWAIN_ARRAY(p)   ((DTWAIN_ARRAY)(p))
@@ -127,5 +127,16 @@ namespace dynarithmic
     }
 
     void SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib);
+    void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
+    void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame);
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
+    DTWAIN_ARRAY CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source);
+    DTWAIN_FRAME CreateFrameArray(const CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
+    void SetArrayValueFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
+    bool MoveArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
+    LONG DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
+    bool DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain);
+    bool TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil);
 }
 #endif

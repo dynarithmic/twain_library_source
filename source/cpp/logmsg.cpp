@@ -33,6 +33,7 @@ OF THIRD PARTY RIGHTS.
 #include "ctlstringdefs.h"
 #include "ctlfileutils.h"
 #include "ctlthreadutils.h"
+#include "ctltwainlogging.h"
 
 using namespace dynarithmic;
 using namespace date;

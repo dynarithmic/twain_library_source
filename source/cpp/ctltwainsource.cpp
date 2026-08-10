@@ -35,6 +35,7 @@
 #include "tiff.h"
 #include "ctlclosesource.h"
 #include "ctldib32ex.h"
+#include "ctlcapcontainerfuncs.h"
 
 using namespace dynarithmic;
 

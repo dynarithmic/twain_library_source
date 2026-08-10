@@ -21,6 +21,7 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "ctlsetgetcaps.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

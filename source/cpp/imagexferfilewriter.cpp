@@ -29,6 +29,7 @@
 #include "ctlfilesave.h"
 #include "ctldib32ex.h"
 #include "ctlguidimpl.h"
+#include "ctltwaindllpath.h"
 
 #define DTWAIN_PAGEMISSINGSTR _T("<missing_page>")
 

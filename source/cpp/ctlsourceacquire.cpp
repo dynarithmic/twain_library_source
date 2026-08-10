@@ -25,6 +25,12 @@
 #include "sourceselectopts.h"
 #include "arrayfactory.h"
 #include "dtwstrfn.h"
+#include "ctlfeed.h"
+#include "ctldtwainhandle.h"
+#include "ctlsourceacquire.h"
+#include "ctlsourceselect.h"
+#include "windowsinit_impl.h"
+#include "ctltwainlogging.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -32,6 +38,35 @@
 
 using namespace dynarithmic;
 
+namespace
+{
+    bool AcquireExHelper(SourceAcquireOptions& opts)
+    {
+        DTWAIN_ARRAY aDibs = SourceAcquire(opts);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+        DTWAINArrayLowLevel_RAII arr(pSource->GetDTWAINHandle(), aDibs);
+        if (!aDibs)
+        {
+            // Destroy internally generated acquisition array and
+            // utilize only user-defined acquisition array
+            pSource->ResetAcquisitionAttempts(nullptr);
+            return false;
+        }
+
+        const auto pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
+        const auto& vValues = pDLLHandle->m_ArrayFactory->underlying_container_t<void*>(aDibs);
+
+        bool bRet = false;
+        bRet = !vValues.empty() ? true: false;
+        if (opts.getStatus() == DTWAIN_TN_ACQUIRESTARTED && !vValues.empty())
+            bRet = true;
+
+        // Destroy internally generated acquisition array and
+        // utilize only user-defined acquisition array
+        pSource->ResetAcquisitionAttempts(nullptr);
+        return bRet;
+    }
+}
 
 DTWAIN_ACQUIRE CTL_TwainDLLHandle::GetNewAcquireNum()
 {
@@ -188,6 +223,130 @@ namespace
             }
         }
         return { true, DTWAIN_NO_ERROR };
+    }
+
+    DTWAIN_ARRAY SourceAcquireWorkerThread(SourceAcquireOptions& opts)
+    {
+        LOG_FUNC_ENTRY_PARAMS((opts))
+        DTWAIN_ARRAY Array = nullptr;
+
+        const auto pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
+        DTWAINArrayLowLevel_RAII a1(pDLLHandle, nullptr);
+
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+        pSource->SetShutdownAcquire(false);
+        pSource->SetLastAcquireError(0);
+        pSource->ResetAcquisitionAttempts(nullptr);
+
+        auto retVal = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
+        if (!retVal.second)
+        {
+            opts.setStatus(retVal.first);
+            return nullptr;
+        }
+        auto aAcquisitionArray = retVal.second;
+        DTWAINArrayLowLevel_RAII aAcq(pDLLHandle, aAcquisitionArray);
+
+        pSource->m_pUserPtr = nullptr;
+        pDLLHandle->m_bTransferDone = false;
+        pDLLHandle->m_bSourceClosed = false;
+        pDLLHandle->m_lLastError = 0;
+
+        pSource->SetUserAcquisitionArray(nullptr);
+
+        if (pDLLHandle->m_lAcquireMode == DTWAIN_MODELESS)
+        {
+            Array = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYHANDLE, 0).second;
+            a1.SetArray(Array);
+            if (!Array)
+            {
+                opts.setStatus(DTWAIN_ERR_OUT_OF_MEMORY);
+                DTWAIN_Check_Error_Condition_WithThrow_Ex(pDLLHandle, []{return true; }, DTWAIN_ERR_OUT_OF_MEMORY, NULL, FUNC_MACRO);
+            }
+        }
+        else
+            pSource->ResetAcquisitionAttempts(aAcquisitionArray);
+
+        switch (opts.getAcquireType())
+        {
+            case ACQUIRENATIVE:
+            case ACQUIRENATIVEEX:
+                if (DTWAIN_LLAcquireNative(opts) == -1L)
+                {
+                    opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
+                    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
+                }
+                if (opts.getAcquireType() == ACQUIRENATIVEEX)
+                    pSource->SetUserAcquisitionArray(opts.getUserArray());
+                break;
+
+            case ACQUIREBUFFERED:
+            case ACQUIREBUFFEREDEX:
+                if (DTWAIN_LLAcquireBuffered(opts) == -1L)
+                {
+                    opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
+                    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
+                }
+                if (opts.getAcquireType() == ACQUIREBUFFEREDEX)
+                    pSource->SetUserAcquisitionArray(opts.getUserArray());
+                break;
+
+            case ACQUIREFILE:
+                if (DTWAIN_LLAcquireFile(opts) == -1L)
+                {
+                    opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
+                    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
+                }
+                break;
+
+            case ACQUIREAUDIONATIVE:
+            case ACQUIREAUDIONATIVEEX:
+                if (DTWAIN_LLAcquireAudioNative(opts) == -1L)
+                {
+                    opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
+                    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
+                }
+                if (opts.getAcquireType() == ACQUIREAUDIONATIVEEX)
+                    pSource->SetUserAcquisitionArray(opts.getUserArray());
+                break;
+
+            case ACQUIREAUDIOFILE:
+                if (DTWAIN_LLAcquireAudioFile(opts) == -1L)
+                {
+                    opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
+                    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
+                }
+                break;
+
+        }
+
+        if (Array)  // This is an immediate return
+        {
+            // turn off RAII here
+            a1.SetDestroy(false);
+            aAcq.SetDestroy(false);
+            pSource->ResetAcquisitionAttempts(aAcquisitionArray);
+            pDLLHandle->m_lLastAcqError = DTWAIN_TN_ACQUIRESTARTED;
+            opts.setStatus(DTWAIN_TN_ACQUIRESTARTED);
+            pSource->m_pUserPtr = Array;
+            LOG_FUNC_EXIT_NONAME_PARAMS(Array)
+        }
+
+        pSource->ResetAcquisitionAttempts(aAcquisitionArray);
+
+        opts.setStatus(pDLLHandle->m_lLastAcqError);
+        // Get the array of Dibs
+        const auto& vValues = pDLLHandle->m_ArrayFactory->
+                                underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(aAcquisitionArray);
+
+        if (vValues.empty() && opts.getAcquireType() != ACQUIREFILE)
+        {
+            pSource->ResetAcquisitionAttempts(nullptr);
+            LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+        }
+        aAcq.SetDestroy(false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
+        CATCH_BLOCK(nullptr)
     }
 }
 
@@ -431,156 +590,7 @@ namespace dynarithmic
         return { aDibs, bRet };
     }
 
-    DTWAIN_ARRAY SourceAcquireWorkerThread(SourceAcquireOptions& opts)
-    {
-        LOG_FUNC_ENTRY_PARAMS((opts))
-        DTWAIN_ARRAY Array = nullptr;
 
-        const auto pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
-        DTWAINArrayLowLevel_RAII a1(pDLLHandle, nullptr);
-
-        auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
-        pSource->SetShutdownAcquire(false);
-        pSource->SetLastAcquireError(0);
-        pSource->ResetAcquisitionAttempts(nullptr);
-
-        auto retVal = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
-        if (!retVal.second)
-        {
-            opts.setStatus(retVal.first);
-            return nullptr;
-        }
-        auto aAcquisitionArray = retVal.second;
-        DTWAINArrayLowLevel_RAII aAcq(pDLLHandle, aAcquisitionArray);
-
-        pSource->m_pUserPtr = nullptr;
-        pDLLHandle->m_bTransferDone = false;
-        pDLLHandle->m_bSourceClosed = false;
-        pDLLHandle->m_lLastError = 0;
-
-        pSource->SetUserAcquisitionArray(nullptr);
-
-        if (pDLLHandle->m_lAcquireMode == DTWAIN_MODELESS)
-        {
-            Array = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYHANDLE, 0).second;
-            a1.SetArray(Array);
-            if (!Array)
-            {
-                opts.setStatus(DTWAIN_ERR_OUT_OF_MEMORY);
-                DTWAIN_Check_Error_Condition_WithThrow_Ex(pDLLHandle, []{return true; }, DTWAIN_ERR_OUT_OF_MEMORY, NULL, FUNC_MACRO);
-            }
-        }
-        else
-            pSource->ResetAcquisitionAttempts(aAcquisitionArray);
-
-        switch (opts.getAcquireType())
-        {
-            case ACQUIRENATIVE:
-            case ACQUIRENATIVEEX:
-                if (DTWAIN_LLAcquireNative(opts) == -1L)
-                {
-                    opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
-                }
-                if (opts.getAcquireType() == ACQUIRENATIVEEX)
-                    pSource->SetUserAcquisitionArray(opts.getUserArray());
-                break;
-
-            case ACQUIREBUFFERED:
-            case ACQUIREBUFFEREDEX:
-                if (DTWAIN_LLAcquireBuffered(opts) == -1L)
-                {
-                    opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
-                }
-                if (opts.getAcquireType() == ACQUIREBUFFEREDEX)
-                    pSource->SetUserAcquisitionArray(opts.getUserArray());
-                break;
-
-            case ACQUIREFILE:
-                if (DTWAIN_LLAcquireFile(opts) == -1L)
-                {
-                    opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
-                }
-                break;
-
-            case ACQUIREAUDIONATIVE:
-            case ACQUIREAUDIONATIVEEX:
-                if (DTWAIN_LLAcquireAudioNative(opts) == -1L)
-                {
-                    opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
-                }
-                if (opts.getAcquireType() == ACQUIREAUDIONATIVEEX)
-                    pSource->SetUserAcquisitionArray(opts.getUserArray());
-                break;
-
-            case ACQUIREAUDIOFILE:
-                if (DTWAIN_LLAcquireAudioFile(opts) == -1L)
-                {
-                    opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                    LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
-                }
-                break;
-
-        }
-
-        if (Array)  // This is an immediate return
-        {
-            // turn off RAII here
-            a1.SetDestroy(false);
-            aAcq.SetDestroy(false);
-            pSource->ResetAcquisitionAttempts(aAcquisitionArray);
-            pDLLHandle->m_lLastAcqError = DTWAIN_TN_ACQUIRESTARTED;
-            opts.setStatus(DTWAIN_TN_ACQUIRESTARTED);
-            pSource->m_pUserPtr = Array;
-            LOG_FUNC_EXIT_NONAME_PARAMS(Array)
-        }
-
-        pSource->ResetAcquisitionAttempts(aAcquisitionArray);
-
-        opts.setStatus(pDLLHandle->m_lLastAcqError);
-        // Get the array of Dibs
-        const auto& vValues = pDLLHandle->m_ArrayFactory->
-                                underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(aAcquisitionArray);
-
-        if (vValues.empty() && opts.getAcquireType() != ACQUIREFILE)
-        {
-            pSource->ResetAcquisitionAttempts(nullptr);
-            LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-        }
-        aAcq.SetDestroy(false);
-        LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
-        CATCH_BLOCK(nullptr)
-    }
-
-    bool AcquireExHelper(SourceAcquireOptions& opts)
-    {
-        DTWAIN_ARRAY aDibs = SourceAcquire(opts);
-        auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
-        DTWAINArrayLowLevel_RAII arr(pSource->GetDTWAINHandle(), aDibs);
-        if (!aDibs)
-        {
-            // Destroy internally generated acquisition array and
-            // utilize only user-defined acquisition array
-            pSource->ResetAcquisitionAttempts(nullptr);
-            return false;
-        }
-
-        const auto pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
-        const auto& vValues = pDLLHandle->m_ArrayFactory->underlying_container_t<void*>(aDibs);
-
-        bool bRet = false;
-        bRet = !vValues.empty() ? true: false;
-        if (opts.getStatus() == DTWAIN_TN_ACQUIRESTARTED && !vValues.empty())
-            bRet = true;
-
-        // Destroy internally generated acquisition array and
-        // utilize only user-defined acquisition array
-        pSource->ResetAcquisitionAttempts(nullptr);
-        return bRet;
-    }
 
     DTWAIN_ACQUIRE  LLAcquireImage(SourceAcquireOptions& opts)
     {

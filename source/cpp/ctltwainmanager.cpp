@@ -54,6 +54,9 @@
 #include "ctltr043.h"
 #include "ctlguidimpl.h"
 #include "ctlstringutilsx.h"
+#include "ctlcapcollect.h"
+#include "ctlcapcontainerfuncs.h"
+#include "ctltwaindllpath.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;

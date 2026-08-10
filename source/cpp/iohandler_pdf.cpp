@@ -29,6 +29,7 @@
 #include "pdffun32.h"
 #include "ctldib32ex.h"
 #include "ctlguidimpl.h"
+#include "ctltwaindllpath.h"
 
 using namespace dynarithmic;
 

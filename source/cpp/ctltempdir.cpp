@@ -25,9 +25,34 @@
 #include "ctlfileutils.h"
 #include "ctlwindowsimpl.h"
 #include "ctlstringutilsx.h"
+#include "ctldtwainhandle.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;
+
+namespace dynarithmic
+{
+    CTL_StringType GetDTWAINTempFilePath(CTL_TwainDLLHandle* pHandle)
+    {
+        static CTL_StringType sDummy;
+        if (!pHandle)
+            return sDummy;
+        if (pHandle->m_sTempFilePath.empty())
+        {
+            const auto tempPath = fileutils::temp_directory_path();
+            if (tempPath.empty())
+            {
+                std::string msg = GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": " + GetResourceStringFromMap(IDS_LOGMSG_TEMPFILENOTEXISTTEXT);
+                LogWriterUtils::WriteLogInfoIndentedA(msg);
+            }
+            else
+                pHandle->m_sTempFilePath = tempPath;
+        }
+        std::string msg = "Temp path is " + stringconversion::Convert_Native_To_Ansi(pHandle->m_sTempFilePath);
+        LogWriterUtils::WriteLogInfoIndentedA(msg);
+        return pHandle->m_sTempFilePath;
+    }
+}
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG CreationFlags)
 {

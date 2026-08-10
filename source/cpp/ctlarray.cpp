@@ -28,6 +28,9 @@
 #include "dtwain_float_utils.h"
 #include "arrayfactory.h"
 #include "ctliface.h"
+#include "ctlarraydumper.h"
+#include "ctlcapcontainerfuncs.h"
+#include "ctldtwainhandle.h"
 using namespace dynarithmic;
 
 namespace
@@ -83,7 +86,7 @@ namespace dynarithmic
 
     std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize)
     {
-        const LONG lType = GetCapArrayType(pHandle, pSource, lCapType);
+        const LONG lType = GetCapArrayType(pSource, lCapType);
         if (lType == DTWAIN_FAILURE1)
             return { DTWAIN_ERR_BAD_CONTAINER, nullptr };
         return CreateArrayFromFactory(pHandle, lType, lSize);

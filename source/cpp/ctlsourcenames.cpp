@@ -22,6 +22,7 @@
 #include "errorcheck.h"
 #include "../h/cppfunc.h"
 #include "ctlstringutilsx.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

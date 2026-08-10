@@ -22,8 +22,23 @@
 #include "ctliface.h"
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
+#include "ctltwainmanager.h"
 
 namespace stringutils = dynarithmic::basicstringutils;
+
+namespace
+{
+    void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, std::string_view s)
+    {
+        std::ostringstream strm;
+        if (!func)
+            func = "(Uninitialized DTWAIN DLL)";
+        strm << "DTWAIN Function " << func << " returned error code " << nError << std::endl << std::endl;
+        strm << s.data();
+        const std::string st = strm.str();
+        MessageBoxA(nullptr, st.c_str(), "DTWAIN Error", MB_ICONSTOP);
+    }
+}
 
 namespace dynarithmic
 {
@@ -116,5 +131,40 @@ namespace dynarithmic
     {
         WriteMultiLineInfoIndentedA(basicstringutils::Narrow(s.data()),
                                     basicstringutils::Narrow(pszDelim).c_str());
+    }
+
+    void OutputDTWAINErrorW(const CTL_TwainDLLHandle* pHandle, LPCWSTR pFunc)
+    {
+        if (pFunc)
+            OutputDTWAINError(pHandle, basicstringutils::Narrow(pFunc).c_str());
+        else
+            OutputDTWAINError(pHandle);
+    }
+
+    void OutputDTWAINErrorA(const CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
+    {
+        OutputDTWAINError(pHandle, pFunc);
+    }
+
+    void OutputDTWAINError(const CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
+    {
+        auto logFilterFlags = CTL_StaticData::GetLogFilterFlags();
+        if (!(logFilterFlags & DTWAIN_LOG_DTWAINERRORS))
+            return;
+        static constexpr int MaxMessage = DTWAIN_USERRES_MAXSIZE;
+        char szBuf[MaxMessage + 1]{};
+        if (!pHandle)
+            DTWAIN_GetErrorStringA(DTWAIN_ERR_BAD_HANDLE, szBuf, MaxMessage);
+        else
+            CTL_TwainAppMgr::GetLastErrorString(szBuf, MaxMessage);
+        std::string_view s(szBuf);
+        if (pHandle)
+            LogWriterUtils::WriteLogInfoIndentedA(s);
+
+        if (logFilterFlags & DTWAIN_LOG_ERRORMSGBOX && pHandle)
+            LogDTWAINErrorToMsgBox(pHandle->m_lLastError, pFunc, s);
+        else
+        if (!pHandle && logFilterFlags & DTWAIN_LOG_INITFAILURE)
+            LogDTWAINErrorToMsgBox(DTWAIN_ERR_BAD_HANDLE, nullptr, s);
     }
 }

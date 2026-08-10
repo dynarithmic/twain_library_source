@@ -24,30 +24,30 @@
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
 
+namespace
+{
+    template <typename hashType>
+    std::vector<unsigned char> GenericHashSHA2(std::string_view message)
+    {
+        std::vector<unsigned char> data(message.begin(), message.end());
+        std::vector<unsigned char> retVal;
+        // Create a hash object
+        hashType hasher;
+
+        // Update the hash object with the input data
+        hasher.update(data.data(), data.size());
+
+        // Obtain the hash result
+        typename hashType::result_type digest = hasher.result();
+
+        for (unsigned char byte : digest)
+            retVal.push_back(byte);
+        return retVal;
+    }
+}
+
 namespace dynarithmic
 {
-    namespace
-    {
-        template <typename hashType>
-        std::vector<unsigned char> GenericHashSHA2(std::string_view message)
-        {
-            std::vector<unsigned char> data(message.begin(), message.end());
-            std::vector<unsigned char> retVal;
-            // Create a hash object
-            hashType hasher;
-
-            // Update the hash object with the input data
-            hasher.update(data.data(), data.size());
-
-            // Obtain the hash result
-            typename hashType::result_type digest = hasher.result();
-
-            for (unsigned char byte : digest)
-                retVal.push_back(byte);
-            return retVal;
-        }
-    }
-
     std::vector<unsigned char> SHA2Hash(std::string_view message, SHA2HashType hashType)
     {
         std::vector<unsigned char> data(message.begin(), message.end());
