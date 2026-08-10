@@ -183,6 +183,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
 {
     LOG_FUNC_ENTRY_PARAMS((LogFlags, lpszLogFile))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+
+    // Clear errors.
+    pHandle->m_lLastError = DTWAIN_NO_ERROR;
     CTL_StaticData::GetLogger().SetDLLHandle(pHandle);
 
     // If the log flags have not specified what to log

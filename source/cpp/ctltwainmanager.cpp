@@ -1510,7 +1510,7 @@ LPSTR CTL_TwainAppMgr::GetLastErrorString(LPSTR lpszBuffer, int nSize)
 
 LPSTR CTL_TwainAppMgr::GetErrorString(int nError, LPSTR lpszBuffer, int nSize)
 {
-    if ( nError == s_nLastError )
+    if ( nError == s_nLastError && (s_nLastError != 0))
         CopyInfoToCString(s_strLastError, lpszBuffer, nSize);
     else
         GetResourceStringA(nError, lpszBuffer, nSize);
