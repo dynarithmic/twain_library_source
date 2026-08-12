@@ -25,7 +25,8 @@
 #include "ctltwainmanager.h"
 #include "ctlstringutilsx.h"
 #include "ctlstaticdata.h"
-
+#include "dtwain_resource_constants2.h"
+#include "dtwain_config.h"
 using namespace dynarithmic;
 
 namespace

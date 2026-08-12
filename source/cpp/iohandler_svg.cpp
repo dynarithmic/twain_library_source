@@ -19,11 +19,11 @@ DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRING
 OF THIRD PARTY RIGHTS.
 */
 #include <string>
-#include "ctliface.h"
 #include "iohandler_svg.h"
 #include "ctldib32ex.h"
 #include "svgwriter.h"
 #include "ctlstaticdata.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

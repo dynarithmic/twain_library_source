@@ -24,6 +24,7 @@
 #include "errorcheck.h"
 #include "ctltr036.h"
 #include "ctlglobalhandletraits.h"
+#include "dtwainx.h"
 using namespace dynarithmic;
 
 /////////////////////////////////////////////////////////////

@@ -21,7 +21,8 @@
 #include <cstring>
 
 #include "ctlobtyp.h"
-#include "ctliface.h"
+#include "ctltwaindllhandle.h"
+#include "ctlconstexprutils.h"
 
 using namespace dynarithmic;
 CTL_TwainTypeOb::CTL_TwainTypeOb( CTL_TwainDLLHandle* pHandle, TW_UINT16 nType, bool bGetTypeSize/*=true*/ ) : 

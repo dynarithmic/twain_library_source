@@ -36,7 +36,7 @@
 #include "ctlgetversion.h"
 #include "ctltwaindllpath.h"
 #include "ctlstaticdata.h"
-
+#include "dtwainx.h"
 namespace stringutils = dynarithmic::basicstringutils;
 
 using namespace dynarithmic;

@@ -18,9 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctliface.h"
 #include "cppfunc.h"
 #include "ctldtwainhandle.h"
+#include "ctltwaindllhandle.h"
 
 using namespace dynarithmic;
 extern "C"

@@ -23,6 +23,7 @@
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
 #include "ctldtwainhandle.h"
+#include "dtwainx.h"
 
 using namespace dynarithmic;
 

@@ -19,9 +19,12 @@
     OF THIRD PARTY RIGHTS.
  */
 
-#include "ctliface.h"
 #include "logwriterutils.h"
 #include "ctldtwainhandle.h"
+#include "ctlstringconversion.h"
+#include "ctlloadresources.h"
+#include "dtwain_resource_constants2.h"
+#include "winconst.h"
 using namespace dynarithmic;
 
 extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)

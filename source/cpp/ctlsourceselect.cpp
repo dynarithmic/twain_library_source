@@ -18,6 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#if 0
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "ctltmpl5.h"
@@ -26,14 +27,27 @@
 #include "errorcheck.h"
 #include "../simpleini/simpleini.h"
 #include "ctlthreadutils.h"
-#include <boost/logic/tribool.hpp>
+
 #include "ctldtwainhandle.h"
 #include "ctlsourceselect.h"
 #include "ctlsourceinfo.h"
+#include "dtwainx.h"
+#endif
+
+#include <boost/logic/tribool.hpp>
+#include "ctltwaindllhandle.h"
+#include "ctlstringutils.h"
+#include "sourceselectopts.h"
+#include "ctlstaticdata.h"
+#include "ctltwainmanager.h"
+#include "errorcheck.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
+#include <dtwainx.h>
+#include <ctlthreadutils.h>
 
 using namespace dynarithmic;
 using namespace boost::logic;

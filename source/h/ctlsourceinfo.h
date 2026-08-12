@@ -23,6 +23,7 @@
 
 #include <bitset>
 #include <map>
+#include <vector>
 #include "ctlstringdefs.h"
 #include "ctlstringutilsx.h"
 
@@ -36,6 +37,14 @@ namespace dynarithmic
         uint32_t m_CurrentCount = 0;
         bool m_bSeenUIClose = false;
         bool m_bSeenXferReady = false;
+    };
+
+    struct CTL_OnSourceOpenProperties
+    {
+        bool m_bCheckFeederStatusOnOpen;
+        bool m_bQueryBestCapContainer;
+        bool m_bQueryCapOperations;
+        bool m_bSaveDefaultToINI;
     };
 
     using SourceToXferReadyMap = std::map<std::string, SourceXferReadyOverride>;
@@ -65,5 +74,8 @@ namespace dynarithmic
     {
         return CopyInfoToCString<CTL_StringType>((p->*pFunc)(), szInfo, nMaxLen);
     }
+
+    class CTL_TwainDLLHandle;
+    std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle);
 }
 #endif

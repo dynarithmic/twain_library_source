@@ -18,10 +18,11 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include <fstream>
 #include "ctlfileutils.h"
 #include "ctlwindowsimpl.h"
 #include "ctlguidimpl.h"
-
+#include "ctlstringconversion.h"
 namespace dynarithmic
 {
     namespace fileutils

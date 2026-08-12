@@ -22,6 +22,7 @@
 #include "icowriter.h"
 #include "iohandler_ico.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

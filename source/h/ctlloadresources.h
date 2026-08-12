@@ -25,6 +25,8 @@
 #include <string_view>
 #include <array>
 #include "mapdefs.h"
+#include "ctlstringdefs.h"
+#include "dtwain_standard_defs.h"
 
 #define DTWAINLANGRESOURCEFILE _T("twainresourcestrings_")
 #define DTWAINRESOURCEINFOFILE _T("twaininfo.txt")

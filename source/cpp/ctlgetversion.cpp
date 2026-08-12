@@ -21,13 +21,14 @@
 #include "dtwain.h"
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
-#include "ctliface.h"
 #include "cppfunc.h"
 #include "dtwinverex.h"
 #include "ctlgetversion.h"
 #include "ctldtwainhandle.h"
 #include "ctltwaindllpath.h"
 #include "ctlstaticdata.h"
+#include "ctltwaindllhandle.h"
+#include "ctlconstexprutils.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;

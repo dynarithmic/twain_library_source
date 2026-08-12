@@ -30,6 +30,20 @@
 
 using namespace dynarithmic;
 
+namespace dynarithmic
+{
+    std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle)
+    {
+        std::vector<CTL_ITwainSource*> vSources;
+        for (auto& pr : pHandle->m_mapStringToSource)
+        {
+            if (pr.second->IsOpened())
+                vSources.push_back(pr.second);
+        }
+        return vSources;
+    }
+}
+
 extern "C"
 {
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceValid(DTWAIN_SOURCE Source)

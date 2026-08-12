@@ -22,6 +22,7 @@
 #include "wbmpwriter.h"
 #include "iohandler_wbmp.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

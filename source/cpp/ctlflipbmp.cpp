@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "ctldib32ex.h"
 #include "ctlglobalhandletraits.h"
+#include "winbit32.h"
 
 using namespace dynarithmic;
 

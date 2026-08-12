@@ -18,12 +18,16 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctliface.h"
+
 #include "ctlfileutils.h"
 #include "tiff.h"
 #include "logwriterutils.h"
 #include "iohandler_tiff.h"
 #include "ctldib32ex.h"
+#include "ctlenum.h"
+#include "ctlconstexprutils.h"
+#include "ctlstringconversion.h"
+#include "ctltwainsource.h"
 
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

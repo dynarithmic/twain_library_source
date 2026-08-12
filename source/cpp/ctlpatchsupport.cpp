@@ -22,8 +22,9 @@
 #include <algorithm>
 
 #include "cppfunc.h"
-#include "ctliface.h"
 #include "ctldtwainhandle.h"
+#include "ctltwainsource.h"
+#include "twain.h"
 
 using namespace dynarithmic;
 

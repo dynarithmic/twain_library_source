@@ -29,6 +29,7 @@
 #include "ctlguidimpl.h"
 #include "ctltwaindllpath.h"
 #include "ctlglobalhandletraits.h"
+#include "dtwainx.h"
 
 #define DTWAIN_PAGEMISSINGSTR _T("<missing_page>")
 

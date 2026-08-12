@@ -31,6 +31,7 @@
 #include "ctlsourceselect.h"
 #include "windowsinit_impl.h"
 #include "ctltwainlogging.h"
+#include "dtwainx.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

@@ -397,8 +397,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/arrayfactory.h
         ${PROJECT_SOURCE_DIR}/h/blankpage.h
         ${PROJECT_SOURCE_DIR}/h/capconst.h
-        ${PROJECT_SOURCE_DIR}/h/capinfomap.h
-        ${PROJECT_SOURCE_DIR}/h/capstruc.h
         ${PROJECT_SOURCE_DIR}/h/cppfunc.h
         ${PROJECT_SOURCE_DIR}/h/crc32_aux.h
         ${PROJECT_SOURCE_DIR}/h/ctlarray.h
@@ -600,6 +598,10 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/twainframe.h
         ${PROJECT_SOURCE_DIR}/h/versioninfo.h
         ${PROJECT_SOURCE_DIR}/h/winconst.h
+        ${PROJECT_SOURCE_DIR}/h/capstructdefs.h
+        ${PROJECT_SOURCE_DIR}/h/ctlinternalconstants.h
+        ${PROJECT_SOURCE_DIR}/h/ctlloggercallback.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwaindllhandle.h
 )
 
 set(MAIN_INL

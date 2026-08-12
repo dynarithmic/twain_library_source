@@ -24,7 +24,9 @@
 #include "dtwtype.h"
 #include "ctliface.h"
 #include "ctlguidimpl.h"
-
+#include "ctltwaindllhandle.h"
+#include "ctlstringconversion.h"
+#include "ctlarray.h"
 using namespace dynarithmic;
 
 namespace

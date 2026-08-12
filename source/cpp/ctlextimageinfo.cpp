@@ -24,6 +24,7 @@
 #include "extendedimageinfo.h"
 #include "ctlarraydumper.h"
 #include "ctldtwainhandle.h"
+#include "dtwainx.h"
 using namespace dynarithmic;
 
 /* These functions can only be used in State 7   (when DTWAIN_TN_TRANSFERDONE notification is sent).

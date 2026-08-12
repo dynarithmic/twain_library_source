@@ -35,6 +35,8 @@
 #include "ctlstringutils.h"
 #include "ctltwainlogging.h"
 #include "ctlglobalhandletraits.h"
+#include "logwriterutils.h"
+#include "dtwainx.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;

@@ -24,11 +24,14 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <chrono>
 #include <boost/lexical_cast.hpp>
+#include <iomanip>
 
-#include "ctliface.h"
 #include "ctlstringutils.h"
 #include "ctltimeutils.h"
+#include "ctlstringdefs.h"
+#include "dtwain_filesystem.h"
 
 namespace dynarithmic
 {

@@ -22,7 +22,6 @@
 #define CTLSUPPORT_H
 #include <algorithm>
 #include "dtwain.h"
-#include "ctliface.h"
 #include "ctlsetgetcaps.h"
 #include "ctlcapcontainerfuncs.h"
 

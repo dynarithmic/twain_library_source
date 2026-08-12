@@ -22,6 +22,7 @@
 #include "errorcheck.h"
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
+#include "dtwainx.h"
 
 using namespace dynarithmic;
 

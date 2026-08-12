@@ -19,13 +19,14 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <cmath>
+#include <array>
 #include "winbit32.h"
-#include "ctliface.h"
 #include "ctlconstexprfind.h"
 #include "resample24to8.h"
 #include "dibutil.h"
 #include "ctldevicecontext.h"
 #include "ctlglobalhandletraits.h"
+#include "dtwaindefs.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4244)

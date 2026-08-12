@@ -27,6 +27,7 @@
 #include "ctlsetgetcaps.h"
 #include "ctldtwainhandle.h"
 #include "ctlsourceacquire.h"
+#include "ctltwaindllhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

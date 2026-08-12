@@ -25,6 +25,7 @@
 #include <errorcheck.h>
 #include "ctldtwainhandle.h"
 #include "ctltwainlogging.h"
+#include "dtwainx.h"
 
 using namespace dynarithmic;
 

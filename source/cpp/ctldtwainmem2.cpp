@@ -19,10 +19,10 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "winbit32.h"
-#include "ctliface.h"
 #include "cppfunc.h"
 #include "ctldtwainhandle.h"
 #include "ctltwainlogging.h"
+#include "ctltwaindllhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

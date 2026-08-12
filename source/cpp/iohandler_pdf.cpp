@@ -20,7 +20,6 @@
  */
 #include <array>
 #include "arrayfactory.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "logwriterutils.h"
@@ -31,6 +30,8 @@
 #include "ctlguidimpl.h"
 #include "ctltwaindllpath.h"
 #include "ctlglobalhandletraits.h"
+#include "dtwainx.h"
+#include "dtwain_resource_constants2.h"
 
 using namespace dynarithmic;
 

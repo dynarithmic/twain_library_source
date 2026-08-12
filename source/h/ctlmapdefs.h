@@ -30,8 +30,8 @@
 #include <memory>
 #include "ctlsourceinfo.h"
 #include "twain.h"
-#include "capstruc.h"
 #include "mapdefs.h"
+#include "capstructdefs.h"
 
 namespace dynarithmic
 {

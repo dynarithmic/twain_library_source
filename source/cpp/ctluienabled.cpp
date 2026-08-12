@@ -22,10 +22,10 @@
 #pragma warning (disable:4702)
 #endif
 #include "cppfunc.h"
-#include "ctliface.h"
 #include "dtwtype.h"
 #include "winconst.h"
 #include "ctldtwainhandle.h"
+#include "ctltwainsource.h"
 
 using namespace dynarithmic;
 

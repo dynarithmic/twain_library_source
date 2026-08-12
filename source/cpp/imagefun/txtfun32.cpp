@@ -26,6 +26,11 @@
 #include "iohandler_tiff.h"
 #include "ctlguidimpl.h"
 #include "ctltwaindllpath.h"
+#include "ctlstringconversion.h"
+#include "ctltwainsource.h"
+#include "logwriterutils.h"
+#include "ctlloadresources.h"
+#include "dtwain_resource_constants2.h"
 
 using namespace dynarithmic;
 bool CTextImageHandler::OpenOutputFile(LPCTSTR pFileName)

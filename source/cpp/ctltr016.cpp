@@ -19,6 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr016.h"
+#include "ctltwaindllhandle.h"
 
 using namespace dynarithmic;
 

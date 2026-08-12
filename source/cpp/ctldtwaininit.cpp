@@ -26,32 +26,33 @@
 #include <set>
 #include <vector>
 
-#include "cppfunc.h"
-#include "ctltwainmanager.h"
-#include "ctlloadresources.h"
-#include "../dtwinver/dtwinverex.h"
-#include "errorcheck.h"
-#include "dtwstrfn.h"
-#include "ctlfileutils.h"
-#include "ctlthreadutils.h"
-#include "arrayfactory.h"
-#include "ctltwainmsgloop.h"
-#include "ctldefsource.h"
-#include "ctlclosesource.h"
-#include "ctlguiddef.h"
-#include "ctlwindowsimpl.h"
-#include "ctlguidimpl.h"
-#include "ctlstringutilsx.h"
-#include "windowsinit_impl.h"
-
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
     #pragma comment (lib, "shlwapi")
 #endif
-#include <ctllogsourcecaps.h>
+#include "ctllogsourcecaps.h"
 #include "ctlgetversion.h"
 #include "ctltwainlogging.h"
 #include "ctldtwainhandle.h"
+#include "ctlstringutils.h"
+#include "ctlthreadutils.h"
+#include "dtwain_version.h"
+#include "cppfunc.h"
+#include "ctlwindowsimpl.h"
+#include "ctlguiddef.h"
+#include "ctltwaindllhandle.h"
+#include "dtwainx.h"
+#include <arrayfactory.h>
+#include "ctlfileutils.h"
+#include "ctlguidimpl.h"
+#include "ctltwaindllpath.h"
+#include "ctldefsource.h"
+#include "windowsinit_impl.h"
+#include "ctltwainsource.h"
+#include "ctltwainmanager.h"
+#include "ctlclosesource.h"
+#include "errorcheck.h"
+
 #ifdef _WIN64
     #pragma message ("Compiling 64-bit DTWAIN")
 #else
@@ -89,17 +90,6 @@ namespace dynarithmic
     {
     }
         
-    std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle)
-    {
-        std::vector<CTL_ITwainSource*> vSources;
-        for (auto& pr : pHandle->m_mapStringToSource)
-        {
-            if (pr.second->IsOpened())
-                vSources.push_back(pr.second);
-        }
-        return vSources;
-    }
-
     HMODULE GetDLLInstance()
     {
         #ifdef _WIN32

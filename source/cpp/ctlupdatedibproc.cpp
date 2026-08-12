@@ -19,10 +19,12 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctliface.h"
 #include "dtwainc.h"
 #include "ctldtwainhandle.h"
 #include "ctltwainlogging.h"
+#include "ctltwaindllhandle.h"
+#include "winbit32.h"
+#include "ctltwainsource.h"
 using namespace dynarithmic;
 
 extern "C"

@@ -23,6 +23,8 @@
 #include "ctlsupport.h"
 #include "ctlsetgetcaps.h"
 #include "ctlstringutilsx.h"
+#include "ctltwaindllhandle.h"
+#include "ctltwainsource.h"
 
 using namespace dynarithmic;
 

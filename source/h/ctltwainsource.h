@@ -26,7 +26,6 @@
 #include <array>
 #include <map>
 
-#include "ctliface.h"
 #include "ctlarray.h"
 #include "ctldib.h"
 #include "ctlenum.h"
@@ -40,6 +39,7 @@
 #include "sourceacquireopts.h"
 #include "ctlguiddef.h"
 #include "mapdefs.h"
+#include "fltrect.h"
 
 namespace dynarithmic
 {
@@ -755,5 +755,7 @@ namespace dynarithmic
         int     m_nFeederWaitTime;
         int     m_nFeederWaitTimeOption;
     };
+
+    using CTL_ITwainSourcePtr = CTL_ITwainSource*;
 }
 #endif

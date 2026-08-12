@@ -27,11 +27,11 @@
 #include <mutex>
 #include <map>
 #include <vector>
+#include <tchar.h>
 #include "ctlstringdefs.h"
 #include "ctlmapdefs.h"
 #include "logmsg.h"
 #include "SimpleIni.h"
-#include "capstruc.h"
 #include "ctltwaindecoder.h"
 #include "pdffont_basic.h"
 #include "ctlfilesavedefs.h"

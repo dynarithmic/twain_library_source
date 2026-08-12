@@ -32,6 +32,8 @@
 #include "ctldtwainhandle.h"
 #include "ctltwaindllpath.h"
 #include "ctltwainlogging.h"
+#include "dtwainx.h"
+#include "windowsinit_impl.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;

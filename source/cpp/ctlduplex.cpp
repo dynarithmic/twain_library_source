@@ -22,6 +22,10 @@
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
 #include "ctldtwainhandle.h"
+#include "ctltwaindllhandle.h"
+#include "ctltwainsource.h"
+#include "dtwainx.h"
+
 using namespace dynarithmic;
 
 namespace

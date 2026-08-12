@@ -22,10 +22,14 @@ OF THIRD PARTY RIGHTS.
 #include "monitorutils.h"
 #include "dtwaindefs.h"
 #include "ctlsourceselect.h"
-#include "ctliface.h"
 #include "cppfunc.h"
 #include "ctldtwainhandle.h"
 #include "ctltwainlogging.h"
+#include "ctlinternalconstants.h"
+#include "ctltwaindllhandle.h"
+#include "windowsinit_impl.h"
+#include "dtwainx.h"
+#include "ctliface.h"
 
 namespace dynarithmic
 {

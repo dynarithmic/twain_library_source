@@ -87,8 +87,8 @@
         #define  TWAINDLL_VERSION1  "TWAIN_32.DLL"
         #define  TWAINDLL_VERSION2  "TWAINDSM.DLL"
     #else
-        #define  TWAINDLLVERSION_1    ""
-        #define  TWAINDLLVERSION_2    "/usr/local/lib/libtwaindsm.so"
+        #define  TWAINDLL_VERSION1    ""
+        #define  TWAINDLL_VERSION2    "/usr/local/lib/libtwaindsm.so"
     #endif
 
     #define DTWAIN_SHORT_VERSION DTWAIN_VERINFO_FILEVERSION DTWAIN_OSPLATFORMEX UNICODE_VERSION

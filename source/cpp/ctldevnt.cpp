@@ -21,6 +21,7 @@
 #include <windows.h>
 #include "ctltripletbase.h"
 #include "ctldevnt.h"
+#include "ctltwaindllhandle.h"
 
 using namespace dynarithmic;
 

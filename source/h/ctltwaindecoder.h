@@ -24,6 +24,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <string>
+#include <boost/functional/hash.hpp>
 #include "twain.h"
 
 /* Structure types are as follows

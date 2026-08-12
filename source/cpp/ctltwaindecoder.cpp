@@ -25,6 +25,7 @@
 #include "ctltwaindecoder.h"
 #include "ctlglobalhandletraits.h"
 #include "ctlstaticdata.h"
+#include "dtwain_resource_constants2.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;

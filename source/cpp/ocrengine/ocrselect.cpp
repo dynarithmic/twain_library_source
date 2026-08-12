@@ -22,6 +22,7 @@
 #include "transym_ocrinterface.h"
 #include "errorcheck.h"
 #include "sourceselectopts.h"
+#include "dtwainx.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4505)

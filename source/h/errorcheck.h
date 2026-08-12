@@ -21,7 +21,6 @@
 #ifndef ERRORCHECK_H
 #define ERRORCHECK_H
 #include "cppfunc.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlstaticdata.h"
 

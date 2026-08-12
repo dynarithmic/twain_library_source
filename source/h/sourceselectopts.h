@@ -22,6 +22,8 @@
 #define SOURCESELECTOPTS_H
 
 #include "ctliface.h"
+#include "ctltwainsource.h"
+#include "ctltwaindllhandle.h"
 
 enum {SELECTSOURCE=1, SELECTDEFAULTSOURCE, SELECTSOURCEBYNAME, SELECTSOURCE2};
 

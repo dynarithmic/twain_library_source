@@ -34,6 +34,10 @@ OF THIRD PARTY RIGHTS.
 #include "ctlfileutils.h"
 #include "ctlthreadutils.h"
 #include "ctltwainlogging.h"
+#include "ctlstringconversion.h"
+#include "dtwain_resource_constants2.h"
+#include "ctlloadresources.h"
+#include "ctliface.h"
 
 using namespace dynarithmic;
 using namespace date;

@@ -21,6 +21,7 @@
 #include "ctltr011.h"
 #include "ctltwainmanager.h"
 #include "ctlstaticdata.h"
+#include "logwriterutils.h"
 using namespace dynarithmic;
 CTL_CapabilityGetTriplet::CTL_CapabilityGetTriplet(CTL_ITwainSession* pSession,
                                                     CTL_ITwainSource* pSource,

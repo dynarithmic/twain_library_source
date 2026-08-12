@@ -18,10 +18,11 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctliface.h"
+
 #include "resamplefactory.h"
 #include "ctldib32ex.h"
 #include "ctlstaticdata.h"
+#include "logwriterutils.h"
 
 namespace dynarithmic
 {

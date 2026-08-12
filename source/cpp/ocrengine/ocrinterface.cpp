@@ -24,6 +24,8 @@
 #include "ctlstringdefs.h"
 #include "ctlstringutilsx.h"
 #include "ctldtwainhandle.h"
+#include "dtwainx.h"
+#include "capconst.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4505)

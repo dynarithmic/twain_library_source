@@ -25,6 +25,8 @@
 #include "ctlarray.h"
 #include "ctlglobalhandletraits.h"
 #include "ctlstaticdata.h"
+#include "logwriterutils.h"
+#include "dtwain_resource_constants2.h"
 
 namespace dynarithmic
 {

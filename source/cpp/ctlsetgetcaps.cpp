@@ -29,6 +29,7 @@
 #include "ctlarraydumper.h"
 #include "ctlcapcontainerfuncs.h"
 #include "ctldtwainhandle.h"
+#include "dtwainx.h"
 
 using namespace dynarithmic;
 

@@ -20,9 +20,9 @@
  */
 #include "iohandler_bmp.h"
 #include "bmprlewriter.h"
-#include "ctliface.h"
 #include "ctldib32ex.h"
 #include "ctlglobalhandletraits.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

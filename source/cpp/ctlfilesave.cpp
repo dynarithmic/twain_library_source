@@ -19,10 +19,10 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctlfilesave.h"
-#include "ctliface.h"
 #include "cppfunc.h"
 #include "ctldtwainhandle.h"
 #include "ctlstaticdata.h"
+#include "ctltwaindllhandle.h"
 
 namespace dynarithmic
 {

@@ -27,6 +27,7 @@
 #include "ctlstringutilsx.h"
 #include "ctlcapcollect.h"
 #include "ctldtwainhandle.h"
+#include "dtwainx.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

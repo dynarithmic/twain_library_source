@@ -22,6 +22,7 @@
 #define WINDOWSINITIMPL_H
 #include "dtwain_standard_defs.h"
 #include "dtwainc.h"
+#include "winconst.h"
 
 namespace dynarithmic
 {
@@ -31,5 +32,16 @@ namespace dynarithmic
     void DTWAIN_InvokeCallback(int nWhich, DTWAIN_HANDLE p, DTWAIN_SOURCE pSource, WPARAM lData1, LPARAM lData2);
     DTWAIN_BOOL DTWAIN_SetCallbackProc(DTWAIN_CALLBACK fnCall, LONG nWhich);
     void DTWAIN_InvokeCallback( int nWhich, DTWAIN_HANDLE pHandle, DTWAIN_SOURCE pSource, WPARAM lData1, LPARAM lData2 );
+    void DTWAIN_AcquireProc(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, WPARAM Data1, LPARAM Data2);
+
+    #ifdef __cplusplus
+    extern "C" {
+    #endif
+    #ifdef _WIN32
+    LRESULT DLLENTRY_DEF DTWAIN_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    #endif
+    #ifdef __cplusplus
+    }
+    #endif
 }
 #endif

@@ -58,6 +58,8 @@
 #include "ctltwaindllpath.h"
 #include "ctltwainlogging.h"
 #include "ctlglobalhandletraits.h"
+#include "dtwain_resource_constants2.h"
+#include <dtwainx.h>
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;
