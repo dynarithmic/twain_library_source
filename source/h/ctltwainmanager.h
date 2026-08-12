@@ -29,7 +29,6 @@
 #include "ctlarray.h"
 #include "ctltwainsession.h"
 #include "ctlenum.h"
-#include "capstruc.h"
 #include "ctltwaindecoder.h"
 #include "ctltripletbase.h"
 #include "ctltr011.h"

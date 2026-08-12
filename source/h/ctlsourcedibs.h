@@ -27,6 +27,7 @@ namespace dynarithmic
 {
     class CTL_TwainDLLHandle;
     std::pair<bool, int> DestroyAcquisitionArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, bool bDestroyDibs);
+    DTWAIN_BOOL DTWAIN_GetAllSourceDibsInternal(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray);
 }
 #endif
 

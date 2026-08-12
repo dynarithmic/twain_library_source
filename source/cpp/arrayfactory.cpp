@@ -24,47 +24,51 @@
 #include "dtwtype.h"
 #include "ctliface.h"
 #include "ctlguidimpl.h"
+#include "ctltwaindllhandle.h"
+#include "ctlstringconversion.h"
+#include "ctlarray.h"
+using namespace dynarithmic;
+
+namespace
+{
+    template <typename ArraySourceT, typename ConversionFunc>
+    void ArrayToNativeArray(CTL_TwainDLLHandle* pHandle,
+        DTWAIN_ARRAY ArraySource,
+        DTWAIN_ARRAY ArrayDest,
+        int ArraySourceType,
+        ConversionFunc fn)
+    {
+        const auto& factory = pHandle->m_ArrayFactory;
+        const auto TypeSource = factory->tag_type(CTL_ArrayFactory::from_void(ArraySource));
+        const auto TypeDest = factory->tag_type(CTL_ArrayFactory::from_void(ArrayDest));
+        if (TypeSource != ArraySourceType)
+            return;
+        if (!(TypeDest == CTL_ArrayFactory::arrayTag::StringType || TypeDest == CTL_ArrayFactory::arrayTag::WStringType))
+            return;
+        const auto theSourceTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArraySource));
+        const auto theDestTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArrayDest));
+        auto& vSource = factory->underlying_container_t<typename ArraySourceT::value_type>(theSourceTag);
+        for (auto& str : vSource)
+        {
+            CTL_StringType sVal;
+            sVal = fn(str);
+            factory->add_to_back(theDestTag, &sVal, 1);
+        }
+    }
+}
 
 namespace dynarithmic
 {
-    namespace
-    {
-        template <typename ArraySourceT, typename ConversionFunc>
-        void ArrayToNativeArray(CTL_TwainDLLHandle* pHandle,
-            DTWAIN_ARRAY ArraySource,
-            DTWAIN_ARRAY ArrayDest,
-            int ArraySourceType,
-            ConversionFunc fn)
-        {
-            const auto& factory = pHandle->m_ArrayFactory;
-            const auto TypeSource = factory->tag_type(CTL_ArrayFactory::from_void(ArraySource));
-            const auto TypeDest = factory->tag_type(CTL_ArrayFactory::from_void(ArrayDest));
-            if (TypeSource != ArraySourceType)
-                return;
-            if (!(TypeDest == CTL_ArrayFactory::arrayTag::StringType || TypeDest == CTL_ArrayFactory::arrayTag::WStringType))
-                return;
-            const auto theSourceTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArraySource));
-            const auto theDestTag = static_cast<CTL_ArrayFactory::arrayTag*>(DTWAIN_ARRAY_TO_VOID(ArrayDest));
-            auto& vSource = factory->underlying_container_t<typename ArraySourceT::value_type>(theSourceTag);
-            for (auto& str : vSource)
-            {
-                CTL_StringType sVal;
-                sVal = fn(str);
-                factory->add_to_back(theDestTag, &sVal, 1);
-            }
-        }
-    }
-
     void ArrayCopyWideToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
     {
         ArrayToNativeArray<CTL_ArrayFactory::tagged_array_wstring>(pHandle, ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::WStringType,
-            [](const std::wstring& val) { return StringConversion::Convert_Wide_To_Native(val); });
+            [](const std::wstring& val) { return stringconversion::Convert_Wide_To_Native(val); });
     }
 
     void ArrayCopyAnsiToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
     {
         ArrayToNativeArray<CTL_ArrayFactory::tagged_array_string>(pHandle, ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::StringType,
-            [](const std::string& val) { return StringConversion::Convert_Ansi_To_Native(val); });
+            [](const std::string& val) { return stringconversion::Convert_Ansi_To_Native(val); });
     }
 
     std::shared_ptr<CTL_ArrayFactory>& GetArrayFactoryFromHandle(CTL_TwainDLLHandle* pHandle)
@@ -318,7 +322,7 @@ namespace dynarithmic
         }
         if (pNewArray)
         {
-            auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
+            auto& guidMap = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
             guidMap.Insert(GetGUIDImpl<std::string>(), pNewArray);
         }
         return pNewArray;
@@ -388,7 +392,7 @@ namespace dynarithmic
         const auto iter = m_tagMap.find(pTag);
         if (iter != m_tagMap.end())
             m_tagMap.erase(iter);
-        auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
+        auto& guidMap = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
         guidMap.EraseRight(pTag);
     }
 

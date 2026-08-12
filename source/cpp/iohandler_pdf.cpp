@@ -20,7 +20,6 @@
  */
 #include <array>
 #include "arrayfactory.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "logwriterutils.h"
@@ -29,9 +28,12 @@
 #include "pdffun32.h"
 #include "ctldib32ex.h"
 #include "ctlguidimpl.h"
+#include "ctltwaindllpath.h"
+#include "ctlglobalhandletraits.h"
+#include "dtwainx.h"
+#include "dtwain_resource_constants2.h"
 
 using namespace dynarithmic;
-namespace stringutils = dynarithmic::basicstringutils;
 
 namespace
 {
@@ -217,7 +219,7 @@ namespace
 
         // test scaling of normal PDF page
         AllPDFDimensions pdfdims;
-        auto it = dynarithmic::generic_array_finder_if(pdfdims.m_mediamap, [&](const auto& pr) { return pr.first == imageInfoEx.PDFPageSize; });
+        auto it = generic_array_finder_if(pdfdims.m_mediamap, [&](const auto& pr) { return pr.first == imageInfoEx.PDFPageSize; });
         if (it.first)
         {
             double d1, d2, d3, d4;
@@ -258,7 +260,7 @@ namespace
         //  c) All other text info fields are "static"
         std::vector<unsigned> PositionVec;
         StringArray strArray;
-        stringutils::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
+        basicstringutils::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
         PDFStringToTextElement pMap;
         pMap.reserve(strArray.size());
         PDFTextElement element;
@@ -341,7 +343,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                 if ( m_pDib->GetDepth() > 1 )
                 {
                     szTempFile += GetGUID() + _T(".JPG");
-                    auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
+                    auto szTempFileA = stringconversion::Convert_Native_To_Ansi(szTempFile);
                     LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA);
 
                     // Create a JPEG
@@ -350,7 +352,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                     if ( bRet != 0 )
                     {
                         LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempFileA);
-                        dynarithmic::fileutils::delete_file(szTempFile.c_str());
+                        fileutils::delete_file(szTempFile.c_str());
                         return bRet;
                     }
                     else
@@ -362,7 +364,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                 {
                     DibMultiPageStruct dps = {};
                     szTempFile += GetGUID() + _T(".TIF");
-                    auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
+                    auto szTempFileA = stringconversion::Convert_Native_To_Ansi(szTempFile);
 
                     LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA);
 
@@ -390,9 +392,9 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
         {
             // call splitpath
             CTL_StringArrayType pathValues;
-            dynarithmic::filenameutils::SplitPath(m_ImageInfoEx.szImageFileName, pathValues);
+            filenameutils::SplitPath(m_ImageInfoEx.szImageFileName, pathValues);
             szTempFile = m_ImageInfoEx.szImageFileName;
-            if ( stringutils::CompareNoCase<CTL_StringType>(pathValues[dynarithmic::filenameutils::EXTENSION_POS], _T("TIF")))
+            if ( basicstringutils::CompareNoCase<CTL_StringType>(pathValues[filenameutils::EXTENSION_POS], _T("TIF")))
                 PDFHandler.SetImageType(1);
             else
                 PDFHandler.SetImageType(0);
@@ -420,7 +422,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
             CTL_TwainAppMgr::SendTwainMsgToWindow(m_ImageInfoEx.theSession, nullptr,
                 DTWAIN_TN_PDFOCRERROR, reinterpret_cast<LPARAM>(m_ImageInfoEx.theSource));
             bRet = DTWAIN_ERR_OCR_RECOGNITIONERROR;
-            dynarithmic::fileutils::delete_file(szTempFile.c_str());
+            fileutils::delete_file(szTempFile.c_str());
         }
         else
         {
@@ -496,7 +498,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
 
     if ( bRet != 0 )
     {
-        dynarithmic::fileutils::delete_file( szTempFile.c_str() );
+        fileutils::delete_file( szTempFile.c_str() );
     }
 
     if ( pMultiPageStruct )
@@ -645,11 +647,11 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
 
                 // Delete the temp file if we created one
                 if ( bMustConvert )
-                    dynarithmic::fileutils::delete_file(sFileToUse.c_str());
+                    fileutils::delete_file(sFileToUse.c_str());
 
                 if ( bSave )
                 {
-                    sText = StringConversion::Convert_Native_To_Ansi(charBuffer.data(), charBuffer.size());
+                    sText = stringconversion::Convert_Native_To_Ansi(charBuffer.data(), charBuffer.size());
                     return 0;
                 }
                 else

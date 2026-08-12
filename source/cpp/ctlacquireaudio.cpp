@@ -23,83 +23,88 @@
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
 #include "acquisitionarray.h"
+#include "ctldtwainhandle.h"
+#include "ctlsourceacquire.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG nMaxAudioClips,
-                                                    DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
-    VerifyHandles(Source);
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG nMaxAudioClips,
+                                                        DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
+        VerifyHandles(Source);
 
-    DTWAIN_ARRAY Acquisitions = DTWAIN_CreateAcquisitionArray();
-    AcquisitionArrayRAII raii(Acquisitions, false);
-    if (DTWAIN_AcquireAudioNativeEx(Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus))
-        raii.bDestroy = false;
+        DTWAIN_ARRAY Acquisitions = DTWAIN_CreateAcquisitionArray();
+        AcquisitionArrayRAII raii(Acquisitions, false);
+        if (DTWAIN_AcquireAudioNativeEx(Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus))
+            raii.bDestroy = false;
 
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(Acquisitions)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(Acquisitions)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG nMaxAudioClips, DTWAIN_BOOL bShowUI,
-                                                     DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions, LPLONG pStatus)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG nMaxAudioClips, DTWAIN_BOOL bShowUI,
+                                                         DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions, LPLONG pStatus)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus))
+        auto [pHandle, pSource] = VerifyHandles(Source);
 
-    // Check if audio transfers are supported
-    auto val = pSource->IsAudioTransferSupported();
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
+        // Check if audio transfers are supported
+        auto val = pSource->IsAudioTransferSupported();
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
 
-    auto ret = dynarithmic::AcquireHelper(pHandle, pSource, 
-                                                    ACQUIREAUDIONATIVEEX, false, 
-                                                  0, false, Acquisitions, 
-                                                      0, nMaxAudioClips, bShowUI, nullptr, pStatus);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(ret.second)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+        auto ret = AcquireHelper(pHandle, pSource, 
+                                 ACQUIREAUDIONATIVEEX, false, 
+                                 0, false, Acquisitions, 
+                                 0, nMaxAudioClips, bShowUI, nullptr, pStatus);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(ret.second)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR lpszFile, LONG lFileFlags,
-                                                  LONG nMaxAudioClips, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileFlags, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR lpszFile, LONG lFileFlags,
+                                                      LONG nMaxAudioClips, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileFlags, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
+        auto [pHandle, pSource] = VerifyHandles(Source);
 
-    // Check if audio transfers are supported
-    auto val = pSource->IsAudioTransferSupported();
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
+        // Check if audio transfers are supported
+        auto val = pSource->IsAudioTransferSupported();
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
 
-    lFileFlags &= ~DTWAIN_USELIST;
+        lFileFlags &= ~DTWAIN_USELIST;
 
-    FileAcquireOptions fileOps = {};
-    fileOps.fileFlags = lFileFlags &= ~DTWAIN_USELIST;
-    fileOps.fileList = nullptr;
-    fileOps.fileName = lpszFile;
+        FileAcquireOptions fileOps = {};
+        fileOps.fileFlags = lFileFlags &= ~DTWAIN_USELIST;
+        fileOps.fileList = nullptr;
+        fileOps.fileName = lpszFile;
     
-    const bool bRetval = dynarithmic::AcquireHelper(pHandle, pSource, 
-        ACQUIREAUDIOFILE,false,0,false,
-        nullptr,0,nMaxAudioClips,bShowUI, &fileOps, pStatus).second;
+        const bool bRetval = AcquireHelper(pHandle, pSource, 
+            ACQUIREAUDIOFILE,false,0,false,
+            nullptr,0,nMaxAudioClips,bShowUI, &fileOps, pStatus).second;
 
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
-    CATCH_BLOCK_LOG_PARAMS(false)
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }
-
-DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireAudioNative(SourceAcquireOptions& opts)
+namespace dynarithmic
 {
-    opts.setActualAcquireType(TWAINAcquireType_AudioNative);
-    return LLAcquireImage(opts);
-}
+    DTWAIN_ACQUIRE DTWAIN_LLAcquireAudioNative(SourceAcquireOptions& opts)
+    {
+        opts.setActualAcquireType(TWAINAcquireType_AudioNative);
+        return LLAcquireImage(opts);
+    }
 
-DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireAudioFile(SourceAcquireOptions& opts)
-{
-    opts.setActualAcquireType(TWAINAcquireType_AudioFile);
-    return DTWAIN_LLAcquireFile(opts);
+    DTWAIN_ACQUIRE DTWAIN_LLAcquireAudioFile(SourceAcquireOptions& opts)
+    {
+        opts.setActualAcquireType(TWAINAcquireType_AudioFile);
+        return DTWAIN_LLAcquireFile(opts);
+    }
 }
-

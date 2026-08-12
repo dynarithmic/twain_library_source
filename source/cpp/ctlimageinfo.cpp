@@ -22,17 +22,50 @@
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "ctltr025.h"
+#include "ctlstringdefs.h"
+#include "ctldtwainhandle.h"
+#include "dtwainx.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
-using namespace dynarithmic;
 namespace stringutils = dynarithmic::basicstringutils;
-using CharType = CTL_StringType::value_type;
+using CharType = TCHAR;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
-                                                LPTSTR XResolution,
-                                                LPTSTR YResolution,
+using namespace dynarithmic;
+extern "C"
+{
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
+                                                    LPTSTR XResolution,
+                                                    LPTSTR YResolution,
+                                                    LPLONG Width,
+                                                    LPLONG Length,
+                                                    LPLONG NumSamples,
+                                                    LPDTWAIN_ARRAY BitsPerSample,
+                                                    LPLONG BitsPerPixel,
+                                                    LPLONG Planar,
+                                                    LPLONG PixelType,
+                                                    LPLONG Compression)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, XResolution, YResolution, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression))
+
+        DTWAIN_FLOAT tempX;
+        DTWAIN_FLOAT tempY;
+        const DTWAIN_BOOL retVal = DTWAIN_GetImageInfo(Source, &tempX, &tempY, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression);
+        if (retVal)
+        {
+            stringutils::SafeStrcpy(XResolution, stringutils::TrimDouble<CTL_StringType>(tempX).c_str(), 255);
+            stringutils::SafeStrcpy(YResolution, stringutils::TrimDouble<CTL_StringType>(tempY).c_str(), 255);
+        }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution))
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
+                                                LPDTWAIN_FLOAT XResolution,
+                                                LPDTWAIN_FLOAT YResolution,
                                                 LPLONG Width,
                                                 LPLONG Length,
                                                 LPLONG NumSamples,
@@ -41,112 +74,86 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
                                                 LPLONG Planar,
                                                 LPLONG PixelType,
                                                 LPLONG Compression)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, XResolution, YResolution, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression))
-
-    DTWAIN_FLOAT tempX;
-    DTWAIN_FLOAT tempY;
-    const DTWAIN_BOOL retVal = DTWAIN_GetImageInfo(Source, &tempX, &tempY, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression);
-    if (retVal)
     {
-        stringutils::SafeStrcpy(XResolution, stringutils::TrimDouble<CTL_StringType>(tempX).c_str(), 255);
-        stringutils::SafeStrcpy(YResolution, stringutils::TrimDouble<CTL_StringType>(tempY).c_str(), 255);
-    }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution))
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(false)
-}
+        LOG_FUNC_ENTRY_PARAMS((Source, XResolution, YResolution, Width, Length, NumSamples, BitsPerSample,BitsPerPixel, Planar, PixelType, Compression))
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
-                                            LPDTWAIN_FLOAT XResolution,
-                                            LPDTWAIN_FLOAT YResolution,
-                                            LPLONG Width,
-                                            LPLONG Length,
-                                            LPLONG NumSamples,
-                                            LPDTWAIN_ARRAY BitsPerSample,
-                                            LPLONG BitsPerPixel,
-                                            LPLONG Planar,
-                                            LPLONG PixelType,
-                                            LPLONG Compression)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, XResolution, YResolution, Width, Length, NumSamples, BitsPerSample,BitsPerPixel, Planar, PixelType, Compression))
+        auto [pHandle, p] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        CTL_ImageInfoTriplet II(pHandle->m_pTwainSession, p);
 
-    auto [pHandle, p] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    CTL_ImageInfoTriplet II(pHandle->m_pTwainSession, p);
+        // Call TWAIN to get the information
+        auto bOk = CTL_TwainAppMgr::GetImageInfo(p, &II);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bOk; }, DTWAIN_ERR_IMAGEINFO_INVALID, false, FUNC_MACRO);
 
-    // Call TWAIN to get the information
-    auto bOk = CTL_TwainAppMgr::GetImageInfo(p, &II);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bOk; }, DTWAIN_ERR_IMAGEINFO_INVALID, false, FUNC_MACRO);
+        // Retrieve the image information.
+        TW_IMAGEINFO *pInfo = II.GetImageInfoBuffer();
+        if (XResolution)
+            *XResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(pInfo->XResolution));
+        if (YResolution)
+            *YResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(pInfo->YResolution));
+        if (Width)
+            *Width = pInfo->ImageWidth;
+        if (Length)
+            *Length = pInfo->ImageLength;
+        if (NumSamples)
+            *NumSamples = pInfo->SamplesPerPixel;
+        if (BitsPerPixel)
+            *BitsPerPixel = pInfo->BitsPerPixel;
 
-    // Retrieve the image information.
-    TW_IMAGEINFO *pInfo = II.GetImageInfoBuffer();
-    if (XResolution)
-        *XResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(pInfo->XResolution));
-    if (YResolution)
-        *YResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(pInfo->YResolution));
-    if (Width)
-        *Width = pInfo->ImageWidth;
-    if (Length)
-        *Length = pInfo->ImageLength;
-    if (NumSamples)
-        *NumSamples = pInfo->SamplesPerPixel;
-    if (BitsPerPixel)
-        *BitsPerPixel = pInfo->BitsPerPixel;
-
-    if (BitsPerSample)
-    {
-        auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 8);
-        if (retValue.second)
+        if (BitsPerSample)
         {
-            auto Array = retValue.second;
-            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
-            TW_INT16* pStart = &pInfo->BitsPerSample[0];
-            TW_INT16* pEnd = &pInfo->BitsPerSample[8];
-            std::copy(pStart, pEnd, vValues.begin());
-            MoveArray(pHandle, BitsPerSample, &Array);
+            auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 8);
+            if (retValue.second)
+            {
+                auto Array = retValue.second;
+                auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
+                TW_INT16* pStart = &pInfo->BitsPerSample[0];
+                TW_INT16* pEnd = &pInfo->BitsPerSample[8];
+                std::copy(pStart, pEnd, vValues.begin());
+                MoveArray(pHandle, BitsPerSample, &Array);
+            }
+            else
+                *BitsPerSample = nullptr;
         }
-        else
-            *BitsPerSample = nullptr;
+
+        if (Planar)
+            *Planar = pInfo->Planar;
+
+        if (PixelType)
+            *PixelType = pInfo->PixelType;
+
+        if (Compression)
+            *Compression = pInfo->Compression;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression))
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
     }
 
-    if (Planar)
-        *Planar = pInfo->Planar;
 
-    if (PixelType)
-        *PixelType = pInfo->PixelType;
-
-    if (Compression)
-        *Compression = pInfo->Compression;
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression))
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-
-HANDLE DLLENTRY_DEF DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source, 
-                                                   LPDWORD Compression, 
-                                                   LPDWORD BytesPerRow, 
-                                                   LPDWORD Columns, 
-                                                   LPDWORD Rows, 
-                                                   LPDWORD XOffset, 
-                                                   LPDWORD YOffset,
-                                                   LPDWORD Flags, 
-                                                   LPDWORD BytesWritten,
-                                                   LPDWORD MemoryLength)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    auto& memxferInfo = pSource->GetBufferedXFerInfo();
-    std::array<LPDWORD, 9> userVals = { Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength };
-    std::array<TW_UINT32, 9> xferVals = { memxferInfo.Compression, memxferInfo.BytesPerRow, memxferInfo.Columns, memxferInfo.Rows,
-                                          memxferInfo.XOffset, memxferInfo.YOffset, memxferInfo.BytesWritten, memxferInfo.Memory.Flags, 
-                                          memxferInfo.Memory.Length };
-    for (size_t i = 0; i < userVals.size(); ++i)
+    HANDLE DLLENTRY_DEF DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source, 
+                                                       LPDWORD Compression, 
+                                                       LPDWORD BytesPerRow, 
+                                                       LPDWORD Columns, 
+                                                       LPDWORD Rows, 
+                                                       LPDWORD XOffset, 
+                                                       LPDWORD YOffset,
+                                                       LPDWORD Flags, 
+                                                       LPDWORD BytesWritten,
+                                                       LPDWORD MemoryLength)
     {
-        if (userVals[i])
-            *(userVals[i]) = xferVals[i];
+        LOG_FUNC_ENTRY_PARAMS((Source, Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        auto& memxferInfo = pSource->GetBufferedXFerInfo();
+        std::array<LPDWORD, 9> userVals = { Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength };
+        std::array<TW_UINT32, 9> xferVals = { memxferInfo.Compression, memxferInfo.BytesPerRow, memxferInfo.Columns, memxferInfo.Rows,
+                                              memxferInfo.XOffset, memxferInfo.YOffset, memxferInfo.BytesWritten, memxferInfo.Memory.Flags, 
+                                              memxferInfo.Memory.Length };
+        for (size_t i = 0; i < userVals.size(); ++i)
+        {
+            if (userVals[i])
+                *(userVals[i]) = xferVals[i];
+        }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
+        LOG_FUNC_EXIT_NONAME_PARAMS(memxferInfo.Memory.TheMem)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
     }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
-    LOG_FUNC_EXIT_NONAME_PARAMS(memxferInfo.Memory.TheMem)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }

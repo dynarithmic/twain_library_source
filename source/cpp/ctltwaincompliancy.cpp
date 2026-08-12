@@ -23,6 +23,7 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
+#include "ctlcapcontainerfuncs.h"
 
 using namespace dynarithmic;
 

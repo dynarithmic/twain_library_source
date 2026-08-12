@@ -24,7 +24,7 @@ using namespace dynarithmic;
 
 
 // Unused
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainTimeout( LONG milliseconds )
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainTimeout( LONG milliseconds )
 {
     LOG_FUNC_ENTRY_PARAMS((milliseconds))
     #if 0
@@ -38,7 +38,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainTimeout( LONG milliseconds )
 }
 
 // Unused
-LONG DLLENTRY_DEF DTWAIN_GetTwainTimeout()
+extern "C" LONG DLLENTRY_DEF DTWAIN_GetTwainTimeout()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     #if 0

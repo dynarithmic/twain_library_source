@@ -29,7 +29,7 @@ OF THIRD PARTY RIGHTS.
 #include "JXRGlue.h"
 #include "ctlstringconversion.h"
 #include "imagefilewriterbase.h"
-
+#include "ctlstringutils.h"
 namespace dynarithmic
 {
     // ============================================================
@@ -137,7 +137,7 @@ namespace dynarithmic
             WMPStream* raw = nullptr;
 
             // Common jxrlib glue helper
-            std::string narrowFilename = StringConversion::Convert_WidePtr_To_Ansi(filename);
+            std::string narrowFilename = basicstringutils::Narrow(filename);
             ERR err = CreateWS_File(&raw, narrowFilename.c_str(), "wb");
             if (err != WMP_errSuccess || !raw)
                 return err;

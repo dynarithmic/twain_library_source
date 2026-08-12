@@ -36,6 +36,7 @@
 #include "ctlstringdefs.h"
 #include "tiffio.h"
 #include "ctliface.h"
+#include "ctlmapdefs.h"
 namespace dynarithmic
 {
     typedef CTL_PDFMediaMap MediaBoxMap;

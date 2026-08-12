@@ -22,7 +22,7 @@
 #define CTLTR031_H
 
 #include "ctltr026.h"
-#include "ctliface.h"
+#include "ctltwainmemoryimpl.h"
 
 namespace dynarithmic
 {

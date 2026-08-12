@@ -37,6 +37,15 @@ namespace dynarithmic
   using CTL_ITwainSessionPtr = std::unique_ptr<CTL_ITwainSession>;
   using CTL_TwainSourceSet = std::unordered_set<CTL_ITwainSource*>;
 
+    // RAII class to close a TWAIN session locally
+    struct SessionCloserRAII
+    {
+        bool bMustClose;
+        SessionCloserRAII(bool bClose) : bMustClose(bClose) {}
+        ~SessionCloserRAII();
+    };
+
+
   class CTL_ITwainSession
   {
     public:

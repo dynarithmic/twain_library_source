@@ -18,12 +18,11 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <windows.h>
+#include <fstream>
 #include "ctlfileutils.h"
-#include "dtwain_filesystem.h"
 #include "ctlwindowsimpl.h"
 #include "ctlguidimpl.h"
-
+#include "ctlstringconversion.h"
 namespace dynarithmic
 {
     namespace fileutils
@@ -117,7 +116,7 @@ namespace dynarithmic
         {
             auto parentDir = get_parent_directory(filename);
             auto guidName = parentDir + GetGUID();
-            std::ofstream testStream(StringConversion::Convert_Native_To_Ansi(guidName, guidName.length()));
+            std::ofstream testStream(stringconversion::Convert_Native_To_Ansi(guidName, guidName.length()));
             if (testStream.is_open())
             {
                 testStream.close();

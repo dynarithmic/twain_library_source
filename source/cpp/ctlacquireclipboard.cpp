@@ -22,6 +22,8 @@
 #include "ctltwainmanager.h"
 #include "sourceacquireopts.h"
 #include "acquisitionarray.h"
+#include "ctldtwainhandle.h"
+#include "ctltwainlogging.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -54,8 +56,8 @@ namespace
     }
 }
 
-DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,
-                                                     LPLONG pStatus)
+extern "C" DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,
+                                                                LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, nTransferMode, bDiscardDibs, bShowUI, bCloseSource, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
@@ -69,9 +71,9 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG 
     if (nTransferMode == DTWAIN_USENATIVE)
         actualAcquireMode = ACQUIRENATIVEEX;
 
-    bool bRet = dynarithmic::AcquireHelper(pHandle, pSource, actualAcquireMode, bDiscardDibs, 
-                                       nTransferMode, true, 
-                                       aDibs, PixelType, nMaxPages, bShowUI,nullptr, pStatus).second;
+    bool bRet = AcquireHelper(pHandle, pSource, actualAcquireMode, bDiscardDibs, 
+                              nTransferMode, true, 
+                              aDibs, PixelType, nMaxPages, bShowUI,nullptr, pStatus).second;
     if (bRet)
     {
         LONG numAcquisitions = DTWAIN_GetNumAcquisitions(aDibs);

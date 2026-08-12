@@ -18,14 +18,18 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CAPSTRUCT_H
-#define CAPSTRUCT_H
+#ifndef CAPSTRUCTDEFS_H
+#define CAPSTRUCTDEFS_H
 
-#include <boost/container/flat_map.hpp>
+#include <string>
+#include <memory>
+
 #include "ctlenum.h"
 #include "twain.h"
 #include "winconst.h"
 #include "ctltmpl4.h"
+#include "mapdefs.h"
+#include "ctlstringdefs.h"
 
 namespace dynarithmic
 {
@@ -46,7 +50,7 @@ namespace dynarithmic
             operator std::string() const;
     };
 
-    typedef boost::container::flat_map<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;
+    typedef BASIC_MAPTYPE_<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;
 
     typedef CTL_ClassValues10<TW_UINT16 ,/* Capability*/
         UINT, /* Container for Get */
@@ -59,5 +63,25 @@ namespace dynarithmic
         UINT,  /* Container for Reset */
         UINT                 /* Container for Query Support*/
     > CTL_CapInfo;
+
+    typedef BASIC_MAPTYPE_<TW_UINT16 , CTL_CapInfo>  CTL_CapInfoMap;
+    typedef std::shared_ptr<CTL_CapInfoMap> CTL_CapInfoMapPtr;
+
+    // Create this statically when initializing.  Initialize the second
+    // value with the dynamically created CTL_CapInfoMap above
+    typedef CTL_ClassValues10<CTL_StringType, /* Product Name */
+                             CTL_CapInfoMapPtr, /* Array of cap info*/
+                             int,       /* dummy */
+                             int,        /* dummy */
+                             char,
+                             char,
+                             char,
+                             char,
+                             char,
+                             char> CTL_SourceCapInfo;
+
+    class CTL_TwainDLLHandle;
+    class CTL_ITwainSource;
+    CTL_CapInfoMapPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p);
 }
 #endif

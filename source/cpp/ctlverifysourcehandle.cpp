@@ -23,14 +23,15 @@
 #pragma warning (disable:4702)
 #endif
 #include "cppfunc.h"
-#include "ctliface.h"
+#include "ctldtwainhandle.h"
+#include "ctlstaticdata.h"
 #include "ctltwainmanager.h"
 #include "dtwtype.h"
 #include "winconst.h"
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
 {
     LOG_FUNC_ENTRY_PARAMS((bCheck))
     CTL_StaticData::SetCheckHandles(bCheck ? true : false);
@@ -38,10 +39,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
     CATCH_BLOCK(false)
 }
 
-namespace dynarithmic
+namespace
 {
 
-    static bool DTWAIN_Check_Bad_Handle_Ex2(CTL_TwainDLLHandle* pHandle, const std::string::value_type* fnName)
+    bool DTWAIN_Check_Bad_Handle_Ex2(CTL_TwainDLLHandle* pHandle, const std::string::value_type* fnName)
     {
         if (CTL_StaticData::IsCheckHandles() && !IsDLLHandleValid(pHandle, false))
         {
@@ -51,7 +52,7 @@ namespace dynarithmic
         return true;
     }
 
-    static void ThrowBadHandle()
+    void ThrowBadHandle()
     {
         std::error_code ec(DTWAIN_ERR_BAD_HANDLE, std::system_category());
         std::system_error err(ec, "Invalid DTWAIN Handle");
@@ -62,7 +63,7 @@ namespace dynarithmic
         throw DTWAINException(DTWAIN_ERR_BAD_HANDLE);
     }
 
-    static std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> ThrowSourceError(CTL_TwainDLLHandle* pHandle, bool setLastError, bool doThrow)
+    std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> ThrowSourceError(CTL_TwainDLLHandle* pHandle, bool setLastError, bool doThrow)
     {
         if (setLastError)
             pHandle->m_lLastError = DTWAIN_ERR_BAD_SOURCE;
@@ -70,7 +71,10 @@ namespace dynarithmic
             throw DTWAINException(DTWAIN_ERR_BAD_SOURCE);
         return { nullptr, nullptr };
     }
+}
 
+namespace dynarithmic
+{
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing/* = DTWAIN_TEST_DLLHANDLE | DTWAIN_TEST_SOURCE*/)
     {
         CTL_ITwainSource* pSource = nullptr;

@@ -27,25 +27,13 @@
 #include <string_view>
 #include <array>
 
-#include "ctliface.h"
 #include "cppfunc.h"
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
 #include "ctlconstexprfind.h"
+#include "ctlglobalhandletraits.h"
 
 using namespace dynarithmic;
-
-namespace timeutils
-{
-    bool GetLocalTime(std::time_t value, std::tm& result)
-    {
-    #ifdef _WIN32
-        return ::localtime_s(&result, &value) == 0;
-    #else
-        return ::localtime_r(&value, &result) != nullptr;
-    #endif
-    }
-}
 
 namespace
 {
@@ -55,50 +43,95 @@ namespace
     {
         if (!lpOrigString)
             return 0;
-        auto retval = dynarithmic::ConvertToAPIStringEx<StringType>(lpOrigString);
+        auto retval = ConvertToAPIStringEx<StringType>(lpOrigString);
         if (retval)
         {
             HandleRAII raii(retval);
             PointerTypeIn ptrData = (PointerTypeIn)raii.getData();
-            auto len = dynarithmic::CharTraits<StringType::value_type>::Length(ptrData);
+            auto len = CharTraits<StringType::value_type>::Length(ptrData);
             StringType str(ptrData, len);
-            return dynarithmic::CopyInfoToCString(str, outString, nLength);
+            return CopyInfoToCString(str, outString, nLength);
         }
         return 0;
     }
+
+    template <typename StringType>
+    StringType ConvertToAPIString(const StringType& origString)
+    {
+        using CharType = StringType::value_type;
+
+        constexpr CharType CR = static_cast<CharType>('\r');
+        constexpr CharType LF = static_cast<CharType>('\n');
+
+        StringType result;
+        result.reserve(origString.size());
+
+        for (std::size_t i = 0; i < origString.size(); ++i)
+        {
+            if (origString[i] == LF &&
+                (i == 0 || origString[i - 1] != CR))
+            {
+                result.push_back(CR);
+            }
+
+            result.push_back(origString[i]);
+        }
+
+        return result;
+    }
+
+    template <typename StringType>
+    HANDLE ConvertToAPIStringEx(typename std::basic_string_view<typename StringType::value_type> origString)
+    {
+        constexpr size_t cSize = sizeof(typename StringType::value_type);
+        StringType newString = ConvertToAPIString<StringType>(origString.data());
+        HANDLE newHandle = GlobalAlloc(GHND | GMEM_ZEROINIT, newString.size() * cSize + cSize);
+        if (newHandle)
+        {
+            auto pData = (typename StringType::value_type*)GlobalLock(newHandle);
+            memcpy(pData, newString.data(), newString.size() * cSize);
+            GlobalUnlock(newHandle);
+            return newHandle;
+        }
+        return nullptr;
+    }
 }
 
-HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-    auto retval = dynarithmic::ConvertToAPIStringEx<CTL_StringType>(lpOrigString);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(nullptr)
-}
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+            auto retval = ConvertToAPIStringEx<CTL_StringType>(lpOrigString);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+            CATCH_BLOCK(nullptr)
+    }
 
-HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-    auto retval = dynarithmic::ConvertToAPIStringEx<std::string>(lpOrigString);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(nullptr)
-}
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+        auto retval = ConvertToAPIStringEx<std::string>(lpOrigString);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(nullptr)
+    }
 
-HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-    auto retval = dynarithmic::ConvertToAPIStringEx<std::wstring>(lpOrigString);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(nullptr)
-}
 
-LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOutString, LONG nSize)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpOrigString, lpOutString, nSize))
-    LONG retval = ConvertToAPIString_InternalEx<CTL_StringType>(lpOrigString, lpOutString, nSize);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOutString))
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(0)
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+        auto retval = ConvertToAPIStringEx<std::wstring>(lpOrigString);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(nullptr)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOutString, LONG nSize)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString, lpOutString, nSize))
+        LONG retval = ConvertToAPIString_InternalEx<CTL_StringType>(lpOrigString, lpOutString, nSize);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOutString))
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(0)
+    }
 }
 
 namespace dynarithmic
@@ -125,45 +158,6 @@ namespace dynarithmic
         return origString.data();
     }
 
-    std::string CreateFileNameWithDateTime(std::string_view prefix, std::string_view ext, bool useUTC)
-    {
-        using namespace std::chrono;
-        const auto now = system_clock::now();
-        std::string result(prefix);
-
-        if (useUTC)
-        {
-            const auto utcMilliseconds = duration_cast<milliseconds>(now.time_since_epoch()).count();
-            result += std::to_string(utcMilliseconds);
-        }
-        else
-        {
-            const auto localmilliseconds = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
-            const std::time_t timeValue = system_clock::to_time_t(now);
-
-            std::tm localTime{};
-            if (!timeutils::GetLocalTime(timeValue, localTime))
-                return {};
-
-            std::ostringstream os;
-
-            os << std::put_time(&localTime, "%Y-%m-%d_%H-%M-%S")
-                << '_'
-                << std::setw(3)
-                << std::setfill('0')
-                << localmilliseconds.count();
-
-            result += os.str();
-        }
-
-        if (!ext.empty())
-        {
-            result += '.';
-            result.append(ext.data(), ext.size());
-        }
-
-        return result;
-    }
 
     // Function to convert a two-character hex string to a byte
     static constexpr unsigned char HexCharToByte(char c) noexcept 
@@ -176,7 +170,7 @@ namespace dynarithmic
             {'a',10},{'b',11},{'c',12},{'d',13},{'e',14},{'f',15}
         } };
 
-        const auto foundVal = dynarithmic::generic_array_finder_if(hexMap, [&](const auto& pr) 
+        const auto foundVal = generic_array_finder_if(hexMap, [&](const auto& pr) 
                                                             { return pr.first == c; });
         if (foundVal.first)
             return static_cast<unsigned char>(foundVal.second);

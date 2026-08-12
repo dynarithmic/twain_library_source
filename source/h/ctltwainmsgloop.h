@@ -21,8 +21,8 @@
 #ifndef CTLTWAINMSGLOOP_H
 #define CTLTWAINMSGLOOP_H
 
-#include "ctliface.h"
 #include <queue>
+#include "dtwainx.h"
 
 namespace dynarithmic
 {

@@ -30,7 +30,6 @@
 #include <sstream>
 #include <array>
 #include <boost/dll/shared_library.hpp>
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "dtwinverex.h"
 #include "logwriterutils.h"
@@ -54,9 +53,16 @@
 #include "ctltr043.h"
 #include "ctlguidimpl.h"
 #include "ctlstringutilsx.h"
+#include "ctlcapcollect.h"
+#include "ctlcapcontainerfuncs.h"
+#include "ctltwaindllpath.h"
+#include "ctltwainlogging.h"
+#include "ctlglobalhandletraits.h"
+#include "dtwain_resource_constants2.h"
+#include <dtwainx.h>
 
 using namespace dynarithmic;
-namespace stringutils = dynarithmic::basicstringutils;
+namespace stringutils = basicstringutils;
 
 static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
     {TWCC_SUCCESS         ,IDS_ErrCCFalseAlarm},
@@ -94,6 +100,21 @@ static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
 
 constexpr int TWRC_Error = 1;
 constexpr int TWCC_Error = 2;
+
+namespace dynarithmic
+{
+    TW_UINT16 CTL_TwainAppMgr::GetConditionCode( CTL_ITwainSession *pSession,
+                                                 CTL_ITwainSource *pSource/*=nullptr*/,
+                                                 TW_UINT16 rc/*=1*/)
+    {
+        if ( rc == -DTWAIN_ERR_EXCEPTION_ERROR )
+            return TWRC_FAILURE;
+        CTL_ConditionCodeTriplet CC(pSession, pSource);
+        if ( CC.Execute() == TWRC_SUCCESS )
+            return CC.GetConditionCode();
+        return TWRC_FAILURE;
+    }
+}
 
 void CTL_TwainAppMgr::SetDLLInstance(HINSTANCE hDLLInstance)
 {
@@ -686,19 +707,6 @@ CTL_ITwainSession* CTL_TwainAppMgr::GetNthSession(int nSession)
     if ( static_cast<int>(nSize) > nSession )
         return s_pGlobalAppMgr->m_arrTwainSession[nSession].get();
     return nullptr;
-}
-
-
-TW_UINT16 dynarithmic::CTL_TwainAppMgr::GetConditionCode( CTL_ITwainSession *pSession,
-                                             CTL_ITwainSource *pSource/*=nullptr*/,
-                                             TW_UINT16 rc/*=1*/)
-{
-    if ( rc == -DTWAIN_ERR_EXCEPTION_ERROR )
-        return TWRC_FAILURE;
-    CTL_ConditionCodeTriplet CC(pSession, pSource);
-    if ( CC.Execute() == TWRC_SUCCESS )
-        return CC.GetConditionCode();
-    return TWRC_FAILURE;
 }
 
 
@@ -1505,8 +1513,8 @@ LPSTR CTL_TwainAppMgr::GetLastErrorString(LPSTR lpszBuffer, int nSize)
 
 LPSTR CTL_TwainAppMgr::GetErrorString(int nError, LPSTR lpszBuffer, int nSize)
 {
-    if ( nError == s_nLastError )
-        dynarithmic::CopyInfoToCString(s_strLastError, lpszBuffer, nSize);
+    if ( nError == s_nLastError && (s_nLastError != 0))
+        CopyInfoToCString(s_strLastError, lpszBuffer, nSize);
     else
         GetResourceStringA(nError, lpszBuffer, nSize);
     return lpszBuffer;
@@ -2002,7 +2010,7 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
 
 int CTL_TwainAppMgr::FindConditionCode(TW_UINT16 nCode)
 {
-    const auto it = dynarithmic::generic_array_finder_if(mapCondCode, [&](const auto& pr) { return pr.first == nCode; });
+    const auto it = generic_array_finder_if(mapCondCode, [&](const auto& pr) { return pr.first == nCode; });
     if (!it.first)
         return INVALID_CONDITION_CODE;
     return mapCondCode[it.second].second;
@@ -2156,21 +2164,13 @@ bool CTL_TwainAppMgr::IsSourceCompliant( const CTL_ITwainSource *pSource,
 #include "linuxget_twain.inl"
 #endif
 
+
 CTL_StringType CTL_TwainAppMgr::GetTwainDirFullName(LPCTSTR szTwainDLLName,
                                                     LPLONG pWhichSearch,
                                                     bool bLeaveLoaded/*=false*/,
                                                     boost::dll::shared_library *pModule)
 {
     return ::GetTwainDirFullName(szTwainDLLName, pWhichSearch, bLeaveLoaded, pModule);
-}
-
-CTL_StringType CTL_TwainAppMgr::GetTwainDirFullNameEx(LPCTSTR szTwainDLLName,
-                                                      LPLONG pWhichSearch,
-                                                      bool bLeaveLoaded/*=false*/,
-                                                      boost::dll::shared_library *pModule)
-{
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    return ::GetTwainDirFullNameEx(pHandle, szTwainDLLName, pWhichSearch, bLeaveLoaded, pModule);
 }
 
 std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringType strTwainDLLName, LPLONG pWhichSearch)
@@ -2274,6 +2274,19 @@ namespace
         libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
         return ec.value();
     }
+
+    CTL_StringType GetTwainDirFullNameEx_Impl(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName,
+        LPLONG pWhichSearch, bool bLeaveLoaded, boost::dll::shared_library* pModule);
+}
+
+
+CTL_StringType CTL_TwainAppMgr::GetTwainDirFullNameEx(LPCTSTR szTwainDLLName,
+                                                      LPLONG pWhichSearch,
+                                                      bool bLeaveLoaded/*=false*/,
+                                                      boost::dll::shared_library *pModule)
+{
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    return GetTwainDirFullNameEx_Impl(pHandle, szTwainDLLName, pWhichSearch, bLeaveLoaded, pModule);
 }
 
 bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
@@ -2302,7 +2315,7 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
         if ( loadReturnCode != boost::system::errc::success)
         {
             const CTL_StringType dllName = _T(" : ") + m_strTwainDSMPath;
-            DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName, dllName.length()), false, true)
+            DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, stringconversion::Convert_Native_To_Ansi(dllName, dllName.length()), false, true)
         }
 
         // Attempt to load the DSM_Entry point
@@ -2328,16 +2341,16 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
             if ( m_strTwainDSMPath.empty())
             {
                 const CTL_StringType dllName = _T(" : ") + tempStr;
-                DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName, dllName.length()), false, true)
+                DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, stringconversion::Convert_Native_To_Ansi(dllName, dllName.length()), false, true)
             }
         }
-        m_strTwainDSMVersionInfo = dynarithmic::GetVersionInfo(m_hLibModule.native(), 0);
+        m_strTwainDSMVersionInfo = GetVersionInfo(m_hLibModule.native(), 0);
         CTL_StringStreamType strm;
         strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session...\n");
-        strm << _T("Version information for \"") << m_strTwainDSMPath << _T("\":\n") << dynarithmic::GetVersionInfo(m_hLibModule.native(), 4);
+        strm << _T("Version information for \"") << m_strTwainDSMPath << _T("\":\n") << GetVersionInfo(m_hLibModule.native(), 4);
         LogToDebugMonitor(strm.str());
         if (CTL_StaticData::GetLogFilterFlags() != 0)
-            DTWAIN_LogMessageA(StringConversion::Convert_Native_To_Ansi(strm.str()).c_str());
+            DTWAIN_LogMessageA(stringconversion::Convert_Native_To_Ansi(strm.str()).c_str());
 
         // Load the entry point for these DLL's
         LoadDSM();

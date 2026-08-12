@@ -26,6 +26,7 @@
 #include <memory>
 #include <string>
 #include <map>
+#include "dtwain_standard_defs.h"
 
 namespace dynarithmic
 {

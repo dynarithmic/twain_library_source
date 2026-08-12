@@ -18,12 +18,16 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <functional>
 #include <algorithm>
 #include "cppfunc.h"
-#include "errorcheck.h"
-using namespace dynarithmic;
+#include "ctlarraydumper.h"
+#include "twainframe.h"
+#include "ctltwainsource.h"
+#include "ctltwainmanager.h"
+#include "ctltwainlogging.h"
+
 namespace stringutils = dynarithmic::basicstringutils;
+using namespace dynarithmic;
 
 namespace
 {
@@ -80,7 +84,7 @@ namespace
         {
             if (pPtr)
                 *m_pStrm << _T("Source ") << *m_pCurItem + 1 << _T(": ") <<
-                StringConversion::Convert_Ansi_To_Native(pPtr->GetTwainIdentity().get_product_name()) << "\n";
+                stringconversion::Convert_Ansi_To_Native(pPtr->GetTwainIdentity().get_product_name()) << "\n";
             ++* m_pCurItem;
         }
     };
@@ -189,7 +193,7 @@ namespace
     template <typename StringType, typename WriterFn, typename StringViewType>
     void GenericDumpArrayString(DTWAIN_ARRAY Array, WriterFn fn)
     {
-        static constexpr auto newLine = dynarithmic::CharTraits<StringType::value_type>::NewLineString();
+        static constexpr auto newLine = CharTraits<StringType::value_type>::NewLineString();
         const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<StringType>(Array);
         StringType allValues = stringutils::Join<StringType>(vData, newLine);
@@ -229,89 +233,91 @@ namespace
     }
 }
 
-
-void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFlags, bool bAsUnsigned)
+namespace dynarithmic
 {
-    auto logFlags = CTL_StaticData::GetLogFilterFlags();
-    bool doArrayDump = ((logFlags && anyLogFlags) || (logFlags & DTWAIN_LOG_MISCELLANEOUS));
-    if ( !doArrayDump )
-        return;
-
-    std::string szBuf;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    // This dumps contents of array to log file
+    void DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFlags, bool bAsUnsigned)
     {
-        // Turn off the error logging flags temporarily
+        auto logFlags = CTL_StaticData::GetLogFilterFlags();
+        bool doArrayDump = ((logFlags && anyLogFlags) || (logFlags & DTWAIN_LOG_MISCELLANEOUS));
+        if (!doArrayDump)
+            return;
+
+        std::string szBuf;
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        // This dumps contents of array to log file
         {
-            DTWAINScopedLogController sLogger(0);
-            if (!Array)
+            // Turn off the error logging flags temporarily
             {
-                szBuf = "DTWAIN_ARRAY is NULL\n";
-                // Turn on the error logging flags
-                LogWriterUtils::WriteLogInfoIndentedA(szBuf);
+                DTWAINScopedLogController sLogger(0);
+                if (!Array)
+                {
+                    szBuf = "DTWAIN_ARRAY is NULL\n";
+                    // Turn on the error logging flags
+                    LogWriterUtils::WriteLogInfoIndentedA(szBuf);
+                    return;
+                }
+            }
+
+            const LONG nCount = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array));
+            StringStreamA strm;
+            if (nCount < 0)
+            {
+                strm << "Could not dump contents of DTWAIN_ARRAY " << Array << "\nNumber of elements: " << nCount;
                 return;
             }
+            strm << "Dumping contents of DTWAIN_ARRAY " << Array << "   : Number of elements: " << nCount;
+            szBuf = strm.str();
         }
 
-        const LONG nCount = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array));
-        StringStreamA strm;
-        if ( nCount < 0 )
+        LogWriterUtils::WriteLogInfoIndentedA(szBuf);
+
+        // determine the type
+        const LONG nType = CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(Array));
+        switch (nType)
         {
-            strm << "Could not dump contents of DTWAIN_ARRAY " << Array << "\nNumber of elements: " << nCount;
-            return;
+            case DTWAIN_ARRAYLONG:
+                DumpArrayLONG(Array, lCap, bAsUnsigned);
+                break;
+
+            case DTWAIN_ARRAYUINT32:
+                DumpArrayULONG(Array);
+                break;
+
+            case DTWAIN_ARRAYFLOAT:
+                DumpArrayFLOAT(Array);
+                break;
+
+            case DTWAIN_ARRAYSTRING:
+                DumpArrayNativeString(Array);
+                break;
+
+            case DTWAIN_ARRAYWIDESTRING:
+                DumpArrayWideString(Array);
+                break;
+
+            case DTWAIN_ARRAYANSISTRING:
+                DumpArrayAnsiString(Array);
+                break;
+
+            case DTWAIN_ARRAYFRAME:
+                DumpArrayFrame(Array);
+                break;
+
+            case DTWAIN_ARRAYLONG64:
+                DumpArrayLONG64(Array);
+                break;
+
+            case DTWAIN_ARRAYSOURCE:
+                DumpSourceNames(Array);
+                break;
+
+            case DTWAIN_ARRAYOFHANDLEARRAYS:
+                DumpArrayAcquisitions(Array);
+                break;
+
+            case DTWAIN_ARRAYHANDLE:
+                DumpArrayHandles(Array);
+                break;
         }
-        strm << "Dumping contents of DTWAIN_ARRAY " << Array << "   : Number of elements: " << nCount;
-        szBuf = strm.str();
-    }
-
-    LogWriterUtils::WriteLogInfoIndentedA(szBuf);
-
-    // determine the type
-    const LONG nType = CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(Array));
-    switch (nType)
-    {
-        case DTWAIN_ARRAYLONG:
-            DumpArrayLONG(Array, lCap, bAsUnsigned);
-            break;
-
-        case DTWAIN_ARRAYUINT32:
-            DumpArrayULONG(Array);
-            break;
-
-        case DTWAIN_ARRAYFLOAT:
-            DumpArrayFLOAT(Array);
-            break;
-
-        case DTWAIN_ARRAYSTRING:
-            DumpArrayNativeString(Array);
-            break;
-
-        case DTWAIN_ARRAYWIDESTRING:
-            DumpArrayWideString(Array);
-            break;
-
-        case DTWAIN_ARRAYANSISTRING:
-            DumpArrayAnsiString(Array);
-            break;
-
-        case DTWAIN_ARRAYFRAME:
-            DumpArrayFrame(Array);
-            break;
-
-        case DTWAIN_ARRAYLONG64:
-            DumpArrayLONG64(Array);
-            break;
-
-        case DTWAIN_ARRAYSOURCE:
-            DumpSourceNames(Array);
-            break;
-
-        case DTWAIN_ARRAYOFHANDLEARRAYS:
-            DumpArrayAcquisitions(Array);
-            break;
-
-        case DTWAIN_ARRAYHANDLE:
-            DumpArrayHandles(Array);
-            break;
     }
 }

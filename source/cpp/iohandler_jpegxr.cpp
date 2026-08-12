@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <algorithm>
-#include "ctliface.h"
 #include "jpegxrwriter.h"
 #include "iohandler_jpegxr.h"
 #include "ctldib32ex.h"
@@ -63,7 +62,7 @@ int CTL_JpegXRIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
     opts.text.comment = GetCopyrightString();
     opts.progressive = m_ImageInfoEx.bProgressiveJpegXR;
 
-    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToJxr(fName, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

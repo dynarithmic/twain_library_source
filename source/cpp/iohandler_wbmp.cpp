@@ -22,6 +22,7 @@
 #include "wbmpwriter.h"
 #include "iohandler_wbmp.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
@@ -52,7 +53,7 @@ static bool WriteOneDibHandleToWbmp(const std::wstring& filename, const WbmpSess
 int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
     HANDLE hDib = m_pDib->GetHandle();
-    dynarithmic::dib::LockedDib dibHandle(m_pDib->GetHandle());
+    dib::LockedDib dibHandle(m_pDib->GetHandle());
     auto height = dibHandle.Height();
     auto width = dibHandle.Width();
 
@@ -66,13 +67,13 @@ int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     else
         return DTWAIN_ERR_INVALIDWBMP; 
 
-    if (!dynarithmic::fileutils::parent_directory_exists(szFile).first)
+    if (!fileutils::parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
 
     WbmpSessionOptions opts{};
     opts.reverseBitOrder = false; // set true only if your 1-bpp DIB rows are LSB-first
 
-    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToWbmp(fName, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

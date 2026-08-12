@@ -22,6 +22,8 @@
 #define SOURCESELECTOPTS_H
 
 #include "ctliface.h"
+#include "ctltwainsource.h"
+#include "ctltwaindllhandle.h"
 
 enum {SELECTSOURCE=1, SELECTDEFAULTSOURCE, SELECTSOURCEBYNAME, SELECTSOURCE2};
 
@@ -65,14 +67,14 @@ namespace dynarithmic
     {
         LPCSTR nuller = "null";
         strm << ("whichOption=") << src.nWhich
-            << (", productName=") << (src.szProduct ? StringConversion::Convert_NativePtr_To_Ansi(src.szProduct) : nuller)
+            << (", productName=") << (src.szProduct ? stringconversion::Convert_NativePtr_To_Ansi(src.szProduct) : nuller)
             << (", parentWindow=") << src.hWndParent
-            << (", title=") << (src.szTitle ? StringConversion::Convert_NativePtr_To_Ansi(src.szTitle) : nuller)
+            << (", title=") << (src.szTitle ? stringconversion::Convert_NativePtr_To_Ansi(src.szTitle) : nuller)
             << (", xPos=") << src.xPos
             << (", yPos=") << src.yPos
-            << (", includeNames=") << (src.szIncludeNames ? StringConversion::Convert_NativePtr_To_Ansi(src.szIncludeNames) : nuller)
-            << (", excludeNames=") << (src.szExcludeNames ? StringConversion::Convert_NativePtr_To_Ansi(src.szExcludeNames) : nuller)
-            << (", nameMapping=") << (src.szNameMapping ? StringConversion::Convert_NativePtr_To_Ansi(src.szNameMapping) : nuller)
+            << (", includeNames=") << (src.szIncludeNames ? stringconversion::Convert_NativePtr_To_Ansi(src.szIncludeNames) : nuller)
+            << (", excludeNames=") << (src.szExcludeNames ? stringconversion::Convert_NativePtr_To_Ansi(src.szExcludeNames) : nuller)
+            << (", nameMapping=") << (src.szNameMapping ? stringconversion::Convert_NativePtr_To_Ansi(src.szNameMapping) : nuller)
             << (", options=") << src.nOptions;
         return strm;
     }
@@ -125,7 +127,7 @@ namespace dynarithmic
         const CTL_StringType strTemp(lpszFiles);
         std::vector<CTL_StringType> strArray;
 
-        const int nTokens = dynarithmic::basicstringutils::TokenizeQuoted(strTemp, szParseDelim.c_str(), strArray);
+        const int nTokens = basicstringutils::TokenizeQuoted(strTemp, szParseDelim.c_str(), strArray);
         factory->clear(*pArray);
         std::for_each(strArray.begin(), strArray.begin() + nTokens, [&](CTL_StringType& s)
         {

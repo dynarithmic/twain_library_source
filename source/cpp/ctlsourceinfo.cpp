@@ -19,9 +19,10 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlstringutilsx.h"
+#include "ctldtwainhandle.h"
+#include "ctlsourceinfo.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -29,85 +30,96 @@
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceValid(DTWAIN_SOURCE Source)
+namespace dynarithmic
 {
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    if ( !Source )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    VerifyHandles(Source);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
+    std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle)
+    {
+        std::vector<CTL_ITwainSource*> vSources;
+        for (auto& pr : pHandle->m_mapStringToSource)
+        {
+            if (pr.second->IsOpened())
+                vSources.push_back(pr.second);
+        }
+        return vSources;
+    }
 }
 
-LONG   DLLENTRY_DEF DTWAIN_GetSourceManufacturer( DTWAIN_SOURCE Source, LPTSTR szMan, LONG nMaxLen)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, szMan, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG Ret = GetSourceInfo(pSource, &CTL_ITwainSource::GetManufacturer, szMan, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szMan))
-    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceValid(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        if ( !Source )
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        VerifyHandles(Source);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
 
-LONG   DLLENTRY_DEF DTWAIN_GetSourceProductFamily( DTWAIN_SOURCE Source, LPTSTR szProduct, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szProduct, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG Ret = GetSourceInfo(pSource, &CTL_ITwainSource::GetProductFamily, szProduct, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProduct))
-    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
-}
+    LONG   DLLENTRY_DEF DTWAIN_GetSourceManufacturer( DTWAIN_SOURCE Source, LPTSTR szMan, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szMan, nMaxLen))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const LONG Ret = GetSourceInfoImpl(pSource, &CTL_ITwainSource::GetManufacturer, szMan, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szMan))
+        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+    }
 
-LONG   DLLENTRY_DEF DTWAIN_GetSourceProductName(DTWAIN_SOURCE Source,LPTSTR szProduct,LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szProduct, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG Ret = GetSourceInfo(pSource, &CTL_ITwainSource::GetProductName, szProduct, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProduct))
-    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
-}
+    LONG   DLLENTRY_DEF DTWAIN_GetSourceProductFamily( DTWAIN_SOURCE Source, LPTSTR szProduct, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szProduct, nMaxLen))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const LONG Ret = GetSourceInfoImpl(pSource, &CTL_ITwainSource::GetProductFamily, szProduct, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProduct))
+        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+    }
 
-LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR lpszOut, LONG nSize)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lpszOut, nSize))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const TW_VERSION *pV = pSource->GetVersion();
-    CTL_StringType pName = StringConversion::Convert_AnsiPtr_To_Native(pV->Info);
-    auto nLen = dynarithmic::CopyInfoToCString(pName, lpszOut, nSize);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
-    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
-}
+    LONG   DLLENTRY_DEF DTWAIN_GetSourceProductName(DTWAIN_SOURCE Source,LPTSTR szProduct,LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szProduct, nMaxLen))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const LONG Ret = GetSourceInfoImpl(pSource, &CTL_ITwainSource::GetProductName, szProduct, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProduct))
+        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+    }
 
-LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, LPTSTR szSourceInfo, LONG indentFactor, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szSourceInfo, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto sAllInfo = StringConversion::Convert_Ansi_To_Native(pSource->GetSourceInfoFormatted(indentFactor));
-    auto nLen = dynarithmic::CopyInfoToCString(sAllInfo, szSourceInfo, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szSourceInfo))
-    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
-}
+    LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR lpszOut, LONG nSize)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lpszOut, nSize))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const TW_VERSION *pV = pSource->GetVersion();
+        CTL_StringType pName = stringconversion::Convert_AnsiPtr_To_Native(pV->Info);
+        auto nLen = CopyInfoToCString(pName, lpszOut, nSize);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+        LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+    }
 
-LONG dynarithmic::GetSourceInfo(CTL_ITwainSource *p,SOURCEINFOFUNC pFunc,LPTSTR szInfo, LONG nMaxLen)
-{
-    return dynarithmic::CopyInfoToCString((p->*pFunc)(), szInfo, nMaxLen);
-}
+    LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, LPTSTR szSourceInfo, LONG indentFactor, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szSourceInfo, nMaxLen))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto sAllInfo = stringconversion::Convert_Ansi_To_Native(pSource->GetSourceInfoFormatted(indentFactor));
+        auto nLen = CopyInfoToCString(sAllInfo, szSourceInfo, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szSourceInfo))
+        LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetSourceVersionNumber( DTWAIN_SOURCE Source, LPLONG pMajor, LPLONG pMinor)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, pMajor, pMinor))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const TW_VERSION *pV = pSource->GetVersion();
-    if ( pMajor )
-        *pMajor = pV->MajorNum;
-    if ( pMinor)
-        *pMinor = pV->MinorNum;
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pMajor, pMinor))
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetSourceVersionNumber( DTWAIN_SOURCE Source, LPLONG pMajor, LPLONG pMinor)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, pMajor, pMinor))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const TW_VERSION *pV = pSource->GetVersion();
+        if ( pMajor )
+            *pMajor = pV->MajorNum;
+        if ( pMinor)
+            *pMinor = pV->MinorNum;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pMajor, pMinor))
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }
-

@@ -35,7 +35,7 @@
 #include "ctltr018.h"
 #include "ctltr019.h"
 #include "ctltr020.h"
-#include "ctliface.h"
+#include "ctltwaindllhandle.h"
 #define USE_NORMALSTRINGS  1
 #define USE_LONGSTRINGS    2
 #define USE_UNICODESTRINGS 4
@@ -332,7 +332,7 @@ namespace dynarithmic
     {
         static void AdderFn(std::vector<CTL_StringType>* ptr, const std::string& data)
         {
-            const CTL_StringType sVal = StringConversion::Convert_Ansi_To_Native(data);
+            const CTL_StringType sVal = stringconversion::Convert_Ansi_To_Native(data);
             ptr->push_back( sVal );
         }
     };
@@ -503,7 +503,7 @@ namespace dynarithmic
     struct StringNativeToTwainConverter
     {
         static std::string convert(const CTL_StringType& value)
-        { return StringConversion::Convert_Native_To_Ansi(value); }
+        { return stringconversion::Convert_Native_To_Ansi(value); }
     };
 
     /////////////////////////////////////////////////////////////////////////////////////////

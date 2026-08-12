@@ -21,109 +21,113 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
 
-TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppID()
+extern "C"
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if (!pHandle->m_bSessionAllocated)
-        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-    TW_IDENTITY *pIdentity = pHandle->m_pTwainSession->GetAppIDPtr();
-    LOG_FUNC_EXIT_NONAME_PARAMS(((TWAIN_IDENTITY)pIdentity))
-    CATCH_BLOCK(nullptr)
-}
-
-TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppIDEx(TW_IDENTITY* pIdentity)
-{
-    LOG_FUNC_ENTRY_PARAMS((pIdentity))
-    const TWAIN_IDENTITY thisID = DTWAIN_GetTwainAppID();
-    if (thisID)
-        memcpy(pIdentity, thisID, sizeof(TW_IDENTITY));
-    LOG_FUNC_EXIT_NONAME_PARAMS(((TWAIN_IDENTITY)pIdentity))
-    CATCH_BLOCK(nullptr)
-}
-
-TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetSourceID(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    TWAIN_IDENTITY Id = static_cast<TWAIN_IDENTITY>(pSource->GetSourceIDPtr());
-    LOG_FUNC_EXIT_NONAME_PARAMS(Id)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-TWAIN_IDENTITY  DLLENTRY_DEF DTWAIN_GetSourceIDEx(DTWAIN_SOURCE Source, TW_IDENTITY* pIdentity)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, pIdentity))
-    const TWAIN_IDENTITY thisID = DTWAIN_GetSourceID(Source);
-    if (thisID)
-        memcpy(pIdentity, thisID, sizeof(TW_IDENTITY));
-    LOG_FUNC_EXIT_NONAME_PARAMS(((TWAIN_IDENTITY)pIdentity))
-    CATCH_BLOCK(nullptr)
-}
-
-LONG DLLENTRY_DEF DTWAIN_CallDSMProc(TWAIN_IDENTITY AppID, TWAIN_IDENTITY SourceId, LONG lDG, LONG lDAT, LONG lMSG, LPVOID pData)
-{
-    LOG_FUNC_ENTRY_PARAMS((AppID, SourceId, lDG, lDAT, lMSG, pData))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto pH = pHandle;
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
-    const LONG Ret = CTL_TwainAppMgr::CallDSMEntryProc(static_cast<TW_IDENTITY*>(AppID),
-                                                       static_cast<TW_IDENTITY*>(SourceId),
-                                                       static_cast<TW_UINT32>(lDG),
-                                                       static_cast<TW_UINT16>(lDAT),
-                                                       static_cast<TW_UINT16>(lMSG),
-                                                       pData);
-    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCurrentTwainTriplet(TW_IDENTITY* pAppID, TW_IDENTITY* pSourceID,
-                                                       LPLONG lpDG, LPLONG lpDAT, LPLONG lpMsg, LPLONG64 lpMemRef)
-{
-    LOG_FUNC_ENTRY_PARAMS((pAppID, pSourceID, lpDAT, lpDG, lpMsg, lpMemRef))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto pH = pHandle;
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
-    const CTL_TwainTriplet* currentTriplet = CTL_TwainAppMgr::GetInstance()->GetCurrentTriplet();
-    if (currentTriplet)
+    TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppID()
     {
-        if ( pAppID )
-        {
-            const TW_IDENTITY* trip = currentTriplet->GetOriginID();
-            if ( trip )
-                memcpy(pAppID, trip, sizeof(TW_IDENTITY));
-        }
-
-        if ( pSourceID )
-        {
-            const TW_IDENTITY* trip = currentTriplet->GetDestinationID();
-            if (trip)
-                memcpy(pSourceID, trip, sizeof(TW_IDENTITY));
-        }
-
-        if ( lpDG )
-            *lpDG = static_cast<LONG>(currentTriplet->GetDG());
-        if (lpDAT)
-            *lpDAT = currentTriplet->GetDAT();
-        if (lpMsg)
-            *lpMsg = currentTriplet->GetMSG();
-
-        if ( lpMemRef )
-        {
-             const TW_MEMREF memref = currentTriplet->GetMemRef();
-             if (memref)
-                *lpMemRef = reinterpret_cast<LONG64>(memref);
-            else
-                *lpMemRef = {};
-        }
+        LOG_FUNC_ENTRY_NONAME_PARAMS()
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (!pHandle->m_bSessionAllocated)
+            LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+        TW_IDENTITY *pIdentity = pHandle->m_pTwainSession->GetAppIDPtr();
+        LOG_FUNC_EXIT_NONAME_PARAMS(((TWAIN_IDENTITY)pIdentity))
+        CATCH_BLOCK(nullptr)
     }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDG, lpDAT, lpMsg, lpMemRef))
-    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
-    CATCH_BLOCK(FALSE)
+
+    TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppIDEx(TW_IDENTITY* pIdentity)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pIdentity))
+        const TWAIN_IDENTITY thisID = DTWAIN_GetTwainAppID();
+        if (thisID)
+            memcpy(pIdentity, thisID, sizeof(TW_IDENTITY));
+        LOG_FUNC_EXIT_NONAME_PARAMS(((TWAIN_IDENTITY)pIdentity))
+        CATCH_BLOCK(nullptr)
+    }
+
+    TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetSourceID(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        TWAIN_IDENTITY Id = static_cast<TWAIN_IDENTITY>(pSource->GetSourceIDPtr());
+        LOG_FUNC_EXIT_NONAME_PARAMS(Id)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
+    }
+
+    TWAIN_IDENTITY  DLLENTRY_DEF DTWAIN_GetSourceIDEx(DTWAIN_SOURCE Source, TW_IDENTITY* pIdentity)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, pIdentity))
+        const TWAIN_IDENTITY thisID = DTWAIN_GetSourceID(Source);
+        if (thisID)
+            memcpy(pIdentity, thisID, sizeof(TW_IDENTITY));
+        LOG_FUNC_EXIT_NONAME_PARAMS(((TWAIN_IDENTITY)pIdentity))
+        CATCH_BLOCK(nullptr)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_CallDSMProc(TWAIN_IDENTITY AppID, TWAIN_IDENTITY SourceId, LONG lDG, LONG lDAT, LONG lMSG, LPVOID pData)
+    {
+        LOG_FUNC_ENTRY_PARAMS((AppID, SourceId, lDG, lDAT, lMSG, pData))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto pH = pHandle;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
+        const LONG Ret = CTL_TwainAppMgr::CallDSMEntryProc(static_cast<TW_IDENTITY*>(AppID),
+                                                           static_cast<TW_IDENTITY*>(SourceId),
+                                                           static_cast<TW_UINT32>(lDG),
+                                                           static_cast<TW_UINT16>(lDAT),
+                                                           static_cast<TW_UINT16>(lMSG),
+                                                           pData);
+        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+        CATCH_BLOCK(DTWAIN_FAILURE1)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCurrentTwainTriplet(TW_IDENTITY* pAppID, TW_IDENTITY* pSourceID,
+                                                           LPLONG lpDG, LPLONG lpDAT, LPLONG lpMsg, LPLONG64 lpMemRef)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pAppID, pSourceID, lpDAT, lpDG, lpMsg, lpMemRef))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto pH = pHandle;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
+        const CTL_TwainTriplet* currentTriplet = CTL_TwainAppMgr::GetInstance()->GetCurrentTriplet();
+        if (currentTriplet)
+        {
+            if ( pAppID )
+            {
+                const TW_IDENTITY* trip = currentTriplet->GetOriginID();
+                if ( trip )
+                    memcpy(pAppID, trip, sizeof(TW_IDENTITY));
+            }
+
+            if ( pSourceID )
+            {
+                const TW_IDENTITY* trip = currentTriplet->GetDestinationID();
+                if (trip)
+                    memcpy(pSourceID, trip, sizeof(TW_IDENTITY));
+            }
+
+            if ( lpDG )
+                *lpDG = static_cast<LONG>(currentTriplet->GetDG());
+            if (lpDAT)
+                *lpDAT = currentTriplet->GetDAT();
+            if (lpMsg)
+                *lpMsg = currentTriplet->GetMSG();
+
+            if ( lpMemRef )
+            {
+                 const TW_MEMREF memref = currentTriplet->GetMemRef();
+                 if (memref)
+                    *lpMemRef = reinterpret_cast<LONG64>(memref);
+                else
+                    *lpMemRef = {};
+            }
+        }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDG, lpDAT, lpMsg, lpMemRef))
+        LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+        CATCH_BLOCK(FALSE)
+    }
 }

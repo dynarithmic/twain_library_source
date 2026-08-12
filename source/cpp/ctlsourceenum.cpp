@@ -22,55 +22,60 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
+#include "dtwainx.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSourcesEx()
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS(())
-    DTWAIN_ARRAY pArray = nullptr;
-    DTWAIN_EnumSources(&pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
-{
-    LOG_FUNC_ENTRY_PARAMS((Array))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-
-    bool bEnumeratorExists = pHandle->m_ArrayFactory->is_valid(*Array);
-    if (!bEnumeratorExists)
-        *Array = nullptr;
-
-    // Create a DTWAIN_ARRAY consisting of pointers to the source objects.
-    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSOURCE, 0);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
-
-    DTWAIN_ARRAY pDTWAINArray = retVal.second;
-    DTWAINArrayLowLevelPtr_RAII raii(pHandle, &pDTWAINArray);
-
-    const auto& factory = pHandle->m_ArrayFactory;
-    auto& vEnum = factory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
-
-    // Start a session if not already started
-    if (!pHandle->m_bSessionAllocated)
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSourcesEx()
     {
-        if (!DTWAIN_StartTwainSession(nullptr, nullptr))
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        LOG_FUNC_ENTRY_PARAMS(())
+        DTWAIN_ARRAY pArray = nullptr;
+        DTWAIN_EnumSources(&pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
+        CATCH_BLOCK(nullptr)
     }
 
-    CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession);
-    const auto& twainSources = pHandle->m_pTwainSession->GetTwainSources();
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Array))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-    // Copy results to user array
-    std::copy(twainSources.begin(), twainSources.end(), std::back_inserter(vEnum));
+        bool bEnumeratorExists = pHandle->m_ArrayFactory->is_valid(*Array);
+        if (!bEnumeratorExists)
+            *Array = nullptr;
 
-    MoveArray(pHandle, Array, &pDTWAINArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
+        // Create a DTWAIN_ARRAY consisting of pointers to the source objects.
+        auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSOURCE, 0);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+
+        DTWAIN_ARRAY pDTWAINArray = retVal.second;
+        DTWAINArrayLowLevelPtr_RAII raii(pHandle, &pDTWAINArray);
+
+        const auto& factory = pHandle->m_ArrayFactory;
+        auto& vEnum = factory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
+
+        // Start a session if not already started
+        if (!pHandle->m_bSessionAllocated)
+        {
+            if (!DTWAIN_StartTwainSession(nullptr, nullptr))
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
+
+        CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession);
+        const auto& twainSources = pHandle->m_pTwainSession->GetTwainSources();
+
+        // Copy results to user array
+        std::copy(twainSources.begin(), twainSources.end(), std::back_inserter(vEnum));
+
+        MoveArray(pHandle, Array, &pDTWAINArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
 }

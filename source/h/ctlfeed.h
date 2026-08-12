@@ -18,26 +18,12 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CAPINFOMAP_H
-#define CAPINFOMAP_H
-
-#include <boost/container/flat_map.hpp>
-#include <memory>
-
-#include "ctlenum.h"
-#include "capstruc.h"
+#ifndef CTLFEED_H
+#define CTLFEED_H
 
 namespace dynarithmic
 {
-
-    class CTL_TwainDLLHandle;
     class CTL_ITwainSource;
-
-    // Create these dynamically whenever a new source is opened
-   // and source cap info does not exist.  Add cap info statically.
-    typedef boost::container::flat_map<TW_UINT16 , CTL_CapInfo>  CTL_CapInfoMap;
-    typedef std::shared_ptr<CTL_CapInfoMap> CTL_CapInfoMapPtr;
-
-    CTL_CapInfoMapPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p);
+    int FeederWait(CTL_ITwainSource* pSource);
 }
 #endif

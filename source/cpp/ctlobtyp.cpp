@@ -21,7 +21,8 @@
 #include <cstring>
 
 #include "ctlobtyp.h"
-#include "ctliface.h"
+#include "ctltwaindllhandle.h"
+#include "ctlconstexprutils.h"
 
 using namespace dynarithmic;
 CTL_TwainTypeOb::CTL_TwainTypeOb( CTL_TwainDLLHandle* pHandle, TW_UINT16 nType, bool bGetTypeSize/*=true*/ ) : 
@@ -32,7 +33,7 @@ CTL_TwainTypeOb::CTL_TwainTypeOb( CTL_TwainDLLHandle* pHandle, TW_UINT16 nType, 
     m_hGlobal(nullptr)
 {
     if ( bGetTypeSize )
-        m_nSize = dynarithmic::GetTwainItemSize( nType );
+        m_nSize = GetTwainItemSize( nType );
     else
         m_nSize = nType;
     m_hGlobal = pHandle->m_TwainMemoryFunc->AllocateMemory(m_nSize);

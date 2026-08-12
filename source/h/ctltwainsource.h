@@ -23,12 +23,9 @@
 
 #include <vector>
 #include <boost/logic/tribool.hpp>
-#include <boost/container/flat_map.hpp>
-#include <boost/container/flat_set.hpp>
 #include <array>
 #include <map>
 
-#include "ctliface.h"
 #include "ctlarray.h"
 #include "ctldib.h"
 #include "ctlenum.h"
@@ -41,11 +38,22 @@
 #include "extendedimageinfo.h"
 #include "sourceacquireopts.h"
 #include "ctlguiddef.h"
+#include "mapdefs.h"
+#include "fltrect.h"
 
 namespace dynarithmic
 {
-    typedef boost::container::flat_map<TW_UINT16, short int> CapToStateMap;
-    typedef boost::container::flat_set<TW_UINT16> CapList;
+    // RAII class to close a TWAIN source locally
+    struct SourceCloserRAII
+    {
+        CTL_ITwainSource* p;
+        bool bMustClose;
+        SourceCloserRAII(CTL_ITwainSource* pSource, bool bClose);
+        ~SourceCloserRAII();
+    };
+
+    typedef BASIC_MAPTYPE_<TW_UINT16, short int> CapToStateMap;
+    typedef std::set<TW_UINT16> CapList;
     typedef std::vector<TW_UINT16> JobControlList;
     typedef std::vector<TW_INFO> TWINFOVector;
 
@@ -128,7 +136,7 @@ namespace dynarithmic
             std::vector<anytype_> m_data;
         };
 
-        typedef boost::container::flat_map<TW_UINT16, container_values> CapToValuesMap;
+        typedef BASIC_MAPTYPE_<TW_UINT16, container_values> CapToValuesMap;
         CapToValuesMap m_capToValuesMap_G;
         CapToValuesMap m_capToValuesMap_GD;
         SourceCompressionMap m_CompressionMap;
@@ -170,9 +178,9 @@ namespace dynarithmic
         TW_UINT16    GetProtocolMinor() const { return m_SourceId.get_protocol_minor(); }
         TW_UINT32    GetSupportedGroups() const { return m_SourceId.get_supported_groups(); }
 #ifdef UNICODE
-        CTL_StringType GetManufacturer() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_manufacturer()); }
-        CTL_StringType GetProductFamily() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_product_family()); }
-        CTL_StringType GetProductName() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_product_name()); }
+        CTL_StringType GetManufacturer() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_manufacturer()); }
+        CTL_StringType GetProductFamily() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_product_family()); }
+        CTL_StringType GetProductName() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_product_name()); }
 #else
         CTL_StringType GetManufacturer() const { return m_SourceId.get_manufacturer(); }
         CTL_StringType GetProductFamily() const { return m_SourceId.get_product_family(); }
@@ -181,9 +189,9 @@ namespace dynarithmic
         std::string GetManufacturerA() const { return m_SourceId.get_manufacturer(); }
         std::string GetProductFamilyA() const { return m_SourceId.get_product_family(); }
         std::string GetProductNameA() const { return m_SourceId.get_product_name(); }
-        std::wstring GetManufacturerW() const { return StringConversion::Convert_Ansi_To_Wide(m_SourceId.get_manufacturer()); }
-        std::wstring GetProductFamilyW() const { return StringConversion::Convert_Ansi_To_Wide(m_SourceId.get_product_family()); }
-        std::wstring GetProductNameW() const { return StringConversion::Convert_Ansi_To_Wide(m_SourceId.get_product_name()); }
+        std::wstring GetManufacturerW() const { return basicstringutils::Widen(m_SourceId.get_manufacturer()); }
+        std::wstring GetProductFamilyW() const { return basicstringutils::Widen(m_SourceId.get_product_family()); }
+        std::wstring GetProductNameW() const { return basicstringutils::Widen(m_SourceId.get_product_name()); }
 
         std::string GetSourceInfo() const { return m_SourceId.to_json(); }
         std::string GetSourceInfoFormatted(int indentFactor) const { return m_SourceId.to_json_formatted(indentFactor);  }
@@ -256,8 +264,6 @@ namespace dynarithmic
         DTWAIN_ARRAY GetFileEnumerator() const { return m_pFileEnumerator; }
         void         SetTransferDone(bool bDone) { m_bTransferDone = bDone; }
         bool         GetTransferDone() const { return m_bTransferDone; }
-        void         SetCapCacheValue(LONG lCap, double dValue, bool bTurnOn);
-        double       GetCapCacheValue(LONG lCap, LONG* pTurnOn) const;
         bool         IsAcquireStarted() const { return m_bAcquireStarted; }
         void         SetAcquireStarted(bool bSet) { m_bAcquireStarted = bSet; }
         void         SetModal(bool bSet) { m_bDialogModal = bSet; }
@@ -402,9 +408,7 @@ namespace dynarithmic
         // Extended image info functions
         bool         IsExtendedImageInfoSupported() const { return m_bExtendedImageInfoSupported; }
         void         SetExtendedImageInfoSupported(bool bSet) { m_bExtendedImageInfoSupported = bSet; }
-        bool         InitExtImageInfo(int nNum);
         bool         GetExtImageInfo(bool bExecute);
-        bool         AddExtImageInfo(TW_INFO Info) const;
         bool         EnumExtImageInfo(CTL_IntArray& r);
         TW_INFO      GetExtImageInfoItem(int nItem, int nSearch) const;
         std::pair<bool, int32_t> GetExtImageInfoData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pNumChars = nullptr) const;
@@ -413,7 +417,6 @@ namespace dynarithmic
 
         bool         DestroyExtImageInfo();
         bool         IsExtendedCapNegotiable(LONG nCap);
-        bool         AddCapToExtendedCapList(LONG nCap);
         bool         ExtendedCapsRetrieved() const { return m_bExtendedCapsRetrieved; }
         void         SetExtendedCapsRetrieved(bool bSet) { m_bExtendedCapsRetrieved = bSet; }
         CapList& GetExtendedCapCache() { return m_aExtendedCaps; }
@@ -467,8 +470,6 @@ namespace dynarithmic
         void         SetImageInfoRetrieved(bool bSet) { m_bImageInfoRetrieved = bSet; }
         bool         IsImageInfoRetrieved() const { return m_bImageInfoRetrieved; }
         void         ProcessMultipageFile();
-        LONG         GetForcedImageBpp() const { return m_nForcedBpp; }
-        void         SetForcedImageBpp(LONG bpp) { m_nForcedBpp = bpp; }
         void         SetFileIncompleteSaveMode(bool bSaveIncomplete) { m_bIsFileSaveIncomplete = bSaveIncomplete; }
         bool         IsFileIncompleteSave() const { return m_bIsFileSaveIncomplete; }
         bool         IsBlankPageDetectionOn() const {
@@ -680,7 +681,6 @@ namespace dynarithmic
         bool            m_bProcessingPixelInfo;
         bool            m_bSkipImageInfoErrors;
         bool            m_bDoublePageCountOnDuplex;
-        LONG            m_nForcedBpp;
         bool            m_bTileMode;
         std::vector<int> m_aTransferMechanisms;
         std::vector<TW_UINT32> m_aSupportedDATS;
@@ -708,10 +708,10 @@ namespace dynarithmic
             TW_UINT16 nCap;
             bool      m_bSupported;
         };
-        typedef boost::container::flat_map<TW_UINT16, bool> CachedCapMap;
+        typedef BASIC_MAPTYPE_<TW_UINT16, bool> CachedCapMap;
 
         public:
-            typedef boost::container::flat_map<int, std::set<int> > CachedPixelTypeMap;
+            typedef BASIC_MAPTYPE_<int, std::set<int> > CachedPixelTypeMap;
             void        AddPixelTypeAndBitDepth(int PixelType, int BitDepth);
             CachedPixelTypeMap::iterator FindPixelType(int PixelType);
             bool IsBitDepthSupported(int PixelType, int BitDepth);
@@ -755,5 +755,7 @@ namespace dynarithmic
         int     m_nFeederWaitTime;
         int     m_nFeederWaitTimeOption;
     };
+
+    using CTL_ITwainSourcePtr = CTL_ITwainSource*;
 }
 #endif

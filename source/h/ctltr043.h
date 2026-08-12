@@ -22,7 +22,6 @@
 #define CTLTR043_H
 
 #include "ctltr026.h"
-#include "ctliface.h"
 
 namespace dynarithmic
 {

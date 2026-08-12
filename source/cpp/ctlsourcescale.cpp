@@ -21,46 +21,54 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
+#include "dtwainx.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
 
-static bool SetImageScale(CTL_ITwainSource *p, DTWAIN_FLOAT xscale, DTWAIN_FLOAT yscale)
+namespace
 {
-    p->SetImageScale(xscale, yscale, true);
-    return true;
+    bool SetImageScale(CTL_ITwainSource* p, DTWAIN_FLOAT xscale, DTWAIN_FLOAT yscale)
+    {
+        p->SetImageScale(xscale, yscale, true);
+        return true;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////
 using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleString(DTWAIN_SOURCE Source, LPCTSTR xscale, LPCTSTR yscale)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, xscale, yscale))
-    const DTWAIN_FLOAT xValue = dynarithmic::CharTraits<CharType>::ToDouble(xscale, 100);
-    const DTWAIN_FLOAT yValue = dynarithmic::CharTraits<CharType>::ToDouble(yscale, 100);
-    const DTWAIN_BOOL retVal = DTWAIN_SetAcquireImageScale(Source, xValue, yValue);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleString(DTWAIN_SOURCE Source, LPCTSTR xscale, LPCTSTR yscale)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, xscale, yscale))
+        const DTWAIN_FLOAT xValue = CharTraits<CharType>::ToDouble(xscale, 100);
+        const DTWAIN_FLOAT yValue = CharTraits<CharType>::ToDouble(yscale, 100);
+        const DTWAIN_BOOL retVal = DTWAIN_SetAcquireImageScale(Source, xValue, yValue);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
+        CATCH_BLOCK(false)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageNegative(DTWAIN_SOURCE Source, DTWAIN_BOOL IsNegative)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, IsNegative))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    pSource->SetImageNegative(IsNegative ? true : false);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageNegative(DTWAIN_SOURCE Source, DTWAIN_BOOL IsNegative)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, IsNegative))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        pSource->SetImageNegative(IsNegative ? true : false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScale(DTWAIN_SOURCE Source, DTWAIN_FLOAT  xscale, DTWAIN_FLOAT  yscale)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, xscale, yscale))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const DTWAIN_BOOL bRet = SetImageScale(pSource, xscale, yscale);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScale(DTWAIN_SOURCE Source, DTWAIN_FLOAT  xscale, DTWAIN_FLOAT  yscale)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, xscale, yscale))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        const DTWAIN_BOOL bRet = SetImageScale(pSource, xscale, yscale);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }

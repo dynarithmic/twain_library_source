@@ -22,13 +22,14 @@
 #pragma warning (disable:4702)
 #endif
 #include "cppfunc.h"
-#include "ctliface.h"
 #include "dtwtype.h"
 #include "winconst.h"
+#include "ctldtwainhandle.h"
+#include "ctltwainsource.h"
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIEnabled(DTWAIN_SOURCE Source)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIEnabled(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);

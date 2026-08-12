@@ -24,6 +24,8 @@
 #include "winbit32.h"
 #include "logwriterutils.h"
 #include "ctldib32ex.h"
+#include "ctltwainlogging.h"
+#include "dtwainx.h"
 
 using namespace dynarithmic;
 
@@ -458,7 +460,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             if (bKeepPage2 )
                             {
                                 // Check if multi page file is being used
-                                const bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(acquireFileStatus.GetAcquireFileFormat());
+                                const bool bIsMultiPageFile = IsFileTypeMultiPage(acquireFileStatus.GetAcquireFileFormat());
                                 int nMultiStage = 0;
                                 if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
                                 {

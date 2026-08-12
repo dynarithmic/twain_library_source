@@ -59,7 +59,7 @@ int CTL_PsdIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
     opts.comment = GetCopyrightString();
 
-    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToPsd(fName, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

@@ -28,9 +28,9 @@ OF THIRD PARTY RIGHTS.
 #include <utility>
 #include <memory>
 #include <string>
-#include <boost/container/flat_map.hpp>
 #include "dibmulti.h"
 #include "dibinfox.h"
+#include "mapdefs.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4100)
@@ -77,7 +77,7 @@ namespace dynarithmic
             std::string m_sCopyright;
             unsigned m_nPage;
             bool m_bOnePageWritten;
-            static boost::container::flat_map<LONG, std::vector<uint16_t>> s_supportedBitDepths;
+            static BASIC_MAPTYPE_<LONG, std::vector<uint16_t>> s_supportedBitDepths;
     };
 }
 #endif

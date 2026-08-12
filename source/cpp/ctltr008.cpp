@@ -23,9 +23,9 @@
 #include "ctltr034.h"
 #include "ctltwainsession.h"
 #include "ctltwainsource.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "logwriterutils.h"
+#include "ctltwainlogging.h"
 using namespace dynarithmic;
 
 /* Transfer started */

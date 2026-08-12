@@ -21,7 +21,7 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "ctltr041.h"
-#include "ctliface.h"
+#include "ctldtwainhandle.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -54,7 +54,7 @@ namespace
 }
 
 ///////////////////////////////////////////////////////////////////////
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, ImageCount, SheetCount))
     VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);

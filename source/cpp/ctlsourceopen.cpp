@@ -26,350 +26,355 @@
 #include "ctllogfunctioncall.h"
 #include "ctlsetgetcaps.h"
 #include "ctllogsourcecaps.h"
+#include "ctldtwainhandle.h"
+#include "dtwainx.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
-namespace stringutils = dynarithmic::basicstringutils;
+namespace stringutils = basicstringutils;
 
-static void TestAndCachePixelTypes(CTL_ITwainSource *p);
-static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
-static void DetermineIfGetMessage(CTL_ITwainSource* p);
-static void DetermineIfPaperDetectable(CTL_ITwainSource* p);
-static void DetermineSheetcountDefs(CTL_ITwainSource* p);
-static void DetermineIfAutoCloseUI(CTL_ITwainSource* pSource);
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
+namespace
 {
-    LOG_FUNC_ENTRY_PARAMS((bSet))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    pHandle->m_bOpenSourceOnSelect = bSet ? true : false;
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOpenSourcesOnSelect(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const bool retVal = pHandle->m_bOpenSourceOnSelect;
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-
-    // If source already opened, just return TRUE.
-    if (pSource->IsOpened())
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-
-    // Set up the opening of the source
-
-    // Go through TWAIN to open the source
-    bool bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource);
-    if (bRetval)
+    void TestAndCachePixelTypes(CTL_ITwainSource* p)
     {
-        // Set up status of the source 
-        auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
-        auto iter = sourcemap.insert({ pSource->GetProductNameA(), {} }).first;
-        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, true);
-        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
-    }
-
-    // Check for failure to open the source
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return bRetval == false; }, DTWAIN_ERR_SOURCE_COULD_NOT_OPEN, false, FUNC_MACRO);
-
-    // Get all the caps supported
-    DTWAIN_ARRAY arr = nullptr;
-    DTWAINArrayPtr_RAII raii(pHandle, &arr);
-    CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
-
-    // See if there is an override for paper detectable
-    DetermineIfPaperDetectable(pSource);
-
-    // If this source has a feeder, check the status of whether we should check.
-    // If the check is on, add it to the feeder sources container.
-    //
-    // Since this operation may rely on the device hardware to respond to CAP_PAPERDETECTABLE
-    // there is an optional check done that can be set in the DTWAIN INI file(s).
-    if (pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen && DTWAIN_IsPaperDetectable(Source))
-        pHandle->m_aFeederSources.insert(Source);
-
-    // Get the supported transfer types
-    pSource->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(pSource));
-
-    // Get the supported DAT types
-    pSource->SetSupportedDATS(CTL_TwainAppMgr::EnumSupportedDATS(pSource));
-
-    // See if the source is one that has a bug in the MSG_XFERREADY sending on the 
-    // TWAIN message queue
-    DetermineIfSpecialXfer(pSource);
-
-    // See if the source uses GetMessage processing for the TWAIN message loop
-    DetermineIfGetMessage(pSource);
-
-    // See if the source will interpret CAP_SHEETCOUNT as Images or actual sheets of paper
-    DetermineSheetcountDefs(pSource);
-
-    // See if the source needs to have the Source UI close on a single acquisition attempted
-    DetermineIfAutoCloseUI(pSource);
-
-    // Cache the pixel types and bit depths
-    TestAndCachePixelTypes(pSource);
-
-    // get the list of caps created
-    CapList& theCapList = pSource->GetCapSupportedList();
-
-    // See if extended image info is supported and cache the results
-    pSource->SetExtendedImageInfoSupported(theCapList.count(static_cast<TW_UINT16>(ICAP_EXTIMAGEINFO))?true:false);
-
-    // Cache the supported TWEI_x values for extended image information
-    if (pSource->IsExtendedImageInfoSupported())
-    {
-        DTWAIN_ARRAY extArray = {};
-        DTWAINArrayPtr_RAII temp_(pHandle, &extArray);
-        bool bOk = GetCapValuesEx2_Internal(pSource, ICAP_SUPPORTEDEXTIMAGEINFO, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &extArray);
-        if (bOk && extArray)
+        struct ProcessingRAII
         {
-            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(extArray);
-            pSource->SetSupportedExtImageInfos(vValues);
-            pSource->SetSupportedExtImageInfoCap(true);
-        }
-        else
-            pSource->SetSupportedExtImageInfoCap(false);
-    }
+            CTL_ITwainSource* m_pSource;
+            ProcessingRAII(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
+            ~ProcessingRAII() { m_pSource->SetCurrentlyProcessingPixelInfo(false); }
+        };
 
-    // See if audio transfers are supported
-    pSource->SetAudioTransferSupported(DTWAIN_IsAudioXferSupported(Source, DTWAIN_ANYSUPPORT)?true:false);
+        if (p->PixelTypesRetrieved())
+            return;
 
-    // Log the source capabilities
-    LogSourceCapabilities(pSource, false);
+        p->SetCurrentlyProcessingPixelInfo(true);
+        ProcessingRAII raii(p);
 
-    if (bRetval)
-        pHandle->m_lLastError = 0; // Reset the error flag to 0
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    if ( !Source )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(pSource);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-void dynarithmic::LogSourceCapabilities(CTL_ITwainSource* pSource, bool bUseLogFlag)
-{
-    CapList& actualCapList = pSource->GetCapSupportedList();
-    auto& logCaps = CTL_StaticData::GetLogFilterFlags();
-
-    if (logCaps)
-    {
-        if ((logCaps & DTWAIN_LOG_MISCELLANEOUS) || !bUseLogFlag)
+        // Do pixel type compliancy and retrieval test.
+        auto& compliancyTester = p->GetCompliancyTester();
+        auto pr = compliancyTester.TestPixelTypeCompliancy();
+        if (!pr.first)
         {
-            CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
-                LogWriterUtils::WriteLogInfoIndented(msg);
-
-                // Log the caps if logging is turned on
-                CTL_StringType sName;
-
-                std::vector<std::string> VecString(actualCapList.size());
-
-                // copy the names
-                std::transform(actualCapList.begin(), actualCapList.end(), VecString.begin(),
-                    [](LONG n) { return CTL_TwainAppMgr::GetCapNameFromCap(n); });
-
-            // Sort the names
-            std::sort(VecString.begin(), VecString.end());
-            CTL_StringStreamType strm;
-            strm << actualCapList.size();
-            sName = _T("\n\n");
-            sName += GetResourceStringFromMap_Native(IDS_LOGMSG_CAPABILITYLISTING);
-            sName += _T(" (") + pSource->GetProductName() + _T(")");
-            sName += _T(" (") + strm.str() + _T("):\n{\n");
-            if (actualCapList.empty())
-                sName += _T(" No capabilities:\n");
-            else
+            // TWAIN source is not compliant with respect to pixel type
+            if (CTL_StaticData::GetLogFilterFlags())
             {
-                sName += _T("    ");
-                sName += StringConversion::Convert_Ansi_To_Native(
-                    stringutils::Join<std::string>(VecString, "\n    "));
+                std::string s1 = GetResourceStringFromMap(pr.second);
+                s1 += " - " + stringutils::QuoteString(p->GetProductNameA());
+                LogWriterUtils::WriteLogInfoIndentedA(s1);
             }
-            sName += _T("\n}");
-
-            LogWriterUtils::WriteMultiLineInfoIndented(sName, _T("\n"));
         }
-    }
-}
 
-void TestAndCachePixelTypes(CTL_ITwainSource* p)
-{
-    struct ProcessingRAII
-    {
-        CTL_ITwainSource* m_pSource;
-        ProcessingRAII(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
-        ~ProcessingRAII() { m_pSource->SetCurrentlyProcessingPixelInfo(false); }
-    };
+        // Print information on the pixel types found
+        const auto& pixelBitDepthMap = p->GetPixelTypeMap();
 
-    if (p->PixelTypesRetrieved())
-        return;
-
-    p->SetCurrentlyProcessingPixelInfo(true);
-    ProcessingRAII raii(p);
-
-    // Do pixel type compliancy and retrieval test.
-    auto& compliancyTester = p->GetCompliancyTester();
-    auto pr = compliancyTester.TestPixelTypeCompliancy();
-    if (!pr.first)
-    {
-        // TWAIN source is not compliant with respect to pixel type
-        if (CTL_StaticData::GetLogFilterFlags())
+        StringStreamA strm;
+        std::string sBitDepths;
+        LONG oldflags = CTL_StaticData::GetLogFilterFlags();
+        for (auto& mapPr : pixelBitDepthMap)
         {
-            std::string s1 = GetResourceStringFromMap(pr.second);
-            s1 += " - " + stringutils::QuoteString(p->GetProductNameA());
-            LogWriterUtils::WriteLogInfoIndentedA(s1);
+            strm.str("");
+            strm << "\nFor source \"" << p->GetProductNameA() << "\", there are (is) " <<
+                mapPr.second.size() << " available bit depth(s) for pixel type " <<
+                CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, mapPr.first).second << "\n";
+            size_t j = 0;
+            for (auto& val : mapPr.second)
+            {
+                strm << "Bit depth[" << j << "] = " << val << "\n";
+                ++j;
+            }
+            sBitDepths += strm.str();
         }
+        if (oldflags)
+            LogWriterUtils::WriteMultiLineInfoIndentedA(sBitDepths, "\n");
     }
 
-    // Print information on the pixel types found
-    const auto& pixelBitDepthMap = p->GetPixelTypeMap();
-
-    StringStreamA strm;
-    std::string sBitDepths;
-    LONG oldflags = CTL_StaticData::GetLogFilterFlags();
-    for (auto& mapPr : pixelBitDepthMap)
+    void DetermineIfSpecialXfer(CTL_ITwainSource* p)
     {
-        strm.str("");
-        strm << "\nFor source \"" << p->GetProductNameA() << "\", there are (is) " <<
-            mapPr.second.size() << " available bit depth(s) for pixel type " <<
-            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, mapPr.first).second << "\n";
-        size_t j = 0;
-        for (auto& val : mapPr.second)
-        {
-            strm << "Bit depth[" << j << "] = " << val << "\n";
-            ++j;
-        }
-        sBitDepths += strm.str();
-    }
-    if (oldflags)
-        LogWriterUtils::WriteMultiLineInfoIndentedA(sBitDepths, "\n");
-}
+        using wildcards::match;
+        auto& xfer_map = CTL_StaticData::GetSourceToXferReadyMap();
+        auto& xfer_list = CTL_StaticData::GetSourceToXferReadyList();
+        std::string sourceName = p->GetProductNameA();
+        auto iter = xfer_map.find(sourceName);
 
-void DetermineIfSpecialXfer(CTL_ITwainSource* p)
-{
-    using wildcards::match;
-    auto& xfer_map = CTL_StaticData::GetSourceToXferReadyMap();
-    auto& xfer_list= CTL_StaticData::GetSourceToXferReadyList();
-    std::string sourceName = p->GetProductNameA();
-    auto iter = xfer_map.find(sourceName);
-
-    // Already in map
-    if (iter != xfer_map.end())
-        return;
-
-    // Search vector for a matching name
-    auto iterSearch = xfer_list.begin();
-    while (iterSearch != xfer_list.end())
-    {
-        bool matches = match(sourceName, iterSearch->first);
-        if (matches)
-        {
-            // Add this source as one that will require special MSG_XFERREADY processing
-            auto insertPr = xfer_map.insert({ sourceName, {} });
-            insertPr.first->second.m_MaxThreshold = iterSearch->second;
+        // Already in map
+        if (iter != xfer_map.end())
             return;
-        }
-        ++iterSearch;
-    }
-}
 
-void DetermineIfPaperDetectable(CTL_ITwainSource* p)
-{
-    using wildcards::match;
-    auto& paperdetectable_map = CTL_StaticData::GetSourcePaperDetectionMap();
-    std::string sourceName = p->GetProductNameA();
-
-    // Search map for a matching name
-    auto iterSearch = paperdetectable_map.begin();
-    while (iterSearch != paperdetectable_map.end())
-    {
-        bool matches = match(sourceName, iterSearch->first);
-        if (matches)
+        // Search vector for a matching name
+        auto iterSearch = xfer_list.begin();
+        while (iterSearch != xfer_list.end())
         {
-            p->SetFeederSensitive(iterSearch->second);
-            return;
+            bool matches = match(sourceName, iterSearch->first);
+            if (matches)
+            {
+                // Add this source as one that will require special MSG_XFERREADY processing
+                auto insertPr = xfer_map.insert({ sourceName, {} });
+                insertPr.first->second.m_MaxThreshold = iterSearch->second;
+                return;
+            }
+            ++iterSearch;
         }
-        ++iterSearch;
     }
-}
 
-void DetermineSheetcountDefs(CTL_ITwainSource* p)
-{
-    using wildcards::match;
-    auto& sheetcount_map = CTL_StaticData::GetSourceSheetcountMap();
-    std::string sourceName = p->GetProductNameA();
-
-    // Search map for a matching name
-    auto iterSearch = sheetcount_map.begin();
-    while (iterSearch != sheetcount_map.end())
+    void DetermineIfPaperDetectable(CTL_ITwainSource* p)
     {
-        bool matches = match(sourceName, iterSearch->first);
-        if (matches)
-        {
-            bool usesSheets = (iterSearch->second == "SHEETS");
-            p->SetUseSheetCountAsSheets(usesSheets);
-            return;
-        }
-        ++iterSearch;
-    }
-    p->SetUseSheetCountAsSheets(true);
-}
+        using wildcards::match;
+        auto& paperdetectable_map = CTL_StaticData::GetSourcePaperDetectionMap();
+        std::string sourceName = p->GetProductNameA();
 
-void DetermineIfGetMessage(CTL_ITwainSource* pSource)
-{
-    using wildcards::match;
-    auto& getmsg_list = CTL_StaticData::GetSourceGetMessageList();
-    std::string sourceName = pSource->GetProductNameA();
-    
-    // Search vector for a matching name
-    auto iterSearch = getmsg_list.begin();
-    while (iterSearch != getmsg_list.end())
+        // Search map for a matching name
+        auto iterSearch = paperdetectable_map.begin();
+        while (iterSearch != paperdetectable_map.end())
+        {
+            bool matches = match(sourceName, iterSearch->first);
+            if (matches)
+            {
+                p->SetFeederSensitive(iterSearch->second);
+                return;
+            }
+            ++iterSearch;
+        }
+    }
+
+    void DetermineSheetcountDefs(CTL_ITwainSource* p)
     {
-        bool matches = match(sourceName, *iterSearch);
-        if (matches)
+        using wildcards::match;
+        auto& sheetcount_map = CTL_StaticData::GetSourceSheetcountMap();
+        std::string sourceName = p->GetProductNameA();
+
+        // Search map for a matching name
+        auto iterSearch = sheetcount_map.begin();
+        while (iterSearch != sheetcount_map.end())
         {
-            pSource->SetUsePeekMessage(false);
-            return;
+            bool matches = match(sourceName, iterSearch->first);
+            if (matches)
+            {
+                bool usesSheets = (iterSearch->second == "SHEETS");
+                p->SetUseSheetCountAsSheets(usesSheets);
+                return;
+            }
+            ++iterSearch;
         }
-        ++iterSearch;
+        p->SetUseSheetCountAsSheets(true);
     }
-}
 
-void DetermineIfAutoCloseUI(CTL_ITwainSource* pSource)
-{
-    using wildcards::match;
-    auto& autoclose_list = CTL_StaticData::GetSourceToUIAutocloseMap();
-    std::string sourceName = pSource->GetProductNameA();
-
-    // Search vector for a matching name
-    auto iterSearch = autoclose_list.begin();
-    while (iterSearch != autoclose_list.end())
+    void DetermineIfGetMessage(CTL_ITwainSource* pSource)
     {
-        bool matches = match(sourceName, iterSearch->first);
-        if (matches)
+        using wildcards::match;
+        auto& getmsg_list = CTL_StaticData::GetSourceGetMessageList();
+        std::string sourceName = pSource->GetProductNameA();
+
+        // Search vector for a matching name
+        auto iterSearch = getmsg_list.begin();
+        while (iterSearch != getmsg_list.end())
         {
-            pSource->SetUseAutocloseUI(iterSearch->second);
-            return;
+            bool matches = match(sourceName, *iterSearch);
+            if (matches)
+            {
+                pSource->SetUsePeekMessage(false);
+                return;
+            }
+            ++iterSearch;
         }
-        ++iterSearch;
+    }
+
+    void DetermineIfAutoCloseUI(CTL_ITwainSource* pSource)
+    {
+        using wildcards::match;
+        auto& autoclose_list = CTL_StaticData::GetSourceToUIAutocloseMap();
+        std::string sourceName = pSource->GetProductNameA();
+
+        // Search vector for a matching name
+        auto iterSearch = autoclose_list.begin();
+        while (iterSearch != autoclose_list.end())
+        {
+            bool matches = match(sourceName, iterSearch->first);
+            if (matches)
+            {
+                pSource->SetUseAutocloseUI(iterSearch->second);
+                return;
+            }
+            ++iterSearch;
+        }
     }
 }
+
+namespace dynarithmic
+{
+    void LogSourceCapabilities(CTL_ITwainSource* pSource, bool bUseLogFlag)
+    {
+        CapList& actualCapList = pSource->GetCapSupportedList();
+        auto& logCaps = CTL_StaticData::GetLogFilterFlags();
+
+        if (logCaps)
+        {
+            if ((logCaps & DTWAIN_LOG_MISCELLANEOUS) || !bUseLogFlag)
+            {
+                CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
+                    LogWriterUtils::WriteLogInfoIndented(msg);
+
+                    // Log the caps if logging is turned on
+                    CTL_StringType sName;
+
+                    std::vector<std::string> VecString(actualCapList.size());
+
+                    // copy the names
+                    std::transform(actualCapList.begin(), actualCapList.end(), VecString.begin(),
+                        [](LONG n) { return CTL_TwainAppMgr::GetCapNameFromCap(n); });
+
+                // Sort the names
+                std::sort(VecString.begin(), VecString.end());
+                CTL_StringStreamType strm;
+                strm << actualCapList.size();
+                sName = _T("\n\n");
+                sName += GetResourceStringFromMap_Native(IDS_LOGMSG_CAPABILITYLISTING);
+                sName += _T(" (") + pSource->GetProductName() + _T(")");
+                sName += _T(" (") + strm.str() + _T("):\n{\n");
+                if (actualCapList.empty())
+                    sName += _T(" No capabilities:\n");
+                else
+                {
+                    sName += _T("    ");
+                    sName += stringconversion::Convert_Ansi_To_Native(
+                        stringutils::Join<std::string>(VecString, "\n    "));
+                }
+                sName += _T("\n}");
+
+                LogWriterUtils::WriteMultiLineInfoIndented(sName, _T("\n"));
+            }
+        }
+    }
+}
+
+extern "C"
+{
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
+    {
+        LOG_FUNC_ENTRY_PARAMS((bSet))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        pHandle->m_bOpenSourceOnSelect = bSet ? true : false;
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOpenSourcesOnSelect(VOID_PROTOTYPE)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        const bool retVal = pHandle->m_bOpenSourceOnSelect;
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+
+        // If source already opened, just return TRUE.
+        if (pSource->IsOpened())
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+
+        // Set up the opening of the source
+
+        // Go through TWAIN to open the source
+        bool bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource);
+        if (bRetval)
+        {
+            // Set up status of the source 
+            auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
+            auto iter = sourcemap.insert({ pSource->GetProductNameA(), {} }).first;
+            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, true);
+            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
+        }
+
+        // Check for failure to open the source
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return bRetval == false; }, DTWAIN_ERR_SOURCE_COULD_NOT_OPEN, false, FUNC_MACRO);
+
+        // Get all the caps supported
+        DTWAIN_ARRAY arr = nullptr;
+        DTWAINArrayPtr_RAII raii(pHandle, &arr);
+        CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
+
+        // See if there is an override for paper detectable
+        DetermineIfPaperDetectable(pSource);
+
+        // If this source has a feeder, check the status of whether we should check.
+        // If the check is on, add it to the feeder sources container.
+        //
+        // Since this operation may rely on the device hardware to respond to CAP_PAPERDETECTABLE
+        // there is an optional check done that can be set in the DTWAIN INI file(s).
+        if (pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen && DTWAIN_IsPaperDetectable(Source))
+            pHandle->m_aFeederSources.insert(Source);
+
+        // Get the supported transfer types
+        pSource->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(pSource));
+
+        // Get the supported DAT types
+        pSource->SetSupportedDATS(CTL_TwainAppMgr::EnumSupportedDATS(pSource));
+
+        // See if the source is one that has a bug in the MSG_XFERREADY sending on the 
+        // TWAIN message queue
+        DetermineIfSpecialXfer(pSource);
+
+        // See if the source uses GetMessage processing for the TWAIN message loop
+        DetermineIfGetMessage(pSource);
+
+        // See if the source will interpret CAP_SHEETCOUNT as Images or actual sheets of paper
+        DetermineSheetcountDefs(pSource);
+
+        // See if the source needs to have the Source UI close on a single acquisition attempted
+        DetermineIfAutoCloseUI(pSource);
+
+        // Cache the pixel types and bit depths
+        TestAndCachePixelTypes(pSource);
+
+        // get the list of caps created
+        CapList& theCapList = pSource->GetCapSupportedList();
+
+        // See if extended image info is supported and cache the results
+        pSource->SetExtendedImageInfoSupported(theCapList.count(static_cast<TW_UINT16>(ICAP_EXTIMAGEINFO))?true:false);
+
+        // Cache the supported TWEI_x values for extended image information
+        if (pSource->IsExtendedImageInfoSupported())
+        {
+            DTWAIN_ARRAY extArray = {};
+            DTWAINArrayPtr_RAII temp_(pHandle, &extArray);
+            bool bOk = GetCapValuesEx2_Internal(pSource, ICAP_SUPPORTEDEXTIMAGEINFO, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &extArray);
+            if (bOk && extArray)
+            {
+                auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(extArray);
+                pSource->SetSupportedExtImageInfos(vValues);
+                pSource->SetSupportedExtImageInfoCap(true);
+            }
+            else
+                pSource->SetSupportedExtImageInfoCap(false);
+        }
+
+        // See if audio transfers are supported
+        pSource->SetAudioTransferSupported(DTWAIN_IsAudioXferSupported(Source, DTWAIN_ANYSUPPORT)?true:false);
+
+        // Log the source capabilities
+        LogSourceCapabilities(pSource, false);
+
+        if (bRetval)
+            pHandle->m_lLastError = 0; // Reset the error flag to 0
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        if ( !Source )
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(pSource);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+}
+

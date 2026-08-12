@@ -19,9 +19,13 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctliface.h"
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
+#include "ctldtwainhandle.h"
+#include "ctltwaindllhandle.h"
+#include "ctltwainsource.h"
+#include "dtwainx.h"
+
 using namespace dynarithmic;
 
 namespace
@@ -47,64 +51,67 @@ namespace
     }
 }
 
-// Duplex Scanner support 
-LONG DLLENTRY_DEF DTWAIN_GetDuplexTypeEx(DTWAIN_SOURCE Source)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    LONG val = 0;
-    auto bRet = DTWAIN_GetDuplexType(Source, &val);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet?val:-1)
-    CATCH_BLOCK(-1)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDupType)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lpDupType))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    bool bRet = true;
-
-    auto getSupport = pSource->GetDuplexSupport();
-
-    // If status of duplex support already determined, return result.
-    if (getSupport.first.value != boost::tribool::indeterminate_value)
+    // Duplex Scanner support 
+    LONG DLLENTRY_DEF DTWAIN_GetDuplexTypeEx(DTWAIN_SOURCE Source)
     {
-        if (lpDupType)
-            *lpDupType = getSupport.second;
-        bRet = getSupport.first.value;
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        LONG val = 0;
+        auto bRet = DTWAIN_GetDuplexType(Source, &val);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet?val:-1)
+        CATCH_BLOCK(-1)
     }
-    else
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDupType)
     {
-        auto dupType = GetDuplexType(Source);
-        pSource->SetDuplexSupport(dupType.first, dupType.second);
-        if (lpDupType)
-            *lpDupType = dupType.second;
-        bRet = dupType.first;
+        LOG_FUNC_ENTRY_PARAMS((Source, lpDupType))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        bool bRet = true;
+
+        auto getSupport = pSource->GetDuplexSupport();
+
+        // If status of duplex support already determined, return result.
+        if (getSupport.first.value != boost::tribool::indeterminate_value)
+        {
+            if (lpDupType)
+                *lpDupType = getSupport.second;
+            bRet = getSupport.first.value;
+        }
+        else
+        {
+            auto dupType = GetDuplexType(Source);
+            pSource->SetDuplexSupport(dupType.first, dupType.second);
+            if (lpDupType)
+                *lpDupType = dupType.second;
+            bRet = dupType.first;
+        }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDupType))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
     }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDupType))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
 
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDuplexSupported(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDuplexSupported(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
-    auto getSupport = pSource->GetDuplexSupport();
+        auto getSupport = pSource->GetDuplexSupport();
 
-    // If status of duplex support already determined, return result.
-    if (getSupport.first.value != boost::tribool::indeterminate_value)
-        LOG_FUNC_EXIT_NONAME_PARAMS(getSupport.first?true:false)
+        // If status of duplex support already determined, return result.
+        if (getSupport.first.value != boost::tribool::indeterminate_value)
+            LOG_FUNC_EXIT_NONAME_PARAMS(getSupport.first?true:false)
 
-    bool bRet = false;
+        bool bRet = false;
 
-    auto retValue = GetDuplexType(Source);
-    if (retValue.second == TWDX_1PASSDUPLEX ||
-        retValue.second == TWDX_2PASSDUPLEX)
-        bRet = true;
+        auto retValue = GetDuplexType(Source);
+        if (retValue.second == TWDX_1PASSDUPLEX ||
+            retValue.second == TWDX_2PASSDUPLEX)
+            bRet = true;
 
-    pSource->SetDuplexSupport(retValue.first, retValue.second);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
+        pSource->SetDuplexSupport(retValue.first, retValue.second);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
 }
