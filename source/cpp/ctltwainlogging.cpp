@@ -18,7 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctliface.h"
+
 #include "cppfunc.h"
 #include "errorcheck.h"
 #include "ctllogsourcecaps.h"
@@ -286,74 +286,77 @@ namespace dynarithmic
     long LogTraitsOn::Apply(long turnOn) { return CTL_StaticData::GetLogFilterFlags() | turnOn; } 
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((LogFlags, lpszLogFile))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-
-    // Clear errors.
-    pHandle->m_lLastError = DTWAIN_NO_ERROR;
-    CTL_StaticData::GetLogger().SetDLLHandle(pHandle);
-
-    // If the log flags have not specified what to log
-    // then log call stack and general TWAIN send/receive info.
-    LONG allFlags = DTWAIN_LOG_ALL;
-    if ( (LogFlags != 0) && (LogFlags & allFlags) == 0)  
-        LogFlags |= (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_DECODE_SOURCE | DTWAIN_LOG_DECODE_DEST | DTWAIN_LOG_MISCELLANEOUS);
-    bool logFailed = false; 
-
-    bool bLoggerExists = AnyLoggerExists(pHandle);
-    auto& logFilterFlags = CTL_StaticData::GetLogFilterFlags();
-    if (LogFlags == 0 && bLoggerExists)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)
     {
-        CTL_StaticData::GetLogger().PrintBanner(false);
-        CTL_StaticData::GetLogger().DisableAllLoggers();
-        logFilterFlags = LogFlags;
+        LOG_FUNC_ENTRY_PARAMS((LogFlags, lpszLogFile))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+
+        // Clear errors.
+        pHandle->m_lLastError = DTWAIN_NO_ERROR;
+        CTL_StaticData::GetLogger().SetDLLHandle(pHandle);
+
+        // If the log flags have not specified what to log
+        // then log call stack and general TWAIN send/receive info.
+        LONG allFlags = DTWAIN_LOG_ALL;
+        if ( (LogFlags != 0) && (LogFlags & allFlags) == 0)  
+            LogFlags |= (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_DECODE_SOURCE | DTWAIN_LOG_DECODE_DEST | DTWAIN_LOG_MISCELLANEOUS);
+        bool logFailed = false; 
+
+        bool bLoggerExists = AnyLoggerExists(pHandle);
+        auto& logFilterFlags = CTL_StaticData::GetLogFilterFlags();
+        if (LogFlags == 0 && bLoggerExists)
+        {
+            CTL_StaticData::GetLogger().PrintBanner(false);
+            CTL_StaticData::GetLogger().DisableAllLoggers();
+            logFilterFlags = LogFlags;
+        }
+        else
+        {
+            logFilterFlags = LogFlags;
+            if (LogFlags && !UserDefinedLoggerExists(pHandle))
+                logFilterFlags &= ~DTWAIN_LOG_USECALLBACK;
+
+            LoggingTraits fTraits;
+            fTraits.m_bAppend = LogFlags & DTWAIN_LOG_FILEAPPEND ? true : false;
+            fTraits.m_bCreateDirectory = LogFlags & DTWAIN_LOG_CREATEDIRECTORY ? true : false;
+            fTraits.m_filename = lpszLogFile;
+            fTraits.m_bSetConsoleHandler = LogFlags & DTWAIN_LOG_CONSOLEWITHHANDLER ? true : false;
+            auto isLogOpen = OpenLogging(lpszLogFile, LogFlags, fTraits);
+
+            // Write the version info
+            // Write to all the loggers that were created
+            if (LogFlags > 0)
+                WriteVersionToLog(pHandle);
+            logFailed = (LogFlags > 0 && !isLogOpen.first);
+            if (logFailed)
+            {
+                // Indicate that there is at least one logger that failed
+                DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO, false);
+            }
+
+            // If there are opened sources, log the capabilities for each
+            if (logFilterFlags)
+            {
+                auto pOpenedSources = GetOpenSources(pHandle);
+                for (auto* pCurSource : pOpenedSources)
+                    LogSourceCapabilities(pCurSource, false);
+            }
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(!logFailed)
+        CATCH_BLOCK(false)
     }
-    else
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLogSaveThreshold(LONG64 lineCount)
     {
-        logFilterFlags = LogFlags;
-        if (LogFlags && !UserDefinedLoggerExists(pHandle))
-            logFilterFlags &= ~DTWAIN_LOG_USECALLBACK;
-
-        LoggingTraits fTraits;
-        fTraits.m_bAppend = LogFlags & DTWAIN_LOG_FILEAPPEND ? true : false;
-        fTraits.m_bCreateDirectory = LogFlags & DTWAIN_LOG_CREATEDIRECTORY ? true : false;
-        fTraits.m_filename = lpszLogFile;
-        fTraits.m_bSetConsoleHandler = LogFlags & DTWAIN_LOG_CONSOLEWITHHANDLER ? true : false;
-        auto isLogOpen = OpenLogging(lpszLogFile, LogFlags, fTraits);
-
-        // Write the version info
-        // Write to all the loggers that were created
-        if (LogFlags > 0)
-            WriteVersionToLog(pHandle);
-        logFailed = (LogFlags > 0 && !isLogOpen.first);
-        if (logFailed)
-        {
-            // Indicate that there is at least one logger that failed
-            DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO, false);
-        }
-
-        // If there are opened sources, log the capabilities for each
-        if (logFilterFlags)
-        {
-            auto pOpenedSources = GetOpenSources(pHandle);
-            for (auto* pCurSource : pOpenedSources)
-                LogSourceCapabilities(pCurSource, false);
-        }
+        LOG_FUNC_ENTRY_PARAMS((lineCount))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (lineCount <= 0)
+            lineCount = -1LL;
+        CTL_StaticData::GetLogFileSaveThreshold() = lineCount;
+        CTL_StaticData::GetLogger().SetLogSaveThreshold(lineCount);
+        LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+        CATCH_BLOCK(false)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(!logFailed)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLogSaveThreshold(LONG64 lineCount)
-{
-    LOG_FUNC_ENTRY_PARAMS((lineCount))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if (lineCount <= 0)
-        lineCount = -1LL;
-    CTL_StaticData::GetLogFileSaveThreshold() = lineCount;
-    CTL_StaticData::GetLogger().SetLogSaveThreshold(lineCount);
-    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
-    CATCH_BLOCK(false)
 }

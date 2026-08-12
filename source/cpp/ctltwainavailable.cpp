@@ -18,7 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctliface.h"
+
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include <ctlstringutilsx.h>
@@ -139,57 +139,61 @@ namespace
         return false;
     }
 }
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainAvailable()
+
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto retVal = CheckTwainAvailability(nullptr, 0, nullptr);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(0)
-}
-
-LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    LONG maxCharsCopied = 0;
-    CheckTwainAvailability(directories, nMaxLen, &maxCharsCopied);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
-    LOG_FUNC_EXIT_NONAME_PARAMS(maxCharsCopied)
-    CATCH_BLOCK(0)
-}
-
-// Test which version of TWAIN is available.
-LONG DLLENTRY_DEF DTWAIN_GetTwainAvailability()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto availability = GetTwainAvailablityInternal();
-    LOG_FUNC_EXIT_NONAME_PARAMS(availability.first)
-    CATCH_BLOCK(0)
-}
-
-// Test which version of TWAIN is available.
-LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto availability = GetTwainAvailablityInternal();
-
-    // If not available set the error and exit
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return availability.first == 0; },
-                                        DTWAIN_ERR_TWAIN_NOT_INSTALLED, 0, FUNC_MACRO);
-
-    // Provide "<null>" for either TWAIN 1 or TWAIN 2 directories in the
-    // returned array of directories if TWAIN could not be found
-    for (auto& s : availability.second)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainAvailable()
     {
-        if (s.empty())
-            s = _T("<null>");
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto retVal = CheckTwainAvailability(nullptr, 0, nullptr);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
+        CATCH_BLOCK(0)
     }
 
-    CTL_StringType sDirs;
-    auto joinedString = basicstringutils::Join<CTL_StringType>(availability.second, _T("|"));
-    auto actualLengthCopied = CopyInfoToCString(joinedString, directories, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
-    LOG_FUNC_EXIT_NONAME_PARAMS(actualLengthCopied)
-    CATCH_BLOCK(0)
+    LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        LONG maxCharsCopied = 0;
+        CheckTwainAvailability(directories, nMaxLen, &maxCharsCopied);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
+        LOG_FUNC_EXIT_NONAME_PARAMS(maxCharsCopied)
+        CATCH_BLOCK(0)
+    }
+
+    // Test which version of TWAIN is available.
+    LONG DLLENTRY_DEF DTWAIN_GetTwainAvailability()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto availability = GetTwainAvailablityInternal();
+        LOG_FUNC_EXIT_NONAME_PARAMS(availability.first)
+        CATCH_BLOCK(0)
+    }
+
+    // Test which version of TWAIN is available.
+    LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto availability = GetTwainAvailablityInternal();
+
+        // If not available set the error and exit
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return availability.first == 0; },
+                                            DTWAIN_ERR_TWAIN_NOT_INSTALLED, 0, FUNC_MACRO);
+
+        // Provide "<null>" for either TWAIN 1 or TWAIN 2 directories in the
+        // returned array of directories if TWAIN could not be found
+        for (auto& s : availability.second)
+        {
+            if (s.empty())
+                s = _T("<null>");
+        }
+
+        CTL_StringType sDirs;
+        auto joinedString = basicstringutils::Join<CTL_StringType>(availability.second, _T("|"));
+        auto actualLengthCopied = CopyInfoToCString(joinedString, directories, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
+        LOG_FUNC_EXIT_NONAME_PARAMS(actualLengthCopied)
+        CATCH_BLOCK(0)
+    }
 }

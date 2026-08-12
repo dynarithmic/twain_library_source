@@ -56,8 +56,8 @@ namespace
     }
 }
 
-DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,
-                                                     LPLONG pStatus)
+extern "C" DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,
+                                                                LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, nTransferMode, bDiscardDibs, bShowUI, bCloseSource, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);

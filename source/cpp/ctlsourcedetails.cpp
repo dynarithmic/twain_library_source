@@ -914,50 +914,53 @@ namespace
     }
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((szBuf, nSize, indentFactor))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    CTL_StringType details;
-    if (!bRefresh &&  !pHandle->m_strSessionDetails.empty())
-        details = pHandle->m_strSessionDetails;
-    else
+    LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh)
     {
-        const auto& vBuf = pHandle->m_pTwainSession->GetTwainSources();
-        if ( vBuf.empty() )
-            LOG_FUNC_EXIT_NONAME_PARAMS(0)
-        std::vector<std::string> vAllSources;
-        for (auto& theSource : vBuf)
-            vAllSources.push_back(theSource->GetProductNameA());
-        details = stringconversion::Convert_Ansi_To_Native(generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor));
-        pHandle->m_strSessionDetails = details;
+        LOG_FUNC_ENTRY_PARAMS((szBuf, nSize, indentFactor))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        CTL_StringType details;
+        if (!bRefresh &&  !pHandle->m_strSessionDetails.empty())
+            details = pHandle->m_strSessionDetails;
+        else
+        {
+            const auto& vBuf = pHandle->m_pTwainSession->GetTwainSources();
+            if ( vBuf.empty() )
+                LOG_FUNC_EXIT_NONAME_PARAMS(0)
+            std::vector<std::string> vAllSources;
+            for (auto& theSource : vBuf)
+                vAllSources.push_back(theSource->GetProductNameA());
+            details = stringconversion::Convert_Ansi_To_Native(generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor));
+            pHandle->m_strSessionDetails = details;
+        }
+        LONG retVal = CopyInfoToCString(details, szBuf, nSize);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
+        CATCH_BLOCK(0)
     }
-    LONG retVal = CopyInfoToCString(details, szBuf, nSize);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(0)
-}
 
-LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh)
-{
-    LOG_FUNC_ENTRY_PARAMS((szSources, szBuf, nSize, indentFactor))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if (bRefresh)
+    LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh)
     {
-        CTL_StringArrayType vAllSourcesT;
-        std::vector<std::string> vAllSources;
-        stringutils::TokenizeEx((CTL_StringType)szSources, _T("|"), vAllSourcesT, false);
-        for (auto& name : vAllSourcesT)
-            vAllSources.push_back(stringconversion::Convert_Native_To_Ansi(name, name.length()));
-        auto genDetails = generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor);
-        #ifdef UNICODE
-        pHandle->m_strSourceDetails = stringconversion::Convert_Ansi_To_Native(genDetails, genDetails.length());
-        #else
-        pHandle->m_strSourceDetails = genDetails;
-        #endif
+        LOG_FUNC_ENTRY_PARAMS((szSources, szBuf, nSize, indentFactor))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (bRefresh)
+        {
+            CTL_StringArrayType vAllSourcesT;
+            std::vector<std::string> vAllSources;
+            stringutils::TokenizeEx((CTL_StringType)szSources, _T("|"), vAllSourcesT, false);
+            for (auto& name : vAllSourcesT)
+                vAllSources.push_back(stringconversion::Convert_Native_To_Ansi(name, name.length()));
+            auto genDetails = generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor);
+            #ifdef UNICODE
+            pHandle->m_strSourceDetails = stringconversion::Convert_Ansi_To_Native(genDetails, genDetails.length());
+            #else
+            pHandle->m_strSourceDetails = genDetails;
+            #endif
+        }
+        LONG retVal = CopyInfoToCString(pHandle->m_strSourceDetails, szBuf, nSize);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
+        CATCH_BLOCK(0)
     }
-    LONG retVal = CopyInfoToCString(pHandle->m_strSourceDetails, szBuf, nSize);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(0)
 }

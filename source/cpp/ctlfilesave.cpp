@@ -102,41 +102,43 @@ namespace dynarithmic
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle, LONG xPos, LONG yPos, LONG nFlags)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, nFlags))
-    // See if DLL Handle exists
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if (nFlags & DTWAIN_DLG_CLEAR_PARAMS)
-        pHandle->m_CustomPlacement.nOptions = 0;
-    else
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle, LONG xPos, LONG yPos, LONG nFlags)
     {
-        pHandle->m_CustomPlacement.xpos = xPos;
-        pHandle->m_CustomPlacement.ypos = yPos;
-        pHandle->m_CustomPlacement.nOptions = nFlags;
-        pHandle->m_CustomPlacement.hWndParent = hWndParent;
-        if (szTitle)
-            pHandle->m_CustomPlacement.sTitle = stringconversion::Convert_NativePtr_To_Wide(szTitle);
+        LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, nFlags))
+        // See if DLL Handle exists
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (nFlags & DTWAIN_DLG_CLEAR_PARAMS)
+            pHandle->m_CustomPlacement.nOptions = 0;
         else
-            pHandle->m_CustomPlacement.sTitle.clear();
+        {
+            pHandle->m_CustomPlacement.xpos = xPos;
+            pHandle->m_CustomPlacement.ypos = yPos;
+            pHandle->m_CustomPlacement.nOptions = nFlags;
+            pHandle->m_CustomPlacement.hWndParent = hWndParent;
+            if (szTitle)
+                pHandle->m_CustomPlacement.sTitle = stringconversion::Convert_NativePtr_To_Wide(szTitle);
+            else
+                pHandle->m_CustomPlacement.sTitle.clear();
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
+
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomFileSave(OPENFILENAME* lpOpenFileName)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOpenFileName))
+        // See if DLL Handle exists
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+
+        pHandle->m_pofn = std::make_unique<OPENFILENAME>();
+        memcpy(pHandle->m_pofn.get(), lpOpenFileName, sizeof(OPENFILENAME));
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
 }
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomFileSave(OPENFILENAME* lpOpenFileName)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpOpenFileName))
-    // See if DLL Handle exists
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-
-    pHandle->m_pofn = std::make_unique<OPENFILENAME>();
-    memcpy(pHandle->m_pofn.get(), lpOpenFileName, sizeof(OPENFILENAME));
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
 
 
 

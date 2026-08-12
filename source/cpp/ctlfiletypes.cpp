@@ -77,45 +77,47 @@ namespace
         return realLen;
     }
 }
-
-LONG DLLENTRY_DEF DTWAIN_GetFileTypeName(LONG nType, LPTSTR lpszName, LONG nMaxLen)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszName))
-    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypeInfo(&GetFileTypeNameInternal, nType, lpszName, nMaxLen))
-    CATCH_BLOCK(-1)
-}
+    LONG DLLENTRY_DEF DTWAIN_GetFileTypeName(LONG nType, LPTSTR lpszName, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszName))
+        LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypeInfo(&GetFileTypeNameInternal, nType, lpszName, nMaxLen))
+        CATCH_BLOCK(-1)
+    }
 
-LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensions(LONG nType, LPTSTR lpszName, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszName))
-    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypeInfo(&GetFileTypeExtensionsInternal, nType, lpszName, nMaxLen))
-    CATCH_BLOCK(-1)
-}
+    LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensions(LONG nType, LPTSTR lpszName, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszName))
+        LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypeInfo(&GetFileTypeExtensionsInternal, nType, lpszName, nMaxLen))
+        CATCH_BLOCK(-1)
+    }
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedFileTypes(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 0))
-    CATCH_BLOCK(nullptr)
-}
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedFileTypes(VOID_PROTOTYPE)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 0))
+        CATCH_BLOCK(nullptr)
+    }
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedMultiPageFileTypes(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 2))
-    CATCH_BLOCK(nullptr)
-}
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedMultiPageFileTypes(VOID_PROTOTYPE)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 2))
+        CATCH_BLOCK(nullptr)
+    }
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedSinglePageFileTypes(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 1))
-    CATCH_BLOCK(nullptr)
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedSinglePageFileTypes(VOID_PROTOTYPE)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 1))
+        CATCH_BLOCK(nullptr)
+    }
 }

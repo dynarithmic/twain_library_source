@@ -502,240 +502,242 @@ SessionCloserRAII::~SessionCloserRAII()
     catch (...) {}
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSessionEnabled()
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if ( pHandle->m_bSessionAllocated )
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK(false)
-}
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lpszDLLName)
-{
-    LOG_FUNC_ENTRY_PARAMS((hWndMsgNotify, lpszDLLName))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if (pHandle->m_bSessionAllocated)
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CTL_StringType sDLLName;
-    if (lpszDLLName)
-        sDLLName = lpszDLLName;
-#ifdef _WIN32
-    HWND hWndMsg;
-    HINSTANCE hInstance;
-
-    // Create a proxy if no window handle is given
-    if ( !hWndMsgNotify )
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSessionEnabled()
     {
-        // Create the window
-        hWndMsg = CreateTwainWindow(pHandle,nullptr,hWndMsgNotify);
-
-        // This is the window's instance handle
-        hInstance = CTL_StaticData::GetDLLInstanceHandle();
-
-        pHandle->m_bUseProxy = true;
-    }
-    else
-    {
-        // Set the TWAIN window to the user's window
-        hWndMsg = hWndMsgNotify;
-
-        // Record that we need to subclass this guy
-        pHandle->m_bUseProxy = false;
-
-        // Get the instance handle of the user's window
-        #ifdef DTWAIN_LIB
-        hInstance = CTL_StaticData::s_DLLInstance;
-        #else
-        hInstance = reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hWndMsg, GWLP_HINSTANCE));
-        #endif
-    }
-    // Error if the window does not exist
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{ return !hWndMsg;}, DTWAIN_ERR_NULL_WINDOW, false, FUNC_MACRO);
-    // Set the callback window
-    pHandle->m_hWndTwain = hWndMsg;
-#else
-    HINSTANCE hInstance;
-    // This is the window's instance handle
-    hInstance = CTL_StaticData::s_DLLInstance;
-    HWND hWndMsg;
-#endif
-
-    const CTL_StringType szName = GetDTWAINExecutionPath(); // ::dll::symbol_location(DTWAIN_DLLNAME).wstring();
-
-    // See if we need to create a TWAIN application manager
-    if ( !CTL_TwainAppMgr::GetInstance() )
-    {
-        // Create it with the parameters shown
-        if ( !CTL_TwainAppMgr::Create(pHandle,
-                                      hInstance,
-                                      CTL_StaticData::GetDLLInstanceHandle(),
-                                      lpszDLLName?sDLLName.c_str():nullptr) )
-        {
-            if ( pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
-                 pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2 )
-               DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1;}, DTWAIN_ERR_TWAINOPENSOURCEDSMNOTFOUND, false, FUNC_MACRO);
-            else
-               DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_TWAIN32DSMNOTFOUND, false, FUNC_MACRO);
-        }
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if ( pHandle->m_bSessionAllocated )
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK(false)
     }
 
-    // Create a session
-    auto Session = CTL_TwainAppMgr::CreateTwainSession( pHandle, szName.c_str(), &hWndMsg);
 
-    if ( Session == nullptr)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lpszDLLName)
     {
-        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, []{return 1;}, DTWAIN_ERR_TWAIN, false, FUNC_MACRO);
-    }
-    #ifdef DTWAIN_LIB
-    CTL_TwainAppMgr::SetDLLInstance( CTL_StaticData::s_DLLInstance );
-    #else
-    CTL_TwainAppMgr::SetDLLInstance( static_cast<HINSTANCE>(GetDLLInstance()) );
-    #endif
-    auto appInstance = CTL_TwainAppMgr::GetInstance();
-    pHandle->m_pAppMgr = appInstance.get();
-    pHandle->m_pTwainSession = Session;
-    pHandle->m_hInstance   = hInstance;
-
-    if (pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
-        pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2)
-    {
-        pHandle->m_strTWAINPath2 = CTL_TwainAppMgr::GetDSMPath();
-    }
-    else
-    {
-        pHandle->m_strTWAINPath = CTL_TwainAppMgr::GetDSMPath();
-    }
-
-    pHandle->m_nTwainPathLocation = CTL_TwainAppMgr::GetDSMPathLocation();
-    // We may need to route the messages to the user.  The user window
-    // must be aware that if it is subclassed again, the message will
-    // appear twice.
-    pHandle->m_hNotifyWnd = hWndMsgNotify;
-
-    // Destroy the pointer
-    pHandle->m_bSessionAllocated = true;
-
-    // Subclass the user's window (if necessary)
+        LOG_FUNC_ENTRY_PARAMS((hWndMsgNotify, lpszDLLName))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (pHandle->m_bSessionAllocated)
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CTL_StringType sDLLName;
+        if (lpszDLLName)
+            sDLLName = lpszDLLName;
     #ifdef _WIN32
-    if ( !pHandle->m_bUseProxy )
-        pHandle->m_hOrigProc = SubclassTwainMsgWindow(hWndMsgNotify);
-    else
-        pHandle->m_hOrigProc = nullptr;
+        HWND hWndMsg;
+        HINSTANCE hInstance;
+
+        // Create a proxy if no window handle is given
+        if ( !hWndMsgNotify )
+        {
+            // Create the window
+            hWndMsg = CreateTwainWindow(pHandle,nullptr,hWndMsgNotify);
+
+            // This is the window's instance handle
+            hInstance = CTL_StaticData::GetDLLInstanceHandle();
+
+            pHandle->m_bUseProxy = true;
+        }
+        else
+        {
+            // Set the TWAIN window to the user's window
+            hWndMsg = hWndMsgNotify;
+
+            // Record that we need to subclass this guy
+            pHandle->m_bUseProxy = false;
+
+            // Get the instance handle of the user's window
+            #ifdef DTWAIN_LIB
+            hInstance = CTL_StaticData::s_DLLInstance;
+            #else
+            hInstance = reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hWndMsg, GWLP_HINSTANCE));
+            #endif
+        }
+        // Error if the window does not exist
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{ return !hWndMsg;}, DTWAIN_ERR_NULL_WINDOW, false, FUNC_MACRO);
+        // Set the callback window
+        pHandle->m_hWndTwain = hWndMsg;
+    #else
+        HINSTANCE hInstance;
+        // This is the window's instance handle
+        hInstance = CTL_StaticData::s_DLLInstance;
+        HWND hWndMsg;
     #endif
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    // Delete it
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+        const CTL_StringType szName = GetDTWAINExecutionPath(); // ::dll::symbol_location(DTWAIN_DLLNAME).wstring();
 
-    // Check if any source is still acquiring
-    if ( pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE )
-    {
-        // Close any sources
-        DTWAIN_CloseAllSources();
-    }
-    else
-        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
-
-    if ( !pHandle->m_bSessionAllocated )
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-
-    CTL_StringTypeA sClosingDSM = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DSM) + "\n";
-    CTL_StringTypeA sClosingTwainSession = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_TWAIN_SESSION) + "\n";
-
-    // Close any sources
-    pHandle->m_pTwainSession->DestroyAllSources();
-
-    // Close the source manager
-    try
-    {
-        CTL_TwainAppMgr::CloseSourceManager(pHandle->m_pTwainSession);
-    }
-    catch(...)
-    {
-        try
+        // See if we need to create a TWAIN application manager
+        if ( !CTL_TwainAppMgr::GetInstance() )
         {
-            LogWriterUtils::WriteLogInfoIndentedA(sClosingDSM);
-        }
-        catch (...)
-        {
-            OutputDebugStringA("Could not close TWAIN DSM!");
-        }
-    }
-
-    // close the general TWAIN session
-    try
-    {
-        CTL_TwainAppMgr::DestroyTwainSession(pHandle->m_pTwainSession);
-    }
-    catch(...)
-    {
-        LogWriterUtils::WriteLogInfoIndentedA(sClosingTwainSession);
-    }
-    if ( CTL_StaticData::GetThreadToDLLHandleMap().size() == 1 )
-    {
-        auto logFilterFlags = CTL_StaticData::GetLogFilterFlags();
-        try
-        {
-            CTL_TwainAppMgr::Destroy();
-        }
-        catch(...)
-        {
-            if (logFilterFlags)
+            // Create it with the parameters shown
+            if ( !CTL_TwainAppMgr::Create(pHandle,
+                                          hInstance,
+                                          CTL_StaticData::GetDLLInstanceHandle(),
+                                          lpszDLLName?sDLLName.c_str():nullptr) )
             {
-                CTL_StringTypeA sClosingManager = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DTWAIN_MANAGER);
-                LogWriterUtils::WriteLogInfoIndentedA(sClosingManager);
+                if ( pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
+                     pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2 )
+                   DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1;}, DTWAIN_ERR_TWAINOPENSOURCEDSMNOTFOUND, false, FUNC_MACRO);
+                else
+                   DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_TWAIN32DSMNOTFOUND, false, FUNC_MACRO);
             }
         }
-        if (logFilterFlags)
+
+        // Create a session
+        auto Session = CTL_TwainAppMgr::CreateTwainSession( pHandle, szName.c_str(), &hWndMsg);
+
+        if ( Session == nullptr)
         {
-            LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_CLOSING_DTWAIN));
+            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, []{return 1;}, DTWAIN_ERR_TWAIN, false, FUNC_MACRO);
         }
+        #ifdef DTWAIN_LIB
+        CTL_TwainAppMgr::SetDLLInstance( CTL_StaticData::s_DLLInstance );
+        #else
+        CTL_TwainAppMgr::SetDLLInstance( static_cast<HINSTANCE>(GetDLLInstance()) );
+        #endif
+        auto appInstance = CTL_TwainAppMgr::GetInstance();
+        pHandle->m_pAppMgr = appInstance.get();
+        pHandle->m_pTwainSession = Session;
+        pHandle->m_hInstance   = hInstance;
+
+        if (pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
+            pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2)
+        {
+            pHandle->m_strTWAINPath2 = CTL_TwainAppMgr::GetDSMPath();
+        }
+        else
+        {
+            pHandle->m_strTWAINPath = CTL_TwainAppMgr::GetDSMPath();
+        }
+
+        pHandle->m_nTwainPathLocation = CTL_TwainAppMgr::GetDSMPathLocation();
+        // We may need to route the messages to the user.  The user window
+        // must be aware that if it is subclassed again, the message will
+        // appear twice.
+        pHandle->m_hNotifyWnd = hWndMsgNotify;
+
+        // Destroy the pointer
+        pHandle->m_bSessionAllocated = true;
+
+        // Subclass the user's window (if necessary)
+        #ifdef _WIN32
+        if ( !pHandle->m_bUseProxy )
+            pHandle->m_hOrigProc = SubclassTwainMsgWindow(hWndMsgNotify);
+        else
+            pHandle->m_hOrigProc = nullptr;
+        #endif
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
     }
 
-    // Close the window (Dummy window may have been created)
-    pHandle->m_bSessionAllocated = false;
-    #ifdef _WIN32
-    if ( pHandle->m_bUseProxy )
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     {
-        pHandle->m_CallbackMsg = nullptr;
-        if (IsWindow(pHandle->m_hWndTwain))
+        LOG_FUNC_ENTRY_PARAMS(())
+        // Delete it
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+
+        // Check if any source is still acquiring
+        if ( pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE )
+        {
+            // Close any sources
+            DTWAIN_CloseAllSources();
+        }
+        else
+            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+
+        if ( !pHandle->m_bSessionAllocated )
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+
+        CTL_StringTypeA sClosingDSM = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DSM) + "\n";
+        CTL_StringTypeA sClosingTwainSession = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_TWAIN_SESSION) + "\n";
+
+        // Close any sources
+        pHandle->m_pTwainSession->DestroyAllSources();
+
+        // Close the source manager
+        try
+        {
+            CTL_TwainAppMgr::CloseSourceManager(pHandle->m_pTwainSession);
+        }
+        catch(...)
         {
             try
             {
-                DestroyWindow(pHandle->m_hWndTwain);
+                LogWriterUtils::WriteLogInfoIndentedA(sClosingDSM);
             }
-            catch (...) {}
+            catch (...)
+            {
+                OutputDebugStringA("Could not close TWAIN DSM!");
+            }
         }
-    }
-    else
-    {
+
+        // close the general TWAIN session
         try
         {
-            // Remove subclass from the user's window
-            if ( pHandle->m_hOrigProc && pHandle->m_hWndTwain )
-                SubclassTwainMsgWindow(pHandle->m_hWndTwain, pHandle->m_hOrigProc);
+            CTL_TwainAppMgr::DestroyTwainSession(pHandle->m_pTwainSession);
         }
         catch(...)
         {
-            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
+            LogWriterUtils::WriteLogInfoIndentedA(sClosingTwainSession);
+        }
+        if ( CTL_StaticData::GetThreadToDLLHandleMap().size() == 1 )
+        {
+            auto logFilterFlags = CTL_StaticData::GetLogFilterFlags();
+            try
             {
-                LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_DTWAIN_ERROR_REMOVE_WINDOW));
+                CTL_TwainAppMgr::Destroy();
+            }
+            catch(...)
+            {
+                if (logFilterFlags)
+                {
+                    CTL_StringTypeA sClosingManager = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DTWAIN_MANAGER);
+                    LogWriterUtils::WriteLogInfoIndentedA(sClosingManager);
+                }
+            }
+            if (logFilterFlags)
+            {
+                LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_CLOSING_DTWAIN));
             }
         }
-    }
-    pHandle->m_hWndTwain = nullptr;
-    pHandle->m_hOrigProc = nullptr;
-    #endif
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
 
+        // Close the window (Dummy window may have been created)
+        pHandle->m_bSessionAllocated = false;
+        #ifdef _WIN32
+        if ( pHandle->m_bUseProxy )
+        {
+            pHandle->m_CallbackMsg = nullptr;
+            if (IsWindow(pHandle->m_hWndTwain))
+            {
+                try
+                {
+                    DestroyWindow(pHandle->m_hWndTwain);
+                }
+                catch (...) {}
+            }
+        }
+        else
+        {
+            try
+            {
+                // Remove subclass from the user's window
+                if ( pHandle->m_hOrigProc && pHandle->m_hWndTwain )
+                    SubclassTwainMsgWindow(pHandle->m_hWndTwain, pHandle->m_hOrigProc);
+            }
+            catch(...)
+            {
+                if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
+                {
+                    LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_DTWAIN_ERROR_REMOVE_WINDOW));
+                }
+            }
+        }
+        pHandle->m_hWndTwain = nullptr;
+        pHandle->m_hOrigProc = nullptr;
+        #endif
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+}

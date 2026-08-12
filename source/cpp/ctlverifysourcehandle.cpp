@@ -24,7 +24,6 @@
 #endif
 #include "cppfunc.h"
 #include "ctldtwainhandle.h"
-#include "ctliface.h"
 #include "ctlstaticdata.h"
 #include "ctltwainmanager.h"
 #include "dtwtype.h"
@@ -32,7 +31,7 @@
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
 {
     LOG_FUNC_ENTRY_PARAMS((bCheck))
     CTL_StaticData::SetCheckHandles(bCheck ? true : false);

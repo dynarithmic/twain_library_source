@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr010.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 
 using namespace dynarithmic;

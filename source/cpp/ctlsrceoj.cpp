@@ -27,7 +27,7 @@
 #endif
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetEOJDetectValue(DTWAIN_SOURCE Source, LONG nValue)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetEOJDetectValue(DTWAIN_SOURCE Source, LONG nValue)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nValue))
     auto [pHandle, pSource] = VerifyHandles(Source);

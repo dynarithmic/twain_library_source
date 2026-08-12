@@ -121,175 +121,178 @@ namespace
     }
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetStaticLibVersion()
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS(())
-    #ifndef DTWAIN_LIB
-        LOG_FUNC_EXIT_NONAME_PARAMS(0)
-        #pragma message ("Compiling DLL -- no static library")
-    #endif
-
-    #ifdef _MSC_VER
-        #if _MSC_VER < 1920
-            #error("C++ Compiler must be Visual Studio 2019 or greater")
-        #elif _MSC_VER >= 1920 && _MSC_VER < 1930
-            #pragma message ("Microsoft Visual Studio 2019 compiler used to build library")
-            LOG_FUNC_EXIT_NONAME_PARAMS(81)
-        #elif _MSC_VER >= 1930
-            #pragma message ("Microsoft Visual Studio 2022 compiler used to build library")
-            LOG_FUNC_EXIT_NONAME_PARAMS(91)
+    LONG DLLENTRY_DEF DTWAIN_GetStaticLibVersion()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        #ifndef DTWAIN_LIB
+            LOG_FUNC_EXIT_NONAME_PARAMS(0)
+            #pragma message ("Compiling DLL -- no static library")
         #endif
-    #endif
-    #ifndef _MSC_VER
-        #pragma message("Unsupported compiler being used to compile DTWAIN")
-    #endif
 
-    CATCH_BLOCK(-1)
-}
+        #ifdef _MSC_VER
+            #if _MSC_VER < 1920
+                #error("C++ Compiler must be Visual Studio 2019 or greater")
+            #elif _MSC_VER >= 1920 && _MSC_VER < 1930
+                #pragma message ("Microsoft Visual Studio 2019 compiler used to build library")
+                LOG_FUNC_EXIT_NONAME_PARAMS(81)
+            #elif _MSC_VER >= 1930
+                #pragma message ("Microsoft Visual Studio 2022 compiler used to build library")
+                LOG_FUNC_EXIT_NONAME_PARAMS(91)
+            #endif
+        #endif
+        #ifndef _MSC_VER
+            #pragma message("Unsupported compiler being used to compile DTWAIN")
+        #endif
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersion(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType)
-{
-    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType))
-    const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, nullptr) ? true : false;
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lMajor, lMinor, lVersionType))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetVal)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel)
-{
-    LOG_FUNC_ENTRY_PARAMS((lMajor,lMinor,lVersionType, lPatchLevel))
-    const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, lPatchLevel)?true:false;
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lMajor, lMinor, lVersionType, lPatchLevel))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetVal)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx2(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel, 
-                                              LPLONG lBuildNumber)
-{
-    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber))
-    const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber) ? true : false;
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetVal)
-    CATCH_BLOCK(false)
-}
-
-// Check the match type.  If version must be < than the passed-in values, return TRUE if version is <
-// If version must be equal to the passed-in values, return TRUE if version is equal
-// If version must be greater to the passed-in values, return TRUE if version is greater
-// Build number is ignored if passed-in build number is 0.
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG lPatchLevel, LONG lBuildNumber,
-                                                LONG MatchType)
-{
-    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lPatchLevel, lBuildNumber, MatchType))
-    VersionNumbersSmall info;
-    bool bMatchOk = false;
-    
-    auto versionVals = GetDTWAINDLLVersionInfo();
-
-    if (lBuildNumber == 0)
-        versionVals[3] = 0;
-
-    std::array<int, 4> userVals = { lMajor, lMinor, lPatchLevel, lBuildNumber };
-
-    int compareResults = -1;
-    if (versionVals > userVals)
-        compareResults = 1;
-    else
-    if (versionVals == userVals)
-        compareResults = 0;
-
-    switch ( MatchType )
-    {
-        case DTWAIN_CHECKDLLVERLESS:
-            bMatchOk = (compareResults == -1);
-        break;
-        case DTWAIN_CHECKDLLVEREQUAL:
-            bMatchOk = (compareResults == 0);
-        break;
-        case DTWAIN_CHECKDLLVERGREATER:
-            bMatchOk = (compareResults == 1);
-        break;
-        case DTWAIN_CHECKDLLVERLESSEQ:
-            bMatchOk = (compareResults == -1 || compareResults == 0);
-        break;
-        case DTWAIN_CHECKDLLVERGREATEREQ:
-            bMatchOk = (compareResults == 1 || compareResults == 0);
-        break;
-        default:
-            bMatchOk = (compareResults == 0);
-        break;
+        CATCH_BLOCK(-1)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(bMatchOk)
-    CATCH_BLOCK(false)
-}
 
-
-LONG DLLENTRY_DEF DTWAIN_GetVersionString(LPTSTR lpszVer, LONG nLength)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
-    const LONG RetVal = CopyInfoToCString(GetVersionString(), lpszVer, nLength);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(-1)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetLibraryPath(LPTSTR lpszVer, LONG nLength)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
-    const LONG RetVal = CopyInfoToCString(GetDTWAINDLLPath(), lpszVer, nLength);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(-1)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetShortVersionString(LPTSTR lpszVer, LONG nLength)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
-    const LONG RetVal = CopyInfoToCString(GetDTWAINDLLVersionInfoStr(), lpszVer, nLength);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(-1)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetVersionInfo(LPTSTR lpszVer, LONG nLength)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
-    const LONG RetVal = CopyInfoToCString(GetVersionInfo(), lpszVer, nLength);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(-1)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetVersionCopyright(LPTSTR lpszVer, LONG nLength)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
-    const LONG RetVal = static_cast<LONG>(GetResourceString(IDS_DTWAIN_APPTITLE, lpszVer, nLength));
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(-1)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(LPTSTR lpszBuffer, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpszBuffer, nMaxLen))
-    LONG RetVal = 0;
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
-    if (pHandle)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersion(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType)
     {
-        if (pHandle->m_sWindowsVersionInfo.empty())
+        LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType))
+        const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, nullptr) ? true : false;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lMajor, lMinor, lVersionType))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetVal)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lMajor,lMinor,lVersionType, lPatchLevel))
+        const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, lPatchLevel)?true:false;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lMajor, lMinor, lVersionType, lPatchLevel))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetVal)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx2(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel, 
+                                                  LPLONG lBuildNumber)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber))
+        const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber) ? true : false;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lMajor, lMinor, lVersionType, lPatchLevel, lBuildNumber))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetVal)
+        CATCH_BLOCK(false)
+    }
+
+    // Check the match type.  If version must be < than the passed-in values, return TRUE if version is <
+    // If version must be equal to the passed-in values, return TRUE if version is equal
+    // If version must be greater to the passed-in values, return TRUE if version is greater
+    // Build number is ignored if passed-in build number is 0.
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckDLLVersion(LONG lMajor, LONG lMinor, LONG lPatchLevel, LONG lBuildNumber,
+                                                    LONG MatchType)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lPatchLevel, lBuildNumber, MatchType))
+        VersionNumbersSmall info;
+        bool bMatchOk = false;
+    
+        auto versionVals = GetDTWAINDLLVersionInfo();
+
+        if (lBuildNumber == 0)
+            versionVals[3] = 0;
+
+        std::array<int, 4> userVals = { lMajor, lMinor, lPatchLevel, lBuildNumber };
+
+        int compareResults = -1;
+        if (versionVals > userVals)
+            compareResults = 1;
+        else
+        if (versionVals == userVals)
+            compareResults = 0;
+
+        switch ( MatchType )
         {
-            RetVal = CopyInfoToCString(GetWinVersion(), lpszBuffer, nMaxLen);
-            if (lpszBuffer)
-                pHandle->m_sWindowsVersionInfo = lpszBuffer;
+            case DTWAIN_CHECKDLLVERLESS:
+                bMatchOk = (compareResults == -1);
+            break;
+            case DTWAIN_CHECKDLLVEREQUAL:
+                bMatchOk = (compareResults == 0);
+            break;
+            case DTWAIN_CHECKDLLVERGREATER:
+                bMatchOk = (compareResults == 1);
+            break;
+            case DTWAIN_CHECKDLLVERLESSEQ:
+                bMatchOk = (compareResults == -1 || compareResults == 0);
+            break;
+            case DTWAIN_CHECKDLLVERGREATEREQ:
+                bMatchOk = (compareResults == 1 || compareResults == 0);
+            break;
+            default:
+                bMatchOk = (compareResults == 0);
+            break;
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(bMatchOk)
+        CATCH_BLOCK(false)
+    }
+
+
+    LONG DLLENTRY_DEF DTWAIN_GetVersionString(LPTSTR lpszVer, LONG nLength)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
+        const LONG RetVal = CopyInfoToCString(GetVersionString(), lpszVer, nLength);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
+        LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
+        CATCH_BLOCK(-1)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetLibraryPath(LPTSTR lpszVer, LONG nLength)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
+        const LONG RetVal = CopyInfoToCString(GetDTWAINDLLPath(), lpszVer, nLength);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
+        LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
+        CATCH_BLOCK(-1)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetShortVersionString(LPTSTR lpszVer, LONG nLength)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
+        const LONG RetVal = CopyInfoToCString(GetDTWAINDLLVersionInfoStr(), lpszVer, nLength);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
+        LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
+        CATCH_BLOCK(-1)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetVersionInfo(LPTSTR lpszVer, LONG nLength)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
+        const LONG RetVal = CopyInfoToCString(GetVersionInfo(), lpszVer, nLength);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
+        LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
+        CATCH_BLOCK(-1)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetVersionCopyright(LPTSTR lpszVer, LONG nLength)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
+        const LONG RetVal = static_cast<LONG>(GetResourceString(IDS_DTWAIN_APPTITLE, lpszVer, nLength));
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
+        LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
+        CATCH_BLOCK(-1)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(LPTSTR lpszBuffer, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpszBuffer, nMaxLen))
+        LONG RetVal = 0;
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
+        if (pHandle)
+        {
+            if (pHandle->m_sWindowsVersionInfo.empty())
+            {
+                RetVal = CopyInfoToCString(GetWinVersion(), lpszBuffer, nMaxLen);
+                if (lpszBuffer)
+                    pHandle->m_sWindowsVersionInfo = lpszBuffer;
+            }
+            else
+                RetVal = CopyInfoToCString(pHandle->m_sWindowsVersionInfo, lpszBuffer, nMaxLen);
         }
         else
-            RetVal = CopyInfoToCString(pHandle->m_sWindowsVersionInfo, lpszBuffer, nMaxLen);
+            RetVal = CopyInfoToCString(GetWinVersion(), lpszBuffer, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
+        LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
+        CATCH_BLOCK(-1)
     }
-    else
-        RetVal = CopyInfoToCString(GetWinVersion(), lpszBuffer, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(-1)
-}
+    }

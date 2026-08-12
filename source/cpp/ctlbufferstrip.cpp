@@ -24,106 +24,109 @@
 #include "ctldtwainhandle.h"
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred )
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, lpMin, lpMax, lpPreferred))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    TW_SETUPMEMXFER Xfer;
-    const bool bRet = CTL_TwainAppMgr::GetMemXferValues(pSource, &Xfer)?true:false;
-
-    if( bRet )
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred )
     {
-        if( lpMin )
-            *lpMin = Xfer.MinBufSize;
+        LOG_FUNC_ENTRY_PARAMS((Source, lpMin, lpMax, lpPreferred))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        TW_SETUPMEMXFER Xfer;
+        const bool bRet = CTL_TwainAppMgr::GetMemXferValues(pSource, &Xfer)?true:false;
 
-        if( lpMax )
-            *lpMax = Xfer.MaxBufSize;
+        if( bRet )
+        {
+            if( lpMin )
+                *lpMin = Xfer.MinBufSize;
 
-        if( lpPreferred )
-            *lpPreferred = Xfer.Preferred;
+            if( lpMax )
+                *lpMax = Xfer.MaxBufSize;
+
+            if( lpPreferred )
+                *lpPreferred = Xfer.Preferred;
+        }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpMin, lpMax, lpPreferred))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
     }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpMin, lpMax, lpPreferred))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripBuffer(DTWAIN_SOURCE Source, HANDLE hMem)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source,hMem))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    if ( !hMem )
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripBuffer(DTWAIN_SOURCE Source, HANDLE hMem)
     {
-        pSource->SetUserStripBuffer(nullptr);
+        LOG_FUNC_ENTRY_PARAMS((Source,hMem))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        if ( !hMem )
+        {
+            pSource->SetUserStripBuffer(nullptr);
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        }
+        else
+        {
+            const SIZE_T dSize = ImageMemoryHandler::GlobalSize( hMem );
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !dSize; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+            pSource->SetUserStripBuffer(hMem);
+            pSource->SetUserStripBufSize(dSize);
+        }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
     }
-    else
-    {
-        const SIZE_T dSize = ImageMemoryHandler::GlobalSize( hMem );
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !dSize; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-        pSource->SetUserStripBuffer(hMem);
-        pSource->SetUserStripBufSize(dSize);
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripSize(DTWAIN_SOURCE Source, DWORD StripSize)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, StripSize))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DWORD MinSize, MaxSize;
-    if ( StripSize == 0 )
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripSize(DTWAIN_SOURCE Source, DWORD StripSize)
     {
+        LOG_FUNC_ENTRY_PARAMS((Source, StripSize))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        DWORD MinSize, MaxSize;
+        if ( StripSize == 0 )
+        {
+            pSource->SetUserStripBufSize(StripSize);
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        }
+
+        if ( DTWAIN_GetAcquireStripSizes(Source, &MinSize, &MaxSize, nullptr) )
+        {
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return StripSize < MinSize || StripSize > MaxSize;},
+                                                        DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        }
+        else
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, []{ return true;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
         pSource->SetUserStripBufSize(StripSize);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
     }
 
-    if ( DTWAIN_GetAcquireStripSizes(Source, &MinSize, &MaxSize, nullptr) )
+    HANDLE DLLENTRY_DEF DTWAIN_GetAcquireStripBuffer(DTWAIN_SOURCE Source)
     {
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return StripSize < MinSize || StripSize > MaxSize;},
-                                                    DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        const HANDLE h = pSource->GetUserStripBuffer();
+        LOG_FUNC_EXIT_NONAME_PARAMS(h)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
     }
-    else
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, []{ return true;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-
-    pSource->SetUserStripBufSize(StripSize);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-HANDLE DLLENTRY_DEF DTWAIN_GetAcquireStripBuffer(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const HANDLE h = pSource->GetUserStripBuffer();
-    LOG_FUNC_EXIT_NONAME_PARAMS(h)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
 
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG lpCompression, LPDWORD lpBytesPerRow,
-                                                    LPDWORD lpColumns, LPDWORD lpRows, LPDWORD XOffset,
-                                                    LPDWORD YOffset, LPDWORD lpBytesWritten)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lpCompression, lpBytesPerRow,lpColumns, lpRows, XOffset,YOffset, lpBytesWritten))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const TW_IMAGEMEMXFER* pBuffer = pSource->GetBufferStripData();
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG lpCompression, LPDWORD lpBytesPerRow,
+                                                        LPDWORD lpColumns, LPDWORD lpRows, LPDWORD XOffset,
+                                                        LPDWORD YOffset, LPDWORD lpBytesWritten)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lpCompression, lpBytesPerRow,lpColumns, lpRows, XOffset,YOffset, lpBytesWritten))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        const TW_IMAGEMEMXFER* pBuffer = pSource->GetBufferStripData();
 
-    if ( lpCompression )
-        *lpCompression = pBuffer->Compression;
-    if ( lpBytesPerRow)
-        *lpBytesPerRow = pBuffer->BytesPerRow;
-    if ( lpColumns )
-        *lpColumns = pBuffer->Columns;
-    if ( lpRows )
-        *lpRows = pBuffer->Rows;
-    if ( XOffset )
-        *XOffset = pBuffer->XOffset;
-    if ( YOffset )
-        *YOffset = pBuffer->YOffset;
-    if ( lpBytesWritten)
-        *lpBytesWritten = pBuffer->BytesWritten;
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpCompression, lpBytesPerRow, lpColumns, lpRows, XOffset, YOffset, lpBytesWritten))
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
+        if ( lpCompression )
+            *lpCompression = pBuffer->Compression;
+        if ( lpBytesPerRow)
+            *lpBytesPerRow = pBuffer->BytesPerRow;
+        if ( lpColumns )
+            *lpColumns = pBuffer->Columns;
+        if ( lpRows )
+            *lpRows = pBuffer->Rows;
+        if ( XOffset )
+            *XOffset = pBuffer->XOffset;
+        if ( YOffset )
+            *YOffset = pBuffer->YOffset;
+        if ( lpBytesWritten)
+            *lpBytesWritten = pBuffer->BytesWritten;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpCompression, lpBytesPerRow, lpColumns, lpRows, XOffset, YOffset, lpBytesWritten))
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }

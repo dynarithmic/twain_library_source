@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "dtwain.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "extendedimageinfo.h"

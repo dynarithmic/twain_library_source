@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltwainmanager.h"
-#include "ctliface.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctldtwainhandle.h"
@@ -209,112 +208,114 @@ namespace
     }
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetRegisteredMsg()
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_NONAME_PARAMS(CTL_StaticData::GetRegisteredMessage())
-    CATCH_BLOCK(0L)
+    LONG DLLENTRY_DEF DTWAIN_GetRegisteredMsg()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        LOG_FUNC_EXIT_NONAME_PARAMS(CTL_StaticData::GetRegisteredMessage())
+        CATCH_BLOCK(0L)
+    }
+
+
+    DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableMsgNotify(DTWAIN_BOOL bSet)
+    {
+        LOG_FUNC_ENTRY_PARAMS((bSet))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        SetNotification(pHandle, pHandle->m_bNotificationsUsed, bSet);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableTripletsNotify(DTWAIN_BOOL bSet)
+    {
+        LOG_FUNC_ENTRY_PARAMS((bSet))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        SetNotification(pHandle, pHandle->m_bNotifyTripletsUsed, bSet);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsMsgNotifyEnabled()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_bNotificationsUsed)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsNotifyTripletsEnabled()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_bNotifyTripletsUsed)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_SetCallback(DTWAIN_CALLBACK_PROC Fn, LONG UserData)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Fn, UserData))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        const DTWAIN_CALLBACK_PROC oldProc = pHandle->m_pCallbackFn;
+        pHandle->m_pCallbackFn = Fn;
+        pHandle->m_lCallbackData = UserData;
+        if (Fn)
+            Fn(DTWAIN_TN_SETCALLBACKINIT, 0, UserData);
+        LOG_FUNC_EXIT_NONAME_PARAMS(oldProc)
+        CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_SetCallback64(DTWAIN_CALLBACK_PROC64 Fn, DTWAIN_LONG64 UserData)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Fn, UserData))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        const DTWAIN_CALLBACK_PROC64 oldProc = pHandle->m_pCallbackFn64;
+        pHandle->m_pCallbackFn64 = Fn;
+        pHandle->m_lCallbackData64 = UserData;
+        if (Fn)
+            Fn(DTWAIN_TN_SETCALLBACK64INIT, 0, UserData);
+        LOG_FUNC_EXIT_NONAME_PARAMS(oldProc)
+        CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_GetCallback()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn)
+        CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_GetCallback64()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn64)
+        CATCH_BLOCK(nullptr)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_CallCallback(WPARAM wParam, LPARAM lParam, LONG UserData)
+    {
+        LOG_FUNC_ENTRY_PARAMS((wParam, lParam, UserData))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LONG RetVal = 1;
+        if (pHandle->m_pCallbackFn)
+            RetVal = static_cast<LONG>((*pHandle->m_pCallbackFn)(wParam, lParam, UserData));
+        LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
+        CATCH_BLOCK(0)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_CallCallback64(WPARAM wParam, LPARAM lParam, LONGLONG UserData)
+    {
+        LOG_FUNC_ENTRY_PARAMS((wParam, lParam, UserData))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LONG RetVal = 1;
+        if (pHandle->m_pCallbackFn64)
+            RetVal = static_cast<LONG>((*pHandle->m_pCallbackFn64)(wParam, lParam, UserData));
+        LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
+        CATCH_BLOCK(0)
+    }
 }
-
-
-DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableMsgNotify(DTWAIN_BOOL bSet)
-{
-    LOG_FUNC_ENTRY_PARAMS((bSet))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    SetNotification(pHandle, pHandle->m_bNotificationsUsed, bSet);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableTripletsNotify(DTWAIN_BOOL bSet)
-{
-    LOG_FUNC_ENTRY_PARAMS((bSet))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    SetNotification(pHandle, pHandle->m_bNotifyTripletsUsed, bSet);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsMsgNotifyEnabled()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_bNotificationsUsed)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsNotifyTripletsEnabled()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_bNotifyTripletsUsed)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_SetCallback(DTWAIN_CALLBACK_PROC Fn, LONG UserData)
-{
-    LOG_FUNC_ENTRY_PARAMS((Fn, UserData))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const DTWAIN_CALLBACK_PROC oldProc = pHandle->m_pCallbackFn;
-    pHandle->m_pCallbackFn = Fn;
-    pHandle->m_lCallbackData = UserData;
-    if (Fn)
-        Fn(DTWAIN_TN_SETCALLBACKINIT, 0, UserData);
-    LOG_FUNC_EXIT_NONAME_PARAMS(oldProc)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_SetCallback64(DTWAIN_CALLBACK_PROC64 Fn, DTWAIN_LONG64 UserData)
-{
-    LOG_FUNC_ENTRY_PARAMS((Fn, UserData))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const DTWAIN_CALLBACK_PROC64 oldProc = pHandle->m_pCallbackFn64;
-    pHandle->m_pCallbackFn64 = Fn;
-    pHandle->m_lCallbackData64 = UserData;
-    if (Fn)
-        Fn(DTWAIN_TN_SETCALLBACK64INIT, 0, UserData);
-    LOG_FUNC_EXIT_NONAME_PARAMS(oldProc)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_GetCallback()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_GetCallback64()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn64)
-    CATCH_BLOCK(nullptr)
-}
-
-LONG DLLENTRY_DEF DTWAIN_CallCallback(WPARAM wParam, LPARAM lParam, LONG UserData)
-{
-    LOG_FUNC_ENTRY_PARAMS((wParam, lParam, UserData))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LONG RetVal = 1;
-    if (pHandle->m_pCallbackFn)
-        RetVal = static_cast<LONG>((*pHandle->m_pCallbackFn)(wParam, lParam, UserData));
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(0)
-}
-
-LONG DLLENTRY_DEF DTWAIN_CallCallback64(WPARAM wParam, LPARAM lParam, LONGLONG UserData)
-{
-    LOG_FUNC_ENTRY_PARAMS((wParam, lParam, UserData))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LONG RetVal = 1;
-    if (pHandle->m_pCallbackFn64)
-        RetVal = static_cast<LONG>((*pHandle->m_pCallbackFn64)(wParam, lParam, UserData));
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(0)
-}
-
 
 namespace
 {
@@ -751,7 +752,7 @@ namespace dynarithmic
 #endif // _WIN32
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DisableAppWindow(HWND hWnd, DTWAIN_BOOL bDisable)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DisableAppWindow(HWND hWnd, DTWAIN_BOOL bDisable)
 {
    LOG_FUNC_ENTRY_PARAMS((hWnd, bDisable))
    #ifdef _WIN32

@@ -28,38 +28,41 @@
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMaxRetryAttempts(DTWAIN_SOURCE Source, LONG nAttempts)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, nAttempts))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    pSource->SetMaxRetryAttempts(nAttempts);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMaxRetryAttempts(DTWAIN_SOURCE Source, LONG nAttempts)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, nAttempts))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        pSource->SetMaxRetryAttempts(nAttempts);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
-LONG DLLENTRY_DEF DTWAIN_GetMaxRetryAttempts(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG retval = pSource->GetMaxRetryAttempts();
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE2)
-}
+    LONG DLLENTRY_DEF DTWAIN_GetMaxRetryAttempts(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const LONG retval = pSource->GetMaxRetryAttempts();
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE2)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCurrentRetryCount(DTWAIN_SOURCE Source, LONG nCount)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, nCount))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    pSource->SetCurrentRetryCount(nCount);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCurrentRetryCount(DTWAIN_SOURCE Source, LONG nCount)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, nCount))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        pSource->SetCurrentRetryCount(nCount);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
-LONG DLLENTRY_DEF DTWAIN_GetCurrentRetryCount(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG retval = pSource->GetCurrentRetryCount();
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+    LONG DLLENTRY_DEF DTWAIN_GetCurrentRetryCount(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const LONG retval = pSource->GetCurrentRetryCount();
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+    }
 }

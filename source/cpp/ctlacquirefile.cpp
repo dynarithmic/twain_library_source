@@ -118,125 +118,128 @@ namespace
     }
 }
 
-DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
-                                                    DTWAIN_ARRAY aFileNames,
-                                                    LONG     lFileType,
-                                                    LONG     lFileFlags,
-                                                    LONG     PixelType,
-                                                    LONG     lMaxPages,
-                                                    DTWAIN_BOOL bShowUI,
-                                                    DTWAIN_BOOL bCloseSource,
-                                                    LPLONG pStatus)
+extern "C" 
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI,bCloseSource, pStatus))
-    int bRetval = DTWAIN_NO_ERROR;
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
+                                                        DTWAIN_ARRAY aFileNames,
+                                                        LONG     lFileType,
+                                                        LONG     lFileFlags,
+                                                        LONG     PixelType,
+                                                        LONG     lMaxPages,
+                                                        DTWAIN_BOOL bShowUI,
+                                                        DTWAIN_BOOL bCloseSource,
+                                                        LPLONG pStatus)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI,bCloseSource, pStatus))
+        int bRetval = DTWAIN_NO_ERROR;
+        auto [pHandle, pSource] = VerifyHandles(Source);
     
-    // Check for null aFileNames
-    if (!aFileNames)
-    {
-        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
-    }
-
-    // Check if file format is supported
-    if (!IsSupportedFileType(Source, lFileType, lFileFlags))
-    {
-        DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    }
-
-    DTWAIN_ARRAY tempNames = nullptr;
-    DTWAINArrayPtr_RAII tempRAII(pHandle, &tempNames);
-    DTWAIN_ARRAY arrayToUse = aFileNames;
-    std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
-    auto& factory = pHandle->m_ArrayFactory;
-
-    const LONG Type = CTL_ArrayFactory::tagtype_to_arraytype(factory->tag_type(aFileNames));
-    const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-    const auto idx = std::distance(validTypes.begin(), itArrType);
-
-    if ( idx > 0 )
-    {
-        if (idx == 1)
+        // Check for null aFileNames
+        if (!aFileNames)
         {
-            // Check for empty array and for blank entries (both are not allowed)
-            bRetval = CheckValidNames<std::string>(pHandle, aFileNames, &tempNames, &ArrayCopyAnsiToNative);
+            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
         }
-        else
+
+        // Check if file format is supported
+        if (!IsSupportedFileType(Source, lFileType, lFileFlags))
         {
-            // Check for empty array and for blank entries (both are not allowed)
-            bRetval = CheckValidNames<std::wstring>(pHandle, aFileNames, &tempNames, &ArrayCopyWideToNative);
+            DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
-        if (tempNames)
-            arrayToUse = tempNames;
+
+        DTWAIN_ARRAY tempNames = nullptr;
+        DTWAINArrayPtr_RAII tempRAII(pHandle, &tempNames);
+        DTWAIN_ARRAY arrayToUse = aFileNames;
+        std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
+        auto& factory = pHandle->m_ArrayFactory;
+
+        const LONG Type = CTL_ArrayFactory::tagtype_to_arraytype(factory->tag_type(aFileNames));
+        const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+        const auto idx = std::distance(validTypes.begin(), itArrType);
+
+        if ( idx > 0 )
+        {
+            if (idx == 1)
+            {
+                // Check for empty array and for blank entries (both are not allowed)
+                bRetval = CheckValidNames<std::string>(pHandle, aFileNames, &tempNames, &ArrayCopyAnsiToNative);
+            }
+            else
+            {
+                // Check for empty array and for blank entries (both are not allowed)
+                bRetval = CheckValidNames<std::wstring>(pHandle, aFileNames, &tempNames, &ArrayCopyWideToNative);
+            }
+            if (tempNames)
+                arrayToUse = tempNames;
+        }
+
+        // Return error if array is empty or if there are blank entries
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return bRetval != DTWAIN_NO_ERROR; }, bRetval, false, FUNC_MACRO);
+
+        FileAcquireOptions fOps = {};
+        fOps.fileFlags = lFileFlags | DTWAIN_USELIST;
+        fOps.fileList = arrayToUse;
+        fOps.fileName = nullptr;
+        fOps.fileType = lFileType;
+
+        bool bRetval2 = AcquireHelper(pHandle, pSource, ACQUIREFILE, 
+                                      false, 0, false, nullptr, PixelType, lMaxPages, bShowUI, &fOps, pStatus).second;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetval2)
+        CATCH_BLOCK_LOG_PARAMS(false)
     }
 
-    // Return error if array is empty or if there are blank entries
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return bRetval != DTWAIN_NO_ERROR; }, bRetval, false, FUNC_MACRO);
-
-    FileAcquireOptions fOps = {};
-    fOps.fileFlags = lFileFlags | DTWAIN_USELIST;
-    fOps.fileList = arrayToUse;
-    fOps.fileName = nullptr;
-    fOps.fileType = lFileType;
-
-    bool bRetval2 = AcquireHelper(pHandle, pSource, ACQUIREFILE, 
-                                  false, 0, false, nullptr, PixelType, lMaxPages, bShowUI, &fOps, pStatus).second;
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval2)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
-                                                  LPCTSTR   lpszFile,
-                                                  LONG     lFileType,
-                                                  LONG     lFileFlags,
-                                                  LONG     PixelType,
-                                                  LONG     lMaxPages,
-                                                  DTWAIN_BOOL bShowUI,
-                                                  DTWAIN_BOOL bCloseSource,
-                                                  LPLONG pStatus)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-
-    // Check for null filename
-    if (!lpszFile)
+    DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
+                                                      LPCTSTR   lpszFile,
+                                                      LONG     lFileType,
+                                                      LONG     lFileFlags,
+                                                      LONG     PixelType,
+                                                      LONG     lMaxPages,
+                                                      DTWAIN_BOOL bShowUI,
+                                                      DTWAIN_BOOL bCloseSource,
+                                                      LPLONG pStatus)
     {
-        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+
+        // Check for null filename
+        if (!lpszFile)
+        {
+            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        }
+
+        DTWAIN_ARRAY aFileNames = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0).second;
+        DTWAINArrayPtr_RAII tempRAII(pHandle, &aFileNames);
+
+        // Parse the file name list into separate items.  
+        ParseFileNames(pHandle, nullptr, lpszFile, &aFileNames);
+
+        auto bRetval = DTWAIN_AcquireFileEx(Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
+
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+        CATCH_BLOCK_LOG_PARAMS(false)
     }
 
-    DTWAIN_ARRAY aFileNames = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0).second;
-    DTWAINArrayPtr_RAII tempRAII(pHandle, &aFileNames);
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileAutoIncrement(DTWAIN_SOURCE Source, LONG nValue, DTWAIN_BOOL bResetOnAcquire, DTWAIN_BOOL bSet)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, nValue, bResetOnAcquire, bSet))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        pSource->SetFileAutoIncrement(bSet ? true : false, nValue);
+        pSource->SetFileAutoIncrementFlags(bResetOnAcquire ? DTWAIN_INCREMENT_DYNAMIC : DTWAIN_INCREMENT_DEFAULT);
+        pSource->SetFileAutoIncrementBase(0);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
-    // Parse the file name list into separate items.  
-    ParseFileNames(pHandle, nullptr, lpszFile, &aFileNames);
-
-    auto bRetval = DTWAIN_AcquireFileEx(Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
-
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileAutoIncrement(DTWAIN_SOURCE Source, LONG nValue, DTWAIN_BOOL bResetOnAcquire, DTWAIN_BOOL bSet)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, nValue, bResetOnAcquire, bSet))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    pSource->SetFileAutoIncrement(bSet ? true : false, nValue);
-    pSource->SetFileAutoIncrementFlags(bResetOnAcquire ? DTWAIN_INCREMENT_DYNAMIC : DTWAIN_INCREMENT_DEFAULT);
-    pSource->SetFileAutoIncrementBase(0);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetFileSavePageCount(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->GetAcquireFileStatusRef().GetFileSavePageCount())
-    CATCH_BLOCK_LOG_PARAMS(-1)
+    LONG DLLENTRY_DEF DTWAIN_GetFileSavePageCount(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pSource->GetAcquireFileStatusRef().GetFileSavePageCount())
+        CATCH_BLOCK_LOG_PARAMS(-1)
+    }
 }
 
 namespace dynarithmic

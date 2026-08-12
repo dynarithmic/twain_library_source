@@ -42,42 +42,44 @@ namespace
 }
 
 /////////////// Patch code support //////////////////////////
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPatchcodeCapsSupported(DTWAIN_SOURCE Source)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    constexpr std::array<LONG, 7> nCapToTest = {
-        ICAP_PATCHCODESEARCHMODE,
-        ICAP_PATCHCODEDETECTIONENABLED,
-        ICAP_SUPPORTEDPATCHCODETYPES   ,
-        ICAP_PATCHCODEMAXSEARCHPRIORITIES,
-        ICAP_PATCHCODESEARCHPRIORITIES,
-        ICAP_PATCHCODEMAXRETRIES,
-        ICAP_PATCHCODETIMEOUT
-    };
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    auto bRet = IsCapInList(pSource, nCapToTest);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-/////////////// barcode support //////////////////////////
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBarcodeCapsSupported(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPatchcodeCapsSupported(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
         constexpr std::array<LONG, 7> nCapToTest = {
-            ICAP_BARCODESEARCHMODE,
-            ICAP_BARCODEDETECTIONENABLED,
-            ICAP_SUPPORTEDBARCODETYPES   ,
-            ICAP_BARCODEMAXSEARCHPRIORITIES,
-            ICAP_BARCODESEARCHPRIORITIES,
-            ICAP_BARCODEMAXRETRIES,
-            ICAP_BARCODETIMEOUT
-    };
+            ICAP_PATCHCODESEARCHMODE,
+            ICAP_PATCHCODEDETECTIONENABLED,
+            ICAP_SUPPORTEDPATCHCODETYPES   ,
+            ICAP_PATCHCODEMAXSEARCHPRIORITIES,
+            ICAP_PATCHCODESEARCHPRIORITIES,
+            ICAP_PATCHCODEMAXRETRIES,
+            ICAP_PATCHCODETIMEOUT
+        };
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        auto bRet = IsCapInList(pSource, nCapToTest);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
 
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    auto bRet = IsCapInList(pSource, nCapToTest);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    /////////////// barcode support //////////////////////////
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBarcodeCapsSupported(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+            constexpr std::array<LONG, 7> nCapToTest = {
+                ICAP_BARCODESEARCHMODE,
+                ICAP_BARCODEDETECTIONENABLED,
+                ICAP_SUPPORTEDBARCODETYPES   ,
+                ICAP_BARCODEMAXSEARCHPRIORITIES,
+                ICAP_BARCODESEARCHPRIORITIES,
+                ICAP_BARCODEMAXRETRIES,
+                ICAP_BARCODETIMEOUT
+        };
+
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        auto bRet = IsCapInList(pSource, nCapToTest);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
 }
-
-/////////////////////////
+    /////////////////////////

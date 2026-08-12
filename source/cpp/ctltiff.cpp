@@ -20,7 +20,6 @@
  */
 #include "cppfunc.h"
 #include "dtwain.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "ctldtwainhandle.h"
@@ -28,39 +27,42 @@
 using namespace dynarithmic;
 
 /////////////////////////////  TIFF Settings ///////////////////////////////
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFInvert(DTWAIN_SOURCE Source, LONG Setting)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, Setting))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    pSource->SetPhotometric( Setting );
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFInvert(DTWAIN_SOURCE Source, LONG Setting)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Setting))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        pSource->SetPhotometric( Setting );
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFCompressType(DTWAIN_SOURCE Source, LONG Setting)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Setting))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    // Must be in state 4 or higher
-    auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFCompressType(DTWAIN_SOURCE Source, LONG Setting)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Setting))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        // Must be in state 4 or higher
+        auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
 
-    const SourceState theState = pSource->GetState();
-    const bool bIsTiff = IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(Setting));
-    LONG curAcquireType = acquireFileStatus.GetAcquireFileFormat();
-    const bool bIsCurTiff = IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
+        const SourceState theState = pSource->GetState();
+        const bool bIsTiff = IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(Setting));
+        LONG curAcquireType = acquireFileStatus.GetAcquireFileFormat();
+        const bool bIsCurTiff = IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
 
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return theState < SOURCE_STATE_UIENABLED;}, DTWAIN_ERR_INVALID_STATE, false,
-                                        FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return theState < SOURCE_STATE_UIENABLED;}, DTWAIN_ERR_INVALID_STATE, false,
+                                            FUNC_MACRO);
 
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !bIsTiff;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !bIsTiff;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !bIsCurTiff;}, DTWAIN_ERR_FILE_FORMAT, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !bIsCurTiff;}, DTWAIN_ERR_FILE_FORMAT, false, FUNC_MACRO);
 
-    if (IsFileTypeMultiPage(static_cast<CTL_TwainFileFormatEnum>(curAcquireType)))
-        acquireFileStatus.SetAcquireFileFormat(GetMultiPageType(static_cast<CTL_TwainFileFormatEnum>(Setting)));
-    else
-        acquireFileStatus.SetAcquireFileFormat(static_cast<CTL_TwainFileFormatEnum>(Setting));
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
+        if (IsFileTypeMultiPage(static_cast<CTL_TwainFileFormatEnum>(curAcquireType)))
+            acquireFileStatus.SetAcquireFileFormat(GetMultiPageType(static_cast<CTL_TwainFileFormatEnum>(Setting)));
+        else
+            acquireFileStatus.SetAcquireFileFormat(static_cast<CTL_TwainFileFormatEnum>(Setting));
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }

@@ -28,41 +28,44 @@
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMultipageScanMode(DTWAIN_SOURCE Source, LONG ScanType)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, ScanType))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const bool bSaveIncomplete = ScanType & DTWAIN_FILESAVE_SAVEINCOMPLETE ? true : false;
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMultipageScanMode(DTWAIN_SOURCE Source, LONG ScanType)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, ScanType))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const bool bSaveIncomplete = ScanType & DTWAIN_FILESAVE_SAVEINCOMPLETE ? true : false;
 
-    // remove the DTWAIN_FILESAVE_INCOMPLETE mask
-    ScanType = ScanType &~DTWAIN_FILESAVE_SAVEINCOMPLETE;
+        // remove the DTWAIN_FILESAVE_INCOMPLETE mask
+        ScanType = ScanType &~DTWAIN_FILESAVE_SAVEINCOMPLETE;
 
-    if (ScanType != DTWAIN_FILESAVE_DEFAULT &&
-        ScanType != DTWAIN_FILESAVE_SOURCECLOSE &&
-        ScanType != DTWAIN_FILESAVE_UICLOSE &&
-        ScanType != DTWAIN_FILESAVE_ENDACQUIRE &&
-        ScanType != DTWAIN_FILESAVE_MANUALSAVE)
-        ScanType = DTWAIN_FILESAVE_DEFAULT;
-    // Flush any pages
-    if (pSource->IsMultiPageModeContinuous())
-        pSource->ProcessMultipageFile();
+        if (ScanType != DTWAIN_FILESAVE_DEFAULT &&
+            ScanType != DTWAIN_FILESAVE_SOURCECLOSE &&
+            ScanType != DTWAIN_FILESAVE_UICLOSE &&
+            ScanType != DTWAIN_FILESAVE_ENDACQUIRE &&
+            ScanType != DTWAIN_FILESAVE_MANUALSAVE)
+            ScanType = DTWAIN_FILESAVE_DEFAULT;
+        // Flush any pages
+        if (pSource->IsMultiPageModeContinuous())
+            pSource->ProcessMultipageFile();
 
-    // Set the scan mode
-    pSource->SetMultiPageScanMode(ScanType);
+        // Set the scan mode
+        pSource->SetMultiPageScanMode(ScanType);
 
-    // Set the flag to save if file is incomplete (multipage scan cancelled)
-    pSource->SetFileIncompleteSaveMode(bSaveIncomplete);
+        // Set the flag to save if file is incomplete (multipage scan cancelled)
+        pSource->SetFileIncompleteSaveMode(bSaveIncomplete);
 
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FlushAcquiredPages(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    if (pSource->IsMultiPageModeContinuous())
-        pSource->ProcessMultipageFile();
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FlushAcquiredPages(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        if (pSource->IsMultiPageModeContinuous())
+            pSource->ProcessMultipageFile();
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }

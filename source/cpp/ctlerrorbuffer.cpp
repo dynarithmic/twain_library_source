@@ -21,105 +21,106 @@
 #include <algorithm>
 
 #include "cppfunc.h"
-#include "ctliface.h"
 #include "errorcheck.h"
 #include "ctldtwainhandle.h"
 using namespace dynarithmic;
 
-LONG DLLENTRY_DEF DTWAIN_GetLastError()
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS(())
-
-    // Test stuff
-    std::string sTest = "VueScan TWAIN";
-
-    auto sNew = basicstringutils::TrimAll(sTest);
-
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
-    if ( !pHandle )
+    LONG DLLENTRY_DEF DTWAIN_GetLastError()
     {
-        LONG err = DTWAIN_ERR_BAD_HANDLE;
-        if (!CTL_StaticData::ResourcesLoaded())
-            err = CTL_StaticData::GetResourceLoadError();
-        LOG_FUNC_EXIT_NONAME_PARAMS(err)
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_lLastError)
-    CATCH_BLOCK(DTWAIN_ERR_BAD_HANDLE)
-}
+        LOG_FUNC_ENTRY_PARAMS(())
 
-LONG DLLENTRY_DEF DTWAIN_SetLastError(LONG nError)
-{
-    LOG_FUNC_ENTRY_PARAMS((nError))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
-    if (!pHandle)
+        // Test stuff
+        std::string sTest = "VueScan TWAIN";
+
+        auto sNew = basicstringutils::TrimAll(sTest);
+
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
+        if ( !pHandle )
+        {
+            LONG err = DTWAIN_ERR_BAD_HANDLE;
+            if (!CTL_StaticData::ResourcesLoaded())
+                err = CTL_StaticData::GetResourceLoadError();
+            LOG_FUNC_EXIT_NONAME_PARAMS(err)
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_lLastError)
+        CATCH_BLOCK(DTWAIN_ERR_BAD_HANDLE)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_SetLastError(LONG nError)
     {
-        LONG err = DTWAIN_ERR_BAD_HANDLE;
-        if (!CTL_StaticData::ResourcesLoaded())
-            err = DTWAIN_ERR_RESOURCES_NOT_FOUND;
-        LOG_FUNC_EXIT_NONAME_PARAMS(err)
+        LOG_FUNC_ENTRY_PARAMS((nError))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
+        if (!pHandle)
+        {
+            LONG err = DTWAIN_ERR_BAD_HANDLE;
+            if (!CTL_StaticData::ResourcesLoaded())
+                err = DTWAIN_ERR_RESOURCES_NOT_FOUND;
+            LOG_FUNC_EXIT_NONAME_PARAMS(err)
+        }
+        pHandle->m_lLastError = nError;
+        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_NO_ERROR)
+        CATCH_BLOCK(-1)
     }
-    pHandle->m_lLastError = nError;
-    LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_NO_ERROR)
-    CATCH_BLOCK(-1)
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
+    {
+        LOG_FUNC_ENTRY_PARAMS((ArrayBuffer))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !ArrayBuffer; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
+        const size_t nEntries = (std::min)(static_cast<size_t>(pHandle->m_nErrorBufferThreshold), pHandle->m_vErrorBuffer.size());
+        auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+
+        auto theArray =  retVal.second;
+        DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
+
+        auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(theArray);
+        std::copy_n(pHandle->m_vErrorBuffer.begin(), nEntries, vIn.begin());
+        MoveArray(pHandle, ArrayBuffer, &theArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearErrorBuffer(VOID_PROTOTYPE)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        std::deque<int> tempdeque;
+        tempdeque.swap(pHandle->m_vErrorBuffer);
+
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(DWORD nErrors)
+    {
+        LOG_FUNC_ENTRY_PARAMS((nErrors))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+
+        // Minimum of 50 errors
+        const DWORD nEntries = (std::max<DWORD>)(nErrors, 50);
+
+        // clear buffer
+        pHandle->m_nErrorBufferThreshold = nEntries;
+
+        std::deque<int> tempdeque;
+        tempdeque.swap(pHandle->m_vErrorBuffer);
+
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    DWORD DLLENTRY_DEF DTWAIN_GetErrorBufferThreshold(VOID_PROTOTYPE)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        const DWORD nValues = pHandle->m_nErrorBufferThreshold;
+        LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
+        CATCH_BLOCK(-1)
+    }
 }
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
-{
-    LOG_FUNC_ENTRY_PARAMS((ArrayBuffer))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !ArrayBuffer; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-
-    const size_t nEntries = (std::min)(static_cast<size_t>(pHandle->m_nErrorBufferThreshold), pHandle->m_vErrorBuffer.size());
-    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
-
-    auto theArray =  retVal.second;
-    DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
-
-    auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(theArray);
-    std::copy_n(pHandle->m_vErrorBuffer.begin(), nEntries, vIn.begin());
-    MoveArray(pHandle, ArrayBuffer, &theArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearErrorBuffer(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    std::deque<int> tempdeque;
-    tempdeque.swap(pHandle->m_vErrorBuffer);
-
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(DWORD nErrors)
-{
-    LOG_FUNC_ENTRY_PARAMS((nErrors))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-
-    // Minimum of 50 errors
-    const DWORD nEntries = (std::max<DWORD>)(nErrors, 50);
-
-    // clear buffer
-    pHandle->m_nErrorBufferThreshold = nEntries;
-
-    std::deque<int> tempdeque;
-    tempdeque.swap(pHandle->m_vErrorBuffer);
-
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-DWORD DLLENTRY_DEF DTWAIN_GetErrorBufferThreshold(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const DWORD nValues = pHandle->m_nErrorBufferThreshold;
-    LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
-    CATCH_BLOCK(-1)
-}
-

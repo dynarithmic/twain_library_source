@@ -937,132 +937,135 @@ namespace
 
 }
 
-//////////////////////////////// Initialize DLL /////////////////////////////
-LONG DLLENTRY_DEF DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((pHandle))
-    LONG retVal = 0;
-    if (!IsDLLHandleValid(static_cast<CTL_TwainDLLHandle*>(pHandle), FALSE))
+    //////////////////////////////// Initialize DLL /////////////////////////////
+    LONG DLLENTRY_DEF DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pHandle))
+        LONG retVal = 0;
+        if (!IsDLLHandleValid(static_cast<CTL_TwainDLLHandle*>(pHandle), FALSE))
+            LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
+        retVal = IsDLLHandleValid(static_cast<CTL_TwainDLLHandle*>(pHandle), TRUE) ? DTWAIN_TWAINSESSIONOK : DTWAIN_APIHANDLEOK;
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    retVal = IsDLLHandleValid(static_cast<CTL_TwainDLLHandle*>(pHandle), TRUE) ? DTWAIN_TWAINSESSIONOK : DTWAIN_APIHANDLEOK;
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(0)
-}
+        CATCH_BLOCK(0)
+    }
 
-LONG DLLENTRY_DEF DTWAIN_GetConditionCodeString(LONG CC, LPTSTR lpszBuffer, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((CC, lpszBuffer, nMaxLen))
-    const LONG lError = -(IDS_TWCC_ERRORSTART + CC);
-    const LONG Retval = DTWAIN_GetErrorString(lError, lpszBuffer, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(Retval)
-    CATCH_BLOCK(0)
-}
+    LONG DLLENTRY_DEF DTWAIN_GetConditionCodeString(LONG CC, LPTSTR lpszBuffer, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((CC, lpszBuffer, nMaxLen))
+        const LONG lError = -(IDS_TWCC_ERRORSTART + CC);
+        const LONG Retval = DTWAIN_GetErrorString(lError, lpszBuffer, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
+        LOG_FUNC_EXIT_NONAME_PARAMS(Retval)
+        CATCH_BLOCK(0)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsInitialized()
-{
-    // Get the Current task
-    LOG_FUNC_ENTRY_PARAMS(())
-    const DWORD hTask = getThreadId();
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsInitialized()
+    {
+        // Get the Current task
+        LOG_FUNC_ENTRY_PARAMS(())
+        const DWORD hTask = getThreadId();
 
-#ifdef DTWAIN_LIB
-    if ( CTL_StaticData::s_DLLInstance == NULL )
+    #ifdef DTWAIN_LIB
+        if ( CTL_StaticData::s_DLLInstance == NULL )
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        if ( !CTL_StaticData::s_DLLHandles.empty() )
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    if ( !CTL_StaticData::s_DLLHandles.empty() )
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-#else
-    // Check if this task has already been hooked
-    if (FindTask( hTask ) )
-        // Already hooked.  No need to do this again
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-#endif
-    CATCH_BLOCK(false)
-}
+    #else
+        // Check if this task has already been hooked
+        if (FindTask( hTask ) )
+            // Already hooked.  No need to do this again
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    #endif
+        CATCH_BLOCK(false)
+    }
 
 
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_GetDTWAINHandle()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_NONAME_PARAMS(::GetDTWAINHandle_Internal())
-    CATCH_BLOCK(nullptr)
-}
+    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_GetDTWAINHandle()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        LOG_FUNC_EXIT_NONAME_PARAMS(::GetDTWAINHandle_Internal())
+        CATCH_BLOCK(nullptr)
+    }
 
-DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLib(HINSTANCE hInstance)
-{
-    LOG_FUNC_ENTRY_PARAMS((hInstance))
+    DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLib(HINSTANCE hInstance)
+    {
+        LOG_FUNC_ENTRY_PARAMS((hInstance))
 
-#ifdef DTWAIN_LIB
-    CTL_StaticData::s_DLLInstance = hInstance;
-#endif
-    const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
-    LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-    CATCH_BLOCK(nullptr)
-}
+    #ifdef DTWAIN_LIB
+        CTL_StaticData::s_DLLInstance = hInstance;
+    #endif
+        const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
+        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
+        CATCH_BLOCK(nullptr)
+    }
 
-DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLibEx2(HINSTANCE hInstance,
-                                                       LPCTSTR szINIPath,
+    DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLibEx2(HINSTANCE hInstance,
+                                                           LPCTSTR szINIPath,
+                                                           LPCTSTR szImageDLLPath,
+                                                           LPCTSTR szLangResourcePath)
+    {
+        LOG_FUNC_ENTRY_PARAMS((hInstance, szINIPath, szImageDLLPath,szLangResourcePath))
+
+        SetLangResourcePath(szLangResourcePath);
+
+        const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
+        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
+        CATCH_BLOCK(nullptr)
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx(HINSTANCE hInstance, LPCTSTR szINIPath)
+    {
+        LOG_FUNC_ENTRY_PARAMS((hInstance, szINIPath))
+
+        CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
+
+        const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLib(hInstance);
+        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
+        CATCH_BLOCK(nullptr)
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////// Initialize Library EX2 code //////////////////////////////////////
+    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
                                                        LPCTSTR szImageDLLPath,
                                                        LPCTSTR szLangResourcePath)
-{
-    LOG_FUNC_ENTRY_PARAMS((hInstance, szINIPath, szImageDLLPath,szLangResourcePath))
+    {
+        LOG_FUNC_ENTRY_PARAMS((szINIPath, szImageDLLPath, szLangResourcePath))
 
-    SetLangResourcePath(szLangResourcePath);
+        SetLangResourcePath(szLangResourcePath);
+        const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeEx(szINIPath);
+        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
+        CATCH_BLOCK(nullptr)
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
+    {
+        LOG_FUNC_ENTRY_PARAMS((szINIPath))
+        CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
+        const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
+        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
+        CATCH_BLOCK(nullptr)
+    }
 
-    const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
-    LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-    CATCH_BLOCK(nullptr)
-}
+    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeNoBlocking()
+    {
+        return SysInitializeImpl({ false, false , false });
+    }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx(HINSTANCE hInstance, LPCTSTR szINIPath)
-{
-    LOG_FUNC_ENTRY_PARAMS((hInstance, szINIPath))
+    DTWAIN_HANDLE  DLLENTRY_DEF DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile)
+    {
+        return SysInitializeImpl({ false, bCreateLogFile ? true : false , false });
+    }
 
-    CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
-
-    const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLib(hInstance);
-    LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-    CATCH_BLOCK(nullptr)
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////// Initialize Library EX2 code //////////////////////////////////////
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
-                                                   LPCTSTR szImageDLLPath,
-                                                   LPCTSTR szLangResourcePath)
-{
-    LOG_FUNC_ENTRY_PARAMS((szINIPath, szImageDLLPath, szLangResourcePath))
-
-    SetLangResourcePath(szLangResourcePath);
-    const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeEx(szINIPath);
-    LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-    CATCH_BLOCK(nullptr)
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
-{
-    LOG_FUNC_ENTRY_PARAMS((szINIPath))
-    CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
-    const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
-    LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeNoBlocking()
-{
-    return SysInitializeImpl({ false, false , false });
-}
-
-DTWAIN_HANDLE  DLLENTRY_DEF DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile)
-{
-    return SysInitializeImpl({ false, bCreateLogFile ? true : false , false });
-}
-
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
-{
-    return SysInitializeImpl({ true, false , false });
+    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
+    {
+        return SysInitializeImpl({ true, false , false });
+    }
 }
 
 DTWAIN_BOOL DTWAIN_SetSourceCloseMode(LONG lCloseMode)
@@ -1082,81 +1085,84 @@ LONG DTWAIN_GetSourceCloseMode()
     CATCH_BLOCK(0)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
+extern "C"
 {
-    std::lock_guard<std::mutex> lg(CTL_StaticData::s_mutexInitDestroy);
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if (!DTWAIN_EndTwainSession())
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    const DTWAIN_BOOL bRet = SysDestroyHelper(FUNC_MACRO, pHandle);
-    if (!bRet)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     {
+        std::lock_guard<std::mutex> lg(CTL_StaticData::s_mutexInitDestroy);
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (!DTWAIN_EndTwainSession())
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        const DTWAIN_BOOL bRet = SysDestroyHelper(FUNC_MACRO, pHandle);
+        if (!bRet)
+        {
+            #if DTWAIN_BUILD_LOGCALLSTACK == 1
+            LogValue(FUNC_MACRO, false, false);
+            #endif
+        }
         #if DTWAIN_BUILD_LOGCALLSTACK == 1
-        LogValue(FUNC_MACRO, false, false);
+        if (CTL_StaticData::GetLogFilterFlags())
+            CTL_LogFunctionCallA(CTL_StaticData::GetLogFilterFlags(), FUNC_MACRO, 1);
         #endif
+        return bRet;
+        CATCH_BLOCK(false)
     }
-    #if DTWAIN_BUILD_LOGCALLSTACK == 1
-    if (CTL_StaticData::GetLogFilterFlags())
-        CTL_LogFunctionCallA(CTL_StaticData::GetLogFilterFlags(), FUNC_MACRO, 1);
-    #endif
-    return bRet;
-    CATCH_BLOCK(false)
-}
 
 
-/* This function tests all open DLL handles to see if any source is acquiring */
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsAcquiring()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const auto iter = std::find_if(pHandle->m_mapStringToSource.begin(),
-                                   pHandle->m_mapStringToSource.end(), 
-                                [&](const CTL_StringToSourcePtrMap::value_type& vt) {return vt.second->IsAcquireAttempt(); });
-    if ( iter != pHandle->m_mapStringToSource.end())
-         LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK(false)
-}
-
-HWND  DLLENTRY_DEF  DTWAIN_GetTwainHwnd()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_hWndTwain)
-    CATCH_BLOCK(nullptr)
-}
-
-
-LONG DLLENTRY_DEF DTWAIN_GetTwainMode()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_lAcquireMode)
-    CATCH_BLOCK(-1L)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainMode(LONG lMode)
-{
-    LOG_FUNC_ENTRY_PARAMS((lMode))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    switch (lMode)
+    /* This function tests all open DLL handles to see if any source is acquiring */
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsAcquiring()
     {
-        case DTWAIN_MODELESS:
-        case DTWAIN_MODAL:
-            pHandle->m_lAcquireMode = lMode;
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        break;
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        const auto iter = std::find_if(pHandle->m_mapStringToSource.begin(),
+                                       pHandle->m_mapStringToSource.end(), 
+                                    [&](const CTL_StringToSourcePtrMap::value_type& vt) {return vt.second->IsAcquireAttempt(); });
+        if ( iter != pHandle->m_mapStringToSource.end())
+             LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK(false)
     }
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, []{return 0;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK(false)
-}
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AppHandlesExceptions(DTWAIN_BOOL bSet)
-{
-    CTL_StaticData::SetThrowExceptions(bSet?true:false);
-    return TRUE;
+    HWND  DLLENTRY_DEF  DTWAIN_GetTwainHwnd()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_hWndTwain)
+        CATCH_BLOCK(nullptr)
+    }
+
+
+    LONG DLLENTRY_DEF DTWAIN_GetTwainMode()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_lAcquireMode)
+        CATCH_BLOCK(-1L)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainMode(LONG lMode)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lMode))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        switch (lMode)
+        {
+            case DTWAIN_MODELESS:
+            case DTWAIN_MODAL:
+                pHandle->m_lAcquireMode = lMode;
+                LOG_FUNC_EXIT_NONAME_PARAMS(true)
+            break;
+        }
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, []{return 0;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AppHandlesExceptions(DTWAIN_BOOL bSet)
+    {
+        CTL_StaticData::SetThrowExceptions(bSet?true:false);
+        return TRUE;
+    }
 }
 
 #ifdef _WIN32

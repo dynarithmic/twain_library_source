@@ -548,104 +548,105 @@ namespace dynarithmic
         CATCH_BLOCK(false)
     }
 }
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayGetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType))
-    DTWAIN_ARRAY arr = {};
-    DTWAIN_GetCapValues(Source, lCap, lGetType, &arr);
-    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
-    CATCH_BLOCK(nullptr) 
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayGetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType))
+        DTWAIN_ARRAY arr = {};
+        DTWAIN_GetCapValues(Source, lCap, lGetType, &arr);
+        LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+        CATCH_BLOCK(nullptr) 
+    }
+
+
+    // Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
+    // with caution!!
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayGetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType )
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType))
+        DTWAIN_ARRAY arr = {};
+        DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, lContainerType, DTWAIN_DEFAULT, &arr);
+        LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+        CATCH_BLOCK(nullptr) 
+    }
+
+    // Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
+    // with caution!!
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayGetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType,
+                                                           LONG nDataType)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        DTWAIN_ARRAY arr = {};
+        GetCapValuesEx2_Internal(pSource, lCap, lGetType, lContainerType, nDataType, &arr);
+        LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
+    }
+
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray )
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, pArray))
+        const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+
+    // Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
+    // with caution!!
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LPDTWAIN_ARRAY pArray )
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, pArray))
+        const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, lContainerType, DTWAIN_DEFAULT, pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    // Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
+    // with caution!!
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType,
+                                                     LONG nDataType, LPDTWAIN_ARRAY pArray )
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType,pArray))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        BOOL bRet = GetCapValuesEx2_Internal(pSource, lCap, lGetType, lContainerType, nDataType, pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, DTWAIN_ARRAY pArray )
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, pArray))
+        const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx2(Source, lCap, lSetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, LONG lContainerType,
+                                                    LONG nDataType, DTWAIN_ARRAY pArray )
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, lContainerType, nDataType, pArray))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        bool bRet = SetCapValuesEx2_Internal(pSource, lCap, lSetType, lContainerType, nDataType, pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, LONG lContainerType,
+                                                    DTWAIN_ARRAY pArray )
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, lContainerType, pArray))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        DTWAIN_BOOL bRet = FALSE;
+        auto nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<TW_UINT16 >(lCap), pSource);
+        if ( nDataType < 0)
+            DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return true;} , DTWAIN_ERR_BAD_CAP, false, FUNC_MACRO, false);
+        else
+            bRet = SetCapValuesEx2_Internal(pSource, lCap, lSetType, lContainerType, nDataType, pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }
-
-
-// Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
-// with caution!!
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayGetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType )
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType))
-    DTWAIN_ARRAY arr = {};
-    DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, lContainerType, DTWAIN_DEFAULT, &arr);
-    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
-    CATCH_BLOCK(nullptr) 
-}
-
-// Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
-// with caution!!
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayGetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType,
-                                                       LONG nDataType)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DTWAIN_ARRAY arr = {};
-    GetCapValuesEx2_Internal(pSource, lCap, lGetType, lContainerType, nDataType, &arr);
-    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray )
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, pArray))
-    const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-
-// Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
-// with caution!!
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LPDTWAIN_ARRAY pArray )
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, pArray))
-    const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, lContainerType, DTWAIN_DEFAULT, pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-// Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
-// with caution!!
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType,
-                                                 LONG nDataType, LPDTWAIN_ARRAY pArray )
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType,pArray))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    BOOL bRet = GetCapValuesEx2_Internal(pSource, lCap, lGetType, lContainerType, nDataType, pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, DTWAIN_ARRAY pArray )
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, pArray))
-    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx2(Source, lCap, lSetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, LONG lContainerType,
-                                                LONG nDataType, DTWAIN_ARRAY pArray )
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, lContainerType, nDataType, pArray))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    bool bRet = SetCapValuesEx2_Internal(pSource, lCap, lSetType, lContainerType, nDataType, pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, LONG lContainerType,
-                                                DTWAIN_ARRAY pArray )
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, lContainerType, pArray))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DTWAIN_BOOL bRet = FALSE;
-    auto nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<TW_UINT16 >(lCap), pSource);
-    if ( nDataType < 0)
-        DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return true;} , DTWAIN_ERR_BAD_CAP, false, FUNC_MACRO, false);
-    else
-        bRet = SetCapValuesEx2_Internal(pSource, lCap, lSetType, lContainerType, nDataType, pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-

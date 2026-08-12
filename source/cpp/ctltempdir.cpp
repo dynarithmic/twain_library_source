@@ -54,67 +54,70 @@ namespace dynarithmic
     }
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG CreationFlags)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((szFilePath, CreationFlags))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if (CreationFlags == 0)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG CreationFlags)
     {
-        const filesys::path p(szFilePath);
-
-        if (exists(p))
+        LOG_FUNC_ENTRY_PARAMS((szFilePath, CreationFlags))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (CreationFlags == 0)
         {
-            if (is_directory(p))
+            const filesys::path p(szFilePath);
+
+            if (exists(p))
             {
-                #ifdef _UNICODE
-                auto retVal = p.generic_wstring();
-                #else
-                auto retVal = p.generic_string();
-                #endif
-                pHandle->m_sTempFilePath = retVal;
-                LOG_FUNC_EXIT_NONAME_PARAMS(true)
+                if (is_directory(p))
+                {
+                    #ifdef _UNICODE
+                    auto retVal = p.generic_wstring();
+                    #else
+                    auto retVal = p.generic_string();
+                    #endif
+                    pHandle->m_sTempFilePath = retVal;
+                    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+                }
+                else
+                    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [] { return false; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
             }
-            else
-                DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [] { return false; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
         }
+        else
+        if (CreationFlags & DTWAIN_TEMPDIR_CREATEDIRECTORY)
+        {
+            bool bLogMessages = (CTL_StaticData::GetLogFilterFlags()) ? true : false;
+            CTL_StringType sTemp = WindowsAPIImplDef::RemoveBackslashFromDirectory(szFilePath);
+            auto dirCreated = fileutils::create_directory(sTemp.c_str());
+            if (!dirCreated.first)
+            {
+                if (bLogMessages)
+                {
+                    std::string sMessage = GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " + 
+                        stringutils::QuoteString(dirCreated.second);
+                    LogWriterUtils::WriteLogInfoIndentedA(sMessage);
+                }
+                DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
+            }
+            pHandle->m_sTempFilePath = WindowsAPIImplDef::AddBackslashToDirectory(sTemp);
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK(false)
     }
-    else
-    if (CreationFlags & DTWAIN_TEMPDIR_CREATEDIRECTORY)
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectory(LPCTSTR szFilePath)
     {
-        bool bLogMessages = (CTL_StaticData::GetLogFilterFlags()) ? true : false;
-        CTL_StringType sTemp = WindowsAPIImplDef::RemoveBackslashFromDirectory(szFilePath);
-        auto dirCreated = fileutils::create_directory(sTemp.c_str());
-        if (!dirCreated.first)
-        {
-            if (bLogMessages)
-            {
-                std::string sMessage = GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " + 
-                    stringutils::QuoteString(dirCreated.second);
-                LogWriterUtils::WriteLogInfoIndentedA(sMessage);
-            }
-            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
-        }
-        pHandle->m_sTempFilePath = WindowsAPIImplDef::AddBackslashToDirectory(sTemp);
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        LOG_FUNC_ENTRY_PARAMS((szFilePath))
+        const DTWAIN_BOOL bRetval = DTWAIN_SetTempFileDirectoryEx(szFilePath, 0);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+        CATCH_BLOCK(false)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK(false)
-}
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectory(LPCTSTR szFilePath)
-{
-    LOG_FUNC_ENTRY_PARAMS((szFilePath))
-    const DTWAIN_BOOL bRetval = DTWAIN_SetTempFileDirectoryEx(szFilePath, 0);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
-    CATCH_BLOCK(false)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectory(LPTSTR szFilePath, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((szFilePath, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG nRealLen = CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFilePath))
-    LOG_FUNC_EXIT_NONAME_PARAMS(nRealLen)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
+    LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectory(LPTSTR szFilePath, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((szFilePath, nMaxLen))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        const LONG nRealLen = CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFilePath))
+        LOG_FUNC_EXIT_NONAME_PARAMS(nRealLen)
+        CATCH_BLOCK(DTWAIN_FAILURE1)
+    }
 }

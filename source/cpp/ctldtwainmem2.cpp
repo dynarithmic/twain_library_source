@@ -70,102 +70,104 @@ namespace
     }
 }
 
-
-HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory(DWORD memSize)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((memSize))
-    auto h = GeneralAllocator<SystemAllocation<SIZE_T>, SIZE_T>(memSize, SystemAllocation<SIZE_T>{});
-    LOG_FUNC_EXIT_NONAME_PARAMS(h)
-    CATCH_BLOCK(nullptr)
-}
-
-// DTWAIN 2.0 memory related functions for 64-bit allocations
-HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory64(ULONG64 memSize)
-{
-    LOG_FUNC_ENTRY_PARAMS((memSize))
-    #ifndef _WIN64
-        #ifdef WIN32
-            // Make sure that the amount of memory is not > 4GB
-            SIZE_T maxMemory = static_cast<SIZE_T>(std::min<ULONG64>(memSize, std::numeric_limits<SIZE_T>::max()));
-            auto h = GeneralAllocator<SystemAllocation<SIZE_T>, SIZE_T>(maxMemory, SystemAllocation<SIZE_T>{});
-        #endif
-    #else
-        // 64-bit, so we don't care what memSize is.
+    HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory(DWORD memSize)
+    {
+        LOG_FUNC_ENTRY_PARAMS((memSize))
         auto h = GeneralAllocator<SystemAllocation<SIZE_T>, SIZE_T>(memSize, SystemAllocation<SIZE_T>{});
-    #endif
-    LOG_FUNC_EXIT_NONAME_PARAMS(h)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemory(HANDLE h)
-{
-    LOG_FUNC_ENTRY_PARAMS((h))
-    const DTWAIN_BOOL bRet = ImageMemoryHandler::GlobalFree(h) ? TRUE : FALSE;
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemory(HANDLE h)
-{
-    LOG_FUNC_ENTRY_PARAMS((h))
-    const DTWAIN_MEMORY_PTR ptr = ImageMemoryHandler::GlobalLock(h);
-    LOG_FUNC_EXIT_NONAME_PARAMS(ptr)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemory(HANDLE h)
-{
-    LOG_FUNC_ENTRY_PARAMS((h))
-    const DTWAIN_BOOL bRet = ImageMemoryHandler::GlobalUnlock(h);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemoryEx(DWORD memSize)
-{
-    LOG_FUNC_ENTRY_PARAMS((memSize))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    TwainAllocation<DWORD> allocation(pHandle);
-    auto h = GeneralAllocator<TwainAllocation<DWORD>, DWORD>(memSize, allocation);
-    LOG_FUNC_EXIT_NONAME_PARAMS(h)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemoryEx(HANDLE h)
-{
-    LOG_FUNC_ENTRY_PARAMS((h))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_BOOL bRet = FALSE;
-    if (pHandle->m_TwainMemoryFunc)
-    {
-        pHandle->m_TwainMemoryFunc->FreeMemory(h);
-        bRet = TRUE;
+        LOG_FUNC_EXIT_NONAME_PARAMS(h)
+        CATCH_BLOCK(nullptr)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
 
-DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemoryEx(HANDLE h)
-{
-    LOG_FUNC_ENTRY_PARAMS((h))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_MEMORY_PTR ptr = nullptr;
-    if (pHandle->m_TwainMemoryFunc)
-        ptr = pHandle->m_TwainMemoryFunc->LockMemory(h);
-    LOG_FUNC_EXIT_NONAME_PARAMS(ptr)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemoryEx(HANDLE h)
-{
-    LOG_FUNC_ENTRY_PARAMS((h))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_BOOL bRet = FALSE;
-    if (pHandle->m_TwainMemoryFunc)
+    // DTWAIN 2.0 memory related functions for 64-bit allocations
+    HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory64(ULONG64 memSize)
     {
-        pHandle->m_TwainMemoryFunc->UnlockMemory(h);
-        bRet = TRUE;
+        LOG_FUNC_ENTRY_PARAMS((memSize))
+        #ifndef _WIN64
+            #ifdef WIN32
+                // Make sure that the amount of memory is not > 4GB
+                SIZE_T maxMemory = static_cast<SIZE_T>(std::min<ULONG64>(memSize, std::numeric_limits<SIZE_T>::max()));
+                auto h = GeneralAllocator<SystemAllocation<SIZE_T>, SIZE_T>(maxMemory, SystemAllocation<SIZE_T>{});
+            #endif
+        #else
+            // 64-bit, so we don't care what memSize is.
+            auto h = GeneralAllocator<SystemAllocation<SIZE_T>, SIZE_T>(memSize, SystemAllocation<SIZE_T>{});
+        #endif
+        LOG_FUNC_EXIT_NONAME_PARAMS(h)
+        CATCH_BLOCK(nullptr)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemory(HANDLE h)
+    {
+        LOG_FUNC_ENTRY_PARAMS((h))
+        const DTWAIN_BOOL bRet = ImageMemoryHandler::GlobalFree(h) ? TRUE : FALSE;
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemory(HANDLE h)
+    {
+        LOG_FUNC_ENTRY_PARAMS((h))
+        const DTWAIN_MEMORY_PTR ptr = ImageMemoryHandler::GlobalLock(h);
+        LOG_FUNC_EXIT_NONAME_PARAMS(ptr)
+        CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemory(HANDLE h)
+    {
+        LOG_FUNC_ENTRY_PARAMS((h))
+        const DTWAIN_BOOL bRet = ImageMemoryHandler::GlobalUnlock(h);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemoryEx(DWORD memSize)
+    {
+        LOG_FUNC_ENTRY_PARAMS((memSize))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        TwainAllocation<DWORD> allocation(pHandle);
+        auto h = GeneralAllocator<TwainAllocation<DWORD>, DWORD>(memSize, allocation);
+        LOG_FUNC_EXIT_NONAME_PARAMS(h)
+        CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemoryEx(HANDLE h)
+    {
+        LOG_FUNC_ENTRY_PARAMS((h))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        DTWAIN_BOOL bRet = FALSE;
+        if (pHandle->m_TwainMemoryFunc)
+        {
+            pHandle->m_TwainMemoryFunc->FreeMemory(h);
+            bRet = TRUE;
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemoryEx(HANDLE h)
+    {
+        LOG_FUNC_ENTRY_PARAMS((h))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        DTWAIN_MEMORY_PTR ptr = nullptr;
+        if (pHandle->m_TwainMemoryFunc)
+            ptr = pHandle->m_TwainMemoryFunc->LockMemory(h);
+        LOG_FUNC_EXIT_NONAME_PARAMS(ptr)
+        CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemoryEx(HANDLE h)
+    {
+        LOG_FUNC_ENTRY_PARAMS((h))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        DTWAIN_BOOL bRet = FALSE;
+        if (pHandle->m_TwainMemoryFunc)
+        {
+            pHandle->m_TwainMemoryFunc->UnlockMemory(h);
+            bRet = TRUE;
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
 }

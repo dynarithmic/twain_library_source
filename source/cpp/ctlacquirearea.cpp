@@ -154,91 +154,93 @@ namespace
 }
 
 ///////////////////////////////////////////////////////////////////////
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquireAreaEx(DTWAIN_SOURCE Source, LONG lGetType)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, lGetType))
-    DTWAIN_ARRAY FloatArray = {};
-    DTWAIN_GetAcquireArea(Source, lGetType, &FloatArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(FloatArray)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetType, LPDTWAIN_ARRAY FloatArray)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !FloatArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<TW_UINT16>(lGetType));
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetType, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lSetType, FloatArray, ActualArray))
-    VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const DTWAIN_BOOL bRet = SetImageSize(Source, FloatArray, ActualArray,static_cast<TW_UINT16>(lSetType));
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2String(DTWAIN_SOURCE Source, LPCTSTR left, LPCTSTR top, LPCTSTR right, LPCTSTR bottom, LONG Unit, LONG flags)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
-    const DTWAIN_FLOAT val1 = CharTraits<CharType>::ToDouble(left);
-    const DTWAIN_FLOAT val2 = CharTraits<CharType>::ToDouble(top);
-    const DTWAIN_FLOAT val3 = CharTraits<CharType>::ToDouble(right);
-    const DTWAIN_FLOAT val4 = CharTraits<CharType>::ToDouble(bottom);
-    const DTWAIN_BOOL bRet = DTWAIN_SetAcquireArea2(Source, val1, val2, val3, val4, Unit, flags);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLOAT left, DTWAIN_FLOAT top, DTWAIN_FLOAT right, DTWAIN_FLOAT bottom, LONG Unit, LONG flags)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !IsValidMeasureUnit(Unit); },
-                                    DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    const DTWAIN_BOOL bRet = SetImageSize2(pSource, left, top, right, bottom, Unit, flags);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTSTR left, LPTSTR top, LPTSTR right, LPTSTR bottom, LPLONG Unit)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
-    std::array<DTWAIN_FLOAT, 4> val = {};
-    std::array<LPTSTR, 4> pStr = { left?left:nullptr, top?top:nullptr, right?right:nullptr, bottom?bottom:nullptr };
-    const DTWAIN_BOOL bRet = DTWAIN_GetAcquireArea2(Source, &val[0], &val[1], &val[2], &val[3], Unit);
-    if (bRet)
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquireAreaEx(DTWAIN_SOURCE Source, LONG lGetType)
     {
-        std::ostringstream strm;
-        auto numDigits = strm.precision();
-        for (size_t i = 0; i < val.size(); ++i)
-        {
-            strm << std::setprecision(numDigits) << val[i];
-            if (pStr[i])
-            {
-                std::string sResult = strm.str();
-                CopyInfoToCString(stringconversion::Convert_Ansi_To_Native(sResult), 
-                                               pStr[i], static_cast<int32_t>(sResult.size()) + 1);
-            }
-            strm.str("");
-        }
+        LOG_FUNC_ENTRY_PARAMS((Source, lGetType))
+        DTWAIN_ARRAY FloatArray = {};
+        DTWAIN_GetAcquireArea(Source, lGetType, &FloatArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(FloatArray)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
     }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT  left, LPDTWAIN_FLOAT  top, LPDTWAIN_FLOAT  right, LPDTWAIN_FLOAT  bottom, LPLONG Unit)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const DTWAIN_BOOL bRet = GetImageSize2(pSource, left, top, right, bottom, Unit);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetType, LPDTWAIN_ARRAY FloatArray)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !FloatArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<TW_UINT16>(lGetType));
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetType, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lSetType, FloatArray, ActualArray))
+        VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        const DTWAIN_BOOL bRet = SetImageSize(Source, FloatArray, ActualArray,static_cast<TW_UINT16>(lSetType));
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2String(DTWAIN_SOURCE Source, LPCTSTR left, LPCTSTR top, LPCTSTR right, LPCTSTR bottom, LONG Unit, LONG flags)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
+        const DTWAIN_FLOAT val1 = CharTraits<CharType>::ToDouble(left);
+        const DTWAIN_FLOAT val2 = CharTraits<CharType>::ToDouble(top);
+        const DTWAIN_FLOAT val3 = CharTraits<CharType>::ToDouble(right);
+        const DTWAIN_FLOAT val4 = CharTraits<CharType>::ToDouble(bottom);
+        const DTWAIN_BOOL bRet = DTWAIN_SetAcquireArea2(Source, val1, val2, val3, val4, Unit, flags);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLOAT left, DTWAIN_FLOAT top, DTWAIN_FLOAT right, DTWAIN_FLOAT bottom, LONG Unit, LONG flags)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !IsValidMeasureUnit(Unit); },
+                                        DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        const DTWAIN_BOOL bRet = SetImageSize2(pSource, left, top, right, bottom, Unit, flags);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTSTR left, LPTSTR top, LPTSTR right, LPTSTR bottom, LPLONG Unit)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
+        std::array<DTWAIN_FLOAT, 4> val = {};
+        std::array<LPTSTR, 4> pStr = { left?left:nullptr, top?top:nullptr, right?right:nullptr, bottom?bottom:nullptr };
+        const DTWAIN_BOOL bRet = DTWAIN_GetAcquireArea2(Source, &val[0], &val[1], &val[2], &val[3], Unit);
+        if (bRet)
+        {
+            std::ostringstream strm;
+            auto numDigits = strm.precision();
+            for (size_t i = 0; i < val.size(); ++i)
+            {
+                strm << std::setprecision(numDigits) << val[i];
+                if (pStr[i])
+                {
+                    std::string sResult = strm.str();
+                    CopyInfoToCString(stringconversion::Convert_Ansi_To_Native(sResult), 
+                                                   pStr[i], static_cast<int32_t>(sResult.size()) + 1);
+                }
+                strm.str("");
+            }
+        }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT  left, LPDTWAIN_FLOAT  top, LPDTWAIN_FLOAT  right, LPDTWAIN_FLOAT  bottom, LPLONG Unit)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        const DTWAIN_BOOL bRet = GetImageSize2(pSource, left, top, right, bottom, Unit);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+}

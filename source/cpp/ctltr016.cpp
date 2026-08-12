@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr016.h"
-#include "ctliface.h"
 
 using namespace dynarithmic;
 

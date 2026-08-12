@@ -21,7 +21,6 @@
 #include "dtwain.h"
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
-#include "ctliface.h"
 #include "cppfunc.h"
 #include <errorcheck.h>
 #include "ctldtwainhandle.h"
@@ -90,122 +89,125 @@ namespace
     }
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResources(LPCTSTR sLangDLL)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((sLangDLL))
-    auto bRet = DTWAIN_LoadCustomStringResourcesEx(sLangDLL, false);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DTWAIN_BOOL bClear)
-{
-    LOG_FUNC_ENTRY_PARAMS((sLangDLL, bClear))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !sLangDLL; }, DTWAIN_ERR_BLANKNAMEDETECTED, false, FUNC_MACRO);
-    bool bRet = GenericResourceLoader(pHandle, sLangDLL, bClear);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadLanguageResource(LONG nLanguage)
-{
-    LOG_FUNC_ENTRY_PARAMS((nLanguage))
-    LPCTSTR pLangDLL;
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    switch(nLanguage)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResources(LPCTSTR sLangDLL)
     {
-        case DTWAIN_RES_ENGLISH:
-            pLangDLL = _T("english");
-            break;
-        case DTWAIN_RES_FRENCH:
-            pLangDLL = _T("french");
-            break;
-        case DTWAIN_RES_SPANISH:
-            pLangDLL = _T("spanish");
-            break;
-        case DTWAIN_RES_GERMAN:
-            pLangDLL = _T("german");
-            break;
-        case DTWAIN_RES_DUTCH:
-            pLangDLL = _T("dutch");
-            break;
-        case DTWAIN_RES_ITALIAN:
-            pLangDLL = _T("italian");
-            break;
-        default:
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        LOG_FUNC_ENTRY_PARAMS((sLangDLL))
+        auto bRet = DTWAIN_LoadCustomStringResourcesEx(sLangDLL, false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
     }
 
-    // Add the resource to the registry.
-    const DTWAIN_BOOL bRet = DTWAIN_LoadCustomStringResources(pLangDLL);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-LONG DLLENTRY_DEF  DTWAIN_GetResourceString(LONG ResourceID, LPTSTR lpszBuffer, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((ResourceID, lpszBuffer, nMaxLen))
-    auto nTotalBytes = GetResourceStringInternal(ResourceID, lpszBuffer, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
-    CATCH_BLOCK(0)
-}
-
-LONG DLLENTRY_DEF  DTWAIN_GetErrorString(LONG lError, LPTSTR lpszBuffer, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((lError, lpszBuffer, nMaxLen))
-    auto nTotalBytes = GetResourceStringInternal(lError, lpszBuffer, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
-    CATCH_BLOCK(0)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePath(LPCTSTR ResourcePath)
-{
-    LOG_FUNC_ENTRY_PARAMS((ResourcePath))
-    if ( ResourcePath )
-        CTL_StaticData::GetResourcePath() = ResourcePath;
-    else
-        CTL_StaticData::GetResourcePath() = _T("");
-    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
-    CATCH_BLOCK(false)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainName(LPCTSTR lpszBuffer)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto badValue = std::numeric_limits<LONG>::min();
-    auto retVal = CTL_StaticData::GetIDFromTwainName(stringconversion::Convert_NativePtr_To_Ansi(lpszBuffer));
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first ? static_cast<LONG>(retVal.second) : badValue);
-    CATCH_BLOCK(std::numeric_limits<LONG>::min())
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
-{
-    LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
-    if (!ret.first)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DTWAIN_BOOL bClear)
     {
+        LOG_FUNC_ENTRY_PARAMS((sLangDLL, bClear))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !sLangDLL; }, DTWAIN_ERR_BLANKNAMEDETECTED, false, FUNC_MACRO);
+        bool bRet = GenericResourceLoader(pHandle, sLangDLL, bClear);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadLanguageResource(LONG nLanguage)
+    {
+        LOG_FUNC_ENTRY_PARAMS((nLanguage))
+        LPCTSTR pLangDLL;
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        switch(nLanguage)
+        {
+            case DTWAIN_RES_ENGLISH:
+                pLangDLL = _T("english");
+                break;
+            case DTWAIN_RES_FRENCH:
+                pLangDLL = _T("french");
+                break;
+            case DTWAIN_RES_SPANISH:
+                pLangDLL = _T("spanish");
+                break;
+            case DTWAIN_RES_GERMAN:
+                pLangDLL = _T("german");
+                break;
+            case DTWAIN_RES_DUTCH:
+                pLangDLL = _T("dutch");
+                break;
+            case DTWAIN_RES_ITALIAN:
+                pLangDLL = _T("italian");
+                break;
+            default:
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
+
+        // Add the resource to the registry.
+        const DTWAIN_BOOL bRet = DTWAIN_LoadCustomStringResources(pLangDLL);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    LONG DLLENTRY_DEF  DTWAIN_GetResourceString(LONG ResourceID, LPTSTR lpszBuffer, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((ResourceID, lpszBuffer, nMaxLen))
+        auto nTotalBytes = GetResourceStringInternal(ResourceID, lpszBuffer, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
+        LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
+        CATCH_BLOCK(0)
+    }
+
+    LONG DLLENTRY_DEF  DTWAIN_GetErrorString(LONG lError, LPTSTR lpszBuffer, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lError, lpszBuffer, nMaxLen))
+        auto nTotalBytes = GetResourceStringInternal(lError, lpszBuffer, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
+        LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
+        CATCH_BLOCK(0)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePath(LPCTSTR ResourcePath)
+    {
+        LOG_FUNC_ENTRY_PARAMS((ResourcePath))
+        if ( ResourcePath )
+            CTL_StaticData::GetResourcePath() = ResourcePath;
+        else
+            CTL_StaticData::GetResourcePath() = _T("");
+        LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+        CATCH_BLOCK(false)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainName(LPCTSTR lpszBuffer)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto badValue = std::numeric_limits<LONG>::min();
+        auto retVal = CTL_StaticData::GetIDFromTwainName(stringconversion::Convert_NativePtr_To_Ansi(lpszBuffer));
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first ? static_cast<LONG>(retVal.second) : badValue);
+        CATCH_BLOCK(std::numeric_limits<LONG>::min())
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
+        if (!ret.first)
+        {
+            LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+        }
+        auto numChars = CopyInfoToCString(ret.second, lpszOut, nSize);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
-        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+        LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+        CATCH_BLOCK(-1)
     }
-    auto numChars = CopyInfoToCString(ret.second, lpszOut, nSize);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
-    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
-    CATCH_BLOCK(-1)
-}
 
-LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantEx(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
-{
-    LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
-    auto numChars = CopyInfoToCString(ret.second, lpszOut, nSize);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
-    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
-    CATCH_BLOCK(0)
+    LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantEx(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
+        auto numChars = CopyInfoToCString(ret.second, lpszOut, nSize);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+        LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+        CATCH_BLOCK(0)
+    }
 }

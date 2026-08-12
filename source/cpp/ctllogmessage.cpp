@@ -24,7 +24,7 @@
 #include "ctldtwainhandle.h"
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
 {
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if ( pHandle )

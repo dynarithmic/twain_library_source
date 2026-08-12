@@ -22,8 +22,6 @@
 #include <utility>
 #include "imagexferfilewriter.h"
 #include "logwriterutils.h"
-
-#include "ctliface.h"
 #include "ctltr026.h"
 #include "ctltwainmanager.h"
 #include "ctlfilesave.h"

@@ -30,7 +30,6 @@
 #include <sstream>
 #include <array>
 #include <boost/dll/shared_library.hpp>
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "dtwinverex.h"
 #include "logwriterutils.h"

@@ -40,7 +40,7 @@ namespace dynarithmic
 using namespace dynarithmic;
 
 // This function allows the user to only show the UI
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);

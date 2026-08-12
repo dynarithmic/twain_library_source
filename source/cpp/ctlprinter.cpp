@@ -19,169 +19,170 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctliface.h"
 #include "errorcheck.h"
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrintersArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY AvailPrinters)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, AvailPrinters))
-    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx2(Source, CAP_PRINTER, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, AvailPrinters );
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-// Deprecated -- Use DTWAIN_SetAvailablePrintersArray
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG lpAvailPrinters)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lpAvailPrinters))
-    if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTER) )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-
-    auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
-    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 32);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
-    auto Array = retVal.second;
-
-    // Destroys array when out of scope
-    DTWAINArrayLowLevel_RAII a(pHandle, Array);
-    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
-
-    LONG j = 0;
-    for ( LONG i = 0; i < 8; i++ )
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrintersArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY AvailPrinters)
     {
-        if ( lpAvailPrinters & 1L << i )
-        {
-            vValues[j] = i;
-            ++j;
-        }
-     }
-
-    const DTWAIN_BOOL bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTER, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array );
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-// Deprecated -- Use DTWAIN_SetPrinterEx
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, DTWAIN_BOOL bSetCurrent)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
-    auto retValue = DTWAIN_SetPrinterEx(Source, nPrinter, bSetCurrent);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retValue)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG nPrinter, DTWAIN_BOOL bSetCurrent)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
-    if (!DTWAIN_IsCapSupported(Source, CAP_PRINTER))
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
-    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
-    auto Array = retVal.second;
-    DTWAINArrayLowLevel_RAII a(pHandle, Array);
-
-    LONG SetType = DTWAIN_CAPSET;
-    if (!bSetCurrent)
-        SetType = DTWAIN_CAPRESET;
-    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
-    DTWAIN_BOOL bRet = 0;
-    if (!vValues.empty())
-    {
-         vValues[0] = nPrinter;
-         bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTER, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array);
+        LOG_FUNC_ENTRY_PARAMS((Source, AvailPrinters))
+        const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx2(Source, CAP_PRINTER, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, AvailPrinters );
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPrinterEnabled(DTWAIN_SOURCE Source, LONG Printer)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Printer))
-    LONG Current;
-    if ( DTWAIN_GetPrinter(Source, &Current, TRUE ) )
+    // Deprecated -- Use DTWAIN_SetAvailablePrintersArray
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG lpAvailPrinters)
     {
-        if ( Current == Printer || Printer == DTWAIN_ANYSUPPORT)
+        LOG_FUNC_ENTRY_PARAMS((Source, lpAvailPrinters))
+        if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTER) )
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+        auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const auto pHandle = pSource->GetDTWAINHandle();
+        auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 32);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+        auto Array = retVal.second;
+
+        // Destroys array when out of scope
+        DTWAINArrayLowLevel_RAII a(pHandle, Array);
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
+
+        LONG j = 0;
+        for ( LONG i = 0; i < 8; i++ )
+        {
+            if ( lpAvailPrinters & 1L << i )
+            {
+                vValues[j] = i;
+                ++j;
+            }
+         }
+
+        const DTWAIN_BOOL bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTER, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array );
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    // Deprecated -- Use DTWAIN_SetPrinterEx
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, DTWAIN_BOOL bSetCurrent)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
+        auto retValue = DTWAIN_SetPrinterEx(Source, nPrinter, bSetCurrent);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retValue)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG nPrinter, DTWAIN_BOOL bSetCurrent)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
+        if (!DTWAIN_IsCapSupported(Source, CAP_PRINTER))
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const auto pHandle = pSource->GetDTWAINHandle();
+        auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+        auto Array = retVal.second;
+        DTWAINArrayLowLevel_RAII a(pHandle, Array);
+
+        LONG SetType = DTWAIN_CAPSET;
+        if (!bSetCurrent)
+            SetType = DTWAIN_CAPRESET;
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
+        DTWAIN_BOOL bRet = 0;
+        if (!vValues.empty())
+        {
+             vValues[0] = nPrinter;
+             bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTER, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array);
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPrinterEnabled(DTWAIN_SOURCE Source, LONG Printer)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Printer))
+        LONG Current;
+        if ( DTWAIN_GetPrinter(Source, &Current, TRUE ) )
+        {
+            if ( Current == Printer || Printer == DTWAIN_ANYSUPPORT)
+                LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_ARRAY ArrayString, LPLONG pNumStrings)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, ArrayString, pNumStrings))
+        if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTERSTRING) )
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+        auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const auto pHandle = pSource->GetDTWAINHandle();
+        auto& factory = pHandle->m_ArrayFactory;
+        // Check if array is of the correct type
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
+                        [&]{ return !factory->is_valid(ArrayString, CTL_ArrayFactory::arrayTag::StringType);},
+                            DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+        const size_t nStrings = factory->size(ArrayString);
+        if ( nStrings == 0 )
+        {
+            if (pNumStrings)
+                *pNumStrings = 0;
             LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_ARRAY ArrayString, LPLONG pNumStrings)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, ArrayString, pNumStrings))
-    if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTERSTRING) )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-
-    auto* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
-    auto& factory = pHandle->m_ArrayFactory;
-    // Check if array is of the correct type
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
-                    [&]{ return !factory->is_valid(ArrayString, CTL_ArrayFactory::arrayTag::StringType);},
-                        DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-    const size_t nStrings = factory->size(ArrayString);
-    if ( nStrings == 0 )
-    {
-        if (pNumStrings)
-            *pNumStrings = 0;
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    }
-
-    bool bRet;
-    if ( nStrings == 1 )
-    {
-        // First try one value
-        bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString)?true:false;
-        if ( !bRet )
-        // Try enumerations
-            bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
-                             DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString)?true:false;
-        if ( bRet )
-        {
-            if ( pNumStrings )
-                *pNumStrings = 1;
         }
-    }
-    else
-    {
-        // Try enumerations
-        bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
-                         DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString)?true:false;
-        if ( bRet )
+
+        bool bRet;
+        if ( nStrings == 1 )
         {
-            if ( pNumStrings )
-                *pNumStrings = static_cast<LONG>(nStrings);
-        }
-        else
-        {
-        //  try one value
-            bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSET,
-                DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString)?true:false;
+            // First try one value
+            bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString)?true:false;
+            if ( !bRet )
+            // Try enumerations
+                bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
+                                 DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString)?true:false;
             if ( bRet )
             {
                 if ( pNumStrings )
                     *pNumStrings = 1;
             }
         }
+        else
+        {
+            // Try enumerations
+            bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
+                             DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString)?true:false;
+            if ( bRet )
+            {
+                if ( pNumStrings )
+                    *pNumStrings = static_cast<LONG>(nStrings);
+            }
+            else
+            {
+            //  try one value
+                bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSET,
+                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString)?true:false;
+                if ( bRet )
+                {
+                    if ( pNumStrings )
+                        *pNumStrings = 1;
+                }
+            }
+        }
+        if ( !bRet )
+        {
+            if ( pNumStrings )
+                *pNumStrings = 0;
+        }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pNumStrings))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
     }
-    if ( !bRet )
-    {
-        if ( pNumStrings )
-            *pNumStrings = 0;
-    }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pNumStrings))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
 }
-
 
 DTWAIN_ARRAY GetPrinterMode(DTWAIN_SOURCE Source, LONG GetType)
 {

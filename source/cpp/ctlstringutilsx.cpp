@@ -27,7 +27,6 @@
 #include <string_view>
 #include <array>
 
-#include "ctliface.h"
 #include "cppfunc.h"
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
@@ -98,37 +97,41 @@ namespace
     }
 }
 
-HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-    auto retval = ConvertToAPIStringEx<CTL_StringType>(lpOrigString);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(nullptr)
-}
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+            auto retval = ConvertToAPIStringEx<CTL_StringType>(lpOrigString);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+            CATCH_BLOCK(nullptr)
+    }
 
-HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-    auto retval = ConvertToAPIStringEx<std::string>(lpOrigString);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(nullptr)
-}
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+        auto retval = ConvertToAPIStringEx<std::string>(lpOrigString);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(nullptr)
+    }
 
-HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-    auto retval = ConvertToAPIStringEx<std::wstring>(lpOrigString);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(nullptr)
-}
 
-LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOutString, LONG nSize)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpOrigString, lpOutString, nSize))
-    LONG retval = ConvertToAPIString_InternalEx<CTL_StringType>(lpOrigString, lpOutString, nSize);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOutString))
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(0)
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+        auto retval = ConvertToAPIStringEx<std::wstring>(lpOrigString);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(nullptr)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOutString, LONG nSize)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString, lpOutString, nSize))
+        LONG retval = ConvertToAPIString_InternalEx<CTL_StringType>(lpOrigString, lpOutString, nSize);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOutString))
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(0)
+    }
 }
 
 namespace dynarithmic

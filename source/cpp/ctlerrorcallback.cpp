@@ -26,41 +26,43 @@
 #endif
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorCallback(DTWAIN_ERROR_PROC logProc, LONG UserData)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((logProc, UserData))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    pHandle->m_pErrorProcFn = logProc;
-    pHandle->m_lErrorProcUserData = UserData;
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false) 
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorCallback(DTWAIN_ERROR_PROC logProc, LONG UserData)
+    {
+        LOG_FUNC_ENTRY_PARAMS((logProc, UserData))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        pHandle->m_pErrorProcFn = logProc;
+        pHandle->m_lErrorProcUserData = UserData;
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false) 
+    }
 
-DTWAIN_ERROR_PROC DLLENTRY_DEF DTWAIN_GetErrorCallback(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const DTWAIN_ERROR_PROC theProc = pHandle->m_pErrorProcFn;
-    LOG_FUNC_EXIT_NONAME_PARAMS(theProc)
-    CATCH_BLOCK(nullptr)
-}
+    DTWAIN_ERROR_PROC DLLENTRY_DEF DTWAIN_GetErrorCallback(VOID_PROTOTYPE)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        const DTWAIN_ERROR_PROC theProc = pHandle->m_pErrorProcFn;
+        LOG_FUNC_EXIT_NONAME_PARAMS(theProc)
+        CATCH_BLOCK(nullptr)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorCallback64(DTWAIN_ERROR_PROC64 logProc, LONG64 UserData)
-{
-    LOG_FUNC_ENTRY_PARAMS((logProc, UserData))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    pHandle->m_pErrorProcFn64 = logProc;
-    pHandle->m_lErrorProcUserData64 = UserData;
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorCallback64(DTWAIN_ERROR_PROC64 logProc, LONG64 UserData)
+    {
+        LOG_FUNC_ENTRY_PARAMS((logProc, UserData))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        pHandle->m_pErrorProcFn64 = logProc;
+        pHandle->m_lErrorProcUserData64 = UserData;
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
 
-DTWAIN_ERROR_PROC64 DLLENTRY_DEF DTWAIN_GetErrorCallback64(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const DTWAIN_ERROR_PROC64 theProc = pHandle->m_pErrorProcFn64;
-    LOG_FUNC_EXIT_NONAME_PARAMS(theProc)
-    CATCH_BLOCK(nullptr)
+    DTWAIN_ERROR_PROC64 DLLENTRY_DEF DTWAIN_GetErrorCallback64(VOID_PROTOTYPE)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        const DTWAIN_ERROR_PROC64 theProc = pHandle->m_pErrorProcFn64;
+        LOG_FUNC_EXIT_NONAME_PARAMS(theProc)
+        CATCH_BLOCK(nullptr)
+    }
 }
-

@@ -35,30 +35,33 @@
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions,
-                                                    LPLONG pStatus)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const bool bRet =  AcquireHelper(pHandle, pSource, ACQUIREBUFFEREDEX,
-                                     false, DTWAIN_USEBUFFERED, false, Acquisitions,
-                                     PixelType, nMaxPages, bShowUI, nullptr,pStatus).second;
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+    DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions,
+                                                        LPLONG pStatus)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const bool bRet =  AcquireHelper(pHandle, pSource, ACQUIREBUFFEREDEX,
+                                         false, DTWAIN_USEBUFFERED, false, Acquisitions,
+                                         PixelType, nMaxPages, bShowUI, nullptr,pStatus).second;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG   pStatus)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto aDibs = AcquireHelper(pHandle, pSource, ACQUIREBUFFERED,
-                                                   false, DTWAIN_USEBUFFERED, false, nullptr,
-                                                   PixelType, nMaxPages, bShowUI, nullptr, pStatus);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(aDibs.first)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG   pStatus)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto aDibs = AcquireHelper(pHandle, pSource, ACQUIREBUFFERED,
+                                                       false, DTWAIN_USEBUFFERED, false, nullptr,
+                                                       PixelType, nMaxPages, bShowUI, nullptr, pStatus);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(aDibs.first)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
+    }
 }
 
 namespace

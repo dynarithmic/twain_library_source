@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <sstream>
-#include "ctliface.h"
 #include "dtwain_exception.h"
 #include "ctllogcalls.h"
 #include "logwriterutils.h"

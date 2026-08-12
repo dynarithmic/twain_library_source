@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr038.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlstaticdata.h"
 

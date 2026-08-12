@@ -115,7 +115,7 @@ namespace dynarithmic
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetQueryCapSupport(DTWAIN_BOOL bSet)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetQueryCapSupport(DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((bSet))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

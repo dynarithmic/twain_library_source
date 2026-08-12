@@ -120,85 +120,88 @@ namespace dynarithmic
     }
 }
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetSourceAcquisitions(DTWAIN_SOURCE Source)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const DTWAIN_ARRAY AcqArray = pSource->GetAcquisitionArray();
-    if (!AcqArray)
-        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-    LOG_FUNC_EXIT_NONAME_PARAMS(AcqArray)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAllSourceDibsEx(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, pArray))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
-
-    auto DibArray = retVal.second;
-    DTWAINArrayLowLevelPtr_RAII raii(pHandle, &DibArray);
-    if (DibArray)
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetSourceAcquisitions(DTWAIN_SOURCE Source)
     {
-        DTWAIN_GetAllSourceDibsInternal(Source, DibArray);
-        MoveArray(pHandle, pArray, &DibArray);
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const DTWAIN_ARRAY AcqArray = pSource->GetAcquisitionArray();
+        if (!AcqArray)
+            LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+        LOG_FUNC_EXIT_NONAME_PARAMS(AcqArray)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    DTWAIN_ARRAY dibs = {};
-    DTWAIN_GetAllSourceDibsEx(Source, &dibs);
-    LOG_FUNC_EXIT_NONAME_PARAMS(dibs)
-    CATCH_BLOCK(nullptr)
-}
-
-HANDLE DLLENTRY_DEF DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const int nCount = pSource->GetNumDibs();
-    if (nCount == 0)
-        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-    LOG_FUNC_EXIT_NONAME_PARAMS((HANDLE)pSource->GetDibHandle(nCount - 1))
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetCurrentPageNum(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG retval = static_cast<LONG>(pSource->GetPendingImageNum());
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK_LOG_PARAMS(-1L)
-}
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second)
-    CATCH_BLOCK(nullptr)
-}
 
 
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAllSourceDibsEx(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, pArray))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAIN_BOOL bDestroyDibs)
-{
-    LOG_FUNC_ENTRY_PARAMS((aAcq))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto retVal = DestroyAcquisitionArray(pHandle, aAcq, bDestroyDibs);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.first; }, retVal.second, nullptr, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first)
-    CATCH_BLOCK(false)
+        auto DibArray = retVal.second;
+        DTWAINArrayLowLevelPtr_RAII raii(pHandle, &DibArray);
+        if (DibArray)
+        {
+            DTWAIN_GetAllSourceDibsInternal(Source, DibArray);
+            MoveArray(pHandle, pArray, &DibArray);
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        DTWAIN_ARRAY dibs = {};
+        DTWAIN_GetAllSourceDibsEx(Source, &dibs);
+        LOG_FUNC_EXIT_NONAME_PARAMS(dibs)
+        CATCH_BLOCK(nullptr)
+    }
+
+    HANDLE DLLENTRY_DEF DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const int nCount = pSource->GetNumDibs();
+        if (nCount == 0)
+            LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+        LOG_FUNC_EXIT_NONAME_PARAMS((HANDLE)pSource->GetDibHandle(nCount - 1))
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetCurrentPageNum(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const LONG retval = static_cast<LONG>(pSource->GetPendingImageNum());
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK_LOG_PARAMS(-1L)
+    }
+
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second)
+        CATCH_BLOCK(nullptr)
+    }
+
+
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAIN_BOOL bDestroyDibs)
+    {
+        LOG_FUNC_ENTRY_PARAMS((aAcq))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto retVal = DestroyAcquisitionArray(pHandle, aAcq, bDestroyDibs);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retVal.first; }, retVal.second, nullptr, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first)
+        CATCH_BLOCK(false)
+    }
 }

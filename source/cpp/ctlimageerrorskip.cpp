@@ -27,20 +27,23 @@
 #endif
 
 using namespace dynarithmic;
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SkipImageInfoError(DTWAIN_SOURCE Source, DTWAIN_BOOL bSkip)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, bSkip))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    pSource->SetImageInfoErrors(bSkip ? true : false);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SkipImageInfoError(DTWAIN_SOURCE Source, DTWAIN_BOOL bSkip)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, bSkip))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        pSource->SetImageInfoErrors(bSkip ? true : false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSkipImageInfoError(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG retval = pSource->SkipImageInfoErrors();
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(false)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSkipImageInfoError(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const LONG retval = pSource->SkipImageInfoErrors();
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(false)
+    }
 }

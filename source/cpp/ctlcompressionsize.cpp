@@ -27,7 +27,7 @@
 #endif
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCompressionSize(DTWAIN_SOURCE Source, LPDWORD lBytes)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCompressionSize(DTWAIN_SOURCE Source, LPDWORD lBytes)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lBytes))
     auto [pHandle, pSource] = VerifyHandles(Source);

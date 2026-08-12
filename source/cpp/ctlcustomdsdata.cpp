@@ -29,102 +29,105 @@ using namespace dynarithmic;
 /////////////////////////////////////////////////////////////
 // Custom cap data functions
 
-HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, DWORD dSize, LPDWORD pActualSize, LONG nFlags )
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, Data, dSize, pActualSize, nFlags))
-    const bool bSupported = DTWAIN_IsCapSupported(Source, CAP_CUSTOMDSDATA)?true:false;
+    HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, DWORD dSize, LPDWORD pActualSize, LONG nFlags )
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Data, dSize, pActualSize, nFlags))
+        const bool bSupported = DTWAIN_IsCapSupported(Source, CAP_CUSTOMDSDATA)?true:false;
 
-    if( !bSupported )
-        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+        if( !bSupported )
+            LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
 
-    auto *p = reinterpret_cast<CTL_ITwainSource*>(Source);
-    // Call TWAIN to get the custom data
-    const auto pSession = p->GetTwainSession();
-    CTL_GetCustomDSTriplet DST(pSession, p);
+        auto *p = reinterpret_cast<CTL_ITwainSource*>(Source);
+        // Call TWAIN to get the custom data
+        const auto pSession = p->GetTwainSession();
+        CTL_GetCustomDSTriplet DST(pSession, p);
 
-    // Get the custom data
-    const int ret = DST.Execute();
+        // Get the custom data
+        const int ret = DST.Execute();
 
-    // return if TWAIN cannot complete this request
-    if( ret != TWRC_SUCCESS )
-        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+        // return if TWAIN cannot complete this request
+        if( ret != TWRC_SUCCESS )
+            LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
 
-    // Copy actual size data to parameter
-    if( pActualSize )
-        *pActualSize = DST.GetDataSize();
-    auto localActualSize = DST.GetDataSize();
+        // Copy actual size data to parameter
+        if( pActualSize )
+            *pActualSize = DST.GetDataSize();
+        auto localActualSize = DST.GetDataSize();
 
-    // Get the returned handle from TWAIN
-    const HANDLE h = DST.GetData();
+        // Get the returned handle from TWAIN
+        const HANDLE h = DST.GetData();
 
-    // Return the handle if that is all user wants to do
-    if( nFlags & DTWAINGCD_RETURNHANDLE )
+        // Return the handle if that is all user wants to do
+        if( nFlags & DTWAINGCD_RETURNHANDLE )
+            LOG_FUNC_EXIT_NONAME_PARAMS(h)
+
+        // Copy data to user's data area.
+        if( Data && (nFlags & DTWAINGCD_COPYDATA))
+        {
+            const char *pData = static_cast<char *>(ImageMemoryHandler::GlobalLock(h));
+            auto nMinCopy = (std::max)((std::min<DWORD>)(dSize, localActualSize), 0UL);
+            memcpy(Data, pData, nMinCopy);
+            ImageMemoryHandler::GlobalUnlock(h);
+            ImageMemoryHandler::GlobalFree(h);
+            LOG_FUNC_EXIT_NONAME_PARAMS(HANDLE(1))
+        }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Data, pActualSize))
         LOG_FUNC_EXIT_NONAME_PARAMS(h)
-
-    // Copy data to user's data area.
-    if( Data && (nFlags & DTWAINGCD_COPYDATA))
-    {
-        const char *pData = static_cast<char *>(ImageMemoryHandler::GlobalLock(h));
-        auto nMinCopy = (std::max)((std::min<DWORD>)(dSize, localActualSize), 0UL);
-        memcpy(Data, pData, nMinCopy);
-        ImageMemoryHandler::GlobalUnlock(h);
-        ImageMemoryHandler::GlobalFree(h);
-        LOG_FUNC_EXIT_NONAME_PARAMS(HANDLE(1))
+        CATCH_BLOCK(nullptr)
     }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Data, pActualSize))
-    LOG_FUNC_EXIT_NONAME_PARAMS(h)
-    CATCH_BLOCK(nullptr)
-}
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hData, LPCBYTE Data, DWORD dSize, LONG nFlags )
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, hData, Data, dSize, nFlags))
-    const bool bSupported = DTWAIN_IsCapSupported(Source, CAP_CUSTOMDSDATA)?true:false;
-
-    if (!bSupported)
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-
-    auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
-
-    // Set up triplet for CUSTOMDSDATA call
-    const auto pSession = p->GetTwainSession();
-    auto pHandle = p->GetDTWAINHandle();
-
-    CTL_SetCustomDSTriplet DST(pSession, p);
-
-    // Check what options the user wants to do
-
-    int nTwainRet = TWRC_SUCCESS;
-
-    // Set data to the handle passed in
-    if( nFlags & DTWAINSCD_USEHANDLE )
-        nTwainRet = DST.SetData(hData, dSize);
-    else
-    if( dSize == -1 )
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hData, LPCBYTE Data, DWORD dSize, LONG nFlags )
     {
-        if( !DTWAIN_GetCustomDSData(Source, nullptr, 0, &dSize, DTWAINGCD_COPYDATA) )
+        LOG_FUNC_ENTRY_PARAMS((Source, hData, Data, dSize, nFlags))
+        const bool bSupported = DTWAIN_IsCapSupported(Source, CAP_CUSTOMDSDATA)?true:false;
+
+        if (!bSupported)
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+        auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
+
+        // Set up triplet for CUSTOMDSDATA call
+        const auto pSession = p->GetTwainSession();
+        auto pHandle = p->GetDTWAINHandle();
+
+        CTL_SetCustomDSTriplet DST(pSession, p);
+
+        // Check what options the user wants to do
+
+        int nTwainRet = TWRC_SUCCESS;
+
+        // Set data to the handle passed in
+        if( nFlags & DTWAINSCD_USEHANDLE )
+            nTwainRet = DST.SetData(hData, dSize);
+        else
+        if( dSize == -1 )
+        {
+            if( !DTWAIN_GetCustomDSData(Source, nullptr, 0, &dSize, DTWAINGCD_COPYDATA) )
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
+
+        // Set data to the data passed in
+        DTWAINGlobalHandleUnlockFree_RAII memHandler;
+
+        if( Data && (nFlags & DTWAINSCD_USEDATA ))
+        {
+            // Allocate local copy of handle
+            char* pData = static_cast<char*>(ImageMemoryHandler::GlobalAllocPr(GMEM_DDESHARE, dSize));
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return pData == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
+
+            // Make sure memory is cleaned up at the end
+            memHandler.reset(ImageMemoryHandler::GlobalHandle(pData));
+            memcpy(pData, Data, dSize);
+            nTwainRet = DST.SetData(ImageMemoryHandler::GlobalHandle(pData), dSize);
+        }
+
+        // return TRUE or FALSE depending on return code of TWAIN
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return nTwainRet != TWRC_SUCCESS; },
+                                            -(IDS_TWRC_ERRORSTART + nTwainRet), false, FUNC_MACRO );
+
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
     }
-
-    // Set data to the data passed in
-    DTWAINGlobalHandleUnlockFree_RAII memHandler;
-
-    if( Data && (nFlags & DTWAINSCD_USEDATA ))
-    {
-        // Allocate local copy of handle
-        char* pData = static_cast<char*>(ImageMemoryHandler::GlobalAllocPr(GMEM_DDESHARE, dSize));
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return pData == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
-
-        // Make sure memory is cleaned up at the end
-        memHandler.reset(ImageMemoryHandler::GlobalHandle(pData));
-        memcpy(pData, Data, dSize);
-        nTwainRet = DST.SetData(ImageMemoryHandler::GlobalHandle(pData), dSize);
-    }
-
-    // return TRUE or FALSE depending on return code of TWAIN
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return nTwainRet != TWRC_SUCCESS; },
-                                        -(IDS_TWRC_ERRORSTART + nTwainRet), false, FUNC_MACRO );
-
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
 }

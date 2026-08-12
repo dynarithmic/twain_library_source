@@ -25,60 +25,63 @@
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FlipBitmap( HANDLE hDib )
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((hDib))
-    // Flip bitmap
-    CTL_TwainDib ThisDib;
-    ThisDib.SetHandle(hDib);
-    ThisDib.FlipBitMap(TRUE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToBitmap(HANDLE hDib, HANDLE hPalette)
-{
-    LOG_FUNC_ENTRY_PARAMS((hDib, hPalette))
-    const auto retVal = CDibInterface::DIBToBitmap(hDib, static_cast<HPALETTE>(hPalette));
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(nullptr)
-}
-
-HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP)
-{
-    LOG_FUNC_ENTRY_PARAMS((hDib, isBMP))
-    HANDLE returnHandle = {};
-    if (isBMP)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FlipBitmap( HANDLE hDib )
     {
-        returnHandle = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
+        LOG_FUNC_ENTRY_PARAMS((hDib))
+        // Flip bitmap
+        CTL_TwainDib ThisDib;
+        ThisDib.SetHandle(hDib);
+        ThisDib.FlipBitMap(TRUE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToBitmap(HANDLE hDib, HANDLE hPalette)
+    {
+        LOG_FUNC_ENTRY_PARAMS((hDib, hPalette))
+        const auto retVal = CDibInterface::DIBToBitmap(hDib, static_cast<HPALETTE>(hPalette));
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
+        CATCH_BLOCK(nullptr)
+    }
+
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP)
+    {
+        LOG_FUNC_ENTRY_PARAMS((hDib, isBMP))
+        HANDLE returnHandle = {};
+        if (isBMP)
+        {
+            returnHandle = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
+            LOG_FUNC_EXIT_NONAME_PARAMS(returnHandle)
+        }
+        else
+        {
+            HandleRAII raii(hDib);
+            const LPBYTE pDibData = raii.getData();
+            returnHandle = GlobalAlloc(GMEM_FIXED, GlobalSize(hDib));
+            const HandleRAII raii2(returnHandle);
+            const LPBYTE bFullImage = raii2.getData();
+            std::copy_n(pDibData, GlobalSize(hDib), &bFullImage[0]);
+        }
         LOG_FUNC_EXIT_NONAME_PARAMS(returnHandle)
+        CATCH_BLOCK(nullptr)
     }
-    else
+
+    HANDLE DLLENTRY_DEF DTWAIN_RotateImage(HANDLE hDib, DTWAIN_FLOAT angle)
     {
-        HandleRAII raii(hDib);
-        const LPBYTE pDibData = raii.getData();
-        returnHandle = GlobalAlloc(GMEM_FIXED, GlobalSize(hDib));
-        const HandleRAII raii2(returnHandle);
-        const LPBYTE bFullImage = raii2.getData();
-        std::copy_n(pDibData, GlobalSize(hDib), &bFullImage[0]);
+        LOG_FUNC_ENTRY_PARAMS((hDib, angle))
+        const auto retVal = CDibInterface::RotateDIB(hDib, static_cast<float>(angle));
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
+        CATCH_BLOCK(nullptr)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(returnHandle)
-    CATCH_BLOCK(nullptr)
-}
 
-HANDLE DLLENTRY_DEF DTWAIN_RotateImage(HANDLE hDib, DTWAIN_FLOAT angle)
-{
-    LOG_FUNC_ENTRY_PARAMS((hDib, angle))
-    const auto retVal = CDibInterface::RotateDIB(hDib, static_cast<float>(angle));
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(nullptr)
-}
-
-HANDLE DLLENTRY_DEF DTWAIN_RotateImageString(HANDLE hDib, LPCTSTR angle)
-{
-    LOG_FUNC_ENTRY_PARAMS((hDib, angle))
-    using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
-    auto retDIB = DTWAIN_RotateImage(hDib, CharTraits<CharType>::ToDouble(angle));
-    LOG_FUNC_EXIT_NONAME_PARAMS(retDIB)
-    CATCH_BLOCK(nullptr)
+    HANDLE DLLENTRY_DEF DTWAIN_RotateImageString(HANDLE hDib, LPCTSTR angle)
+    {
+        LOG_FUNC_ENTRY_PARAMS((hDib, angle))
+        using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
+        auto retDIB = DTWAIN_RotateImage(hDib, CharTraits<CharType>::ToDouble(angle));
+        LOG_FUNC_EXIT_NONAME_PARAMS(retDIB)
+        CATCH_BLOCK(nullptr)
+    }
 }

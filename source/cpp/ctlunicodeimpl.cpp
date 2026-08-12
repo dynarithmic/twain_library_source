@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "dtwain.h"
-#include "ctliface.h"
 #include "arrayfactory.h"
 
 #ifdef UNICODE
