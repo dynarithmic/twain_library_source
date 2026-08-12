@@ -25,6 +25,7 @@
 #include "cppfunc.h"
 #include "ctldtwainhandle.h"
 #include "ctliface.h"
+#include "ctlstaticdata.h"
 #include "ctltwainmanager.h"
 #include "dtwtype.h"
 #include "winconst.h"

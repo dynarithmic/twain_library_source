@@ -49,6 +49,7 @@
 #include "iohandler_pbm.h"
 #include "iohandler_text.h"
 #include "iohandler_svg.h"
+#include "ctlglobalhandletraits.h"
 
 template<typename T1, typename T2, typename T3>
 constexpr auto BOUND(T1 x, T2 min, T3 max) { return ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x))); }

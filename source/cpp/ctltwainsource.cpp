@@ -36,6 +36,7 @@
 #include "ctlclosesource.h"
 #include "ctldib32ex.h"
 #include "ctlcapcontainerfuncs.h"
+#include "ctlstaticdata.h"
 
 using namespace dynarithmic;
 

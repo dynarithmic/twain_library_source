@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "dtwainc.h"
 #include "ctldtwainhandle.h"
+#include "ctltwainlogging.h"
 using namespace dynarithmic;
 
 DTWAIN_DIBUPDATE_PROC DLLENTRY_DEF DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc)

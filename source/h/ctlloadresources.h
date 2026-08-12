@@ -24,7 +24,7 @@
 #include <string>
 #include <string_view>
 #include <array>
-#include <boost/container/flat_map.hpp>
+#include "mapdefs.h"
 
 #define DTWAINLANGRESOURCEFILE _T("twainresourcestrings_")
 #define DTWAINRESOURCEINFOFILE _T("twaininfo.txt")
@@ -33,7 +33,7 @@
 
 namespace dynarithmic
 {
-    typedef boost::container::flat_map<std::string, bool> CTL_ResourceRegistryMap;
+    typedef BASIC_MAPTYPE_<std::string, bool> CTL_ResourceRegistryMap;
 
     bool LoadLanguageResourceA(const char* lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear);
     bool LoadLanguageResourceA(const char* lpszName, bool bClear);

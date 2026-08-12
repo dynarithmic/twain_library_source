@@ -32,6 +32,8 @@
 #include <array>
 #include <string_view>
 #include <deque>
+#include <map>
+#include <boost/functional/hash.hpp>
 #include "ctltripletbase.h"
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
@@ -39,8 +41,6 @@
 #include "ctlloadresources.h"
 #include "dtwain.h"
 #include "twainframe.h"
-#include <boost/functional/hash.hpp>
-#include <boost/container/flat_map.hpp>
 #include "../simpleini/simpleini.h"
 #include "notimpl.h"
 #include "sourceacquireopts.h"
@@ -54,14 +54,6 @@
 #else
     #include "linuxlibraryloader_impl.inl"
 #endif
-template <typename T>
-struct dtwain_library_loader : library_loader_impl
-{
-    static T get_func_ptr(void *handle, const char *name)
-    {
-        return static_cast<T>(get(handle, name));
-    }
-};
 
 #include "capstruc.h"
 #include "ctltmpl4.h"
@@ -70,13 +62,23 @@ struct dtwain_library_loader : library_loader_impl
 #include "ctltwaindecoder.h"
 #include "logmsg.h"
 #include "winconst.h"
-#include <map>
 #include "ctlguiddef.h"
 #include "ctlsourceselect.h"
 #include "ctltwainmemoryimpl.h"
+#include "ctlsourceinfo.h"
+#include "ctlmapdefs.h"
 
 namespace dynarithmic
 {
+    template <typename T>
+    struct dtwain_library_loader : library_loader_impl
+    {
+        static T get_func_ptr(void* handle, const char* name)
+        {
+            return static_cast<T>(get(handle, name));
+        }
+    };
+
     class CTL_TwainDLLHandle;
     class CTL_ITwainSource;
     class CTL_TwainAppMgr;
@@ -105,17 +107,10 @@ namespace dynarithmic
     #define DTWAIN_TN_MESSAGELOOPERROR             (DTWAIN_INTERNAL_NOTIFICATION + 6)
     #define REGISTERED_DTWAIN_MSG _T("DTWAIN_NOTIFY-{37AE5C3E-34B6-472f-A0BC-74F3CB199F2B}")
 
-    // Availability flags
-    #define DTWAIN_BASE_AVAILABLE       0
-    #define DTWAIN_PDF_AVAILABLE        1
-    #define DTWAIN_TWAINSAVE_AVAILABLE  2
-    #define DTWAIN_OCR_AVAILABLE        3
-    #define DTWAIN_BARCODE_AVAILABLE    4
-
-        /* Transfer started */
-        /* Scanner already has physically scanned a page.
-         This is sent only once (when TWAIN actually does the transformation of the
-         scanned image to the DIB) */
+    /* Transfer started */
+    /* Scanner already has physically scanned a page.
+        This is sent only once (when TWAIN actually does the transformation of the
+        scanned image to the DIB) */
     #define  DTWAIN_TWAINAcquireStarted          (DTWAIN_INTERNAL_NOTIFICATION + 7)
 
     /* Sent when DTWAIN_Acquire...() functions are about to return */
@@ -128,44 +123,8 @@ namespace dynarithmic
     #define  TWAINDLLVERSION_2    "/usr/local/lib/libtwaindsm.so"
     #endif
 
-    template <typename CallbackType, typename UserType>
-    struct CallbackInfo
-    {
-        CallbackType Fn;
-        UserType UserData;
-        LRESULT retvalue;
-        CallbackInfo(CallbackType theFn=NULL, UserType theUserData=0) :
-        Fn(theFn), UserData(theUserData), retvalue(1)
-        {}
-    };
-
     #include "capstruc.h"
     #include "capinfomap.h"
-
-    #define CAPINFO_IDX_CAPABILITY 0U    
-    #define CAPINFO_IDX_GETCONTAINER 1U    
-    #define CAPINFO_IDX_SETCONTAINER 2U    
-    #define CAPINFO_IDX_DATATYPE     3U    
-    #define CAPINFO_IDX_SUPPORTEDOPS 4U    
-    #define CAPINFO_IDX_GETCURRENTCONTAINER 5U    
-    #define CAPINFO_IDX_GETDEFAULTCONTAINER 6U    
-    #define CAPINFO_IDX_SETCONSTRAINTCONTAINER 7U    
-    #define CAPINFO_IDX_RESETCONTAINER 8U    
-    #define CAPINFO_IDX_QUERYSUPPORT 9U    
-
-    typedef boost::container::flat_map<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
-    typedef boost::container::flat_map<LONG, int> CTL_LongToIntMap;
-    typedef boost::container::flat_map<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
-    typedef boost::container::flat_map<CTL_StringType, int> CTL_StringToIntMap;
-    typedef boost::container::flat_map<LONG, HMODULE> CTL_LongToHMODULEMap;
-    typedef boost::container::flat_map<TW_UINT16 , CTL_CapInfo> CTL_EnumCapToInfoMap;
-    typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONG>> CTL_CallbackProcArray;
-    typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG>> CTL_CallbackProcArray64;
-    typedef boost::container::flat_map<LONG, CTL_StringType> CTL_StringToLongMap;
-    typedef boost::container::flat_map<LONG, std::string> CTL_LongToStringMap;
-    typedef boost::container::flat_map<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
-    typedef boost::container::flat_map<LONG, std::vector<LONG>> CTL_LongToVectorLongMap;
-    typedef std::vector<CTL_MapThreadToDLLHandle> CTL_HookInfoArray;
 
     // Create this statically when initializing.  Initialize the second
     // value with the dynamically created CTL_CapInfoMap above
@@ -186,326 +145,14 @@ namespace dynarithmic
     constexpr int DTWAIN_MaxErrorSize=256;
     class CTLTwainDibArray;
 
-
     // define a vector that holds OCREngine interfaces
     typedef std::vector<OCREnginePtr> OCRInterfaceContainer;
     typedef std::unordered_map<std::string, OCREnginePtr> OCRProductNameToEngineMap;
-
-    struct ImageModuleDef
-    {
-        CTL_StringType sName;
-        LONG    ImgType;
-        HMODULE hMod;
-        bool  bIsLoaded;
-    };
-
-    inline bool operator==(const TwainFrameInternal& lhs, const TwainFrameInternal& rhs)
-    {
-        return lhs.m_FrameComponent == rhs.m_FrameComponent;
-    }
-
-    inline bool operator!=(const TwainFrameInternal& lhs, const TwainFrameInternal& rhs)
-    {
-        return !(lhs.m_FrameComponent == rhs.m_FrameComponent);
-    }
-
-    typedef std::vector<ImageModuleDef> CTL_IMAGEDLLINFO;
     typedef std::shared_ptr<CTL_TwainDLLHandle> CTL_TwainDLLHandlePtr;
-
     typedef CTL_ITwainSource* CTL_ITwainSourcePtr;
 
     struct CTL_ArrayFactory;
     typedef std::shared_ptr<CTL_ArrayFactory> CTL_ArrayFactoryPtr;
-
-    struct FileFormatNode
-    {
-        std::string m_formatName;
-        std::vector<std::string> m_vExtensions;
-        FileFormatNode(std::string name, std::vector<std::string> vExt) :
-            m_formatName(std::move(name)), m_vExtensions(std::move(vExt)) {}
-    };
-
-    struct ImageResamplerData
-    {
-        std::string m_sImageType;
-        std::vector<uint16_t> m_vNoSamples;
-        std::map<uint16_t, uint16_t> m_mapFromTo;
-    };
-
-    struct SourceStatus
-    {
-        enum { SOURCE_STATUS_OPEN, SOURCE_STATUS_SELECECTED, SOURCE_STATUS_UNKNOWN };
-
-        std::bitset<3> m_Status;
-        std::string m_ThreadId;
-        CTL_ITwainSource* m_pSource;
-        SourceStatus() : m_Status(), m_ThreadId{}, m_pSource{} {}
-        SourceStatus& SetStatus(int Status, bool bSet) { m_Status[Status] = bSet; return *this; }
-        bool GetStatus(int Status) const { return m_Status[Status]; }
-        bool IsSelected() const { return m_Status[SOURCE_STATUS_SELECECTED]; }
-        bool IsOpen() const { return m_Status[SOURCE_STATUS_OPEN]; }
-        bool IsClosed() const { return !IsOpen(); }
-        bool IsUnknown() const { return m_Status[SOURCE_STATUS_UNKNOWN]; }
-        SourceStatus& SetThreadID(const std::string& threadId) { m_ThreadId = threadId; return *this; }
-        SourceStatus& SetSourceHandle(CTL_ITwainSource* Source) { m_pSource = Source; return *this; }
-        std::string GetThreadID() const { return m_ThreadId; }
-        CTL_ITwainSource* GetSourceHandle() const { return m_pSource; }
-    };
-
-    struct CacheKeyHash 
-    {
-        std::size_t operator()(const std::pair<LONG, std::string>& key) const 
-        {
-            std::size_t seed = 0;
-            boost::hash_combine(seed, key.first);
-            boost::hash_combine(seed, key.second);
-            return seed;
-        }
-    };
-
-    struct FileSaveNode
-    {
-        int m_FileType;
-        CTL_StringType m_sTotalFilter;
-        CTL_StringType m_sExtension;
-        FileSaveNode();
-        FileSaveNode(int fType, CTL_StringType filter1, CTL_StringType filter2, CTL_StringType ext);
-        CTL_StringType& GetTotalFilter() { return m_sTotalFilter; }
-        CTL_StringType& GetExtension() { return m_sExtension; }
-    };
-
-    struct SourceXferReadyOverride
-    {
-        uint32_t m_MaxThreshold = 0;
-        uint32_t m_CurrentCount = 0;
-        bool m_bSeenUIClose = false;
-        bool m_bSeenXferReady = false;
-    };
-
-    using SourceStatusMap = boost::container::flat_map<std::string, SourceStatus>;
-    using ImageResamplerMap = boost::container::flat_map<int, ImageResamplerData>;
-    using CTL_PDFMediaMap = boost::container::flat_map<int, std::pair<std::string, std::string>>;
-    using CTL_AvailableFileFormatsMap = boost::container::flat_map<LONG, FileFormatNode>;
-    using TwainConstantType = int64_t;
-    using CTL_TwainConstantToStringMapNode = boost::container::flat_map<TwainConstantType, std::vector<std::string>>;
-    using CTL_TwainConstantsMap = boost::container::flat_map<int, CTL_TwainConstantToStringMapNode>;
-    using CTL_TwainIDToStringMap = boost::container::flat_map<TwainConstantType, std::string>;
-    using CTL_ErrorToExtraInfoMap = boost::container::flat_map<int32_t, std::string>;
-    using CTL_ThreadMap = boost::container::flat_map<std::string, unsigned long>;
-    using CTL_StringToConstantMap = boost::container::flat_map<std::string, TwainConstantType>;
-    using CTL_UINT16ToInfoMap = boost::container::flat_map<TW_UINT16, TW_INFO>;
-    using CTL_FileSaveMap = boost::container::flat_map<int, FileSaveNode>;
-    using CTL_CompressionMap = boost::container::flat_map<int, std::vector<int>>;
-    using SourceToUIAutocloseMap = std::map<std::string, bool>;
-    using SourceToXferReadyMap = std::map<std::string, SourceXferReadyOverride>;
-    using SourceToXferReadyList = std::vector<std::pair<std::string, uint32_t>>;
-    using SourceFlatbedOnlyList = std::unordered_set<std::string>;
-    using SourceGetMessageList = std::unordered_set<std::string>;
-    using SourceSheetcountMap = std::vector<std::pair<std::string, std::string>>;
-    using SourcePaperDetectableMap = std::map<std::string, bool>;
-    using CTL_PairToStringMap = std::unordered_map<std::pair<int, std::string>, std::string, CacheKeyHash>;
-
-    struct CTL_GeneralResourceInfo
-    {
-        CTL_StringType sResourceName;
-        bool bIsFromRC = false;
-    };
-
-    struct CTL_StaticDataStruct
-    {
-        enum { INI_SOURCEXFERWAITINFO_KEY, 
-               INI_TWAINLOOPPEEK_KEY, 
-               INI_PAPERDETECTIONSTATUS_KEY, 
-               INI_FLATBEDONLY_KEY, 
-               INI_SOURCEOPENPROPS_KEY, 
-               INI_CHECKFEEDERSTATUS_ITEM, 
-               INI_QUERYBESTCAPCONTAINER_ITEM, 
-               INI_QUERYCAPOPERATIONS_ITEM, 
-               INI_IMAGEGILE_KEY, 
-               INI_MISCELLANEOUS_KEY, 
-               INI_RESOURCECHECK_ITEM,
-               INI_RESAMPLE_ITEM, 
-               INI_OCRLIBRARY_KEY, 
-               INI_LANGUAGE_KEY, 
-               INI_DEFAULT_ITEM,
-               INI_SOURCES_KEY, 
-               INI_DSMERRORLOGGING_KEY, 
-               INI_ALLOWDUP_RESOURCE,
-               INI_SOURCE_SAVEDEFAULT,
-               INI_SELECTSOURCEPOS_KEY,
-               INI_SAVESELECTSOURCEPOS_KEY,
-               INI_TWAINLOOPGETMSG_KEY,
-               INI_SHEETCOUNT_KEY,
-               INI_TESTGET_ITEM,
-               INI_AUTOCLOSEUI_KEY,
-               INI_PARSEDELIMS_ITEM,
-               LASTINIENTRY };
-        std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
-        int32_t                      s_nExtImageInfoOffset = 0;
-        int                          s_nLoadingError = DTWAIN_ERR_BAD_HANDLE;
-        bool                         s_bINIFileLoaded = false;
-        bool                         s_bDoResampling = true;
-        bool                         s_bCheckHandles = true;
-        bool                         s_multipleThreads = false;
-        HFONT                        s_DialogFont = nullptr;
-        LONG                         s_nRegisteredDTWAINMsg = 0;
-        bool                         s_bThrowExceptions = false;
-        HINSTANCE                    s_DLLInstance = nullptr;
-        uint32_t                     s_logFilterFlags = 0;
-        UINT_PTR                     s_nTimeoutID = 0;
-        UINT                         s_nTimeoutMilliseconds = 0;
-        bool                         s_ResourcesInitialized = false;
-        bool                         s_bTimerIDSet = false;
-        CTL_StringType               s_FileParseDelimiters;
-        CTL_UINT16ToInfoMap          s_IntToTwainInfoMap;
-        CTL_StringToConstantMap      s_MapStringToConstant;
-        CTL_TwainIDToStringMap     s_MapExtendedImageInfo;
-        CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
-        CTL_GeneralResourceInfo         s_ResourceInfo;
-        CTL_PDFMediaMap          s_PDFMediaMap;
-        CTL_AvailableFileFormatsMap s_AvailableFileFormatsMap;
-        CTL_TwainConstantsMap s_TwainConstantsMap;
-        CTL_StringType           s_strResourcePath;  // path to the DTWAIN resource strings
-        CTL_StringType           s_DLLPath;
-        CTL_StringType           s_DLLParentPath;
-        CTL_StringType           s_sINIPath;
-        CTL_StringType           s_StartupDSMSearchOrder = _T("CWSOU");
-        CTL_StringType           s_StartupDSMSearchOrderDir;
-        CTL_LongToStringMap      s_ErrorCodes;
-        CTL_StringType           s_VersionString;
-        CTL_ErrorToExtraInfoMap  s_mapExtraErrorInfo;
-        CTL_GeneralCapInfo       s_mapGeneralCapInfo;
-        CTL_MapThreadToDLLHandle s_mapThreadToDLLHandle;
-        CTL_ThreadMap            s_ThreadMap;
-        std::unordered_set<HWND> s_appWindowsToDisable;
-        CTL_StringType           s_strLangResourcePath;
-        CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
-        CLogSystem               s_appLog;
-        ImageResamplerMap        s_ImageResamplerMap;
-        SourceStatusMap          s_SourceStatusMap;
-        CTL_StringType           s_ResourceVersion;
-        std::string              s_CurrentResourceKey;
-        CTL_PairToStringMap      s_ResourceCache;
-        CTL_FileSaveMap          s_FileSaveMap;
-        CTL_CompressionMap       s_CompressionMap;
-        std::string              s_AppTitle;
-        std::string              s_AppTitleHTML;
-        std::pair<int32_t, int32_t> s_SavedSelectSourcePos;
-        CTL_TEXTELEMENTPTRLIST   s_PDFTextElementList;
-        int64_t                  s_logFileSaveThreshold = -1LL;
-        bool                     s_bTestGetMessage = true;
-        SourceToXferReadyMap     s_SourceToXferReadyMap;
-        SourceToXferReadyList    s_SourceToXferReadyList;
-        SourceFlatbedOnlyList    s_SourceFlatbedOnlyList;
-        SourceGetMessageList     s_SourceGetMessageList;
-        SourcePaperDetectableMap s_SourcePaperDetectableMap;
-        SourceSheetcountMap      s_SourceSheetcountList;
-        SourceToUIAutocloseMap   s_SourceToAutocloseMap;
-        CTL_StringType           s_ApplicationName;
-
-        CTL_StaticDataStruct();
-    };
-
-    struct CTL_StaticData
-    {
-        static std::mutex               s_mutexInitDestroy;
-        static std::unique_ptr<CSimpleIniA>    s_iniInterface;
-        static CTL_StaticDataStruct s_StaticData;
-        static UINT_PTR GetTimeoutID() { return s_StaticData.s_nTimeoutID; }
-        static void SetTimeoutID(UINT_PTR val) { s_StaticData.s_nTimeoutID = val; }
-        static UINT GetTimeoutValue() { return s_StaticData.s_nTimeoutMilliseconds; }
-        static void SetTimeoutValue(UINT value) { s_StaticData.s_nTimeoutMilliseconds = value; }
-        static CTL_ThreadMap& GetThreadMap() { return s_StaticData.s_ThreadMap; }
-        static HFONT& GetDialogFont() { return s_StaticData.s_DialogFont; }
-        static CLogSystem& GetLogger() { return s_StaticData.s_appLog; }
-        static LONG& GetRegisteredMessage() { return s_StaticData.s_nRegisteredDTWAINMsg; }
-        static bool IsResamplingDone() { return s_StaticData.s_bDoResampling;  }
-        static void SetResamplingDone(bool bSet) { s_StaticData.s_bDoResampling = bSet; }
-        static CTL_StringType& GetVersionString() { return s_StaticData.s_VersionString; }
-        static bool IsINIFileLoaded() { return s_StaticData.s_bINIFileLoaded; }
-        static void SetINIFileLoaded(bool bSet) { s_StaticData.s_bINIFileLoaded = bSet; }
-        static CTL_StringType& GetLanguageResourcePath() { return s_StaticData.s_strLangResourcePath; }
-        static CTL_ErrorToExtraInfoMap& GetExtraErrorInfoMap() { return s_StaticData.s_mapExtraErrorInfo; }
-        static CTL_MapThreadToDLLHandle& GetThreadToDLLHandleMap() { return s_StaticData.s_mapThreadToDLLHandle; }
-        static CTL_FileSaveMap& GetFileSaveMap() { return s_StaticData.s_FileSaveMap; }
-        static CTL_CompressionMap& GetCompressionMap() { return s_StaticData.s_CompressionMap; }
-        static bool ResourcesLoaded() { return s_StaticData.s_ResourcesInitialized; }
-        static void Reset() 
-        { 
-            CTL_StaticDataStruct tempStruct; 
-            tempStruct.s_DLLPath = s_StaticData.s_DLLPath;
-            tempStruct.s_DLLParentPath = s_StaticData.s_DLLParentPath;
-            tempStruct.s_DLLInstance = s_StaticData.s_DLLInstance;
-            tempStruct.s_StartupDSMSearchOrder = s_StaticData.s_StartupDSMSearchOrder;
-            tempStruct.s_StartupDSMSearchOrderDir = s_StaticData.s_StartupDSMSearchOrderDir;
-            tempStruct.s_SavedSelectSourcePos = s_StaticData.s_SavedSelectSourcePos;
-            s_StaticData = tempStruct;
-        }
-        static auto& GetLogFilterFlags() { return s_StaticData.s_logFilterFlags; }
-        static bool IsThrowExceptions() { return s_StaticData.s_bThrowExceptions; }
-        static void SetThrowExceptions(bool bSet) { s_StaticData.s_bThrowExceptions = bSet; }
-        static CTL_UINT16ToInfoMap& GetIntToTwainInfoMap() { return s_StaticData.s_IntToTwainInfoMap; }
-        static int32_t GetExtImageInfoOffset() { return s_StaticData.s_nExtImageInfoOffset; }
-        static void SetExtImageInfoOffset(int32_t offset) { s_StaticData.s_nExtImageInfoOffset = offset; }
-        static CTL_StringToConstantMap& GetStringToConstantMap() { return s_StaticData.s_MapStringToConstant; }
-        static CTL_TwainIDToStringMap& GetExtendedImageInfoMap() { return s_StaticData.s_MapExtendedImageInfo; }
-        static int GetResourceLoadError() { return s_StaticData.s_nLoadingError; }
-        static void SetResourceLoadError(int errNum) { s_StaticData.s_nLoadingError = errNum; }
-        static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }
-        static CTL_PairToStringMap& GetResourceCache() { return s_StaticData.s_ResourceCache; }
-        static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_StaticData.s_AllLoadedResourcesMap; }
-        static CTL_LongToStringMap* GetLanguageResource(std::string_view sLang);
-        static std::string&         GetCurrentLanguageResourceKey() { return s_StaticData.s_CurrentResourceKey; }
-        static void SetCurrentLanguageResourceKey(const std::string& sLang) { s_StaticData.s_CurrentResourceKey = sLang; }
-        static CTL_LongToStringMap* GetCurrentLanguageResource();
-        static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_StaticData.s_ResourceInfo; }
-        static CTL_PDFMediaMap& GetPDFMediaMap() { return s_StaticData.s_PDFMediaMap; }
-        static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_StaticData.s_AvailableFileFormatsMap; }
-        static CTL_TwainConstantsMap& GetTwainConstantsMap() { return s_StaticData.s_TwainConstantsMap; }
-        static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_StaticData.s_TwainConstantsMap[nWhich]; }
-        static bool IsCheckHandles() { return s_StaticData.s_bCheckHandles; }
-        static void SetCheckHandles(bool bSet) { s_StaticData.s_bCheckHandles = bSet; }
-        static std::pair<bool, TwainConstantType> GetIDFromTwainName(std::string_view sName);
-        static constexpr int GetDGResourceID() { return 8890; }
-        static constexpr int GetDATResourceID() { return 8891; }
-        static constexpr int GetMSGResourceID() { return 8892; }
-        static CTL_StringType& GetResourcePath() { return s_StaticData.s_strResourcePath; }
-        static CTL_StringType& GetDLLPath() { return s_StaticData.s_DLLPath; }
-        static CTL_StringType& GetINIPath() { return s_StaticData.s_sINIPath; }
-        static CTL_StringType& GetStartupDSMSearchOrder() { return s_StaticData.s_StartupDSMSearchOrder; }
-        static CTL_StringType& GetStartupDSMSearchOrderDir() { return s_StaticData.s_StartupDSMSearchOrderDir; }
-        static bool IsUsingMultipleThreads() { return s_StaticData.s_multipleThreads; }
-        static void SetUseMultipleThreads(bool bSet) { s_StaticData.s_multipleThreads = bSet; }
-        static CTL_LongToStringMap& GetErrorCodes() { return s_StaticData.s_ErrorCodes; }
-        static CTL_GeneralCapInfo& GetGeneralCapInfo() { return s_StaticData.s_mapGeneralCapInfo; }
-        static HINSTANCE GetDLLInstanceHandle() { return s_StaticData.s_DLLInstance; }
-        static CTL_GeneralErrorInfo& GetGeneralErrorInfoMap() { return s_StaticData.s_mapGeneralErrorInfo; }
-        static void SetDLLInstanceHandle(HINSTANCE h) { s_StaticData.s_DLLInstance = h; }
-        static ImageResamplerMap& GetImageResamplerMap() { return s_StaticData.s_ImageResamplerMap; }
-        static SourceStatusMap& GetSourceStatusMap() { return s_StaticData.s_SourceStatusMap;  }
-        static CTL_StringType& GetResourceVersion() { return s_StaticData.s_ResourceVersion; }
-        static std::pair<bool, CTL_StringType> GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant);
-        static std::pair<bool, std::string> GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant);
-        static std::pair<bool, std::wstring> GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
-        static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
-        static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
-        static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
-        static std::string& GetAppTitleHTML() { return s_StaticData.s_AppTitleHTML; }
-        static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
-        static auto& GetPDFTextElementList() { return s_StaticData.s_PDFTextElementList; }
-        static auto& GetLogFileSaveThreshold() { return s_StaticData.s_logFileSaveThreshold; }
-        static bool& IsTestForGetMessage() { return s_StaticData.s_bTestGetMessage; }
-        static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_StaticData.s_SourceToXferReadyMap; }
-        static SourceToXferReadyList& GetSourceToXferReadyList() { return s_StaticData.s_SourceToXferReadyList; }
-        static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_StaticData.s_SourceFlatbedOnlyList; }
-        static SourceGetMessageList& GetSourceGetMessageList() { return s_StaticData.s_SourceGetMessageList; }
-        static SourcePaperDetectableMap& GetSourcePaperDetectionMap() { return s_StaticData.s_SourcePaperDetectableMap; }
-        static SourceSheetcountMap& GetSourceSheetcountMap() { return s_StaticData.s_SourceSheetcountList; }
-        static SourceToUIAutocloseMap& GetSourceToUIAutocloseMap() { return s_StaticData.s_SourceToAutocloseMap; }
-        static CTL_StringType& GetFileParseDelimiters() { return s_StaticData.s_FileParseDelimiters; }
-        static CTL_StringType& GetApplicationName() { return s_StaticData.s_ApplicationName;  }
-        static CTL_StringType& GetDLLParentPath() { return s_StaticData.s_DLLParentPath; }
-    };
 
     struct CTL_LoggerCallbackInfo
     {
@@ -687,8 +334,6 @@ namespace dynarithmic
     };
 
     DTWAIN_HANDLE SysInitializeImpl(const SysInitializeOptions& initOptions);
-    std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const LoggingTraits& fTraits = {});
-    void WriteVersionToLog(CTL_TwainDLLHandle* pHandle);
     std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle);
     bool AssociateThreadToTwainDLL(std::shared_ptr<CTL_TwainDLLHandle>& pHandle, unsigned long threadId);
     LONG DTWAIN_CloseAllSources();
@@ -699,191 +344,17 @@ namespace dynarithmic
     #endif
     #ifdef _WIN32
     LRESULT DLLENTRY_DEF DTWAIN_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
     #endif
     void DTWAIN_AcquireProc(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, WPARAM Data1, LPARAM Data2);
     #ifdef __cplusplus
     }
     #endif
 
-    void DTWAIN_InvokeCallback( int nWhich, DTWAIN_HANDLE pHandle, DTWAIN_SOURCE pSource, WPARAM lData1, LPARAM lData2 );
-
-    void LogDTWAINMessage(HWND, UINT, WPARAM, LPARAM, bool bCallback=false);
-    std::string LogWin32Error(DWORD lastError);
     void LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
     void UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
-    void LogToDebugMonitorA(std::string sMsg);
-    void LogToDebugMonitorW(std::wstring sMsg);
-    void LogToDebugMonitor(CTL_StringType sMsg);
 
     DTWAIN_HANDLE GetDTWAINHandle_Internal();
-    bool TileModeOn(DTWAIN_SOURCE Source);
     void SysDestroyNoCheck();
-
-    struct DTWAINGlobalHandle_CloseTraits
-    {
-        static void Destroy(HANDLE h);
-        void operator()(HANDLE h) { Destroy(h); }
-    };
-
-    struct DTWAINGlobalHandle_ClosePtrTraits
-    {
-        static void Destroy(HANDLE* h);
-        void operator()(HANDLE* h) { Destroy(h); }
-    };
-
-    struct DTWAINGlobalHandle_CloseFreeTraits
-    {
-        static void Destroy(HANDLE h);
-        void operator()(HANDLE h) { Destroy(h); }
-    };
-
-    using DSMPair = std::pair<CTL_TwainDLLHandle*, HANDLE>;
-
-    struct DSM2UnlockTraits
-    {
-        static void Unlock(DSMPair* pr)
-        {
-            pr->first->m_TwainMemoryFunc->UnlockMemory(pr->second);
-        }
-    };
-
-    struct DSM2NoFreeTraits
-    {
-        static void Free(DSMPair /*h*/)
-        {
-        }
-    };
-
-    struct DSM2FreeTraits
-    {
-        static void Free(DSMPair* pr)
-        {
-            pr->first->m_TwainMemoryFunc->FreeMemory(pr->second);
-        }
-    };
-
-    template <typename T, typename UnLockFn, typename FreeFn>
-    struct DTWAINGlobalHandle_GenericUnlockFreeTraits
-    {
-        static void Destroy(T* h)
-        {
-            UnLockFn::Unlock(h);
-            FreeFn::Free(h);
-        }
-        void operator()(T* h) { Destroy(h); }
-    };
-
-    struct DTWAINGlobalHandle_ReleaseDCTraits
-    {
-        static void Destroy(std::pair<HWND, HDC>& val)
-        {
-            #ifdef _WIN32
-            if (val.second)
-                ReleaseDC(val.first, val.second);
-            #endif
-        }
-        void operator()(std::pair<HWND, HDC>* val) { Destroy(*val); }
-    };
-
-    struct DTWAINFileHandle_CloseTraits
-    {
-        static void Destroy(HANDLE h)
-        {
-            #ifdef _WIN32
-            if (h)
-                CloseHandle(h);
-            #endif
-        }
-        void operator()(HANDLE h) { Destroy(h); }
-    };
-
-    struct DTWAINResource_UnlockFreeTraits
-    {
-        static void Destroy(HGLOBAL h)
-        {
-        }
-        void operator()(HGLOBAL h) { Destroy(h); }
-    };
-
-    struct DTWAINResource_DeleteObjectTraits
-    {
-        static void Destroy(HBITMAP* h)
-        {
-#ifdef _WIN32
-            if (h && *h)
-                DeleteObject(*h);
-#endif
-        }
-        void operator()(HBITMAP* h) { Destroy(h); }
-    };
-
-    template <typename ArrayType>
-    struct DTWAINArrayLowLevel_RAII_Impl
-    {
-        CTL_TwainDLLHandle* m_pHandle;
-        ArrayType m_Array;
-        bool m_bDestroy;
-        DTWAINArrayLowLevel_RAII_Impl() : m_pHandle{}, m_Array{}, m_bDestroy(true) {}
-        DTWAINArrayLowLevel_RAII_Impl(CTL_TwainDLLHandle* pHandle, ArrayType a) : m_pHandle(pHandle), m_Array(a), m_bDestroy(true) {}
-        void SetDestroy(bool bSet) { m_bDestroy = bSet; }
-        void SetArray(ArrayType arr) { m_Array = arr; }
-        void SetHandle(CTL_TwainDLLHandle* pHandle) { m_pHandle = pHandle; }
-        void Destroy()
-        {
-            if (m_pHandle && m_bDestroy && m_Array)
-            {
-                if constexpr (std::is_same_v<ArrayType, DTWAIN_ARRAY*>)
-                {
-                    if (*m_Array)
-                        m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));
-                }
-                else
-                {
-                    m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(m_Array));
-                }
-                m_Array = {};
-            }
-        }
-        ~DTWAINArrayLowLevel_RAII_Impl()
-        {
-            Destroy();
-        }
-    };
-
-    using DTWAINArrayLowLevel_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY>;
-    using DTWAINArrayLowLevelPtr_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY*>;
-    using DTWAINArrayPtr_RAII = DTWAINArrayLowLevelPtr_RAII;
-
-    // RAII Classes
-    using DTWAINDeviceContextRelease_RAII = std::unique_ptr<std::pair<HWND, HDC>, DTWAINGlobalHandle_ReleaseDCTraits>;
-    using DTWAINGlobalHandlePtr_RAII = std::unique_ptr<HANDLE, DTWAINGlobalHandle_ClosePtrTraits>;
-    using DTWAINFileHandle_RAII = std::unique_ptr<void, DTWAINFileHandle_CloseTraits>;
-    using DTWAINResourceUnlockFree_RAII = std::unique_ptr<void, DTWAINResource_UnlockFreeTraits>;
-    using DTWAINHBITMAPFree_RAII = std::unique_ptr<HBITMAP, DTWAINResource_DeleteObjectTraits>;
-    using DTWAINGlobalHandle_RAII = std::unique_ptr<void, DTWAINGlobalHandle_CloseTraits>;
-    using DTWAINGlobalHandleUnlockFree_RAII = std::unique_ptr<void, DTWAINGlobalHandle_CloseFreeTraits>;
-    using DTWAINDSM2Lock_RAII = std::unique_ptr<void, 
-            DTWAINGlobalHandle_GenericUnlockFreeTraits<HANDLE, DSM2UnlockTraits, DSM2NoFreeTraits>>;
-    using DTWAINDSM2LockAndFree_RAII = std::unique_ptr<DSMPair,
-        DTWAINGlobalHandle_GenericUnlockFreeTraits<DSMPair, DSM2UnlockTraits, DSM2FreeTraits>>;
-
-    struct HandleRAII
-    {
-        LPBYTE m_pByte;
-        DTWAINGlobalHandle_RAII m_raii;
-        HandleRAII(HANDLE h) : m_raii(h), m_pByte(static_cast<LPBYTE>(GlobalLock(h))) {}
-        LPBYTE getData() const { return m_pByte; }
-        HandleRAII(HandleRAII&) = delete;
-        HandleRAII& operator=(HandleRAII&) = delete;
-    };
-
-    struct LogTraitsOff
-    { static long Apply(long turnOff) { return CTL_StaticData::GetLogFilterFlags() &~turnOff; } };
-
-    struct LogTraitsOn
-    { static long Apply(long turnOn) { return CTL_StaticData::GetLogFilterFlags() | turnOn; } };
-
 
     #define THIS_FUNCTION_PROTO_THROWS  ;
     #define THIS_FUNCTION_THROWS
@@ -892,16 +363,6 @@ namespace dynarithmic
 
     #define IDS_DTWAIN_APPTITLE       9700
     #define IDS_DTWAIN_APPTITLE_HTML  9701
-
-    #define CHECK_FOR_PDF_TYPE() \
-        (lFileType == DTWAIN_PDF) || \
-        (lFileType == DTWAIN_PDFMULTI) || \
-        (lFileType == DTWAIN_POSTSCRIPT1) || \
-        (lFileType == DTWAIN_POSTSCRIPT2) || \
-        (lFileType == DTWAIN_POSTSCRIPT3) || \
-        (lFileType == DTWAIN_POSTSCRIPT1MULTI) || \
-        (lFileType == DTWAIN_POSTSCRIPT2MULTI) || \
-        (lFileType == DTWAIN_POSTSCRIPT3MULTI)
 }
 
 #endif

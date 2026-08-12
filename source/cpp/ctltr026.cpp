@@ -34,9 +34,43 @@
 #include "ctldib32ex.h"
 #include "ctlstringutils.h"
 #include "ctltwainlogging.h"
+#include "ctlglobalhandletraits.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;
+
+namespace
+{
+    using DSMPair = std::pair<CTL_TwainDLLHandle*, HANDLE>;
+
+    struct DSM2UnlockTraits
+    {
+        static void Unlock(DSMPair* pr)
+        {
+            pr->first->m_TwainMemoryFunc->UnlockMemory(pr->second);
+        }
+    };
+
+    struct DSM2NoFreeTraits
+    {
+        static void Free(DSMPair /*h*/)
+        {
+        }
+    };
+
+    struct DSM2FreeTraits
+    {
+        static void Free(DSMPair* pr)
+        {
+            pr->first->m_TwainMemoryFunc->FreeMemory(pr->second);
+        }
+    };
+
+    using DTWAINDSM2Lock_RAII = std::unique_ptr<void, 
+            DTWAINGlobalHandle_GenericUnlockFreeTraits<HANDLE, DSM2UnlockTraits, DSM2NoFreeTraits>>;
+    using DTWAINDSM2LockAndFree_RAII = std::unique_ptr<DSMPair,
+        DTWAINGlobalHandle_GenericUnlockFreeTraits<DSMPair, DSM2UnlockTraits, DSM2FreeTraits>>;
+}
 
 namespace
 {

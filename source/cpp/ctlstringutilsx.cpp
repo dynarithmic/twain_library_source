@@ -32,6 +32,7 @@
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
 #include "ctlconstexprfind.h"
+#include "ctlglobalhandletraits.h"
 
 using namespace dynarithmic;
 

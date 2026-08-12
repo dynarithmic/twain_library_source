@@ -22,7 +22,6 @@
  */
 #include "cppfunc.h"
 #include "dtwain.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "ctldtwainhandle.h"

@@ -18,18 +18,42 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLSOURCEACQUIRE_H
-#define CTLSOURCEACQUIRE_H
-#include "dtwtype.h"
+
+#ifdef _MSC_VER
+#pragma warning (disable:4702)
+#endif
+
+#include "ctlglobalhandletraits.h"
+#include "winbit32.h"
 
 namespace dynarithmic
 {
-    struct SourceAcquireOptions;
-    DTWAIN_ARRAY  SourceAcquire(SourceAcquireOptions& opts);
-    bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType);
-    DTWAIN_ACQUIRE  LLAcquireImage(SourceAcquireOptions& opts);
-    bool TileModeOn(DTWAIN_SOURCE Source);
+    void DTWAINGlobalHandle_CloseTraits::Destroy(HANDLE h)
+    {
+        #ifdef _WIN32
+            if (h)
+                ImageMemoryHandler::GlobalUnlock(h);
+        #endif
+    }
+
+    void DTWAINGlobalHandle_ClosePtrTraits::Destroy(HANDLE* h)
+     {
+        #ifdef _WIN32
+            if (h && *h)
+                ImageMemoryHandler::GlobalUnlock(*h);
+        #endif
+    }
+
+    void DTWAINGlobalHandle_CloseFreeTraits::Destroy(HANDLE h)
+    {
+        #ifdef _WIN32
+        if (h)
+        {
+            ImageMemoryHandler::GlobalUnlock(h);
+            ImageMemoryHandler::GlobalFree(h);
+        }
+        #endif
+    }
+
+    HandleRAII::HandleRAII(HANDLE h) : m_raii(h), m_pByte(static_cast<LPBYTE>(GlobalLock(h))) {}
 }
-#endif
-
-

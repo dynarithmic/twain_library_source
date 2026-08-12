@@ -21,11 +21,11 @@
 #ifndef CAPSTRUCT_H
 #define CAPSTRUCT_H
 
-#include <boost/container/flat_map.hpp>
 #include "ctlenum.h"
 #include "twain.h"
 #include "winconst.h"
 #include "ctltmpl4.h"
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -46,7 +46,7 @@ namespace dynarithmic
             operator std::string() const;
     };
 
-    typedef boost::container::flat_map<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;
+    typedef BASIC_MAPTYPE_<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;
 
     typedef CTL_ClassValues10<TW_UINT16 ,/* Capability*/
         UINT, /* Container for Get */

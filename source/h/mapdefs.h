@@ -18,18 +18,13 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLSOURCEACQUIRE_H
-#define CTLSOURCEACQUIRE_H
-#include "dtwtype.h"
-
-namespace dynarithmic
-{
-    struct SourceAcquireOptions;
-    DTWAIN_ARRAY  SourceAcquire(SourceAcquireOptions& opts);
-    bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType);
-    DTWAIN_ACQUIRE  LLAcquireImage(SourceAcquireOptions& opts);
-    bool TileModeOn(DTWAIN_SOURCE Source);
-}
+#ifndef MAPDEFS_H
+#define MAPDEFS_H
+    #ifdef DTWAIN_USE_BOOST_MAP_
+        #include <boost/container/flat_map.hpp>
+        #define BASIC_MAPTYPE_    boost::container::flat_map
+    #else
+        #include <map>
+        #define BASIC_MAPTYPE_ std::map
+    #endif
 #endif
-
-

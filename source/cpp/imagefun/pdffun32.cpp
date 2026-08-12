@@ -30,6 +30,7 @@
 #include "ctlfileutils.h"
 #include "dtwain_float_utils.h"
 #include "logwriterutils.h"
+#include "ctlstaticdata.h"
 
 using namespace dynarithmic;
 

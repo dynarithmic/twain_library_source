@@ -21,6 +21,7 @@
 #include "cppfunc.h"
 #include "ctliface.h"
 #include "ctldib32ex.h"
+#include "ctlglobalhandletraits.h"
 
 using namespace dynarithmic;
 

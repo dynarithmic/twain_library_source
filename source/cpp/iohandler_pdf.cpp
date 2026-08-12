@@ -30,6 +30,7 @@
 #include "ctldib32ex.h"
 #include "ctlguidimpl.h"
 #include "ctltwaindllpath.h"
+#include "ctlglobalhandletraits.h"
 
 using namespace dynarithmic;
 

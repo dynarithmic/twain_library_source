@@ -22,6 +22,7 @@
 #include "cppfunc.h"
 #include "ctldtwainhandle.h"
 #include "ctliface.h"
+#include "ctlstaticdata.h"
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
 #include "ctltwainmanager.h"

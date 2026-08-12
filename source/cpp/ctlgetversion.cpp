@@ -27,6 +27,7 @@
 #include "ctlgetversion.h"
 #include "ctldtwainhandle.h"
 #include "ctltwaindllpath.h"
+#include "ctlstaticdata.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;

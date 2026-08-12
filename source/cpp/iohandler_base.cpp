@@ -22,10 +22,12 @@
 #include "ctlloadresources.h"
 #include "ctldib32ex.h"
 #include "logwriterutils.h"
+#include "ctlstaticdata.h"
+#include "mapdefs.h"
 
 using namespace dynarithmic;
 
-boost::container::flat_map<LONG, std::vector<uint16_t>> CTL_ImageIOHandler::s_supportedBitDepths;
+BASIC_MAPTYPE_<LONG, std::vector<uint16_t>> CTL_ImageIOHandler::s_supportedBitDepths;
 
 CTL_ImageIOHandler::CTL_ImageIOHandler() : 
     pMultiDibData(nullptr), 

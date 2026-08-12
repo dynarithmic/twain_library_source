@@ -126,6 +126,43 @@ namespace dynarithmic
         std::transform(vect.begin(), vect.end(), vect.begin(), [&](ArrayType value) { return static_cast<TwainTypeOut>(value); });
     }
 
+    template <typename ArrayType>
+    struct DTWAINArrayLowLevel_RAII_Impl
+    {
+        CTL_TwainDLLHandle* m_pHandle;
+        ArrayType m_Array;
+        bool m_bDestroy;
+        DTWAINArrayLowLevel_RAII_Impl() : m_pHandle{}, m_Array{}, m_bDestroy(true) {}
+        DTWAINArrayLowLevel_RAII_Impl(CTL_TwainDLLHandle* pHandle, ArrayType a) : m_pHandle(pHandle), m_Array(a), m_bDestroy(true) {}
+        void SetDestroy(bool bSet) { m_bDestroy = bSet; }
+        void SetArray(ArrayType arr) { m_Array = arr; }
+        void SetHandle(CTL_TwainDLLHandle* pHandle) { m_pHandle = pHandle; }
+        void Destroy()
+        {
+            if (m_pHandle && m_bDestroy && m_Array)
+            {
+                if constexpr (std::is_same_v<ArrayType, DTWAIN_ARRAY*>)
+                {
+                    if (*m_Array)
+                        m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));
+                }
+                else
+                {
+                    m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(m_Array));
+                }
+                m_Array = {};
+            }
+        }
+        ~DTWAINArrayLowLevel_RAII_Impl()
+        {
+            Destroy();
+        }
+    };
+
+    using DTWAINArrayLowLevel_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY>;
+    using DTWAINArrayLowLevelPtr_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY*>;
+    using DTWAINArrayPtr_RAII = DTWAINArrayLowLevelPtr_RAII;
+
     void SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib);
     void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
     void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame);

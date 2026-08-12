@@ -57,6 +57,8 @@
 #include "ctlcapcollect.h"
 #include "ctlcapcontainerfuncs.h"
 #include "ctltwaindllpath.h"
+#include "ctltwainlogging.h"
+#include "ctlglobalhandletraits.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;

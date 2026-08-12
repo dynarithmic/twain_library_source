@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "ctlstringutilsx.h"
 #include "ctldtwainhandle.h"
+#include "ctlstaticdata.h"
 using namespace dynarithmic;
 
 namespace

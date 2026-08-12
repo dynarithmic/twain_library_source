@@ -23,10 +23,21 @@
 
 #include "dtwain_standard_defs.h"
 #include "ctlstringdefs.h"
+#include "ctlstaticdata.h"
 
 namespace dynarithmic
 {
     class CTL_TwainDLLHandle;
+
+    struct LogTraitsOff
+    {
+        static long Apply(long turnOff);
+    };
+
+    struct LogTraitsOn
+    {
+        static long Apply(long turnOn);
+    };
 
     // RAII Class for turning on/off logging locally
     struct DTWAINScopedLogController
@@ -62,5 +73,11 @@ namespace dynarithmic
     void LogToDebugMonitorA(std::string sMsg);
     void LogToDebugMonitorW(std::wstring sMsg);
     void LogToDebugMonitor(CTL_StringType sMsg);
+    void LogDTWAINMessage(HWND, UINT, WPARAM, LPARAM, bool bCallback=false);
+
+    struct LoggingTraits;
+    std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const LoggingTraits& fTraits = {});
+    void WriteVersionToLog(CTL_TwainDLLHandle* pHandle);
+
 }
 #endif

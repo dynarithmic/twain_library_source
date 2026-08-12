@@ -21,6 +21,7 @@
 #include "ctliface.h"
 #include "resamplefactory.h"
 #include "ctldib32ex.h"
+#include "ctlstaticdata.h"
 
 namespace dynarithmic
 {

@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctliface.h"
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
 #include "ctldtwainhandle.h"

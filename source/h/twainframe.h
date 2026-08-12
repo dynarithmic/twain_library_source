@@ -127,5 +127,14 @@ namespace dynarithmic
         return !(operator==(f1, f2));
     }
 
+    inline bool operator==(const TwainFrameInternal& lhs, const TwainFrameInternal& rhs)
+    {
+        return lhs.m_FrameComponent == rhs.m_FrameComponent;
+    }
+
+    inline bool operator!=(const TwainFrameInternal& lhs, const TwainFrameInternal& rhs)
+    {
+        return !(lhs.m_FrameComponent == rhs.m_FrameComponent);
+    }
 }
 #endif // TWAINFRAME_H

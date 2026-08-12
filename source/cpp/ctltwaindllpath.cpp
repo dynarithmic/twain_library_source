@@ -23,6 +23,7 @@
 #include "ctlwindowsimpl.h"
 #include "ctlfileutils.h"
 #include "ctltwaindllpath.h"
+#include "ctlstaticdata.h"
 
 using namespace dynarithmic;
 

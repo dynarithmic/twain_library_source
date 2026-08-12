@@ -411,6 +411,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlconstexprfind.h
         ${PROJECT_SOURCE_DIR}/h/ctlconstexprutils.h
         ${PROJECT_SOURCE_DIR}/h/ctldefsource.h
+        ${PROJECT_SOURCE_DIR}/h/ctldevicecontext.h
         ${PROJECT_SOURCE_DIR}/h/ctldevnt.h
         ${PROJECT_SOURCE_DIR}/h/ctldib.h
         ${PROJECT_SOURCE_DIR}/h/ctldib32.h
@@ -420,16 +421,19 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlenum.h
         ${PROJECT_SOURCE_DIR}/h/ctlfeed.h
         ${PROJECT_SOURCE_DIR}/h/ctlfilesave.h
+        ${PROJECT_SOURCE_DIR}/h/ctlfilesavedefs.h
         ${PROJECT_SOURCE_DIR}/h/ctlfileutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlgetversion.h
         ${PROJECT_SOURCE_DIR}/h/ctlguiddef.h
         ${PROJECT_SOURCE_DIR}/h/ctlguidimpl.h
+        ${PROJECT_SOURCE_DIR}/h/ctlglobalhandletraits.h
         ${PROJECT_SOURCE_DIR}/h/ctliface.h
         ${PROJECT_SOURCE_DIR}/h/ctlloadresources.h
         ${PROJECT_SOURCE_DIR}/h/ctllogcalls.h
         ${PROJECT_SOURCE_DIR}/h/ctllogfunctioncall.h
         ${PROJECT_SOURCE_DIR}/h/ctllogsourcecaps.h
         ${PROJECT_SOURCE_DIR}/h/ctlobtyp.h
+        ${PROJECT_SOURCE_DIR}/h/ctlmapdefs.h
         ${PROJECT_SOURCE_DIR}/h/ctlrandnumutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlsetgetcaps.h
         ${PROJECT_SOURCE_DIR}/h/ctlshowuionly.h
@@ -441,6 +445,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlstringdefs.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlstringutilsx.h
+        ${PROJECT_SOURCE_DIR}/h/ctlstaticdata.h
         ${PROJECT_SOURCE_DIR}/h/ctlsupport.h
         ${PROJECT_SOURCE_DIR}/h/ctlthreadutils.h
         ${PROJECT_SOURCE_DIR}/h/ctltimer.h
@@ -581,6 +586,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/iohandler_wmf.h
         ${PROJECT_SOURCE_DIR}/h/logmsg.h
         ${PROJECT_SOURCE_DIR}/h/logwriterutils.h
+        ${PROJECT_SOURCE_DIR}/h/mapdefs.h
         ${PROJECT_SOURCE_DIR}/h/monitorutils.h
         ${PROJECT_SOURCE_DIR}/h/notimpl.h
         ${PROJECT_SOURCE_DIR}/h/ocrengine/ocrinterface.h
@@ -603,7 +609,6 @@ set(MAIN_INL
   ${PROJECT_SOURCE_DIR}/inl/ctltr018.inl
   ${PROJECT_SOURCE_DIR}/inl/ctltr019.inl
   ${PROJECT_SOURCE_DIR}/inl/ctltr020.inl
-  ${PROJECT_SOURCE_DIR}/inl/windowsinit_impl.inl
   ${PROJECT_SOURCE_DIR}/inl/windows_info.inl
   ${PROJECT_SOURCE_DIR}/inl/winget_twain.inl
   ${PROJECT_SOURCE_DIR}/inl/winlibraryloader_impl.inl
@@ -650,6 +655,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlgetcapinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlgetmetrics.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlgetversion.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlglobalhandletraits.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlhashutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlhigh.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlimageerrorskip.cpp

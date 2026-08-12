@@ -23,8 +23,6 @@
 
 #include <vector>
 #include <boost/logic/tribool.hpp>
-#include <boost/container/flat_map.hpp>
-#include <boost/container/flat_set.hpp>
 #include <array>
 #include <map>
 
@@ -41,6 +39,7 @@
 #include "extendedimageinfo.h"
 #include "sourceacquireopts.h"
 #include "ctlguiddef.h"
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -53,8 +52,8 @@ namespace dynarithmic
         ~SourceCloserRAII();
     };
 
-    typedef boost::container::flat_map<TW_UINT16, short int> CapToStateMap;
-    typedef boost::container::flat_set<TW_UINT16> CapList;
+    typedef BASIC_MAPTYPE_<TW_UINT16, short int> CapToStateMap;
+    typedef std::set<TW_UINT16> CapList;
     typedef std::vector<TW_UINT16> JobControlList;
     typedef std::vector<TW_INFO> TWINFOVector;
 
@@ -137,7 +136,7 @@ namespace dynarithmic
             std::vector<anytype_> m_data;
         };
 
-        typedef boost::container::flat_map<TW_UINT16, container_values> CapToValuesMap;
+        typedef BASIC_MAPTYPE_<TW_UINT16, container_values> CapToValuesMap;
         CapToValuesMap m_capToValuesMap_G;
         CapToValuesMap m_capToValuesMap_GD;
         SourceCompressionMap m_CompressionMap;
@@ -709,10 +708,10 @@ namespace dynarithmic
             TW_UINT16 nCap;
             bool      m_bSupported;
         };
-        typedef boost::container::flat_map<TW_UINT16, bool> CachedCapMap;
+        typedef BASIC_MAPTYPE_<TW_UINT16, bool> CachedCapMap;
 
         public:
-            typedef boost::container::flat_map<int, std::set<int> > CachedPixelTypeMap;
+            typedef BASIC_MAPTYPE_<int, std::set<int> > CachedPixelTypeMap;
             void        AddPixelTypeAndBitDepth(int PixelType, int BitDepth);
             CachedPixelTypeMap::iterator FindPixelType(int PixelType);
             bool IsBitDepthSupported(int PixelType, int BitDepth);

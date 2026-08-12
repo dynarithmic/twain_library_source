@@ -24,6 +24,8 @@
 #include "arrayfactory.h"
 #include "extendedimageinfo.h"
 #include "ctlarray.h"
+#include "ctlglobalhandletraits.h"
+#include "ctlstaticdata.h"
 
 namespace dynarithmic
 {

@@ -23,6 +23,7 @@ OF THIRD PARTY RIGHTS.
 #include "iohandler_svg.h"
 #include "ctldib32ex.h"
 #include "svgwriter.h"
+#include "ctlstaticdata.h"
 
 using namespace dynarithmic;
 

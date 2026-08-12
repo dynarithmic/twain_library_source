@@ -19,11 +19,14 @@ DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRING
 OF THIRD PARTY RIGHTS.
 */
 #ifdef _WIN32
-struct library_loader_impl
+namespace dynarithmic
 {
-    static void *get(void *handle, const char *name)
+    struct library_loader_impl
     {
-        return GetProcAddress(static_cast<HMODULE>(handle), name);
-    }
-};
+        static void* get(void* handle, const char* name)
+        {
+            return GetProcAddress(static_cast<HMODULE>(handle), name);
+        }
+    };
+}
 #endif

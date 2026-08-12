@@ -18,18 +18,27 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLSOURCEACQUIRE_H
-#define CTLSOURCEACQUIRE_H
-#include "dtwtype.h"
+#ifndef CTLDEVICECONTEXT_H
+#define CTLDEVICECONTEXT_H
 
+#include <memory>
+#include <utility>
+#include <winuser.h>
+#include "dtwain_standard_defs.h"
 namespace dynarithmic
 {
-    struct SourceAcquireOptions;
-    DTWAIN_ARRAY  SourceAcquire(SourceAcquireOptions& opts);
-    bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType);
-    DTWAIN_ACQUIRE  LLAcquireImage(SourceAcquireOptions& opts);
-    bool TileModeOn(DTWAIN_SOURCE Source);
+    struct DTWAINGlobalHandle_ReleaseDCTraits
+    {
+        static void Destroy(std::pair<HWND, HDC>& val)
+        {
+            #ifdef _WIN32
+            if (val.second)
+                ReleaseDC(val.first, val.second);
+            #endif
+        }
+        void operator()(std::pair<HWND, HDC>* val) { Destroy(*val); }
+    };
+
+    using DTWAINDeviceContextRelease_RAII = std::unique_ptr<std::pair<HWND, HDC>, DTWAINGlobalHandle_ReleaseDCTraits>;
 }
 #endif
-
-

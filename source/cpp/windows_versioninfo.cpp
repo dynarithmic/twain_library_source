@@ -3,6 +3,7 @@
 #include "ctlstringdefs.h"
 #include "versioninfo.h"
 #include "dtwinverex.h"
+#include "ctlstaticdata.h"
 
 namespace dynarithmic
 {

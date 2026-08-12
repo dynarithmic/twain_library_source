@@ -27,7 +27,6 @@
 #include "dtwstrfn.h"
 #include "dtwain_float_utils.h"
 #include "arrayfactory.h"
-#include "ctliface.h"
 #include "ctlarraydumper.h"
 #include "ctlcapcontainerfuncs.h"
 #include "ctldtwainhandle.h"

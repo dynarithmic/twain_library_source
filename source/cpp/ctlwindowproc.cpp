@@ -24,6 +24,8 @@
 #include "errorcheck.h"
 #include "ctldtwainhandle.h"
 #include "ctlsourcedibs.h"
+#include "ctltwainlogging.h"
+#include "windowsinit_impl.h"
 
 using namespace dynarithmic;
 
@@ -35,6 +37,17 @@ using namespace dynarithmic;
 
 namespace
 {
+    template <typename CallbackType, typename UserType>
+    struct CallbackInfo
+    {
+        CallbackType Fn;
+        UserType UserData;
+        LRESULT retvalue;
+        CallbackInfo(CallbackType theFn=NULL, UserType theUserData=0) :
+        Fn(theFn), UserData(theUserData), retvalue(1)
+        {}
+    };
+
     void SetNotification(CTL_TwainDLLHandle* pHandle, bool& notification, DTWAIN_BOOL bSet)
     {
         // See if DLL Handle exists
@@ -321,19 +334,6 @@ namespace
 
 namespace dynarithmic
 {
-    void LogDTWAINMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bool bToCallback)
-    {
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_NOTIFICATIONS)
-        {
-            CTL_TWAINDecoderStruct e;
-            std::string s;
-            if ( bToCallback )
-                s = "To callback: ";
-            s += e.GetDTWAINMessageAndDataInfo(hWnd, uMsg, wParam, lParam);
-            LogWriterUtils::WriteMultiLineInfoIndentedA(s, "\n");
-        }
-    }
-
 #ifdef _WIN32
     LRESULT DLLENTRY_DEF DTWAIN_WindowProc(HWND hWnd,
         UINT uMsg,

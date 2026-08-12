@@ -23,6 +23,7 @@
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
 #include "ctltwainmanager.h"
+#include "ctlstaticdata.h"
 
 namespace stringutils = dynarithmic::basicstringutils;
 

@@ -77,6 +77,7 @@ using namespace dynarithmic;
 #else
     #define WRITE_TO_LOG()
 #endif
+#include "ctlstaticdata.h"
 
 #define EXTRA_OBJECTS   3
 

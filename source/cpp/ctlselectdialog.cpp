@@ -24,6 +24,8 @@
 #include "errorcheck.h"
 #include "ctlstringutils.h"
 #include "monitorutils.h"
+#include "ctltwainlogging.h"
+#include "ctldevicecontext.h"
 
 using namespace dynarithmic;
 using namespace boost::logic;

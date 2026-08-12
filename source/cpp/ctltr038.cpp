@@ -21,6 +21,7 @@
 #include "ctltr038.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "ctlstaticdata.h"
 
 using namespace dynarithmic;
 #ifdef _MSC_VER

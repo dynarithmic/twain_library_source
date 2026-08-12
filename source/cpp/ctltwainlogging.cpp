@@ -24,6 +24,8 @@
 #include "ctllogsourcecaps.h"
 #include "ctltwainlogging.h"
 #include "ctldtwainhandle.h"
+#include "ctlgetversion.h"
+#include "dtwinverex.h"
 
 using namespace dynarithmic;
 
@@ -177,6 +179,111 @@ namespace dynarithmic
 #endif
     }
 
+    void LogDTWAINMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bool bToCallback)
+    {
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_NOTIFICATIONS)
+        {
+            CTL_TWAINDecoderStruct e;
+            std::string s;
+            if ( bToCallback )
+                s = "To callback: ";
+            s += e.GetDTWAINMessageAndDataInfo(hWnd, uMsg, wParam, lParam);
+            LogWriterUtils::WriteMultiLineInfoIndentedA(s, "\n");
+        }
+    }
+
+    std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const LoggingTraits& lTraits)
+    {
+        uint16_t nWhichLogging = 0;
+        uint16_t totalLoggingOptions = 0;
+        std::vector<uint16_t> vBadLogs;
+        if (pFileName && pFileName[0])
+        {
+            bool bLogOpen = false;
+            bLogOpen = CTL_StaticData::GetLogger().InitFileLogging(pFileName, CTL_StaticData::GetDLLInstanceHandle(), lTraits);
+            if (!bLogOpen)
+                vBadLogs.push_back(nWhichLogging);
+            ++totalLoggingOptions;
+        }
+        ++nWhichLogging;
+        std::array<std::function<bool(HINSTANCE, const LoggingTraits&)>, 3> vLoggingFuncs = {
+                                [&](HINSTANCE hinst, const LoggingTraits& theTraits) { return CTL_StaticData::GetLogger().InitConsoleLogging(hinst, theTraits); },
+                                [&](HINSTANCE hinst, const LoggingTraits&) { return CTL_StaticData::GetLogger().InitDebugWindowLogging(hinst); },
+                                [&](HINSTANCE hinst, const LoggingTraits&) { return CTL_StaticData::GetLogger().InitCallbackLogging(hinst); }};
+        static constexpr std::array<long, 4> aLogFlags = { 0, DTWAIN_LOG_CONSOLE, DTWAIN_LOG_DEBUGMONITOR, DTWAIN_LOG_USECALLBACK };
+        for (auto& fn : vLoggingFuncs)
+        {
+            if (logFlags & aLogFlags[nWhichLogging])
+            {
+                bool bRet = true;
+                ++totalLoggingOptions;
+                bRet = fn(CTL_StaticData::GetDLLInstanceHandle(), lTraits);
+                if (!bRet)
+                    vBadLogs.push_back(nWhichLogging);
+            }
+            ++nWhichLogging;
+        }
+        bool bAnyLogsOpen = vBadLogs.size() < totalLoggingOptions;
+        if (bAnyLogsOpen && logFlags)
+        {
+            CTL_StaticData::GetLogger().PrintTime(true);
+            CTL_StaticData::GetLogger().PrintAppName(true);
+            CTL_StaticData::GetLogger().PrintBanner();
+        }
+        return { vBadLogs.empty(), vBadLogs };
+    }
+
+    void WriteVersionToLog(CTL_TwainDLLHandle *pHandle)
+    {
+        std::string ansiVer;
+        if (CTL_StaticData::GetLogFilterFlags())
+        {
+            auto sVer = GetVersionString();
+            const auto sWinVer = GetWinVersion();
+            auto sDSMPath = CTL_TwainAppMgr::GetDSMPath();
+            CTL_StringType sDSMVersionInfo;
+            if (sDSMPath.empty())
+            {
+                sDSMPath = _T("(unknown or not queried)");
+                sDSMVersionInfo.clear();
+                sDSMVersionInfo = _T("\nDSM Version Information: ");
+                sDSMVersionInfo += _T("(unknown or not queried)");
+            }
+            else
+            {
+                sDSMVersionInfo = _T("\nDSM Version Information:\n");
+                if ( CTL_TwainAppMgr::GetInstance() )
+                    sDSMVersionInfo += GetVersionInfo(CTL_TwainAppMgr::GetInstance()->GetDSMModuleHandle(), 4, _T("\n"));
+                else
+                    sDSMVersionInfo += _T("(unknown or not queried)");
+            }
+            sDSMPath = _T("Active DSM Path: ") + sDSMPath;
+            sVer += _T("\n") + sWinVer + sDSMPath + sDSMVersionInfo + _T("\n");
+            #ifdef _WIN32
+            // All log messages must be ANSI
+            ansiVer = stringconversion::Convert_Native_To_Ansi(sVer);
+            auto logFilterFlags = CTL_StaticData::GetLogFilterFlags();
+            if (logFilterFlags & (DTWAIN_LOG_USEFILE | DTWAIN_LOG_CONSOLE))
+            {
+                if (!CTL_StaticData::GetLogger().StatusOutFast(ansiVer.c_str()))
+                {
+                    ansiVer += "\n";
+                    LogToDebugMonitorA(ansiVer);
+                }
+            }
+            if (logFilterFlags & DTWAIN_LOG_DEBUGMONITOR)
+            {
+                sVer += _T("\n");
+                LogToDebugMonitor(sVer);
+            }
+            if ( UserDefinedLoggerExists(pHandle) )
+                WriteUserDefinedLogMsgA(pHandle, ansiVer.c_str());
+            #endif
+        }
+    }
+
+    long LogTraitsOff::Apply(long turnOff) { return CTL_StaticData::GetLogFilterFlags() &~turnOff; }
+    long LogTraitsOn::Apply(long turnOn) { return CTL_StaticData::GetLogFilterFlags() | turnOn; } 
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(DWORD LogFlags, LPCTSTR lpszLogFile)

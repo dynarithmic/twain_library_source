@@ -32,10 +32,10 @@
 #include <string>
 #include <algorithm>
 #include <stdexcept>
-#include <boost/container/flat_map.hpp>
 #include "twainframe.h"
 #include "twainfix32.h"
 #include "ctlconstexprfind.h"
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -128,53 +128,49 @@ namespace dynarithmic
         using tagged_array_fix32 = tagged_array<TW_FIX32Ex>;
         using tagged_array_long64 = tagged_array<LONG64, ULONG64>;
 
-        // Map type that maps the array tag to a function that manipulates the 
-        // DTWAIN array
-        #define FNMAPTYPE boost::container::flat_map
-
         // Function that adds a value to the DTWAIN Array
         using voidAddFn = std::function<void(arrayTag*, std::size_t, void*)>;
-        using voidAddFnMap = FNMAPTYPE<int, voidAddFn>;
+        using voidAddFnMap = BASIC_MAPTYPE_<int, voidAddFn>;
 
         // Function that gets a value to the DTWAIN Array
         using voidGetFn = std::function<void*(arrayTag*, std::size_t, void*)>;
-        using voidGetFnMap = FNMAPTYPE<int, voidGetFn>;
+        using voidGetFnMap = BASIC_MAPTYPE_<int, voidGetFn>;
 
         // Function that finds a value to the DTWAIN Array
         using voidFindFn = std::function<std::size_t(arrayTag*, void*, double)>;
-        using voidFindFnMap = FNMAPTYPE<int, voidFindFn>;
+        using voidFindFnMap = BASIC_MAPTYPE_<int, voidFindFn>;
 
         // Function that inserts a value to the DTWAIN Array
         using voidInserterFn = std::function<void(arrayTag*, std::size_t, std::size_t, void*)>;
-        using voidInserterFnMap = FNMAPTYPE<int, voidInserterFn>;
+        using voidInserterFnMap = BASIC_MAPTYPE_<int, voidInserterFn>;
 
         // Function that copies from one array to another of the same type
         using voidCopierFn = std::function<void(arrayTag*, arrayTag*)>;
-        using voidCopierFnMap = FNMAPTYPE<int, voidCopierFn>;
+        using voidCopierFnMap = BASIC_MAPTYPE_<int, voidCopierFn>;
 
         // Function that removes a value from the DTWAIN Array
         using voidRemoverFn = std::function<void(arrayTag*, std::size_t, std::size_t)>;
-        using voidRemoverFnMap = FNMAPTYPE<int, voidRemoverFn>;
+        using voidRemoverFnMap = BASIC_MAPTYPE_<int, voidRemoverFn>;
 
         // Function that clears the DTWAIN Array
         using voidClearerFn = std::function<void(arrayTag*)>;
-        using voidClearerFnMap = FNMAPTYPE<int, voidClearerFn>;
+        using voidClearerFnMap = BASIC_MAPTYPE_<int, voidClearerFn>;
 
         // Function that resizes the DTWAIN Array
         using voidResizerFn = std::function<void(arrayTag*, std::size_t)>;
-        using voidResizerFnMap = FNMAPTYPE<int, voidResizerFn>;
+        using voidResizerFnMap = BASIC_MAPTYPE_<int, voidResizerFn>;
 
         // Function that returns the size of the DTWAIN array
         using intCounterFn = std::function<std::size_t(arrayTag*)>;
-        using intCounterFnMap = FNMAPTYPE<int, intCounterFn>;
+        using intCounterFnMap = BASIC_MAPTYPE_<int, intCounterFn>;
 
         // Function that sets an existing value in the DTWAIN Array
         using voidSetterFn = std::function<void(arrayTag*, std::size_t, void* value)>;
-        using voidSetterFnMap = FNMAPTYPE<int, voidSetterFn>;
+        using voidSetterFnMap = BASIC_MAPTYPE_<int, voidSetterFn>;
 
         // Function that gets a pointer to the underlying DTWAIN Array buffer
         using voidGetBufferFn = std::function<void*(arrayTag*, std::size_t)>;
-        using voidGetBufferFnMap = FNMAPTYPE<int, voidGetBufferFn>;
+        using voidGetBufferFnMap = BASIC_MAPTYPE_<int, voidGetBufferFn>;
 
         // Returns the underlying std::vector that the DTWAIN Array is wrapping.
         template <typename T>
@@ -446,7 +442,7 @@ namespace dynarithmic
         }
 
     private:
-        FNMAPTYPE<arrayTag*, std::pair<int, std::shared_ptr<arrayTag>>> m_tagMap;
+        BASIC_MAPTYPE_<arrayTag*, std::pair<int, std::shared_ptr<arrayTag>>> m_tagMap;
         voidAddFnMap m_vfnAddMap;
         voidGetFnMap m_vfnGetMap;
         voidFindFnMap m_vfnFindMap;

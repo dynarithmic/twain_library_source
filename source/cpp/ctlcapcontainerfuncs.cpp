@@ -25,7 +25,6 @@
 #include "ctlutils.h"
 #include "ctlcapcollect.h"
 #include "ctlcapcontainerfuncs.h"
-#include "ctliface.h"
 #include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER

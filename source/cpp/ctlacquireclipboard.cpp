@@ -23,6 +23,7 @@
 #include "sourceacquireopts.h"
 #include "acquisitionarray.h"
 #include "ctldtwainhandle.h"
+#include "ctltwainlogging.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif

@@ -20,6 +20,7 @@
  */
 #include "ctltwainmanager.h"
 #include "ctlloadresources.h"
+#include "ctlstaticdata.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

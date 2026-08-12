@@ -23,6 +23,7 @@
 #include "cppfunc.h"
 #include "errorcheck.h"
 #include "ctltr036.h"
+#include "ctlglobalhandletraits.h"
 using namespace dynarithmic;
 
 /////////////////////////////////////////////////////////////

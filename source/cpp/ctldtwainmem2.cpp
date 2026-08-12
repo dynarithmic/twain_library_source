@@ -22,6 +22,7 @@
 #include "ctliface.h"
 #include "cppfunc.h"
 #include "ctldtwainhandle.h"
+#include "ctltwainlogging.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -168,31 +169,3 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemoryEx(HANDLE h)
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
-
-void DTWAINGlobalHandle_CloseTraits::Destroy(HANDLE h)
-{
-    #ifdef _WIN32
-        if (h)
-            ImageMemoryHandler::GlobalUnlock(h);
-    #endif
-}
-
-void DTWAINGlobalHandle_ClosePtrTraits::Destroy(HANDLE* h)
- {
-    #ifdef _WIN32
-        if (h && *h)
-            ImageMemoryHandler::GlobalUnlock(*h);
-    #endif
-}
-
-void DTWAINGlobalHandle_CloseFreeTraits::Destroy(HANDLE h)
-{
-    #ifdef _WIN32
-    if (h)
-    {
-        ImageMemoryHandler::GlobalUnlock(h);
-        ImageMemoryHandler::GlobalFree(h);
-    }
-    #endif
-}
-

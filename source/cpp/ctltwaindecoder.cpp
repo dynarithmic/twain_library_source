@@ -23,6 +23,8 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctltwaindecoder.h"
+#include "ctlglobalhandletraits.h"
+#include "ctlstaticdata.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;

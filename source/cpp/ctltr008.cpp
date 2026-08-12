@@ -26,6 +26,7 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "logwriterutils.h"
+#include "ctltwainlogging.h"
 using namespace dynarithmic;
 
 /* Transfer started */

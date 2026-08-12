@@ -24,6 +24,8 @@
 #include "ctlconstexprfind.h"
 #include "resample24to8.h"
 #include "dibutil.h"
+#include "ctldevicecontext.h"
+#include "ctlglobalhandletraits.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4244)

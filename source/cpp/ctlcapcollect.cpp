@@ -22,6 +22,7 @@
 #include "ctltmpl5.h"
 #include "ctlcapcollect.h"
 #include "cppfunc.h"
+#include "ctlstaticdata.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
