@@ -27,6 +27,7 @@
 #include "ctlenum.h"
 #include "dtwain_version.h"
 #include "dtwpdft.h"
+#include "dtwain_config.h"
 
 namespace dynarithmic
 {

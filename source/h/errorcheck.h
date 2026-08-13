@@ -23,6 +23,7 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "ctlstaticdata.h"
+#include "dtwain_config.h"
 
 namespace dynarithmic
 {
