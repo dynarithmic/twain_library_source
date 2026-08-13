@@ -27,7 +27,6 @@
 #include <iterator>
 #include <algorithm>
 #include <numeric>
-#include <windows.h>
 #include <cctype>
 #include <cwctype>
 
@@ -76,13 +75,12 @@ namespace dynarithmic
             return s1 ? strtod(s1, nullptr) : defVal;
         }
 
-        static constexpr char* DoubleQuote() { return "\""; }
-        static constexpr char* Space() { return " "; }
-        static constexpr char* EmptyString() { return ""; }
-        static constexpr char* NewLineString() { return "\n"; }
-        static constexpr char* DateTimeString() { return "%Y-%m-%d_%H-%M-%S"; }
+        static const constexpr char* DoubleQuote() { return "\""; }
+        static const constexpr char* Space() { return " "; }
+        static const constexpr char* EmptyString() { return ""; }
+        static const constexpr char* NewLineString() { return "\n"; }
+        static const constexpr char* DateTimeString() { return "%Y-%m-%d_%H-%M-%S"; }
         static size_t Length(const char* s) { return std::char_traits<char>::length(s); }
-
     };
 
     template <>
@@ -113,11 +111,11 @@ namespace dynarithmic
             return s1 ? wcstod(s1, nullptr) : defVal;
         }
 
-        static constexpr wchar_t* DoubleQuote() { return L"\""; }
-        static constexpr wchar_t* Space() { return L" "; }
-        static constexpr wchar_t* EmptyString() { return L""; }
-        static constexpr wchar_t* NewLineString() { return L"\n"; }
-        static constexpr wchar_t* DateTimeString() { return L"%Y-%m-%d_%H-%M-%S"; }
+        static const constexpr wchar_t* DoubleQuote() { return L"\""; }
+        static const constexpr wchar_t* Space() { return L" "; }
+        static const constexpr wchar_t* EmptyString() { return L""; }
+        static const constexpr wchar_t* NewLineString() { return L"\n"; }
+        static const constexpr wchar_t* DateTimeString() { return L"%Y-%m-%d_%H-%M-%S"; }
 
         static size_t Length(const wchar_t* s) { return std::char_traits<wchar_t>::length(s); }
     };
@@ -178,21 +176,21 @@ namespace dynarithmic
         template <typename StringType>
         bool StartsWith(const StringType& str, const StringType& prefix)
         {
-            return StartsWith(std::basic_string_view<StringType::value_type>(str),
-                std::basic_string_view<StringType::value_type>(prefix));
+            return StartsWith(std::basic_string_view<typename StringType::value_type>(str),
+                std::basic_string_view<typename StringType::value_type>(prefix));
         }
 
         template <typename StringType>
         bool EndsWith(const StringType& str, const StringType& suffix)
         {
-            return EndsWith(std::basic_string_view<StringType::value_type>(str),
-                std::basic_string_view<StringType::value_type>(suffix));
+            return EndsWith(std::basic_string_view<typename StringType::value_type>(str),
+                std::basic_string_view<typename StringType::value_type>(suffix));
         }
 
         template <typename StringType>
         StringType QuoteString(const StringType& str,
-            typename const StringType::value_type* quoteString =
-            CharTraits<StringType::value_type>::DoubleQuote())
+                               const typename StringType::value_type* quoteString =
+            CharTraits<typename StringType::value_type>::DoubleQuote())
         {
             return quoteString + str + quoteString;
         }
@@ -209,7 +207,7 @@ namespace dynarithmic
             }
             else
             {
-                using StreamType = std::basic_ostringstream<StringType::value_type>;
+                using StreamType = std::basic_ostringstream<typename StringType::value_type>;
                 StreamType strm;
                 strm << value;
                 return strm.str();
@@ -218,25 +216,25 @@ namespace dynarithmic
         }
 
         template <typename StringType>
-        StringType Mid(typename std::basic_string_view<typename StringType::value_type> str, size_t nFirst)
+        StringType Mid(std::basic_string_view<typename StringType::value_type> str, size_t nFirst)
         {
             return str.substr(nFirst).data();
         }
 
         template <typename StringType>
-        StringType Mid(typename std::basic_string_view<typename StringType::value_type> str, size_t nFirst, size_t nNum)
+        StringType Mid(std::basic_string_view<typename StringType::value_type> str, size_t nFirst, size_t nNum)
         {
             return { str.substr(nFirst, nNum).data(), nNum };
         }
 
         template <typename StringType>
-        StringType Left(typename std::basic_string_view<typename StringType::value_type> str, size_t nNum)
+        StringType Left(std::basic_string_view<typename StringType::value_type> str, size_t nNum)
         {
             return Mid<StringType>(str, 0, nNum);
         }
 
         template <typename StringType>
-        StringType Right(typename std::basic_string_view<typename StringType::value_type> str, size_t nNum)
+        StringType Right(std::basic_string_view<typename StringType::value_type> str, size_t nNum)
         {
             const size_t nLen = str.length();
             if (nNum > nLen)
@@ -247,7 +245,7 @@ namespace dynarithmic
         template <typename StringType>
         StringType TrimDouble(double value, int numDigitsPrecision = 8)
         {
-            StringType::value_type buf[256];
+            typename StringType::value_type buf[256];
             if constexpr (std::is_same_v<StringType, std::string>)
                 DTWAIN_SPRINTF_FUNC(buf, "%.*g", numDigitsPrecision, value);
             else
@@ -289,9 +287,9 @@ namespace dynarithmic
         }
 
         template <typename StringType>
-        StringType ReplaceAll(typename std::basic_string_view<typename StringType::value_type> strOrig,
-                              typename std::basic_string_view<typename StringType::value_type> findStr,
-                              typename std::basic_string_view<typename StringType::value_type> replaceStr)
+        StringType ReplaceAll(std::basic_string_view<typename StringType::value_type> strOrig,
+                              std::basic_string_view<typename StringType::value_type> findStr,
+                              std::basic_string_view<typename StringType::value_type> replaceStr)
         {
             if (strOrig.empty())
                 return {};
@@ -321,14 +319,14 @@ namespace dynarithmic
         }
 
         template <typename StringType>
-        int Compare(typename std::basic_string_view<typename StringType::value_type> str, 
+        int Compare(std::basic_string_view<typename StringType::value_type> str, 
                     const typename StringType::value_type* lpsz)
         {
             return str.compare(lpsz);
         }
 
         template <typename StringType>
-        bool CompareNoCase(typename std::basic_string_view<typename StringType::value_type> str, 
+        bool CompareNoCase(std::basic_string_view<typename StringType::value_type> str, 
                            const typename StringType::value_type* lpsz)
         {
             using StringView = std::basic_string_view<typename StringType::value_type>;
@@ -453,21 +451,21 @@ namespace dynarithmic
 
         template <typename StringType>
         StringType& TrimRight(StringType& str, 
-                   const typename StringType::value_type* lpszTrimStr = typename CharTraits<StringType::value_type>::Space())
+                   const typename StringType::value_type* lpszTrimStr = typename CharTraits<typename StringType::value_type>::Space())
         {
             return rtrim_if(str, is_any_of(lpszTrimStr));
         }
 
         template <typename StringType>
         StringType& TrimLeft(StringType& str, 
-            const typename StringType::value_type* lpszTrimStr = typename CharTraits<StringType::value_type>::Space())
+            const typename StringType::value_type* lpszTrimStr = typename CharTraits<typename StringType::value_type>::Space())
         {
             return ltrim_if(str, is_any_of(lpszTrimStr));
         }
 
         template <typename StringType>
         StringType& TrimAll(StringType& str, 
-            const typename StringType::value_type* lpszTrimStr = typename CharTraits<StringType::value_type>::Space())
+            const typename StringType::value_type* lpszTrimStr = typename CharTraits<typename StringType::value_type>::Space())
         {
             return trim_if(str, is_any_of(lpszTrimStr));
         }
@@ -654,7 +652,7 @@ namespace dynarithmic
                      std::vector<std::basic_string<CharType>>& rArray, bool bGetNullTokens = false)
         {
             using StringType = std::basic_string<CharType>;
-            return TokenizeEx((StringType)str, lpszTokStr, rArray, bGetNullTokens);
+            return TokenizeEx(static_cast<StringType>(str), lpszTokStr, rArray, bGetNullTokens);
         }
 
         template <typename StringType>
@@ -673,11 +671,11 @@ namespace dynarithmic
         }
 
         template <typename StringType>
-        StringType to_lower_upper_copy(typename std::basic_string_view<typename StringType::value_type> input,
-                                        bool isLower,
-                                        const std::locale& loc = std::locale())
+        StringType to_lower_upper_copy(std::basic_string_view<typename StringType::value_type> input,
+                                       bool isLower,
+                                       const std::locale& loc = std::locale())
         {
-            using CharType = StringType::value_type;
+            using CharType = typename StringType::value_type;
             auto const& facet = std::use_facet<std::ctype<CharType>>(loc);
             StringType out;
             out.reserve(input.size());
@@ -703,7 +701,7 @@ namespace dynarithmic
         }
 
         template <typename StringType>
-        StringType UpperCase(typename std::basic_string_view<typename StringType::value_type> str)
+        StringType UpperCase(std::basic_string_view<typename StringType::value_type> str)
         {
             return to_lower_upper_copy(str, false);
         }
@@ -715,7 +713,7 @@ namespace dynarithmic
         }
 
         template <typename StringType>
-        StringType LowerCase(typename std::basic_string_view<typename StringType::value_type> str)
+        StringType LowerCase(std::basic_string_view<typename StringType::value_type> str)
         {
             return to_lower_upper_copy(str, true);
         }
@@ -734,7 +732,7 @@ namespace dynarithmic
 
         template <typename StringType, typename Container>
         StringType Join(const Container& ct, const typename StringType::value_type* seperator = 
-                            CharTraits<StringType::value_type>::EmptyString())
+                            CharTraits<typename StringType::value_type>::EmptyString())
         {
             StringType sSep(seperator);
             return Join<StringType, typename Container::const_iterator>(ct.begin(), ct.end(), sSep);
@@ -744,9 +742,9 @@ namespace dynarithmic
         StringType defaultJoinImpl(const StringType& str,
                                     const val& value,
                                     const typename StringType::value_type* separator
-                                    = CharTraits<StringType::value_type>::EmptyString())
+                                    = CharTraits<typename StringType::value_type>::EmptyString())
         {
-            using StreamType = std::basic_ostringstream<StringType::value_type>;
+            using StreamType = std::basic_ostringstream<typename StringType::value_type>;
             StreamType strm{};
             if (!str.empty())
                 strm << str << separator << value;
@@ -758,7 +756,7 @@ namespace dynarithmic
         template <typename StringType, typename Iter>
         StringType Join(Iter iter1, Iter iter2, 
                         const typename StringType::value_type* separator = 
-                            CharTraits<StringType::value_type>::EmptyString())
+                            CharTraits<typename StringType::value_type>::EmptyString())
         {
             return std::accumulate(iter1, iter2, StringType(),
                 [&](const auto& str, typename std::iterator_traits<Iter>::value_type val)

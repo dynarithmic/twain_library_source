@@ -83,7 +83,7 @@ extern "C"
                 bool ok = GetCapValuesEx2_Internal(pSource, lCapability, DTWAIN_CAPGET, ContainerTypeArray[j], DataTypeArray[i], &testArray);
                 if (ok)
                 {
-                    LONG statusValue = (LONG)DataTypeArray[i] << 16 | ContainerTypeArray[j];
+                    LONG statusValue = static_cast<LONG>(DataTypeArray[i]) << 16 | ContainerTypeArray[j];
                     vValues.push_back(statusValue);
                     DumpArrayContents(testArray, lCapability, false, 
                                       IsTwainUIntegralType(static_cast<TW_UINT16>(DataTypeArray[i])));

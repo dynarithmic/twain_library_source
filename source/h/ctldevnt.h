@@ -20,6 +20,10 @@
  */
 #ifndef CTLDEVNT_H
 #define CTLDEVNT_H
+#include "ctlstringdefs.h"
+#include "twain.h"
+#include "dtwtype.h"
+
 namespace dynarithmic
 {
     class CTL_TwainDLLHandle;

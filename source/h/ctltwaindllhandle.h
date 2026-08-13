@@ -44,6 +44,7 @@
 #include "capstructdefs.h"
 #include "ocrinterface.h"
 #include "ctlinternalconstants.h"
+#include "ctlstaticdata.h"
 
 namespace dynarithmic
 {

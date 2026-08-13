@@ -130,4 +130,14 @@ namespace dynarithmic
             pHandle->m_lLastError = DTWAIN_NO_ERROR;
         return { pHandle, pSource };
     }
+
+    CTL_TwainDLLHandle* GetDTWAINHandleFromSource(CTL_ITwainSource* pSource) 
+    {
+        return pSource->GetDTWAINHandle();
+    }
+
+    void SetLastErrorFromHandle(CTL_TwainDLLHandle* pHandle, LONG lastError)
+    {
+        pHandle->m_lLastError = lastError;
+    }
 }

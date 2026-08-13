@@ -84,7 +84,7 @@ namespace dynarithmic
 
     template <typename StringType>
     std::vector<std::make_unsigned_t<typename StringType::value_type>> 
-            UCharsFromString(typename std::basic_string_view<typename StringType::value_type> str)
+            UCharsFromString(std::basic_string_view<typename StringType::value_type> str)
     {
         return std::vector<std::make_unsigned_t<typename StringType::value_type>>(str.begin(), str.end());
     }
@@ -151,7 +151,7 @@ namespace dynarithmic
                               typename StringType::value_type* szInfo, 
                               int32_t nMaxLen)
     {
-        using CharType = StringType::value_type;
+        using CharType = typename StringType::value_type;
         if (strInfo.empty())
         {
             if (szInfo && nMaxLen > 0)

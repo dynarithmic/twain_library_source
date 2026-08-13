@@ -45,13 +45,11 @@ namespace
     template <typename T>
     bool CheckForAnyBlankNames(const T& vect)
     {
-        using CharType = T::value_type::value_type;
-        for (auto& oneName : vect)
+        using CharType = typename T::value_type::value_type;
+        return std::any_of(vect.begin(), vect.end(), [&](auto& oneName)
         {
-            if (stringutils::IsAllSpace<CharType>(oneName.c_str()))
-                return true;
-        }
-        return false;
+            return stringutils::IsAllSpace<CharType>(oneName.c_str());
+        });
     }
 
     template <typename StringType, typename CopyFn>
@@ -114,7 +112,7 @@ namespace
     {
         return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
             GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " +
-            stringconversion::Convert_NativePtr_To_Ansi(fileName.data());
+            stringconversion::Convert_NativePtr_To_Ansi(fileName.data(), fileName.size());
     }
 }
 

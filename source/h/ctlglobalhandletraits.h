@@ -29,19 +29,19 @@ namespace dynarithmic
     struct DTWAINGlobalHandle_CloseTraits
     {
         static void Destroy(HANDLE h);
-        void operator()(HANDLE h) { Destroy(h); }
+        void operator()(HANDLE h) const { Destroy(h); }
     };
 
     struct DTWAINGlobalHandle_ClosePtrTraits
     {
         static void Destroy(HANDLE* h);
-        void operator()(HANDLE* h) { Destroy(h); }
+        void operator()(HANDLE* h) const { Destroy(h); }
     };
 
     struct DTWAINGlobalHandle_CloseFreeTraits
     {
         static void Destroy(HANDLE h);
-        void operator()(HANDLE h) { Destroy(h); }
+        void operator()(HANDLE h) const { Destroy(h); }
     };
 
     template <typename T, typename UnLockFn, typename FreeFn>

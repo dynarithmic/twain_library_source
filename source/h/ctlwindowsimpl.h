@@ -117,7 +117,7 @@ namespace dynarithmic
             return {};
         }
 
-        static string_type AddBackslashToDirectory(typename std::basic_string_view<typename string_type::value_type> pathName)
+        static string_type AddBackslashToDirectory(std::basic_string_view<typename string_type::value_type> pathName)
         {
             using stringview_type = std::basic_string_view<typename string_type::value_type>;
             std::filesystem::path fsPath(pathName);

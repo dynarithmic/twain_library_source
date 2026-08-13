@@ -25,6 +25,7 @@ OF THIRD PARTY RIGHTS.
 //// Special bitmap routines
 #include <windows.h>
 #include <optional>
+#include <memory>
 #include "dtwaindefs.h"
 #include "blankpage.h"
 #include "fltrect.h"

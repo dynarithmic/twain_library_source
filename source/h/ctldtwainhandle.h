@@ -43,5 +43,7 @@ namespace dynarithmic
     CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay);
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing = DTWAIN_VERIFY_DLLHANDLE | DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR);
+    CTL_TwainDLLHandle* GetDTWAINHandleFromSource(CTL_ITwainSource* pSource);
+    void SetLastErrorFromHandle(CTL_TwainDLLHandle* pHandle, LONG lastError);
 }
 #endif

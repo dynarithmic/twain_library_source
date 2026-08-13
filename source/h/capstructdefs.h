@@ -24,9 +24,7 @@
 #include <string>
 #include <memory>
 
-#include "ctlenum.h"
 #include "twain.h"
-#include "winconst.h"
 #include "ctltmpl4.h"
 #include "mapdefs.h"
 #include "ctlstringdefs.h"

@@ -22,7 +22,6 @@
 #define CTLTWAINMANAGER_H
 
 #include <memory>
-#include <map>
 #include <string>
 #include <string_view>
 #include "ctlstringdefs.h"
