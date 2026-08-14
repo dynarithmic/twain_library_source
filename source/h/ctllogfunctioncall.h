@@ -21,10 +21,10 @@
 #ifndef CTLLOGFUNCTIONCALL_H
 #define CTLLOGFUNCTIONCALL_H
 #include "dtwain_config.h"
+#include "ctlstringutils.h"
 
 #if DTWAIN_BUILD_LOGCALLSTACK == 1
 
-#include <string.h>
 #include <winconst.h>
 #include <string>
 #include "logwriterutils.h"
@@ -216,7 +216,7 @@ namespace dynarithmic
                 else
                 {
                     if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                        strm << dynarithmic::basicstringutils::Narrow(t).c_str();
+                        strm << basicstringutils::Narrow(t).c_str();
                     else
                         strm << t;
                 }

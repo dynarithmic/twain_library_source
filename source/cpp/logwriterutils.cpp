@@ -23,7 +23,9 @@
 #include "ctlstringutilsx.h"
 #include "ctltwainmanager.h"
 #include "ctlstaticdata.h"
+#include "dtwain_config.h"
 #include "dtwainx.h"
+#include "ctllogcalls.h"
 
 namespace stringutils = dynarithmic::basicstringutils;
 

@@ -32,6 +32,7 @@
 #include "ctltimeutils.h"
 #include "ctlstringdefs.h"
 #include "dtwain_filesystem.h"
+#include "dtwain_standard_defs.h"
 
 namespace dynarithmic
 {
@@ -52,22 +53,22 @@ namespace dynarithmic
         enum { DRIVE_POS, DRIVE_PATH, DIRECTORY_POS, NAME_POS, EXTENSION_POS };
 
         template <typename StringType, typename T>
-        StringType PathGenericString(const T& x) 
-        { 
+        StringType PathGenericString(const T& x)
+        {
             if constexpr (std::is_same_v<StringType, std::string>)
             {
                 return x.generic_string();
             }
             else
-            if constexpr (std::is_same_v<StringType, std::wstring>)
-            { 
-                return x.generic_wstring();
-            }
+                if constexpr (std::is_same_v<StringType, std::wstring>)
+                {
+                    return x.generic_wstring();
+                }
             return {};
         }
 
         template <typename StringViewType, typename StringType>
-        void SplitPath(StringViewType str, std::vector<typename StringType>& rArray)
+        void SplitPath(StringViewType str, std::vector<StringType>& rArray)
         {
             static constexpr int numComponents = 5;
             using FILESYSTEM_PATHTYPE = filesys::path;
@@ -121,61 +122,57 @@ namespace dynarithmic
             return PathGenericString<StringType>(full_path);
         }
 
-        namespace
+        inline std::string CreateFileNameWithDateTime_Impl(std::string_view prefix, std::string_view ext, bool useUTC)
         {
-            inline std::string CreateFileNameWithDateTime_Impl(std::string_view prefix, std::string_view ext, bool useUTC)
+            using namespace std::chrono;
+            const auto now = system_clock::now();
+            std::string result(prefix);
+
+            if (useUTC)
             {
-                using namespace std::chrono;
-                const auto now = system_clock::now();
-                std::string result(prefix);
-
-                if (useUTC)
-                {
-                    const auto utcMilliseconds = duration_cast<milliseconds>(now.time_since_epoch()).count();
-                    result += std::to_string(utcMilliseconds);
-                }
-                else
-                {
-                    const auto localmilliseconds = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
-                    const std::time_t timeValue = system_clock::to_time_t(now);
-
-                    std::tm localTime{};
-                    if (!timeutils::GetLocalTime(timeValue, localTime))
-                        return {};
-
-                    std::ostringstream os;
-
-                    os << std::put_time(&localTime, "%Y-%m-%d_%H-%M-%S")
-                        << '_'
-                        << std::setw(3)
-                        << std::setfill('0')
-                        << localmilliseconds.count();
-
-                    result += os.str();
-                }
-
-                if (!ext.empty())
-                {
-                    result += '.';
-                    result.append(ext.data(), ext.size());
-                }
-
-                return result;
+                const auto utcMilliseconds = duration_cast<milliseconds>(now.time_since_epoch()).count();
+                result += std::to_string(utcMilliseconds);
             }
-        }
+            else
+            {
+                const auto localmilliseconds = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+                const std::time_t timeValue = system_clock::to_time_t(now);
 
+                std::tm localTime{};
+                if (!timeutils::GetLocalTime(timeValue, localTime))
+                    return {};
+
+                std::ostringstream os;
+
+                os << std::put_time(&localTime, "%Y-%m-%d_%H-%M-%S")
+                    << '_'
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << localmilliseconds.count();
+
+                result += os.str();
+            }
+
+            if (!ext.empty())
+            {
+                result += '.';
+                result.append(ext.data(), ext.size());
+            }
+
+            return result;
+        }
 
         template <typename StringType>
         StringType CreateFileNameFromNumber(const StringType& sFileName, int num, int nDigits)
         {
-            using CharType = StringType::value_type;
+            using CharType = typename StringType::value_type;
             using StreamType = std::basic_ostringstream<CharType>;
 
             std::vector<StringType> rArray = {};
             SplitPath(sFileName, rArray);
 
             // Adjust the file name
-            StreamType strm {};
+            StreamType strm{};
             strm << std::setfill(CharType('0')) << std::setw(nDigits) << num;
             StringType szBuf = strm.str();
             StringType& sTemp = rArray[NAME_POS];
@@ -186,7 +183,7 @@ namespace dynarithmic
         template <typename StringType>
         int GetInitialFileNumber(const StringType& sFileName, size_t& nDigits)
         {
-            using CharType = StringType::value_type;
+            using CharType = typename StringType::value_type;
             std::vector<StringType> rArray = {};
             SplitPath(sFileName, rArray);
             nDigits = 0;
@@ -224,7 +221,7 @@ namespace dynarithmic
         // Create a file using the data and time within the file name
         template <typename StringType>
         StringType CreateFileNameWithDateTime(
-            std::basic_string_view<typename StringType::value_type> prefix, 
+            std::basic_string_view<typename StringType::value_type> prefix,
             std::basic_string_view<typename StringType::value_type> ext, bool useUTC = false)
         {
             std::string fileName;
@@ -236,7 +233,7 @@ namespace dynarithmic
             else
             {
                 fileName = CreateFileNameWithDateTime_Impl(basicstringutils::Narrow(prefix),
-                                                           basicstringutils::Narrow(ext), useUTC);
+                    basicstringutils::Narrow(ext), useUTC);
                 return basicstringutils::Widen(fileName);
             }
             return {};
@@ -247,7 +244,7 @@ namespace dynarithmic
         StringType GetPageFileName(const StringType& strBase, int nCurImage, bool bUseLongNames)
         {
             StringType strFormat;
-            using CharType = StringType::value_type;
+            using CharType = typename StringType::value_type;
             using StreamType = std::basic_ostringstream<CharType>;
             StreamType strm{};
             strm << nCurImage;

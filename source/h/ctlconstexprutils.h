@@ -25,8 +25,9 @@
 #include "ctlconstexprfind.h"
 #include "twain.h"
 #include "ctlenum.h"
-#include "dtwain_version.h"
 #include "dtwpdft.h"
+#include "dtwain_config.h"
+#include "dtwain_version.h"
 
 namespace dynarithmic
 {

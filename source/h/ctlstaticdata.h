@@ -35,6 +35,7 @@
 #include "ctltwaindecoder.h"
 #include "pdffont_basic.h"
 #include "ctlfilesavedefs.h"
+#include "dtwaindefs.h"
 
 namespace dynarithmic
 {

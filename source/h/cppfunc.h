@@ -26,6 +26,7 @@
 #include "logwriterutils.h"
 #include <boost/version.hpp>
 #include "dtwain_exception.h"
+#include "dtwain_config.h"
 
  /* This indicates that the build requires Visual C++ runtime if set to 1*/
  /* Since there is no way to set the runtime to use at compile time, this */

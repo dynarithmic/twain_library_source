@@ -52,6 +52,7 @@
 #include "ctltwainmanager.h"
 #include "ctlclosesource.h"
 #include "errorcheck.h"
+#include "dtwain_config.h"
 
 #ifdef _WIN64
     #pragma message ("Compiling 64-bit DTWAIN")

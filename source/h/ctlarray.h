@@ -44,6 +44,8 @@ namespace dynarithmic
     void ArrayCopyWideToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
     void ArrayCopyAnsiToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
     std::shared_ptr<CTL_ArrayFactory>& GetArrayFactoryFromHandle(CTL_TwainDLLHandle* pHandle);
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
+    void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
 
     template <typename Container, typename DTWAINArrayType>
     static void CopyContainer(CTL_TwainDLLHandle* pHandle, const Container& theContainer, DTWAIN_ARRAY theArray)
@@ -144,11 +146,11 @@ namespace dynarithmic
                 if constexpr (std::is_same_v<ArrayType, DTWAIN_ARRAY*>)
                 {
                     if (*m_Array)
-                        m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));
+                        DestroyArrayFromFactory(m_pHandle, *m_Array);
                 }
                 else
                 {
-                    m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(m_Array));
+                    DestroyArrayFromFactory(m_pHandle, m_Array);
                 }
                 m_Array = {};
             }
@@ -164,9 +166,7 @@ namespace dynarithmic
     using DTWAINArrayPtr_RAII = DTWAINArrayLowLevelPtr_RAII;
 
     void SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib);
-    void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
     void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame);
-    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
     std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
     DTWAIN_ARRAY CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source);
     DTWAIN_FRAME CreateFrameArray(const CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);

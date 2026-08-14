@@ -40,7 +40,7 @@ namespace
     LONG PerformCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nCap, LONG lCapType, CTL_CapInfo* CapInfo)
     {
         // Get the container information for this cap
-        LONG lResults = (LONG)std::get<CapInfoIdx>(*CapInfo);
+        LONG lResults = static_cast<LONG>(std::get<CapInfoIdx>(*CapInfo));
 
         // Test if the container info specifies a single container type
         size_t numBitsOn = countOneBits(static_cast<uint32_t>(lResults));
