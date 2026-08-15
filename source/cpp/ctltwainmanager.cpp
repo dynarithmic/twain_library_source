@@ -2496,8 +2496,8 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 
     TW_UINT16 retcode = TWRC_SUCCESS;
 
-    CTL_TWAINDecoderStruct e;
-    std::string s;
+    CTL_TWAINDecoderStruct decoder;
+    std::string sTwainLogString;
 
     pTW_IDENTITY pOrigin = pTriplet.GetOriginID();
     pTW_IDENTITY pDest   = pTriplet.GetDestinationID();
@@ -2514,10 +2514,10 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
     {
-        e = GetGeneralErrorInfo(nDG, nDAT, nMSG);
-        s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
-        s = GetResourceStringFromMap(IDS_LOGMSG_INPUTTEXT) + ": " + s;
-        LogWriterUtils::WriteMultiLineInfoIndentedA(s, "\n");
+        decoder = GetGeneralErrorInfo(nDG, nDAT, nMSG);
+        sTwainLogString = decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
+        sTwainLogString = GetResourceStringFromMap(IDS_LOGMSG_INPUTTEXT) + ": " + sTwainLogString;
+        LogWriterUtils::WriteMultiLineInfoIndentedA(sTwainLogString, "\n");
     }
 
     TripletSaveRestore tSaveRestore(&m_pCurrentTriplet);
@@ -2577,11 +2577,11 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         {
             std::string sz;
             std::ostringstream strm;
-            sz = e.GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
-            s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
+            sz = decoder.GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
+            sTwainLogString = decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
             strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4",
                 { GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT),
-                                  std::to_string(retcode),sz, s });
+                                  std::to_string(retcode),sz, sTwainLogString });
             LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
         }
         return retcode;
@@ -2596,10 +2596,10 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     {
         std::string sz;
         std::ostringstream strm;
-        s =  e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
+        sTwainLogString =  decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
         sz = CTL_TWAINDecoderStruct::GetTWAINDSMError(retcode);
         std::string s1 = GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT);
-        strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4\n", { s1, std::to_string(retcode), sz, s });
+        strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4\n", { s1, std::to_string(retcode), sz, sTwainLogString });
         LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
     if (retcode == TWRC_FAILURE || retcode == TWRC_CHECKSTATUS)
