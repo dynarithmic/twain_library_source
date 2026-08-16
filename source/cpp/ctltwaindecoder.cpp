@@ -26,14 +26,14 @@
 #include "ctlglobalhandletraits.h"
 #include "ctlstaticdata.h"
 #include "dtwain_resource_constants2.h"
+#include "ctlstringutils.h"
 /*#define FMT_HEADER_ONLY
 #include "../fmt/format.h"
 */
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;
 
-
-constexpr const char * IndentDefinition() { return "    "; }
+constexpr const char *indenter = "    ";
 
 #define ADD_ERRORCODE_TO_MAP2(x, y) {(x) + (y), #y}
 
@@ -94,6 +94,44 @@ static constexpr std::array<std::pair<uint32_t, const char*>, 6> mapSupportedGro
 
 namespace
 {
+    std::string DecodeTWMemory(TW_MEMREF pData);   
+    std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups);
+    std::string DecodeCustomDSData(TW_MEMREF pData);
+    std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix, int indentLevel = 1);
+    std::string DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCSTR pMem);
+    std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem);
+    std::string DecodeDeviceEvent(TW_MEMREF pData);
+    std::string DecodeTWEvent(TW_MEMREF pData); 
+    std::string DecodeFileSystem(TW_MEMREF pData);
+    std::string DecodeTWCapability(TW_MEMREF pData);
+    std::string DecodeTWIdentity(TW_MEMREF pData);
+    std::string DecodeUserInterface(TW_MEMREF pData); 
+    std::string DecodeTWEntryPoint(TW_MEMREF pData);
+    std::string DecodeTWImageLayout(TW_MEMREF pData);
+    std::string DecodeTWImageInfo(TW_MEMREF pData);
+    std::string DecodeHWND(TW_MEMREF pData);
+    std::string DecodeTWPassthru(TW_MEMREF pData);
+    std::string DecodePendingXFers(TW_MEMREF pData);
+    std::string DecodeSetupFileXFer(TW_MEMREF pData);
+    std::string DecodeSetupMemXFer(TW_MEMREF pData);
+    std::string DecodeStatusUTF8(TW_MEMREF pData);
+    std::string DecodeTWStatus(TW_MEMREF pData);
+    std::string DecodeImageMemXfer(TW_MEMREF pData);
+    std::string DecodeTWCIEColor(TW_MEMREF pData);
+    std::string DecodeJPEGCompression(TW_MEMREF pData);
+    std::string DecodeHDIB(TW_MEMREF pData);
+    std::string DecodeTWPalette8(TW_MEMREF pData);
+    std::string DecodeTWUINT32(TW_MEMREF pData);
+    std::string DecodeTWGrayResponse(TW_MEMREF pData);
+    std::string DecodeTWRGBResponse(TW_MEMREF pData);
+    std::string DecodeExtImageInfo(TW_MEMREF pData);
+    std::string DecodeTWUNKIdentity(TW_MEMREF pData);
+    std::string DecodeTWAudioInfo(TW_MEMREF pData);
+    std::string DecodeTWCallback(TW_MEMREF pData);
+    std::string DecodeTWCallback2(TW_MEMREF pData);
+    std::string DecodeTWMetrics(TW_MEMREF pData);
+    std::string DecodeTwainDirect(TW_MEMREF pData);
+
     std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups)
     {
         std::vector<std::string> allGroups;
@@ -113,32 +151,41 @@ namespace
         return stringutils::Join<std::string>(allGroups, ", ");
     }
 
-    std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix)
+    std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix, int indentLevel)
     {
-        std::ostringstream sBuffer;
         if (pIdentity)
         {
-            const std::string indenter = IndentDefinition();
-            sBuffer << "Decoded " << sPrefix << ":\n{\n" <<
-                indenter << "Id=" << pIdentity->Id << "\n" <<
-                indenter << "Version Number=" << pIdentity->Version.MajorNum << "." << pIdentity->Version.MinorNum << "\n" <<
-                indenter << "Version Language=" << pIdentity->Version.Language << "\n" <<
-                indenter << "Version Country=" << pIdentity->Version.Country << "\n" <<
-                indenter << "Version Info=" << pIdentity->Version.Info << "\n" <<
-                indenter << "ProtocolMajor=" << pIdentity->ProtocolMajor << "\n" <<
-                indenter << "ProtocolMinor=" << pIdentity->ProtocolMinor << "\n" <<
-                indenter << "SupportedGroups=" << DecodeSupportedGroups(pIdentity->SupportedGroups) << "\n" <<
-                indenter << "Manufacturer=" << pIdentity->Manufacturer << "\n" <<
-                indenter << "Product Family=" << pIdentity->ProductFamily << "\n" <<
-                indenter << "Product Name=" << pIdentity->ProductName << "\n}";
-        }
-        else
-        {
-            sBuffer << "\nNo information for " << sPrefix;
-        }
-        return sBuffer.str();
-    }
+            std::string indenter1;
+            std::string indenter2;
+            if ( indentLevel == 1 )
+            {
+                indenter1 = indenter;
+            }
+            else
+            {
+                for (int i = 0; i < indentLevel; ++i)
+                    indenter1 += indenter;
+                for (int i = 0; i < indentLevel - 1; ++i)
+                    indenter2 += indenter;
+            }
 
+            std::ostringstream sBuffer;
+            sBuffer << indenter2 << "Decoded " << sPrefix << ":\n" << indenter2 << "{\n" << indenter1 << 
+                "Id=" << pIdentity->Id << "\n" << indenter1 <<
+                "Version Number=" << pIdentity->Version.MajorNum << "." << pIdentity->Version.MinorNum << "\n" << indenter1 <<
+                "Version Language=" << pIdentity->Version.Language << "\n" << indenter1 <<
+                "Version Country=" << pIdentity->Version.Country << "\n" << indenter1 << 
+                "Version Info=" << pIdentity->Version.Info << "\n" << indenter1 << 
+                "ProtocolMajor=" << pIdentity->ProtocolMajor << "\n" << indenter1 <<
+                "ProtocolMinor=" << pIdentity->ProtocolMinor << "\n" << indenter1 <<
+                "SupportedGroups=" << DecodeSupportedGroups(pIdentity->SupportedGroups) << "\n" << indenter1 <<
+                "Manufacturer=" << pIdentity->Manufacturer << "\n" << indenter1 <<
+                "Product Family=" << pIdentity->ProductFamily << "\n" << indenter1 <<
+                "Product Name=" << pIdentity->ProductName << "\n" << indenter2 << "}";
+            return sBuffer.str();
+        }
+        return "\nNo information for " + std::string(sPrefix);
+    }
 
     std::string DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCSTR pMem)
     {
@@ -147,7 +194,7 @@ namespace
             pMemory->Flags << ", " <<
             "Length=" <<
             pMemory->Length << ", " <<
-            "TheMem=" << pMemory->TheMem << "H}";
+            "TheMem=" << basicstringutils::PointerToString<std::string>(pMemory->TheMem) << "}";
         std::string sTemp = sBuffer.str();
         if (pMem)
         {
@@ -163,9 +210,9 @@ namespace
     {
         std::ostringstream sBuffer;
 
-        sBuffer << "{Index=" << pEl->Index << ", " <<
-            "Channel1=" << pEl->Channel1 << ", " <<
-            "Channel2=" << pEl->Channel3 << "}";
+        sBuffer << "{Index=" << static_cast<int>(pEl->Index) << ", " <<
+            "Channel1=" << static_cast<int>(pEl->Channel1) << ", " <<
+            "Channel2=" << static_cast<int>(pEl->Channel3) << "}";
         std::string sTemp = sBuffer.str();
         if (pMem)
         {
@@ -180,9 +227,9 @@ namespace
     {
         auto pCUSTOMDSDATA = static_cast<pTW_CUSTOMDSDATA>(pData);
         std::ostringstream strm;
-        strm << "\nTW_MEMREF <==> TW_CUSTOMDATA:\n{\n" <<
-            "InfoLength=" << pCUSTOMDSDATA->InfoLength << "\n" <<
-            "hData=" << pCUSTOMDSDATA->hData << "\n}";
+        strm << "\nTW_MEMREF <==> TW_CUSTOMDSDATA:\n{\n" << indenter <<
+            "InfoLength=" << pCUSTOMDSDATA->InfoLength << "\n" << indenter <<
+            "hData=" << basicstringutils::PointerToString<std::string>(pCUSTOMDSDATA->hData) << "\n}";
         return strm.str();
     }
 
@@ -190,41 +237,47 @@ namespace
     {
         auto pDEVICEEVENT = static_cast<pTW_DEVICEEVENT>(pData);
         std::ostringstream sBuffer;
-        sBuffer << "\nTW_MEMREF <==> TW_DEVICEEVENT:\n{\n" <<
-            "Event=" << CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWDE, pDEVICEEVENT->Event).second << "\n" <<
-            "DeviceName=" << pDEVICEEVENT->DeviceName << "\n" <<
-            "BatteryMinutes=" << pDEVICEEVENT->BatteryMinutes << "\n" <<
-            "BatteryPercentage=" << pDEVICEEVENT->BatteryPercentage << "\n" <<
-            "PowerSupply=" << pDEVICEEVENT->PowerSupply << "\n" <<
-            "XResolution=" << Fix32ToFloat(pDEVICEEVENT->XResolution) << "\n" <<
-            "YResolution=" << Fix32ToFloat(pDEVICEEVENT->YResolution) << "\n" <<
-            "FlashUsed2=" << pDEVICEEVENT->FlashUsed2 << "\n" <<
-            "AutomaticCapture=" << pDEVICEEVENT->AutomaticCapture << "\n" <<
-            "TimeBeforeFirstCapture=" << pDEVICEEVENT->TimeBeforeFirstCapture << "\n" <<
+        sBuffer << "\nTW_MEMREF <==> TW_DEVICEEVENT:\n{\n" << indenter << 
+            "Event=" << CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWDE, pDEVICEEVENT->Event).second << "\n" << indenter << 
+            "DeviceName=" << pDEVICEEVENT->DeviceName << "\n" << indenter << 
+            "BatteryMinutes=" << pDEVICEEVENT->BatteryMinutes << "\n" << indenter << 
+            "BatteryPercentage=" << pDEVICEEVENT->BatteryPercentage << "\n" << indenter << 
+            "PowerSupply=" << pDEVICEEVENT->PowerSupply << "\n" << indenter << 
+            "XResolution=" << Fix32ToFloat(pDEVICEEVENT->XResolution) << "\n" << indenter << 
+            "YResolution=" << Fix32ToFloat(pDEVICEEVENT->YResolution) << "\n" << indenter << 
+            "FlashUsed2=" << pDEVICEEVENT->FlashUsed2 << "\n" << indenter << 
+            "AutomaticCapture=" << pDEVICEEVENT->AutomaticCapture << "\n" << indenter << 
+            "TimeBeforeFirstCapture=" << pDEVICEEVENT->TimeBeforeFirstCapture << "\n" << indenter << 
             "TimeBetweenCaptures=" << pDEVICEEVENT->TimeBetweenCaptures << "\n}";
         return sBuffer.str();
     }
 
     std::string DecodeTWEvent(TW_MEMREF pData)
     {
-        constexpr auto indenter = IndentDefinition();
         auto logFilterFlags = CTL_StaticData::GetLogFilterFlags();
         if (logFilterFlags & DTWAIN_LOG_DECODE_TWEVENT)
         {
             std::ostringstream sBuffer;
-            auto p = static_cast<pTW_EVENT>(pData);
-            MSG* pmsg = static_cast<MSG*>(p->pEvent);
             sBuffer << "\nTW_MEMREF <==> TW_EVENT:\n{\n" <<
                 indenter << "pEvent has MSG structure:\n" <<
                 indenter << "MSG Values\n" <<
-                indenter << "{" <<
-                " hwnd=" << pmsg->hwnd <<
-                ", message=" << pmsg->message <<
-                ", wParam=" << pmsg->wParam <<
-                ", lParam=" << pmsg->lParam <<
-                ", time=" << pmsg->time <<
-                ", point.x=" << pmsg->pt.x <<
-                ", point.y=" << pmsg->pt.y <<
+                indenter << "{\n";
+
+            auto p = static_cast<pTW_EVENT>(pData);
+            if (!p || !p->pEvent )
+            {
+                sBuffer << indenter << indenter << "Invalid MSG (null)" << "\n" << indenter << "}\n}";
+                return sBuffer.str();
+            }
+            MSG* pmsg = static_cast<MSG*>(p->pEvent);
+            sBuffer << indenter << indenter << 
+                    "hwnd=" << pmsg->hwnd << "\n" << indenter << indenter <<
+                    "message=" << pmsg->message << "\n" << indenter << indenter <<
+                    "wParam=" << pmsg->wParam << "\n" << indenter << indenter <<
+                    "lParam=" << pmsg->lParam << "\n" << indenter << indenter <<
+                    "time=" << pmsg->time << "\n" << indenter << indenter <<
+                    "point.x=" << pmsg->pt.x << "\n" << indenter << indenter <<
+                    "point.y=" << pmsg->pt.y << "\n" << indenter <<
                 " }\n" <<
                 indenter << "DS Message=" << p->TWMessage << "\n}";
             return sBuffer.str();
@@ -234,13 +287,12 @@ namespace
 
     std::string DecodeFileSystem(TW_MEMREF pData)
     {
-        constexpr auto indenter = IndentDefinition();
         std::ostringstream sBuffer;
         auto pFILESYSTEM = static_cast<pTW_FILESYSTEM>(pData);
         sBuffer << "\nTW_MEMREF <==> TW_FILESYSTEM:\n{\n" <<
             indenter << "InputName=" << pFILESYSTEM->InputName << "\n" <<
             indenter << "OutputName=" << pFILESYSTEM->OutputName << "\n" <<
-            indenter << "Context=" << pFILESYSTEM->Context << "H\n" <<
+            indenter << "Context=" << basicstringutils::PointerToString<std::string>(pFILESYSTEM->Context) << "\n" <<
             indenter << "Recursive=" << pFILESYSTEM->Recursive << "\n" <<
             indenter << "FileType=" << pFILESYSTEM->FileType << "\n" <<
             indenter << "Size=" << pFILESYSTEM->Size << "\n" <<
@@ -255,7 +307,7 @@ namespace
 
     std::string DecodeTWCapability(TW_MEMREF pData)
     {
-        constexpr auto indenter = IndentDefinition();
+        
         std::ostringstream sBuffer;
         auto pCAPABILITY = static_cast<pTW_CAPABILITY>(pData);
         std::string s = "Unspecified (TWON_DONTCARE)";
@@ -265,7 +317,7 @@ namespace
         sBuffer << "\nTW_MEMREF <==> TW_CAPABILITY:\n{\n" <<
             indenter << "Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(pCAPABILITY->Cap) << "\n" <<
             indenter << "ContainerType=" << s << "\n" <<
-            indenter << "hContainer=" << pCAPABILITY->hContainer << "\n}";
+            indenter << "hContainer=" << basicstringutils::PointerToString<std::string>(pCAPABILITY->hContainer) << "\n}";
         return sBuffer.str();
     }
 
@@ -277,13 +329,13 @@ namespace
     std::string DecodeTWMemory(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pMEMORY = static_cast<TW_MEMORY*>(pData);
         sBuffer <<
             "\nTW_MEMREF <==> TW_MEMORY:\n{\n" <<
             indenter << "Flags=" << pMEMORY->Flags << "\n" <<
             indenter << "Length=" << pMEMORY->Length << "\n" <<
-            indenter << "TheMem=" << pMEMORY->TheMem << "\n}";
+            indenter << "TheMem=" << basicstringutils::PointerToString<std::string>(pMEMORY->TheMem) << "\n}";
         return sBuffer.str();
     }
 
@@ -291,7 +343,7 @@ namespace
     {
         std::ostringstream sBuffer;
 #ifdef _WIN32
-        constexpr auto indenter = IndentDefinition();
+        
         auto pUSERINTERFACE = static_cast<pTW_USERINTERFACE>(pData);
         TCHAR sz[256];
         RECT r;
@@ -301,7 +353,7 @@ namespace
         sBuffer << "\nTW_MEMREF <==> TW_USERINTERFACE:\n{\n" <<
             indenter << "ShowUI=" << (pUSERINTERFACE->ShowUI ? "TRUE" : "FALSE") << "\n" <<
             indenter << "ModalUI=" << (pUSERINTERFACE->ModalUI ? "TRUE" : "FALSE") << "\n" <<
-            indenter << "hParent=" << pUSERINTERFACE->hParent << "\n" <<
+            indenter << "hParent=" << basicstringutils::PointerToString<std::string>(pUSERINTERFACE->hParent) << "\n" <<
             indenter << "hParent.Title=" << stringconversion::Convert_NativePtr_To_Ansi(sz) << "\n" <<
             indenter << "hParent.ScreenPos= {" << stringutils::Join<std::string>(aRect, ",") << "}\n}";
 #endif
@@ -311,22 +363,22 @@ namespace
     std::string DecodeTWEntryPoint(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pENTRYPOINT = static_cast<TW_ENTRYPOINT*>(pData);
         sBuffer <<
             "\nTW_MEMREF <==> TW_ENTRYPOINT:\n{\n" <<
             indenter << "Size=" << pENTRYPOINT->Size << "\n" <<
-            indenter << "DSMEntry=" << &pENTRYPOINT->DSM_Entry << "\n" <<
-            indenter << "DSMMemAllocate=" << &pENTRYPOINT->DSM_MemAllocate << "\n" <<
-            indenter << "DSMMemLock=" << &pENTRYPOINT->DSM_MemLock << "\n" <<
-            indenter << "DSMMemUnlock=" << &pENTRYPOINT->DSM_MemUnlock << "\n}";
+            indenter << "DSMEntry=" << basicstringutils::PointerToString<std::string>(&pENTRYPOINT->DSM_Entry) << "\n" <<
+            indenter << "DSMMemAllocate=" << basicstringutils::PointerToString<std::string>(&pENTRYPOINT->DSM_MemAllocate) << "\n" <<
+            indenter << "DSMMemLock=" << basicstringutils::PointerToString<std::string>(&pENTRYPOINT->DSM_MemLock) << "\n" <<
+            indenter << "DSMMemUnlock=" << basicstringutils::PointerToString<std::string>(&pENTRYPOINT->DSM_MemUnlock) << "\n}";
         return sBuffer.str();
     }
 
     std::string DecodeTWImageLayout(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pIMAGELAYOUT = static_cast<pTW_IMAGELAYOUT>(pData);
         sBuffer <<
             "\nTW_MEMREF <==> TW_IMAGELAYOUT:\n{\n" <<
@@ -345,23 +397,16 @@ namespace
     std::string DecodeTWImageInfo(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pIMAGEINFO = static_cast<pTW_IMAGEINFO>(pData);
+        auto allSamples = "{" + basicstringutils::Join<std::string>(pIMAGEINFO->BitsPerSample, pIMAGEINFO->BitsPerSample + 8, ",") + "}";
         sBuffer << "\nTW_MEMREF <==> TW_IMAGEINFO:\n{\n" <<
             indenter << "XResolution=" << Fix32ToFloat(pIMAGEINFO->XResolution) << "\n" <<
             indenter << "YResolution=" << Fix32ToFloat(pIMAGEINFO->YResolution) << "\n" <<
             indenter << "ImageWidth=" << pIMAGEINFO->ImageWidth << "\n" <<
             indenter << "ImageLength=" << pIMAGEINFO->ImageLength << "\n" <<
             indenter << "SamplesPerPixel=" << pIMAGEINFO->SamplesPerPixel << "\n" <<
-            indenter << "BitsPerSample" <<
-            pIMAGEINFO->BitsPerSample[0] << "," <<
-            pIMAGEINFO->BitsPerSample[1] << "," <<
-            pIMAGEINFO->BitsPerSample[2] << "," <<
-            pIMAGEINFO->BitsPerSample[3] << "," <<
-            pIMAGEINFO->BitsPerSample[4] << "," <<
-            pIMAGEINFO->BitsPerSample[5] << "," <<
-            pIMAGEINFO->BitsPerSample[6] << "," <<
-            pIMAGEINFO->BitsPerSample[7] << "\n" <<
+            indenter << "BitsPerSample=" << allSamples << "\n" << 
             indenter << "BitsPerPixel=" << pIMAGEINFO->BitsPerPixel << "\n" <<
             indenter << "Planar=" << (pIMAGEINFO->Planar ? "TRUE" : "FALSE") << "\n" <<
             indenter << "PixelType=" << pIMAGEINFO->PixelType << "\n" <<
@@ -372,16 +417,23 @@ namespace
     std::string DecodeHWND(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
 #ifdef _WIN32
         RECT r;
         HWND* pHWND = static_cast<HWND*>(pData);
-        GetWindowRect(*pHWND, &r);
-        std::array<LONG, 4> aRect = { r.left, r.top, r.right, r.bottom };
-        sBuffer <<
-            "\nTW_MEMREF <==> handle to window (HWND):\n{\n" <<
-            indenter << "HWND=" << *pHWND << "\n" <<
-            indenter << "Screen Pos.=" << stringutils::Join<std::string>(aRect, ",") << "\n}";
+        if (*pHWND && IsWindow(*pHWND))
+        {
+            GetWindowRect(*pHWND, &r);
+            std::array<LONG, 4> aRect = { r.left, r.top, r.right, r.bottom };
+            sBuffer <<
+                "\nTW_MEMREF <==> handle to window (HWND):\n{\n" <<
+                indenter << "HWND=" << *pHWND << "\n" <<
+                indenter << "Screen Pos.=" << stringutils::Join<std::string>(aRect, ",") << "\n}";
+        }
+        else
+        {
+            sBuffer << "\nTW_MEMREF <==> handle to window (HWND):\n{\n" << indenter << "Null or invalid window handle\n}";
+        }
 #endif
         return sBuffer.str();
     }
@@ -389,14 +441,14 @@ namespace
     std::string DecodeTWPassthru(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pPASSTHRU = static_cast<pTW_PASSTHRU>(pData);
         sBuffer <<
             "\nTW_MEMREF <==> TW_PASSTHRU:\n{\n" <<
-            indenter << "Command=" << pPASSTHRU->pCommand << "H\n" <<
+            indenter << "Command=" << basicstringutils::PointerToString<std::string>(pPASSTHRU->pCommand) << "\n" <<
             indenter << "CommandBytes=" << pPASSTHRU->CommandBytes << "\n" <<
             indenter << "Direction=" << pPASSTHRU->Direction << "\n" <<
-            indenter << "pDataBuffer=" << pPASSTHRU->pData << "H\n" <<
+            indenter << "pDataBuffer=" << basicstringutils::PointerToString<std::string>(pPASSTHRU->pData) << "\n" <<
             indenter << "DataBytes=" << pPASSTHRU->DataBytes << "\n" <<
             indenter << "DataBytesXfered=" << pPASSTHRU->DataBytesXfered << "\n}";
         return sBuffer.str();
@@ -405,7 +457,7 @@ namespace
     std::string DecodePendingXFers(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pPENDINGXFERS = static_cast<pTW_PENDINGXFERS>(pData);
         sBuffer << "\nTW_MEMREF <==> TW_PENDINGXFERS:\n{\n" <<
             indenter << "Count=" << pPENDINGXFERS->Count << "\n" <<
@@ -416,7 +468,7 @@ namespace
     std::string DecodeSetupFileXFer(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pSETUPFILEXFER = static_cast<pTW_SETUPFILEXFER>(pData);
         sBuffer <<
         "\nTW_MEMREF <==> TW_SETUPFILEXFER:\n{\n" <<
@@ -429,7 +481,7 @@ namespace
     std::string DecodeSetupMemXFer(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pSETUPMEMXFER = static_cast<pTW_SETUPMEMXFER>(pData);
         sBuffer << "\nTW_MEMREF <==> TW_SETUPMEMXFER:\n{\n" <<
                 indenter << "MinBufSize=" << pSETUPMEMXFER->MinBufSize << "\n" <<
@@ -441,20 +493,20 @@ namespace
     std::string DecodeStatusUTF8(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pSTATUSUTF8 = static_cast<pTW_STATUSUTF8>(pData);
         pTW_STATUS pStatus = &pSTATUSUTF8->Status;
         sBuffer << "\nTW_MEMREF <==> TW_STATUSUTF8:\n{\n" <<
             indenter << "Status ConditionCode=" << pStatus->ConditionCode << "\n" <<
             indenter << "Size=" << pSTATUSUTF8->Size << "\n" <<
-            indenter << "UTF8string=" << pSTATUSUTF8->UTF8string << "\n}";
+            indenter << "UTF8string=" << basicstringutils::PointerToString<std::string>(pSTATUSUTF8->UTF8string) << "\n}";
         return sBuffer.str();
     }
 
     std::string DecodeTWStatus(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pSTATUS = static_cast<pTW_STATUS>(pData);
         std::string sConditionCode = "(Unknown)";
         uint32_t finderValue = IDS_TWCC_ERRORSTART + pSTATUS->ConditionCode;
@@ -462,14 +514,14 @@ namespace
         if (it.first)
             sConditionCode = std::string() + mapTwainDSMReturnCodes[it.second].second + "";
         sBuffer << "\nTW_MEMREF <==> TW_STATUS:\n{\n" <<
-                indenter << "ConditionCode=" << pSTATUS->ConditionCode << "  " << sConditionCode << "\n}";
+                indenter << "ConditionCode=" << pSTATUS->ConditionCode << "  (" << sConditionCode << ")\n}";
         return sBuffer.str();
     }
 
     std::string DecodeImageMemXfer(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pIMAGEMEMXFER = static_cast<pTW_IMAGEMEMXFER>(pData);
         sBuffer << "\nTW_MEMREF <==> TW_IMAGEMEMXFER:\n{\n" <<
                     indenter << "Compression=" << pIMAGEMEMXFER->Compression << "\n" <<
@@ -486,7 +538,7 @@ namespace
     std::string DecodeTWCIEColor(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         static constexpr std::array<const char *, 4> CIEPointNames = {"WhitePoint", "BlackPoint", "WhitePaper", "BlackInk"};
         auto pCIECOLOR = static_cast<pTW_CIECOLOR>(pData);
         std::array<pTW_CIEPOINT, CIEPointNames.size()> aPoints = {&pCIECOLOR->WhitePoint, &pCIECOLOR->BlackPoint, &pCIECOLOR->WhitePaper, &pCIECOLOR->BlackInk};
@@ -549,7 +601,7 @@ namespace
     std::string DecodeJPEGCompression(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pJPEGCOMPRESSION = static_cast<pTW_JPEGCOMPRESSION>(pData);
         sBuffer << "\nTW_MEMREF <==> TW_JPEGCOMPRESSION:\n{\n" <<
                     indenter << "ColorSpace=" << pJPEGCOMPRESSION->ColorSpace << "\n" <<
@@ -588,24 +640,24 @@ namespace
     std::string DecodeHDIB(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto handle = static_cast<HANDLE>(pData);
         sBuffer << "\nTW_MEMREF <==> a DIB:\n{\n" <<
-                    indenter << "DIB Handle=" << handle << "\n}";
+                    indenter << "DIB Handle=" << basicstringutils::PointerToString<std::string>(handle) << "\n}";
         return sBuffer.str();
     }
 
     std::string DecodeTWPalette8(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pPALETTE8 = static_cast<pTW_PALETTE8>(pData);
         sBuffer << "\nTW_MEMREF <==> a TW_PALETTE8:\n{\n" <<
                     indenter << "NumColors=" << pPALETTE8->NumColors << "\n" <<
                     indenter << "PaletteType=" << pPALETTE8->PaletteType << "\n";
         for ( int i = 0; i < 256; i++ )
         {
-            sBuffer << "ColorInfo[" << i << "]" <<
+            sBuffer << indenter << "ColorInfo[" << i << "]" <<
                     " - Index=" << static_cast<int>(pPALETTE8->Colors[i].Index) <<
                     ", Channel1=" << static_cast<int>(pPALETTE8->Colors[i].Channel1) <<
                     ", Channel2=" << static_cast<int>(pPALETTE8->Colors[i].Channel2) <<
@@ -618,9 +670,9 @@ namespace
     std::string DecodeTWUINT32(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         sBuffer << "\nTW_MEMREF <==> TW_UINT32 pointer:\n{\n" <<
-                    indenter << "Address=" << pData << "H\n" <<
+                    indenter << "Address=" << basicstringutils::PointerToString<std::string>(pData) << "\n" <<
                     indenter << "Value at Address=" << *static_cast<TW_UINT32*>(pData) << "\n}";
         return sBuffer.str();
     }
@@ -629,7 +681,7 @@ namespace
     {
         std::ostringstream sBuffer;
         auto pGRAYRESPONSE = static_cast<pTW_GRAYRESPONSE>(pData);
-        sBuffer << "\nTW_MEMREF <==> TW_GRAYRESPONSE:\n{\n" <<
+        sBuffer << "\nTW_MEMREF <==> TW_GRAYRESPONSE:\n{\n" << indenter <<
                     DecodeTW_ELEMENT8(&pGRAYRESPONSE->Response[0], "Response[0]") <<
                     "\n}";
         return sBuffer.str();
@@ -639,7 +691,7 @@ namespace
     {
         std::ostringstream sBuffer;
         auto pRGBRESPONSE = static_cast<pTW_RGBRESPONSE>(pData);
-        sBuffer << "\nTW_MEMREF <==> TW_RGBRESPONSE:\n{\n" <<
+        sBuffer << "\nTW_MEMREF <==> TW_RGBRESPONSE:\n{\n" << indenter << 
                     DecodeTW_ELEMENT8(&pRGBRESPONSE->Response[0], "Response[0]") <<
                     "\n}";
         return sBuffer.str();
@@ -649,20 +701,20 @@ namespace
     {
         std::ostringstream sBuffer;
         auto pEXTIMAGEINFO = static_cast<pTW_EXTIMAGEINFO>(pData);
-        sBuffer << "\nTW_MEMREF <==> TW_EXTIMAGINFO:\n{\n" << "NumInfos=" << pEXTIMAGEINFO->NumInfos << "}";
+        sBuffer << "\nTW_MEMREF <==> TW_EXTIMAGINFO:\n{\n" << indenter << "NumInfos=" << pEXTIMAGEINFO->NumInfos << "\n}";
         return sBuffer.str();
     }
 
     std::string DecodeTWUNKIdentity(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pTWUNKIDENTITY = static_cast<pTW_TWUNKIDENTITY>(pData);
         pTW_IDENTITY pIdentity = &pTWUNKIDENTITY->identity;
         std::string dsPath = " ";
             dsPath = pTWUNKIDENTITY->dsPath;
-        sBuffer << "\nTW_MEMREF <==> TW_TWUNKIDENTITY:\n{\n" <<
-                    indenter << DecodeSourceInfo(pIdentity, "TW_TWUNKIDENTITY") << "\n" <<
+        sBuffer << "\nTW_MEMREF <==> TW_TWUNKIDENTITY:\n{\n" << 
+                    DecodeSourceInfo(pIdentity, "TW_TWUNKIDENTITY", 2) << "\n" <<
                     indenter << "dsPath=" << dsPath << "\n}";
         return sBuffer.str();
     }
@@ -670,7 +722,7 @@ namespace
     std::string DecodeTWAudioInfo(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pAUDIOINFO = static_cast<pTW_AUDIOINFO>(pData);
         sBuffer << "\nTW_MEMREF <==> TW_AUDIOINFO:\n{\n" <<
             indenter << "Name=" << pAUDIOINFO->Name << "\n" <<
@@ -681,7 +733,7 @@ namespace
     std::string DecodeTWCallback(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pCALLBACK = static_cast<pTW_CALLBACK>(pData);
         sBuffer << "\nTW_MEMREF <==> TW_CALLBACK:\n{\n";
         #if defined(__APPLE__)
@@ -694,10 +746,10 @@ namespace
     std::string DecodeTWCallback2(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pCALLBACK2 = static_cast<pTW_CALLBACK2>(pData);
         sBuffer << "\nTW_MEMREF <==> TW_CALLBACK2:\n{\n";
-        sBuffer << indenter << "CallbackProc=" << pCALLBACK2->CallBackProc << "\n";
+        sBuffer << indenter << "CallbackProc=" << basicstringutils::PointerToString<std::string>(pCALLBACK2->CallBackProc) << "\n";
         sBuffer << indenter << "Refcon=" << pCALLBACK2->RefCon << "\n";
         sBuffer << indenter << "Message=" << pCALLBACK2->Message << "\n}";
         return sBuffer.str();
@@ -706,7 +758,7 @@ namespace
     std::string DecodeTWMetrics(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pMETRICS = static_cast<pTW_METRICS>(pData);
         sBuffer << "\nTW_MEMREF <==> TW_METRICS:\n{\n";
         sBuffer << indenter << "SizeOf=" << pMETRICS->SizeOf << "\n";
@@ -718,14 +770,14 @@ namespace
     std::string DecodeTwainDirect(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        constexpr auto indenter = IndentDefinition();
+        
         auto pTWAINDIRECT = static_cast<pTW_TWAINDIRECT>(pData);
         sBuffer << "\nTW_MEMREF <==> TW_TWAINDIRECT:\n{\n";
         sBuffer << indenter << "SizeOf=" << pTWAINDIRECT->SizeOf << "\n";
         sBuffer << indenter << "CommunicationManager=" << pTWAINDIRECT->CommunicationManager << "\n";
-        sBuffer << indenter << "Send=" << pTWAINDIRECT->Send << "\n";
+        sBuffer << indenter << "Send=" << basicstringutils::PointerToString<std::string>(pTWAINDIRECT->Send) << "\n";
         sBuffer << indenter << "SendSize=" << pTWAINDIRECT->SendSize << "\n";
-        sBuffer << indenter << "Receive=" << pTWAINDIRECT->Receive << "\n";
+        sBuffer << indenter << "Receive=" << basicstringutils::PointerToString<std::string>(pTWAINDIRECT->Receive) << "\n";
         sBuffer << indenter << "ReceiveSize=" << pTWAINDIRECT->ReceiveSize << "\n}";
         return sBuffer.str();
     }
