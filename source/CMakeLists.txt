@@ -605,7 +605,6 @@ set(MAIN_HEADERS
 )
 
 set(MAIN_INL
-  ${PROJECT_SOURCE_DIR}/inl/ctlstrimpl.inl
   ${PROJECT_SOURCE_DIR}/inl/ctltr016.inl
   ${PROJECT_SOURCE_DIR}/inl/ctltr017.inl
   ${PROJECT_SOURCE_DIR}/inl/ctltr018.inl
@@ -626,6 +625,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquireclipboard.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquirefile.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquirenative.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlansiunicodeimpl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlarray.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlarraydumper.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlblankpage.cpp
@@ -735,7 +735,6 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainsource.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctluicontrollable.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctluienabled.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlunicodeimpl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlupdatedibproc.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlverifysourcehandle.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlwindowproc.cpp

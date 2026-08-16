@@ -20,6 +20,7 @@
  */
 #ifndef ANSIWIDECONVERTER_WIN32_H
 #define ANSIWIDECONVERTER_WIN32_H
+#include <windows.h>
 #include <string>
 
 namespace dynarithmic
