@@ -21,7 +21,7 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
-#include "ctltmpl5.h"
+#include "ctlgetsetcapsinternal.h"
 #include "ctllogcalls.h"
 #include "ctlarray.h"
 #include "ctlstringutilsx.h"

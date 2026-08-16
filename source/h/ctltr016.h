@@ -53,10 +53,10 @@ namespace dynarithmic
                             void *pData2,
                             void *pData3) const;
 
-            void EncodeEnumValue(pTW_ENUMERATION pArray,
-                                int valuePos,
-                                size_t nItemSize,
-                                void *pData);
+            static void EncodeEnumValue(pTW_ENUMERATION pArray,
+                                        int valuePos,
+                                        size_t nItemSize,
+                                        void *pData);
 
             static void EncodeArrayValue(pTW_ARRAY pArray,
                                          size_t valuePos,

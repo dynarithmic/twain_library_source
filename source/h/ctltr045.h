@@ -23,7 +23,7 @@
 
 #include "ctltr013.h"
 #include "ctltr014.h"
-#include "ctltmpl5.h"
+#include "ctlgetsetcapsinternal.h"
 
 namespace dynarithmic
 {

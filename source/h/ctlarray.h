@@ -29,11 +29,7 @@
 #include "twain.h"
 #include "dtwaindefs.h"
 #include "arrayfactory.h"
-
-using CTL_IntArray = std::vector<int>;
-using CTL_TwainCapArray = std::vector<TW_UINT16>;
-using CTL_RealArray = std::vector<double>;
-using CTL_HDIBArray = std::vector<HANDLE>;
+#include "ctlarraydefs.h"
 
 #define DTWAIN_ARRAY_TO_VOID(p)   ((void*)(p))
 #define VOID_TO_DTWAIN_ARRAY(p)   ((DTWAIN_ARRAY)(p))

@@ -106,6 +106,7 @@ namespace dynarithmic
             CTL_TWAINTypeDecoder() = default;
             void StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest, TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF Data,
                               DecoderStructTypes sType);
+
             static std::string DecodeBitmap(HANDLE hBitmap);
             static std::string DecodePDFTextElement(PDFTextElement* pEl);
             static std::string DecodeTWAINReturnCode(TW_UINT16 retCode);

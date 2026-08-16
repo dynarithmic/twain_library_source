@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 
-#include "ctltmpl5.h"
+#include "ctlgetsetcapsinternal.h"
 #include "ctlcapcollect.h"
 #include "cppfunc.h"
 #include "ctlstaticdata.h"

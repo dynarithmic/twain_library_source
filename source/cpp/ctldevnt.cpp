@@ -21,7 +21,11 @@
 #include <windows.h>
 #include "ctltripletbase.h"
 #include "ctldevnt.h"
+
+#include "arrayfactory.h"
+#include "ctlconstexprutils.h"
 #include "ctltwaindllhandle.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 

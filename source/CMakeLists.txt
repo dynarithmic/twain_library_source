@@ -395,6 +395,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ansiwideconverter_generic.h
         ${PROJECT_SOURCE_DIR}/h/ansiwideconverter_win32.h
         ${PROJECT_SOURCE_DIR}/h/arrayfactory.h
+        ${PROJECT_SOURCE_DIR}/h/ctlarraydefs.h
         ${PROJECT_SOURCE_DIR}/h/blankpage.h
         ${PROJECT_SOURCE_DIR}/h/capconst.h
         ${PROJECT_SOURCE_DIR}/h/cppfunc.h
@@ -448,9 +449,8 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlthreadutils.h
         ${PROJECT_SOURCE_DIR}/h/ctltimer.h
         ${PROJECT_SOURCE_DIR}/h/ctltimeutils.h
-        ${PROJECT_SOURCE_DIR}/h/ctltmpl3.h
-        ${PROJECT_SOURCE_DIR}/h/ctltmpl4.h
-        ${PROJECT_SOURCE_DIR}/h/ctltmpl5.h
+        ${PROJECT_SOURCE_DIR}/h/ctl10tuple.h
+        ${PROJECT_SOURCE_DIR}/h/ctlgetsetcapsinternal.h
         ${PROJECT_SOURCE_DIR}/h/ctltr000.h
         ${PROJECT_SOURCE_DIR}/h/ctltr001.h
         ${PROJECT_SOURCE_DIR}/h/ctltr002.h

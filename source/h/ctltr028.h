@@ -25,7 +25,7 @@
 #include <algorithm>
 #include "capconst.h"
 #include "ctltripletbase.h"
-#include "ctltmpl5.h"
+#include "ctlgetsetcapsinternal.h"
 namespace dynarithmic
 {
     template <TW_UINT16 GetSetType>

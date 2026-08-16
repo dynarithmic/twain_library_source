@@ -20,7 +20,6 @@
  */
 #ifndef CTLFILESAVE_H
 #define CTLFILESAVE_H
-#include <windows.h>
 #include "ctlenum.h"
 #include "ctlstringdefs.h"
 namespace dynarithmic

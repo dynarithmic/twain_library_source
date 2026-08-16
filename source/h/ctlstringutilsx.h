@@ -57,7 +57,7 @@ namespace dynarithmic
     }
 
     // Search and replace %1, %2, etc. placeholders with data
-    template <typename StringType, typename Container=std::vector<StringType>>
+    template <typename StringType = DTWAIN_STRING_TYPE_, typename Container=std::vector<StringType>>
     StringType ReplacePlaceHolders(const StringType& fmt, const Container& values)
     {
         using char_type = typename StringType::value_type;
@@ -94,7 +94,7 @@ namespace dynarithmic
         return result;
     }
 
-    template <typename StringType>
+    template <typename StringType = DTWAIN_STRING_TYPE_>
     StringType StringFromUChars(const std::make_unsigned_t<typename StringType::value_type>* val, std::size_t nSize)
     {
         if (!val || nSize == 0)
@@ -111,7 +111,7 @@ namespace dynarithmic
     }
 
 
-    template <typename StringType, typename ByteType>
+    template <typename StringType = DTWAIN_STRING_TYPE_, typename ByteType>
     StringType BytesToHex(const ByteType* data, std::size_t size)
     {
         using CharType = typename StringType::value_type;
@@ -137,7 +137,7 @@ namespace dynarithmic
 
         return result;
     }
-    template <typename StringType>
+    template <typename StringType = DTWAIN_STRING_TYPE_>
     StringType HexStringFromUChars(const std::make_unsigned_t<typename StringType::value_type>* val, 
                                     size_t nSize)
     {

@@ -22,7 +22,7 @@
 #include <algorithm>
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
-#include "ctltmpl5.h"
+#include "ctlgetsetcapsinternal.h"
 #include "errorcheck.h"
 #include "ctlutils.h"
 #include "ctlsetgetcaps.h"
