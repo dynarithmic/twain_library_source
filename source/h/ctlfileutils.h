@@ -52,7 +52,7 @@ namespace dynarithmic
     {
         enum { DRIVE_POS, DRIVE_PATH, DIRECTORY_POS, NAME_POS, EXTENSION_POS };
 
-        template <typename StringType, typename T>
+        template <typename StringType = DTWAIN_STRING_TYPE_, typename T>
         StringType PathGenericString(const T& x)
         {
             if constexpr (std::is_same_v<StringType, std::string>)
@@ -219,7 +219,7 @@ namespace dynarithmic
 
 
         // Create a file using the data and time within the file name
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType CreateFileNameWithDateTime(
             std::basic_string_view<typename StringType::value_type> prefix,
             std::basic_string_view<typename StringType::value_type> ext, bool useUTC = false)

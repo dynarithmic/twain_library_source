@@ -2189,7 +2189,7 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
         #else
             auto lowerName = stringutils::LowerCase(dllName.filename().string());
         #endif
-            auto isSame = stringutils::CompareNoCase<CTL_StringType>(lowerName, strTwainDLLName.c_str());
+            auto isSame = stringutils::CompareNoCase(lowerName, strTwainDLLName.c_str());
             if (isSame)
                 return { true, appMgrPtr->GetDSMPath() };
         }

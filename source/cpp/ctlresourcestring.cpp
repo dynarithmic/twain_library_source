@@ -50,7 +50,7 @@ namespace
         {
             // Copy the error number to the buffer if we haven't been able to find the 
             // resource string
-            sCopy = stringutils::ToString<CTL_StringType>(resourceID);
+            sCopy = stringutils::ToString(resourceID);
             if (resourceID != DTWAIN_ERR_WIN32_ERROR)
                 return CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
         }

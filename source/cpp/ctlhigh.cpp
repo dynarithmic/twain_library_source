@@ -75,7 +75,7 @@ namespace
         DTWAIN_FLOAT tempR;
         const DTWAIN_BOOL retVal = fn(Source, &tempR);
         if (retVal)
-            stringutils::SafeStrcpy(strVal, stringutils::TrimDouble<CTL_StringType>(tempR).c_str(), 255);
+            stringutils::SafeStrcpy(strVal, stringutils::TrimDouble(tempR).c_str(), 255);
         return retVal;
     }
 }

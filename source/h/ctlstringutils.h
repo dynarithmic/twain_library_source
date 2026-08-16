@@ -29,15 +29,22 @@
 #include <numeric>
 #include <cctype>
 #include <cwctype>
+#include <charconv>
 
 // Widening string macros
 #define WIDEN2(x) L##x
 #define WIDEN(x)  WIDEN2(x)
 
 #ifdef _MSC_VER
+    #ifdef _UNICODE
+        #define DTWAIN_STRING_TYPE_ std::wstring
+    #else
+        #define DTWAIN_STRING_TYPE_ std::string
+    #endif
     #define DTWAIN_SPRINTF_FUNC sprintf_s
     #define DTWAIN_SWPRINTF_FUNC swprintf_s
 #else
+    #define DTWAIN_STRING_TYPE_ std::string
     #define DTWAIN_SPRINTF_FUNC sprintf
     #define DTWAIN_SWPRINTF_FUNC swprintf
 #endif
@@ -122,6 +129,20 @@ namespace dynarithmic
 
     namespace basicstringutils
     {
+        template <typename StringType = DTWAIN_STRING_TYPE_>
+        StringType PointerToString(const void* ptr)
+        {
+            char buffer[2 + sizeof(std::uintptr_t) * 2] = { '0', 'x' };
+
+            const auto result = std::to_chars(
+                buffer + 2,
+                buffer + sizeof(buffer),
+                reinterpret_cast<std::uintptr_t>(ptr),
+                16);
+
+            return StringType(buffer, result.ptr);
+        }
+
         inline std::wstring Widen(std::string_view s, size_t len)
         {
             std::wstring ws;
@@ -173,21 +194,21 @@ namespace dynarithmic
                 str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         bool StartsWith(const StringType& str, const StringType& prefix)
         {
             return StartsWith(std::basic_string_view<typename StringType::value_type>(str),
                 std::basic_string_view<typename StringType::value_type>(prefix));
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         bool EndsWith(const StringType& str, const StringType& suffix)
         {
             return EndsWith(std::basic_string_view<typename StringType::value_type>(str),
                 std::basic_string_view<typename StringType::value_type>(suffix));
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType QuoteString(const StringType& str,
                                const typename StringType::value_type* quoteString =
             CharTraits<typename StringType::value_type>::DoubleQuote())
@@ -195,7 +216,7 @@ namespace dynarithmic
             return quoteString + str + quoteString;
         }
 
-        template <typename StringType, typename T>
+        template <typename StringType = DTWAIN_STRING_TYPE_, typename T>
         StringType ToString(const T& value)
         {
             if constexpr (std::is_arithmetic_v<T>)
@@ -215,25 +236,25 @@ namespace dynarithmic
             return {};
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType Mid(std::basic_string_view<typename StringType::value_type> str, size_t nFirst)
         {
             return str.substr(nFirst).data();
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType Mid(std::basic_string_view<typename StringType::value_type> str, size_t nFirst, size_t nNum)
         {
             return { str.substr(nFirst, nNum).data(), nNum };
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType Left(std::basic_string_view<typename StringType::value_type> str, size_t nNum)
         {
             return Mid<StringType>(str, 0, nNum);
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType Right(std::basic_string_view<typename StringType::value_type> str, size_t nNum)
         {
             const size_t nLen = str.length();
@@ -242,7 +263,7 @@ namespace dynarithmic
             return Mid<StringType>(nLen - nNum, nNum);
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType TrimDouble(double value, int numDigitsPrecision = 8)
         {
             typename StringType::value_type buf[256];
@@ -286,7 +307,7 @@ namespace dynarithmic
             return Copy(pDest, pSrc);
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType ReplaceAll(std::basic_string_view<typename StringType::value_type> strOrig,
                               std::basic_string_view<typename StringType::value_type> findStr,
                               std::basic_string_view<typename StringType::value_type> replaceStr)
@@ -318,14 +339,14 @@ namespace dynarithmic
                 });
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         int Compare(std::basic_string_view<typename StringType::value_type> str, 
                     const typename StringType::value_type* lpsz)
         {
             return str.compare(lpsz);
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         bool CompareNoCase(std::basic_string_view<typename StringType::value_type> str, 
                            const typename StringType::value_type* lpsz)
         {
@@ -449,28 +470,28 @@ namespace dynarithmic
             return ltrim_copy(rtrim_copy(str));
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType& TrimRight(StringType& str, 
                    const typename StringType::value_type* lpszTrimStr = typename CharTraits<typename StringType::value_type>::Space())
         {
             return rtrim_if(str, is_any_of(lpszTrimStr));
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType& TrimLeft(StringType& str, 
             const typename StringType::value_type* lpszTrimStr = typename CharTraits<typename StringType::value_type>::Space())
         {
             return ltrim_if(str, is_any_of(lpszTrimStr));
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType& TrimAll(StringType& str, 
             const typename StringType::value_type* lpszTrimStr = typename CharTraits<typename StringType::value_type>::Space())
         {
             return trim_if(str, is_any_of(lpszTrimStr));
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         int TokenizeEx(const StringType& str,
                         const typename StringType::value_type* lpszTokStr,
                         std::vector<StringType>& rArray,
@@ -520,7 +541,7 @@ namespace dynarithmic
             return static_cast<int>(rArray.size());
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         int TokenizeQuotedEx(const StringType& str,
                              const typename StringType::value_type* lpszTokStr,
                              std::vector<StringType>& rArray,
@@ -640,7 +661,7 @@ namespace dynarithmic
             return static_cast<int>(rArray.size());
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         int Tokenize(const StringType& str, const typename StringType::value_type* lpszTokStr,
                            std::vector<StringType>& rArray, bool bGetNullTokens = false)
         {
@@ -655,7 +676,7 @@ namespace dynarithmic
             return TokenizeEx(static_cast<StringType>(str), lpszTokStr, rArray, bGetNullTokens);
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         int TokenizeQuoted(const StringType& str, const typename StringType::value_type* lpszTokStr,
                            std::vector<StringType>& rArray, bool bGetNullTokens = false)
         {
@@ -686,51 +707,51 @@ namespace dynarithmic
             return out;
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType& MakeUpperCase(StringType& str)
         {
             to_lower_upper(str.data(), str.size(), false);
             return str;
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType& MakeLowerCase(StringType& str)
         {
             to_lower_upper(str.data(), str.size(), true);
             return str;
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType UpperCase(std::basic_string_view<typename StringType::value_type> str)
         {
             return to_lower_upper_copy(str, false);
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType UpperCase(const StringType& str)
         {
             return to_lower_upper_copy<StringType>(std::basic_string_view<typename StringType::value_type>(str), false);
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType LowerCase(std::basic_string_view<typename StringType::value_type> str)
         {
             return to_lower_upper_copy(str, true);
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType LowerCase(const StringType& str)
         {
             return to_lower_upper_copy<StringType>(std::basic_string_view<typename StringType::value_type>(str), true);
         }
 
-        template <typename StringType, typename Container>
+        template <typename StringType = DTWAIN_STRING_TYPE_, typename Container>
         StringType Join(const Container& ct, const StringType& seperator = {})
         {
             return Join<StringType, Container>(ct.begin(), ct.end(), seperator);
         }
 
-        template <typename StringType, typename Container>
+        template <typename StringType = DTWAIN_STRING_TYPE_, typename Container>
         StringType Join(const Container& ct, const typename StringType::value_type* seperator = 
                             CharTraits<typename StringType::value_type>::EmptyString())
         {
@@ -771,7 +792,7 @@ namespace dynarithmic
             return Join<StringType>(iter1, iter2, separator.c_str());
         }
 
-        template <typename StringType, typename Iter, typename Fn>
+        template <typename StringType = DTWAIN_STRING_TYPE_, typename Iter, typename Fn>
         StringType JoinEx(Iter iter1, Iter iter2, Fn concatFn)
         {
             return std::accumulate(iter1, iter2, StringType(),

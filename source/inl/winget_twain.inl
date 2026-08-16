@@ -192,7 +192,7 @@ namespace
                 if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
                 {
                     CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" failed with error code: ");
-                    msg += stringutils::ToString<CTL_StringType>(loadReturnCode.second);
+                    msg += stringutils::ToString(loadReturnCode.second);
                     LogWriterUtils::WriteLogInfo(msg);
                 }
                 continue;
@@ -225,7 +225,7 @@ namespace
                     LogWriterUtils::WriteLogInfo(msg);
                 }
                 // We need the full module name
-                fNameTotal = filenameutils::PathGenericString<CTL_StringType>(libloader.location());
+                fNameTotal = filenameutils::PathGenericString(libloader.location());
                 if (pModule)
                 {
                     if (bLeaveLoaded)

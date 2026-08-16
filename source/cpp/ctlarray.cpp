@@ -1527,7 +1527,7 @@ extern "C"
         const DTWAIN_BOOL bRet = DTWAIN_ArrayGetAt(pArray, nWhere, &dValue);
         if (bRet)
             stringutils::SafeStrcpy(Val, 
-                stringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
+                stringutils::TrimDouble(dValue).c_str(), 255);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Val))
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
@@ -2040,7 +2040,7 @@ extern "C"
         double dValue;
         const DTWAIN_BOOL bRet = DTWAIN_RangeGetValueFloat(pArray, nWhich, &dValue);
         if ( bRet )
-            stringutils::SafeStrcpy(pVal, stringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
+            stringutils::SafeStrcpy(pVal, stringutils::TrimDouble(dValue).c_str(), 255);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVal))
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
@@ -2167,7 +2167,7 @@ extern "C"
             {
                 if (vals[i])
                     stringutils::SafeStrcpy(vals[i], 
-                                stringutils::TrimDouble<CTL_StringType>(dValue[i]).c_str(), 255);
+                                stringutils::TrimDouble(dValue[i]).c_str(), 255);
             }
         }
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((dLow, dUp, dStep, dDefault, dCurrent))
@@ -2241,7 +2241,7 @@ extern "C"
         double dValue;
         const DTWAIN_BOOL bRet = DTWAIN_RangeGetExpValueFloat(pArray,lPos,&dValue);
         if ( bRet )
-            stringutils::SafeStrcpy(pVal, stringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
+            stringutils::SafeStrcpy(pVal, stringutils::TrimDouble(dValue).c_str(), 255);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVal))
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
@@ -2418,7 +2418,7 @@ extern "C"
         double dOut;
         const DTWAIN_BOOL bRet = DTWAIN_RangeGetNearestValueFloat(pArray, dValue, &dOut,RoundType);
         if ( bRet )
-            stringutils::SafeStrcpy(pOutput, stringutils::TrimDouble<CTL_StringType>(dOut).c_str(), 255);
+            stringutils::SafeStrcpy(pOutput, stringutils::TrimDouble(dOut).c_str(), 255);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pOutput))
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
@@ -2482,7 +2482,7 @@ extern "C"
         for (size_t i = 0; i < vals.size(); ++i)
         {
             if ( vals[i] )
-                stringutils::SafeStrcpy(vals[i], stringutils::TrimDouble<CTL_StringType>(pr.second->m_FrameComponent[i]).c_str(), 255);
+                stringutils::SafeStrcpy(vals[i], stringutils::TrimDouble(pr.second->m_FrameComponent[i]).c_str(), 255);
         }
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pleft, ptop, pright, pbottom))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2710,7 +2710,7 @@ extern "C"
         for (size_t i = 0; i < aFrameComponent.size(); ++i )
         {
             if ( vals[i])
-                stringutils::SafeStrcpy(vals[i], stringutils::TrimDouble<CTL_StringType>(aFrameComponent[i]).c_str(), 255);
+                stringutils::SafeStrcpy(vals[i], stringutils::TrimDouble(aFrameComponent[i]).c_str(), 255);
         }
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Left, Top, Right, Bottom))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2726,7 +2726,7 @@ extern "C"
             LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         if (Value)
         {
-            stringutils::SafeStrcpy(Value, stringutils::TrimDouble<CTL_StringType>(dValue).c_str(), 255);
+            stringutils::SafeStrcpy(Value, stringutils::TrimDouble(dValue).c_str(), 255);
             LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Value))
         }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)

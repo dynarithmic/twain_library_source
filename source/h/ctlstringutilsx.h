@@ -146,7 +146,7 @@ namespace dynarithmic
 
     // If szInfo is nullptr, only the computed length is returned.
     // The length includes trailing null character.
-    template <typename StringType>
+    template <typename StringType = DTWAIN_STRING_TYPE_>
     int32_t CopyInfoToCString(const StringType& strInfo, 
                               typename StringType::value_type* szInfo, 
                               int32_t nMaxLen)

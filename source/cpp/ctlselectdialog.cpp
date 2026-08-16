@@ -382,7 +382,7 @@ namespace dynarithmic
                     CTL_StringStreamType strm2;
                     auto nl = _T("\n");
                     strm2 << "----- " << GetResourceStringFromMap_Native(IDS_SOURCES_TEXT) <<
-                        stringutils::JoinEx<CTL_StringType>(vNewSourceNames.begin(), vNewSourceNames.end(),
+                        stringutils::JoinEx(vNewSourceNames.begin(), vNewSourceNames.end(),
                             [&](const CTL_StringType& str, const CTL_StringType& val)
                             {
                                 CTL_StringStreamType strmInner;
@@ -398,7 +398,7 @@ namespace dynarithmic
                     index = SendMessage(lstSources, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(sName.c_str()));
                     if (!DefName.empty())
                     {
-                        if (stringutils::Compare<CTL_StringType>(sName, static_cast<LPCTSTR>(DefName.data())) == 0)
+                        if (stringutils::Compare(sName, static_cast<LPCTSTR>(DefName.data())) == 0)
                             DefIndex = index;
                     }
                 }

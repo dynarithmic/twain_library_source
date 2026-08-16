@@ -72,7 +72,7 @@ namespace dynarithmic
     template <typename SourceFunc>
     LONG GetSourceInfoImpl(CTL_ITwainSource* p, SourceFunc pFunc, LPTSTR szInfo, LONG nMaxLen)
     {
-        return CopyInfoToCString<CTL_StringType>((p->*pFunc)(), szInfo, nMaxLen);
+        return CopyInfoToCString((p->*pFunc)(), szInfo, nMaxLen);
     }
 
     class CTL_TwainDLLHandle;

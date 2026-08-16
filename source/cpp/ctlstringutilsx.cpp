@@ -37,7 +37,7 @@ using namespace dynarithmic;
 
 namespace
 {
-    template <typename StringType, typename PointerTypeIn = StringType::value_type*,
+    template <typename StringType = DTWAIN_STRING_TYPE_, typename PointerTypeIn = StringType::value_type*,
               typename PointerTypeOut = PointerTypeIn>
     LONG ConvertToAPIString_InternalEx(const PointerTypeIn lpOrigString, PointerTypeOut outString, LONG nLength)
     {
@@ -80,7 +80,7 @@ namespace
         return result;
     }
 
-    template <typename StringType>
+    template <typename StringType = DTWAIN_STRING_TYPE_>
     HANDLE ConvertToAPIStringEx(typename std::basic_string_view<typename StringType::value_type> origString)
     {
         constexpr size_t cSize = sizeof(typename StringType::value_type);
@@ -102,7 +102,7 @@ extern "C"
     HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
     {
         LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-            auto retval = ConvertToAPIStringEx<CTL_StringType>(lpOrigString);
+            auto retval = ConvertToAPIStringEx(lpOrigString);
         LOG_FUNC_EXIT_NONAME_PARAMS(retval)
             CATCH_BLOCK(nullptr)
     }
@@ -127,7 +127,7 @@ extern "C"
     LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOutString, LONG nSize)
     {
         LOG_FUNC_ENTRY_PARAMS((lpOrigString, lpOutString, nSize))
-        LONG retval = ConvertToAPIString_InternalEx<CTL_StringType>(lpOrigString, lpOutString, nSize);
+        LONG retval = ConvertToAPIString_InternalEx(lpOrigString, lpOutString, nSize);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOutString))
         LOG_FUNC_EXIT_NONAME_PARAMS(retval)
         CATCH_BLOCK(0)

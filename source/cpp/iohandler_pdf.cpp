@@ -394,7 +394,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
             CTL_StringArrayType pathValues;
             filenameutils::SplitPath(m_ImageInfoEx.szImageFileName, pathValues);
             szTempFile = m_ImageInfoEx.szImageFileName;
-            if ( basicstringutils::CompareNoCase<CTL_StringType>(pathValues[filenameutils::EXTENSION_POS], _T("TIF")))
+            if ( basicstringutils::CompareNoCase(pathValues[filenameutils::EXTENSION_POS], _T("TIF")))
                 PDFHandler.SetImageType(1);
             else
                 PDFHandler.SetImageType(0);
