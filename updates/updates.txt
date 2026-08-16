@@ -10,8 +10,8 @@ DTWAIN Version changes
   asterisk (*), and semicolons (:) as delimiters if a list of files are specified.  The
   space character is no longer a valid delimiter character.
 
-- Calling the DTWAIN_SetTwainDSM() function when the TWAIN Data Source is active will now result 
-  in a -1019 error being produced (DTWAIN_ERR_ACTIVE_TWAINDSM).  
+- Calling the DTWAIN_SetTwainDSM() function when the TWAIN Data Source Manager is active will 
+  now result in a -1019 error being produced (DTWAIN_ERR_ACTIVE_TWAINDSM).  
 
       The DTWAIN_SetTwainDSM() can only be called successfully 
 
