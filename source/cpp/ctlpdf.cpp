@@ -395,9 +395,6 @@ namespace
                               {DTWAIN_FLOATDEFAULT, 1.0 , strokeWidth, &element.strokeWidth,DTWAIN_PDFTEXT_NOSTROKEWIDTH},
         };
 
-        constexpr size_t numDefVals = std::size(defVals);
-        constexpr size_t numDefValsDOUBLE = std::size(defValsDOUBLE);
-
         element.m_text = stringconversion::Convert_NativePtr_To_Ansi(szText);
         element.xpos = xPos;
         element.ypos = yPos;

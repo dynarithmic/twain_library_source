@@ -56,7 +56,7 @@ extern "C"
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         BOOL sessionEnabled = pHandle->m_bSessionAllocated;
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return sessionEnabled; }, 
-                                                  DTWAIN_ERR_ACTIVE_TWAINSESSION, nullptr, FUNC_MACRO);
+                                                  DTWAIN_ERR_ACTIVE_TWAINSESSION, false, FUNC_MACRO);
         #ifndef _WIN64
         if ( DSMType == DTWAIN_TWAINDSM_LEGACY || DSMType == DTWAIN_TWAINDSM_LATESTVERSION)
         {

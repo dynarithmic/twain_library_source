@@ -34,7 +34,7 @@ CTL_CapabilitySetTripletBase::CTL_CapabilitySetTripletBase(CTL_ITwainSession *pS
 {
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
 
-    pCap->Cap = static_cast<TW_UINT16>(sCap);
+    pCap->Cap = sCap;
     pCap->ConType = static_cast<TW_UINT16>(-1);
     pCap->hContainer = nullptr;
 }

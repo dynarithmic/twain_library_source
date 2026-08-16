@@ -29,7 +29,7 @@
 
 using namespace dynarithmic;
 
-static constexpr TCHAR* s_NullEntry = _T("<null>");
+static const constexpr TCHAR* s_NullEntry = _T("<null>");
 
 namespace
 {

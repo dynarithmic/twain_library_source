@@ -38,8 +38,10 @@
 #ifdef _MSC_VER
     #ifdef _UNICODE
         #define DTWAIN_STRING_TYPE_ std::wstring
+        #define DTWAIN_CHAR_TYPE_ wchar_t
     #else
         #define DTWAIN_STRING_TYPE_ std::string
+        #define DTWAIN_CHAR_TYPE_ char
     #endif
     #define DTWAIN_SPRINTF_FUNC sprintf_s
     #define DTWAIN_SWPRINTF_FUNC swprintf_s
@@ -286,7 +288,7 @@ namespace dynarithmic
             return std::char_traits<CharType>::copy(dest, src, CharTraits<CharType>::Length(src)); 
         }
 
-        template <typename CharType>
+        template <typename CharType = DTWAIN_CHAR_TYPE_>
         CharType* SafeStrcpy(CharType* pDest, const CharType* pSrc, size_t nMaxChars)
         {
             if (!pSrc || !pDest)
@@ -299,7 +301,7 @@ namespace dynarithmic
             return pDest;
         }
 
-        template <typename CharType>
+        template <typename CharType = DTWAIN_CHAR_TYPE_>
         CharType* SafeStrcpy(CharType* pDest, const CharType* pSrc)
         {
             if (!pSrc || !pDest)

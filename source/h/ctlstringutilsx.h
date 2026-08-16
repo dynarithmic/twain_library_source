@@ -24,6 +24,9 @@
 #include <string>
 #include <vector>
 #include <string_view>
+#include <array>
+
+#include "ctlconstexprfind.h"
 
 namespace dynarithmic
 {
@@ -34,6 +37,24 @@ namespace dynarithmic
 
     // Convert a string into a byte array
     std::vector<unsigned char> HexStringToByteArray(std::string_view hexString);
+
+    // Function to convert a two-character hex string to a byte
+    constexpr unsigned char HexCharToByte(char c) noexcept
+    {
+        // create lookup table
+        constexpr std::array<std::pair<char, unsigned int>, 22> hexMap =
+        { {
+            {'0',0},{'1',1},{'2',2},{'3',3},{'4',4},{'5',5},{'6',6},{'7', 7},{'8',8},{'9',9},
+            {'A',10},{'B',11},{'C',12},{'D',13},{'E',14},{'F',15},
+            {'a',10},{'b',11},{'c',12},{'d',13},{'e',14},{'f',15}
+        } };
+
+        const auto foundVal = generic_array_finder_if(hexMap, [&](const auto& pr)
+            { return pr.first == c; });
+        if (foundVal.first)
+            return static_cast<unsigned char>(foundVal.second);
+        return 0;
+    }
 
     // Search and replace %1, %2, etc. placeholders with data
     template <typename StringType, typename Container=std::vector<StringType>>

@@ -26,6 +26,7 @@
 #include "ctlwindowsimpl.h"
 #include "ctlstringutilsx.h"
 #include "ctldtwainhandle.h"
+#include "ctltwaindllpath.h"
 
 using namespace dynarithmic;
 namespace stringutils = basicstringutils;

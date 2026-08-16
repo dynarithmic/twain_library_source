@@ -1496,7 +1496,7 @@ extern "C"
         LONG value = {};
         auto constexpr badValue = std::numeric_limits<LONG>::min();
         auto bRet = DTWAIN_ArrayGetAt(pArray, nWhere, &value);
-        LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? value : badValue);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? value : badValue)
         CATCH_BLOCK(std::numeric_limits<LONG>::min())
     }
 
@@ -1506,7 +1506,7 @@ extern "C"
         LONG64 value = {};
         auto constexpr badValue = std::numeric_limits<LONG64>::min();
         auto bRet = DTWAIN_ArrayGetAt(pArray, nWhere, &value);
-        LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? value : badValue);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? value : badValue)
         CATCH_BLOCK(std::numeric_limits<LONG64>::min())
     }
 
@@ -2809,7 +2809,7 @@ extern "C"
     DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayConvertFloatToFix32(DTWAIN_ARRAY FloatArray)
     {
         LOG_FUNC_ENTRY_PARAMS((FloatArray))
-            auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
         const auto& factory = pHandle->m_ArrayFactory;
         const auto FloatArrayV = FloatArray;
 
@@ -2884,99 +2884,96 @@ extern "C"
     }
 }
 
-template <typename StringType>
-DTWAIN_ARRAY GenericArrayFloatToString(const CTL_TwainDLLHandle* pHandle,  
-                                       DTWAIN_ARRAY FloatArray, 
-                                       CTL_ArrayType arrayType, 
-                                       LONG& retVal)
+namespace
 {
-    const auto& factory = pHandle->m_ArrayFactory;
-    const auto FloatArrayV = FloatArray;
-
-    // Check if array exists
-    const bool bIsValid = factory->is_valid(FloatArrayV);
-    if (!bIsValid)
+    template <typename StringType>
+    DTWAIN_ARRAY GenericArrayFloatToString(const CTL_TwainDLLHandle* pHandle,
+        DTWAIN_ARRAY FloatArray,
+        CTL_ArrayType arrayType,
+        LONG& retVal)
     {
-        retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
-        return nullptr;
-    }
+        const auto& factory = pHandle->m_ArrayFactory;
+        const auto FloatArrayV = FloatArray;
 
-    const auto bIsFloat = factory->tag_type(FloatArrayV) == CTL_ArrayFactory::arrayTag::DoubleType;
-    if (!bIsFloat)
-    {
-        retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
-        return nullptr;
-    }
-
-    int nStatus;
-    // get count
-    const size_t Count = factory->size(FloatArrayV);
-
-    // create a new array
-    auto aString = factory->create_array(arrayType, &nStatus, Count);
-
-    // get the underlying vectors
-    auto vIn = static_cast<double*>(factory->get_buffer(FloatArrayV, 0));
-    auto vOut = static_cast<StringType*>(factory->get_buffer(aString, 0));
-
-    // call ToString to convert float to double
-    std::transform(vIn, vIn + Count, vOut, [&](double d)
+        // Check if array exists
+        const bool bIsValid = factory->is_valid(FloatArrayV);
+        if (!bIsValid)
         {
-            StringType::value_type Value[256] = {};
-            StringType sValue;
-            stringutils::SafeStrcpy(Value, stringutils::TrimDouble<StringType>(d).c_str(), 255);
-            sValue = Value;
-            return sValue;
-        });
-    retVal = DTWAIN_NO_ERROR;
-    return VOID_TO_DTWAIN_ARRAY(aString);
-}
+            retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
+            return nullptr;
+        }
 
-template <typename WrapperType>
-DTWAIN_ARRAY GenericArrayStringToFloat(const CTL_TwainDLLHandle* pHandle,  
-                                       DTWAIN_ARRAY StringArray,        
-                                       int arrayTagType, 
-                                       LONG& retVal)
-{
-    const auto& factory = pHandle->m_ArrayFactory;
-
-    // Check if array exists
-    const bool bIsValid = factory->is_valid(StringArray);
-    if (!bIsValid)
-    {
-        retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
-        return nullptr;
-    }
-
-    const auto bIsStringArray = factory->tag_type(StringArray) == arrayTagType;
-    if (!bIsStringArray)
-    {
-        retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
-        return nullptr;
-    }
-
-    int nStatus;
-    // get count
-    const size_t Count = factory->size(StringArray);
-
-    // create a new array
-    auto aDouble = factory->create_array(CTL_ArrayDoubleType, &nStatus, Count);
-
-    // get the underlying vectors
-    auto vIn = static_cast<CTL_StringType*>(factory->get_buffer(StringArray, 0));
-    auto vOut = static_cast<double*>(factory->get_buffer(aDouble, 0));
-
-    // convert string to double
-    std::transform(vIn, vIn + Count, vOut, [&](const auto& str)
+        const auto bIsFloat = factory->tag_type(FloatArrayV) == CTL_ArrayFactory::arrayTag::DoubleType;
+        if (!bIsFloat)
         {
-            return CharTraits<CTL_StringType::value_type>::ToDouble(str.c_str());
-        });
-    retVal = DTWAIN_NO_ERROR;
-    return VOID_TO_DTWAIN_ARRAY(aDouble);
-}
+            retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
+            return nullptr;
+        }
 
-namespace 
-{
+        int nStatus;
+        // get count
+        const size_t Count = factory->size(FloatArrayV);
+
+        // create a new array
+        auto aString = factory->create_array(arrayType, &nStatus, Count);
+
+        // get the underlying vectors
+        auto vIn = static_cast<double*>(factory->get_buffer(FloatArrayV, 0));
+        auto vOut = static_cast<StringType*>(factory->get_buffer(aString, 0));
+
+        // call ToString to convert float to double
+        std::transform(vIn, vIn + Count, vOut, [&](double d)
+            {
+                typename StringType::value_type Value[256] = {};
+                StringType sValue;
+                stringutils::SafeStrcpy(Value, stringutils::TrimDouble<StringType>(d).c_str(), 255);
+                sValue = Value;
+                return sValue;
+            });
+        retVal = DTWAIN_NO_ERROR;
+        return VOID_TO_DTWAIN_ARRAY(aString);
+    }
+
+    template <typename WrapperType>
+    DTWAIN_ARRAY GenericArrayStringToFloat(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY StringArray, int arrayTagType, LONG& retVal)
+    {
+        const auto& factory = pHandle->m_ArrayFactory;
+
+        // Check if array exists
+        const bool bIsValid = factory->is_valid(StringArray);
+        if (!bIsValid)
+        {
+            retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
+            return nullptr;
+        }
+
+        const auto bIsStringArray = factory->tag_type(StringArray) == arrayTagType;
+        if (!bIsStringArray)
+        {
+            retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
+            return nullptr;
+        }
+
+        int nStatus;
+        // get count
+        const size_t Count = factory->size(StringArray);
+
+        // create a new array
+        auto aDouble = factory->create_array(CTL_ArrayDoubleType, &nStatus, Count);
+
+        // get the underlying vectors
+        auto vIn = static_cast<CTL_StringType*>(factory->get_buffer(StringArray, 0));
+        auto vOut = static_cast<double*>(factory->get_buffer(aDouble, 0));
+
+        // convert string to double
+        std::transform(vIn, vIn + Count, vOut, [&](const auto& str)
+            {
+                return CharTraits<CTL_StringType::value_type>::ToDouble(str.c_str());
+            });
+        retVal = DTWAIN_NO_ERROR;
+        return VOID_TO_DTWAIN_ARRAY(aDouble);
+    }
+
     LONG GetNumAcquiredImages(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhich)
     {
         LONG lError;
@@ -2998,7 +2995,7 @@ extern "C"
     DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayFloatToANSIString(DTWAIN_ARRAY FloatArray)
     {
         LOG_FUNC_ENTRY_PARAMS((FloatArray))
-            auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
         LONG retVal = 0;
         auto newArray = GenericArrayFloatToString<CTL_StringTypeA>(pHandle, FloatArray, CTL_ArrayANSIStringType, retVal);
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; }, DTWAIN_ERR_WRONG_ARRAY_TYPE, nullptr, FUNC_MACRO);

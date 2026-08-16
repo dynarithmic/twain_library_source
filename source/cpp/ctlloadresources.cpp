@@ -24,7 +24,6 @@
 #include <fstream>
 #include <string>
 #include <boost/algorithm/string.hpp>
-#include "ctliface.h"
 #include "ctlloadresources.h"
 #include "ctlwindowsimpl.h"
 #include "cppfunc.h"

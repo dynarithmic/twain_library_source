@@ -22,6 +22,8 @@
 #include "sourceacquireopts.h"
 #include "ctltr040.h"
 #include "ctltwainmsgloop.h"
+#include "windowsinit_impl.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -30,6 +32,47 @@
 #include "ctlshowuionly.h"
 #include "ctldtwainhandle.h"
 #include "ctlsourceacquire.h"
+
+namespace
+{
+    bool DTWAIN_ShouldUseGetMessage()
+    {
+        if (!dynarithmic::CTL_StaticData::IsTestForGetMessage())
+            return false;
+
+        MSG msg;
+
+        // 1) If no window belongs to this thread, likely script host
+        DWORD thisThread = GetCurrentThreadId();
+        bool hasWindow = false;
+
+        EnumThreadWindows(thisThread,
+            [](HWND, LPARAM lParam) -> BOOL
+            {
+                *reinterpret_cast<bool*>(lParam) = true;
+                return FALSE;
+            },
+            reinterpret_cast<LPARAM>(&hasWindow));
+
+        if (!hasWindow)
+            return true; // safer to block
+
+
+        // 2) Probe message responsiveness WITHOUT timing
+        constexpr int kProbeCount = 3;  // small, deterministic
+
+        for (int i = 0; i < kProbeCount; ++i)
+        {
+            if (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
+                return false; // messages are flowing, so PeekMessage loop OK
+
+            WaitMessage(); // cooperative yield (debugger-safe)
+        }
+
+        // No messages after several real waits, so prefer GetMessage
+        return true;
+    }
+}
 
 namespace dynarithmic
 {
@@ -112,43 +155,6 @@ namespace dynarithmic
         }
     }
 
-    bool DTWAIN_ShouldUseGetMessage()
-    {
-        if (!CTL_StaticData::IsTestForGetMessage())
-            return false;
-
-        MSG msg;
-
-        // 1) If no window belongs to this thread, likely script host
-        DWORD thisThread = GetCurrentThreadId();
-        bool hasWindow = false;
-
-        EnumThreadWindows(thisThread,
-            [](HWND, LPARAM lParam) -> BOOL
-            {
-                *reinterpret_cast<bool*>(lParam) = true;
-                return FALSE;
-            },
-            reinterpret_cast<LPARAM>(&hasWindow));
-
-        if (!hasWindow)
-            return true; // safer to block
-
-
-        // 2) Probe message responsiveness WITHOUT timing
-        constexpr int kProbeCount = 3;  // small, deterministic
-
-        for (int i = 0; i < kProbeCount; ++i)
-        {
-            if (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
-                return false; // messages are flowing, so PeekMessage loop OK
-
-            WaitMessage(); // cooperative yield (debugger-safe)
-        }
-
-        // No messages after several real waits, so prefer GetMessage
-        return true;
-    }
 }
 
 using namespace dynarithmic;

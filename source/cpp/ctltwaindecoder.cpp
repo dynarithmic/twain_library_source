@@ -363,15 +363,37 @@ namespace
     std::string DecodeTWEntryPoint(TW_MEMREF pData)
     {
         std::ostringstream sBuffer;
-        
+
+        union
+        {
+            DSMENTRYPROC      DSM_Entry;
+            DSM_MEMALLOCATE   DSM_MemAllocate;
+            DSM_MEMFREE       DSM_MemFree;
+            DSM_MEMLOCK       DSM_MemLock;
+            DSM_MEMUNLOCK     DSM_MemUnlock;
+            void* data;
+        } converter;
         auto pENTRYPOINT = static_cast<TW_ENTRYPOINT*>(pData);
+
+        converter.DSM_Entry = pENTRYPOINT->DSM_Entry;
+        void* pEntry = converter.data;
+        converter.DSM_MemAllocate = pENTRYPOINT->DSM_MemAllocate;
+        void* pAllocate = converter.data;
+        converter.DSM_MemFree = pENTRYPOINT->DSM_MemFree;
+        void* pFree = converter.data;
+        converter.DSM_MemLock = pENTRYPOINT->DSM_MemLock;
+        void* pLock = converter.data;
+        converter.DSM_MemUnlock = pENTRYPOINT->DSM_MemUnlock;
+        void* pUnlock = converter.data;
+
         sBuffer <<
             "\nTW_MEMREF <==> TW_ENTRYPOINT:\n{\n" <<
             indenter << "Size=" << pENTRYPOINT->Size << "\n" <<
-            indenter << "DSMEntry=" << basicstringutils::PointerToString<std::string>(&pENTRYPOINT->DSM_Entry) << "\n" <<
-            indenter << "DSMMemAllocate=" << basicstringutils::PointerToString<std::string>(&pENTRYPOINT->DSM_MemAllocate) << "\n" <<
-            indenter << "DSMMemLock=" << basicstringutils::PointerToString<std::string>(&pENTRYPOINT->DSM_MemLock) << "\n" <<
-            indenter << "DSMMemUnlock=" << basicstringutils::PointerToString<std::string>(&pENTRYPOINT->DSM_MemUnlock) << "\n}";
+            indenter << "DSMEntry=" << basicstringutils::PointerToString<std::string>(pEntry) << "\n" <<
+            indenter << "DSMMemAllocate=" << basicstringutils::PointerToString<std::string>(pAllocate) << "\n" <<
+            indenter << "DSMMemFree=" << basicstringutils::PointerToString<std::string>(pFree) << "\n" <<
+            indenter << "DSMMemLock=" << basicstringutils::PointerToString<std::string>(pLock) << "\n" <<
+            indenter << "DSMMemUnlock=" << basicstringutils::PointerToString<std::string>(pUnlock) << "\n}";
         return sBuffer.str();
     }
 

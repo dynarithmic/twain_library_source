@@ -177,7 +177,7 @@ extern "C"
     LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainName(LPCTSTR lpszBuffer)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
-        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         auto badValue = std::numeric_limits<LONG>::min();
         auto retVal = CTL_StaticData::GetIDFromTwainName(stringconversion::Convert_NativePtr_To_Ansi(lpszBuffer));
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first ? static_cast<LONG>(retVal.second) : badValue);

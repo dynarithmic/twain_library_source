@@ -160,7 +160,7 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
         m_pExtImageInfo->NumInfos = static_cast<TW_UINT32>(nInfos);
         // Get the app manager's AppID
         const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-        if ( pMgr && pMgr->IsValidTwainSession( pSession ))
+        if ( pMgr && CTL_TwainAppMgr::IsValidTwainSession( pSession ))
         {
             if ( pSource )
             {
@@ -169,7 +169,7 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
                       DG_IMAGE,
                       DAT_EXTIMAGEINFO,
                       MSG_GET,
-                      static_cast<TW_MEMREF>(static_cast<pTW_EXTIMAGEINFO>(m_pExtImageInfo)));
+                      m_pExtImageInfo);
                 SetAlive (true);
             }
         }

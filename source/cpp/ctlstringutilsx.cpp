@@ -20,12 +20,9 @@
  */
 
 #include <chrono>
-#include <ctime>
 #include <iomanip>
-#include <sstream>
 #include <string>
 #include <string_view>
-#include <array>
 
 #include "cppfunc.h"
 #include "ctlstringutils.h"
@@ -37,7 +34,7 @@ using namespace dynarithmic;
 
 namespace
 {
-    template <typename StringType = DTWAIN_STRING_TYPE_, typename PointerTypeIn = StringType::value_type*,
+    template <typename StringType = DTWAIN_STRING_TYPE_, typename PointerTypeIn = typename StringType::value_type*,
               typename PointerTypeOut = PointerTypeIn>
     LONG ConvertToAPIString_InternalEx(const PointerTypeIn lpOrigString, PointerTypeOut outString, LONG nLength)
     {
@@ -48,7 +45,7 @@ namespace
         {
             HandleRAII raii(retval);
             PointerTypeIn ptrData = (PointerTypeIn)raii.getData();
-            auto len = CharTraits<StringType::value_type>::Length(ptrData);
+            auto len = CharTraits<typename StringType::value_type>::Length(ptrData);
             StringType str(ptrData, len);
             return CopyInfoToCString(str, outString, nLength);
         }
@@ -58,7 +55,7 @@ namespace
     template <typename StringType>
     StringType ConvertToAPIString(const StringType& origString)
     {
-        using CharType = StringType::value_type;
+        using CharType = typename StringType::value_type;
 
         constexpr CharType CR = static_cast<CharType>('\r');
         constexpr CharType LF = static_cast<CharType>('\n');
@@ -81,14 +78,14 @@ namespace
     }
 
     template <typename StringType = DTWAIN_STRING_TYPE_>
-    HANDLE ConvertToAPIStringEx(typename std::basic_string_view<typename StringType::value_type> origString)
+    HANDLE ConvertToAPIStringEx(std::basic_string_view<typename StringType::value_type> origString)
     {
         constexpr size_t cSize = sizeof(typename StringType::value_type);
         StringType newString = ConvertToAPIString<StringType>(origString.data());
         HANDLE newHandle = GlobalAlloc(GHND | GMEM_ZEROINIT, newString.size() * cSize + cSize);
         if (newHandle)
         {
-            auto pData = (typename StringType::value_type*)GlobalLock(newHandle);
+            auto pData = reinterpret_cast<typename StringType::value_type*>(GlobalLock(newHandle));
             memcpy(pData, newString.data(), newString.size() * cSize);
             GlobalUnlock(newHandle);
             return newHandle;
@@ -102,9 +99,9 @@ extern "C"
     HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
     {
         LOG_FUNC_ENTRY_PARAMS((lpOrigString))
-            auto retval = ConvertToAPIStringEx(lpOrigString);
+        auto retval = ConvertToAPIStringEx(lpOrigString);
         LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-            CATCH_BLOCK(nullptr)
+        CATCH_BLOCK(nullptr)
     }
 
     HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
@@ -156,25 +153,6 @@ namespace dynarithmic
 
         // Just return the original string
         return origString.data();
-    }
-
-
-    // Function to convert a two-character hex string to a byte
-    static constexpr unsigned char HexCharToByte(char c) noexcept 
-    {
-        // create lookup table
-        constexpr std::array<std::pair<char, unsigned int>, 22> hexMap =
-        { {
-            {'0',0},{'1',1},{'2',2},{'3',3},{'4',4},{'5',5},{'6',6},{'7', 7},{'8',8},{'9',9},
-            {'A',10},{'B',11},{'C',12},{'D',13},{'E',14},{'F',15},
-            {'a',10},{'b',11},{'c',12},{'d',13},{'e',14},{'f',15}
-        } };
-
-        const auto foundVal = generic_array_finder_if(hexMap, [&](const auto& pr) 
-                                                            { return pr.first == c; });
-        if (foundVal.first)
-            return static_cast<unsigned char>(foundVal.second);
-        return 0;
     }
 
     // convert a hex string to a byte array

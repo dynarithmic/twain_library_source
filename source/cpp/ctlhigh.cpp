@@ -49,8 +49,6 @@ typedef bool (*SetDoubleCapFn)(DTWAIN_SOURCE, LONG, double);
 typedef bool (*GetDoubleCapFn)(DTWAIN_SOURCE, LONG, double *);
 typedef LONG (*GetCapValuesFn)(DTWAIN_SOURCE, LPDTWAIN_ARRAY, LONG, DTWAIN_BOOL);
 
-using CharType = dynarithmic::CTL_StringType::value_type;
-
 using namespace dynarithmic;
 
 namespace

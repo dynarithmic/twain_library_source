@@ -18,22 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#if 0
-#include "cppfunc.h"
-#include "ctltwainmanager.h"
-#include "ctltmpl5.h"
-#include "dtwstrfn.h"
-#include "sourceselectopts.h"
-#include "errorcheck.h"
-#include "../simpleini/simpleini.h"
-#include "ctlthreadutils.h"
-
-#include "ctldtwainhandle.h"
-#include "ctlsourceselect.h"
-#include "ctlsourceinfo.h"
-#include "dtwainx.h"
-#endif
-
 #include <boost/logic/tribool.hpp>
 #include "ctltwaindllhandle.h"
 #include "ctlstringutils.h"
