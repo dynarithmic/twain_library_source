@@ -605,11 +605,6 @@ set(MAIN_HEADERS
 )
 
 set(MAIN_INL
-  ${PROJECT_SOURCE_DIR}/inl/ctltr016.inl
-  ${PROJECT_SOURCE_DIR}/inl/ctltr017.inl
-  ${PROJECT_SOURCE_DIR}/inl/ctltr018.inl
-  ${PROJECT_SOURCE_DIR}/inl/ctltr019.inl
-  ${PROJECT_SOURCE_DIR}/inl/ctltr020.inl
   ${PROJECT_SOURCE_DIR}/inl/windows_info.inl
   ${PROJECT_SOURCE_DIR}/inl/winget_twain.inl
   ${PROJECT_SOURCE_DIR}/inl/winlibraryloader_impl.inl
