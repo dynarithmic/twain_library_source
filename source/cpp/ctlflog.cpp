@@ -59,6 +59,9 @@ namespace
 namespace dynarithmic
 {
 #if DTWAIN_BUILD_LOGCALLSTACK == 1
+    static const constexpr char* EnterString = "==>>";
+    static const constexpr char* ExitString = "<<==";
+
     std::string CTL_LogFunctionCallA(int32_t logFlags, const char* pFuncName, int nWhich, const char* pOptionalString/* = NULL*/)
     {
         if (!(CTL_StaticData::GetLogFilterFlags() & logFlags))
@@ -89,7 +92,7 @@ namespace dynarithmic
                 auto resText = GetResourceStringFromMap(IDS_LOGMSG_ENTERTEXT);
                 if (resText.empty())
                     resText = "Entering";
-                s = sTemp + static_cast<std::string>("===>>>") + resText + " ";
+                s = sTemp + static_cast<std::string>(EnterString) + resText + " ";
                 theLogger.IndentLine();
             }
             else
@@ -101,7 +104,7 @@ namespace dynarithmic
                 auto resText = GetResourceStringFromMap(IDS_LOGMSG_EXITTEXT);
                 if (resText.empty())
                     resText = "Exiting";
-                s = sTemp + static_cast<std::string>("<<<===") + resText + " ";
+                s = sTemp + static_cast<std::string>(ExitString) + resText + " ";
             }
             else
             if (nWhich == LOG_INDENT_USELAST)
