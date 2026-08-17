@@ -65,11 +65,12 @@ namespace
 
         void operator()(const TwainFrameInternal& pPtr) const
         {
+            auto frameComponent = pPtr.GetFrameComponent();
             *m_pStrm << _T("Array[") << *m_pCurItem << _T("]");
-            *m_pStrm << _T("{left=" << pPtr.m_FrameComponent[0] << _T("}\n"));
-            *m_pStrm << _T("{top=" << pPtr.m_FrameComponent[1] << _T("}\n"));
-            *m_pStrm << _T("{right=" << pPtr.m_FrameComponent[2] << _T("}\n"));
-            *m_pStrm << _T("{bottom=" << pPtr.m_FrameComponent[3] << _T("}\n"));
+            *m_pStrm << _T("{left=" << frameComponent[TwainFrameInternal::FRAMELEFT] << _T("}\n"));
+            *m_pStrm << _T("{top=" <<  frameComponent[TwainFrameInternal::FRAMETOP] << _T("}\n"));
+            *m_pStrm << _T("{right=" << frameComponent[TwainFrameInternal::FRAMERIGHT] << _T("}\n"));
+            *m_pStrm << _T("{bottom=" << frameComponent[TwainFrameInternal::FRAMEBOTTOM] << _T("}\n"));
             ++* m_pCurItem;
         }
     };

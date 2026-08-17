@@ -2477,12 +2477,13 @@ extern "C"
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; },
                                           pr.first, false, FUNC_MACRO);
 
+        auto& frameComponent = pr.second->GetFrameComponent();
         std::array<LPTSTR, 4> vals = { pleft ? pleft : nullptr, ptop? ptop: nullptr, pright ? pright : nullptr, pbottom ? pbottom : nullptr };
         StringStreamA strm;
         for (size_t i = 0; i < vals.size(); ++i)
         {
             if ( vals[i] )
-                stringutils::SafeStrcpy(vals[i], stringutils::TrimDouble(pr.second->m_FrameComponent[i]).c_str(), 255);
+                stringutils::SafeStrcpy(vals[i], stringutils::TrimDouble(frameComponent[i]).c_str(), 255);
         }
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pleft, ptop, pright, pbottom))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2523,12 +2524,12 @@ extern "C"
         std::array<double, 4> aComponents;
         static constexpr std::array<LONG, 4> aDimensions = { DTWAIN_FRAMELEFT, DTWAIN_FRAMETOP, DTWAIN_FRAMERIGHT, DTWAIN_FRAMEBOTTOM };
         std::array<LPCTSTR, 4> aValues = { left, top, right, bottom };
-        auto vOne = pr.second;
+        auto& vOne = pr.second->GetFrameComponent();
         for (int i = 0; i < 4; ++i)
         {
             aComponents[i] = CharTraits<CharType>::ToDouble(aValues[i]);
             if ( aValues[i] )
-                vOne->m_FrameComponent[aDimensions[i]] = aComponents[i];
+                vOne[aDimensions[i]] = aComponents[i];
         }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
@@ -2640,8 +2641,8 @@ extern "C"
             const bool bCheck = TwainFrameInternal::IsValidComponent(nWhich);
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bCheck; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
             auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
-            auto& pPtr = vOne.front();
-            *Value = pPtr.m_FrameComponent[nWhich];
+            auto& pPtr = vOne.front().GetFrameComponent();
+            *Value = pPtr[nWhich];
         }
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Value))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2657,8 +2658,8 @@ extern "C"
         const bool bCheck = TwainFrameInternal::IsValidComponent(nWhich);
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !bCheck;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
         auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
-        auto& pPtr = vOne.front();
-        pPtr.m_FrameComponent[nWhich] = Value;
+        auto& pPtr = vOne.front().GetFrameComponent();
+        pPtr[nWhich] = Value;
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -2687,12 +2688,12 @@ extern "C"
         static constexpr std::array<LONG, 4> aDimensions = { DTWAIN_FRAMELEFT, DTWAIN_FRAMETOP, DTWAIN_FRAMERIGHT, DTWAIN_FRAMEBOTTOM };
         std::array<LPCTSTR, 4> aValues = { Left, Top, Right, Bottom };
         auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
-        auto& pPtr = vOne.front();
+        auto& pPtr = vOne.front().GetFrameComponent();
         for (int i = 0; i < 4; ++i)
         {
             aComponents[i] = CharTraits<CharType>::ToDouble(aValues[i]);
             if ( aValues[i] )
-                pPtr.m_FrameComponent[aDimensions[i]] = aComponents[i];
+                pPtr[aDimensions[i]] = aComponents[i];
         }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
@@ -2702,7 +2703,8 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Frame, Left, Top, Right, Bottom))
         std::array<double, 4> aFrameComponent;
-        const DTWAIN_BOOL bRet = DTWAIN_FrameGetAll(Frame, &aFrameComponent[0], &aFrameComponent[1], &aFrameComponent[2], &aFrameComponent[3]);
+        const DTWAIN_BOOL bRet = DTWAIN_FrameGetAll(Frame, &aFrameComponent[DTWAIN_FRAMELEFT], &aFrameComponent[DTWAIN_FRAMETOP], 
+                                                    &aFrameComponent[DTWAIN_FRAMERIGHT], &aFrameComponent[DTWAIN_FRAMEBOTTOM]);
         if (!bRet)
             LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
 

@@ -474,10 +474,11 @@ namespace dynarithmic
         const auto frame = create_array(CTL_ArrayFrameSingleType, &status, 1);
         auto& vect = underlying_container_t<TwainFrameInternal>(frame);
         auto& frameInst = vect.front();
-        frameInst.m_FrameComponent[0] = left;
-        frameInst.m_FrameComponent[1] = top;
-        frameInst.m_FrameComponent[2] = right;
-        frameInst.m_FrameComponent[3] = bottom;
+        auto& frameComponent = frameInst.GetFrameComponent();
+        frameComponent[TwainFrameInternal::FRAMELEFT] = left;
+        frameComponent[TwainFrameInternal::FRAMETOP] = top;
+        frameComponent[TwainFrameInternal::FRAMERIGHT] = right;
+        frameComponent[TwainFrameInternal::FRAMEBOTTOM] = bottom;
         return frame;
     }
 
