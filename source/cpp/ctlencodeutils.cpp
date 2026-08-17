@@ -22,6 +22,8 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <string_view>
 #include "ctlencodeutils.h"
+
+#include "ctlstringutilsx.h"
 #include "zlib.h"
 
 using namespace dynarithmic;
@@ -106,17 +108,8 @@ int dynarithmic::ASCII85Encode(std::string_view inData, std::string& outData)
 // HexEncode utility
 int dynarithmic::ASCIIHexEncode(std::string_view inData, std::string& outData)
 {
-    outData.reserve(inData.size() * 2);
-    for (size_t i = 0; i < inData.size(); ++i)
-    {
-        auto pHexStr = "0123456789ABCDEF";
-        unsigned char ch = inData[i];
-        ch = ch >> 4;
-        unsigned int hival = ch;
-        unsigned int loval = inData[i] & 0x0F;
-        outData += pHexStr[hival];
-        outData += pHexStr[loval];
-    }
+    outData = HexStringFromUChars<std::string>(reinterpret_cast<const std::make_unsigned_t<std::string::value_type>*>(inData.data()), 
+                                                inData.size(), true);
     outData += '>';
     return 1;
 }

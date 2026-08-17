@@ -51,10 +51,10 @@ namespace dynarithmic
 
         constexpr TwainFrameInternal(const TW_FRAME& frame)
         {
-            SetFrame(static_cast<double>(Fix32ToFloat(frame.Left)),
-                static_cast<double>(Fix32ToFloat(frame.Top)),
-                static_cast<double>(Fix32ToFloat(frame.Right)),
-                static_cast<double>(Fix32ToFloat(frame.Bottom)));
+            SetFrame(Fix32ToFloat(frame.Left),
+                      Fix32ToFloat(frame.Top),
+                    Fix32ToFloat(frame.Right),
+                    Fix32ToFloat(frame.Bottom));
         }
 
         constexpr TwainFrameInternal& operator=(const TW_FRAME& frame) { From_TWFRAME(frame); return *this; }
@@ -71,10 +71,10 @@ namespace dynarithmic
 
         constexpr void From_TWFRAME(const TW_FRAME& frame)
         {
-            SetFrame(static_cast<double>(Fix32ToFloat(frame.Left)),
-                static_cast<double>(Fix32ToFloat(frame.Top)),
-                static_cast<double>(Fix32ToFloat(frame.Right)),
-                static_cast<double>(Fix32ToFloat(frame.Bottom)));
+            SetFrame(Fix32ToFloat(frame.Left),
+                Fix32ToFloat(frame.Top),
+                Fix32ToFloat(frame.Right),
+                Fix32ToFloat(frame.Bottom));
         }
 
         constexpr auto& GetFrameComponent()  { return m_FrameComponent; }

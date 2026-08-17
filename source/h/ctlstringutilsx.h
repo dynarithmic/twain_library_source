@@ -110,36 +110,9 @@ namespace dynarithmic
         return std::vector<std::make_unsigned_t<typename StringType::value_type>>(str.begin(), str.end());
     }
 
-
-    template <typename StringType = DTWAIN_STRING_TYPE_, typename ByteType>
-    StringType BytesToHex(const ByteType* data, std::size_t size)
-    {
-        using CharType = typename StringType::value_type;
-
-        static constexpr CharType hexDigits[] =
-        {
-            CharType('0'), CharType('1'), CharType('2'), CharType('3'),
-            CharType('4'), CharType('5'), CharType('6'), CharType('7'),
-            CharType('8'), CharType('9'), CharType('a'), CharType('b'),
-            CharType('c'), CharType('d'), CharType('e'), CharType('f')
-        };
-
-        StringType result;
-        result.reserve(size * 2);
-
-        for (std::size_t i = 0; i < size; ++i)
-        {
-            unsigned char ch = static_cast<unsigned char>(data[i]);
-
-            result.push_back(hexDigits[ch >> 4]);
-            result.push_back(hexDigits[ch & 0x0F]);
-        }
-
-        return result;
-    }
     template <typename StringType = DTWAIN_STRING_TYPE_>
     StringType HexStringFromUChars(const std::make_unsigned_t<typename StringType::value_type>* val, 
-                                    size_t nSize)
+                                    size_t nSize, bool useUpperCase = false)
     {
         using CharType = typename StringType::value_type;
 
@@ -150,6 +123,18 @@ namespace dynarithmic
             CharType('8'), CharType('9'), CharType('a'), CharType('b'),
             CharType('c'), CharType('d'), CharType('e'), CharType('f')
         };
+
+        static constexpr CharType hexDigitsUpper[] =
+        {
+            CharType('0'), CharType('1'), CharType('2'), CharType('3'),
+            CharType('4'), CharType('5'), CharType('6'), CharType('7'),
+            CharType('8'), CharType('9'), CharType('A'), CharType('B'),
+            CharType('C'), CharType('D'), CharType('E'), CharType('F')
+        };
+
+        const CharType* pDigitsToUse = hexDigits;
+        if (useUpperCase)
+            pDigitsToUse = hexDigitsUpper;
 
         StringType result;
         result.reserve(nSize * 2);
@@ -158,8 +143,8 @@ namespace dynarithmic
         {
             unsigned char ch = static_cast<unsigned char>(val[i]);
 
-            result.push_back(hexDigits[ch >> 4]);
-            result.push_back(hexDigits[ch & 0x0F]);
+            result.push_back(pDigitsToUse[ch >> 4]);
+            result.push_back(pDigitsToUse[ch & 0x0F]);
         }
 
         return result;

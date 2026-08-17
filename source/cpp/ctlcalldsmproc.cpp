@@ -55,7 +55,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source))
         auto [pHandle, pSource] = VerifyHandles(Source);
-        TWAIN_IDENTITY Id = static_cast<TWAIN_IDENTITY>(pSource->GetSourceIDPtr());
+        TWAIN_IDENTITY Id = pSource->GetSourceIDPtr();
         LOG_FUNC_EXIT_NONAME_PARAMS(Id)
         CATCH_BLOCK_LOG_PARAMS(nullptr)
     }
