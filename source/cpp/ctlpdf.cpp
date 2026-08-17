@@ -244,7 +244,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source, bCompression))
         auto [pHandle, pSource] = VerifyHandles(Source);
-        pSource->SetPDFValue(PDFCOMPRESSIONKEY, static_cast<LONG>(bCompression));
+        pSource->SetPDFValue(PDFCOMPRESSIONKEY, bCompression);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
@@ -264,12 +264,12 @@ extern "C"
 
         if (nWhichEncryption == DTWAIN_PDF_AES128)
         {
-            pSource->SetPDFValue(PDFAESKEY, static_cast<LONG>(bUseAES));
+            pSource->SetPDFValue(PDFAESKEY, bUseAES);
         }
         else
         if (nWhichEncryption == DTWAIN_PDF_AES256)
         {
-            pSource->SetPDFValue(PDFAES256KEY, static_cast<LONG>(bUseAES));
+            pSource->SetPDFValue(PDFAES256KEY, bUseAES);
         }
 
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -281,7 +281,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source, bCompression))
         auto [pHandle, pSource] = VerifyHandles(Source);
-        pSource->SetPDFValue(PDFASCIICOMPRESSKEY, static_cast<LONG>(bCompression));
+        pSource->SetPDFValue(PDFASCIICOMPRESSKEY, bCompression);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
@@ -471,8 +471,8 @@ extern "C"
                             static_cast<LONG>(pElement->ypos),
                             stringconversion::Convert_Ansi_To_Native(pElement->m_font.m_fontName).c_str(),
                             pElement->fontSize,
-                            static_cast<LONG>(pElement->colorRGB),
-                            static_cast<LONG>(pElement->renderMode),
+                            pElement->colorRGB,
+                            pElement->renderMode,
                             pElement->scaling,
                             pElement->charSpacing,
                             pElement->wordSpacing,

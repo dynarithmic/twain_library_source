@@ -151,7 +151,7 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
     DestroyInfo();
 
     // Allocate memory for TW_INFO structure
-    m_memHandle = sessionHandle->m_TwainMemoryFunc->AllocateMemory(static_cast<TW_UINT32>(sizeof(TW_INFO) * nInfos + sizeof(TW_EXTIMAGEINFO)));
+    m_memHandle = sessionHandle->m_TwainMemoryFunc->AllocateMemory(sizeof(TW_INFO) * nInfos + sizeof(TW_EXTIMAGEINFO));
     m_pExtImageInfo = static_cast<TW_EXTIMAGEINFO*>(sessionHandle->m_TwainMemoryFunc->LockMemory(m_memHandle));
 
     // Set up the base triplet information here

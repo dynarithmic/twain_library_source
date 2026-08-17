@@ -114,7 +114,7 @@ namespace
             lineQueue.pop();
             lineQueue.push(line);
         }
-        auto crcVal = crc32_aux(reinterpret_cast<unsigned char*>(totalBuf.data()), static_cast<unsigned int>(totalBuf.size()));
+        auto crcVal = crc32_aux(reinterpret_cast<unsigned char*>(totalBuf.data()), totalBuf.size());
         try
         {
             uint64_t crc = std::stoul(lineQueue.front());

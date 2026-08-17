@@ -186,7 +186,7 @@ bool IcoMemoryPngEncoder::Encode(const PreparedIcoDibPage& page, std::vector<uin
     for (uint32_t y = 0; y < ready.height; ++y)
     {
         rows[y] = const_cast<png_bytep>(
-            ready.bits + static_cast<size_t>(y) * ready.strideBytes);
+            ready.bits + y * ready.strideBytes);
     }
 
     png_write_image(png_ptr, rows.data());
@@ -233,7 +233,7 @@ bool IcoMemoryPngEncoder::build_png_ready_image(const PreparedIcoDibPage& page, 
         case IcoPixelFlavor::Palette4:
         {
             out.flavor = PngReadyFlavor::Palette4;
-            out.strideBytes = static_cast<uint32_t>((page.width + 1) / 2);
+            out.strideBytes = (page.width + 1) / 2;
             out.palette.resize(16);
             for (size_t i = 0; i < out.palette.size(); ++i)
                 out.palette[i] = RGBQUAD{ 0,0,0,0 };
@@ -276,13 +276,13 @@ bool IcoMemoryPngEncoder::build_png_ready_image(const PreparedIcoDibPage& page, 
             out.strideBytes = page.width;
 
             // If this is actually palette-indexed gray, expand through palette to true Gray8.
-            out.ownedBits.resize(static_cast<size_t>(out.strideBytes) * out.height);
+            out.ownedBits.resize(out.strideBytes * out.height);
 
             for (uint32_t y = 0; y < page.height; ++y)
             {
                 const uint32_t srcY = page.bottomUp ? (page.height - 1 - y) : y;
                 const uint8_t* src = page.bits + static_cast<size_t>(srcY) * page.strideBytes;
-                uint8_t* dst = out.ownedBits.data() + static_cast<size_t>(y) * out.strideBytes;
+                uint8_t* dst = out.ownedBits.data() + y * out.strideBytes;
 
                 if (page.palette && page.paletteEntries > 0)
                 {
@@ -309,13 +309,13 @@ bool IcoMemoryPngEncoder::build_png_ready_image(const PreparedIcoDibPage& page, 
         {
             out.flavor = PngReadyFlavor::Rgb24;
             out.strideBytes = page.width * 3;
-            out.ownedBits.resize(static_cast<size_t>(out.strideBytes) * out.height);
+            out.ownedBits.resize(out.strideBytes * out.height);
 
             for (uint32_t y = 0; y < page.height; ++y)
             {
                 const uint32_t srcY = page.bottomUp ? (page.height - 1 - y) : y;
                 const uint8_t* src = page.bits + static_cast<size_t>(srcY) * page.strideBytes;
-                uint8_t* dst = out.ownedBits.data() + static_cast<size_t>(y) * out.strideBytes;
+                uint8_t* dst = out.ownedBits.data() + y * out.strideBytes;
 
                 for (uint32_t x = 0; x < page.width; ++x)
                 {
@@ -360,13 +360,13 @@ bool IcoMemoryPngEncoder::build_png_ready_image(const PreparedIcoDibPage& page, 
 
 void IcoMemoryPngEncoder::normalize_top_down_bytes(const PreparedIcoDibPage& page, uint32_t outStride, std::vector<uint8_t>& out)
 {
-    out.resize(static_cast<size_t>(outStride) * page.height);
+    out.resize(outStride * page.height);
 
     for (uint32_t y = 0; y < page.height; ++y)
     {
         const uint32_t srcY = page.bottomUp ? (page.height - 1 - y) : y;
         const uint8_t* src = page.bits + static_cast<size_t>(srcY) * page.strideBytes;
-        uint8_t* dst = out.data() + static_cast<size_t>(y) * outStride;
+        uint8_t* dst = out.data() + y * outStride;
         std::memcpy(dst, src, outStride);
     }
 }
@@ -538,7 +538,7 @@ bool IcoSessionWriter::write_ico_file()
     entry.bReserved = 0;
     entry.wPlanes = 1;
     entry.wBitCount = currentPage_.bitsPerPixel;
-    entry.dwBytesInRes = static_cast<uint32_t>(imageData_.size());
+    entry.dwBytesInRes = imageData_.size();
     entry.dwImageOffset = sizeof(ICONDIR) + sizeof(ICONDIRENTRY);
 
     if (std::fwrite(&dir, sizeof(dir), 1, file_) != 1)

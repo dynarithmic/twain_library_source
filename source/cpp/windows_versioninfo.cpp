@@ -36,7 +36,7 @@ namespace dynarithmic
 
         std::wstring modulePath(32768, L'\0');
 
-        DWORD len = GetModuleFileNameW(hModule,modulePath.data(),static_cast<DWORD>(modulePath.size()));
+        DWORD len = GetModuleFileNameW(hModule,modulePath.data(),modulePath.size());
 
         if (len == 0 || len >= modulePath.size())
             return false;

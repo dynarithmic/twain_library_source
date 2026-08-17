@@ -330,7 +330,7 @@ namespace dynarithmic
 
     bool CTL_ArrayFactory::is_valid(arrayTag* pTag) const
     {
-        return m_tagMap.find(const_cast<arrayTag*>(pTag)) != m_tagMap.end();
+        return m_tagMap.find(pTag) != m_tagMap.end();
     }
 
     bool CTL_ArrayFactory::is_frame_valid(const void *frame) const
@@ -353,7 +353,7 @@ namespace dynarithmic
     {
         if (is_valid(pTag))
         {
-            const auto pTagTemp = static_cast<arrayTag*>(pTag);
+            const auto pTagTemp = pTag;
             return pTagTemp->getTag();
         }
         return -1;

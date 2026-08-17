@@ -213,7 +213,7 @@ bool JxrSessionWriter::WriteCurrentPage()
             currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
 
         uint8_t* dst =
-            imageBuffer_.data() + static_cast<size_t>(y) * stride;
+            imageBuffer_.data() + y * stride;
 
         PrepareRow(src, dst, stride);
     }
@@ -275,7 +275,7 @@ uint32_t JxrSessionWriter::EffectiveRowBytes() const
     switch (currentPage_.pixelFlavor)
     {
         case JxrPixelFlavor::BW1:
-            return static_cast<uint32_t>((currentPage_.width + 7) / 8);
+            return (currentPage_.width + 7) / 8;
         case JxrPixelFlavor::Gray8:
             return currentPage_.width;
         case JxrPixelFlavor::Gray16:

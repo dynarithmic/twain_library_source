@@ -161,7 +161,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
 
         // Write the new line at the end of the file
         char ff = '\x0c';
-        ptrStream->write(reinterpret_cast<char*>(&ff), 1);
+        ptrStream->write(&ff, 1);
 
         // Write the temp file and save the OCR output
         m_pOCREngine->SetCurrentPageNumber(m_pOCREngine->GetCurrentPageNumber() + 1);
@@ -199,7 +199,7 @@ int CTextImageHandler::SaveOCR()
     if ( m_pOCREngine->IsReturnCodeOk(bRet) )
     {
         const std::string theText = m_pOCREngine->GetOCRText();
-        m_pTextPageInfo->fh->write(reinterpret_cast<const char *>(theText.c_str()), theText.length()*sizeof(TCHAR));
+        m_pTextPageInfo->fh->write(theText.c_str(), theText.length()*sizeof(TCHAR));
     }
     return bRet;
 }

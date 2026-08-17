@@ -377,7 +377,7 @@ int TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, b
     // message queue to ensure we're not stuck forever on waiting for a 
     // message in the GetMessage() call.
     HWND theWnd = *pSource->GetTwainSession()->GetWindowHandlePtr();
-    ::PostMessage(theWnd, WM_NULL, static_cast<WPARAM>(0), static_cast<LPARAM>(0));
+    ::PostMessage(theWnd, WM_NULL, 0, 0);
 
     bool watchdog_triggered = false;
     if (pSource->IsUsePeekMessage())

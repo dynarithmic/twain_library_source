@@ -198,7 +198,7 @@ namespace dynarithmic
         pVal[2] = &pTwain->Right;
         pVal[3] = &pTwain->Bottom;
 
-        if ( !DTWAIN_FrameGetAll(pDdtwil, static_cast<LPDTWAIN_FLOAT>(&Val[0]), static_cast<LPDTWAIN_FLOAT>(&Val[1]), static_cast<LPDTWAIN_FLOAT>(&Val[2]), static_cast<LPDTWAIN_FLOAT>(&Val[3])))
+        if ( !DTWAIN_FrameGetAll(pDdtwil, &Val[0], &Val[1], &Val[2], &Val[3]))
             return false;
         for ( int i = 0; i < 4; i++ )
             *pVal[i] = FloatToFix32( static_cast<float>(Val[i]) );
@@ -1859,12 +1859,12 @@ extern "C"
         if (!checkStatus.IsAnsiArray())
         {
             auto sTemp = stringconversion::Convert_NativePtr_To_Wide(pStr);
-            SetArrayValueFromFactory(pHandle, pArray, nWhere, (LPVOID)sTemp.data());
+            SetArrayValueFromFactory(pHandle, pArray, nWhere, sTemp.data());
         }
         else
         {
             auto sTemp = stringconversion::Convert_NativePtr_To_Ansi(pStr);
-            SetArrayValueFromFactory(pHandle, pArray, nWhere, (LPVOID)sTemp.data());
+            SetArrayValueFromFactory(pHandle, pArray, nWhere, sTemp.data());
         }
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
@@ -1941,7 +1941,7 @@ extern "C"
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeDestroy(DTWAIN_RANGE Range)
     {
         LOG_FUNC_ENTRY_PARAMS((Range))
-        const DTWAIN_BOOL bRet = DTWAIN_ArrayDestroy(static_cast<DTWAIN_ARRAY>(Range));
+        const DTWAIN_BOOL bRet = DTWAIN_ArrayDestroy(Range);
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
     }
@@ -2011,7 +2011,7 @@ extern "C"
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
         if ( !pVariant )
             LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        const DTWAIN_BOOL bRet = DTWAIN_ArrayGetAt(static_cast<DTWAIN_ARRAY>(pArray), nWhich, pVariant);
+        const DTWAIN_BOOL bRet = DTWAIN_ArrayGetAt(pArray, nWhich, pVariant);
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
     }
@@ -2179,7 +2179,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((pArray))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
-        if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(pArray)) < 0 )
+        if (IsValidRangeArray(pHandle, pArray) < 0 )
             LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
 
         // Check if (low < high) and 0 < step < (high - low)
@@ -2202,7 +2202,7 @@ extern "C"
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return lPos < 0; },
                                           DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-        if (IsValidRangeArray( pHandle, static_cast<DTWAIN_ARRAY>(pArray)) < 0 )
+        if (IsValidRangeArray( pHandle, pArray) < 0 )
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
         if ( !pVariant )
             LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2251,7 +2251,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((pArray, pVariant, pPos))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
-        if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(pArray)) < 0 )
+        if (IsValidRangeArray(pHandle, pArray) < 0 )
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
         if (!pVariant || !pPos)
             LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2320,7 +2320,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Range, Array))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
-        if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(Range) ) < 0 )
+        if (IsValidRangeArray(pHandle, Range ) < 0 )
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
         // Check if DTWAIN_ARRAY pointer is not NULL
@@ -2353,7 +2353,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((pArray, pVariantIn, pVariantOut, RoundType))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
-        if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
+        if (IsValidRangeArray(pHandle, pArray ) < 0 )
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
         if ( !pVariantIn || !pVariantOut)
@@ -2848,10 +2848,10 @@ extern "C"
             // call transform to create array of TW_FIX32 values
             for (size_t curFrame = 0; curFrame < Count; ++curFrame)
             {
-                vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMELEFT] = (TW_FIX32Ex)FloatToFix32(static_cast<float>(vIn[curFrame].Left()));
-                vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMETOP] = (TW_FIX32Ex)FloatToFix32(static_cast<float>(vIn[curFrame].Top()));
-                vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMERIGHT] = (TW_FIX32Ex)FloatToFix32(static_cast<float>(vIn[curFrame].Right()));
-                vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMEBOTTOM] = (TW_FIX32Ex)FloatToFix32(static_cast<float>(vIn[curFrame].Bottom()));
+                vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMELEFT] = FloatToFix32(static_cast<float>(vIn[curFrame].Left()));
+                vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMETOP] = FloatToFix32(static_cast<float>(vIn[curFrame].Top()));
+                vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMERIGHT] = FloatToFix32(static_cast<float>(vIn[curFrame].Right()));
+                vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMEBOTTOM] = FloatToFix32(static_cast<float>(vIn[curFrame].Bottom()));
             }
         }
         // remove the old array

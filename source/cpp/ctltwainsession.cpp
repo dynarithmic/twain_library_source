@@ -127,8 +127,8 @@ CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
     m_AppIdTemp.Id = 0;
     m_AppIdTemp.Version.MajorNum = pHandle->m_SessionStruct.nMajorNum;
     m_AppIdTemp.Version.MinorNum = pHandle->m_SessionStruct.nMinorNum;
-    m_AppIdTemp.Version.Language = static_cast<TW_UINT16>(pHandle->m_SessionStruct.nLanguage);
-    m_AppIdTemp.Version.Country  = static_cast<TW_UINT16>(pHandle->m_SessionStruct.nCountry);
+    m_AppIdTemp.Version.Language = pHandle->m_SessionStruct.nLanguage;
+    m_AppIdTemp.Version.Country  = pHandle->m_SessionStruct.nCountry;
 
     stringutils::SafeStrcpy( m_AppIdTemp.Version.Info,
                                 stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szVersion).c_str(),
@@ -596,7 +596,7 @@ extern "C"
         #ifdef DTWAIN_LIB
         CTL_TwainAppMgr::SetDLLInstance( CTL_StaticData::s_DLLInstance );
         #else
-        CTL_TwainAppMgr::SetDLLInstance( static_cast<HINSTANCE>(GetDLLInstance()) );
+        CTL_TwainAppMgr::SetDLLInstance( GetDLLInstance() );
         #endif
         auto appInstance = CTL_TwainAppMgr::GetInstance();
         pHandle->m_pAppMgr = appInstance.get();

@@ -38,12 +38,12 @@ TW_INT32   CTL_DeviceEvent::GetPowerSupply() const { return       m_DeviceEvent.
 
 double CTL_DeviceEvent::GetXResolution() const
 {
-    return static_cast<double>(Fix32ToFloat(m_DeviceEvent.XResolution));
+    return Fix32ToFloat(m_DeviceEvent.XResolution);
 }
 
 double CTL_DeviceEvent::GetYResolution() const
 {
-    return static_cast<double>(Fix32ToFloat(m_DeviceEvent.YResolution));
+    return Fix32ToFloat(m_DeviceEvent.YResolution);
 }
 
 TW_UINT32  CTL_DeviceEvent::GetFlashUsed2() const { return             m_DeviceEvent.FlashUsed2;            }

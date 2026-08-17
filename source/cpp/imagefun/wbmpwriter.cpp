@@ -176,7 +176,7 @@ bool WbmpSessionWriter::WriteHeader() const
 
 bool WbmpSessionWriter::WriteBitmapData()
 {
-    const uint32_t rowBytes = static_cast<uint32_t>((currentPage_.width + 7) / 8);
+    const uint32_t rowBytes = (currentPage_.width + 7) / 8;
     rowBuffer_.resize(rowBytes);
 
     for (uint32_t y = 0; y < currentPage_.height; ++y)

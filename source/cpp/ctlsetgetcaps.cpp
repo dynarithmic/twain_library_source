@@ -239,7 +239,7 @@ namespace
     {
         LOG_FUNC_ENTRY_PARAMS((pSource, lCap, lGetType, lContainerType, nDataType, pArray, bOverrideDataType))
 
-            const auto pHandle = pSource->GetDTWAINHandle();
+        const auto pHandle = pSource->GetDTWAINHandle();
 
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pArray == nullptr; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
         switch (lGetType)
@@ -265,7 +265,7 @@ namespace
         if (bOverrideDataType)
             overrideDataType = 0xFFFF;
 
-        if (!pSource->IsCapNegotiableInState(static_cast<TW_UINT16>(lCap), pSource->GetState()))
+        if (!pSource->IsCapNegotiableInState(lCap, pSource->GetState()))
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return true; }, DTWAIN_ERR_CAP_INVALIDSTATE, false, FUNC_MACRO);
 
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN || nDataType == 0xFFFF; },

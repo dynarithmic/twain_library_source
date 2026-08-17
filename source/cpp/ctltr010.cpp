@@ -88,7 +88,7 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
             {
                 // Need to specially decode this to determine ItemType
                 // Get pointer to data
-                void *pCapData = static_cast<void*>(memfnptr->LockMemory(m_Capability.hContainer));
+                void *pCapData = memfnptr->LockMemory(m_Capability.hContainer);
 
                 // dereference to a TW_ONEVALUE structure.  Don't really
                 // care if item is not really TW_ONEVALUE since first

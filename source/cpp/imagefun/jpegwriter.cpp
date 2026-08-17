@@ -152,7 +152,7 @@ bool JpegSessionWriter::WriteCurrentPage()
 
     while (cinfo.next_scanline < cinfo.image_height)
     {
-        const uint32_t y = static_cast<uint32_t>(cinfo.next_scanline);
+        const uint32_t y = cinfo.next_scanline;
         const uint32_t srcY = currentPage_.bottomUp
             ? (currentPage_.height - 1 - y)
             : y;
@@ -272,7 +272,7 @@ void JpegSessionWriter::write_comment_markers(jpeg_compress_struct& cinfo) const
     while (remaining > 0)
     {
         const unsigned int chunk =
-            static_cast<unsigned int>(remaining > kChunkSize ? kChunkSize : remaining);
+            remaining > kChunkSize ? kChunkSize : remaining;
 
         jpeg_write_marker(&cinfo, JPEG_COM, p, chunk);
 

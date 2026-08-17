@@ -29,7 +29,7 @@ CTL_CapabilitySetTripletBase::CTL_CapabilitySetTripletBase(CTL_ITwainSession *pS
                                                            TW_UINT16 sType,
                                                            TW_UINT16    sCap,
                                                            TW_UINT16 TwainType) :
-                    CTL_CapabilityTriplet(pSession, pSource, static_cast<TW_UINT16>(sType), TwainType, false),
+                    CTL_CapabilityTriplet(pSession, pSource, sType, TwainType, false),
                         m_gType(sType), m_gCap(sCap), m_nTwainType(TwainType)
 {
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
@@ -227,7 +227,7 @@ CTL_CapabilityResetTriplet::CTL_CapabilityResetTriplet(CTL_ITwainSession *pSessi
 {
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
 
-    pCap->Cap = static_cast<TW_UINT16>(sCap);
+    pCap->Cap = sCap;
     pCap->ConType = TWON_DONTCARE16;
     pCap->hContainer = nullptr;
     SetTestMode( true );  // No decoding done for this triplet type

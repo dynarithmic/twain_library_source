@@ -316,7 +316,7 @@ namespace dynarithmic::dib
 
         uint32_t EffectiveWidth() const noexcept
         {
-            return bih_ ? effective_width(image_width(*bih_), static_cast<uint16_t>(bih_->biBitCount)): 0;
+            return bih_ ? effective_width(image_width(*bih_), bih_->biBitCount): 0;
         }
 
     private:

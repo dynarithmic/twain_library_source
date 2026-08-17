@@ -120,7 +120,7 @@ namespace
     size_t calc_output_row_size(const PreparedTiffDibPage& page, const PageTagInfo& tagInfo)
     {
         if (tagInfo.bitsPerSample == 1 && tagInfo.samplesPerPixel == 1)
-            return static_cast<size_t>((page.width + 7) / 8);
+            return (page.width + 7) / 8;
 
         return static_cast<size_t>(page.width) *
             static_cast<size_t>(tagInfo.samplesPerPixel) *
@@ -137,7 +137,7 @@ namespace
         {
             case PixelFlavor::BW1:
             {
-                const size_t n = static_cast<size_t>((page.width + 7) / 8);
+                const size_t n = (page.width + 7) / 8;
                 if (dstSize < n)
                     return false;
 
@@ -154,7 +154,7 @@ namespace
             case PixelFlavor::Gray8:
             case PixelFlavor::Palette8:
             {
-                const size_t n = static_cast<size_t>(page.width);
+                const size_t n = page.width;
                 if (dstSize < n)
                     return false;
 

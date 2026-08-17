@@ -59,7 +59,7 @@ namespace dynarithmic
             if (ptr)
             {
                 if (!m_bOutputAsString)
-                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(ptr) << std::dec;
+                    strm << outStr << "=" << basicstringutils::PointerToString<std::string>(ptr) << std::dec;
                 else
                     strm << outStr << *ptr;
             }
@@ -86,7 +86,7 @@ namespace dynarithmic
                     LogType(outStr, static_cast<const wchar_t*>(t));
                 else
                 if (t)
-                    strm << outStr << "=0x" << std::hex << static_cast<void*>(t) << std::dec;
+                    strm << outStr << "=" << basicstringutils::PointerToString<std::string>(t) << std::dec;
                 else
                     strm << outStr << "=(null)";
             }
@@ -97,7 +97,7 @@ namespace dynarithmic
                     LogType(outStr, static_cast<const char*>(t));
                 else
                 if (t)
-                    strm << outStr << "=0x" << std::hex << static_cast<void*>(t) << std::dec;
+                    strm << outStr << "=" << basicstringutils::PointerToString<std::string>(t) << std::dec;
                 else
                     strm << outStr << "=(null)";
             }
@@ -115,7 +115,7 @@ namespace dynarithmic
                 else
                 {
                     if (t)
-                        strm << outStr << "=0x" << std::hex << static_cast<void*>(t) << std::dec;
+                        strm << outStr << "=" << basicstringutils::PointerToString<std::string>(t) << std::dec;
                     else
                         strm << outStr << "=" << "(null)";
                 }
@@ -124,7 +124,7 @@ namespace dynarithmic
             if constexpr (std::is_pointer_v<T>)
             {
                 if (t)
-                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(t) << std::dec;
+                    strm << outStr << "=" << basicstringutils::PointerToString<std::string>(t) << std::dec;
                 else
                     strm << outStr << "=" << "(null)";
             }
@@ -301,7 +301,7 @@ namespace dynarithmic
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
             //  terminated value into the output string).
             // So for now, we just output the pointer value of the string
-            strm << outStr << "=" << static_cast<void*>(ptr);
+            strm << outStr << "=" << ptr;
         }
 
         template <typename T>

@@ -663,7 +663,7 @@ namespace
     {
         std::ostringstream sBuffer;
         
-        auto handle = static_cast<HANDLE>(pData);
+        auto handle = pData;
         sBuffer << "\nTW_MEMREF <==> a DIB:\n{\n" <<
                     indenter << "DIB Handle=" << basicstringutils::PointerToString<std::string>(handle) << "\n}";
         return sBuffer.str();
@@ -897,9 +897,10 @@ void CTL_TWAINTypeDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest
     auto sDAT = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, nDAT).second;
     auto sMSG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, nMSG).second;
 
-    sBuffer << "DSM_Entry(pSource=0x" << std::hex << pSource << ", " <<
-        "pDest=0x" << std::hex << pDest << ", " << sDG << ", " << sDAT << ", " << sMSG << ", " <<
-        "TW_MEMREF=0x" << std::hex << Data << ") " << GetResourceStringFromMap(IDS_LOGMSG_CALLEDTEXT) << "\n";
+    sBuffer << "DSM_Entry(pSource=" << basicstringutils::PointerToString<std::string>(pSource) << ", " <<
+               "pDest=" << basicstringutils::PointerToString<std::string>(pDest) << ", " << sDG << ", " << sDAT << ", " << sMSG << ", " <<
+               "TW_MEMREF=" << basicstringutils::PointerToString<std::string>(Data) << ") " 
+               << GetResourceStringFromMap(IDS_LOGMSG_CALLEDTEXT) << "\n";
 
     s1 = sBuffer.str();
 

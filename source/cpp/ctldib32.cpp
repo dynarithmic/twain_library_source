@@ -87,7 +87,7 @@ void CTL_TwainDibInfo::DeleteDibPalette()
 {
     if (m_hPal)
     {
-        ImageMemoryHandler::DeleteObject(static_cast<HGDIOBJ>(m_hPal));
+        ImageMemoryHandler::DeleteObject(m_hPal);
         m_hPal = nullptr;
     }
 }
@@ -579,7 +579,7 @@ std::optional<DWORD> CTL_TwainDib::GetBitsOffset() const
     {
         dib::LockedDib dibHandle(hDib);
         auto ptr_bits = dibHandle.Bits();
-        DWORD offset = static_cast<DWORD>(static_cast<BYTE*>(ptr_bits) - reinterpret_cast<BYTE*>(dibHandle.HeaderMutable()));
+        DWORD offset = static_cast<DWORD>(ptr_bits - reinterpret_cast<BYTE*>(dibHandle.HeaderMutable()));
         return offset;
     }
     return std::nullopt;
@@ -744,7 +744,7 @@ HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
     const size_t totalSize = ImageMemoryHandler::GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
 
     // Allocate for returned handle
-    returnHandle = static_cast<HANDLE>(ImageMemoryHandler::GlobalAlloc(GMEM_FIXED, totalSize));
+    returnHandle = ImageMemoryHandler::GlobalAlloc(GMEM_FIXED, totalSize);
     const HandleRAII raii2(returnHandle);
     if (const LPBYTE bFullImage = raii2.getData())
     {

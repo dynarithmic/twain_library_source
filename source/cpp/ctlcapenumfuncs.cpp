@@ -101,7 +101,7 @@ extern "C"
                     const CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
                     CTL_CapInfoMap *pCapInfoArray = std::get<1>(Info).get();
                     std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoMap::value_type& CapInfo)
-                                    { vCaps.push_back(static_cast<int>(std::get<0>(CapInfo))); });
+                                    { vCaps.push_back(std::get<0>(CapInfo)); });
                     MoveArray(pHandle, Array, &ThisArray); 
                     LOG_FUNC_EXIT_NONAME_PARAMS(true)
                 }
@@ -338,7 +338,7 @@ extern "C"
         auto& logFilterFlags = GetLogFilterFlags();
         // First try a RESETALL, since the source may support this MSG type
         bool bResetAllOk = 
-            SetCapabilityValues(pSource, 1, DTWAIN_CAPRESETALL, static_cast<UINT>(TwainContainer_ONEVALUE), 0, Array);
+            SetCapabilityValues(pSource, 1, DTWAIN_CAPRESETALL, TwainContainer_ONEVALUE, 0, Array);
 
         if (!bResetAllOk)
         {
@@ -352,7 +352,7 @@ extern "C"
                     auto Ops = GetCapOperationsInternal(pHandle, pSource, cap);
                     if (Ops & TWQC_RESET)
                     {
-                        bool bResetOk = SetCapabilityValues(pSource, cap, DTWAIN_CAPRESET, static_cast<UINT>(TwainContainer_ONEVALUE), 0, Array);
+                        bool bResetOk = SetCapabilityValues(pSource, cap, DTWAIN_CAPRESET, TwainContainer_ONEVALUE, 0, Array);
                         if (logFilterFlags && !bResetOk)
                         {
                             // Save the failed names if logging is on

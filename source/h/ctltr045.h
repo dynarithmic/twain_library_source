@@ -37,7 +37,7 @@ namespace dynarithmic
             CTL_CapabilityGetOneValTriplet(pSession, nullptr, msgType, gCap, TwainType)
             {
                 TW_CAPABILITY* pCap = GetCapabilityBuffer();
-                pCap->Cap = static_cast<TW_UINT16>(gCap);
+                pCap->Cap = gCap;
                 pCap->ConType = TWON_ONEVALUE;
                 pCap->hContainer = nullptr;
             }

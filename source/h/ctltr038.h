@@ -23,9 +23,6 @@
 
 #include "ctltripletbase.h"
 #include "ctlarraydefs.h"
-
-#include <vector>
-#include <map>
 #include "ctlmapdefs.h"
 
 namespace dynarithmic

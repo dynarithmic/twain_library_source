@@ -830,7 +830,7 @@ void PDFEncryptionAES::EncryptInternal(std::string_view dataIn, std::string& dat
     {
         // we need to add padding bytes (PKCS#7)
         extraPadding = true;
-        auto nearest16 = dynarithmic::RoundUpToNearest(static_cast<uint32_t>(dataIn.size()), 16U);
+        auto nearest16 = dynarithmic::RoundUpToNearest(dataIn.size(), 16U);
         if (dataIn.size() % 16 == 0)
         {
             paddingByte = 0x10;

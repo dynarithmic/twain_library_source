@@ -239,7 +239,7 @@ std::string MakeCompatiblePDFString(std::string_view sString)
 
                 if (found != nEscapeChar.end())
                 {
-                    const int dist = static_cast<int>(std::distance(nEscapeChar.begin(), found));
+                    const int dist = std::distance(nEscapeChar.begin(), found);
                     sNew += nEscapeString[dist];
                     addit = false;
                 }
@@ -337,7 +337,7 @@ static std::string GetPDFDate()
 
     // Get the current time...
     curtime = time (nullptr);
-    const struct tm* timenow = static_cast<tm*>(localtime(&curtime));
+    const struct tm* timenow = localtime(&curtime);
 
     return MakeDate (1900 + timenow->tm_year,
              timenow->tm_mon + 1,
@@ -1687,7 +1687,7 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
     }
     fclose (infile);
 
-    unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
+    unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), m_imgLengthInBytes);
 
     m_nCurCRCVal = crcVal;
     return true;
@@ -1772,7 +1772,7 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
         PdfDocument::FLATE_COMPRESS);
 
     m_imgLengthInBytes = static_cast<unsigned long>(m_vImgStream.size());
-    const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
+    const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), m_imgLengthInBytes);
     m_nCurCRCVal = crcVal;
     TIFFClose(image);
     return true;
@@ -1964,7 +1964,7 @@ void PageObject::ComposeObject()
 
     // Get the CRC for the page contents
     std::vector<unsigned char> v(sConstantText.begin(), sConstantText.end());
-    m_CRCValue = crc32_aux(v.data(), static_cast<unsigned>(v.size()));
+    m_CRCValue = crc32_aux(v.data(), v.size());
 }
 
 

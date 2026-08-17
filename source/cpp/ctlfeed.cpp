@@ -28,6 +28,7 @@
 #include "ctltimer.h"
 #include "ctldtwainhandle.h"
 #include "dtwainx.h"
+#include "ctlfeed.h"
 
 using namespace dynarithmic;
 using namespace std::chrono_literals;

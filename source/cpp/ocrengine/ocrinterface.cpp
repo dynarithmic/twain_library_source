@@ -255,7 +255,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Engine, szMan, nMaxLen))
         auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-        const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetManufacturer),
+        const LONG Ret = GetOCRInfo(pEngine, &OCREngine::GetManufacturer,
                                     szMan, nMaxLen);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szMan))
         LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
@@ -266,7 +266,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Engine, szProdFamily, nMaxLen))
         auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-        const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductFamily), szProdFamily, nMaxLen);
+        const LONG Ret = GetOCRInfo(pEngine, &OCREngine::GetProductFamily, szProdFamily, nMaxLen);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProdFamily))
         LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
         CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -276,7 +276,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Engine, szProdName, nMaxLen))
         auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-        const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductName), szProdName, nMaxLen);
+        const LONG Ret = GetOCRInfo(pEngine, &OCREngine::GetProductName, szProdName, nMaxLen);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProdName))
         LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
         CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -501,7 +501,7 @@ extern "C"
         DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
         auto cInfo = reinterpret_cast<OCRCharacterInfo*>(OCRTextInfo);
-        const LONG realSize = static_cast<LONG>(std::distance(cInfo->dConfidence.begin(), cInfo->dConfidence.end()));
+        const LONG realSize = std::distance(cInfo->dConfidence.begin(), cInfo->dConfidence.end());
         const LONG actualSize = (std::min)(bufSize, realSize);
         switch (nWhichItem)
         {

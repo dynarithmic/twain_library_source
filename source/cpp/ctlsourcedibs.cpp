@@ -178,7 +178,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source))
         auto [pHandle, pSource] = VerifyHandles(Source);
-        const LONG retval = static_cast<LONG>(pSource->GetPendingImageNum());
+        const LONG retval = pSource->GetPendingImageNum();
         LOG_FUNC_EXIT_NONAME_PARAMS(retval)
         CATCH_BLOCK_LOG_PARAMS(-1L)
     }

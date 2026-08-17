@@ -169,7 +169,7 @@ namespace dynarithmic
                         TW_UNI512 ThisString;
                         pGetTriplet->GetValue(ThisString, i );
                         StringArrayW *pArray = reinterpret_cast<StringArrayW*>(&rArray);
-                        pArray->push_back(reinterpret_cast<LPWSTR>(ThisString));
+                        pArray->push_back(ThisString);
                     }
                 }
             }

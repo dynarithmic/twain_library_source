@@ -1069,8 +1069,8 @@ void CTL_ITwainSource::DeleteDuplexFiles(int nWhich)
 unsigned long CTL_ITwainSource::GetNumDuplexFiles(int nWhich) const
 {
     if ( nWhich == 0 )
-        return static_cast<unsigned long>(m_DuplexFileData.first.size());
-    return static_cast<unsigned long>(m_DuplexFileData.second.size());
+        return m_DuplexFileData.first.size();
+    return m_DuplexFileData.second.size();
 }
 
 void CTL_ITwainSource::GetImageInfoEx(DTWAINImageInfoEx &ImageInfoEx) const
@@ -1092,7 +1092,7 @@ template <typename T>
 static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
-    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size())).second;
+    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, nCap, static_cast<LONG>(dataArray.size())).second;
     if (theArray)
     {
         auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);

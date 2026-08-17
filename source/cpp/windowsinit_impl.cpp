@@ -80,7 +80,7 @@ namespace dynarithmic
 
     void UnregisterTwainWindowClass()
     {
-        UnregisterClass(_T("DTWAINWindowClass"), static_cast<HINSTANCE>(CTL_StaticData::GetDLLInstanceHandle()));
+        UnregisterClass(_T("DTWAINWindowClass"), CTL_StaticData::GetDLLInstanceHandle());
     }
 
     DTWAIN_BOOL DTWAIN_SetCallbackProc(DTWAIN_CALLBACK fnCall, LONG nWhich)

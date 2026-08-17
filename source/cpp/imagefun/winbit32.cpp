@@ -212,9 +212,9 @@ HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=
 
             for(DWORD i=0;i<bih->biClrUsed;++i)
             {
-                pRgb[i].rgbRed=static_cast<char>(palette[i * RGB_SIZE + RGB_RED]);
-                pRgb[i].rgbGreen=static_cast<char>(palette[i * RGB_SIZE + RGB_GREEN]);
-                pRgb[i].rgbBlue=static_cast<char>(palette[i * RGB_SIZE + RGB_BLUE]);
+                pRgb[i].rgbRed=palette[i * RGB_SIZE + RGB_RED];
+                pRgb[i].rgbGreen=palette[i * RGB_SIZE + RGB_GREEN];
+                pRgb[i].rgbBlue=palette[i * RGB_SIZE + RGB_BLUE];
                 pRgb[i].rgbReserved=0;
             }
         }

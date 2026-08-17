@@ -208,7 +208,7 @@ bool PsdSessionWriter::WriteImageResourcesSection()
             resources.push_back(0);
 
         // Data size
-        write_u32_be_vec(resources, static_cast<uint32_t>(data.size()));
+        write_u32_be_vec(resources, data.size());
 
         // Data
         resources.insert(resources.end(), data.begin(), data.end());
@@ -225,7 +225,7 @@ bool PsdSessionWriter::WriteImageResourcesSection()
     append_resource(1008, "Caption", captionData);
 
     if (!dynarithmic::psd::write_u32_be(file_,
-        static_cast<uint32_t>(resources.size())))
+        resources.size()))
     {
         return false;
     }
@@ -277,7 +277,7 @@ bool PsdSessionWriter::WriteImageDataSectionRle()
     rleLengths_.clear();
     rleData_.clear();
 
-    const size_t totalRows = static_cast<size_t>(currentPage_.height) * 3;
+    const size_t totalRows = currentPage_.height * 3;
     rleLengths_.reserve(totalRows);
 
     if (!BuildChannelPlaneRle(2))
@@ -324,7 +324,7 @@ bool PsdSessionWriter::BuildChannelPlaneRle(uint32_t bgrIndex)
 
         packBitsRow_.clear();
         EncodePackBitsRow(channelRow_.data(),
-            static_cast<uint32_t>(channelRow_.size()),
+            channelRow_.size(),
             packBitsRow_);
 
         if (packBitsRow_.size() > 65535)
