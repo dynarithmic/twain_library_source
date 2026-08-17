@@ -25,7 +25,7 @@
 
 namespace dynarithmic
 {
-    template <class T>
+    template <typename T>
     class CTL_CapabilitySetEnumTriplet : public CTL_CapabilitySetTriplet<T>
     {
         public:
@@ -47,8 +47,54 @@ namespace dynarithmic
             size_t      m_nAggSize;
     };
 
-    #ifndef USE_EXPLICIT_TEMPLATE_INSTANTIATIONS
-        #include "../inl/ctltr019.inl"
-    #endif
+    template <typename T>
+    CTL_CapabilitySetEnumTriplet<T>::CTL_CapabilitySetEnumTriplet(CTL_ITwainSession* pSession,
+        CTL_ITwainSource* pSource,
+        TW_UINT16 sType,
+        TW_UINT16  sCap,
+        TW_UINT16 TwainType,
+        const std::vector<T>& rArray)
+        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray), m_nAggSize(rArray.size())
+    { }
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetEnumTriplet<T>::GetContainerTypeSize()
+    {
+        return sizeof(TW_ENUMERATION);
+    }
+
+    template <typename T>
+    size_t CTL_CapabilitySetEnumTriplet<T>::GetAggregateSize()
+    {
+        return m_nAggSize;
+    }
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetEnumTriplet<T>::GetContainerType()
+    {
+        return TWON_ENUMERATION;
+    }
+
+    template <typename T>
+    bool CTL_CapabilitySetEnumTriplet<T>::Encode(const std::vector<T>& rArray, void* pMemBlock)
+    {
+        // Get a TW_ENUMERATION structure
+        pTW_ENUMERATION pArray = static_cast<pTW_ENUMERATION>(pMemBlock);
+
+        // Set the # of elements
+        pArray->NumItems = static_cast<TW_UINT32>(m_nAggSize);
+
+        // Set the data type
+        pArray->ItemType = CTL_CapabilitySetTripletBase::GetTwainType();
+
+        // Get size of datatype
+        size_t nItemSize = GetTwainItemSize(pArray->ItemType);
+
+        // Set the items in the list
+        size_t i = 0;
+        std::for_each(rArray.begin(), rArray.begin() + m_nAggSize, [&](T Data)
+            { this->EncodeEnumValue(pArray, static_cast<int>(i), nItemSize, &Data); ++i; });
+        return true;
+    }
 }
 #endif

@@ -47,29 +47,18 @@ namespace dynarithmic
             TW_UINT16 PostEncode(TW_UINT16);
 
             static void EncodeOneValue(pTW_ONEVALUE pVal, void *pData);
-
-            void EncodeRange(pTW_RANGE pVal,
-                            void *pData1,
-                            void *pData2,
-                            void *pData3) const;
-
-            static void EncodeEnumValue(pTW_ENUMERATION pArray,
-                                        int valuePos,
-                                        size_t nItemSize,
-                                        void *pData);
-
-            static void EncodeArrayValue(pTW_ARRAY pArray,
-                                         size_t valuePos,
-                                         void *pData);
+            void EncodeRange(pTW_RANGE pVal, void *pData1, void *pData2,void *pData3) const;
+            static void EncodeEnumValue(pTW_ENUMERATION pArray, int valuePos, size_t nItemSize,void *pData);
+            static void EncodeArrayValue(pTW_ARRAY pArray, size_t valuePos,void *pData);
 
         private:
-            TW_UINT16         m_gType;
+            TW_UINT16       m_gType;
             TW_UINT16       m_gCap;
-            TW_UINT16               m_nTwainType;
+            TW_UINT16       m_nTwainType;
     };
 
 
-    template <class T>
+    template <typename T>
     class CTL_CapabilitySetTriplet : public CTL_CapabilitySetTripletBase
     {
         public:
@@ -89,9 +78,45 @@ namespace dynarithmic
             std::vector<T>              m_Array;
     };
 
-    #ifndef USE_EXPLICIT_TEMPLATE_INSTANTIATIONS
-    #include "../inl/ctltr016.inl"
-    #endif
+    template <typename T>
+    CTL_CapabilitySetTriplet<T>::CTL_CapabilitySetTriplet(CTL_ITwainSession* pSession,
+                                                        CTL_ITwainSource* pSource,
+                                                        TW_UINT16 sType,
+                                                        TW_UINT16    sCap,
+                                                        TW_UINT16 TwainType,
+                                                        const std::vector<T>& rArray
+    ) : CTL_CapabilitySetTripletBase(pSession, pSource, sType, sCap, TwainType), m_Array(rArray) {}
+
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetTriplet<T>::Execute()
+    {
+        // Ensures we clean up any memory if an exception is thrown
+        struct PrePostEncoderRAII
+        {
+            TW_UINT16* m_pRC;
+            CTL_CapabilitySetTriplet<T>* m_pThis;
+            PrePostEncoderRAII(CTL_CapabilitySetTriplet<T>* pThis, TW_UINT16* pRC) : m_pThis(pThis), m_pRC(pRC) {}
+
+            // The PostEncode() releases any memory allocated by PreEncode().
+            ~PrePostEncoderRAII() { m_pThis->PostEncode(*m_pRC); }
+        };
+
+        TW_UINT16 rc = TWRC_FAILURE;
+        {
+            PrePostEncoderRAII raii(this, &rc);
+
+            // Allocate memory for the container.
+            void* pCapPtr = PreEncode();
+            if (pCapPtr)
+            {
+                if (Encode(m_Array, pCapPtr))
+                    // Call base class
+                    rc = CTL_CapabilityTriplet::Execute();
+            }
+        }
+        return rc;
+    }
 
     class CTL_CapabilityResetTriplet : public CTL_CapabilityTriplet
     {

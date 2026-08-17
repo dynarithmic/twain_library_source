@@ -21,11 +21,12 @@
 #ifndef CTLTR017_H
 #define CTLTR017_H
 #include <vector>
+#include "twain.h"
 #include "ctltr016.h"
 
 namespace dynarithmic
 {
-    template <class T>
+    template <typename T>
     class CTL_CapabilitySetOneValTriplet : public CTL_CapabilitySetTriplet<T>
     {
         public:
@@ -44,8 +45,56 @@ namespace dynarithmic
             bool        Encode(const std::vector<T>& rArray, void *pMemBlock) override;
     };
 
-    #ifndef USE_EXPLICIT_TEMPLATE_INSTANTIATIONS
-    #include "../inl/ctltr017.inl"
-    #endif
+    template <typename T>
+    CTL_CapabilitySetOneValTriplet<T>::CTL_CapabilitySetOneValTriplet(CTL_ITwainSession* pSession,
+        CTL_ITwainSource* pSource,
+        TW_UINT16 sType,
+        TW_UINT16    sCap,
+        TW_UINT16 TwainType,
+        const std::vector<T>& rArray)
+        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray)
+    {}
+
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetOneValTriplet<T>::GetContainerTypeSize()
+    {
+        return sizeof(TW_ONEVALUE);
+    }
+
+
+    template <typename T>
+    size_t CTL_CapabilitySetOneValTriplet<T>::GetAggregateSize()
+    {
+        return 0;
+    }
+
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetOneValTriplet<T>::GetContainerType()
+    {
+        return TWON_ONEVALUE;
+    }
+
+    template <typename T>
+    bool CTL_CapabilitySetOneValTriplet<T>::Encode(const std::vector<T>& rArray, void* pMemBlock)
+    {
+        T Data;
+
+        // Get a TW_ONEVALUE structure
+        const pTW_ONEVALUE pVal = static_cast<pTW_ONEVALUE>(pMemBlock);
+
+        // Get the TWTY_xxx type
+        pVal->ItemType = CTL_CapabilitySetTripletBase::GetTwainType();
+
+        // Get the data
+        if (!rArray.empty())
+        {
+            Data = rArray[0];
+            CTL_CapabilitySetTripletBase::EncodeOneValue(pVal, &Data);
+            return true;
+        }
+        return false;
+    }
 }
 #endif

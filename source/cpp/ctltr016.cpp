@@ -235,23 +235,5 @@ CTL_CapabilityResetTriplet::CTL_CapabilityResetTriplet(CTL_ITwainSession *pSessi
 
 
 CTL_CapabilityResetAllTriplet::CTL_CapabilityResetAllTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : 
-    CTL_CapabilityResetTriplet(pSession, pSource, CAP_SUPPORTEDCAPS, MSG_RESETALL)
-{}
-
-
-#ifdef USE_EXPLICIT_TEMPLATE_INSTANTIATIONS
-    #include "ctltr016.inl"
-    template  CTL_CapabilitySetTriplet<int>;
-    template  CTL_CapabilitySetTriplet<long>;
-    template  CTL_CapabilitySetTriplet<unsigned int>;
-    template  CTL_CapabilitySetTriplet<unsigned long>;
-    template  CTL_CapabilitySetTriplet<unsigned short>;
-    template  CTL_CapabilitySetTriplet<double>;
-    template  CTL_CapabilitySetTriplet<std::string>;
-    template  CTL_CapabilitySetTriplet<char *>;
-    template  CTL_CapabilitySetTriplet<TW_FRAME>;
-    template  CTL_CapabilitySetTriplet<unsigned short *>;
-    template  CTL_CapabilitySetTriplet<int *>;
-    template  CTL_CapabilitySetTriplet<short *>;
-#endif
+    CTL_CapabilityResetTriplet(pSession, pSource, CAP_SUPPORTEDCAPS, MSG_RESETALL) {}
 
