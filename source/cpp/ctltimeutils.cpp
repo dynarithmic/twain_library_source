@@ -18,25 +18,24 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTIMEUTILS_H
-#define CTLTIMEUTILS_H
 
-#include <ctime>
-#include <string>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/thread/thread_time.hpp>
+#include "ctltimeutils.h"
 
 namespace dynarithmic
 {
     namespace timeutils
     {
-        inline bool GetLocalTime(std::time_t value, std::tm& result)
+        std::string GetSystemTimeInMilliseconds()
         {
-#ifdef _WIN32
-            return ::localtime_s(&result, &value) == 0;
-#else
-            return ::localtime_r(&value, &result) != nullptr;
-#endif
+            constexpr boost::posix_time::ptime time_t_epoch(boost::gregorian::date(1601, 1, 1));
+            const auto systimex = boost::get_system_time();
+            const boost::posix_time::time_duration diff = systimex - time_t_epoch;
+            const auto mill = diff.total_milliseconds() * 10000LL;
+            std::ostringstream strm;
+            strm << mill;
+            return strm.str();
         }
-        std::string GetSystemTimeInMilliseconds();
     }
 }
-#endif

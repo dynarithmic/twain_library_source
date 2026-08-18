@@ -36,8 +36,8 @@ OF THIRD PARTY RIGHTS.
 #include "ctlhashutils.h"
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
+#include "ctltimeutils.h"
 
-std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
 #endif
