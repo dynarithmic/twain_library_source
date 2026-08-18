@@ -59,12 +59,6 @@ namespace dynarithmic
                                          bool bUseAESEncryption,
                                          uint32_t nKeyLength);
 
-            LONG DTWLIB_PSWriteFile(LPCTSTR szFileIn,
-                                    LPCTSTR szFileOut,
-                                    LONG PSType,
-                                    LPCTSTR szTitle,
-                                    bool bUseEncapsulated);
-
             void DTWLIB_PDFSetASCIICompression(PdfDocumentPtr pDoc, bool bCompression);
             void DTWLIB_PDFSetNoCompression(PdfDocumentPtr pDoc, bool bCompression);
             void DTWLIB_PDFSetSearchableText(PdfDocumentPtr pDoc, const char* text);

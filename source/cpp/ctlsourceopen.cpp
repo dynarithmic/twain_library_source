@@ -336,7 +336,7 @@ extern "C"
         CapList& theCapList = pSource->GetCapSupportedList();
 
         // See if extended image info is supported and cache the results
-        pSource->SetExtendedImageInfoSupported(theCapList.count(static_cast<TW_UINT16>(ICAP_EXTIMAGEINFO))?true:false);
+        pSource->SetExtendedImageInfoSupported(theCapList.count(ICAP_EXTIMAGEINFO)?true:false);
 
         // Cache the supported TWEI_x values for extended image information
         if (pSource->IsExtendedImageInfoSupported())

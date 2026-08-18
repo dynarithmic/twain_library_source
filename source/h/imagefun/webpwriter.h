@@ -22,12 +22,10 @@ OF THIRD PARTY RIGHTS.
 #define WEBPWRITER_H
 
 #include <vector>
-#include <cstdint>
 #include <string>
 #include <memory>
 #include <webp/encode.h>
 #include <optional>
-#include "dibutil.h"
 #include "imagefilewriterbase.h"
 
 namespace dynarithmic

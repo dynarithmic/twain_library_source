@@ -29,7 +29,7 @@
 
 using namespace dynarithmic;
 
-static constexpr TCHAR* s_NullEntry = _T("<null>");
+static const constexpr TCHAR* s_NullEntry = _T("<null>");
 
 namespace
 {
@@ -191,7 +191,7 @@ extern "C"
         }
 
         CTL_StringType sDirs;
-        auto joinedString = basicstringutils::Join<CTL_StringType>(availability.second, _T("|"));
+        auto joinedString = basicstringutils::Join(availability.second, _T("|"));
         auto actualLengthCopied = CopyInfoToCString(joinedString, directories, nMaxLen);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
         LOG_FUNC_EXIT_NONAME_PARAMS(actualLengthCopied)

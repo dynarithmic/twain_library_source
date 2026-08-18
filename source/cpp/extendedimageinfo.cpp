@@ -1119,7 +1119,7 @@ DTWAIN_ARRAY ExtendedImageInformation::GetBarcodeInfo(long nWhichInfo)
     {
         case TWEI_BARCODECOUNT:
             return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(), 
-                                                { static_cast<DWORD>(m_InfoBlock.m_barcodeInfo.count) });
+                                                { (m_InfoBlock.m_barcodeInfo.count) });
         break;
         case TWEI_BARCODEX:
             return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
@@ -1242,7 +1242,7 @@ DTWAIN_ARRAY ExtendedImageInformation::GetShaderAreaInfo(long nWhichInfo)
     {
         case TWEI_DESHADECOUNT:
             return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
-                                                    { static_cast<TW_UINT32>(m_InfoBlock.m_shadedInfo.count) });
+                                                    { (m_InfoBlock.m_shadedInfo.count) });
         break;
         case TWEI_DESHADELEFT:
             return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(), m_InfoBlock.m_shadedInfo.leftV);
@@ -1296,15 +1296,15 @@ DTWAIN_ARRAY ExtendedImageInformation::GetSpeckleRemovalInfo(long nWhichInfo)
     {
         case TWEI_SPECKLESREMOVED:
             return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
-                { static_cast<TW_UINT32>(m_InfoBlock.m_speckleRemoval.specklesRemoved) });
+                { (m_InfoBlock.m_speckleRemoval.specklesRemoved) });
         break;
         case TWEI_BLACKSPECKLESREMOVED:
             return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
-                { static_cast<TW_UINT32>(m_InfoBlock.m_speckleRemoval.blackSpecklesRemoved) });
+                { (m_InfoBlock.m_speckleRemoval.blackSpecklesRemoved) });
         break;
         case TWEI_WHITESPECKLESREMOVED:
             return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
-                { static_cast<TW_UINT32>(m_InfoBlock.m_speckleRemoval.whiteSpecklesRemoved) });
+                { (m_InfoBlock.m_speckleRemoval.whiteSpecklesRemoved) });
         break;
     }
     return nullptr;

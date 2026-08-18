@@ -31,7 +31,7 @@ namespace dynarithmic
         const CTL_StringType pName = stringconversion::Convert_Ansi_To_Native((pEngine->*pFunc)());
         const int nLen = static_cast<int>(pName.length());
         if (szInfo == nullptr)
-            return static_cast<LONG>(nLen);
+            return nLen;
         const int nRealLen = (std::min)(static_cast<int>(nMaxLen), nLen);
         basicstringutils::CopyN(szInfo, pName.c_str(), nRealLen);
         szInfo[nRealLen] = _T('\0');

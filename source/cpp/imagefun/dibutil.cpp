@@ -861,9 +861,9 @@ HANDLE dynarithmic::dib::IncreaseDibBpp(HANDLE hDib, uint16_t dstBpp)
 
     for (uint32_t y = 0; y < height; ++y)
     {
-        const uint8_t* srow = srcBits + static_cast<size_t>(y) * srcStride;
+        const uint8_t* srow = srcBits + y * srcStride;
 
-        uint8_t* drow = dstBits + static_cast<size_t>(y) * dstStride;
+        uint8_t* drow = dstBits + y * dstStride;
 
         std::memset(drow, 0, dstStride);
 
@@ -1034,8 +1034,8 @@ HANDLE dynarithmic::dib::DecreaseDibBpp(HANDLE hDib, uint16_t dstBpp)
 
     for (uint32_t y = 0; y < height; ++y)
     {
-        const uint8_t* srow = srcBits + static_cast<size_t>(y) * srcStride;
-        uint8_t* drow = dstBits + static_cast<size_t>(y) * dstStride;
+        const uint8_t* srow = srcBits + y * srcStride;
+        uint8_t* drow = dstBits + y * dstStride;
         std::memset(drow, 0, dstStride);
         for (uint32_t x = 0; x < width; ++x)
         {
@@ -1179,7 +1179,7 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
                 // invert actual pixel indices/data.
                 for (uint32_t y = 0; y < height; ++y)
                 {
-                    uint8_t* row = bits + static_cast<size_t>(y) * stride;
+                    uint8_t* row = bits + y * stride;
                     for (uint32_t i = 0; i < stride; ++i)
                         row[i] = static_cast<uint8_t>(~row[i]);
                 }
@@ -1204,7 +1204,7 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
             for (uint32_t y = 0; y < height; ++y)
             {
                 auto* row = reinterpret_cast<uint16_t*>(
-                    bits + static_cast<size_t>(y) * stride);
+                    bits + y * stride);
 
                 for (uint32_t x = 0; x < width; ++x)
                     row[x] = static_cast<uint16_t>(0xFFFFu - row[x]);
@@ -1217,7 +1217,7 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
         {
             for (uint32_t y = 0; y < height; ++y)
             {
-                uint8_t* row = bits + static_cast<size_t>(y) * stride;
+                uint8_t* row = bits + y * stride;
 
                 for (uint32_t x = 0; x < width; ++x)
                 {
@@ -1573,7 +1573,7 @@ HANDLE dynarithmic::dib::ResizeDib(HANDLE hDib, int32_t newx, int32_t newy)
 
                     const BgraD s = SampleBicubic24Or32(src, srcX, srcY, 24);
 
-                    uint8_t* p = dstRow + static_cast<size_t>(x) * 3;
+                    uint8_t* p = dstRow + x * 3;
                     p[0] = ClampU8(s.b);
                     p[1] = ClampU8(s.g);
                     p[2] = ClampU8(s.r);
@@ -1590,7 +1590,7 @@ HANDLE dynarithmic::dib::ResizeDib(HANDLE hDib, int32_t newx, int32_t newy)
 
                     const BgraD s = SampleBicubic24Or32(src, srcX, srcY, 32);
 
-                    uint8_t* p = dstRow + static_cast<size_t>(x) * 4;
+                    uint8_t* p = dstRow + x * 4;
                     p[0] = ClampU8(s.b);
                     p[1] = ClampU8(s.g);
                     p[2] = ClampU8(s.r);

@@ -48,10 +48,10 @@ CTL_ImageMemFileXferTriplet::CTL_ImageMemFileXferTriplet(CTL_ITwainSession *pSes
     if (bHandleMemory)
     {
         hLocalHandle = ImageMemoryHandler::GlobalAlloc(GMEM_MOVEABLE, numBytes);
-        m_ImageMemXferBuffer.Memory.TheMem = static_cast<TW_MEMREF>(ImageMemoryHandler::GlobalLock(hLocalHandle));
+        m_ImageMemXferBuffer.Memory.TheMem = ImageMemoryHandler::GlobalLock(hLocalHandle);
     }
     else
-        m_ImageMemXferBuffer.Memory.TheMem = static_cast<TW_MEMREF>(ImageMemoryHandler::GlobalLock(hBuffer));
+        m_ImageMemXferBuffer.Memory.TheMem = ImageMemoryHandler::GlobalLock(hBuffer);
 }
 
 void CTL_ImageMemFileXferTriplet::InitXferBuffer()

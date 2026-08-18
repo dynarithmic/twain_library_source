@@ -22,6 +22,7 @@
 #define CTLTIMEUTILS_H
 
 #include <ctime>
+#include <string>
 
 namespace dynarithmic
 {
@@ -35,6 +36,7 @@ namespace dynarithmic
             return ::localtime_r(&value, &result) != nullptr;
 #endif
         }
+        std::string GetSystemTimeInMilliseconds();
     }
 }
 #endif

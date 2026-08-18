@@ -201,7 +201,7 @@ TgaHeader TgaSessionWriter::BuildHeader() const
     hdr.image_type = GetImageType();
     hdr.color_map_first_entry = 0;
     hdr.color_map_length = UsesColorMap()
-        ? static_cast<uint16_t>(GetColorMapLength())
+        ? GetColorMapLength()
         : 0;
     hdr.color_map_entry_size = UsesColorMap() ? 24 : 0;
     hdr.x_origin = 0;
@@ -435,7 +435,7 @@ bool TgaSessionWriter::WriteRleRow(const uint8_t* row, uint32_t width, uint32_t 
         if (std::fwrite(&header, 1, 1, file_) != 1)
             return false;
 
-        const size_t rawBytes = static_cast<size_t>(rawLen) * pixelBytes;
+        const size_t rawBytes = rawLen * pixelBytes;
         if (std::fwrite(row + rawStart * pixelBytes, 1, rawBytes, file_) != rawBytes)
             return false;
     }

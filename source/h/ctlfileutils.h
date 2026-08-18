@@ -52,7 +52,7 @@ namespace dynarithmic
     {
         enum { DRIVE_POS, DRIVE_PATH, DIRECTORY_POS, NAME_POS, EXTENSION_POS };
 
-        template <typename StringType, typename T>
+        template <typename StringType = DTWAIN_STRING_TYPE_, typename T>
         StringType PathGenericString(const T& x)
         {
             if constexpr (std::is_same_v<StringType, std::string>)
@@ -96,7 +96,7 @@ namespace dynarithmic
             }
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         std::vector<StringType> SplitPath(const StringType& str)
         {
             std::vector<StringType> sArrType;
@@ -110,7 +110,7 @@ namespace dynarithmic
             SplitPath(std::basic_string_view<CharType>(str), rArray);
         }
 
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType MakePath(const std::vector<StringType>& rArray)
         {
             if (rArray.size() < 5)
@@ -119,7 +119,7 @@ namespace dynarithmic
             const filesys::path dir(rArray[DIRECTORY_POS]);
             const filesys::path file = s;
             filesys::path full_path = dir / file;
-            return PathGenericString<StringType>(full_path);
+            return PathGenericString(full_path);
         }
 
         inline std::string CreateFileNameWithDateTime_Impl(std::string_view prefix, std::string_view ext, bool useUTC)
@@ -219,7 +219,7 @@ namespace dynarithmic
 
 
         // Create a file using the data and time within the file name
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType CreateFileNameWithDateTime(
             std::basic_string_view<typename StringType::value_type> prefix,
             std::basic_string_view<typename StringType::value_type> ext, bool useUTC = false)
@@ -240,19 +240,15 @@ namespace dynarithmic
         }
 
         ////////////////////////////////////////////////////////////////////////////
-        template <typename StringType>
+        template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType GetPageFileName(const StringType& strBase, int nCurImage, bool bUseLongNames)
         {
             StringType strFormat;
-            using CharType = typename StringType::value_type;
-            using StreamType = std::basic_ostringstream<CharType>;
-            StreamType strm{};
-            strm << nCurImage;
-            strFormat = strm.str();
+            strFormat = basicstringutils::ToString(nCurImage); 
             const int nLenFormat = static_cast<int>(strFormat.length());
 
             std::vector<StringType> rName = {};
-            SplitPath<StringType>(strBase, rName);
+            SplitPath(strBase, rName);
 
             auto strName = rName[NAME_POS];
 
@@ -263,7 +259,7 @@ namespace dynarithmic
                 if ((strName + strFormat).length() > 8)
                 {
                     int nBase = 8 - nLenFormat;
-                    strName = basicstringutils::Left<StringType>(strName, nBase) + strFormat;
+                    strName = basicstringutils::Left(strName, nBase) + strFormat;
                 }
                 else
                     strName += strFormat;

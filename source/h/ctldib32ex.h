@@ -204,8 +204,6 @@ namespace dynarithmic
             // Negate DIB
             int NegateDib();
 
-            static void ResolvePostscriptOptions(const DTWAINImageInfoEx& Info, int &nFormat );
-
             CTL_TwainDib();
             CTL_TwainDib(HANDLE hDib, HWND hWnd= nullptr);
             CTL_TwainDib(const CTL_TwainDib& rDib);

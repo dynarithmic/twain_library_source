@@ -25,7 +25,7 @@
 #include <memory>
 
 #include "twain.h"
-#include "ctltmpl4.h"
+#include "ctl10tuple.h"
 #include "mapdefs.h"
 #include "ctlstringdefs.h"
 

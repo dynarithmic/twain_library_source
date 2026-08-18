@@ -423,7 +423,7 @@ bool PnmSessionWriter::WriteGray16Plain() const
 
 bool PnmSessionWriter::WriteGray16Raw()
 {
-    rowBuffer_.resize(static_cast<size_t>(currentPage_.width) * 2);
+    rowBuffer_.resize(currentPage_.width * 2);
 
     for (uint32_t y = 0; y < currentPage_.height; ++y)
     {
@@ -482,7 +482,7 @@ bool PnmSessionWriter::WriteRgb24Plain() const
 
 bool PnmSessionWriter::WriteRgb24Raw()
 {
-    rowBuffer_.resize(static_cast<size_t>(currentPage_.width) * 3);
+    rowBuffer_.resize(currentPage_.width * 3);
 
     for (uint32_t y = 0; y < currentPage_.height; ++y)
     {
@@ -538,7 +538,7 @@ bool PnmSessionWriter::WriteRgba32AsRgbPlain() const
 
 bool PnmSessionWriter::WriteRgba32AsRgbRaw()
 {
-    rowBuffer_.resize(static_cast<size_t>(currentPage_.width) * 3);
+    rowBuffer_.resize(currentPage_.width * 3);
 
     for (uint32_t y = 0; y < currentPage_.height; ++y)
     {

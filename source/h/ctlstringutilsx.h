@@ -24,6 +24,9 @@
 #include <string>
 #include <vector>
 #include <string_view>
+#include <array>
+
+#include "ctlconstexprfind.h"
 
 namespace dynarithmic
 {
@@ -35,8 +38,26 @@ namespace dynarithmic
     // Convert a string into a byte array
     std::vector<unsigned char> HexStringToByteArray(std::string_view hexString);
 
+    // Function to convert a two-character hex string to a byte
+    constexpr unsigned char HexCharToByte(char c) noexcept
+    {
+        // create lookup table
+        constexpr std::array<std::pair<char, unsigned int>, 22> hexMap =
+        { {
+            {'0',0},{'1',1},{'2',2},{'3',3},{'4',4},{'5',5},{'6',6},{'7', 7},{'8',8},{'9',9},
+            {'A',10},{'B',11},{'C',12},{'D',13},{'E',14},{'F',15},
+            {'a',10},{'b',11},{'c',12},{'d',13},{'e',14},{'f',15}
+        } };
+
+        const auto foundVal = generic_array_finder_if(hexMap, [&](const auto& pr)
+            { return pr.first == c; });
+        if (foundVal.first)
+            return static_cast<unsigned char>(foundVal.second);
+        return 0;
+    }
+
     // Search and replace %1, %2, etc. placeholders with data
-    template <typename StringType, typename Container=std::vector<StringType>>
+    template <typename StringType = DTWAIN_STRING_TYPE_, typename Container=std::vector<StringType>>
     StringType ReplacePlaceHolders(const StringType& fmt, const Container& values)
     {
         using char_type = typename StringType::value_type;
@@ -73,7 +94,7 @@ namespace dynarithmic
         return result;
     }
 
-    template <typename StringType>
+    template <typename StringType = DTWAIN_STRING_TYPE_>
     StringType StringFromUChars(const std::make_unsigned_t<typename StringType::value_type>* val, std::size_t nSize)
     {
         if (!val || nSize == 0)
@@ -89,36 +110,9 @@ namespace dynarithmic
         return std::vector<std::make_unsigned_t<typename StringType::value_type>>(str.begin(), str.end());
     }
 
-
-    template <typename StringType, typename ByteType>
-    StringType BytesToHex(const ByteType* data, std::size_t size)
-    {
-        using CharType = typename StringType::value_type;
-
-        static constexpr CharType hexDigits[] =
-        {
-            CharType('0'), CharType('1'), CharType('2'), CharType('3'),
-            CharType('4'), CharType('5'), CharType('6'), CharType('7'),
-            CharType('8'), CharType('9'), CharType('a'), CharType('b'),
-            CharType('c'), CharType('d'), CharType('e'), CharType('f')
-        };
-
-        StringType result;
-        result.reserve(size * 2);
-
-        for (std::size_t i = 0; i < size; ++i)
-        {
-            unsigned char ch = static_cast<unsigned char>(data[i]);
-
-            result.push_back(hexDigits[ch >> 4]);
-            result.push_back(hexDigits[ch & 0x0F]);
-        }
-
-        return result;
-    }
-    template <typename StringType>
+    template <typename StringType = DTWAIN_STRING_TYPE_>
     StringType HexStringFromUChars(const std::make_unsigned_t<typename StringType::value_type>* val, 
-                                    size_t nSize)
+                                    size_t nSize, bool useUpperCase = false)
     {
         using CharType = typename StringType::value_type;
 
@@ -129,6 +123,18 @@ namespace dynarithmic
             CharType('8'), CharType('9'), CharType('a'), CharType('b'),
             CharType('c'), CharType('d'), CharType('e'), CharType('f')
         };
+
+        static constexpr CharType hexDigitsUpper[] =
+        {
+            CharType('0'), CharType('1'), CharType('2'), CharType('3'),
+            CharType('4'), CharType('5'), CharType('6'), CharType('7'),
+            CharType('8'), CharType('9'), CharType('A'), CharType('B'),
+            CharType('C'), CharType('D'), CharType('E'), CharType('F')
+        };
+
+        const CharType* pDigitsToUse = hexDigits;
+        if (useUpperCase)
+            pDigitsToUse = hexDigitsUpper;
 
         StringType result;
         result.reserve(nSize * 2);
@@ -137,8 +143,8 @@ namespace dynarithmic
         {
             unsigned char ch = static_cast<unsigned char>(val[i]);
 
-            result.push_back(hexDigits[ch >> 4]);
-            result.push_back(hexDigits[ch & 0x0F]);
+            result.push_back(pDigitsToUse[ch >> 4]);
+            result.push_back(pDigitsToUse[ch & 0x0F]);
         }
 
         return result;
@@ -146,7 +152,7 @@ namespace dynarithmic
 
     // If szInfo is nullptr, only the computed length is returned.
     // The length includes trailing null character.
-    template <typename StringType>
+    template <typename StringType = DTWAIN_STRING_TYPE_>
     int32_t CopyInfoToCString(const StringType& strInfo, 
                               typename StringType::value_type* szInfo, 
                               int32_t nMaxLen)

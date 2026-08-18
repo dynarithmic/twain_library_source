@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTMPL5_H
-#define CTLTMPL5_H
+#ifndef CTLGETSETCAPSINTERNAL_H
+#define CTLGETSETCAPSINTERNAL_H
 
 #include <utility>
 #include <vector>
@@ -47,7 +47,7 @@ namespace dynarithmic
     bool FindFirstValue( TypeInfo SearchVal, std::vector<TypeArray>* SearchArray, int *pWhere);
     CTL_CapInfo* GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap);
 
-    template <class T>
+    template <typename T>
     std::pair<bool, TW_UINT16> GetCapabilityValues( const CTL_ITwainSource *pSource,
                                 TW_UINT16 nCap,
                                 TW_UINT16 GetType,
@@ -56,7 +56,7 @@ namespace dynarithmic
                                 TW_UINT16 TwainDataType,
                                 std::vector<T> &rArray
                               );
-    template <class T>
+    template <typename T>
     std::pair<bool, TW_UINT16> GetCapabilityValues( const CTL_ITwainSource *pSource,
                              TW_UINT16 nCap,
                              TW_UINT16 GetType,
@@ -169,7 +169,7 @@ namespace dynarithmic
                         TW_UNI512 ThisString;
                         pGetTriplet->GetValue(ThisString, i );
                         StringArrayW *pArray = reinterpret_cast<StringArrayW*>(&rArray);
-                        pArray->push_back(reinterpret_cast<LPWSTR>(ThisString));
+                        pArray->push_back(ThisString);
                     }
                 }
             }
@@ -178,7 +178,7 @@ namespace dynarithmic
         return { false, rc };
     }
 
-    template <class T>
+    template <typename T>
     bool SetCapabilityValues( const CTL_ITwainSource *pSource,
                              TW_UINT16  nCap,
                              TW_UINT16 SetType,
@@ -186,7 +186,7 @@ namespace dynarithmic
                              TW_UINT16  nDataType,
                              std::vector<T> &rArray
                             );
-    template <class T>
+    template <typename T>
     bool SetCapabilityValues( const CTL_ITwainSource *pSource,
                              TW_UINT16  nCap,
                              TW_UINT16 SetType,
@@ -297,20 +297,20 @@ namespace dynarithmic
         return { false, DTWAIN_ERR_GETCAP_FAILED };
     }
 
-    template <class T>
+    template <typename T>
     bool SetOneCapValue(const CTL_ITwainSource* pSource, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType);
 
-    template <class T>
+    template <typename T>
     bool SetOneCapValue(const CTL_ITwainSource* pSource, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType)
     {
         std::vector<T> Array{dValue};
         return SetCapabilityValues(pSource, static_cast<TW_UINT16>(nCap), static_cast<TW_UINT16>(SetType), static_cast<UINT>(TwainContainer_ONEVALUE), nDataType, Array) ? true : false;
     }
 
-    template <class T>
+    template <typename T>
     bool SetOneCapValue(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType);
 
-    template <class T>
+    template <typename T>
     bool SetOneCapValue( DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT16 nCap, TW_UINT16 SetType, T dValue,TW_UINT16 nDataType)
     {
         CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);

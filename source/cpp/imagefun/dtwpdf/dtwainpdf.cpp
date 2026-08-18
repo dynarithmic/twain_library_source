@@ -42,6 +42,7 @@
 #include "jpeglib.h"
 #include "ctlhashutils.h"
 #include "ctlstringutilsx.h"
+#include "ctltimeutils.h"
 
 #undef Z_PREFIX
 #ifdef __MSL__
@@ -68,284 +69,274 @@
 
 using namespace dynarithmic;
 
-// Add DTWAIN stuff if internal to DTWAIN32.DLL
 #ifdef PDFLIB_INTERNAL
     #define IMGFUNC_IGNORE
     #include "ctltwainmanager.h"
-
-    #define WRITE_TO_LOG()
-#else
-    #define WRITE_TO_LOG()
 #endif
 #include "ctlstaticdata.h"
 
-#define EXTRA_OBJECTS   3
-
-static std::string GetPDFDate();
-static std::string CreateIDString(std::string_view sName, std::string& ID1, std::string& ID2);
-static std::string HexString(unsigned char *input, int length=-1);
-static std::string MakeCompatiblePDFString(std::string_view sString);
-std::string GetSystemTimeInMilliseconds();
-static bool IsRenderModeStroked(int rendermode);
-
-static int EncodeVectorStream(const std::vector<char>& InputStream,
-                                size_t InputLength,
-                                std::vector<char>& OutStream,
-                                PdfDocument::CompressTypes compresstype= PdfDocument::FLATE_COMPRESS);
-
-typedef std::array<std::array<double, 3>, 3> Matrix3_3;
-
-static uint8_t ReverseBits(uint8_t v)
+namespace
 {
-    v = static_cast<uint8_t>(((v & 0xF0) >> 4) | ((v & 0x0F) << 4));
-    v = static_cast<uint8_t>(((v & 0xCC) >> 2) | ((v & 0x33) << 2));
-    v = static_cast<uint8_t>(((v & 0xAA) >> 1) | ((v & 0x55) << 1));
-    return v;
+    std::string MakeDate(int year, int month, int day, int hour, int minutes, int seconds)
+    {
+        // Get current utc time
+        const boost::posix_time::ptime timeutc =
+            boost::posix_time::second_clock::universal_time();
+
+        // get time zone difference
+        auto utchour_diff = hour - timeutc.time_of_day().hours();
+
+        char negValue = '+';
+        if (utchour_diff < 0)
+            negValue = '-';
+        utchour_diff = abs(utchour_diff);
+        auto utcminute_diff = minutes - timeutc.time_of_day().minutes();
+        if (utcminute_diff < 0)
+            utcminute_diff = 0;
+
+        // Make the string
+        char szBuf[255];
+        sprintf(szBuf, "D:%4d%02d%02d%02d%02d%02d%c%02d'%02d'", year, month, day, hour, minutes, seconds, negValue, static_cast<int>(utchour_diff), static_cast<int>(utcminute_diff));
+        return szBuf;
+    }
+
+    std::string GetPDFDate()
+    {
+        time_t curtime;
+
+        // Get the current time...
+        curtime = time(nullptr);
+        const struct tm* timenow = localtime(&curtime);
+
+        return MakeDate(1900 + timenow->tm_year,
+            timenow->tm_mon + 1,
+            timenow->tm_mday,
+            timenow->tm_hour, timenow->tm_min, timenow->tm_sec);
+    };
+
+    std::string HexString(unsigned char* input, int length/*=-1*/)
+    {
+        if (length == -1)
+            length = static_cast<int>(strlen(reinterpret_cast<const char*>(input)));
+        return HexStringFromUChars<std::string>(input, length, true);
+    }
+
+    std::string CreateIDString(std::string_view sName, std::string& ID1, std::string& ID2)
+    {
+        char szBuf[1024];
+        char szBuf2[] = "001";
+        const std::string sNow = GetPDFDate();
+        sprintf(szBuf, "%s-%s", sNow.c_str(), sName.data());
+        std::vector<unsigned char> hash =
+        MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf), strlen(szBuf));
+        hash.resize(32, '\0');
+        std::vector<unsigned char> version =
+        MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf2), strlen(szBuf2));
+        version.resize(32, '\0');
+        std::string hexHash;
+        hexHash.append(HexString(hash.data(), 32).data(), 32);
+        std::string hexVersion;
+        hexVersion.append(HexString(version.data(), 32).data(), 32);
+        sprintf(szBuf, "[<%s> <%s>]", hexHash.c_str(), hexVersion.c_str());
+        ID1 = hexHash;
+        ID2 = hexVersion;
+        return szBuf;
+    }
+
+    std::string MakeCompatiblePDFString(std::string_view sString)
+    {
+        // Search for forward slash and replace with two forward slashes
+        std::string sNew;
+        sNew.reserve(100);
+
+        unsigned char nChars[] = { 0x09, 0x0d, 0x0a, 0x0c, 0x08, 0x28, 0x29 };
+
+        std::string::difference_type nEscapes[sizeof(nChars)] = { 0 };
+        std::vector<unsigned char> nEscapeChar(sizeof(nChars));
+        std::copy_n(nChars, sizeof(nChars), nEscapeChar.begin());
+
+        const std::string::difference_type nForward = std::count(sString.begin(), sString.end(), '\\');
+        std::string::difference_type sum = 0;
+
+        for (int i = 0; i < sizeof(nChars); ++i)
+        {
+            nEscapes[i] = std::count(sString.begin(), sString.end(), nEscapeChar[i]);
+            sum += nEscapes[i];
+        }
+
+        if (nForward + sum > 0)
+        {
+            auto it1 = sString.begin();
+            auto it2 = sString.end();
+
+            while (it1 != it2)
+            {
+                bool addit = true;
+                if (*it1 == '\\')
+                    sNew += '\\';
+                else
+                {
+                    auto found = std::find(nEscapeChar.begin(), nEscapeChar.end(), *it1);
+
+                    if (found != nEscapeChar.end())
+                    {
+                        const char* nEscapeString[] = { "\\t", "\\r", "\\n", "\\f", "\\b", "(", ")" };
+                        const int dist = std::distance(nEscapeChar.begin(), found);
+                        sNew += nEscapeString[dist];
+                        addit = false;
+                    }
+                }
+                if (addit)
+                    sNew += *it1;
+                ++it1;
+            }
+        }
+        else
+            sNew = sString;
+
+        // prepend all parens with / characters
+        std::string sNew2;
+        std::string::const_iterator it3 = sNew.begin();
+        const std::string::const_iterator it4 = sNew.end();
+        while (it3 != it4)
+        {
+            if (*it3 == '(' || *it3 == ')')
+                sNew2 += "\\";
+            sNew2 += *it3;
+            ++it3;
+        }
+        return sNew2;
+    }
+
+    bool IsRenderModeStroked(int rendermode)
+    {
+        return rendermode == 1 ||
+            rendermode == 2 ||
+            rendermode == 5 ||
+            rendermode == 6;
+    }
+
+    int NoCompress(std::string_view inData, std::string& outData)
+    {
+        outData = inData;
+        return 1;
+    }
+
+    int EncodeVectorStream(const std::vector<char>& InputStream,
+                           size_t InputLength, std::vector<char>& OutStream, PdfDocument::CompressTypes compresstype)
+    {
+        static std::array<
+            std::pair<PdfDocument::CompressTypes, std::function<int(std::string_view, std::string&)>>, 4>
+            compress_fn = { {{ PdfDocument::NO_COMPRESS, NoCompress},
+                            { PdfDocument::A85_COMPRESS, ASCII85Encode},
+                            { PdfDocument::AHEX_COMPRESS, ASCIIHexEncode},
+                            { PdfDocument::FLATE_COMPRESS, FlateEncode },} };
+
+        auto iter = generic_array_finder_if(compress_fn, [&](const auto& pr) { return pr.first == compresstype; });
+        if (iter.first)
+        {
+            auto fnCall = compress_fn[iter.second].second;
+            std::string sTemp;
+            std::string sOut;
+            sTemp.append(InputStream.data(), InputLength);
+            fnCall(sTemp, sOut);
+            OutStream.resize(sOut.size());
+            std::copy(sOut.begin(), sOut.end(), OutStream.begin());
+            return 1;
+        }
+        return 0;
+    }
+
+    uint8_t ReverseBits(uint8_t v)
+    {
+        v = static_cast<uint8_t>(((v & 0xF0) >> 4) | ((v & 0x0F) << 4));
+        v = static_cast<uint8_t>(((v & 0xCC) >> 2) | ((v & 0x33) << 2));
+        v = static_cast<uint8_t>(((v & 0xAA) >> 1) | ((v & 0x55) << 1));
+        return v;
+    }
+
+    void ReverseBitsInRow(uint8_t* row, uint32 rowBytes)
+    {
+        for (uint32 i = 0; i < rowBytes; ++i)
+            row[i] = ReverseBits(row[i]);
+    }
+
+    using Matrix3_3 = std::array<std::array<double, 3>, 3>;
+
+    Matrix3_3 MultiplyMatrix33(const Matrix3_3& A, const Matrix3_3& B)
+    {
+        Matrix3_3 C;
+        const double a00 = A[0][0], a01 = A[0][1], a02 = A[0][2];
+        const double a10 = A[1][0], a11 = A[1][1], a12 = A[1][2];
+        const double a20 = A[2][0], a21 = A[2][1], a22 = A[2][2];
+
+        const double b00 = B[0][0], b01 = B[0][1], b02 = B[0][2];
+        const double b10 = B[1][0], b11 = B[1][1], b12 = B[1][2];
+        const double b20 = B[2][0], b21 = B[2][1], b22 = B[2][2];
+
+        C[0][0] = a00 * b00 + a01 * b10 + a02 * b20;
+        C[0][1] = a00 * b01 + a01 * b11 + a02 * b21;
+        C[0][2] = a00 * b02 + a01 * b12 + a02 * b22;
+
+        C[1][0] = a10 * b00 + a11 * b10 + a12 * b20;
+        C[1][1] = a10 * b01 + a11 * b11 + a12 * b21;
+        C[1][2] = a10 * b02 + a11 * b12 + a12 * b22;
+
+        C[2][0] = a20 * b00 + a21 * b10 + a22 * b20;
+        C[2][1] = a20 * b01 + a21 * b11 + a22 * b21;
+        C[2][2] = a20 * b02 + a21 * b12 + a22 * b22;
+        return C;
+    }
+
+    std::string MakeLandscapeMediaBox(const std::string& sBox)
+    {
+        double f1[4];
+        char szBuf[50];
+        std::string sStart = sBox.substr(1, sBox.length() - 2);
+        sscanf(sStart.c_str(), "%lf%lf%lf%lf", &f1[0], &f1[1], &f1[2], &f1[3]);
+        sprintf(szBuf, "%-5.2lf %-5.2lf %-5.2lf %-5.2lf", f1[0], f1[1], f1[3], f1[2]);
+        sStart = "[";
+        sStart += szBuf;
+        sStart += "]";
+        return sStart;
+    }
+
+    std::string MakeCompatiblePDFString(const PDFEncryption::UCHARArray& u)
+    {
+        const std::string sTemp(reinterpret_cast<const char*>(u.data()), u.size());
+        return MakeCompatiblePDFString(sTemp);
+    }
+
+    bool RemoveCurrentText(const PDFTextElement* element)
+    {
+        return (*element).displayFlags & DTWAIN_PDFTEXT_CURRENTPAGE ? true : false;
+    }
+
+    bool SortFontsByNumber(const PDFFont& left, const PDFFont& right)
+    {
+        return left.refNum < right.refNum;
+    }
+
+    bool SortByRefNum(ObjectInfo first, ObjectInfo second)
+    {
+        return first.ObjNum < second.ObjNum;
+    }
+
+    bool GetMaxFontRefNumInternal(const std::pair<unsigned int, PDFFont>& left,
+                                 const std::pair<unsigned int, PDFFont>& right)
+    {
+        return left.second.refNum < right.second.refNum;
+    }
+
+    char converttobin(char ch)
+    {
+        return static_cast<char>(256 - ch);
+    }
 }
 
-static void ReverseBitsInRow(uint8_t* row, uint32 rowBytes)
-{
-    for (uint32 i = 0; i < rowBytes; ++i)
-        row[i] = ReverseBits(row[i]);
-}
-
-static Matrix3_3 MultiplyMatrix33(const Matrix3_3 & A, const Matrix3_3 & B)
-{
-    Matrix3_3 C;
-    const double a00 = A[0][0], a01 = A[0][1], a02 = A[0][2];
-    const double a10 = A[1][0], a11 = A[1][1], a12 = A[1][2];
-    const double a20 = A[2][0], a21 = A[2][1], a22 = A[2][2];
-
-    const double b00 = B[0][0], b01 = B[0][1], b02 = B[0][2];
-    const double b10 = B[1][0], b11 = B[1][1], b12 = B[1][2];
-    const double b20 = B[2][0], b21 = B[2][1], b22 = B[2][2];
-
-    C[0][0] = a00 * b00 + a01 * b10 + a02 * b20;
-    C[0][1] = a00 * b01 + a01 * b11 + a02 * b21;
-    C[0][2] = a00 * b02 + a01 * b12 + a02 * b22;
-
-    C[1][0] = a10 * b00 + a11 * b10 + a12 * b20;
-    C[1][1] = a10 * b01 + a11 * b11 + a12 * b21;
-    C[1][2] = a10 * b02 + a11 * b12 + a12 * b22;
-
-    C[2][0] = a20 * b00 + a21 * b10 + a22 * b20;
-    C[2][1] = a20 * b01 + a21 * b11 + a22 * b21;
-    C[2][2] = a20 * b02 + a21 * b12 + a22 * b22;
-    return C;
-}
 
 std::vector<char> ImageObject::m_vImgStream;
 unsigned int ImageObject::m_sTiffOffset;
-
-std::string HexString(unsigned char *input, int length/*=-1*/)
-{
-    std::string sOut;
-    if ( length == -1 )
-        length = static_cast<int>(strlen(reinterpret_cast<const char*>(input)));
-    ASCIIHexEncode(std::string(reinterpret_cast<const char*>(input), length), sOut);
-    if (!sOut.empty())
-        sOut.pop_back();
-    return sOut;
-}
-
-std::string CreateIDString(std::string_view sName, std::string& ID1, std::string& ID2)
-{
-    char szBuf[1024];
-    char szBuf2[] = "001";
-    const std::string sNow = GetPDFDate();
-    WRITE_TO_LOG()
-    sprintf(szBuf, "%s-%s", sNow.c_str(), sName.data());
-    WRITE_TO_LOG()
-    std::vector<unsigned char> hash = 
-        MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf), strlen(szBuf));
-    hash.resize(32,'\0');
-    WRITE_TO_LOG()
-    std::vector<unsigned char> version = 
-        MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf2), strlen(szBuf2));
-    version.resize(32,'\0');
-    WRITE_TO_LOG()
-    std::string hexHash;
-    WRITE_TO_LOG()
-    hexHash.append(HexString(hash.data(), 32).data(), 32);
-    WRITE_TO_LOG()
-    std::string hexVersion;
-    WRITE_TO_LOG()
-    hexVersion.append(HexString(version.data(), 32).data(), 32);
-    WRITE_TO_LOG()
-
-    sprintf(szBuf, "[<%s> <%s>]", hexHash.c_str(), hexVersion.c_str());
-    WRITE_TO_LOG()
-    ID1 = hexHash;
-    WRITE_TO_LOG()
-    ID2 = hexVersion;
-    WRITE_TO_LOG()
-    return szBuf;
-}
-
-static std::string MakeLandscapeMediaBox(const std::string& sBox)
-{
-    double f1[4];
-    char szBuf[50];
-    std::string sStart = sBox.substr(1, sBox.length() - 2);
-    sscanf(sStart.c_str(), "%lf%lf%lf%lf", &f1[0], &f1[1], &f1[2], &f1[3]);
-    sprintf(szBuf, "%-5.2lf %-5.2lf %-5.2lf %-5.2lf", f1[0], f1[1], f1[3], f1[2]);
-    sStart = "[";
-    sStart += szBuf;
-    sStart += "]";
-    return sStart;
-}
-
-std::string MakeCompatiblePDFString(const PDFEncryption::UCHARArray& u)
-{
-    const std::string sTemp(reinterpret_cast<const char*>(u.data()), u.size());
-    return MakeCompatiblePDFString(sTemp);
-}
-
-std::string MakeCompatiblePDFString(std::string_view sString)
-{
-    // Search for forward slash and replace with two forward slashes
-    std::string sNew;
-    sNew.reserve(100);
-
-    unsigned char nChars[] = { 0x09, 0x0d, 0x0a, 0x0c, 0x08, 0x28, 0x29 };
-    const char* nEscapeString[] = { "\\t", "\\r", "\\n", "\\f", "\\b", "(", ")" };
-
-    std::string::difference_type nEscapes[sizeof(nChars)] = {0};
-    std::vector<unsigned char> nEscapeChar(sizeof(nChars));
-    std::copy_n(nChars, sizeof(nChars), nEscapeChar.begin());
-
-    const std::string::difference_type nForward = std::count(sString.begin(), sString.end(), '\\');
-    std::string::difference_type sum = 0;
-
-    for (int i = 0; i < sizeof(nChars); ++i)
-    {
-        nEscapes[i] = std::count(sString.begin(), sString.end(), nEscapeChar[i]);
-        sum += nEscapes[i];
-    }
-
-    if (nForward + sum > 0)
-    {
-        auto it1 = sString.begin();
-        auto it2 = sString.end();
-
-        while (it1 != it2)
-        {
-            bool addit = true;
-            if (*it1 == '\\')
-                sNew += '\\';
-            else
-            {
-                auto found = std::find(nEscapeChar.begin(), nEscapeChar.end(), *it1);
-
-                if (found != nEscapeChar.end())
-                {
-                    const int dist = static_cast<int>(std::distance(nEscapeChar.begin(), found));
-                    sNew += nEscapeString[dist];
-                    addit = false;
-                }
-            }
-            if (addit)
-                sNew += *it1;
-            ++it1;
-        }
-    }
-    else
-        sNew = sString;
-
-    // prepend all parens with / characters
-    std::string sNew2;
-    std::string::const_iterator it3 = sNew.begin();
-    const std::string::const_iterator it4 = sNew.end();
-    while (it3 != it4)
-    {
-        if (*it3 == '(' || *it3 == ')')
-            sNew2 += "\\";
-        sNew2 += *it3;
-        ++it3;
-    }
-    return sNew2;
-}
-
-static int NoCompress(std::string_view inData, std::string& outData)
-{
-    outData = inData;
-    return 1;
-}
-
-static int EncodeVectorStream(const std::vector<char>& InputStream,
-                              size_t InputLength,std::vector<char>& OutStream,PdfDocument::CompressTypes compresstype)
-{
-    static std::array<
-        std::pair<PdfDocument::CompressTypes, std::function<int(std::string_view, std::string&)>>,4>
-        compress_fn = { {{ PdfDocument::NO_COMPRESS, NoCompress},
-                        { PdfDocument::A85_COMPRESS, ASCII85Encode},
-                        { PdfDocument::AHEX_COMPRESS, ASCIIHexEncode},
-                        { PdfDocument::FLATE_COMPRESS, FlateEncode },}};
-
-    auto iter = generic_array_finder_if(compress_fn, [&](const auto& pr) { return pr.first == compresstype; });
-    if ( iter.first)
-    {
-        auto fnCall = compress_fn[iter.second].second;
-        std::string sTemp;
-        std::string sOut;
-        sTemp.append(InputStream.data(), InputLength);
-        fnCall(sTemp, sOut);
-        OutStream.resize(sOut.size());
-        std::copy(sOut.begin(), sOut.end(), OutStream.begin());
-        return 1;
-    }
-    return 0;
-}
-
-static std::string MakeDate(int year, int month, int day, int hour, int minutes,int seconds)
-{
-    // Get current utc time
-    const boost::posix_time::ptime timeutc =
-        boost::posix_time::second_clock::universal_time();
-
-    // get time zone difference
-    auto utchour_diff = hour - timeutc.time_of_day().hours();
-
-    char negValue = '+';
-    if ( utchour_diff < 0 )
-        negValue = '-';
-    utchour_diff = abs(utchour_diff);
-    auto utcminute_diff = minutes - timeutc.time_of_day().minutes();
-    if ( utcminute_diff < 0 )
-        utcminute_diff = 0;
-
-    // Make the string
-    char szBuf[255];
-    sprintf(szBuf, "D:%4d%02d%02d%02d%02d%02d%c%02d'%02d'", year, month, day, hour, minutes, seconds, negValue, static_cast<int>(utchour_diff), static_cast<int>(utcminute_diff));
-    return szBuf;
-}
-
-std::string GetSystemTimeInMilliseconds()
-{
-    const boost::posix_time::ptime time_t_epoch(boost::gregorian::date(1601, 1, 1));
-    const auto systimex = boost::get_system_time();
-    const boost::posix_time::time_duration diff = systimex - time_t_epoch;
-    const auto mill = diff.total_milliseconds() * 10000LL;
-    StringStreamOutA strm;
-    strm << mill;
-    return strm.str();
-}
-
-static std::string GetPDFDate()
-{
-    time_t curtime;
-
-    // Get the current time...
-    curtime = time (nullptr);
-    const struct tm* timenow = static_cast<tm*>(localtime(&curtime));
-
-    return MakeDate (1900 + timenow->tm_year,
-             timenow->tm_mon + 1,
-             timenow->tm_mday,
-             timenow->tm_hour, timenow->tm_min, timenow->tm_sec);
-
-};
-
 
 int PDFObject::EncryptBlock(std::string_view sIn, std::string& sOut, int objectnum, int gennum) const
 {
@@ -382,7 +373,7 @@ PdfDocument::PdfDocument() :
     m_byteOffset(0),
     m_sPDFVer("1.3"),
     m_sPDFHeader("DTWAIN PDF, 2025"),
-    m_sCurSysTime(GetSystemTimeInMilliseconds()),
+    m_sCurSysTime(timeutils::GetSystemTimeInMilliseconds()),
     m_nPolarity(DTWAIN_PDFPOLARITY_POSITIVE),
     m_nCurContentsObj(0),
     m_nCurObjNum(0),
@@ -431,12 +422,6 @@ void PdfDocument::SetPDFVersion(int major, int minor)
     m_sPDFVer = strm.str();
 }
 
-char converttobin(char ch)
-{
-    return static_cast<char>(256 - ch);
-}
-
-
 std::string PdfDocument::GetBinaryHeader() const
 {
     std::string sBinHeader = m_sPDFHeader;
@@ -465,7 +450,6 @@ bool PdfDocument::WriteHeaderInfo()
 
 bool PdfDocument::OpenNewPDFFile(CTL_StringType sFile)
 {
-    WRITE_TO_LOG()
     // Open the file here
     {
         CTL_StringStreamType strm;
@@ -474,15 +458,11 @@ bool PdfDocument::OpenNewPDFFile(CTL_StringType sFile)
     }
 
     m_outFile.open(sFile, std::ios::binary|std::ios::out);
-    WRITE_TO_LOG()
     if ( !m_outFile )
         return false;
-    WRITE_TO_LOG()
     m_sOutputFileName = std::move(sFile);
-    WRITE_TO_LOG()
     // Get the document ID for this file
     CreateIDString(stringconversion::Convert_Native_To_Ansi(m_sOutputFileName), m_DocumentID[0], m_DocumentID[1]);
-    WRITE_TO_LOG()
     return true;
 }
 
@@ -495,11 +475,6 @@ void PdfDocument::SetSearchableText(std::string_view /*s*/)
     tElement.SetInvisible();
     tElement.displayFlags = DTWAIN_PDFTEXT_CURRENTPAGE;
     m_vPDFText.push_back(tElement);*/
-}
-
-bool RemoveCurrentText(const PDFTextElement* element)
-{
-    return (*element).displayFlags & DTWAIN_PDFTEXT_CURRENTPAGE?true:false;
 }
 
 void PdfDocument::RemoveTempTextElements()
@@ -686,12 +661,6 @@ bool PdfDocument::WritePage(CTL_StringType sImgFileName)
     return true;
 }
 
-bool GetMaxFontRefNumInternal(const std::pair<unsigned int, PDFFont>& left,
-                              const std::pair<unsigned int, PDFFont>& right)
-{
-    return left.second.refNum < right.second.refNum;
-}
-
 unsigned int PdfDocument::GetMaxFontRefNumber() const
 {
     if ( m_mapFontNumbers.empty() )
@@ -777,11 +746,6 @@ bool PdfDocument::StartPDFCreation(int majorv, int minorv)
     return true;
 }
 
-bool SortByRefNum(ObjectInfo first, ObjectInfo second)
-{
-    return first.ObjNum < second.ObjNum;
-}
-
 void PdfDocument::SortObjects()
 {
     sort(m_vAllOffsets.begin(), m_vAllOffsets.end(), SortByRefNum);
@@ -860,11 +824,6 @@ void PdfDocument::CreateFontNumbersFromTextElements()
         }
     }
 //    CurFontRefNum = firstFontRef;
-}
-
-bool SortFontsByNumber(const PDFFont& left, const PDFFont& right)
-{
-    return left.refNum < right.refNum;
 }
 
 std::string PdfDocument::GenerateFontDictionary(int firstObjNum, int& nextObjNum)
@@ -1206,13 +1165,6 @@ void EncryptionObject::ComposeObject()
     }
 }
 
-bool IsRenderModeStroked(int rendermode)
-{
-    return rendermode == 1 ||
-        rendermode == 2 ||
-        rendermode == 5 ||
-        rendermode == 6;
-}
 
 std::string PDFTextElement::GetPDFTextString() const
 {
@@ -1233,7 +1185,6 @@ std::string PDFTextElement::GetPDFTextString() const
     // Get the position
     sprintf(szBuf, "\n1 0 0 1 %lf %lf Tm\n", xpos, ypos);
 
-//    sprintf(szBuf, "\n%d %d Td ", xpos, ypos);
     sText += szBuf;
 
     // Get the character spacing
@@ -1687,7 +1638,7 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
     }
     fclose (infile);
 
-    unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
+    unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), m_imgLengthInBytes);
 
     m_nCurCRCVal = crcVal;
     return true;
@@ -1715,8 +1666,8 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
 
     switch (samplesPerPixel)
     {
-    case 1:  m_sColorSpace = "DeviceGray"; break;
-    default: m_sColorSpace = "DeviceRGB";  break;
+        case 1:  m_sColorSpace = "DeviceGray"; break;
+        default: m_sColorSpace = "DeviceRGB";  break;
     }
 
     TIFFGetField(image, TIFFTAG_IMAGEWIDTH, &width);
@@ -1766,20 +1717,17 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
     m_imgLengthInBytes = static_cast<unsigned long>(m_vImgStream.size());
 
     const std::vector<char> tempRealData = m_vImgStream;
-    EncodeVectorStream(tempRealData,
-        m_imgLengthInBytes,
-        m_vImgStream,
-        PdfDocument::FLATE_COMPRESS);
+    EncodeVectorStream(tempRealData, m_imgLengthInBytes, m_vImgStream,
+            PdfDocument::FLATE_COMPRESS);
 
     m_imgLengthInBytes = static_cast<unsigned long>(m_vImgStream.size());
-    const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
+    const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), m_imgLengthInBytes);
     m_nCurCRCVal = crcVal;
     TIFFClose(image);
     return true;
 }
 void ImageObject::ComposeObject()
 {
-
     char szBuf[255];
     SetContents("<< /Type /XObject\n"
                 "   /Subtype /Image\n"
@@ -1964,7 +1912,7 @@ void PageObject::ComposeObject()
 
     // Get the CRC for the page contents
     std::vector<unsigned char> v(sConstantText.begin(), sConstantText.end());
-    m_CRCValue = crc32_aux(v.data(), static_cast<unsigned>(v.size()));
+    m_CRCValue = crc32_aux(v.data(), v.size());
 }
 
 
@@ -2034,7 +1982,7 @@ void PdfDocument::SetEncryption(CTL_StringViewType ownerPassword,
         m_bIsStrongEncryption = true; // always uses strong encryption for AES
     }
 
-    const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
+    const std::string s = timeutils::GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
     auto docIDHash = MD5Hasher().GetHash(reinterpret_cast<const unsigned char*>(s.c_str()), s.size());
     const std::string dID = HexStringFromUChars<std::string>(docIDHash.data(), docIDHash.size());
     m_DocumentID[0] = dID;

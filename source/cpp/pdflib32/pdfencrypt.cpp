@@ -36,8 +36,8 @@ OF THIRD PARTY RIGHTS.
 #include "ctlhashutils.h"
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
+#include "ctltimeutils.h"
 
-std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
 #endif
@@ -830,7 +830,7 @@ void PDFEncryptionAES::EncryptInternal(std::string_view dataIn, std::string& dat
     {
         // we need to add padding bytes (PKCS#7)
         extraPadding = true;
-        auto nearest16 = dynarithmic::RoundUpToNearest(static_cast<uint32_t>(dataIn.size()), 16U);
+        auto nearest16 = dynarithmic::RoundUpToNearest(dataIn.size(), 16U);
         if (dataIn.size() % 16 == 0)
         {
             paddingByte = 0x10;

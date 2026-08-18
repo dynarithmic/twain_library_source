@@ -29,6 +29,20 @@
 
 using namespace dynarithmic;
 
+namespace
+{
+    struct LogWin_DestroyTraits
+    {
+        static void Destroy(LPSTR p)
+        {
+            if (p)
+                LocalFree(p);
+        }
+    };
+
+    using LogMsg_RAII = DTWAIN_RAII<LPSTR, LogWin_DestroyTraits>;
+}
+
 namespace dynarithmic
 {
     bool UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle)
@@ -112,17 +126,6 @@ namespace dynarithmic
                 loggerRef.m_pLoggerCallback_UserDataA);
         #endif
     }
-
-    struct LogWin_DestroyTraits
-    {
-        static void Destroy(LPSTR p)
-        {
-            if (p)
-                LocalFree(p);
-        }
-    };
-
-    using LogMsg_RAII = DTWAIN_RAII<LPSTR, LogWin_DestroyTraits>;
 
     std::string LogWin32Error(DWORD lastError)
     {
@@ -351,7 +354,7 @@ extern "C"
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLogSaveThreshold(LONG64 lineCount)
     {
         LOG_FUNC_ENTRY_PARAMS((lineCount))
-        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         if (lineCount <= 0)
             lineCount = -1LL;
         CTL_StaticData::GetLogFileSaveThreshold() = lineCount;

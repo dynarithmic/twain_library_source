@@ -159,7 +159,7 @@ namespace
     const BYTE* GetRowPointer(const DibContext& ctx, int y)
     {
         if (ctx.topDown)
-            return ctx.bits + static_cast<std::ptrdiff_t>(y) * ctx.stride;
+            return ctx.bits + y * ctx.stride;
 
         const int physicalRow = ctx.height - 1 - y;
         return ctx.bits + static_cast<std::ptrdiff_t>(physicalRow) * ctx.stride;
@@ -468,7 +468,7 @@ namespace
             for (int x = ctx.left; x < ctx.right; ++x)
             {
                 const auto* pPix = reinterpret_cast<const std::uint16_t*>(
-                    row + static_cast<std::ptrdiff_t>(x) * 2);
+                    row + x * 2);
 
                 BYTE r = 0, g = 0, b = 0;
                 Decode16BPP_Pixel(ctx, *pPix, r, g, b);
@@ -489,7 +489,7 @@ namespace
             for (int x = ctx.left; x < ctx.right; ++x)
             {
                 const auto* pPix = reinterpret_cast<const std::uint16_t*>(
-                    row + static_cast<std::ptrdiff_t>(x) * 2);
+                    row + x * 2);
 
                 BYTE r = 0, g = 0, b = 0;
                 Decode16BPP_Pixel(ctx, *pPix, r, g, b);
@@ -512,7 +512,7 @@ namespace
             const BYTE* row = GetRowPointer(ctx, y);
             for (int x = ctx.left; x < ctx.right; ++x)
             {
-                const BYTE* px = row + static_cast<std::ptrdiff_t>(x) * ctx.bytesPerPixel;
+                const BYTE* px = row + x * ctx.bytesPerPixel;
                 const int gray = ComputeGray(px[2], px[1], px[0]);
                 ++hist[gray];
             }
@@ -528,7 +528,7 @@ namespace
             const BYTE* row = GetRowPointer(ctx, y);
             for (int x = ctx.left; x < ctx.right; ++x)
             {
-                const BYTE* px = row + static_cast<std::ptrdiff_t>(x) * ctx.bytesPerPixel;
+                const BYTE* px = row + x * ctx.bytesPerPixel;
                 const int gray = ComputeGray(px[2], px[1], px[0]);
 
                 const bool isBackground = (std::abs(gray - bgGray) <= tol);

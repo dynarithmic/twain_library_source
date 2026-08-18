@@ -20,7 +20,7 @@
  */
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
-#include "../h/cppfunc.h"
+#include "cppfunc.h"
 #include "ctlstringutilsx.h"
 #include "ctldtwainhandle.h"
 

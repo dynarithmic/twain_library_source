@@ -28,7 +28,7 @@ void ParamOutputter::LogType(std::string_view outStr, const char* ptr)
     // ptr must be a pointer to a valid null terminated string, or nullptr.
     if (ptr)
         strm << outStr << "=\"" << TruncateStringWithMore(ptr, 256)
-        << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")" << std::dec;
+        << "\" (" << basicstringutils::PointerToString<std::string>(ptr) << ")" << std::dec;
     else
         strm << outStr << "=(null)";
 }
@@ -39,7 +39,7 @@ void ParamOutputter::LogType(std::string_view outStr, const wchar_t* ptr)
     if (ptr)
         strm << outStr << "=\"" <<
         TruncateStringWithMore(basicstringutils::Narrow(ptr), 256) <<
-        "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")" << std::dec;
+        "\" (" << basicstringutils::PointerToString<std::string>(ptr) << ")" << std::dec;
     else
         strm << outStr << "=(null)";
 }

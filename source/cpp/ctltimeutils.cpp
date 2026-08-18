@@ -18,9 +18,24 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTMPL3_H
-#define CTLTMPL3_H
 
-#include "ctliface.h"
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/thread/thread_time.hpp>
+#include "ctltimeutils.h"
 
-#endif
+namespace dynarithmic
+{
+    namespace timeutils
+    {
+        std::string GetSystemTimeInMilliseconds()
+        {
+            constexpr boost::posix_time::ptime time_t_epoch(boost::gregorian::date(1601, 1, 1));
+            const auto systimex = boost::get_system_time();
+            const boost::posix_time::time_duration diff = systimex - time_t_epoch;
+            const auto mill = diff.total_milliseconds() * 10000LL;
+            std::ostringstream strm;
+            strm << mill;
+            return strm.str();
+        }
+    }
+}

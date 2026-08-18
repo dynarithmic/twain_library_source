@@ -615,39 +615,39 @@ void AES::XorBlocks(const unsigned char *a, const unsigned char *b,
 std::vector<unsigned char> AES::EncryptECB(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key) 
 {
-   return EncryptECB(in.data(), static_cast<unsigned int>(in.size()), key.data());
+   return EncryptECB(in.data(), in.size(), key.data());
 }
 
 std::vector<unsigned char> AES::DecryptECB(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key) 
 {
-    return DecryptECB(in.data(), static_cast<unsigned int>(in.size()), key.data());
+    return DecryptECB(in.data(), in.size(), key.data());
 }
 
 std::vector<unsigned char> AES::EncryptCBC(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key,
                                            const std::vector<unsigned char>& iv) 
 {
-   return EncryptCBC(in.data(), static_cast<unsigned int>(in.size()), key.data(), iv.data());
+   return EncryptCBC(in.data(), in.size(), key.data(), iv.data());
 }
 
 std::vector<unsigned char> AES::DecryptCBC(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key,
                                            const std::vector<unsigned char>& iv) 
 {
-    return DecryptCBC(in.data(), static_cast<unsigned int>(in.size()), key.data(), iv.data());
+    return DecryptCBC(in.data(), in.size(), key.data(), iv.data());
 }
 
 std::vector<unsigned char> AES::EncryptCFB(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key,
                                            const std::vector<unsigned char>& iv) 
 {
-    return EncryptCFB(in.data(), static_cast<unsigned int>(in.size()), key.data(), iv.data());
+    return EncryptCFB(in.data(), in.size(), key.data(), iv.data());
 }
 
 std::vector<unsigned char> AES::DecryptCFB(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key,
                                            const std::vector<unsigned char>& iv) 
 {
-    return DecryptCFB(in.data(), static_cast<unsigned int>(in.size()), key.data(), iv.data());
+    return DecryptCFB(in.data(), in.size(), key.data(), iv.data());
 }

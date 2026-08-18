@@ -22,9 +22,7 @@
 #define CTLTR038_H
 
 #include "ctltripletbase.h"
-
-#include <vector>
-#include <map>
+#include "ctlarraydefs.h"
 #include "ctlmapdefs.h"
 
 namespace dynarithmic
@@ -67,8 +65,7 @@ namespace dynarithmic
 
             ~CTL_ExtImageInfoTriplet() override;
 
-            static bool EnumSupported(CTL_ITwainSource *pSource,
-                                      CTL_IntArray &rArray);
+            static bool EnumSupported(CTL_ITwainSource *pSource, CTL_IntArray &rArray);
 
             auto& RetrieveInfo() noexcept { return m_ExtInfoMap; } 
             bool HasRetrievedInfo() const { return m_bRetrievedInfo; }

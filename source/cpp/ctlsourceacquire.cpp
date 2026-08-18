@@ -742,7 +742,7 @@ namespace dynarithmic
                         lFileFlags = lMode | DTWAIN_USELONGNAME;
 
                     // Allocate for array
-                    auto pArray = static_cast<DTWAIN_ARRAY>(pSource->GetFileEnumerator());
+                    auto pArray = pSource->GetFileEnumerator();
                     if (!pArray)
                         pArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0).second;
                     // Check if array exists

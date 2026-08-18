@@ -51,59 +51,287 @@ enum
 };
 
 using FileSysRetType = std::pair<LONG, TW_MEMREF>;
-static FileSysRetType FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich);
-static FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHandle, LONG nWhich);
-static DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* Source, LPCTSTR szFileName, TW_FILESYSTEM* pFS);
-static bool FSGetCameras(CTL_ITwainSource *pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType );
-static bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFS, TW_UINT16 rc);
-static FileSysRetType FSFileOp(CTL_ITwainSource* pSource, LPCTSTR sInput, LPCTSTR sOutput, LONG nWhich);
-static DTWAIN_BOOL FSFileOp2(CTL_ITwainSource* pSource, LPCTSTR sInput, DTWAIN_BOOL bRecursive, LONG nWhich);
-
 typedef bool (*WALKFSPROC)(TW_FILESYSTEM* p, LPARAM UserParam);
-static bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szDir, LPARAM UserParam);
-static bool EnumCameraProc(TW_FILESYSTEM* p, LPARAM UserParam);
 
-static int CheckFileSystemSupport(CTL_ITwainSource* pSource)
-{
-    // If source is not open, return an error
-    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
-        return DTWAIN_ERR_SOURCE_NOT_OPEN;
-
-    auto getSupport = pSource->IsFileSystemSupported();
-
-    // If already determined that source does not support
-    // file system, return error.
-    if (!getSupport)
-        return DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED;
-
-    if (getSupport.value == boost::tribool::indeterminate_value)
-    {
-        // Test if source supports file system
-
-        // See if DAT_FILESYSTEM is one of the supported DATS
-        DTWAIN_BOOL bRet = false;
-        const auto& vDats = pSource->GetSupportedDATS();
-        if (std::find_if(vDats.begin(), vDats.end(), 
-            [](TW_UINT32 val) { return (val & 0x0000FFFF) == DAT_FILESYSTEM; }) != vDats.end())
-                bRet = true;
-        else
-            // No support directly, so try changing to the root directory
-            bRet = FSDirectory(pSource, _T("/"), CHANGE_DIRECTORY).first;
-        pSource->SetFileSystemSupported(bRet);
-
-        // return results
-        return bRet?DTWAIN_NO_ERROR:DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED;
-    }
-
-    // Already tested and determined that source supports file system
-    return DTWAIN_NO_ERROR;
-}
-
-/**********************************************************************************/
-/**********************************************************************************/
-/**********************************************************************************/
 namespace
 {
+    FileSysRetType FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich);
+    FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHandle, LONG nWhich);
+    DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* Source, LPCTSTR szFileName, TW_FILESYSTEM* pFS);
+    bool FSGetCameras(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType);
+    bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFS, TW_UINT16 rc);
+    FileSysRetType FSFileOp(CTL_ITwainSource* pSource, LPCTSTR sInput, LPCTSTR sOutput, LONG nWhich);
+    DTWAIN_BOOL FSFileOp2(CTL_ITwainSource* pSource, LPCTSTR sInput, DTWAIN_BOOL bRecursive, LONG nWhich);
+    bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart, LPARAM UserParam);
+    bool EnumCameraProc(TW_FILESYSTEM* p, LPARAM UserParam);
+    int CheckFileSystemSupport(CTL_ITwainSource* pSource);
+}
+
+namespace
+{
+    struct CameraStruct {
+        DTWAIN_ARRAY aCameras = {};
+        TW_UINT16 CameraType;
+    };
+
+    DTWAIN_ARRAY GenericEnumCameras(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
+    {
+        auto retVal = DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
+        if (retVal)
+        {
+            CTL_TwainDLLHandle* pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+            MoveArray(pHandle, Cameras, &retVal);
+            return *Cameras;
+        }
+        return nullptr;
+    }
+
+    FileSysRetType FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich)
+    {
+        const auto pSession = pSource->GetTwainSession();
+        CTL_FileSystemTriplet FS(pSession, pSource);
+        TW_UINT16 rc = 0;
+        switch (nWhich)
+        {
+            case CHANGE_DIRECTORY:
+                rc = FS.ChangeDirectory(sDir);
+                break;
+
+            case CREATE_DIRECTORY:
+                rc = FS.CreateDirectory(sDir);
+                break;
+
+            case FORMAT_MEDIA:
+                rc = FS.FormatMedia(sDir);
+                break;
+            default:;
+        }
+
+        DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
+        return { results,nullptr };
+    }
+
+    FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHandle, LONG nWhich)
+    {
+        const auto pSession = pSource->GetTwainSession();
+        CTL_FileSystemTriplet FS(pSession, pSource);
+        TW_UINT16 rc = 0;
+        TW_MEMREF returnedContext = nullptr;
+        switch (nWhich)
+        {
+            case GET_FIRST:
+                rc = FS.GetFirstFile();
+                break;
+
+            case GET_NEXT:
+                rc = FS.GetNextFile(FSHandle);
+                break;
+
+            case GET_CLOSE:
+                rc = FS.GetClose();
+                break;
+        }
+
+        const bool bRet = GetResults(pSource, &FS, rc);
+        if (bRet)
+        {
+            TW_FILESYSTEM* pFS = pSource->GetFileSystem();
+            if (nWhich != GET_CLOSE)
+            {
+                returnedContext = pFS->Context;
+                stringutils::SafeStrcpy(sDir, stringconversion::Convert_AnsiPtr_To_Native(pFS->OutputName).c_str());
+            }
+        }
+        return { bRet, returnedContext };
+    }
+
+    DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* pSource, LPCTSTR szFileName, TW_FILESYSTEM* pFS)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pSource, szFileName, pFS))
+        const auto pSession = pSource->GetTwainSession();
+        CTL_FileSystemTriplet FS(pSession, pSource);
+        const TW_UINT16 rc = FS.GetInfo(szFileName);
+        switch (rc)
+        {
+            case TWRC_SUCCESS:
+                *pFS = FS.GetTWFileSystem();
+                LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+            break;
+
+            case TWRC_FAILURE:
+            {
+                LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+            }
+            break;
+            default: {}
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+        CATCH_BLOCK(FALSE)
+    }
+
+    bool FSGetCameras(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pSource, Cameras, CameraType))
+        DTWAIN_ARRAY aCameras = CreateArrayFromFactory(pSource->GetDTWAINHandle(), DTWAIN_ARRAYANSISTRING, 0).second;
+        if (!aCameras)
+            return false;
+        DTWAINArrayLowLevelPtr_RAII raii(pSource->GetDTWAINHandle(), &aCameras);
+        CameraStruct CS{};
+        CS.aCameras = aCameras;
+        CS.CameraType = CameraType;
+        WalkFileSystem(EnumCameraProc, pSource, _T("/"), reinterpret_cast<LPARAM>(&CS));
+        MoveArray(pSource->GetDTWAINHandle(), Cameras, &aCameras);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    FileSysRetType FSFileOp(CTL_ITwainSource* pSource, LPCTSTR sInput, LPCTSTR sOutput, LONG nWhich)
+    {
+        const auto pSession = pSource->GetTwainSession();
+        CTL_FileSystemTriplet FS(pSession, pSource);
+        TW_UINT16 rc = 0;
+        switch (nWhich)
+        {
+            case COPY_DIRECTORY:
+                rc = FS.CopyFile(sInput, sOutput);
+                break;
+
+            case RENAME_DIRECTORY:
+                rc = FS.Rename(sInput, sOutput);
+                break;
+            default:;
+        }
+
+        DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
+        return { results,nullptr };
+    }
+
+    DTWAIN_BOOL FSFileOp2(CTL_ITwainSource* pSource, LPCTSTR sInput, DTWAIN_BOOL bRecursive, LONG nWhich)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pSource, sInput, bRecursive, nWhich))
+        const auto pSession = pSource->GetTwainSession();
+        CTL_FileSystemTriplet FS(pSession, pSource);
+        TW_UINT16 rc = 0;
+        switch (nWhich)
+        {
+            case DELETE_DIRECTORY:
+                rc = FS.DeleteFile(sInput, bRecursive ? true : false);
+                break;
+            default:;
+        }
+        DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
+        LOG_FUNC_EXIT_NONAME_PARAMS(results)
+        CATCH_BLOCK(FALSE)
+    }
+
+    bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart, LPARAM UserParam)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pProc, pSource, szStart, UserParam))
+        std::vector<TCHAR> szCurDir(256, 0);
+        bool bRes = FSDirectory(pSource, szStart, CHANGE_DIRECTORY).first;
+        TW_MEMREF Context = nullptr;
+        stringutils::SafeStrcpy(szCurDir.data(), szStart);
+        TW_FILESYSTEM* pFS = pSource->GetFileSystem();
+
+        // Get the first file in the directory
+        auto results = FSGetFile(pSource, szCurDir.data(), nullptr, GET_FIRST);
+        bRes = results.first;
+        Context = results.second;
+        while (bRes)
+        {
+            auto FileType = static_cast<TW_UINT16>(pFS->FileType);
+            if (!(*pProc)(pFS, UserParam))
+                LOG_FUNC_EXIT_NONAME_PARAMS(true)
+            switch (FileType)
+            {
+                case TWFY_DIRECTORY:
+                    bRes = WalkFileSystem(pProc, pSource, szCurDir.data(), UserParam);
+                    if (bRes)
+                    {
+                        FSGetFile(pSource, nullptr, pFS->Context, GET_CLOSE);
+                        LOG_FUNC_EXIT_NONAME_PARAMS(bRes ? true : false)
+                    }
+                    break;
+            }
+            results = FSGetFile(pSource, szCurDir.data(), Context, GET_NEXT);
+            bRes = results.first;
+            Context = results.second;
+        }
+
+        FSGetFile(pSource, nullptr, pFS->Context, GET_CLOSE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFST, TW_UINT16 rc)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pSource, pFST, rc))
+        switch (rc)
+        {
+            case TWRC_SUCCESS:
+            {
+                TW_FILESYSTEM* pFS = pSource->GetFileSystem();
+                *pFS = pFST->GetTWFileSystem();
+                LOG_FUNC_EXIT_NONAME_PARAMS(true)
+            }
+
+            case TWRC_FAILURE:
+            {
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
+            }
+
+            default: {}
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK(false)
+    }
+
+    int CheckFileSystemSupport(CTL_ITwainSource* pSource)
+    {
+        // If source is not open, return an error
+        if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
+            return DTWAIN_ERR_SOURCE_NOT_OPEN;
+
+        auto getSupport = pSource->IsFileSystemSupported();
+
+        // If already determined that source does not support
+        // file system, return error.
+        if (!getSupport)
+            return DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED;
+
+        if (getSupport.value == boost::tribool::indeterminate_value)
+        {
+            // Test if source supports file system
+
+            // See if DAT_FILESYSTEM is one of the supported DATS
+            DTWAIN_BOOL bRet = false;
+            const auto& vDats = pSource->GetSupportedDATS();
+            if (std::find_if(vDats.begin(), vDats.end(), 
+                [](TW_UINT32 val) { return (val & 0x0000FFFF) == DAT_FILESYSTEM; }) != vDats.end())
+                    bRet = true;
+            else
+                // No support directly, so try changing to the root directory
+                bRet = FSDirectory(pSource, _T("/"), CHANGE_DIRECTORY).first;
+            pSource->SetFileSystemSupported(bRet);
+
+            // return results
+            return bRet?DTWAIN_NO_ERROR:DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED;
+        }
+
+        // Already tested and determined that source supports file system
+        return DTWAIN_NO_ERROR;
+    }
+
+    bool EnumCameraProc(TW_FILESYSTEM* p, LPARAM UserParam)
+    {
+        LOG_FUNC_ENTRY_PARAMS((p, UserParam))
+        const CameraStruct* pCS = reinterpret_cast<CameraStruct*>(UserParam);
+        if (pCS->CameraType == DTWAIN_FT_ALLCAMERAS || p->FileType == pCS->CameraType)
+            DTWAIN_ArrayAdd(pCS->aCameras, p->OutputName);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
     struct GetFileOpTraits
     {
         static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPTSTR sz, LPTSTR /* */, TW_MEMREF FSHandle, int operation)
@@ -277,26 +505,6 @@ extern "C"
     }
 }
 
-namespace
-{
-    struct CameraStruct {
-        DTWAIN_ARRAY aCameras = {};
-        TW_UINT16 CameraType;
-    };
-
-    DTWAIN_ARRAY GenericEnumCameras(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
-    {
-        auto retVal = DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
-        if (retVal)
-        {
-            CTL_TwainDLLHandle* pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-            MoveArray(pHandle, Cameras, &retVal);
-            return *Cameras;
-        }
-        return nullptr;
-    }
-}
-
 extern "C"
 {
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
@@ -374,215 +582,11 @@ extern "C"
     }
 }
 
-bool FSGetCameras(CTL_ITwainSource *pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType )
-{
-    LOG_FUNC_ENTRY_PARAMS((pSource, Cameras, CameraType))
-    DTWAIN_ARRAY aCameras = CreateArrayFromFactory(pSource->GetDTWAINHandle(), DTWAIN_ARRAYANSISTRING, 0).second;
-    if (!aCameras)
-        return false;
-    DTWAINArrayLowLevelPtr_RAII raii(pSource->GetDTWAINHandle(), &aCameras);
-    CameraStruct CS{};
-    CS.aCameras = aCameras;
-    CS.CameraType = CameraType;
-    WalkFileSystem(EnumCameraProc, pSource, _T("/"), reinterpret_cast<LPARAM>(&CS));
-    MoveArray(pSource->GetDTWAINHandle(), Cameras, &aCameras);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-bool EnumCameraProc(TW_FILESYSTEM* p, LPARAM UserParam)
-{
-    LOG_FUNC_ENTRY_PARAMS((p, UserParam))
-    const CameraStruct *pCS = reinterpret_cast<CameraStruct*>(UserParam);
-    if ( pCS->CameraType == DTWAIN_FT_ALLCAMERAS || p->FileType == pCS->CameraType )
-        DTWAIN_ArrayAdd(pCS->aCameras, p->OutputName);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart, LPARAM UserParam)
-{
-    LOG_FUNC_ENTRY_PARAMS((pProc, pSource, szStart, UserParam))
-    std::vector<TCHAR> szCurDir(256, 0);
-    bool bRes = FSDirectory(pSource, szStart, CHANGE_DIRECTORY).first;
-    TW_MEMREF Context = nullptr;
-    stringutils::SafeStrcpy(&szCurDir[0], szStart);
-    TW_FILESYSTEM *pFS = pSource->GetFileSystem();
-
-    // Get the first file in the directory
-    auto results = FSGetFile(pSource, szCurDir.data(), nullptr, GET_FIRST);
-    bRes = results.first;
-    Context = results.second;
-    while ( bRes )
-    {
-        auto FileType = static_cast<TW_UINT16>(pFS->FileType);
-        if ( !(*pProc)(pFS, UserParam))
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        switch ( FileType )
-        {
-            case TWFY_DIRECTORY:
-                bRes = WalkFileSystem(pProc, pSource, &szCurDir[0], UserParam);
-                if ( bRes )
-                {
-                    FSGetFile( pSource, nullptr, static_cast<LPLONG>(pFS->Context), GET_CLOSE );
-                    LOG_FUNC_EXIT_NONAME_PARAMS(bRes ? true : false)
-                }
-            break;
-        }
-        results = FSGetFile(pSource, szCurDir.data(), Context, GET_NEXT);
-        bRes = results.first;
-        Context = results.second;
-    }
-
-    FSGetFile(pSource, nullptr, static_cast<LPLONG>(pFS->Context), GET_CLOSE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* pSource, LPCTSTR szFileName, TW_FILESYSTEM* pFS)
-{
-    LOG_FUNC_ENTRY_PARAMS((pSource, szFileName, pFS))
-    const auto pSession = pSource->GetTwainSession();
-    CTL_FileSystemTriplet FS(pSession, pSource);
-    const TW_UINT16 rc = FS.GetInfo(szFileName);
-    switch(rc)
-    {
-        case TWRC_SUCCESS:
-            *pFS = FS.GetTWFileSystem();
-            LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
-        break;
-
-        case TWRC_FAILURE:
-        {
-            LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-        }
-        break;
-        default: {}
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-    CATCH_BLOCK(FALSE)
-}
-
-FileSysRetType FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich)
-{
-    const auto pSession = pSource->GetTwainSession();
-    CTL_FileSystemTriplet FS(pSession, pSource);
-    TW_UINT16 rc = 0;
-    switch(nWhich)
-    {
-        case CHANGE_DIRECTORY:
-            rc = FS.ChangeDirectory(sDir);
-        break;
-
-        case CREATE_DIRECTORY:
-            rc = FS.CreateDirectory(sDir);
-        break;
-
-        case FORMAT_MEDIA:
-            rc = FS.FormatMedia(sDir);
-        break;
-        default: ;
-    }
-
-    DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
-    return { results,nullptr };
-}
 
 
-FileSysRetType FSFileOp(CTL_ITwainSource* pSource, LPCTSTR sInput, LPCTSTR sOutput, LONG nWhich)
-{
-    const auto pSession = pSource->GetTwainSession();
-    CTL_FileSystemTriplet FS(pSession, pSource);
-    TW_UINT16 rc = 0;
-    switch(nWhich)
-    {
-        case COPY_DIRECTORY:
-            rc = FS.CopyFile(sInput, sOutput);
-        break;
-
-        case RENAME_DIRECTORY:
-            rc = FS.Rename(sInput, sOutput);
-        break;
-        default: ;
-    }
-
-    DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
-    return { results,nullptr };
-}
 
 
-DTWAIN_BOOL FSFileOp2(CTL_ITwainSource* pSource, LPCTSTR sInput, DTWAIN_BOOL bRecursive, LONG nWhich)
-{
-    LOG_FUNC_ENTRY_PARAMS((pSource, sInput, bRecursive, nWhich))
-    const auto pSession = pSource->GetTwainSession();
-    CTL_FileSystemTriplet FS(pSession, pSource);
-    TW_UINT16 rc = 0;
-    switch(nWhich)
-    {
-        case DELETE_DIRECTORY:
-            rc = FS.DeleteFile(sInput, bRecursive?true:false);
-        break;
-        default: ;
-    }
-    DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
-    LOG_FUNC_EXIT_NONAME_PARAMS(results)
-    CATCH_BLOCK(FALSE)
-}
 
 
-FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHandle, LONG nWhich)
-{
-    const auto pSession = pSource->GetTwainSession();
-    CTL_FileSystemTriplet FS(pSession, pSource);
-    TW_UINT16 rc = 0;
-    TW_MEMREF returnedContext = nullptr;
-    switch(nWhich)
-    {
-        case GET_FIRST:
-            rc = FS.GetFirstFile();
-        break;
 
-        case GET_NEXT:
-            rc = FS.GetNextFile(FSHandle);
-        break;
 
-        case GET_CLOSE:
-            rc = FS.GetClose();
-        break;
-    }
-
-    const bool bRet = GetResults(pSource, &FS, rc);
-    if ( bRet )
-    {
-        TW_FILESYSTEM *pFS = pSource->GetFileSystem();
-        if (nWhich != GET_CLOSE)
-        {
-            returnedContext = pFS->Context;
-            stringutils::SafeStrcpy(sDir, stringconversion::Convert_AnsiPtr_To_Native(pFS->OutputName).c_str());
-        }
-    }
-    return { bRet, returnedContext };
-}
-
-bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFST, TW_UINT16 rc)
-{
-    LOG_FUNC_ENTRY_PARAMS((pSource, pFST, rc))
-    switch (rc)
-    {
-        case TWRC_SUCCESS:
-        {
-            TW_FILESYSTEM *pFS = pSource->GetFileSystem();
-            *pFS = pFST->GetTWFileSystem();
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        }
-
-        case TWRC_FAILURE:
-        {
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
-        }
-
-        default:{}
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK(false)
-}

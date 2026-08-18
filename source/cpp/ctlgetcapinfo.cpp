@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "arrayfactory.h"
-#include "ctltmpl5.h"
+#include "ctlgetsetcapsinternal.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif

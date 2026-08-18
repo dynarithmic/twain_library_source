@@ -140,7 +140,7 @@ namespace
         }
 
         ULONG read = 0;
-        if (stream->Read(out.data(), static_cast<ULONG>(out.size()), &read) != S_OK ||
+        if (stream->Read(out.data(), out.size(), &read) != S_OK ||
             read != out.size())
         {
             stream->Release();
@@ -311,7 +311,7 @@ namespace
         WriteLE32(out, crc);
 
         // --- ISIZE (original input size modulo 2^32) ---
-        WriteLE32(out, static_cast<uint32_t>(svgText.size()));
+        WriteLE32(out, svgText.size());
 
         // --- Write to file ---
         std::ofstream f(filename, std::ios::binary);

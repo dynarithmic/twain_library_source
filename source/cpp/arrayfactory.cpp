@@ -330,7 +330,7 @@ namespace dynarithmic
 
     bool CTL_ArrayFactory::is_valid(arrayTag* pTag) const
     {
-        return m_tagMap.find(const_cast<arrayTag*>(pTag)) != m_tagMap.end();
+        return m_tagMap.find(pTag) != m_tagMap.end();
     }
 
     bool CTL_ArrayFactory::is_frame_valid(const void *frame) const
@@ -353,7 +353,7 @@ namespace dynarithmic
     {
         if (is_valid(pTag))
         {
-            const auto pTagTemp = static_cast<arrayTag*>(pTag);
+            const auto pTagTemp = pTag;
             return pTagTemp->getTag();
         }
         return -1;
@@ -474,10 +474,11 @@ namespace dynarithmic
         const auto frame = create_array(CTL_ArrayFrameSingleType, &status, 1);
         auto& vect = underlying_container_t<TwainFrameInternal>(frame);
         auto& frameInst = vect.front();
-        frameInst.m_FrameComponent[0] = left;
-        frameInst.m_FrameComponent[1] = top;
-        frameInst.m_FrameComponent[2] = right;
-        frameInst.m_FrameComponent[3] = bottom;
+        auto& frameComponent = frameInst.GetFrameComponent();
+        frameComponent[TwainFrameInternal::FRAMELEFT] = left;
+        frameComponent[TwainFrameInternal::FRAMETOP] = top;
+        frameComponent[TwainFrameInternal::FRAMERIGHT] = right;
+        frameComponent[TwainFrameInternal::FRAMEBOTTOM] = bottom;
         return frame;
     }
 

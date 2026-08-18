@@ -115,7 +115,7 @@ namespace
                 )
             {
             #ifdef _WIN32
-                lResult = CallWindowProc(static_cast<WNDPROC>(pHandle->m_hOrigProc), hWnd, uMsg, wParam, lParam);
+                lResult = CallWindowProc(pHandle->m_hOrigProc, hWnd, uMsg, wParam, lParam);
             #endif
                 // Called if only callback exists
                 if (CALLBACK32_EXISTS(pHandle))
@@ -300,7 +300,7 @@ extern "C"
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         LONG RetVal = 1;
         if (pHandle->m_pCallbackFn)
-            RetVal = static_cast<LONG>((*pHandle->m_pCallbackFn)(wParam, lParam, UserData));
+            RetVal = (*pHandle->m_pCallbackFn)(wParam, lParam, UserData);
         LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
         CATCH_BLOCK(0)
     }
@@ -311,7 +311,7 @@ extern "C"
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         LONG RetVal = 1;
         if (pHandle->m_pCallbackFn64)
-            RetVal = static_cast<LONG>((*pHandle->m_pCallbackFn64)(wParam, lParam, UserData));
+            RetVal = (*pHandle->m_pCallbackFn64)(wParam, lParam, UserData);
         LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
         CATCH_BLOCK(0)
     }
@@ -436,7 +436,7 @@ namespace dynarithmic
                 if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))
                     bPassMsg = true;
                 DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
-                    static_cast<DTWAIN_HANDLE>(pHandle),
+                    pHandle,
                     reinterpret_cast<DTWAIN_SOURCE>(pSource),
                     wParam, lParam);
 
@@ -495,9 +495,9 @@ namespace dynarithmic
                     return DTWAIN_RETRY_EX;
 
                 DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
-                    static_cast<DTWAIN_HANDLE>(pHandle),
+                    pHandle,
                     reinterpret_cast<DTWAIN_SOURCE>(pSource),
-                    wParam, static_cast<LPARAM>(pSource->GetAcquireNum()));
+                    wParam, pSource->GetAcquireNum());
             }
             break;
 
@@ -508,7 +508,7 @@ namespace dynarithmic
                 if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))
                     bPassMsg = true;
                 DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
-                    static_cast<DTWAIN_HANDLE>(pHandle),
+                    pHandle,
                     reinterpret_cast<DTWAIN_SOURCE>(pSource),
                     wParam, lParam);
             }
@@ -552,7 +552,7 @@ namespace dynarithmic
                     return TRUE;
 
                 DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
-                    static_cast<DTWAIN_HANDLE>(pHandle),
+                    pHandle,
                     reinterpret_cast<DTWAIN_SOURCE>(pSource),
                     wParam, lParam);
             }
@@ -566,7 +566,7 @@ namespace dynarithmic
                     bPassMsg = true;
                 // Couldn't acquire the first page, so acquire failed totally!
                 DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
-                    static_cast<DTWAIN_HANDLE>(pHandle),
+                    pHandle,
                     reinterpret_cast<DTWAIN_SOURCE>(pSource),
                     wParam, lParam);
 
@@ -596,7 +596,7 @@ namespace dynarithmic
                 if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))
                     bPassMsg = true;
                 DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
-                    static_cast<DTWAIN_HANDLE>(pHandle),
+                    pHandle,
                     reinterpret_cast<DTWAIN_SOURCE>(pSource),
                     wParam, lParam);
                 // Post a message back to the app and main window that the source will be closed
@@ -634,9 +634,9 @@ namespace dynarithmic
                     if (pHandle->m_hNotifyWnd)
                         ::SendMessage(pHandle->m_hNotifyWnd, uMsg, DTWAIN_TN_ACQUIRECANCELLED_EX, lParam);
                     DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
-                        static_cast<DTWAIN_HANDLE>(pHandle),
+                        pHandle,
                         reinterpret_cast<DTWAIN_SOURCE>(pSource),
-                        static_cast<WPARAM>(DTWAIN_TN_ACQUIRECANCELLED), 0);
+                        DTWAIN_TN_ACQUIRECANCELLED, 0);
                 }
 
                 if (pSource->IsAcquireAttempt()) // Didn't really acquire the image
@@ -647,7 +647,7 @@ namespace dynarithmic
 
                 DisableAppWindows(false);
                 DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
-                    static_cast<DTWAIN_HANDLE>(pHandle),
+                    pHandle,
                     reinterpret_cast<DTWAIN_SOURCE>(pSource),
                     wParam, 0);
                 // Post a message back to the app and main window that the source will be closed
@@ -697,7 +697,7 @@ namespace dynarithmic
                             if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))
                                 bPassMsg = true;
                             DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
-                                static_cast<DTWAIN_HANDLE>(pHandle),
+                                pHandle,
                                 reinterpret_cast<DTWAIN_SOURCE>(pSource),
                                 wParam, 0);
                         }
@@ -715,7 +715,7 @@ namespace dynarithmic
                     if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))
                         bPassMsg = true;
                     DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
-                        static_cast<DTWAIN_HANDLE>(pHandle),
+                        pHandle,
                         reinterpret_cast<DTWAIN_SOURCE>(pSource),
                         wParam, 0L);
                 }

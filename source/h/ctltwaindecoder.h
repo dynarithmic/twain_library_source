@@ -60,43 +60,43 @@
 */
 namespace dynarithmic
 {
-   enum ErrorStructTypes {  ERRSTRUCT_NONE,
-                            ERRSTRUCT_TW_CUSTOMDSDATA           ,
-                            ERRSTRUCT_TW_DEVICEEVENT            ,
-                            ERRSTRUCT_TW_EVENT                  ,
-                            ERRSTRUCT_TW_FILESYSTEM             ,
-                            ERRSTRUCT_TW_IDENTITY               ,
-                            ERRSTRUCT_LPHWND                    ,
-                            ERRSTRUCT_TW_PASSTHRU               ,
-                            ERRSTRUCT_TW_PENDINGXFERS           ,
-                            ERRSTRUCT_TW_SETUPFILEXFER          ,
-                            ERRSTRUCT_TW_SETUPMEMXFER           ,
-                            ERRSTRUCT_TW_STATUS                 ,
-                            ERRSTRUCT_TW_USERINTERFACE          ,
-                            ERRSTRUCT_pTW_UINT32                ,
-                            ERRSTRUCT_TW_CIECOLOR               ,
-                            ERRSTRUCT_TW_EXTIMAGEINFO           ,
-                            ERRSTRUCT_TW_GRAYRESPONSE           ,
-                            ERRSTRUCT_TW_IMAGEINFO              ,
-                            ERRSTRUCT_TW_IMAGELAYOUT            ,
-                            ERRSTRUCT_TW_IMAGEMEMXFER           ,
-                            ERRSTRUCT_HDIB                      ,
-                            ERRSTRUCT_TW_JPEGCOMPRESSION        ,
-                            ERRSTRUCT_TW_PALETTE8               ,
-                            ERRSTRUCT_TW_RGBRESPONSE            ,
-                            ERRSTRUCT_TW_TWUNKIDENTITY          ,
-                            ERRSTRUCT_TW_TWUNKDSENTRYPARAMS     ,
-                            ERRSTRUCT_TW_AUDIOINFO              ,
-                            ERRSTRUCT_pWAV                      ,
-                            ERRSTRUCT_TW_CAPABILITY,
-                            ERRSTRUCT_DTWAIN_MESSAGE,
-                            ERRSTRUCT_TW_STATUSUTF8,
-                            ERRSTRUCT_TW_MEMORY,
-                            ERRSTRUCT_TW_ENTRYPOINT,
-                            ERRSTRUCT_TW_CALLBACK,
-                            ERRSTRUCT_TW_CALLBACK2,
-                            ERRSTRUCT_TW_TWAINDIRECT,
-                            ERRSTRUCT_TW_METRICS
+   enum DecoderStructTypes {DECODERSTRUCT_NONE,
+                            DECODERSTRUCT_TW_CUSTOMDSDATA           ,
+                            DECODERSTRUCT_TW_DEVICEEVENT            ,
+                            DECODERSTRUCT_TW_EVENT                  ,
+                            DECODERSTRUCT_TW_FILESYSTEM             ,
+                            DECODERSTRUCT_TW_IDENTITY               ,
+                            DECODERSTRUCT_LPHWND                    ,
+                            DECODERSTRUCT_TW_PASSTHRU               ,
+                            DECODERSTRUCT_TW_PENDINGXFERS           ,
+                            DECODERSTRUCT_TW_SETUPFILEXFER          ,
+                            DECODERSTRUCT_TW_SETUPMEMXFER           ,
+                            DECODERSTRUCT_TW_STATUS                 ,
+                            DECODERSTRUCT_TW_USERINTERFACE          ,
+                            DECODERSTRUCT_pTW_UINT32                ,
+                            DECODERSTRUCT_TW_CIECOLOR               ,
+                            DECODERSTRUCT_TW_EXTIMAGEINFO           ,
+                            DECODERSTRUCT_TW_GRAYRESPONSE           ,
+                            DECODERSTRUCT_TW_IMAGEINFO              ,
+                            DECODERSTRUCT_TW_IMAGELAYOUT            ,
+                            DECODERSTRUCT_TW_IMAGEMEMXFER           ,
+                            DECODERSTRUCT_HDIB                      ,
+                            DECODERSTRUCT_TW_JPEGCOMPRESSION        ,
+                            DECODERSTRUCT_TW_PALETTE8               ,
+                            DECODERSTRUCT_TW_RGBRESPONSE            ,
+                            DECODERSTRUCT_TW_TWUNKIDENTITY          ,
+                            DECODERSTRUCT_TW_TWUNKDSENTRYPARAMS     ,
+                            DECODERSTRUCT_TW_AUDIOINFO              ,
+                            DECODERSTRUCT_pWAV                      ,
+                            DECODERSTRUCT_TW_CAPABILITY,
+                            DECODERSTRUCT_DTWAIN_MESSAGE,
+                            DECODERSTRUCT_TW_STATUSUTF8,
+                            DECODERSTRUCT_TW_MEMORY,
+                            DECODERSTRUCT_TW_ENTRYPOINT,
+                            DECODERSTRUCT_TW_CALLBACK,
+                            DECODERSTRUCT_TW_CALLBACK2,
+                            DECODERSTRUCT_TW_TWAINDIRECT,
+                            DECODERSTRUCT_TW_METRICS
    };
 
    struct PDFTextElement;
@@ -105,7 +105,8 @@ namespace dynarithmic
         public:
             CTL_TWAINTypeDecoder() = default;
             void StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest, TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF Data,
-                              ErrorStructTypes sType);
+                              DecoderStructTypes sType);
+
             static std::string DecodeBitmap(HANDLE hBitmap);
             static std::string DecodePDFTextElement(PDFTextElement* pEl);
             static std::string DecodeTWAINReturnCode(TW_UINT16 retCode);
@@ -164,7 +165,7 @@ namespace dynarithmic
                 m_pOrigin = pOrigin; m_pDest = pDest; m_pData = pData;
                 m_Decoder.StartDecoder(m_pOrigin, m_pDest, GetDG(),
                                         GetDAT(), GetMSG(), m_pData,
-                                        static_cast<ErrorStructTypes>(m_nStructType));
+                                        static_cast<DecoderStructTypes>(m_nStructType));
                 return m_Decoder.GetDecodedString();
             }
 

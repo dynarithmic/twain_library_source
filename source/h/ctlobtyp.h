@@ -65,7 +65,7 @@ namespace dynarithmic
              operator TW_UINT32 ()  const { return *static_cast<TW_UINT32*>(m_pData); }
              operator TW_FIX32 ()   const { return *static_cast<TW_FIX32*>(m_pData); }
              operator TW_FRAME ()   const { return *static_cast<TW_FRAME*>(m_pData); }
-             operator std::string()  const { return  static_cast<std::string>(static_cast<LPSTR>(m_pData)); }
+             operator std::string()  const { return  static_cast<LPSTR>(m_pData); }
 
         private:
              int        m_nSize;

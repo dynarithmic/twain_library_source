@@ -34,7 +34,7 @@ CTL_CapabilityQueryTriplet::CTL_CapabilityQueryTriplet(CTL_ITwainSession *pSessi
                                              TwainType)
 {
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
-    pCap->Cap = static_cast<TW_UINT16>(gCap);
+    pCap->Cap = gCap;
     pCap->ConType = TWON_ONEVALUE;
     pCap->hContainer = nullptr;
     m_lCapSupport = 0;

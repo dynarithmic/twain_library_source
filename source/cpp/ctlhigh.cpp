@@ -49,8 +49,6 @@ typedef bool (*SetDoubleCapFn)(DTWAIN_SOURCE, LONG, double);
 typedef bool (*GetDoubleCapFn)(DTWAIN_SOURCE, LONG, double *);
 typedef LONG (*GetCapValuesFn)(DTWAIN_SOURCE, LPDTWAIN_ARRAY, LONG, DTWAIN_BOOL);
 
-using CharType = dynarithmic::CTL_StringType::value_type;
-
 using namespace dynarithmic;
 
 namespace
@@ -75,7 +73,7 @@ namespace
         DTWAIN_FLOAT tempR;
         const DTWAIN_BOOL retVal = fn(Source, &tempR);
         if (retVal)
-            stringutils::SafeStrcpy(strVal, stringutils::TrimDouble<CTL_StringType>(tempR).c_str(), 255);
+            stringutils::SafeStrcpy(strVal, stringutils::TrimDouble(tempR).c_str(), 255);
         return retVal;
     }
 }

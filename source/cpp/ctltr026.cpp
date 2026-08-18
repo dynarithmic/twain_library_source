@@ -175,7 +175,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
                     // Lock the DIB returned by the device
                     BITMAPINFOHEADER* thisBitmap =
-                        (BITMAPINFOHEADER*)sessionHandle->m_TwainMemoryFunc->LockMemory((HBITMAP)m_hDataHandleFromDevice);
+                        (BITMAPINFOHEADER*)sessionHandle->m_TwainMemoryFunc->LockMemory(m_hDataHandleFromDevice);
 
                     if (!thisBitmap)
                     {
@@ -265,7 +265,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                         bSuccess = true;
                         // Indicate that pending xfers has been executed
                         SetPendingXfersDone(true);
-                        bEndOfJobDetected = Pending.EOJ == static_cast<TW_UINT32>(pSource->GetEOJDetectedValue());
+                        bEndOfJobDetected = Pending.EOJ == pSource->GetEOJDetectedValue();
                     }
                 }
                 else
@@ -514,7 +514,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     {
                         // We can't get here if the file copy did not work, so assume success
                         CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_FILESAVEOK,
-                                                              static_cast<LPARAM>(pSource->GetAcquireNum()));
+                                                              pSource->GetAcquireNum());
                     }
                 }
                 break;

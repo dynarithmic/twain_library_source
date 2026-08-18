@@ -21,11 +21,10 @@
 #ifndef CTLTR018_H
 #define CTLTR018_H
 #include <vector>
-
 #include "ctltr016.h"
 namespace dynarithmic
 {
-    template <class T>
+    template <typename T>
     class CTL_CapabilitySetRangeTriplet : public CTL_CapabilitySetTriplet<T>
     {
         public:
@@ -43,8 +42,53 @@ namespace dynarithmic
             bool        Encode(const std::vector<T>& rArray, void *pMemBlock) override;
     };
 
-    #ifndef USE_EXPLICIT_TEMPLATE_INSTANTIATIONS
-        #include "../inl/ctltr018.inl"
-    #endif
+    template <typename T>
+    CTL_CapabilitySetRangeTriplet<T>::CTL_CapabilitySetRangeTriplet(CTL_ITwainSession* pSession,
+                                                                    CTL_ITwainSource* pSource,
+                                                                    TW_UINT16 sType,
+                                                                    TW_UINT16  sCap,
+                                                                    TW_UINT16 TwainType,
+                                                                    const std::vector<T>& rArray)
+        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray)
+    {}
+
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetRangeTriplet<T>::GetContainerTypeSize()
+    {
+        return sizeof(TW_RANGE);
+    }
+
+    template <typename T>
+    size_t CTL_CapabilitySetRangeTriplet<T>::GetAggregateSize()
+    {
+        return 0;
+    }
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetRangeTriplet<T>::GetContainerType()
+    {
+        return TWON_RANGE;
+    }
+
+
+    template <typename T>
+    bool CTL_CapabilitySetRangeTriplet<T>::Encode(const std::vector<T>& rArray, void* pMemBlock)
+    {
+        T Data1, Data2, Data3;
+
+        // Get a TW_RANGE structure
+        const pTW_RANGE pVal = static_cast<pTW_RANGE>(pMemBlock);
+        if (rArray.size() >= 3)
+        {
+            Data1 = rArray[0]; // Min value
+            Data2 = rArray[1]; // Max value
+            Data3 = rArray[2]; // Step value
+            CTL_CapabilitySetTripletBase::EncodeRange(pVal, &Data1, &Data2, &Data3);
+            pVal->DefaultValue = TWON_DONTCARE32;
+            return true;
+        }
+        return false;
+    }
 }
 #endif

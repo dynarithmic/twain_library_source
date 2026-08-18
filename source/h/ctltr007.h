@@ -54,7 +54,7 @@ namespace dynarithmic
         private:
             void SetValues(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID)
             {
-                Init(pSession, pSourceID, DG_CONTROL, DAT_STATUS, MSG_GET, static_cast<TW_MEMREF>(&m_Status));
+                Init(pSession, pSourceID, DG_CONTROL, DAT_STATUS, MSG_GET, &m_Status);
                 SetAlive(true);
             }
 

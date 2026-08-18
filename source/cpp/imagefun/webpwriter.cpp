@@ -199,7 +199,7 @@ bool WebPSessionWriter::ImportBgr24(WebPPicture& picture)
             currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
 
         uint8_t* dst =
-            rgbBuffer_.data() + static_cast<size_t>(y) * rowBytes;
+            rgbBuffer_.data() + y * rowBytes;
 
         for (uint32_t x = 0; x < currentPage_.width; ++x)
         {
@@ -228,7 +228,7 @@ bool WebPSessionWriter::ImportBgra32(WebPPicture& picture)
             currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
 
         uint8_t* dst =
-            rgbaBuffer_.data() + static_cast<size_t>(y) * rowBytes;
+            rgbaBuffer_.data() + y * rowBytes;
 
         for (uint32_t x = 0; x < currentPage_.width; ++x)
         {

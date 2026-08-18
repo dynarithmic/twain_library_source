@@ -151,7 +151,7 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
     DestroyInfo();
 
     // Allocate memory for TW_INFO structure
-    m_memHandle = sessionHandle->m_TwainMemoryFunc->AllocateMemory(static_cast<TW_UINT32>(sizeof(TW_INFO) * nInfos + sizeof(TW_EXTIMAGEINFO)));
+    m_memHandle = sessionHandle->m_TwainMemoryFunc->AllocateMemory(sizeof(TW_INFO) * nInfos + sizeof(TW_EXTIMAGEINFO));
     m_pExtImageInfo = static_cast<TW_EXTIMAGEINFO*>(sessionHandle->m_TwainMemoryFunc->LockMemory(m_memHandle));
 
     // Set up the base triplet information here
@@ -160,7 +160,7 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
         m_pExtImageInfo->NumInfos = static_cast<TW_UINT32>(nInfos);
         // Get the app manager's AppID
         const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-        if ( pMgr && pMgr->IsValidTwainSession( pSession ))
+        if ( pMgr && CTL_TwainAppMgr::IsValidTwainSession( pSession ))
         {
             if ( pSource )
             {
@@ -169,7 +169,7 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
                       DG_IMAGE,
                       DAT_EXTIMAGEINFO,
                       MSG_GET,
-                      static_cast<TW_MEMREF>(static_cast<pTW_EXTIMAGEINFO>(m_pExtImageInfo)));
+                      m_pExtImageInfo);
                 SetAlive (true);
             }
         }

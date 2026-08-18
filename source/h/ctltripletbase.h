@@ -23,7 +23,7 @@
 
 #include <tuple>
 #include <utility>
-#include "ctltwainsession.h"
+#include "twain.h"
 
 namespace dynarithmic
 {

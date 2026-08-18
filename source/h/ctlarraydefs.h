@@ -18,13 +18,18 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "dtwain.h"
-#include "arrayfactory.h"
+#ifndef CTLARRAYDEFS_H
+#define CTLARRAYDEFS_H
 
-#ifdef UNICODE
-    #pragma message ("Creating UNICODE version of DTWAIN functions")
-#else
-    #pragma message ("Creating MBCS version of DTWAIN functions")
+#include <vector>
+#include "twain.h"
+#include "dtwain_standard_defs.h"
+
+namespace dynarithmic
+{
+    using CTL_IntArray = std::vector<int>;
+    using CTL_TwainCapArray = std::vector<TW_UINT16>;
+    using CTL_RealArray = std::vector<double>;
+    using CTL_HDIBArray = std::vector<HANDLE>;
+}
 #endif
-
-#include "ctlstrimpl.inl"

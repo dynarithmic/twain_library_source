@@ -444,7 +444,7 @@ bool CTL_TwainAppMgr::OpenSource( CTL_ITwainSession* pSession, const CTL_ITwainS
 LONG CTL_TwainAppMgr::DoCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, TW_UINT16 nCap, LONG lGetType)
 {
     const auto pSession = pSource->GetTwainSession();
-    CTL_CapabilityGetTriplet CapTester(pSession, pSource, static_cast<TW_UINT16>(lGetType), static_cast<TW_UINT16>(nCap), 0);
+    CTL_CapabilityGetTriplet CapTester(pSession, pSource, static_cast<TW_UINT16>(lGetType), nCap, 0);
     CapTester.SetTestMode(true);
     const TW_UINT16 rc = CapTester.Execute();
     if (rc == TWRC_SUCCESS)
@@ -500,7 +500,7 @@ bool CTL_TwainAppMgr::SetImageLayoutSize(const CTL_ITwainSource* pSource,
     const auto pSession = pTempSource->GetTwainSession();
 
     std::unique_ptr<CTL_TwainTriplet> layOutTriplet;
-    if (::IsMSGResetType(static_cast<TW_UINT16>(SetType)))
+    if (::IsMSGResetType(SetType))
         layOutTriplet = std::make_unique<CTL_ResetImageLayoutTriplet>(pSession, pTempSource, nullptr);
     else
         layOutTriplet = std::make_unique<CTL_SetImageLayoutTriplet>(pSession, pTempSource, &rArray);
@@ -564,7 +564,7 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
         }
     };
 
-    const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
+    const auto pTempSource = pSource;
     const auto pSession = pTempSource->GetTwainSession();
 
     if ( pTempSource->IsUIOpen() )
@@ -678,7 +678,7 @@ void CTL_TwainAppMgr::EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSo
 
 bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip/*=NULL*/)
 {
-    const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
+    const auto pTempSource = pSource;
     const auto pSession = pTempSource->GetTwainSession();
     CTL_ImageInfoTriplet ImageInfo(pSession, pTempSource);
     if ( !pTrip )
@@ -867,7 +867,7 @@ int CTL_TwainAppMgr::TransferImage(const CTL_ITwainSource *pSource, int nImageNu
 bool CTL_TwainAppMgr::StoreImageLayout(CTL_ITwainSource *pSource)
 {
     FloatRect fRect;
-    const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
+    const auto pTempSource = pSource;
     const auto pSession = pTempSource->GetTwainSession();
 
 
@@ -973,7 +973,7 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
     if ( AcquireType == TWAINAcquireType_MemFile )
     {
         // Check if user has defined a strip size
-        auto nSizeStrip = static_cast<TW_UINT32>(pSource->GetUserStripBufSize());
+        auto nSizeStrip = pSource->GetUserStripBufSize();
 
         // User has not defined a buffer.  Let DTWAIN handle the memory here
         if (!pSource->GetUserStripBuffer())
@@ -1017,7 +1017,7 @@ int  CTL_TwainAppMgr::BufferTransfer( CTL_ITwainSession *pSession,
                                       bool bIsMemoryFile)
 {
     // Get the source
-    auto* pTempSource = static_cast<CTL_ITwainSource*>(pSource);
+    auto* pTempSource = pSource;
 
     // Get the image information
     CTL_ImageInfoTriplet ImageInfo(pSession, pTempSource);
@@ -1366,7 +1366,7 @@ int CTL_TwainAppMgr::StartTransfer( CTL_ITwainSession * /*pSession*/,
 
 bool CTL_TwainAppMgr::GetFileTransferDefaults(CTL_ITwainSource *pSource, int &nFileType)
 {
-    const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
+    const auto pTempSource = pSource;
     const auto pSession = pTempSource->GetTwainSession();
     CTL_GetDefaultSetupFileXferTriplet  FileXferGetDef( pSession, pTempSource,
                                             static_cast<CTL_TwainFileFormatEnum>(0),{});
@@ -2019,7 +2019,7 @@ int CTL_TwainAppMgr::FindConditionCode(TW_UINT16 nCode)
 std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
 {
     if ( static_cast<UINT>(Cap) >= CAP_CUSTOMBASE )
-        return "CAP_CUSTOMBASE + " + std::to_string(static_cast<long>(Cap) - static_cast<long>(CAP_CUSTOMBASE));
+        return "CAP_CUSTOMBASE + " + std::to_string(Cap - static_cast<long>(CAP_CUSTOMBASE));
     else
     {
         static constexpr std::array<int, 4> aConstantTypes = { {DTWAIN_CONSTANT_ICAP, DTWAIN_CONSTANT_CAP, 
@@ -2036,7 +2036,7 @@ std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
 
 int CTL_TwainAppMgr::GetDataTypeFromCap( TW_UINT16 Cap, CTL_ITwainSource *pSource/*=NULL*/ )
 {
-    const auto nThisCap = static_cast<TW_UINT16>(Cap);
+    const auto nThisCap = Cap;
     if (nThisCap >= CAP_CUSTOMBASE)
     {
         if (!pSource)
@@ -2189,7 +2189,7 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
         #else
             auto lowerName = stringutils::LowerCase(dllName.filename().string());
         #endif
-            auto isSame = stringutils::CompareNoCase<CTL_StringType>(lowerName, strTwainDLLName.c_str());
+            auto isSame = stringutils::CompareNoCase(lowerName, strTwainDLLName.c_str());
             if (isSame)
                 return { true, appMgrPtr->GetDSMPath() };
         }
@@ -2413,7 +2413,7 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
         // Get all the information about the capability.
         std::for_each(pArray.begin(), pArray.end(), [&](TW_UINT16 val)
         {
-            DTWAIN_CacheCapabilityInfo(pSource, pHandle, static_cast<TW_UINT16>(val));
+            DTWAIN_CacheCapabilityInfo(pSource, pHandle, val);
         });
 
         // Retrieve any custom caps
@@ -2496,8 +2496,8 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 
     TW_UINT16 retcode = TWRC_SUCCESS;
 
-    CTL_TWAINDecoderStruct e;
-    std::string s;
+    CTL_TWAINDecoderStruct decoder;
+    std::string sTwainLogString;
 
     pTW_IDENTITY pOrigin = pTriplet.GetOriginID();
     pTW_IDENTITY pDest   = pTriplet.GetDestinationID();
@@ -2514,10 +2514,10 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
     {
-        e = GetGeneralErrorInfo(nDG, nDAT, nMSG);
-        s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
-        s = GetResourceStringFromMap(IDS_LOGMSG_INPUTTEXT) + ": " + s;
-        LogWriterUtils::WriteMultiLineInfoIndentedA(s, "\n");
+        decoder = GetGeneralErrorInfo(nDG, nDAT, nMSG);
+        sTwainLogString = decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
+        sTwainLogString = GetResourceStringFromMap(IDS_LOGMSG_INPUTTEXT) + ": " + sTwainLogString;
+        LogWriterUtils::WriteMultiLineInfoIndentedA(sTwainLogString, "\n");
     }
 
     TripletSaveRestore tSaveRestore(&m_pCurrentTriplet);
@@ -2577,11 +2577,11 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         {
             std::string sz;
             std::ostringstream strm;
-            sz = e.GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
-            s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
+            sz = decoder.GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
+            sTwainLogString = decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
             strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4",
                 { GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT),
-                                  std::to_string(retcode),sz, s });
+                                  std::to_string(retcode),sz, sTwainLogString });
             LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
         }
         return retcode;
@@ -2596,10 +2596,10 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     {
         std::string sz;
         std::ostringstream strm;
-        s =  e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
+        sTwainLogString =  decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
         sz = CTL_TWAINDecoderStruct::GetTWAINDSMError(retcode);
         std::string s1 = GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT);
-        strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4\n", { s1, std::to_string(retcode), sz, s });
+        strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4\n", { s1, std::to_string(retcode), sz, sTwainLogString });
         LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
     if (retcode == TWRC_FAILURE || retcode == TWRC_CHECKSTATUS)
@@ -2695,4 +2695,4 @@ TW_IDENTITY CTL_TwainAppMgr::s_AppId = {};
 CTL_ITwainSession* CTL_TwainAppMgr::s_pSelectedSession = nullptr;
 int          CTL_TwainAppMgr::s_nLastError = 0;
 std::string  CTL_TwainAppMgr::s_strLastError;
-HINSTANCE    CTL_TwainAppMgr::s_ThisInstance = static_cast<HINSTANCE>(nullptr);
+HINSTANCE    CTL_TwainAppMgr::s_ThisInstance = nullptr;

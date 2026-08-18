@@ -28,7 +28,7 @@ CTL_CapabilityGetTriplet::CTL_CapabilityGetTriplet(CTL_ITwainSession* pSession,
                                                     TW_UINT16 gType,
                                                     TW_UINT16 gCap,
                                                     TW_UINT16 TwainDataType)
-                       :  CTL_CapabilityTriplet(pSession, pSource, static_cast<TW_UINT16>(gType), TwainDataType, true)
+                       :  CTL_CapabilityTriplet(pSession, pSource, gType, TwainDataType, true)
                        , m_gCap(gCap), m_gType(gType)
 {
     TW_CAPABILITY* pCap = GetCapabilityBuffer();

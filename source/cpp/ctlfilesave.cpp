@@ -32,7 +32,7 @@ namespace dynarithmic
         LPCTSTR szExt = nullptr;
 
         auto& filesaveMap = CTL_StaticData::GetFileSaveMap();
-        const auto it = filesaveMap.find(static_cast<int>(nFileAcquireType));
+        const auto it = filesaveMap.find(nFileAcquireType);
         if (it != filesaveMap.end())
         {
             szFilter = it->second.GetTotalFilter();

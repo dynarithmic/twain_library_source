@@ -124,12 +124,12 @@ namespace dynarithmic
         LOG_FUNC_ENTRY_PARAMS((Source, nCap))
         auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
         auto pHandle = p->GetDTWAINHandle();
-        if (!p->IsCapInSupportedList(static_cast<TW_UINT16>(nCap)))
+        if (!p->IsCapInSupportedList(nCap))
         {
             // Try getting it the slow way
             if (!CTL_TwainAppMgr::IsCapabilitySupported(p, nCap))
                 LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_CAP_NO_SUPPORT)
-            p->AddCapToSupportedList(static_cast<TW_UINT16>(nCap));
+            p->AddCapToSupportedList(nCap);
         }
 
         DTWAIN_CacheCapabilityInfo(p, pHandle, nCap);

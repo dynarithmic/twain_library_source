@@ -55,8 +55,8 @@ extern "C"
         const DTWAIN_BOOL retVal = DTWAIN_GetImageInfo(Source, &tempX, &tempY, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression);
         if (retVal)
         {
-            stringutils::SafeStrcpy(XResolution, stringutils::TrimDouble<CTL_StringType>(tempX).c_str(), 255);
-            stringutils::SafeStrcpy(YResolution, stringutils::TrimDouble<CTL_StringType>(tempY).c_str(), 255);
+            stringutils::SafeStrcpy(XResolution, stringutils::TrimDouble(tempX).c_str(), 255);
+            stringutils::SafeStrcpy(YResolution, stringutils::TrimDouble(tempY).c_str(), 255);
         }
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution))
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal)

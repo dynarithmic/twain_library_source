@@ -556,12 +556,12 @@ namespace
                 {
                     bool bWroteInfoToFile = false;
                     std::string sErr = stringconversion::Convert_Native_To_Ansi(
-                        stringutils::ReplaceAll<CTL_StringType>(sAllErrors, _T("\r"), _T(" ")));
+                        stringutils::ReplaceAll(sAllErrors, _T("\r"), _T(" ")));
                     if (initOptions.createErrorLog)
                     {
                         // Write the information to errorlog_*.txt located in the resource directory
                         // Get the base file name with time stamp
-                        auto baseFileName = filenameutils::CreateFileNameWithDateTime<CTL_StringType>(_T("errorlog_"), _T("txt"));
+                        auto baseFileName = filenameutils::CreateFileNameWithDateTime(_T("errorlog_"), _T("txt"));
 
                         // Create the file name with the path of the resources
                         auto errorName = stringconversion::Convert_Native_To_Ansi(CreateResourceFileName(baseFileName.c_str()));

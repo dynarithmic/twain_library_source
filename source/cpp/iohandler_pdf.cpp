@@ -210,8 +210,8 @@ namespace
 
         const double xInches = static_cast<double>(pbi->biXPelsPerMeter) / 39.37;
         const double yInches = static_cast<double>(pbi->biYPelsPerMeter) / 39.37;
-        const double xWidth = static_cast<double>(pbi->biWidth);
-        const double yHeight = static_cast<double>(pbi->biHeight);
+        const double xWidth = pbi->biWidth;
+        const double yHeight = pbi->biHeight;
         const double widthInPoints = xWidth / xInches * 72.0;
         const double heightInPoints = yHeight / yInches * 72.0;
 
@@ -394,7 +394,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
             CTL_StringArrayType pathValues;
             filenameutils::SplitPath(m_ImageInfoEx.szImageFileName, pathValues);
             szTempFile = m_ImageInfoEx.szImageFileName;
-            if ( basicstringutils::CompareNoCase<CTL_StringType>(pathValues[filenameutils::EXTENSION_POS], _T("TIF")))
+            if ( basicstringutils::CompareNoCase(pathValues[filenameutils::EXTENSION_POS], _T("TIF")))
                 PDFHandler.SetImageType(1);
             else
                 PDFHandler.SetImageType(0);
@@ -450,7 +450,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
 
             while ( itStart != itEnd )
             {
-                DTWAIN_PDFTEXTELEMENT SourceElement = static_cast<void*>(&(*itStart));
+                DTWAIN_PDFTEXTELEMENT SourceElement = &*itStart;
                 DTWAIN_PDFTEXTELEMENT TextElement = DTWAIN_CreatePDFTextElementCopy(SourceElement); // add to Source array of elements
                 DTWAIN_SetPDFTextElementLong(TextElement, DTWAIN_PDFTEXT_CURRENTPAGE, 0, DTWAIN_PDFTEXTELEMENT_DISPLAYFLAGS);
                 DTWAIN_AddPDFTextElement(reinterpret_cast<DTWAIN_SOURCE>(m_ImageInfoEx.theSource), TextElement);

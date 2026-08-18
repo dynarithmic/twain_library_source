@@ -29,12 +29,12 @@ CTL_CapabilitySetTripletBase::CTL_CapabilitySetTripletBase(CTL_ITwainSession *pS
                                                            TW_UINT16 sType,
                                                            TW_UINT16    sCap,
                                                            TW_UINT16 TwainType) :
-                    CTL_CapabilityTriplet(pSession, pSource, static_cast<TW_UINT16>(sType), TwainType, false),
+                    CTL_CapabilityTriplet(pSession, pSource, sType, TwainType, false),
                         m_gType(sType), m_gCap(sCap), m_nTwainType(TwainType)
 {
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
 
-    pCap->Cap = static_cast<TW_UINT16>(sCap);
+    pCap->Cap = sCap;
     pCap->ConType = static_cast<TW_UINT16>(-1);
     pCap->hContainer = nullptr;
 }
@@ -227,7 +227,7 @@ CTL_CapabilityResetTriplet::CTL_CapabilityResetTriplet(CTL_ITwainSession *pSessi
 {
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
 
-    pCap->Cap = static_cast<TW_UINT16>(sCap);
+    pCap->Cap = sCap;
     pCap->ConType = TWON_DONTCARE16;
     pCap->hContainer = nullptr;
     SetTestMode( true );  // No decoding done for this triplet type
@@ -235,23 +235,5 @@ CTL_CapabilityResetTriplet::CTL_CapabilityResetTriplet(CTL_ITwainSession *pSessi
 
 
 CTL_CapabilityResetAllTriplet::CTL_CapabilityResetAllTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : 
-    CTL_CapabilityResetTriplet(pSession, pSource, CAP_SUPPORTEDCAPS, MSG_RESETALL)
-{}
-
-
-#ifdef USE_EXPLICIT_TEMPLATE_INSTANTIATIONS
-    #include "ctltr016.inl"
-    template  CTL_CapabilitySetTriplet<int>;
-    template  CTL_CapabilitySetTriplet<long>;
-    template  CTL_CapabilitySetTriplet<unsigned int>;
-    template  CTL_CapabilitySetTriplet<unsigned long>;
-    template  CTL_CapabilitySetTriplet<unsigned short>;
-    template  CTL_CapabilitySetTriplet<double>;
-    template  CTL_CapabilitySetTriplet<std::string>;
-    template  CTL_CapabilitySetTriplet<char *>;
-    template  CTL_CapabilitySetTriplet<TW_FRAME>;
-    template  CTL_CapabilitySetTriplet<unsigned short *>;
-    template  CTL_CapabilitySetTriplet<int *>;
-    template  CTL_CapabilitySetTriplet<short *>;
-#endif
+    CTL_CapabilityResetTriplet(pSession, pSource, CAP_SUPPORTEDCAPS, MSG_RESETALL) {}
 
