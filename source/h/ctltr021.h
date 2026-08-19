@@ -22,8 +22,6 @@
 #define CTLTR021_H
 
 #include "ctltripletbase.h"
-#include "ctltwainsession.h"
-#include "ctltwainmanager.h"
 
 namespace dynarithmic
 {
@@ -35,7 +33,7 @@ namespace dynarithmic
                                         CTL_ITwainSource* pSource,
                                         TW_USERINTERFACE* pTWUI,
                                         TW_BOOL bShowUI = TRUE)
-                                        : CTL_TwainTriplet(), m_pUserInterface(pTWUI)
+                                        : m_pUserInterface(pTWUI)
             {
                 m_pUserInterface->ShowUI = bShowUI;
                 m_pUserInterface->ModalUI = 0;
@@ -48,7 +46,7 @@ namespace dynarithmic
             bool    IsModal() const { return m_pUserInterface->ModalUI?true:false; }
             TW_USERINTERFACE *GetTWUserInterface() const { return m_pUserInterface; }
 
-            virtual TW_UINT16 Execute()
+            TW_UINT16 Execute() override
             {
                 return ExecuteFn::Execute(*this);
             }

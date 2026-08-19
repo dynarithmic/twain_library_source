@@ -21,10 +21,14 @@
 #ifndef CTLTR026_H
 #define CTLTR026_H
 
+#include <string>
+#include "blankpage.h"
 #include "ctltr024.h"
 #include "ctltr027.h"
+#include "ctldib32ex.h"
 namespace dynarithmic
 {
+    struct DTWAINImageInfoEx;
     class CTL_ImageIOHandler;
     class ImageXferFileWriter;
 

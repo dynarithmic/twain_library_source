@@ -21,12 +21,13 @@
 #ifndef CTLTR024_H
 #define CTLTR024_H
 
+#include "ctlenum.h"
 #include "ctltripletbase.h"
-#include "ctltwainsession.h"
-#include "ctlobtyp.h"
 
 namespace dynarithmic
 {
+    class CTL_TwainDibArray;
+
     class CTL_ImageTriplet : public CTL_TwainTriplet
     {
         public:

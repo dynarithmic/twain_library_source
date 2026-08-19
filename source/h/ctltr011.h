@@ -20,7 +20,11 @@
  */
 #ifndef CTLTR011_H
 #define CTLTR011_H
+#include "ctlconstexprutils.h"
+#include "ctlenum.h"
 #include "ctltr010.h"
+#include "ctltwainsession.h"
+
 namespace dynarithmic
 {
     class CTL_CapabilityGetTriplet : public CTL_CapabilityTriplet

@@ -22,6 +22,7 @@
 #define CTLCONSTEXPRUTILS_H
 
 #include <array>
+#include <string_view>
 #include "ctlconstexprfind.h"
 #include "twain.h"
 #include "ctlenum.h"

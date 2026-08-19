@@ -26,6 +26,7 @@ OF THIRD PARTY RIGHTS.
 #include <windows.h>
 #include <optional>
 #include <memory>
+#include <vector>
 #include "dtwaindefs.h"
 #include "blankpage.h"
 #include "fltrect.h"

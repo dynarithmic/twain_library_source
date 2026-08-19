@@ -31,7 +31,7 @@ namespace dynarithmic
     {
         public:
             CTL_Palette8Triplet(CTL_ITwainSession* pSession,
-                                CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_Palette8()
+                                CTL_ITwainSource* pSource) : m_Palette8()
             {
                 InitGeneric(pSession, pSource, DG_IMAGE, DAT_PALETTE8, MsgType, &m_Palette8);
             }

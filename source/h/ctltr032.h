@@ -22,6 +22,8 @@
 #define CTLTR032_H
 
 #include "ctltr010.h"
+#include "ctlconstexprutils.h"
+
 namespace dynarithmic
 {
     template <TW_UINT16 GetSetType>
@@ -29,11 +31,11 @@ namespace dynarithmic
     {
         public:
             CTL_ImageLayoutTripletImpl(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource,
-                                       const CTL_RealArray* rArray = nullptr) : CTL_TwainTriplet(), m_ImageLayout{}
+                                       const CTL_RealArray* rArray = nullptr) : m_ImageLayout{}
             {
                 InitGeneric(pSession, pSource, DG_IMAGE, DAT_IMAGELAYOUT, GetSetType, &m_ImageLayout);
 
-                if (::IsMSGSetOrResetType(GetSetType))
+                if (IsMSGSetOrResetType(GetSetType))
                 {
                     TW_IMAGELAYOUT* pLayout = GetImageLayout();
                     if (GetSetType != MSG_RESET && rArray && rArray->size() >= 4)

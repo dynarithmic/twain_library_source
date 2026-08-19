@@ -20,6 +20,8 @@
  */
 #include "arrayfactory.h"
 #include "ctlgetsetcapsinternal.h"
+#include "ctltwainsource.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -35,7 +37,7 @@ namespace dynarithmic
         int nWhere;
         FindFirstValue(strProdName, &pHandle->m_aSourceCapInfo, &nWhere);
         if (nWhere == -1)
-            return CTL_CapInfoMapPtr();
+            return {};
 
         // Get the cap array values
         const CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
@@ -46,7 +48,6 @@ namespace dynarithmic
     CTL_CapInfo* GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap)
     {
         const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, p);
-        CTL_CapInfo* CapInfo = nullptr;
         if (!pArray)
         {
             return nullptr;
@@ -54,8 +55,9 @@ namespace dynarithmic
         const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
         if (iter != pArray->end())
         {
-            CapInfo = &iter->second;
-            CapInfo->SetValid(true);
+            CTL_CapInfo* CapInfo = &iter->second;
+            if ( CapInfo )
+                CapInfo->SetValid(true);
             return CapInfo;
         }
         return nullptr;

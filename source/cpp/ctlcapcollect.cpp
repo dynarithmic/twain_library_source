@@ -23,6 +23,7 @@
 #include "ctlcapcollect.h"
 #include "cppfunc.h"
 #include "ctlstaticdata.h"
+#include "ctltwainsource.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
