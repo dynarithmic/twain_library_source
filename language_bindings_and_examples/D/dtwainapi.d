@@ -985,6 +985,8 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ERR_BLANKNAMEDETECTED = (-1087);
     public static const int DTWAIN_ERR_FEEDER_NOPAPERSENSOR = (-1088);
     public static const int DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089);
+    public static const int DTWAIN_ERR_DTWAINDLL_VERSION = (-1090);
+    public static const int DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091);
     public static const int TWAIN_ERR_LOW_MEMORY = (-1100);
     public static const int TWAIN_ERR_FALSE_ALARM = (-1101);
     public static const int TWAIN_ERR_BUMMER = (-1102);
