@@ -26,6 +26,7 @@
 #include "ctldtwainhandle.h"
 #include "ctlgetversion.h"
 #include "dtwinverex.h"
+#include "ctltwainidentity.h"
 
 using namespace dynarithmic;
 
@@ -262,6 +263,14 @@ namespace dynarithmic
             }
             sDSMPath = _T("Active DSM Path: ") + sDSMPath;
             sVer += _T("\n") + sWinVer + sDSMPath + sDSMVersionInfo + _T("\n");
+            std::string sTwainSessionInfo;
+            if ( pHandle->m_bSessionAllocated && pHandle->m_pTwainSession )
+                sTwainSessionInfo = pHandle->m_pTwainSession->GetTwainIdentity().to_json_formatted(2) + "\n";
+            sVer += _T("Current TWAIN Session Info:");
+            if (sTwainSessionInfo.empty())
+                sVer += _T(" (No Active TWAIN Session)");
+            else
+                sVer += _T("\n") + stringconversion::Convert_Ansi_To_Native(sTwainSessionInfo);
             #ifdef _WIN32
             // All log messages must be ANSI
             ansiVer = stringconversion::Convert_Native_To_Ansi(sVer);

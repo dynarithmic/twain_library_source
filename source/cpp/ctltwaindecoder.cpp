@@ -995,6 +995,11 @@ std::string CTL_TWAINTypeDecoder::DecodeTWAINReturnCodeCC(TW_UINT16 retCode)
                            GetErrorString_Internal(DTWAIN_ERR_UNKNOWN_TWAIN_CC));
 }
 
+std::string CTL_TWAINTypeDecoder::DecodeTWAINIdentity(pTW_IDENTITY pId)
+{
+    return DecodeTWIdentity(pId);
+}
+
 std::string CTL_TWAINTypeDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, std::string_view defMessage)
 {
     const TW_UINT16 actualCode = retCode + errStart;
