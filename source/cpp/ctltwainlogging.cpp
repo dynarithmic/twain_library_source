@@ -26,6 +26,7 @@
 #include "ctldtwainhandle.h"
 #include "ctlgetversion.h"
 #include "dtwinverex.h"
+#include "ctltwainidentity.h"
 
 using namespace dynarithmic;
 
