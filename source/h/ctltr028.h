@@ -23,9 +23,10 @@
 
 #include <unordered_map>
 #include <algorithm>
-#include "capconst.h"
 #include "ctltripletbase.h"
 #include "ctlgetsetcapsinternal.h"
+#include "ctlstringutils.h"
+
 namespace dynarithmic
 {
     template <TW_UINT16 GetSetType>
@@ -36,11 +37,11 @@ namespace dynarithmic
                 CTL_ITwainSource* pSource,
                 CTL_TwainFileFormatEnum FileFormat,
                 CTL_StringType strFileName
-            ) : CTL_TwainTriplet(), m_SetupFileXfer()
+            ) : m_SetupFileXfer()
             {
                 SetSessionPtr(pSession);
                 SetSourcePtr(pSource);
-                stringutils::SafeStrcpy(m_SetupFileXfer.FileName,
+                basicstringutils::SafeStrcpy(m_SetupFileXfer.FileName,
                     stringconversion::Convert_Native_To_Ansi(strFileName).c_str(),
                     sizeof m_SetupFileXfer.FileName - 1);
 
@@ -49,7 +50,7 @@ namespace dynarithmic
                 InitGeneric(pSession, pSource, DG_CONTROL, DAT_SETUPFILEXFER, GetSetType, &m_SetupFileXfer);
 
                 // Set the capability map if this is a set type
-                const bool bIsSet = IsMSGSetType();
+                const bool bIsSet = IsMessageSetType();
                 if (bIsSet)
                 {
                     m_capMap[ICAP_JPEGPIXELTYPE] = TWPT_BW;
@@ -64,7 +65,7 @@ namespace dynarithmic
             {
                 CTL_ITwainSource* m_pSource;
                 CapGetter(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
-                void operator()(CTL_SetupFileXferTripletImpl::FileXferCapMap::value_type& v) const
+                void operator()(FileXferCapMap::value_type& v) const
                 {
                     CTL_TwainAppMgr::GetOneTwainCapValue(m_pSource, &v.second, v.first, MSG_GETCURRENT,
                                                          static_cast<TW_UINT16>(CTL_TwainAppMgr::GetGeneralCapInfo(v.first).m_nDataType));
@@ -75,7 +76,7 @@ namespace dynarithmic
             {
                 CTL_ITwainSource* m_pSource;
                 CapSetter(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
-                void operator()(const CTL_SetupFileXferTripletImpl::FileXferCapMap::value_type& v) const
+                void operator()(const FileXferCapMap::value_type& v) const
                 {
                     SetOneCapValue(m_pSource, v.first, MSG_SET, v.second, static_cast<TW_UINT16>(CTL_TwainAppMgr::GetGeneralCapInfo(v.first).m_nDataType));
                 }
@@ -83,7 +84,7 @@ namespace dynarithmic
 
             TW_UINT16 Execute() override
             {
-                const bool bIsSet = IsMSGSetType();
+                const bool bIsSet = IsMessageSetType();
 
                 if (bIsSet)
                 {

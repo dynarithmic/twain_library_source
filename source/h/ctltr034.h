@@ -27,7 +27,7 @@ namespace dynarithmic
     class CTL_DeviceEventTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_DeviceEventTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : CTL_TwainTriplet()
+            CTL_DeviceEventTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource)
             {
                 InitGeneric(pSession, pSource, DG_CONTROL, DAT_DEVICEEVENT, MSG_GET, &m_DeviceEvent);
                 m_bPassed = false;

@@ -453,12 +453,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlgetsetcapsinternal.h
         ${PROJECT_SOURCE_DIR}/h/ctltr000.h
         ${PROJECT_SOURCE_DIR}/h/ctltr001.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr002.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr003.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr004.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr005.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr006.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr007.h
         ${PROJECT_SOURCE_DIR}/h/ctltr008.h
         ${PROJECT_SOURCE_DIR}/h/ctltr009.h
         ${PROJECT_SOURCE_DIR}/h/ctltr010.h
@@ -473,8 +467,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltr019.h
         ${PROJECT_SOURCE_DIR}/h/ctltr020.h
         ${PROJECT_SOURCE_DIR}/h/ctltr021.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr022.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr023.h
         ${PROJECT_SOURCE_DIR}/h/ctltr024.h
         ${PROJECT_SOURCE_DIR}/h/ctltr025.h
         ${PROJECT_SOURCE_DIR}/h/ctltr026.h
@@ -484,7 +476,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltr030.h
         ${PROJECT_SOURCE_DIR}/h/ctltr031.h
         ${PROJECT_SOURCE_DIR}/h/ctltr032.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr033.h
         ${PROJECT_SOURCE_DIR}/h/ctltr034.h
         ${PROJECT_SOURCE_DIR}/h/ctltr035.h
         ${PROJECT_SOURCE_DIR}/h/ctltr036.h

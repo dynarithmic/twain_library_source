@@ -30,7 +30,7 @@ namespace dynarithmic
     {
         public:
             CTL_CustomDSTripletImpl(CTL_ITwainSession* pSession,
-                CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_CustomDSData{}
+                CTL_ITwainSource* pSource) : m_CustomDSData{}
             {
                 InitGeneric(pSession, pSource, DG_CONTROL, DAT_CUSTOMDSDATA, nMsg, &m_CustomDSData);
             }

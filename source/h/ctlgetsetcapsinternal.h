@@ -36,6 +36,7 @@
 #include "ctltr019.h"
 #include "ctltr020.h"
 #include "ctltwaindllhandle.h"
+#include "ctlstringconversion.h"
 #define USE_NORMALSTRINGS  1
 #define USE_LONGSTRINGS    2
 #define USE_UNICODESTRINGS 4

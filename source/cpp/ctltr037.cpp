@@ -19,6 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr037.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 /////////////////////////////////////////////////////////////////////////

@@ -20,6 +20,7 @@
  */
 #include "ctltr015.h"
 #include "ctlobtyp.h"
+#include "ctltwainsession.h"
 
 using namespace dynarithmic;
 

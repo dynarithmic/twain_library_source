@@ -19,7 +19,10 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr016.h"
+
+#include "ctlconstexprutils.h"
 #include "ctltwaindllhandle.h"
+#include "ctltwainsession.h"
 
 using namespace dynarithmic;
 
