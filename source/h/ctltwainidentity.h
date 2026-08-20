@@ -29,6 +29,8 @@
 #include <string_view>
 #include <windows.h>
 #include "twain.h"
+#include "ctlstaticdata.h"
+#include "ctlstringutils.h"
 
 namespace dynarithmic
 {
@@ -45,7 +47,6 @@ namespace dynarithmic
 
         TW_IDENTITY m_identity;
         static constexpr unsigned maxCharSize = 32;
-        mutable std::string m_JsonCached;
 
     public:
         explicit CTL_TwainIdentity(TW_IDENTITY& t) : m_identity(t) {}
@@ -125,8 +126,6 @@ namespace dynarithmic
 
         std::string to_json() const
         {
-            if (!m_JsonCached.empty())
-                return m_JsonCached;
             std::stringstream jstrm;
             if (m_identity.SupportedGroups == 0)
                 jstrm << "{\"device-name\":\"" << m_identity.ProductName << "\", \"twain-identity\":\"<not available>\"}";
@@ -161,10 +160,18 @@ namespace dynarithmic
                 jstrm << "\"version-minornum\":" << m_identity.Version.MinorNum;
                 jComponents.push_back(jstrm.str());
                 jstrm.str("");
-                jstrm << "\"version-language\":" << m_identity.Version.Language;
+                auto lang = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWLG, m_identity.Version.Language);
+                if ( lang.first )
+                    jstrm << "\"version-language\":" << basicstringutils::QuoteString(lang.second);
+                else
+                    jstrm << "\"version-language\":" << m_identity.Version.Language;
                 jComponents.push_back(jstrm.str());
                 jstrm.str("");
-                jstrm << "\"version-country\":" << m_identity.Version.Country;
+                auto country = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWCY, m_identity.Version.Country);
+                if (country.first)
+                    jstrm << "\"version-country\":" << basicstringutils::QuoteString(country.second);
+                else
+                    jstrm << "\"version-country\":" << m_identity.Version.Country;
                 jComponents.push_back(jstrm.str());
                 jstrm.str("");
                 jstrm << "\"version-info\":\"" << m_identity.Version.Info << "\"";
@@ -177,8 +184,7 @@ namespace dynarithmic
                 jstrm.str("");
                 jstrm << "{\"device-name\":\"" << m_identity.ProductName << "\", \"twain-identity\":{" << s1 << "}";
             }
-            m_JsonCached = jstrm.str();
-            return m_JsonCached;
+            return jstrm.str();
         }
     };
 }

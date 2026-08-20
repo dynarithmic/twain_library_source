@@ -122,8 +122,9 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((nMajor, nMinor))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-        pHandle->m_SessionStruct.nMajorNum = static_cast<TW_UINT16>(nMajor);
-        pHandle->m_SessionStruct.nMinorNum = static_cast<TW_UINT16>(nMinor);
+        constexpr DWORD minValue = 0xFFFF;
+        pHandle->m_SessionStruct.nMajorNum = static_cast<TW_UINT16>(std::min(nMajor, minValue));
+        pHandle->m_SessionStruct.nMinorNum = static_cast<TW_UINT16>(std::min(nMinor, minValue));
         if (pHandle->m_bSessionAllocated && pHandle->m_pTwainSession)
         {
             pHandle->m_pTwainSession->FillTWIdentity(pHandle);

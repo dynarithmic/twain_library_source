@@ -132,7 +132,8 @@ CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
 
 void CTL_ITwainSession::FillTWIdentity(const CTL_TwainDLLHandle* pHandle)
 {
-    TW_IDENTITY m_AppIdTemp = {};
+    TW_IDENTITY& m_AppIdTemp = m_AppId.get_identity();
+    m_AppIdTemp = {};
     m_AppIdTemp.Id = 0;
     m_AppIdTemp.Version.MajorNum = pHandle->m_SessionStruct.nMajorNum;
     m_AppIdTemp.Version.MinorNum = pHandle->m_SessionStruct.nMinorNum;
@@ -150,7 +151,6 @@ void CTL_ITwainSession::FillTWIdentity(const CTL_TwainDLLHandle* pHandle)
     stringutils::SafeStrcpy(m_AppIdTemp.Manufacturer, stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szManufact).c_str(), sizeof m_AppIdTemp.Manufacturer - 1);
     stringutils::SafeStrcpy(m_AppIdTemp.ProductFamily, stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szFamily).c_str(), sizeof m_AppIdTemp.ProductFamily - 1);
     stringutils::SafeStrcpy(m_AppIdTemp.ProductName, stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szProduct).c_str(), sizeof m_AppIdTemp.ProductName - 1);
-    m_AppId = m_AppIdTemp;
 }
 
 CTL_ITwainSource* CTL_ITwainSession::CreateTwainSource( LPCTSTR pProduct )

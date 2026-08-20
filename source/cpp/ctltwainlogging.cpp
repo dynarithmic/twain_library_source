@@ -263,8 +263,8 @@ namespace dynarithmic
             sDSMPath = _T("Active DSM Path: ") + sDSMPath;
             sVer += _T("\n") + sWinVer + sDSMPath + sDSMVersionInfo + _T("\n");
             std::string sTwainSessionInfo;
-            if ( pHandle->m_bSessionAllocated )
-                sTwainSessionInfo = CTL_TWAINTypeDecoder::DecodeTWAINIdentity(pHandle->m_pTwainSession->GetAppIDPtr());
+            if ( pHandle->m_bSessionAllocated && pHandle->m_pTwainSession )
+                sTwainSessionInfo = pHandle->m_pTwainSession->GetTwainIdentity().to_json_formatted(2) + "\n";
             sVer += _T("Current TWAIN Session Info:");
             if (sTwainSessionInfo.empty())
                 sVer += _T(" (No Active TWAIN Session)");

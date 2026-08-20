@@ -57,6 +57,7 @@ namespace dynarithmic
 
         HWND*               GetWindowHandlePtr() const { return const_cast<HWND*>(&m_AppWnd); }
         TW_IDENTITY*        GetAppIDPtr()              { return &m_AppId.get_identity(); }
+        const CTL_TwainIdentity&   GetTwainIdentity() const { return m_AppId; }
         CTL_ITwainSource*    CreateTwainSource( LPCTSTR pProduct );
         bool                AddTwainSource( CTL_ITwainSource *pSource );
         void                CopyAllSources( CTL_TwainSourceSet & rArray );
