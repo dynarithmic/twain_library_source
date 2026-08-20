@@ -108,7 +108,7 @@ CTL_ITwainSession*  CTL_ITwainSession::Create(CTL_TwainDLLHandle *pHandle,
 CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
                                      LPCTSTR pAppName,
                                      HWND* hAppWnd) : 
-                                    m_AppId{}, m_AppWnd{}, m_pTwainDLLHandle{}, m_pSelectedSource{}
+                                     m_AppWnd{}, m_pTwainDLLHandle{}, m_pSelectedSource{}
 {
     if ( pAppName )
         m_AppName = pAppName;
@@ -123,28 +123,34 @@ CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
         m_bTwainWindowCreated = true;
     }
 
+    FillTWIdentity(pHandle);
+
+    m_pSelectedSource = nullptr;
+    m_bTwainMessageFlag = false;
+    m_bAllSourcesRetrieved = false;
+}
+
+void CTL_ITwainSession::FillTWIdentity(const CTL_TwainDLLHandle* pHandle)
+{
     TW_IDENTITY m_AppIdTemp = {};
     m_AppIdTemp.Id = 0;
     m_AppIdTemp.Version.MajorNum = pHandle->m_SessionStruct.nMajorNum;
     m_AppIdTemp.Version.MinorNum = pHandle->m_SessionStruct.nMinorNum;
     m_AppIdTemp.Version.Language = pHandle->m_SessionStruct.nLanguage;
-    m_AppIdTemp.Version.Country  = pHandle->m_SessionStruct.nCountry;
+    m_AppIdTemp.Version.Country = pHandle->m_SessionStruct.nCountry;
 
-    stringutils::SafeStrcpy( m_AppIdTemp.Version.Info,
-                                stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szVersion).c_str(),
-                                sizeof m_AppIdTemp.Version.Info - 1 );
+    stringutils::SafeStrcpy(m_AppIdTemp.Version.Info,
+        stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szVersion).c_str(),
+        sizeof m_AppIdTemp.Version.Info - 1);
 
-    m_AppIdTemp.ProtocolMajor =    TWON_PROTOCOLMAJOR;
-    m_AppIdTemp.ProtocolMinor =    TWON_PROTOCOLMINOR;
-    m_AppIdTemp.SupportedGroups =  DG_IMAGE | DG_CONTROL | DG_AUDIO | DF_APP2 | DF_DSM2 ;
+    m_AppIdTemp.ProtocolMajor = TWON_PROTOCOLMAJOR;
+    m_AppIdTemp.ProtocolMinor = TWON_PROTOCOLMINOR;
+    m_AppIdTemp.SupportedGroups = DG_IMAGE | DG_CONTROL | DG_AUDIO | DF_APP2 | DF_DSM2;
 
-    stringutils::SafeStrcpy( m_AppIdTemp.Manufacturer,  stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szManufact).c_str(), sizeof m_AppIdTemp.Manufacturer - 1 );
-    stringutils::SafeStrcpy( m_AppIdTemp.ProductFamily, stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szFamily).c_str(), sizeof m_AppIdTemp.ProductFamily - 1 );
-    stringutils::SafeStrcpy( m_AppIdTemp.ProductName,   stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szProduct).c_str(),sizeof m_AppIdTemp.ProductName - 1 );
+    stringutils::SafeStrcpy(m_AppIdTemp.Manufacturer, stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szManufact).c_str(), sizeof m_AppIdTemp.Manufacturer - 1);
+    stringutils::SafeStrcpy(m_AppIdTemp.ProductFamily, stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szFamily).c_str(), sizeof m_AppIdTemp.ProductFamily - 1);
+    stringutils::SafeStrcpy(m_AppIdTemp.ProductName, stringconversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szProduct).c_str(), sizeof m_AppIdTemp.ProductName - 1);
     m_AppId = m_AppIdTemp;
-    m_pSelectedSource = nullptr;
-    m_bTwainMessageFlag = false;
-    m_bAllSourcesRetrieved = false;
 }
 
 CTL_ITwainSource* CTL_ITwainSession::CreateTwainSource( LPCTSTR pProduct )

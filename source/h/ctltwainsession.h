@@ -82,6 +82,8 @@ namespace dynarithmic
         void                SetTwainDLLHandle(CTL_TwainDLLHandle* pHandle) { m_pTwainDLLHandle = pHandle; }
         const CTL_TwainSourceSet& GetTwainSources();
         const CTL_TwainSourceSet& GetCurrentTwainSources() const { return m_arrTwainSource; }
+        void                FillTWIdentity(const CTL_TwainDLLHandle* pHandle);
+
         virtual ~CTL_ITwainSession();
 
     protected:

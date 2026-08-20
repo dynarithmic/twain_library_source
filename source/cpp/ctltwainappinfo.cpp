@@ -21,6 +21,7 @@
 #include "cppfunc.h"
 #include "ctldtwainhandle.h"
 #include "ctltwaindllhandle.h"
+#include "ctltwainsession.h"
 
 using namespace dynarithmic;
 extern "C"
@@ -38,6 +39,10 @@ extern "C"
             pHandle->m_SessionStruct.szFamily = szProdFam;
         if ( szProdName )
             pHandle->m_SessionStruct.szProduct = szProdName;
+        if ( pHandle->m_bSessionAllocated && pHandle->m_pTwainSession )
+        {
+            pHandle->m_pTwainSession->FillTWIdentity(pHandle);
+        }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -76,6 +81,10 @@ extern "C"
         LOG_FUNC_ENTRY_PARAMS((nCountry))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         pHandle->m_SessionStruct.nCountry = static_cast<TW_UINT16>(nCountry);
+        if (pHandle->m_bSessionAllocated && pHandle->m_pTwainSession)
+        {
+            pHandle->m_pTwainSession->FillTWIdentity(pHandle);
+        }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -85,6 +94,10 @@ extern "C"
         LOG_FUNC_ENTRY_PARAMS((nLanguage))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         pHandle->m_SessionStruct.nLanguage = static_cast<TW_UINT16>(nLanguage);
+        if (pHandle->m_bSessionAllocated && pHandle->m_pTwainSession)
+        {
+            pHandle->m_pTwainSession->FillTWIdentity(pHandle);
+        }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -103,5 +116,32 @@ extern "C"
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_SessionStruct.nLanguage)
         CATCH_BLOCK(DTWAIN_FAILURE1)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMajorMinorVersion(DWORD nMajor, DWORD nMinor)
+    {
+        LOG_FUNC_ENTRY_PARAMS((nMajor, nMinor))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        pHandle->m_SessionStruct.nMajorNum = static_cast<TW_UINT16>(nMajor);
+        pHandle->m_SessionStruct.nMinorNum = static_cast<TW_UINT16>(nMinor);
+        if (pHandle->m_bSessionAllocated && pHandle->m_pTwainSession)
+        {
+            pHandle->m_pTwainSession->FillTWIdentity(pHandle);
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetMajorMinorVersion(LPDWORD pMajor, LPDWORD pMinor)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pMajor, pMinor))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (pMajor)
+            *pMajor = pHandle->m_SessionStruct.nMajorNum;
+        if (pMinor)
+            *pMinor = pHandle->m_SessionStruct.nMinorNum;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pMajor, pMinor))
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
     }
 }
