@@ -3234,6 +3234,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetLoggerCallbackDelegate() As DTwainLoggerProc
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetMajorMinorVersionDelegate(ByRef nMajor As UInteger, ByRef nMinor As UInteger) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetManualDuplexCountDelegate(Source As System.IntPtr, ByRef pSide1 As Integer, ByRef pSide2 As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -4255,6 +4258,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetLoggerCallbackDelegate(logProc As DTwainLoggerProc, UserData As System.Int64) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_SetMajorMinorVersionDelegate(nMajor As UInteger, nMinor As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetManualDuplexModeDelegate(Source As System.IntPtr, Flags As Integer, bSet As Integer) As Integer
@@ -6263,6 +6269,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetLoggerCallback()
         End Function
         
+        Public Function DTWAIN_GetMajorMinorVersion(ByRef nMajor As UInteger, ByRef nMinor As UInteger) As Integer
+        Return api.DTWAIN_GetMajorMinorVersion(nMajor, nMinor)
+        End Function
+        
         Public Function DTWAIN_GetManualDuplexCount(Source As System.IntPtr, ByRef pSide1 As Integer, ByRef pSide2 As Integer) As Integer
         Return api.DTWAIN_GetManualDuplexCount(Source, pSide1, pSide2)
         End Function
@@ -7627,6 +7637,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetLoggerCallback(logProc, UserData)
         End Function
         
+        Public Function DTWAIN_SetMajorMinorVersion(nMajor As UInteger, nMinor As UInteger) As Integer
+        Return api.DTWAIN_SetMajorMinorVersion(nMajor, nMinor)
+        End Function
+        
         Public Function DTWAIN_SetManualDuplexMode(Source As System.IntPtr, Flags As Integer, bSet As Integer) As Integer
         Return api.DTWAIN_SetManualDuplexMode(Source, Flags, bSet)
         End Function
@@ -8428,6 +8442,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetLightSources As DTWAIN_GetLightSourcesDelegate
             Public DTWAIN_GetLightSourcesEx As DTWAIN_GetLightSourcesExDelegate
             Public DTWAIN_GetLoggerCallback As DTWAIN_GetLoggerCallbackDelegate
+            Public DTWAIN_GetMajorMinorVersion As DTWAIN_GetMajorMinorVersionDelegate
             Public DTWAIN_GetManualDuplexCount As DTWAIN_GetManualDuplexCountDelegate
             Public DTWAIN_GetMaxAcquisitions As DTWAIN_GetMaxAcquisitionsDelegate
             Public DTWAIN_GetMaxBuffers As DTWAIN_GetMaxBuffersDelegate
@@ -8769,6 +8784,7 @@ Namespace Dynarithmic
             Public DTWAIN_SetLightSources As DTWAIN_SetLightSourcesDelegate
             Public DTWAIN_SetLogSaveThreshold As DTWAIN_SetLogSaveThresholdDelegate
             Public DTWAIN_SetLoggerCallback As DTWAIN_SetLoggerCallbackDelegate
+            Public DTWAIN_SetMajorMinorVersion As DTWAIN_SetMajorMinorVersionDelegate
             Public DTWAIN_SetManualDuplexMode As DTWAIN_SetManualDuplexModeDelegate
             Public DTWAIN_SetMaxAcquisitions As DTWAIN_SetMaxAcquisitionsDelegate
             Public DTWAIN_SetMaxBuffers As DTWAIN_SetMaxBuffersDelegate

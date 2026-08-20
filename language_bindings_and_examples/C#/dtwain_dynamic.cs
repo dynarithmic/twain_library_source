@@ -2383,6 +2383,7 @@
         public delegate int DTWAIN_GetLightSourcesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY LightSources);
         public delegate DTWAIN_ARRAY DTWAIN_GetLightSourcesExDelegate(DTWAIN_SOURCE Source);
         public delegate DTwainLoggerProc DTWAIN_GetLoggerCallbackDelegate();
+        public delegate int DTWAIN_GetMajorMinorVersionDelegate(ref DWORD nMajor, ref DWORD nMinor);
         public delegate int DTWAIN_GetManualDuplexCountDelegate(DTWAIN_SOURCE Source, ref int pSide1, ref int pSide2);
         public delegate int DTWAIN_GetMaxAcquisitionsDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetMaxBuffersDelegate(DTWAIN_SOURCE Source, ref DWORD pMaxBuf);
@@ -2766,6 +2767,7 @@
         public delegate int DTWAIN_SetLightSourcesDelegate(DTWAIN_SOURCE Source, DTWAIN_ARRAY LightSources);
         public delegate int DTWAIN_SetLogSaveThresholdDelegate(LONG64 lineCount);
         public delegate int DTWAIN_SetLoggerCallbackDelegate(DTwainLoggerProc logProc, long UserData);
+        public delegate int DTWAIN_SetMajorMinorVersionDelegate(uint nMajor, uint nMinor);
         public delegate int DTWAIN_SetManualDuplexModeDelegate(DTWAIN_SOURCE Source, int Flags, int bSet);
         public delegate int DTWAIN_SetMaxAcquisitionsDelegate(DTWAIN_SOURCE Source, int MaxAcquires);
         public delegate int DTWAIN_SetMaxBuffersDelegate(DTWAIN_SOURCE Source, uint MaxBuf);
@@ -4261,6 +4263,9 @@
         [DTWAINNativeFunction("DTWAIN_GetLoggerCallback")]
         private readonly DTWAIN_GetLoggerCallbackDelegate  _DTWAIN_GetLoggerCallback;
 
+        [DTWAINNativeFunction("DTWAIN_GetMajorMinorVersion")]
+        private readonly DTWAIN_GetMajorMinorVersionDelegate  _DTWAIN_GetMajorMinorVersion;
+
         [DTWAINNativeFunction("DTWAIN_GetManualDuplexCount")]
         private readonly DTWAIN_GetManualDuplexCountDelegate  _DTWAIN_GetManualDuplexCount;
 
@@ -5409,6 +5414,9 @@
 
         [DTWAINNativeFunction("DTWAIN_SetLoggerCallback")]
         private readonly DTWAIN_SetLoggerCallbackDelegate  _DTWAIN_SetLoggerCallback;
+
+        [DTWAINNativeFunction("DTWAIN_SetMajorMinorVersion")]
+        private readonly DTWAIN_SetMajorMinorVersionDelegate  _DTWAIN_SetMajorMinorVersion;
 
         [DTWAINNativeFunction("DTWAIN_SetManualDuplexMode")]
         private readonly DTWAIN_SetManualDuplexModeDelegate  _DTWAIN_SetManualDuplexMode;
@@ -7074,6 +7082,9 @@
         public  DTwainLoggerProc DTWAIN_GetLoggerCallback()
         => _DTWAIN_GetLoggerCallback();
 
+        public  int DTWAIN_GetMajorMinorVersion(ref DWORD nMajor, ref DWORD nMinor)
+        => _DTWAIN_GetMajorMinorVersion(ref nMajor, ref nMinor);
+
         public  int DTWAIN_GetManualDuplexCount(DTWAIN_SOURCE Source, ref int pSide1, ref int pSide2)
         => _DTWAIN_GetManualDuplexCount(Source, ref pSide1, ref pSide2);
 
@@ -8222,6 +8233,9 @@
 
         public  int DTWAIN_SetLoggerCallback(DTwainLoggerProc logProc, long UserData)
         => _DTWAIN_SetLoggerCallback(logProc, UserData);
+
+        public  int DTWAIN_SetMajorMinorVersion(uint nMajor, uint nMinor)
+        => _DTWAIN_SetMajorMinorVersion(nMajor, nMinor);
 
         public  int DTWAIN_SetManualDuplexMode(DTWAIN_SOURCE Source, int Flags, int bSet)
         => _DTWAIN_SetManualDuplexMode(Source, Flags, bSet);

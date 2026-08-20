@@ -2366,6 +2366,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetLoggerCallback.restype = theDLL.SETLOGGERPROC_TYPE
      theDLL.DTWAIN_GetLoggerCallbackA.restype = theDLL.SETLOGGERPROCA_TYPE
      theDLL.DTWAIN_GetLoggerCallbackW.restype = theDLL.SETLOGGERPROCW_TYPE
+     theDLL.DTWAIN_GetMajorMinorVersion.restype = ct.c_long
      theDLL.DTWAIN_GetManualDuplexCount.restype = ct.c_long
      theDLL.DTWAIN_GetMaxAcquisitions.restype = ct.c_long
      theDLL.DTWAIN_GetMaxBuffers.restype = ct.c_long
@@ -2853,6 +2854,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetLoggerCallback.restype = ct.c_long
      theDLL.DTWAIN_SetLoggerCallbackA.restype = ct.c_long
      theDLL.DTWAIN_SetLoggerCallbackW.restype = ct.c_long
+     theDLL.DTWAIN_SetMajorMinorVersion.restype = ct.c_long
      theDLL.DTWAIN_SetManualDuplexMode.restype = ct.c_long
      theDLL.DTWAIN_SetMaxAcquisitions.restype = ct.c_long
      theDLL.DTWAIN_SetMaxBuffers.restype = ct.c_long
@@ -3529,6 +3531,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetLightSource.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLightSources.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetLightSourcesEx.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_GetMajorMinorVersion.argtypes = [ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong)]
      theDLL.DTWAIN_GetManualDuplexCount.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetMaxAcquisitions.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetMaxBuffers.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ulong)]
@@ -3996,6 +3999,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetLoggerCallback.argtypes = [theDLL.SETLOGGERPROC_TYPE, ct.c_int64]
      theDLL.DTWAIN_SetLoggerCallbackA.argtypes = [theDLL.SETLOGGERPROCA_TYPE, ct.c_int64]
      theDLL.DTWAIN_SetLoggerCallbackW.argtypes = [theDLL.SETLOGGERPROCW_TYPE, ct.c_int64]
+     theDLL.DTWAIN_SetMajorMinorVersion.argtypes = [ct.c_ulong, ct.c_ulong]
      theDLL.DTWAIN_SetManualDuplexMode.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetMaxAcquisitions.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_SetMaxBuffers.argtypes = [ct.c_void_p, ct.c_ulong]
@@ -4707,6 +4711,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetLoggerCallback.restype = theDLL.SETLOGGERPROC_TYPE
      theDLL.DTWAIN_GetLoggerCallbackA.restype = theDLL.SETLOGGERPROCA_TYPE
      theDLL.DTWAIN_GetLoggerCallbackW.restype = theDLL.SETLOGGERPROCW_TYPE
+     theDLL.DTWAIN_GetMajorMinorVersion.restype = ct.c_long
      theDLL.DTWAIN_GetManualDuplexCount.restype = ct.c_long
      theDLL.DTWAIN_GetMaxAcquisitions.restype = ct.c_long
      theDLL.DTWAIN_GetMaxBuffers.restype = ct.c_long
@@ -5194,6 +5199,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetLoggerCallback.restype = ct.c_long
      theDLL.DTWAIN_SetLoggerCallbackA.restype = ct.c_long
      theDLL.DTWAIN_SetLoggerCallbackW.restype = ct.c_long
+     theDLL.DTWAIN_SetMajorMinorVersion.restype = ct.c_long
      theDLL.DTWAIN_SetManualDuplexMode.restype = ct.c_long
      theDLL.DTWAIN_SetMaxAcquisitions.restype = ct.c_long
      theDLL.DTWAIN_SetMaxBuffers.restype = ct.c_long
@@ -5870,6 +5876,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetLightSource.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLightSources.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetLightSourcesEx.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_GetMajorMinorVersion.argtypes = [ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong)]
      theDLL.DTWAIN_GetManualDuplexCount.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetMaxAcquisitions.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetMaxBuffers.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ulong)]
@@ -6337,6 +6344,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetLoggerCallback.argtypes = [theDLL.SETLOGGERPROC_TYPE, ct.c_int64]
      theDLL.DTWAIN_SetLoggerCallbackA.argtypes = [theDLL.SETLOGGERPROCA_TYPE, ct.c_int64]
      theDLL.DTWAIN_SetLoggerCallbackW.argtypes = [theDLL.SETLOGGERPROCW_TYPE, ct.c_int64]
+     theDLL.DTWAIN_SetMajorMinorVersion.argtypes = [ct.c_ulong, ct.c_ulong]
      theDLL.DTWAIN_SetManualDuplexMode.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetMaxAcquisitions.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_SetMaxBuffers.argtypes = [ct.c_void_p, ct.c_ulong]

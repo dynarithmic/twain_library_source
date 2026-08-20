@@ -3171,6 +3171,9 @@ module TwainAPI =
     type DTWAIN_GetLoggerCallbackDelegate = delegate of unit -> DTWAIN_LOGGER_PROC
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetMajorMinorVersionDelegate = delegate of DWORD byref * DWORD byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetManualDuplexCountDelegate = delegate of DTWAIN_SOURCE * int byref * int byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4185,6 +4188,9 @@ module TwainAPI =
     type DTWAIN_SetLogSaveThresholdDelegate = delegate of LONG64 -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_SetMajorMinorVersionDelegate = delegate of DWORD * DWORD -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SetManualDuplexModeDelegate = delegate of DTWAIN_SOURCE * LONG * DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4889,6 +4895,7 @@ module TwainAPI =
     let private GetLightSources = lazy (DynamicDll.Bind "DTWAIN_GetLightSources" : DTWAIN_GetLightSourcesDelegate)
     let private GetLightSourcesEx = lazy (DynamicDll.Bind "DTWAIN_GetLightSourcesEx" : DTWAIN_GetLightSourcesExDelegate)
     let private GetLoggerCallback = lazy (DynamicDll.Bind "DTWAIN_GetLoggerCallback" : DTWAIN_GetLoggerCallbackDelegate)
+    let private GetMajorMinorVersion = lazy (DynamicDll.Bind "DTWAIN_GetMajorMinorVersion" : DTWAIN_GetMajorMinorVersionDelegate)
     let private GetManualDuplexCount = lazy (DynamicDll.Bind "DTWAIN_GetManualDuplexCount" : DTWAIN_GetManualDuplexCountDelegate)
     let private GetMaxAcquisitions = lazy (DynamicDll.Bind "DTWAIN_GetMaxAcquisitions" : DTWAIN_GetMaxAcquisitionsDelegate)
     let private GetMaxBuffers = lazy (DynamicDll.Bind "DTWAIN_GetMaxBuffers" : DTWAIN_GetMaxBuffersDelegate)
@@ -5227,6 +5234,7 @@ module TwainAPI =
     let private SetLightSource = lazy (DynamicDll.Bind "DTWAIN_SetLightSource" : DTWAIN_SetLightSourceDelegate)
     let private SetLightSources = lazy (DynamicDll.Bind "DTWAIN_SetLightSources" : DTWAIN_SetLightSourcesDelegate)
     let private SetLogSaveThreshold = lazy (DynamicDll.Bind "DTWAIN_SetLogSaveThreshold" : DTWAIN_SetLogSaveThresholdDelegate)
+    let private SetMajorMinorVersion = lazy (DynamicDll.Bind "DTWAIN_SetMajorMinorVersion" : DTWAIN_SetMajorMinorVersionDelegate)
     let private SetManualDuplexMode = lazy (DynamicDll.Bind "DTWAIN_SetManualDuplexMode" : DTWAIN_SetManualDuplexModeDelegate)
     let private SetMaxAcquisitions = lazy (DynamicDll.Bind "DTWAIN_SetMaxAcquisitions" : DTWAIN_SetMaxAcquisitionsDelegate)
     let private SetMaxBuffers = lazy (DynamicDll.Bind "DTWAIN_SetMaxBuffers" : DTWAIN_SetMaxBuffersDelegate)
@@ -7070,6 +7078,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetLoggerCallback.Value.Invoke()
 
+    let DTWAIN_GetMajorMinorVersion (nmajor: DWORD byref) (nminor: DWORD byref) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetMajorMinorVersion.Value.Invoke(&nmajor, &nminor)
+
     let DTWAIN_GetManualDuplexCount (source: DTWAIN_SOURCE) (pside1: int byref) (pside2: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetManualDuplexCount.Value.Invoke(source, &pside1, &pside2)
@@ -8421,6 +8433,10 @@ module TwainAPI =
     let DTWAIN_SetLogSaveThreshold (linecount: LONG64) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SetLogSaveThreshold.Value.Invoke(linecount)
+
+    let DTWAIN_SetMajorMinorVersion (nmajor: DWORD) (nminor: DWORD) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        SetMajorMinorVersion.Value.Invoke(nmajor, nminor)
 
     let DTWAIN_SetManualDuplexMode (source: DTWAIN_SOURCE) (flags: LONG) (bset: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
