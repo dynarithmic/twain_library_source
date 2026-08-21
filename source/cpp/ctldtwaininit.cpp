@@ -36,7 +36,7 @@
 #include "ctldtwainhandle.h"
 #include "ctlstringutils.h"
 #include "ctlthreadutils.h"
-#include "dtwain_version.h"
+#include "ctlverinfoutils.h"
 #include "cppfunc.h"
 #include "ctlwindowsimpl.h"
 #include "ctlguiddef.h"

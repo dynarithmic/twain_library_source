@@ -24,7 +24,7 @@
 #include "ctltwaindllpath.h"
 #include "ctlstaticdata.h"
 #include "ctlinternalconstants.h"
-#include "dtwain_version.h"
+#include "ctlverinfoutils.h"
 
 using namespace dynarithmic;
 

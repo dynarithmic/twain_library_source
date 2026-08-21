@@ -28,6 +28,7 @@
 #include "ctlsetgetcaps.h"
 #include "ctlstringutilsx.h"
 #include "ctldtwainhandle.h"
+#include "ctlverinfoutils.h"
 #include "dtwainx.h"
 
 #ifdef _MSC_VER

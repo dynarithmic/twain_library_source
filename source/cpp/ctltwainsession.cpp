@@ -635,6 +635,12 @@ extern "C"
         else
             pHandle->m_hOrigProc = nullptr;
         #endif
+        if ( CTL_StaticData::GetLogFilterFlags() && pHandle->m_pTwainSession)
+        {
+            auto sTwainSessionInfo = pHandle->m_pTwainSession->GetTwainIdentity().to_json_formatted(2) + "\n";
+            sTwainSessionInfo = "Active TWAIN Session:\n" + sTwainSessionInfo;
+            LogWriterUtils::WriteMultiLineInfoIndentedA(sTwainSessionInfo, "\n");
+        }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }

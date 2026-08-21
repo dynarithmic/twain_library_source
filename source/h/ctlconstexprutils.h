@@ -28,7 +28,6 @@
 #include "ctlenum.h"
 #include "dtwpdft.h"
 #include "dtwain_config.h"
-#include "dtwain_version.h"
 
 namespace dynarithmic
 {
@@ -571,12 +570,6 @@ namespace dynarithmic
         return (GetCapMaskFromCap(Cap) & SetType);
     }
 
-    constexpr std::array<int, 4> GetDTWAINDLLVersionInfo() noexcept
-    {
-        constexpr std::array<int, 4> aDLLVersion = { DTWAIN_MAJOR_VERSION,DTWAIN_MINOR_VERSION, DTWAIN_PATCHLEVEL_VERSION, DTWAIN_BUILDNUMBER_VERSION };
-        return aDLLVersion;
-    }
-
     constexpr bool IsTimeOutTripletIgnored(const RawTwainTriplet& trip)
     {
         constexpr std::array<RawTwainTriplet, 7> Trips = {
@@ -591,39 +584,6 @@ namespace dynarithmic
         auto isFoundPr = generic_array_finder_if(Trips, [&](auto& trip2)
             { return std::tie(trip.nDG, trip.nDAT, trip.nMSG) == std::tie(trip2.nDG, trip2.nDAT, trip2.nMSG); });
         return isFoundPr.first;
-    }
-
-    constexpr LONG GetDTWAINVersionType() noexcept
-    {
-        LONG lVersionType = 0;
-        #ifdef UNICODE
-            lVersionType |= DTWAIN_UNICODE_VERSION;
-        #endif
-
-        #ifdef DTWAIN_DEBUG
-            lVersionType |= DTWAIN_DEVELOP_VERSION;
-        #endif
-
-        #if defined (WIN64) || defined(_WIN64)
-            lVersionType |= DTWAIN_64BIT_VERSION;
-            #else
-            #if defined (WIN32) || defined(_WIN32)
-                lVersionType |= DTWAIN_32BIT_VERSION;
-            #endif
-        #endif
-
-        #ifdef DTWAIN_DEVELOP_DLL
-            lVersionType |= DTWAIN_DEVELOP_VERSION;
-        #endif
-
-        #if DTWAIN_BUILD_LOGCALLSTACK == 1
-            lVersionType |= DTWAIN_CALLSTACK_LOGGING;
-        #endif
-
-        #if DTWAIN_BUILD_LOGCALLSTACK == 1 && DTWAIN_BUILD_LOGPOINTERS == 1
-            lVersionType |= DTWAIN_CALLSTACK_LOGGING_PLUS;
-        #endif
-            return lVersionType;
     }
 
     constexpr uint32_t RoundUpToNearest(uint32_t value, uint32_t upto) noexcept
@@ -723,6 +683,5 @@ namespace dynarithmic
         }
         return 1.0;
     }
-};
-
+}
 #endif

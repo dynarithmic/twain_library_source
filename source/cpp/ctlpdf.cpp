@@ -20,7 +20,8 @@
  */
 #include <algorithm>
 #include "cppfunc.h"
-#include "dtwain.h"
+#include "dtwainc.h"
+#include "dtwainx.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "dtwstrfn.h"

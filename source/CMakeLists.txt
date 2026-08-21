@@ -500,6 +500,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltwainsession.h
         ${PROJECT_SOURCE_DIR}/h/ctltwainsource.h
         ${PROJECT_SOURCE_DIR}/h/ctlutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlverinfoutils.h
         ${PROJECT_SOURCE_DIR}/h/ctlwindowsimpl.h
         ${PROJECT_SOURCE_DIR}/h/windowsinit_impl.h
         ${PROJECT_SOURCE_DIR}/h/dibinfox.h
@@ -725,6 +726,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlupdatedibproc.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlverifysourcehandle.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlwindowproc.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/dtwain_version.cpp
   ${PROJECT_SOURCE_DIR}/cpp/extendedimageinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/bmprlewriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/ctldibblank.cpp
