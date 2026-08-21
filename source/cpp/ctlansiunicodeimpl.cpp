@@ -20,7 +20,8 @@
  */
 #include <algorithm>
 #include <string_view>
-#include "dtwain.h"
+#include "dtwainc.h"
+#include "dtwainx.h"
 #include "ctlstringconversion.h"
 #include "arrayfactory.h"
 

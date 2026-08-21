@@ -19,7 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "dtwain.h"
+#include "dtwainc.h"
+#include "dtwainx.h"
 #include "ctltwainmanager.h"
 #include "ctldtwainhandle.h"
 
