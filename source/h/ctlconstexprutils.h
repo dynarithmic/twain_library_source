@@ -23,6 +23,7 @@
 
 #include <array>
 #include <string_view>
+#include <tuple>
 #include "ctlconstexprfind.h"
 #include "twain.h"
 #include "ctlenum.h"
