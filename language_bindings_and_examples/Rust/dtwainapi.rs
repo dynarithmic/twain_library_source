@@ -445,6 +445,9 @@ type DtwaingetactivedsmversioninfoFunc = unsafe extern "C" fn(*mut u16,i32) -> i
 type DtwaingetactivedsmversioninfoaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
 type DtwaingetactivedsmversioninfowFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
 type DtwaingetalarmvolumeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetallsessioninfoFunc = unsafe extern "C" fn(*mut u16,i32,i32) -> i32;
+type DtwaingetallsessioninfoaFunc = unsafe extern "C" fn(*mut c_char,i32,i32) -> i32;
+type DtwaingetallsessioninfowFunc = unsafe extern "C" fn(*mut u16,i32,i32) -> i32;
 type DtwaingetallsourcedibsFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type DtwaingetallsourceinfoFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32,i32) -> i32;
 type DtwaingetallsourceinfoaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32,i32) -> i32;
@@ -1634,6 +1637,9 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetActiveDSMVersionInfoAFunc: Symbol<'a, DtwaingetactivedsmversioninfoaFunc>,
     DTWAIN_GetActiveDSMVersionInfoWFunc: Symbol<'a, DtwaingetactivedsmversioninfowFunc>,
     DTWAIN_GetAlarmVolumeFunc: Symbol<'a, DtwaingetalarmvolumeFunc>,
+    DTWAIN_GetAllSessionInfoFunc: Symbol<'a, DtwaingetallsessioninfoFunc>,
+    DTWAIN_GetAllSessionInfoAFunc: Symbol<'a, DtwaingetallsessioninfoaFunc>,
+    DTWAIN_GetAllSessionInfoWFunc: Symbol<'a, DtwaingetallsessioninfowFunc>,
     DTWAIN_GetAllSourceDibsFunc: Symbol<'a, DtwaingetallsourcedibsFunc>,
     DTWAIN_GetAllSourceInfoFunc: Symbol<'a, DtwaingetallsourceinfoFunc>,
     DTWAIN_GetAllSourceInfoAFunc: Symbol<'a, DtwaingetallsourceinfoaFunc>,
@@ -4486,6 +4492,9 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetActiveDSMVersionInfoA: Symbol<DtwaingetactivedsmversioninfoaFunc> = unsafe { library.get(b"DTWAIN_GetActiveDSMVersionInfoA")? };
         let DTWAIN_GetActiveDSMVersionInfoW: Symbol<DtwaingetactivedsmversioninfowFunc> = unsafe { library.get(b"DTWAIN_GetActiveDSMVersionInfoW")? };
         let DTWAIN_GetAlarmVolume: Symbol<DtwaingetalarmvolumeFunc> = unsafe { library.get(b"DTWAIN_GetAlarmVolume")? };
+        let DTWAIN_GetAllSessionInfo: Symbol<DtwaingetallsessioninfoFunc> = unsafe { library.get(b"DTWAIN_GetAllSessionInfo")? };
+        let DTWAIN_GetAllSessionInfoA: Symbol<DtwaingetallsessioninfoaFunc> = unsafe { library.get(b"DTWAIN_GetAllSessionInfoA")? };
+        let DTWAIN_GetAllSessionInfoW: Symbol<DtwaingetallsessioninfowFunc> = unsafe { library.get(b"DTWAIN_GetAllSessionInfoW")? };
         let DTWAIN_GetAllSourceDibs: Symbol<DtwaingetallsourcedibsFunc> = unsafe { library.get(b"DTWAIN_GetAllSourceDibs")? };
         let DTWAIN_GetAllSourceInfo: Symbol<DtwaingetallsourceinfoFunc> = unsafe { library.get(b"DTWAIN_GetAllSourceInfo")? };
         let DTWAIN_GetAllSourceInfoA: Symbol<DtwaingetallsourceinfoaFunc> = unsafe { library.get(b"DTWAIN_GetAllSourceInfoA")? };
@@ -5674,6 +5683,9 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetActiveDSMVersionInfoAFunc: DTWAIN_GetActiveDSMVersionInfoA,
             DTWAIN_GetActiveDSMVersionInfoWFunc: DTWAIN_GetActiveDSMVersionInfoW,
             DTWAIN_GetAlarmVolumeFunc: DTWAIN_GetAlarmVolume,
+            DTWAIN_GetAllSessionInfoFunc: DTWAIN_GetAllSessionInfo,
+            DTWAIN_GetAllSessionInfoAFunc: DTWAIN_GetAllSessionInfoA,
+            DTWAIN_GetAllSessionInfoWFunc: DTWAIN_GetAllSessionInfoW,
             DTWAIN_GetAllSourceDibsFunc: DTWAIN_GetAllSourceDibs,
             DTWAIN_GetAllSourceInfoFunc: DTWAIN_GetAllSourceInfo,
             DTWAIN_GetAllSourceInfoAFunc: DTWAIN_GetAllSourceInfoA,
@@ -8057,6 +8069,18 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetAlarmVolume(&self, Source: *mut c_void, lpVolume: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_GetAlarmVolumeFunc)(Source, lpVolume);  }
+    }
+
+    pub fn DTWAIN_GetAllSessionInfo(&self, lpszOut: *mut u16, indentFactor: i32, nMaxLen: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetAllSessionInfoFunc)(lpszOut, indentFactor, nMaxLen);  }
+    }
+
+    pub fn DTWAIN_GetAllSessionInfoA(&self, lpszOut: *mut c_char, indentFactor: i32, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetAllSessionInfoAFunc)(lpszOut, indentFactor, nSize);  }
+    }
+
+    pub fn DTWAIN_GetAllSessionInfoW(&self, lpszOut: *mut u16, indentFactor: i32, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetAllSessionInfoWFunc)(lpszOut, indentFactor, nSize);  }
     }
 
     pub fn DTWAIN_GetAllSourceDibs(&self, Source: *mut c_void) -> *mut c_void {

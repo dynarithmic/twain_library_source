@@ -2834,6 +2834,12 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetAlarmVolume(DTWAIN_SOURCE Source, ref int lpVolume);
 
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_GetAllSessionInfo([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int indentFactor, int nMaxLen);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_GetAllSessionInfo(System.IntPtr lpszOut, int indentFactor, int nMaxLen);
+
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source);
 

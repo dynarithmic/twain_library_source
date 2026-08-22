@@ -449,6 +449,9 @@
     D_GETACTIVEDSMVERSIONINFOAFUNC                DYNDTWAIN_API::DTWAIN_GetActiveDSMVersionInfoA = nullptr;
     D_GETACTIVEDSMVERSIONINFOWFUNC                DYNDTWAIN_API::DTWAIN_GetActiveDSMVersionInfoW = nullptr;
     D_GETALARMVOLUMEFUNC                          DYNDTWAIN_API::DTWAIN_GetAlarmVolume = nullptr;
+    D_GETALLSESSIONINFOFUNC                       DYNDTWAIN_API::DTWAIN_GetAllSessionInfo = nullptr;
+    D_GETALLSESSIONINFOAFUNC                      DYNDTWAIN_API::DTWAIN_GetAllSessionInfoA = nullptr;
+    D_GETALLSESSIONINFOWFUNC                      DYNDTWAIN_API::DTWAIN_GetAllSessionInfoW = nullptr;
     D_GETALLSOURCEDIBSFUNC                        DYNDTWAIN_API::DTWAIN_GetAllSourceDibs = nullptr;
     D_GETALLSOURCEINFOFUNC                        DYNDTWAIN_API::DTWAIN_GetAllSourceInfo = nullptr;
     D_GETALLSOURCEINFOAFUNC                       DYNDTWAIN_API::DTWAIN_GetAllSourceInfoA = nullptr;
@@ -1706,6 +1709,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetActiveDSMVersionInfoA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetActiveDSMVersionInfoW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetAlarmVolume, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetAllSessionInfo, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetAllSessionInfoA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetAllSessionInfoW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetAllSourceDibs, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetAllSourceInfo, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetAllSourceInfoA, hModule);

@@ -2933,6 +2933,9 @@ Namespace Dynarithmic
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetAlarmVolumeDelegate(Source As System.IntPtr, ByRef lpVolume As Integer) As Integer
         
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Private Delegate Function DTWAIN_GetAllSessionInfoDelegate(<MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, indentFactor As Integer, nMaxLen As Integer) As Integer
+        
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetAllSourceDibsDelegate(Source As System.IntPtr) As System.IntPtr
         
@@ -5869,6 +5872,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetAlarmVolume(Source, lpVolume)
         End Function
         
+        Public Function DTWAIN_GetAllSessionInfo(<MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, indentFactor As Integer, nMaxLen As Integer) As Integer
+        Return api.DTWAIN_GetAllSessionInfo(lpszOut, indentFactor, nMaxLen)
+        End Function
+        
         Public Function DTWAIN_GetAllSourceDibs(Source As System.IntPtr) As System.IntPtr
         Return api.DTWAIN_GetAllSourceDibs(Source)
         End Function
@@ -8342,6 +8349,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetActiveDSMPath As DTWAIN_GetActiveDSMPathDelegate
             Public DTWAIN_GetActiveDSMVersionInfo As DTWAIN_GetActiveDSMVersionInfoDelegate
             Public DTWAIN_GetAlarmVolume As DTWAIN_GetAlarmVolumeDelegate
+            Public DTWAIN_GetAllSessionInfo As DTWAIN_GetAllSessionInfoDelegate
             Public DTWAIN_GetAllSourceDibs As DTWAIN_GetAllSourceDibsDelegate
             Public DTWAIN_GetAllSourceInfo As DTWAIN_GetAllSourceInfoDelegate
             Public DTWAIN_GetAppInfo As DTWAIN_GetAppInfoDelegate

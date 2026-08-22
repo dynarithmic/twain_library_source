@@ -2262,6 +2262,8 @@
         public delegate int DTWAIN_GetActiveDSMVersionInfoDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szDLLInfo, int nMaxLen);
         public delegate int DTWAIN_GetActiveDSMVersionInfoDelegate_overload(System.IntPtr szDLLInfo, int nMaxLen);
         public delegate int DTWAIN_GetAlarmVolumeDelegate(DTWAIN_SOURCE Source, ref int lpVolume);
+        public delegate int DTWAIN_GetAllSessionInfoDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int indentFactor, int nMaxLen);
+        public delegate int DTWAIN_GetAllSessionInfoDelegate_overload(System.IntPtr lpszOut, int indentFactor, int nMaxLen);
         public delegate DTWAIN_ARRAY DTWAIN_GetAllSourceDibsDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetAllSourceInfoDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int indentFactor, int nSize);
         public delegate int DTWAIN_GetAllSourceInfoDelegate_overload(DTWAIN_SOURCE Source, System.IntPtr lpszOut, int indentFactor, int nSize);
@@ -3899,6 +3901,12 @@
 
         [DTWAINNativeFunction("DTWAIN_GetAlarmVolume")]
         private readonly DTWAIN_GetAlarmVolumeDelegate  _DTWAIN_GetAlarmVolume;
+
+        [DTWAINNativeFunction("DTWAIN_GetAllSessionInfo")]
+        private readonly DTWAIN_GetAllSessionInfoDelegate  _DTWAIN_GetAllSessionInfo;
+
+        [DTWAINNativeFunction("DTWAIN_GetAllSessionInfo")]
+        private readonly DTWAIN_GetAllSessionInfoDelegate_overload _DTWAIN_GetAllSessionInfo_overload; 
 
         [DTWAINNativeFunction("DTWAIN_GetAllSourceDibs")]
         private readonly DTWAIN_GetAllSourceDibsDelegate  _DTWAIN_GetAllSourceDibs;
@@ -6718,6 +6726,12 @@
 
         public  int DTWAIN_GetAlarmVolume(DTWAIN_SOURCE Source, ref int lpVolume)
         => _DTWAIN_GetAlarmVolume(Source, ref lpVolume);
+
+        public  int DTWAIN_GetAllSessionInfo([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int indentFactor, int nMaxLen)
+        => _DTWAIN_GetAllSessionInfo(lpszOut, indentFactor, nMaxLen);
+
+        public  int DTWAIN_GetAllSessionInfo (System.IntPtr lpszOut, int indentFactor, int nMaxLen)
+        => _DTWAIN_GetAllSessionInfo_overload(lpszOut, indentFactor, nMaxLen);
 
         public  DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source)
         => _DTWAIN_GetAllSourceDibs(Source);

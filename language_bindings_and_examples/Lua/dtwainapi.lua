@@ -475,6 +475,9 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetActiveDSMVersionInfoA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nMaxLen);
         DTWAIN_BOOL DTWAIN_GetAlarmVolume(DTWAIN_SOURCE Source, LPLONG lpVolume);
+        LONG DTWAIN_GetAllSessionInfo(LPTSTR lpszOut, LONG indentFactor, LONG nMaxLen);
+        LONG DTWAIN_GetAllSessionInfoA(LPSTR lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSessionInfoW(LPWSTR lpszOut, LONG indentFactor, LONG nSize);
         DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE lpszOut, LONG indentFactor, LONG nSize);
         LONG DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize);
@@ -1719,6 +1722,9 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetActiveDSMVersionInfoA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nMaxLen);
         DTWAIN_BOOL DTWAIN_GetAlarmVolume(DTWAIN_SOURCE Source, LPLONG lpVolume);
+        LONG DTWAIN_GetAllSessionInfo(LPTSTR lpszOut, LONG indentFactor, LONG nMaxLen);
+        LONG DTWAIN_GetAllSessionInfoA(LPSTR lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSessionInfoW(LPWSTR lpszOut, LONG indentFactor, LONG nSize);
         DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE lpszOut, LONG indentFactor, LONG nSize);
         LONG DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize);
@@ -2963,6 +2969,9 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetActiveDSMVersionInfoA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nMaxLen);
         DTWAIN_BOOL DTWAIN_GetAlarmVolume(DTWAIN_SOURCE Source, LPLONG lpVolume);
+        LONG DTWAIN_GetAllSessionInfo(LPTSTR lpszOut, LONG indentFactor, LONG nMaxLen);
+        LONG DTWAIN_GetAllSessionInfoA(LPSTR lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSessionInfoW(LPWSTR lpszOut, LONG indentFactor, LONG nSize);
         DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE lpszOut, LONG indentFactor, LONG nSize);
         LONG DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize);
@@ -4207,6 +4216,9 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetActiveDSMVersionInfoA(LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nMaxLen);
         DTWAIN_BOOL DTWAIN_GetAlarmVolume(DTWAIN_SOURCE Source, LPLONG lpVolume);
+        LONG DTWAIN_GetAllSessionInfo(LPTSTR lpszOut, LONG indentFactor, LONG nMaxLen);
+        LONG DTWAIN_GetAllSessionInfoA(LPSTR lpszOut, LONG indentFactor, LONG nSize);
+        LONG DTWAIN_GetAllSessionInfoW(LPWSTR lpszOut, LONG indentFactor, LONG nSize);
         DTWAIN_ARRAY DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE lpszOut, LONG indentFactor, LONG nSize);
         LONG DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize);

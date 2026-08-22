@@ -2096,6 +2096,7 @@ Class DTWAINAPI
     Public Declare Unicode Function DTWAIN_GetActiveDSMPath Lib "dtwain64ud.dll" (<MarshalAs(UnmanagedType.LPTStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Unicode Function DTWAIN_GetActiveDSMVersionInfo Lib "dtwain64ud.dll" (<MarshalAs(UnmanagedType.LPTStr)> szDLLInfo As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetAlarmVolume Lib "dtwain64ud.dll" (Source As System.IntPtr, ByRef lpVolume As Integer) As Integer
+    Public Declare Unicode Function DTWAIN_GetAllSessionInfo Lib "dtwain64ud.dll" (<MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, indentFactor As Integer, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetAllSourceDibs Lib "dtwain64ud.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Unicode Function DTWAIN_GetAllSourceInfo Lib "dtwain64ud.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, indentFactor As Integer, nSize As Integer) As Integer
     Public Declare Unicode Function DTWAIN_GetAppInfo Lib "dtwain64ud.dll" (<MarshalAs(UnmanagedType.LPTStr)> szVerStr As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> szManu As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> szProdFam As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> szProdName As StringBuilder) As Integer

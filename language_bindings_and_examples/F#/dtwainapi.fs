@@ -2870,6 +2870,9 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetAlarmVolumeDelegate = delegate of DTWAIN_SOURCE * int byref -> DTWAIN_BOOL
 
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetAllSessionInfoDelegate = delegate of System.Text.StringBuilder * LONG * LONG -> LONG
+
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetAllSourceDibsDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
 
@@ -4795,6 +4798,7 @@ module TwainAPI =
     let private GetActiveDSMPath = lazy (DynamicDll.Bind "DTWAIN_GetActiveDSMPath" : DTWAIN_GetActiveDSMPathDelegate)
     let private GetActiveDSMVersionInfo = lazy (DynamicDll.Bind "DTWAIN_GetActiveDSMVersionInfo" : DTWAIN_GetActiveDSMVersionInfoDelegate)
     let private GetAlarmVolume = lazy (DynamicDll.Bind "DTWAIN_GetAlarmVolume" : DTWAIN_GetAlarmVolumeDelegate)
+    let private GetAllSessionInfo = lazy (DynamicDll.Bind "DTWAIN_GetAllSessionInfo" : DTWAIN_GetAllSessionInfoDelegate)
     let private GetAllSourceDibs = lazy (DynamicDll.Bind "DTWAIN_GetAllSourceDibs" : DTWAIN_GetAllSourceDibsDelegate)
     let private GetAllSourceInfo = lazy (DynamicDll.Bind "DTWAIN_GetAllSourceInfo" : DTWAIN_GetAllSourceInfoDelegate)
     let private GetAppInfo = lazy (DynamicDll.Bind "DTWAIN_GetAppInfo" : DTWAIN_GetAppInfoDelegate)
@@ -6677,6 +6681,10 @@ module TwainAPI =
     let DTWAIN_GetAlarmVolume (source: DTWAIN_SOURCE) (lpvolume: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetAlarmVolume.Value.Invoke(source, &lpvolume)
+
+    let DTWAIN_GetAllSessionInfo (lpszout: System.Text.StringBuilder) (indentfactor: LONG) (nmaxlen: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetAllSessionInfo.Value.Invoke(lpszout, indentfactor, nmaxlen)
 
     let DTWAIN_GetAllSourceDibs (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
