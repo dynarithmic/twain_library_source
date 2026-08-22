@@ -1198,3 +1198,6 @@ DTWAIN_GetVersionEx2                              @1194
 DTWAIN_CheckDLLVersion                            @1195
 DTWAIN_SetMajorMinorVersion                       @1196
 DTWAIN_GetMajorMinorVersion                       @1197
+DTWAIN_GetAllSessionInfo                          @1198
+DTWAIN_GetAllSessionInfoA                         @1199
+DTWAIN_GetAllSessionInfoW                         @1200
