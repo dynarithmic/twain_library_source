@@ -1311,13 +1311,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_SysInitializeEx2W
    attr_reader :DTWAIN_SysInitializeExA
    attr_reader :DTWAIN_SysInitializeExW
-   attr_reader :DTWAIN_SysInitializeLib
-   attr_reader :DTWAIN_SysInitializeLibEx
-   attr_reader :DTWAIN_SysInitializeLibEx2
-   attr_reader :DTWAIN_SysInitializeLibEx2A
-   attr_reader :DTWAIN_SysInitializeLibEx2W
-   attr_reader :DTWAIN_SysInitializeLibExA
-   attr_reader :DTWAIN_SysInitializeLibExW
    attr_reader :DTWAIN_SysInitializeNoBlocking
    attr_reader :DTWAIN_SysInitializeNoBlockingEx
    attr_reader :DTWAIN_TestGetCap
@@ -4202,13 +4195,6 @@ class DTWAINAPI
        @DTWAIN_SysInitializeEx2W = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeEx2W'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_SysInitializeExA = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeExA'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_SysInitializeExW = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeExW'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeLib = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeLib'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeLibEx = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeLibEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeLibEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeLibEx2'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeLibEx2A = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeLibEx2A'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeLibEx2W = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeLibEx2W'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeLibExA = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeLibExA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeLibExW = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeLibExW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_SysInitializeNoBlocking = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeNoBlocking'],[],Fiddle::TYPE_VOIDP)
        @DTWAIN_SysInitializeNoBlockingEx = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeNoBlockingEx'],[Fiddle::TYPE_INT],Fiddle::TYPE_VOIDP)
        @DTWAIN_TestGetCap = Fiddle::Function::new(dtwain_dll['DTWAIN_TestGetCap'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)

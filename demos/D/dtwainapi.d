@@ -3094,13 +3094,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_HANDLE function(LPCWSTR, LPCWSTR, LPCWSTR) DTWAIN_SysInitializeEx2W;
     extern(Windows) DTWAIN_HANDLE function(LPCSTR) DTWAIN_SysInitializeExA;
     extern(Windows) DTWAIN_HANDLE function(LPCWSTR) DTWAIN_SysInitializeExW;
-    extern(Windows) DTWAIN_HANDLE function(HINSTANCE) DTWAIN_SysInitializeLib;
-    extern(Windows) DTWAIN_HANDLE function(HINSTANCE, DTWAIN_CCHARPTRTYPE) DTWAIN_SysInitializeLibEx;
-    extern(Windows) DTWAIN_HANDLE function(HINSTANCE, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE) DTWAIN_SysInitializeLibEx2;
-    extern(Windows) DTWAIN_HANDLE function(HINSTANCE, LPCSTR, LPCSTR, LPCSTR) DTWAIN_SysInitializeLibEx2A;
-    extern(Windows) DTWAIN_HANDLE function(HINSTANCE, LPCWSTR, LPCWSTR, LPCWSTR) DTWAIN_SysInitializeLibEx2W;
-    extern(Windows) DTWAIN_HANDLE function(HINSTANCE, LPCSTR) DTWAIN_SysInitializeLibExA;
-    extern(Windows) DTWAIN_HANDLE function(HINSTANCE, LPCWSTR) DTWAIN_SysInitializeLibExW;
     extern(Windows) DTWAIN_HANDLE function() DTWAIN_SysInitializeNoBlocking;
     extern(Windows) DTWAIN_HANDLE function(DTWAIN_BOOL) DTWAIN_SysInitializeNoBlockingEx;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG) DTWAIN_TestGetCap;
@@ -4282,13 +4275,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_SysInitializeEx2W, "DTWAIN_SysInitializeEx2W");
         bindFunction(cast(void**)&DTWAIN_SysInitializeExA, "DTWAIN_SysInitializeExA");
         bindFunction(cast(void**)&DTWAIN_SysInitializeExW, "DTWAIN_SysInitializeExW");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeLib, "DTWAIN_SysInitializeLib");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeLibEx, "DTWAIN_SysInitializeLibEx");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeLibEx2, "DTWAIN_SysInitializeLibEx2");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeLibEx2A, "DTWAIN_SysInitializeLibEx2A");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeLibEx2W, "DTWAIN_SysInitializeLibEx2W");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeLibExA, "DTWAIN_SysInitializeLibExA");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeLibExW, "DTWAIN_SysInitializeLibExW");
         bindFunction(cast(void**)&DTWAIN_SysInitializeNoBlocking, "DTWAIN_SysInitializeNoBlocking");
         bindFunction(cast(void**)&DTWAIN_SysInitializeNoBlockingEx, "DTWAIN_SysInitializeNoBlockingEx");
         bindFunction(cast(void**)&DTWAIN_TestGetCap, "DTWAIN_TestGetCap");

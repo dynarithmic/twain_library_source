@@ -4512,15 +4512,6 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_SysInitializeEx2Delegate(szINIPath As String, szImageDLLPath As String, szLangResourcePath As String) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SysInitializeLibDelegate(hInstance As System.IntPtr) As System.IntPtr
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Private Delegate Function DTWAIN_SysInitializeLibExDelegate(hInstance As System.IntPtr, szINIPath As String) As System.IntPtr
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Private Delegate Function DTWAIN_SysInitializeLibEx2Delegate(hInstance As System.IntPtr, szINIPath As String, szImageDLLPath As String, szLangResourcePath As String) As System.IntPtr
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SysInitializeNoBlockingDelegate() As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -7976,18 +7967,6 @@ Namespace Dynarithmic
         Return api.DTWAIN_SysInitializeEx2(szINIPath, szImageDLLPath, szLangResourcePath)
         End Function
         
-        Public Function DTWAIN_SysInitializeLib(hInstance As System.IntPtr) As System.IntPtr
-        Return api.DTWAIN_SysInitializeLib(hInstance)
-        End Function
-        
-        Public Function DTWAIN_SysInitializeLibEx(hInstance As System.IntPtr, szINIPath As String) As System.IntPtr
-        Return api.DTWAIN_SysInitializeLibEx(hInstance, szINIPath)
-        End Function
-        
-        Public Function DTWAIN_SysInitializeLibEx2(hInstance As System.IntPtr, szINIPath As String, szImageDLLPath As String, szLangResourcePath As String) As System.IntPtr
-        Return api.DTWAIN_SysInitializeLibEx2(hInstance, szINIPath, szImageDLLPath, szLangResourcePath)
-        End Function
-        
         Public Function DTWAIN_SysInitializeNoBlocking() As System.IntPtr
         Return api.DTWAIN_SysInitializeNoBlocking()
         End Function
@@ -8875,9 +8854,6 @@ Namespace Dynarithmic
             Public DTWAIN_SysInitialize As DTWAIN_SysInitializeDelegate
             Public DTWAIN_SysInitializeEx As DTWAIN_SysInitializeExDelegate
             Public DTWAIN_SysInitializeEx2 As DTWAIN_SysInitializeEx2Delegate
-            Public DTWAIN_SysInitializeLib As DTWAIN_SysInitializeLibDelegate
-            Public DTWAIN_SysInitializeLibEx As DTWAIN_SysInitializeLibExDelegate
-            Public DTWAIN_SysInitializeLibEx2 As DTWAIN_SysInitializeLibEx2Delegate
             Public DTWAIN_SysInitializeNoBlocking As DTWAIN_SysInitializeNoBlockingDelegate
             Public DTWAIN_SysInitializeNoBlockingEx As DTWAIN_SysInitializeNoBlockingExDelegate
             Public DTWAIN_TestGetCap As DTWAIN_TestGetCapDelegate

@@ -2852,9 +2852,6 @@
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeDelegate();
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeExDelegate([MarshalAs(UnmanagedType.LPTStr)] string szINIPath);
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeEx2Delegate([MarshalAs(UnmanagedType.LPTStr)] string szINIPath, [MarshalAs(UnmanagedType.LPTStr)] string szImageDLLPath, [MarshalAs(UnmanagedType.LPTStr)] string szLangResourcePath);
-        public delegate DTWAIN_HANDLE DTWAIN_SysInitializeLibDelegate(HINSTANCE hInstance);
-        public delegate DTWAIN_HANDLE DTWAIN_SysInitializeLibExDelegate(HINSTANCE hInstance, [MarshalAs(UnmanagedType.LPTStr)] string szINIPath);
-        public delegate DTWAIN_HANDLE DTWAIN_SysInitializeLibEx2Delegate(HINSTANCE hInstance, [MarshalAs(UnmanagedType.LPTStr)] string szINIPath, [MarshalAs(UnmanagedType.LPTStr)] string szImageDLLPath, [MarshalAs(UnmanagedType.LPTStr)] string szLangResourcePath);
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingDelegate();
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingExDelegate(int bCreateLogFile);
         public delegate DTWAIN_ARRAY DTWAIN_TestGetCapDelegate(DTWAIN_SOURCE Source, int lCapability);
@@ -5672,15 +5669,6 @@
         [DTWAINNativeFunction("DTWAIN_SysInitializeEx2")]
         private readonly DTWAIN_SysInitializeEx2Delegate  _DTWAIN_SysInitializeEx2;
 
-        [DTWAINNativeFunction("DTWAIN_SysInitializeLib")]
-        private readonly DTWAIN_SysInitializeLibDelegate  _DTWAIN_SysInitializeLib;
-
-        [DTWAINNativeFunction("DTWAIN_SysInitializeLibEx")]
-        private readonly DTWAIN_SysInitializeLibExDelegate  _DTWAIN_SysInitializeLibEx;
-
-        [DTWAINNativeFunction("DTWAIN_SysInitializeLibEx2")]
-        private readonly DTWAIN_SysInitializeLibEx2Delegate  _DTWAIN_SysInitializeLibEx2;
-
         [DTWAINNativeFunction("DTWAIN_SysInitializeNoBlocking")]
         private readonly DTWAIN_SysInitializeNoBlockingDelegate  _DTWAIN_SysInitializeNoBlocking;
 
@@ -8496,15 +8484,6 @@
 
         public  DTWAIN_HANDLE DTWAIN_SysInitializeEx2([MarshalAs(UnmanagedType.LPTStr)] string szINIPath, [MarshalAs(UnmanagedType.LPTStr)] string szImageDLLPath, [MarshalAs(UnmanagedType.LPTStr)] string szLangResourcePath)
         => _DTWAIN_SysInitializeEx2(szINIPath, szImageDLLPath, szLangResourcePath);
-
-        public  DTWAIN_HANDLE DTWAIN_SysInitializeLib(HINSTANCE hInstance)
-        => _DTWAIN_SysInitializeLib(hInstance);
-
-        public  DTWAIN_HANDLE DTWAIN_SysInitializeLibEx(HINSTANCE hInstance, [MarshalAs(UnmanagedType.LPTStr)] string szINIPath)
-        => _DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
-
-        public  DTWAIN_HANDLE DTWAIN_SysInitializeLibEx2(HINSTANCE hInstance, [MarshalAs(UnmanagedType.LPTStr)] string szINIPath, [MarshalAs(UnmanagedType.LPTStr)] string szImageDLLPath, [MarshalAs(UnmanagedType.LPTStr)] string szLangResourcePath)
-        => _DTWAIN_SysInitializeLibEx2(hInstance, szINIPath, szImageDLLPath, szLangResourcePath);
 
         public  DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking()
         => _DTWAIN_SysInitializeNoBlocking();

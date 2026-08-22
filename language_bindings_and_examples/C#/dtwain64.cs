@@ -4605,15 +4605,6 @@ namespace Dynarithmic
         public static extern DTWAIN_HANDLE DTWAIN_SysInitializeEx2([MarshalAs(UnmanagedType.LPStr)] string szINIPath, [MarshalAs(UnmanagedType.LPStr)] string szImageDLLPath, [MarshalAs(UnmanagedType.LPStr)] string szLangResourcePath);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern DTWAIN_HANDLE DTWAIN_SysInitializeLib(HINSTANCE hInstance);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        public static extern DTWAIN_HANDLE DTWAIN_SysInitializeLibEx(HINSTANCE hInstance, [MarshalAs(UnmanagedType.LPStr)] string szINIPath);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        public static extern DTWAIN_HANDLE DTWAIN_SysInitializeLibEx2(HINSTANCE hInstance, [MarshalAs(UnmanagedType.LPStr)] string szINIPath, [MarshalAs(UnmanagedType.LPStr)] string szImageDLLPath, [MarshalAs(UnmanagedType.LPStr)] string szLangResourcePath);
-
-        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]

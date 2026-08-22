@@ -2621,9 +2621,6 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_SysInitialize Lib "dtwain64d.dll" () As System.IntPtr
     Public Declare Ansi Function DTWAIN_SysInitializeEx Lib "dtwain64d.dll" (szINIPath As String) As System.IntPtr
     Public Declare Ansi Function DTWAIN_SysInitializeEx2 Lib "dtwain64d.dll" (szINIPath As String, szImageDLLPath As String, szLangResourcePath As String) As System.IntPtr
-    Public Declare Function DTWAIN_SysInitializeLib Lib "dtwain64d.dll" (hInstance As System.IntPtr) As System.IntPtr
-    Public Declare Ansi Function DTWAIN_SysInitializeLibEx Lib "dtwain64d.dll" (hInstance As System.IntPtr, szINIPath As String) As System.IntPtr
-    Public Declare Ansi Function DTWAIN_SysInitializeLibEx2 Lib "dtwain64d.dll" (hInstance As System.IntPtr, szINIPath As String, szImageDLLPath As String, szLangResourcePath As String) As System.IntPtr
     Public Declare Function DTWAIN_SysInitializeNoBlocking Lib "dtwain64d.dll" () As System.IntPtr
     Public Declare Function DTWAIN_SysInitializeNoBlockingEx Lib "dtwain64d.dll" (bCreateLogFile As Integer) As System.IntPtr
     Public Declare Function DTWAIN_TestGetCap Lib "dtwain64d.dll" (Source As System.IntPtr, lCapability As Integer) As System.IntPtr

@@ -1776,7 +1776,7 @@ func Load_DTWAINDLL(path string) (*DTWAIN_DLL, error) {
         return nil, err
     }
 
-    var arr [1188] string
+    var arr [1181] string
     arr[0] = "DTWAIN_AcquireAudioFile"
     arr[1] = "DTWAIN_AcquireAudioFileA"
     arr[2] = "DTWAIN_AcquireAudioFileW"
@@ -2951,20 +2951,13 @@ func Load_DTWAINDLL(path string) (*DTWAIN_DLL, error) {
     arr[1171] = "DTWAIN_SysInitializeEx2W"
     arr[1172] = "DTWAIN_SysInitializeExA"
     arr[1173] = "DTWAIN_SysInitializeExW"
-    arr[1174] = "DTWAIN_SysInitializeLib"
-    arr[1175] = "DTWAIN_SysInitializeLibEx"
-    arr[1176] = "DTWAIN_SysInitializeLibEx2"
-    arr[1177] = "DTWAIN_SysInitializeLibEx2A"
-    arr[1178] = "DTWAIN_SysInitializeLibEx2W"
-    arr[1179] = "DTWAIN_SysInitializeLibExA"
-    arr[1180] = "DTWAIN_SysInitializeLibExW"
-    arr[1181] = "DTWAIN_SysInitializeNoBlocking"
-    arr[1182] = "DTWAIN_SysInitializeNoBlockingEx"
-    arr[1183] = "DTWAIN_TestGetCap"
-    arr[1184] = "DTWAIN_UnlockMemory"
-    arr[1185] = "DTWAIN_UnlockMemoryEx"
-    arr[1186] = "DTWAIN_UpdateCurrentAcquiredImage"
-    arr[1187] = "DTWAIN_UseMultipleThreads"
+    arr[1174] = "DTWAIN_SysInitializeNoBlocking"
+    arr[1175] = "DTWAIN_SysInitializeNoBlockingEx"
+    arr[1176] = "DTWAIN_TestGetCap"
+    arr[1177] = "DTWAIN_UnlockMemory"
+    arr[1178] = "DTWAIN_UnlockMemoryEx"
+    arr[1179] = "DTWAIN_UpdateCurrentAcquiredImage"
+    arr[1180] = "DTWAIN_UseMultipleThreads"
     for _, name := range arr {
         addr, err := syscall.GetProcAddress(d.Handle, name)
         if err != nil {
@@ -10190,52 +10183,6 @@ func (d *DTWAIN_DLL) DTWAIN_SysInitializeExA(szINIPath string) DTWAIN_HANDLE {
 func (d *DTWAIN_DLL) DTWAIN_SysInitializeExW(szINIPath uintptr) DTWAIN_HANDLE {
     theProc := d.procs["DTWAIN_SysInitializeExW"]
     v1, _, _ := syscall.SyscallN(theProc, szINIPath)
-    return DTWAIN_HANDLE(v1)
-}
-
-func (d *DTWAIN_DLL) DTWAIN_SysInitializeLib(hInstance HINSTANCE) DTWAIN_HANDLE {
-    theProc := d.procs["DTWAIN_SysInitializeLib"]
-    v1, _, _ := syscall.SyscallN(theProc, uintptr(hInstance))
-    return DTWAIN_HANDLE(v1)
-}
-
-func (d *DTWAIN_DLL) DTWAIN_SysInitializeLibEx(hInstance HINSTANCE, szINIPath uintptr) DTWAIN_HANDLE {
-    theProc := d.procs["DTWAIN_SysInitializeLibEx"]
-    v1, _, _ := syscall.SyscallN(theProc, uintptr(hInstance), szINIPath)
-    return DTWAIN_HANDLE(v1)
-}
-
-func (d *DTWAIN_DLL) DTWAIN_SysInitializeLibEx2(hInstance HINSTANCE, szINIPath uintptr, szImageDLLPath uintptr, szLangResourcePath uintptr) DTWAIN_HANDLE {
-    theProc := d.procs["DTWAIN_SysInitializeLibEx2"]
-    v1, _, _ := syscall.SyscallN(theProc, uintptr(hInstance), szINIPath, szImageDLLPath, szLangResourcePath)
-    return DTWAIN_HANDLE(v1)
-}
-
-func (d *DTWAIN_DLL) DTWAIN_SysInitializeLibEx2A(hInstance HINSTANCE, szINIPath string, szImageDLLPath string, szLangResourcePath string) DTWAIN_HANDLE {
-    theProc := d.procs["DTWAIN_SysInitializeLibEx2A"]
-    arg_0 := []byte(szINIPath)
-    arg_1 := []byte(szImageDLLPath)
-    arg_2 := []byte(szLangResourcePath)
-    v1, _, _ := syscall.SyscallN(theProc, uintptr(hInstance), uintptr(unsafe.Pointer(&arg_0[0])), uintptr(unsafe.Pointer(&arg_1[0])), uintptr(unsafe.Pointer(&arg_2[0])))
-    return DTWAIN_HANDLE(v1)
-}
-
-func (d *DTWAIN_DLL) DTWAIN_SysInitializeLibEx2W(hInstance HINSTANCE, szINIPath uintptr, szImageDLLPath uintptr, szLangResourcePath uintptr) DTWAIN_HANDLE {
-    theProc := d.procs["DTWAIN_SysInitializeLibEx2W"]
-    v1, _, _ := syscall.SyscallN(theProc, uintptr(hInstance), szINIPath, szImageDLLPath, szLangResourcePath)
-    return DTWAIN_HANDLE(v1)
-}
-
-func (d *DTWAIN_DLL) DTWAIN_SysInitializeLibExA(hInstance HINSTANCE, szINIPath string) DTWAIN_HANDLE {
-    theProc := d.procs["DTWAIN_SysInitializeLibExA"]
-    arg_0 := []byte(szINIPath)
-    v1, _, _ := syscall.SyscallN(theProc, uintptr(hInstance), uintptr(unsafe.Pointer(&arg_0[0])))
-    return DTWAIN_HANDLE(v1)
-}
-
-func (d *DTWAIN_DLL) DTWAIN_SysInitializeLibExW(hInstance HINSTANCE, szINIPath uintptr) DTWAIN_HANDLE {
-    theProc := d.procs["DTWAIN_SysInitializeLibExW"]
-    v1, _, _ := syscall.SyscallN(theProc, uintptr(hInstance), szINIPath)
     return DTWAIN_HANDLE(v1)
 }
 

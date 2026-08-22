@@ -1223,13 +1223,6 @@ type Dtwainsysinitializeex2aFunc = unsafe extern "C" fn(*const c_char,*const c_c
 type Dtwainsysinitializeex2wFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16) -> *mut c_void;
 type DtwainsysinitializeexaFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
 type DtwainsysinitializeexwFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
-type DtwainsysinitializelibFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainsysinitializelibexFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> *mut c_void;
-type Dtwainsysinitializelibex2Func = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16) -> *mut c_void;
-type Dtwainsysinitializelibex2aFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char) -> *mut c_void;
-type Dtwainsysinitializelibex2wFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16) -> *mut c_void;
-type DtwainsysinitializelibexaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> *mut c_void;
-type DtwainsysinitializelibexwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> *mut c_void;
 type DtwainsysinitializenoblockingFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwainsysinitializenoblockingexFunc = unsafe extern "C" fn(i32) -> *mut c_void;
 type DtwaintestgetcapFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
@@ -2415,13 +2408,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_SysInitializeEx2WFunc: Symbol<'a, Dtwainsysinitializeex2wFunc>,
     DTWAIN_SysInitializeExAFunc: Symbol<'a, DtwainsysinitializeexaFunc>,
     DTWAIN_SysInitializeExWFunc: Symbol<'a, DtwainsysinitializeexwFunc>,
-    DTWAIN_SysInitializeLibFunc: Symbol<'a, DtwainsysinitializelibFunc>,
-    DTWAIN_SysInitializeLibExFunc: Symbol<'a, DtwainsysinitializelibexFunc>,
-    DTWAIN_SysInitializeLibEx2Func: Symbol<'a, Dtwainsysinitializelibex2Func>,
-    DTWAIN_SysInitializeLibEx2AFunc: Symbol<'a, Dtwainsysinitializelibex2aFunc>,
-    DTWAIN_SysInitializeLibEx2WFunc: Symbol<'a, Dtwainsysinitializelibex2wFunc>,
-    DTWAIN_SysInitializeLibExAFunc: Symbol<'a, DtwainsysinitializelibexaFunc>,
-    DTWAIN_SysInitializeLibExWFunc: Symbol<'a, DtwainsysinitializelibexwFunc>,
     DTWAIN_SysInitializeNoBlockingFunc: Symbol<'a, DtwainsysinitializenoblockingFunc>,
     DTWAIN_SysInitializeNoBlockingExFunc: Symbol<'a, DtwainsysinitializenoblockingexFunc>,
     DTWAIN_TestGetCapFunc: Symbol<'a, DtwaintestgetcapFunc>,
@@ -5270,13 +5256,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_SysInitializeEx2W: Symbol<Dtwainsysinitializeex2wFunc> = unsafe { library.get(b"DTWAIN_SysInitializeEx2W")? };
         let DTWAIN_SysInitializeExA: Symbol<DtwainsysinitializeexaFunc> = unsafe { library.get(b"DTWAIN_SysInitializeExA")? };
         let DTWAIN_SysInitializeExW: Symbol<DtwainsysinitializeexwFunc> = unsafe { library.get(b"DTWAIN_SysInitializeExW")? };
-        let DTWAIN_SysInitializeLib: Symbol<DtwainsysinitializelibFunc> = unsafe { library.get(b"DTWAIN_SysInitializeLib")? };
-        let DTWAIN_SysInitializeLibEx: Symbol<DtwainsysinitializelibexFunc> = unsafe { library.get(b"DTWAIN_SysInitializeLibEx")? };
-        let DTWAIN_SysInitializeLibEx2: Symbol<Dtwainsysinitializelibex2Func> = unsafe { library.get(b"DTWAIN_SysInitializeLibEx2")? };
-        let DTWAIN_SysInitializeLibEx2A: Symbol<Dtwainsysinitializelibex2aFunc> = unsafe { library.get(b"DTWAIN_SysInitializeLibEx2A")? };
-        let DTWAIN_SysInitializeLibEx2W: Symbol<Dtwainsysinitializelibex2wFunc> = unsafe { library.get(b"DTWAIN_SysInitializeLibEx2W")? };
-        let DTWAIN_SysInitializeLibExA: Symbol<DtwainsysinitializelibexaFunc> = unsafe { library.get(b"DTWAIN_SysInitializeLibExA")? };
-        let DTWAIN_SysInitializeLibExW: Symbol<DtwainsysinitializelibexwFunc> = unsafe { library.get(b"DTWAIN_SysInitializeLibExW")? };
         let DTWAIN_SysInitializeNoBlocking: Symbol<DtwainsysinitializenoblockingFunc> = unsafe { library.get(b"DTWAIN_SysInitializeNoBlocking")? };
         let DTWAIN_SysInitializeNoBlockingEx: Symbol<DtwainsysinitializenoblockingexFunc> = unsafe { library.get(b"DTWAIN_SysInitializeNoBlockingEx")? };
         let DTWAIN_TestGetCap: Symbol<DtwaintestgetcapFunc> = unsafe { library.get(b"DTWAIN_TestGetCap")? };
@@ -6461,13 +6440,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_SysInitializeEx2WFunc: DTWAIN_SysInitializeEx2W,
             DTWAIN_SysInitializeExAFunc: DTWAIN_SysInitializeExA,
             DTWAIN_SysInitializeExWFunc: DTWAIN_SysInitializeExW,
-            DTWAIN_SysInitializeLibFunc: DTWAIN_SysInitializeLib,
-            DTWAIN_SysInitializeLibExFunc: DTWAIN_SysInitializeLibEx,
-            DTWAIN_SysInitializeLibEx2Func: DTWAIN_SysInitializeLibEx2,
-            DTWAIN_SysInitializeLibEx2AFunc: DTWAIN_SysInitializeLibEx2A,
-            DTWAIN_SysInitializeLibEx2WFunc: DTWAIN_SysInitializeLibEx2W,
-            DTWAIN_SysInitializeLibExAFunc: DTWAIN_SysInitializeLibExA,
-            DTWAIN_SysInitializeLibExWFunc: DTWAIN_SysInitializeLibExW,
             DTWAIN_SysInitializeNoBlockingFunc: DTWAIN_SysInitializeNoBlocking,
             DTWAIN_SysInitializeNoBlockingExFunc: DTWAIN_SysInitializeNoBlockingEx,
             DTWAIN_TestGetCapFunc: DTWAIN_TestGetCap,
@@ -11181,34 +11153,6 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_SysInitializeExW(&self, szINIPath: *const u16) -> *mut c_void {
         unsafe { return (self.DTWAIN_SysInitializeExWFunc)(szINIPath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeLib(&self, hInstance: *mut c_void) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeLibFunc)(hInstance);  }
-    }
-
-    pub fn DTWAIN_SysInitializeLibEx(&self, hInstance: *mut c_void, szINIPath: *const u16) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeLibExFunc)(hInstance, szINIPath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeLibEx2(&self, hInstance: *mut c_void, szINIPath: *const u16, szImageDLLPath: *const u16, szLangResourcePath: *const u16) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeLibEx2Func)(hInstance, szINIPath, szImageDLLPath, szLangResourcePath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeLibEx2A(&self, hInstance: *mut c_void, szINIPath: *const c_char, szImageDLLPath: *const c_char, szLangResourcePath: *const c_char) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeLibEx2AFunc)(hInstance, szINIPath, szImageDLLPath, szLangResourcePath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeLibEx2W(&self, hInstance: *mut c_void, szINIPath: *const u16, szImageDLLPath: *const u16, szLangResourcePath: *const u16) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeLibEx2WFunc)(hInstance, szINIPath, szImageDLLPath, szLangResourcePath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeLibExA(&self, hInstance: *mut c_void, szINIPath: *const c_char) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeLibExAFunc)(hInstance, szINIPath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeLibExW(&self, hInstance: *mut c_void, szINIPath: *const u16) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeLibExWFunc)(hInstance, szINIPath);  }
     }
 
     pub fn DTWAIN_SysInitializeNoBlocking(&self) -> *mut c_void {

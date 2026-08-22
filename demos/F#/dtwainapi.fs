@@ -4437,15 +4437,6 @@ module TwainAPI =
     type DTWAIN_SysInitializeEx2Delegate = delegate of string * string * string -> DTWAIN_HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_SysInitializeLibDelegate = delegate of HINSTANCE -> DTWAIN_HANDLE
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_SysInitializeLibExDelegate = delegate of HINSTANCE * string -> DTWAIN_HANDLE
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_SysInitializeLibEx2Delegate = delegate of HINSTANCE * string * string * string -> DTWAIN_HANDLE
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SysInitializeNoBlockingDelegate = delegate of unit -> DTWAIN_HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -5320,9 +5311,6 @@ module TwainAPI =
     let private SysInitialize = lazy (DynamicDll.Bind "DTWAIN_SysInitialize" : DTWAIN_SysInitializeDelegate)
     let private SysInitializeEx = lazy (DynamicDll.Bind "DTWAIN_SysInitializeEx" : DTWAIN_SysInitializeExDelegate)
     let private SysInitializeEx2 = lazy (DynamicDll.Bind "DTWAIN_SysInitializeEx2" : DTWAIN_SysInitializeEx2Delegate)
-    let private SysInitializeLib = lazy (DynamicDll.Bind "DTWAIN_SysInitializeLib" : DTWAIN_SysInitializeLibDelegate)
-    let private SysInitializeLibEx = lazy (DynamicDll.Bind "DTWAIN_SysInitializeLibEx" : DTWAIN_SysInitializeLibExDelegate)
-    let private SysInitializeLibEx2 = lazy (DynamicDll.Bind "DTWAIN_SysInitializeLibEx2" : DTWAIN_SysInitializeLibEx2Delegate)
     let private SysInitializeNoBlocking = lazy (DynamicDll.Bind "DTWAIN_SysInitializeNoBlocking" : DTWAIN_SysInitializeNoBlockingDelegate)
     let private SysInitializeNoBlockingEx = lazy (DynamicDll.Bind "DTWAIN_SysInitializeNoBlockingEx" : DTWAIN_SysInitializeNoBlockingExDelegate)
     let private TestGetCap = lazy (DynamicDll.Bind "DTWAIN_TestGetCap" : DTWAIN_TestGetCapDelegate)
@@ -8769,18 +8757,6 @@ module TwainAPI =
     let DTWAIN_SysInitializeEx2 (szinipath: string) (szimagedllpath: string) (szlangresourcepath: string) : DTWAIN_HANDLE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SysInitializeEx2.Value.Invoke(szinipath, szimagedllpath, szlangresourcepath)
-
-    let DTWAIN_SysInitializeLib (hinstance: HINSTANCE) : DTWAIN_HANDLE =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        SysInitializeLib.Value.Invoke(hinstance)
-
-    let DTWAIN_SysInitializeLibEx (hinstance: HINSTANCE) (szinipath: string) : DTWAIN_HANDLE =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        SysInitializeLibEx.Value.Invoke(hinstance, szinipath)
-
-    let DTWAIN_SysInitializeLibEx2 (hinstance: HINSTANCE) (szinipath: string) (szimagedllpath: string) (szlangresourcepath: string) : DTWAIN_HANDLE =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        SysInitializeLibEx2.Value.Invoke(hinstance, szinipath, szimagedllpath, szlangresourcepath)
 
     let DTWAIN_SysInitializeNoBlocking() : DTWAIN_HANDLE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

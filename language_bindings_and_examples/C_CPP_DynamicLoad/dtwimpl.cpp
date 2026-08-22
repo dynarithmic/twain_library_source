@@ -1230,13 +1230,6 @@
     D_SYSINITIALIZEEX2WFUNC                       DYNDTWAIN_API::DTWAIN_SysInitializeEx2W = nullptr;
     D_SYSINITIALIZEEXAFUNC                        DYNDTWAIN_API::DTWAIN_SysInitializeExA = nullptr;
     D_SYSINITIALIZEEXWFUNC                        DYNDTWAIN_API::DTWAIN_SysInitializeExW = nullptr;
-    D_SYSINITIALIZELIBFUNC                        DYNDTWAIN_API::DTWAIN_SysInitializeLib = nullptr;
-    D_SYSINITIALIZELIBEXFUNC                      DYNDTWAIN_API::DTWAIN_SysInitializeLibEx = nullptr;
-    D_SYSINITIALIZELIBEX2FUNC                     DYNDTWAIN_API::DTWAIN_SysInitializeLibEx2 = nullptr;
-    D_SYSINITIALIZELIBEX2AFUNC                    DYNDTWAIN_API::DTWAIN_SysInitializeLibEx2A = nullptr;
-    D_SYSINITIALIZELIBEX2WFUNC                    DYNDTWAIN_API::DTWAIN_SysInitializeLibEx2W = nullptr;
-    D_SYSINITIALIZELIBEXAFUNC                     DYNDTWAIN_API::DTWAIN_SysInitializeLibExA = nullptr;
-    D_SYSINITIALIZELIBEXWFUNC                     DYNDTWAIN_API::DTWAIN_SysInitializeLibExW = nullptr;
     D_SYSINITIALIZENOBLOCKINGFUNC                 DYNDTWAIN_API::DTWAIN_SysInitializeNoBlocking = nullptr;
     D_SYSINITIALIZENOBLOCKINGEXFUNC               DYNDTWAIN_API::DTWAIN_SysInitializeNoBlockingEx = nullptr;
     D_TESTGETCAPFUNC                              DYNDTWAIN_API::DTWAIN_TestGetCap = nullptr;
@@ -2490,13 +2483,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SysInitializeEx2W, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SysInitializeExA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SysInitializeExW, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeLib, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeLibEx, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeLibEx2, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeLibEx2A, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeLibEx2W, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeLibExA, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeLibExW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SysInitializeNoBlocking, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SysInitializeNoBlockingEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_TestGetCap, hModule);
