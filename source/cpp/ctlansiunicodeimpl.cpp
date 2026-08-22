@@ -475,7 +475,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(MaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetCurrentFileName(Source, (MaxLen > 0 && szName) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const LONG retVal = DTWAIN_GetCurrentFileName(Source, szName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szName, retVal);
 #else
         return DTWAIN_GetCurrentFileName(Source, szName, MaxLen);
@@ -488,7 +488,7 @@ extern "C"
         return DTWAIN_GetCurrentFileName(Source, szName, MaxLen);
 #else
         std::string arg((std::max)(MaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetCurrentFileName(Source, (MaxLen > 0 && szName) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetCurrentFileName(Source, szName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szName, retVal);
 #endif
     }
@@ -499,7 +499,7 @@ extern "C"
         return DTWAIN_GetDSMFullName(DSMType, szDLLName, nMaxLen, pWhichSearch);
 #else
         std::string arg((std::max)(nMaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetDSMFullName(DSMType, (nMaxLen > 0 && szDLLName) ? arg.data() : nullptr, static_cast<LONG>(arg.size()), pWhichSearch);
+        LONG retVal = DTWAIN_GetDSMFullName(DSMType, szDLLName ? arg.data() : nullptr, static_cast<LONG>(arg.size()), pWhichSearch);
         return null_terminator_copier(get_view(arg), szDLLName, retVal);
 #endif
     }
@@ -508,7 +508,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg(nMaxLen, 0);
-        const LONG retVal = DTWAIN_GetDSMFullName(DSMType, (nMaxLen > 0 && szDLLName) ? arg.data() : nullptr, static_cast<LONG>(arg.size()), pWhichSearch);
+        const LONG retVal = DTWAIN_GetDSMFullName(DSMType, szDLLName ? arg.data() : nullptr, static_cast<LONG>(arg.size()), pWhichSearch);
         return null_terminator_copier(get_view(arg), szDLLName, retVal);
 #else
         return DTWAIN_GetDSMFullName(DSMType, szDLLName, nMaxLen, pWhichSearch);
@@ -541,7 +541,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetErrorString(lError, (nLength > 0 && lpszBuffer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const LONG retVal = DTWAIN_GetErrorString(lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #else
         return DTWAIN_GetErrorString(lError, lpszBuffer, nLength);
@@ -554,7 +554,7 @@ extern "C"
         return DTWAIN_GetErrorString(lError, lpszBuffer, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetErrorString(lError, (nLength > 0 && lpszBuffer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetErrorString(lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #endif
     }
@@ -563,7 +563,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetResourceString(ResourceID, (nLength > 0 && lpszBuffer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const LONG retVal = DTWAIN_GetResourceString(ResourceID, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #else
         return DTWAIN_GetResourceString(ResourceID, lpszBuffer, nLength);
@@ -576,7 +576,7 @@ extern "C"
         return DTWAIN_GetResourceString(ResourceID, lpszBuffer, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetResourceString(ResourceID, (nLength > 0 && lpszBuffer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetResourceString(ResourceID, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #endif
     }
@@ -585,7 +585,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetConditionCodeString(lError, (nLength > 0 && lpszBuffer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const LONG retVal = DTWAIN_GetConditionCodeString(lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #else
         return DTWAIN_GetConditionCodeString(lError, lpszBuffer, nLength);
@@ -598,7 +598,7 @@ extern "C"
         return DTWAIN_GetConditionCodeString(lError, lpszBuffer, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetConditionCodeString(lError, (nLength > 0 && lpszBuffer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetConditionCodeString(lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #endif
     }
@@ -609,7 +609,7 @@ extern "C"
         return DTWAIN_GetPaperSizeName(paperNumber, outName, nSize);
 #else
         std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetPaperSizeName(paperNumber, (nSize > 0 && outName) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetPaperSizeName(paperNumber, outName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), outName, retVal);
 #endif
     }
@@ -619,7 +619,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetPaperSizeName(paperNumber, (nSize > 0 && outName) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetPaperSizeName(paperNumber, outName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), outName, retVal);
 #else
         return DTWAIN_GetPaperSizeName(paperNumber, outName, nSize);
@@ -632,7 +632,7 @@ extern "C"
         return DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, lpszOut, nSize);
 #else
         std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, (nSize > 0 && lpszOut) ? arg.data()
+        LONG retVal = DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, lpszOut ? arg.data()
                                                           : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
 #endif
@@ -643,7 +643,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, (nSize > 0 && lpszOut) ? arg.data()
+        LONG retVal = DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, lpszOut ? arg.data()
                                                           : nullptr,
             static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
@@ -677,7 +677,7 @@ extern "C"
         return DTWAIN_GetExtNameFromCap(nValue, szValue, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetExtNameFromCap(nValue, (nLength > 0 && szValue) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetExtNameFromCap(nValue, szValue ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szValue, retVal);
 #endif
     }
@@ -686,7 +686,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetExtNameFromCap(nValue, (nLength > 0 && szValue) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const LONG retVal = DTWAIN_GetExtNameFromCap(nValue, szValue ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szValue, retVal);
 #else
         return DTWAIN_GetExtNameFromCap(nValue, szValue, nLength);
@@ -770,7 +770,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const DTWAIN_BOOL retVal = DTWAIN_GetNameFromCap(nCapValue, (nLength > 0 && szValue) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const DTWAIN_BOOL retVal = DTWAIN_GetNameFromCap(nCapValue, szValue ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szValue, retVal);
 #else
         return DTWAIN_GetNameFromCap(nCapValue, szValue, nLength);
@@ -783,7 +783,7 @@ extern "C"
         return DTWAIN_GetNameFromCap(nCapValue, szValue, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        DTWAIN_BOOL retVal = DTWAIN_GetNameFromCap(nCapValue, (nLength > 0 && szValue) ? arg.data() : nullptr, nLength);
+        DTWAIN_BOOL retVal = DTWAIN_GetNameFromCap(nCapValue, szValue ? arg.data() : nullptr, nLength);
         return null_terminator_copier(get_view(arg), szValue, retVal);
 #endif
     }
@@ -794,7 +794,7 @@ extern "C"
         return DTWAIN_GetOCRErrorString(Engine, lError, lpszBuffer, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetOCRErrorString(Engine, lError, (nLength > 0 && lpszBuffer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetOCRErrorString(Engine, lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #endif
     }
@@ -803,7 +803,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetOCRErrorString(Engine, lError, (nLength > 0 && lpszBuffer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const LONG retVal = DTWAIN_GetOCRErrorString(Engine, lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #else
         return DTWAIN_GetOCRErrorString(Engine, lError, lpszBuffer, nLength);
@@ -816,7 +816,7 @@ extern "C"
         return DTWAIN_GetOCRManufacturer(Engine, szManufacturer, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetOCRManufacturer(Engine, (nLength > 0 && szManufacturer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetOCRManufacturer(Engine, szManufacturer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szManufacturer, retVal);
 #endif
     }
@@ -825,7 +825,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetOCRManufacturer(Engine, (nLength > 0 && szManufacturer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const LONG retVal = DTWAIN_GetOCRManufacturer(Engine, szManufacturer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szManufacturer, retVal);
 #else
         return DTWAIN_GetOCRManufacturer(Engine, szManufacturer, nLength);
@@ -836,7 +836,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetOCRProductFamily(Engine, (nLength > 0 && szProductFamily) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const LONG retVal = DTWAIN_GetOCRProductFamily(Engine, szProductFamily ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szProductFamily, retVal);
 #else
         return DTWAIN_GetOCRProductFamily(Engine, szProductFamily, nLength);
@@ -849,7 +849,7 @@ extern "C"
         return DTWAIN_GetOCRProductFamily(Engine, szProductFamily, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetOCRProductFamily(Engine, (nLength > 0 && szProductFamily) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetOCRProductFamily(Engine, szProductFamily ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szProductFamily, retVal);
 #endif
     }
@@ -860,7 +860,7 @@ extern "C"
         return DTWAIN_GetOCRProductName(Engine, szProductName, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetOCRProductName(Engine, (nLength > 0 && szProductName) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetOCRProductName(Engine, szProductName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szProductName, retVal);
 #endif
     }
@@ -869,7 +869,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetOCRProductName(Engine, (nLength > 0 && szProductName) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const LONG retVal = DTWAIN_GetOCRProductName(Engine, szProductName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), szProductName, retVal);
 #else
         return DTWAIN_GetOCRProductName(Engine, szProductName, nLength);
@@ -880,7 +880,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg(dSize, 0);
-        const HANDLE retVal = DTWAIN_GetOCRText(Engine, nPageNo, (dSize > 0 && Data) ? arg.data() : nullptr, dSize, pActualSize, nFlags);
+        const HANDLE retVal = DTWAIN_GetOCRText(Engine, nPageNo, Data ? arg.data() : nullptr, dSize, pActualSize, nFlags);
         return null_terminator_copier(get_view(arg), Data, retVal);
 #else
         return DTWAIN_GetOCRText(Engine, nPageNo, Data, dSize, pActualSize, nFlags);
@@ -893,7 +893,7 @@ extern "C"
         return DTWAIN_GetOCRText(Engine, nPageNo, Data, dSize, pActualSize, nFlags);
 #else
         std::string arg(dSize, 0);
-        HANDLE retVal = DTWAIN_GetOCRText(Engine, nPageNo, (dSize > 0 && Data) ? arg.data() : nullptr, dSize, pActualSize, nFlags);
+        HANDLE retVal = DTWAIN_GetOCRText(Engine, nPageNo, Data ? arg.data() : nullptr, dSize, pActualSize, nFlags);
         return null_terminator_copier(get_view(arg), Data, retVal);
 #endif
     }
@@ -902,7 +902,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetOCRVersionInfo(Engine, (nLength > 0 && buffer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const LONG retVal = DTWAIN_GetOCRVersionInfo(Engine, buffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), buffer, retVal);
 #else
         return DTWAIN_GetOCRVersionInfo(Engine, buffer, nLength);
@@ -915,7 +915,7 @@ extern "C"
         return DTWAIN_GetOCRVersionInfo(Engine, buffer, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetOCRVersionInfo(Engine, (nLength > 0 && buffer) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetOCRVersionInfo(Engine, buffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), buffer, retVal);
 #endif
     }
@@ -924,7 +924,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nMaxLen, 0L), 0);
-        const auto retVal = DTWAIN_GetPDFTextElementString(TextElement, (nMaxLen > 0 && szData) ? arg.data() : nullptr, static_cast<LONG>(arg.size()), Flags);
+        const auto retVal = DTWAIN_GetPDFTextElementString(TextElement, szData ? arg.data() : nullptr, static_cast<LONG>(arg.size()), Flags);
         return null_terminator_copier(get_view(arg), szData, retVal);
 #else
         return DTWAIN_GetPDFTextElementString(TextElement, szData, nMaxLen, Flags);
@@ -937,7 +937,7 @@ extern "C"
         return DTWAIN_GetPDFTextElementString(TextElement, szData, maxLen, Flags);
 #else
         std::string arg((std::max)(maxLen, 0L), 0);
-        const auto retVal = DTWAIN_GetPDFTextElementString(TextElement, (maxLen > 0 && szData) ? arg.data() : nullptr, static_cast<LONG>(arg.size()), Flags);
+        const auto retVal = DTWAIN_GetPDFTextElementString(TextElement, szData ? arg.data() : nullptr, static_cast<LONG>(arg.size()), Flags);
         return null_terminator_copier(get_view(arg), szData, retVal);
 #endif
     }
@@ -946,7 +946,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nLength, 0L), 0);
-        const DTWAIN_BOOL retVal = DTWAIN_GetPrinterSuffixString(Source, (nLength > 0 && Suffix) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        const DTWAIN_BOOL retVal = DTWAIN_GetPrinterSuffixString(Source, Suffix ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), Suffix, retVal);
 #else
         return DTWAIN_GetPrinterSuffixString(Source, Suffix, nLength);
@@ -959,7 +959,7 @@ extern "C"
         return DTWAIN_GetPrinterSuffixString(Source, Suffix, nLength);
 #else
         std::string arg((std::max)(nLength, 0L), 0);
-        DTWAIN_BOOL retVal = DTWAIN_GetPrinterSuffixString(Source, (nLength > 0 && Suffix) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        DTWAIN_BOOL retVal = DTWAIN_GetPrinterSuffixString(Source, Suffix ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), Suffix, retVal);
 #endif
     }
@@ -1014,7 +1014,7 @@ extern "C"
         return DTWAIN_GetSaveFileName(Source, fName, nMaxLen);
 #else
         std::string args((std::max)(nMaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetSaveFileName(Source, (nMaxLen > 0 && fName) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetSaveFileName(Source, fName ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), fName, retVal);
 #endif
     }
@@ -1023,7 +1023,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nMaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetSaveFileName(Source, (nMaxLen > 0 && fName) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetSaveFileName(Source, fName ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), fName, retVal);
 #else
         return DTWAIN_GetSaveFileName(Source, fName, nMaxLen);
@@ -1056,7 +1056,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSourceManufacturer(Source, (nLength > 0 && szProduct) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetSourceManufacturer(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szProduct, retVal);
 #else
         return DTWAIN_GetSourceManufacturer(Source, szProduct, nLength);
@@ -1069,7 +1069,7 @@ extern "C"
         return DTWAIN_GetSourceManufacturer(Source, szProduct, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetSourceManufacturer(Source, (nLength > 0 && szProduct) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetSourceManufacturer(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szProduct, retVal);
 #endif
     }
@@ -1080,7 +1080,7 @@ extern "C"
         return DTWAIN_GetSourceProductFamily(Source, szProduct, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetSourceProductFamily(Source, (nLength > 0 && szProduct) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetSourceProductFamily(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szProduct, retVal);
 #endif
     }
@@ -1089,7 +1089,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSourceProductFamily(Source, (nLength > 0 && szProduct) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetSourceProductFamily(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szProduct, retVal);
 #else
         return DTWAIN_GetSourceProductFamily(Source, szProduct, nLength);
@@ -1100,7 +1100,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSourceProductName(Source, (nLength > 0 && szProduct) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetSourceProductName(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szProduct, retVal);
 #else
         return DTWAIN_GetSourceProductName(Source, szProduct, nLength);
@@ -1113,7 +1113,7 @@ extern "C"
         return DTWAIN_GetSourceProductName(Source, szProduct, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetSourceProductName(Source, (nLength > 0 && szProduct) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetSourceProductName(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szProduct, retVal);
 #endif
     }
@@ -1122,7 +1122,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSourceVersionInfo(Source, (nLength > 0 && szProduct) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetSourceVersionInfo(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szProduct, retVal);
 #else
         return DTWAIN_GetSourceVersionInfo(Source, szProduct, nLength);
@@ -1135,7 +1135,7 @@ extern "C"
         return DTWAIN_GetSourceVersionInfo(Source, szProduct, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetSourceVersionInfo(Source, (nLength > 0 && szProduct) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetSourceVersionInfo(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szProduct, retVal);
 #endif
     }
@@ -1146,7 +1146,7 @@ extern "C"
         return DTWAIN_GetTempFileDirectory(szFilePath, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetTempFileDirectory((nLength > 0 && szFilePath) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetTempFileDirectory(szFilePath ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szFilePath, retVal);
 #endif
     }
@@ -1155,7 +1155,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetTempFileDirectory((nLength > 0 && szFilePath) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetTempFileDirectory(szFilePath ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szFilePath, retVal);
 #else
         return DTWAIN_GetTempFileDirectory(szFilePath, nLength);
@@ -1210,7 +1210,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetTwainAvailabilityEx((nLength > 0 && szDirectories) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetTwainAvailabilityEx(szDirectories ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szDirectories, retVal);
 #else
         return DTWAIN_GetTwainAvailabilityEx(szDirectories, nLength);
@@ -1223,7 +1223,7 @@ extern "C"
         return DTWAIN_GetTwainAvailabilityEx(szDirectories, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetTwainAvailabilityEx((nLength > 0 && szDirectories) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetTwainAvailabilityEx(szDirectories ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szDirectories, retVal);
 #endif
     }
@@ -1233,7 +1233,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_IsTwainAvailableEx((nLength > 0 && szDirectories) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_IsTwainAvailableEx(szDirectories ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szDirectories, retVal);
 #else
         return DTWAIN_IsTwainAvailableEx(szDirectories, nLength);
@@ -1246,7 +1246,7 @@ extern "C"
         return DTWAIN_IsTwainAvailableEx(szDirectories, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_IsTwainAvailableEx((nLength > 0 && szDirectories) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_IsTwainAvailableEx(szDirectories ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), szDirectories, retVal);
 #endif
     }
@@ -1257,7 +1257,7 @@ extern "C"
         return DTWAIN_GetVersionInfo(lpszVer, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetVersionInfo((nLength > 0 && lpszVer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetVersionInfo(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszVer, retVal);
 #endif
     }
@@ -1266,7 +1266,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetVersionInfo((nLength > 0 && lpszVer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetVersionInfo(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszVer, retVal);
 #else
         return DTWAIN_GetVersionInfo(lpszVer, nLength);
@@ -1279,7 +1279,7 @@ extern "C"
         return DTWAIN_GetVersionString(lpszVer, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetVersionString((nLength > 0 && lpszVer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetVersionString(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszVer, retVal);
 #endif
     }
@@ -1288,7 +1288,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetLibraryPath((nLength > 0 && lpszVer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetLibraryPath(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszVer, retVal);
 #else
         return DTWAIN_GetLibraryPath(lpszVer, nLength);
@@ -1301,7 +1301,7 @@ extern "C"
         return DTWAIN_GetLibraryPath(lpszVer, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetLibraryPath((nLength > 0 && lpszVer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetLibraryPath(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszVer, retVal);
 #endif
     }
@@ -1310,7 +1310,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetVersionString((nLength > 0 && lpszVer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetVersionString(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszVer, retVal);
 #else
         return DTWAIN_GetVersionString(lpszVer, nLength);
@@ -1323,7 +1323,7 @@ extern "C"
         return DTWAIN_GetShortVersionString(lpszVer, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetShortVersionString((nLength > 0 && lpszVer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetShortVersionString(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszVer, retVal);
 #endif
     }
@@ -1332,7 +1332,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetShortVersionString((nLength > 0 && lpszVer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetShortVersionString(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszVer, retVal);
 #else
         return DTWAIN_GetShortVersionString(lpszVer, nLength);
@@ -1363,7 +1363,7 @@ extern "C"
         return DTWAIN_GetWindowsVersionInfo(lpszBuffer, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetWindowsVersionInfo((nLength > 0 && lpszBuffer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetWindowsVersionInfo(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #endif
     }
@@ -1373,7 +1373,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetWindowsVersionInfo((nLength > 0 && lpszBuffer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetWindowsVersionInfo(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #else
         return DTWAIN_GetWindowsVersionInfo(lpszBuffer, nLength);
@@ -1387,7 +1387,7 @@ extern "C"
         return DTWAIN_GetActiveDSMPath(lpszBuffer, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetActiveDSMPath((nLength > 0 && lpszBuffer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetActiveDSMPath(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #endif
     }
@@ -1396,7 +1396,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetActiveDSMPath((nLength > 0 && lpszBuffer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetActiveDSMPath(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #else
         return DTWAIN_GetActiveDSMPath(lpszBuffer, nLength);
@@ -1410,7 +1410,7 @@ extern "C"
         return DTWAIN_GetActiveDSMVersionInfo(lpszBuffer, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetActiveDSMVersionInfo((nLength > 0 && lpszBuffer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        LONG retVal = DTWAIN_GetActiveDSMVersionInfo(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #endif
     }
@@ -1419,7 +1419,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetActiveDSMVersionInfo((nLength > 0 && lpszBuffer) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetActiveDSMVersionInfo(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #else
         return DTWAIN_GetActiveDSMVersionInfo(lpszBuffer, nLength);
@@ -2747,7 +2747,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nMaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetFileTypeExtensions(nType, (nMaxLen > 0 && lpszName) ? arg.data() : nullptr, nMaxLen);
+        const LONG retVal = DTWAIN_GetFileTypeExtensions(nType, lpszName ? arg.data() : nullptr, nMaxLen);
         return null_terminator_copier(get_view(arg), lpszName, retVal);
 #else
         return DTWAIN_GetFileTypeExtensions(nType, lpszName, nMaxLen);
@@ -2760,7 +2760,7 @@ extern "C"
         return DTWAIN_GetFileTypeExtensions(nType, lpszName, nMaxLen);
 #else
         std::string arg((std::max)(nMaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetFileTypeExtensions(nType, (nMaxLen > 0 && lpszName) ? arg.data() : nullptr, nMaxLen);
+        const LONG retVal = DTWAIN_GetFileTypeExtensions(nType, lpszName ? arg.data() : nullptr, nMaxLen);
         return null_terminator_copier(get_view(arg), lpszName, retVal);
 #endif
     }
@@ -2769,7 +2769,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nMaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetFileTypeName(nType, (nMaxLen > 0 && lpszName) ? arg.data() : nullptr, nMaxLen);
+        const LONG retVal = DTWAIN_GetFileTypeName(nType, lpszName ? arg.data() : nullptr, nMaxLen);
         return null_terminator_copier(get_view(arg), lpszName, retVal);
 #else
         return DTWAIN_GetFileTypeName(nType, lpszName, nMaxLen);
@@ -2783,7 +2783,7 @@ extern "C"
         return DTWAIN_GetFileTypeName(nType, lpszName, nMaxLen);
 #else
         std::string arg((std::max)(nMaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetFileTypeName(nType, (nMaxLen > 0 && lpszName) ? arg.data() : nullptr, nMaxLen);
+        const LONG retVal = DTWAIN_GetFileTypeName(nType, lpszName ? arg.data() : nullptr, nMaxLen);
         return null_terminator_copier(get_view(arg), lpszName, retVal);
 #endif
     }
@@ -2792,7 +2792,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSessionDetails((nLength > 0 && lpszBuf) ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
+        const LONG retVal = DTWAIN_GetSessionDetails(lpszBuf ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
         return null_terminator_copier(get_view(args), lpszBuf, retVal);
 #else
         return DTWAIN_GetSessionDetails(lpszBuf, nLength, indentFactor, bRefresh);
@@ -2805,7 +2805,7 @@ extern "C"
         return DTWAIN_GetSessionDetails(lpszBuf, nLength, indentFactor, bRefresh);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetSessionDetails((nLength > 0 && lpszBuf) ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
+        LONG retVal = DTWAIN_GetSessionDetails(lpszBuf ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
         return null_terminator_copier(get_view(args), lpszBuf, retVal);
 #endif
     }
@@ -2815,7 +2815,7 @@ extern "C"
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
         const LONG retVal = DTWAIN_GetSourceDetails(stringconversion::Convert_AnsiPtr_To_Native(lpszSources).c_str(),
-            (nLength > 0 && lpszBuf) ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
+            lpszBuf ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
         return null_terminator_copier(get_view(args), lpszBuf, retVal);
 #else
         return DTWAIN_GetSourceDetails(lpszSources, lpszBuf, nLength, indentFactor, bRefresh);
@@ -2829,7 +2829,7 @@ extern "C"
 #else
         std::string args((std::max)(nLength, 0L), 0);
         const LONG retVal = DTWAIN_GetSourceDetails(basicstringutils::Narrow(lpszSources).c_str(),
-            (nLength > 0 && lpszBuf) ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
+            lpszBuf ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
         return null_terminator_copier(get_view(args), lpszBuf, retVal);
 #endif
     }
@@ -2838,7 +2838,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetVersionCopyright((nLength > 0 && lpszApp) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetVersionCopyright(lpszApp ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszApp, retVal);
 #else
         return DTWAIN_GetVersionCopyright(lpszApp, nLength);
@@ -2851,7 +2851,7 @@ extern "C"
         return DTWAIN_GetVersionCopyright(lpszApp, nLength);
 #else
         std::string args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetVersionCopyright((nLength > 0 && lpszApp) ? args.data() : nullptr, static_cast<LONG>(args.size()));
+        const LONG retVal = DTWAIN_GetVersionCopyright(lpszApp ? args.data() : nullptr, static_cast<LONG>(args.size()));
         return null_terminator_copier(get_view(args), lpszApp, retVal);
 #endif
     }
@@ -3237,7 +3237,7 @@ extern "C"
         return DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut, nSize);
 #else
         std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, (nSize > 0 && lpszOut) ? arg.
+        LONG retVal = DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut ? arg.
                                                             data()
                                                             : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
@@ -3249,7 +3249,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, (nSize > 0 && lpszOut) ? arg.
+        LONG retVal = DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut ? arg.
                                                             data()
                                                             : nullptr,
             static_cast<LONG>(arg.size()));
@@ -3311,7 +3311,7 @@ extern "C"
         return DTWAIN_GetCapLabel(lCapability, lpszOut, nSize);
 #else
         std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetCapLabel(lCapability, (nSize > 0 && lpszOut) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetCapLabel(lCapability, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
 #endif
     }
@@ -3321,7 +3321,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetCapLabel(lCapability, (nSize > 0 && lpszOut) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetCapLabel(lCapability, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
 #else
         return DTWAIN_GetCapLabel(lCapability, lpszOut, nSize);
@@ -3334,7 +3334,7 @@ extern "C"
         return DTWAIN_GetCapHelp(lCapability, lpszOut, nSize);
 #else
         std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetCapHelp(lCapability, (nSize > 0 && lpszOut) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetCapHelp(lCapability, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
 #endif
     }
@@ -3344,7 +3344,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetCapHelp(lCapability, (nSize > 0 && lpszOut) ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetCapHelp(lCapability, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
 #else
         return DTWAIN_GetCapHelp(lCapability, lpszOut, nSize);
@@ -3355,7 +3355,7 @@ extern "C"
     {
 #ifdef _UNICODE
         std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetAllSourceInfo(Source, (nSize > 0 && lpszOut) ? arg.data() : nullptr, indentFactor, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetAllSourceInfo(Source, lpszOut ? arg.data() : nullptr, indentFactor, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
 #else
         return DTWAIN_GetAllSourceInfo(Source, lpszOut, indentFactor, nSize);
@@ -3368,7 +3368,29 @@ extern "C"
         return DTWAIN_GetAllSourceInfo(Source, lpszOut, indentFactor, nSize);
 #else
         std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetAllSourceInfo(Source, (nSize > 0 && lpszOut) ? arg.data() : nullptr, indentFactor, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetAllSourceInfo(Source, lpszOut ? arg.data() : nullptr, indentFactor, static_cast<LONG>(arg.size()));
+        return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#endif
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetAllSessionInfoA(LPSTR lpszOut, LONG indentFactor, LONG nSize)
+    {
+#ifdef _UNICODE
+        std::wstring arg((std::max)(nSize, 0L), 0);
+        LONG retVal = DTWAIN_GetAllSessionInfo(lpszOut ? arg.data() : nullptr, indentFactor, static_cast<LONG>(arg.size()));
+        return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#else
+        return DTWAIN_GetAllSessionInfo(lpszOut, indentFactor, nSize);
+#endif
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetAllSessionInfoW(LPWSTR lpszOut, LONG indentFactor, LONG nSize)
+    {
+#ifdef _UNICODE
+        return DTWAIN_GetAllSessionInfo(lpszOut, indentFactor, nSize);
+#else
+        std::string arg((std::max)(nSize, 0L), 0);
+        LONG retVal = DTWAIN_GetAllSessionInfo(lpszOut ? arg.data() : nullptr, indentFactor, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
 #endif
     }
