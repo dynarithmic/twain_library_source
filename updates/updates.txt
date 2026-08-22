@@ -79,6 +79,22 @@ DTWAIN Version changes
     5.0.0.  Note that the DTWAIN_CheckDLLVersion() function should only be called after the DTWAIN DLL has been loaded, either 
     automatically at runtime, or through LoadLibrary().
 
+- Removed the following obsolete API functions:
+    DTWAIN_SysInitializeLib
+    DTWAIN_SysInitializeLibEx  
+    DTWAIN_SysInitializeLibEx2 
+    DTWAIN_SysInitializeLibExW    
+    DTWAIN_SysInitializeLibExA    
+    DTWAIN_SysInitializeLibEx2W   
+    DTWAIN_SysInitializeLibEx2A   
+
+- Sorted exported names in the DLL's export table.  This required reordering of the ordinal numbers used in the DTWAIN DLL.  
+
+  This should affect a very small number of users who are using a programming environment that relies on explicit 
+  usage of the DLL's internal ordinal numbers to identify the exported DLL functions.  If you are one of the 
+  few programmers using the ordinal numbers within the DTWAIN DLL, you will have to change your 
+  application to use the new ordinal numbers.
+
 - Fix issues with DTWAIN_IsTwainAvailable() when run on a system without TWAIN_32.DLL installed.
 
 - Fix issue with logging the Windows version if using Windows Server Enterprise Edition.
