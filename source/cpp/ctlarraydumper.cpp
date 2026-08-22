@@ -261,12 +261,13 @@ namespace dynarithmic
 
             const LONG nCount = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array));
             StringStreamA strm;
+            auto ptrString = basicstringutils::PointerToString<std::string>(Array);
             if (nCount < 0)
             {
-                strm << "Could not dump contents of DTWAIN_ARRAY " << Array << "\nNumber of elements: " << nCount;
+                strm << "Could not dump contents of DTWAIN_ARRAY " << ptrString << "\nNumber of elements: " << nCount;
                 return;
             }
-            strm << "Dumping contents of DTWAIN_ARRAY " << Array << "   : Number of elements: " << nCount;
+            strm << "Dumping contents of DTWAIN_ARRAY " << ptrString << "   : Number of elements: " << nCount;
             szBuf = strm.str();
         }
 

@@ -21,6 +21,16 @@ DTWAIN Version changes
       2) after a TWAIN session has been terminated (either by calling 
          DTWAIN_EndTwainSession() or DTWAIN_SysDestroy()).  
 
+- Ensure that DTWAIN ANSI and Wide character-specific API functions that have strings as parameters,
+  (the functions with names that end with the letter "A" and "W"), will return 0 characters 
+  copied if the length argument provided by the user is 0.  This is only for functions that copy data
+  to the user-provided string buffer on return.  
+
+      Currently in some circumstances, even though no characters are copied to the user's buffer
+      if the length argument is 0, the DTWAIN function may return a non-zero, positive number.  Examples would be 
+      DTWAIN_GetErrorStringA() and DTWAIN_GetErrorStringW() will now always return 0 if the length argument 
+      provided by the user is 0. 
+
 - Add DTWAIN_SetMajorMinorVersion() function to allow setting the TWAIN session's
   major and minor version number (basically, the same items in the TW_IDENTITY structure for
   the TWAIN session).  

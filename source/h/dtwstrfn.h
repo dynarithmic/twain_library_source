@@ -347,6 +347,9 @@ LONG DLLENTRY_DEF DTWAIN_GetCapHelpA(LONG lCapability, LPSTR lpszOut, LONG nSize
 LONG DLLENTRY_DEF DTWAIN_GetCapHelpW(LONG lCapability, LPWSTR lpszOut, LONG nSize);
 LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize);
 LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfoW(DTWAIN_SOURCE Source, LPWSTR lpszOut, LONG indentFactor, LONG nSize);
+LONG DLLENTRY_DEF DTWAIN_GetAllSessionInfoA(LPSTR lpszOut, LONG indentFactor, LONG nSize);
+LONG DLLENTRY_DEF DTWAIN_GetAllSessionInfoW(LPWSTR lpszOut, LONG indentFactor, LONG nSize);
+
 
 #ifdef DTWAIN_ANSIDLL
     #define DTWAIN_CHARPTRTYPE LPSTR
@@ -548,6 +551,8 @@ HANDLE DLLENTRY_DEF DTWAIN_RotateImageString(HANDLE hDib, DTWAIN_CCHARPTRTYPE an
 LONG DLLENTRY_DEF DTWAIN_GetCapLabel(LONG lCapability, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
 LONG DLLENTRY_DEF DTWAIN_GetCapHelp(LONG lCapability, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
 LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE lpszOut, LONG indentFactor, LONG nSize);
+LONG DLLENTRY_DEF DTWAIN_GetAllSessionInfo(DTWAIN_CHARPTRTYPE lpszOut, LONG indentFactor, LONG nMaxLen);
+
 #ifdef __cplusplus
 }
 #endif
