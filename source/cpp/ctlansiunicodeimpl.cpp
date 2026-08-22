@@ -2367,42 +2367,6 @@ extern "C"
 #endif
     }
 
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibExW(HINSTANCE hInstance, LPCWSTR szINIPath)
-    {
-#ifdef _UNICODE
-        return DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
-#else
-        return DTWAIN_SysInitializeLibEx(hInstance, stringconversion::Convert_WidePtr_To_Native(szINIPath).c_str());
-#endif
-    }
-
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibExA(HINSTANCE hInstance, LPCSTR szINIPath)
-    {
-#ifdef _UNICODE
-        return DTWAIN_SysInitializeLibEx(hInstance, stringconversion::Convert_AnsiPtr_To_Native(szINIPath).c_str());
-#else
-        return DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
-#endif
-    }
-
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx2W(HINSTANCE hInstance, LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath)
-    {
-#ifdef _UNICODE
-        return DTWAIN_SysInitializeLibEx2(hInstance, szINIPath, szImageDLLPath, szLangResourcePath);
-#else
-        return DTWAIN_SysInitializeLibEx2(hInstance, stringconversion::Convert_WidePtr_To_Native(szINIPath).c_str(), stringconversion::Convert_WidePtr_To_Native(szImageDLLPath).c_str(), stringconversion::Convert_WidePtr_To_Native(szLangResourcePath).c_str());
-#endif
-    }
-
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx2A(HINSTANCE hInstance, LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath)
-    {
-#ifdef _UNICODE
-        return DTWAIN_SysInitializeLibEx2(hInstance, stringconversion::Convert_AnsiPtr_To_Native(szINIPath).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szImageDLLPath).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szLangResourcePath).c_str());
-#else
-        return DTWAIN_SysInitializeLibEx2(hInstance, szINIPath, szImageDLLPath, szLangResourcePath);
-#endif
-    }
-
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoubleFeedDetectLengthStringA(DTWAIN_SOURCE Source, LPCSTR szLength)
     {
 #ifdef _UNICODE
