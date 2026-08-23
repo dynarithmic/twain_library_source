@@ -22,6 +22,7 @@
 #define ANSIWIDECONVERTER_WIN32_H
 #include <windows.h>
 #include <string>
+#include <limits>
 
 namespace dynarithmic
 {
@@ -32,28 +33,14 @@ namespace dynarithmic
             if (utf8.empty())
                 return { {}, true };
 
-            int size = MultiByteToWideChar(
-                CP_UTF8,
-                MB_ERR_INVALID_CHARS,
-                utf8.data(),
-                static_cast<int>(utf8.size()),
-                nullptr,
-                0
-            );
+            int size = MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.data(),static_cast<int>(utf8.size()),nullptr,0);
 
             if (size == 0)
                 return { {}, false };
 
             std::wstring result(size, 0);
 
-            MultiByteToWideChar(
-                CP_UTF8,
-                MB_ERR_INVALID_CHARS,
-                utf8.data(),
-                static_cast<int>(utf8.size()),
-                result.data(),
-                size
-            );
+            MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.data(),static_cast<int>(utf8.size()),result.data(),size);
 
             return { result, true };
         }
@@ -65,31 +52,13 @@ namespace dynarithmic
                 return { {}, true };
             }
 
-            int size = WideCharToMultiByte(
-                CP_UTF8,
-                0,
-                utf16string.data(),
-                static_cast<int>(utf16string.size()),
-                nullptr,
-                0,
-                nullptr,
-                nullptr
-            );
+            int size = WideCharToMultiByte(CP_UTF8,0,utf16string.data(),static_cast<int>(utf16string.size()),nullptr,0,nullptr,nullptr);
 
             if (size == 0)
                 return { {}, false };
 
             std::string result(size, 0);
-            int chars_converted = WideCharToMultiByte(
-                CP_UTF8,
-                0,
-                utf16string.data(),
-                static_cast<int>(utf16string.size()),
-                &result[0],
-                size,
-                nullptr,
-                nullptr);
-
+            int chars_converted = WideCharToMultiByte(CP_UTF8,0,utf16string.data(),static_cast<int>(utf16string.size()),&result[0],size,nullptr,nullptr);
             result.resize(chars_converted);
             return { result, true };
         }

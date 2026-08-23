@@ -53,7 +53,7 @@ int CTL_WmfIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     else
         opts.type = MetafileType::Emf;
 
-    opts.description = basicstringutils::Widen(GetCopyrightString());
+    opts.description = stringconversion::Convert_Ansi_To_Wide(GetCopyrightString());
     std::wstring sFileName = stringconversion::Convert_NativePtr_To_Wide(szFile);
     auto retval = WriteOneDibHandleToMetafile(sFileName, m_pDib->GetHandle(), opts);
     if (!retval)

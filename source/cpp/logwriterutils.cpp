@@ -67,7 +67,7 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteLogInfoW(std::wstring_view s, bool bFlush)
     {
-        WriteLogInfoA(basicstringutils::Narrow(s.data()), bFlush);
+        WriteLogInfoA(stringconversion::Convert_Wide_To_Ansi(s.data()), bFlush);
     }
 
     void LogWriterUtils::WriteLogInfo(CTL_StringViewType s, bool bFlush)
@@ -84,7 +84,7 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteLogInfoIndentedW(std::wstring_view s)
     {
-        WriteLogInfoIndentedA(basicstringutils::Narrow(s.data()));
+        WriteLogInfoIndentedA(stringconversion::Convert_WidePtr_To_Ansi(s.data()));
     }
 
     void LogWriterUtils::WriteLogInfoIndented(CTL_StringViewType s)
@@ -115,8 +115,8 @@ namespace dynarithmic
     
     void LogWriterUtils::WriteMultiLineInfoW(std::wstring_view s, const wchar_t* pszDelim)
     {
-        WriteMultiLineInfoA(basicstringutils::Narrow(s.data()),
-                            basicstringutils::Narrow(pszDelim).c_str());
+        WriteMultiLineInfoA(stringconversion::Convert_WidePtr_To_Ansi(s.data()),
+                            stringconversion::Convert_WidePtr_To_Ansi(pszDelim).c_str());
     }
 
     void LogWriterUtils::WriteMultiLineInfoIndented(CTL_StringViewType s, const CTL_StringType::traits_type::char_type* pszDelim)
@@ -132,14 +132,14 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteMultiLineInfoIndentedW(std::wstring_view s, const wchar_t* pszDelim)
     {
-        WriteMultiLineInfoIndentedA(basicstringutils::Narrow(s.data()),
-                                    basicstringutils::Narrow(pszDelim).c_str());
+        WriteMultiLineInfoIndentedA(stringconversion::Convert_WidePtr_To_Ansi(s.data()),
+                                    stringconversion::Convert_WidePtr_To_Ansi(pszDelim).c_str());
     }
 
     void OutputDTWAINErrorW(const CTL_TwainDLLHandle* pHandle, LPCWSTR pFunc)
     {
-        if (pFunc)
-            OutputDTWAINError(pHandle, basicstringutils::Narrow(pFunc).c_str());
+        if ( pFunc )
+            OutputDTWAINError(pHandle, stringconversion::Convert_Wide_To_Ansi(pFunc).c_str());
         else
             OutputDTWAINError(pHandle);
     }
