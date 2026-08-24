@@ -28,7 +28,7 @@ namespace dynarithmic
     class CTL_WebpIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_WebpIOHandler() : CTL_ImageIOHandler()
+            CTL_WebpIOHandler()
             {
                 SetSaveArgs();
             }

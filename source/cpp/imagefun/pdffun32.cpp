@@ -23,15 +23,15 @@
 #endif
 #include "pdffun32.h"
 #include <string>
-#include <cmath>
 #include <pdfconst.h>
 #include <utility>
 #include <memory>
-#include "ctliface.h"
-#include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "dtwain_float_utils.h"
 #include "logwriterutils.h"
+#include "ctlstaticdata.h"
+#include "ctltwaindllhandle.h"
+#include "ctltwainsource.h"
 
 using namespace dynarithmic;
 
@@ -237,7 +237,7 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
 
     if (!pPDFInfo->m_Interface->DTWLIB_PDFWritePage(pPDFInfo->pPDFdoc, path))
     {
-        delete_file(path);
+        fileutils::delete_file(path);
         pPDFInfo->m_Interface->DTWLIB_PDFReleaseDocument(pPDFInfo->pPDFdoc);
         pPDFInfo.reset();
         return DTWAIN_ERR_FILEWRITE;
@@ -245,7 +245,7 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
 
     // Add the file to the array for later deletion
     // delete the temporary file
-    delete_file(path);
+    fileutils::delete_file(path);
 
     if ( m_MultiPageStruct.Stage == 0)
     {
@@ -349,12 +349,12 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
 
     }
 
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_AUTHOR,   std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFAuthor) + ")").c_str());
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_PRODUCER, std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFProducer) + ")").c_str());
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_KEYWORDS, std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFKeywords) + ")").c_str());
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_TITLE,    std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFTitle) + ")").c_str());
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_SUBJECT,  std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFSubject) + ")").c_str());
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_CREATOR,  std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFCreator) + ")").c_str());
+    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_AUTHOR,   std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFAuthor) + ")").c_str());
+    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_PRODUCER, std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFProducer) + ")").c_str());
+    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_KEYWORDS, std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFKeywords) + ")").c_str());
+    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_TITLE,    std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFTitle) + ")").c_str());
+    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_SUBJECT,  std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFSubject) + ")").c_str());
+    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_CREATOR,  std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFCreator) + ")").c_str());
     return 0;
 }
 
@@ -363,7 +363,7 @@ void CPDFImageHandler::RemoveAllImageFiles(PDFINFO *pPDFInfo)
     auto it = pPDFInfo->TempFileArray.begin();
     while (it != pPDFInfo->TempFileArray.end())
     {
-        delete_file((*it).c_str());
+        fileutils::delete_file((*it).c_str());
         ++it;
     }
 }
@@ -394,5 +394,5 @@ void CPDFImageHandler::SetSearchableText(std::string_view sText)
 
 void CPDFImageHandler::AddPDFTextElement(PDFTextElementPtr element) const
 {
-    m_ImageInfoEx.theSource->SetPDFValue(StringConversion::Convert_Ansi_To_Native("PDFTEXTELEMENTKEY"), element);
+    m_ImageInfoEx.theSource->SetPDFValue(stringconversion::Convert_Ansi_To_Native("PDFTEXTELEMENTKEY"), element);
 }

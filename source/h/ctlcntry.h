@@ -21,8 +21,8 @@
 #ifndef CTLCNTRY_H
 #define CTLCNTRY_H
 
-#include "ctlobstr.h"
-#include "ctlenum.h"
+#include "ctlstringdefs.h"
+#include "twain.h"
 namespace dynarithmic
 {
     struct TW_CountryInfo

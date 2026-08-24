@@ -13,7 +13,11 @@
 #include <io.h>
 #include "SourceProperties.h"
 #define MAX_LOADSTRING 100
-
+#ifdef _WIN64
+    #define TWAINDLLS TWAINDLL_VERSION2
+#else
+    #define TWAINDLLS TWAINDLL_VERSION1 " or 32-bit " TWAINDLL_VERSION2
+#endif
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 TCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
@@ -50,7 +54,7 @@ void DisplaySourceProps();
 void SetCaptionToSourceName();
 void AcquireNative();
 void AcquireBuffered();
-void AcquireFile(BOOL bUseSource, LONG fileType);
+void AcquireFile(BOOL bUseSource, LONG resourceId, LONG fileType);
 void ToggleCheckedItem(UINT resId);
 BOOL GetToggleMenuState(UINT resID);
 void DisplayLoggingOptions();
@@ -61,8 +65,11 @@ void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable);
 void SetUpAcquire();
 void DisplayBlankThresholdOptions();
 void DisableFileXFerSubItems();
+BOOL IsAcquirePDFEncrypted(int PDFType);
+BOOL IsAcquirePDF(int PDFType);
 
 INT_PTR DisplayGetFileNameDlg();
+INT_PTR DisplayPDFOptionsDlg(BOOL bUseEncryption);
 
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -84,6 +91,7 @@ LRESULT CALLBACK DisplayLoggingProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 LRESULT CALLBACK DisplayBlankThresholdProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK EnterFileNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK PDFSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR DisplayOneDibPage(HINSTANCE hInstance, HANDLE hDib, UINT resID, HWND wndHandle);
 
 
@@ -94,6 +102,21 @@ typedef struct
     LONG DTWAINType;
     LPCTSTR defName;
 } AllTypes ;
+
+typedef struct
+{
+    char szPDFTitle[256];
+    char szPDFSubject[256];
+    char szPDFAuthor[256];
+    char szPDFCreator[256];
+    char szPDFKeywords[256];
+    char szPDFProducer[256];
+    char szPDFUserPass[256];
+    char szPDFOwnerPass[256];
+    BOOL bUseEncryption;
+} PDFInfo;
+
+PDFInfo AllPDFInfo;
 
 typedef struct  
 {
@@ -121,7 +144,8 @@ AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("engli
                                  {ID_LANGUAGE_TRADITIONALCHINESE    , _T("traditional_chinese")},
                                  {ID_LANGUAGE_JAPANESE              , _T("japanese")},
                                  {ID_LANGUAGE_KOREAN                , _T("korean")},
-                                 {ID_LANGUAGE_TURKISH               , _T("turkish")}
+                                 {ID_LANGUAGE_TURKISH               , _T("turkish")},
+                                 {ID_LANGUAGE_CANTONESE             , _T("cantonese")},
                                 };
 
 AllFileTypes g_allDTWAINFileTypes[] = {
@@ -162,6 +186,11 @@ AllFileTypes g_allDTWAINFileTypes[] = {
         {IDM_ACQUIREFILE_PAINTSHOP              ,  DTWAIN_PSD },
         {IDM_ACQUIREFILE_PCX                    ,  DTWAIN_PCX },
         {IDM_ACQUIREFILE_PDF                    ,  DTWAIN_PDFMULTI },
+        {IDM_ACQUIREFILE_PDF_ASCII85            ,  DTWAIN_PDFMULTI },
+        {IDM_ACQUIREFILE_PDF_RC4_40BIT          ,  DTWAIN_PDFMULTI },
+        {IDM_ACQUIREFILE_PDF_RC4_128BIT         ,  DTWAIN_PDFMULTI },
+        {IDM_ACQUIREFILE_PDF_AES_128BIT         ,  DTWAIN_PDFMULTI },
+        {IDM_ACQUIREFILE_PDF_AES_256BIT         ,  DTWAIN_PDFMULTI },
         {IDM_ACQUIREFILE_PNG                    ,  DTWAIN_PNG },
         {IDM_ACQUIREFILE_POSTSCRIPTLEVEL1       ,  DTWAIN_POSTSCRIPT1MULTI },
         {IDM_ACQUIREFILE_POSTSCRIPTLEVEL2       ,  DTWAIN_POSTSCRIPT2MULTI },
@@ -187,8 +216,9 @@ const UINT nFirstAcquireSourceID = IDM_ACQUIREFILESOURCE_WINDOWSBMP;
 const UINT nLastAcquireSourceID = IDM_ACQUIREFILESOURCE_DEJAVU;
 
 const UINT nFirstAcquireFileID = IDM_ACQUIREFILE_BIGTIFF_NOCOMPRESSION;
-const UINT nLastAcquireFileID = IDM_ACQUIREFILE_POSTSCRIPTLEVEL3;
+const UINT nLastAcquireFileID = IDM_ACQUIREFILE_PDF_ASCII85;
 const UINT numDTWAINFileTypes = sizeof(g_allDTWAINFileTypes) / sizeof(g_allDTWAINFileTypes[0]);
+
 
 UINT g_AllMenuItems[] = { IDM_SELECT_SOURCE,
                           IDM_SELECT_SOURCE_BY_NAME,
@@ -219,7 +249,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     HACCEL hAccelTable;
     if ( !DTWAIN_IsTwainAvailable() )
     {
-        MessageBox(NULL, _T("TWAIN is not installed!\r\nExiting..."), _T("Error"), MB_ICONSTOP);
+        MessageBoxA(NULL, TWAINDLLS " was not found!\r\nExiting...", "Error", MB_ICONSTOP);
         return FALSE;
     }
 
@@ -278,6 +308,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     /* Call function to determine the DTWAIN version */
     DTWAIN_GetVersion(&nMajorVer, &nMinorVer, &nDTwainType);
+
+    DTWAIN_CheckDLLVersion(5, 9, 2, 0, DTWAIN_CHECKDLLVEREQUAL);
+    DTWAIN_CheckDLLVersion(5, 9, 3, 9, DTWAIN_CHECKDLLVEREQUAL);
+    DTWAIN_CheckDLLVersion(3, 9, 3, 9, DTWAIN_CHECKDLLVERGREATER);
+    DTWAIN_CheckDLLVersion(5, 9, 3, 100, DTWAIN_CHECKDLLVERLESSEQ);
 
     /* Create a PDF text element for usage when acquiring to a PDF file */
     g_PDFTextElement = DTWAIN_CreatePDFTextElement();
@@ -376,7 +411,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     {
                         EnableAllMenuItems(FALSE);
                         g_FileType = g_allDTWAINFileTypes[i].dtwainType;
-                        AcquireFile(g_allDTWAINFileTypes[i].resourceId < nFirstAcquireFileID, g_allDTWAINFileTypes[i].dtwainType);
+                        AcquireFile(g_allDTWAINFileTypes[i].resourceId < nFirstAcquireFileID, 
+                                              g_allDTWAINFileTypes[i].resourceId, 
+                                              g_allDTWAINFileTypes[i].dtwainType);
                         EnableAllMenuItems(TRUE);
                         break;
                     }
@@ -423,15 +460,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     EnableAllMenuItems(FALSE);
                     AcquireBuffered();
                     EnableAllMenuItems(TRUE);
-                break;
-                case IDM_ACQUIRE_FILE_DTWAIN:
-                    EnableAllMenuItems(FALSE);
-                    AcquireFile(FALSE, 0);
-                    EnableAllMenuItems(TRUE);
-                break;
-
-                case IDM_ACQUIRE_FILE_SOURCE:
-                    AcquireFile(TRUE, 0);
                 break;
 
                 case IDM_ACQUIRETEST_USEGETMESSAGE:
@@ -482,6 +510,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case ID_LANGUAGE_SIMPLIFIEDCHINESE  : 
                 case ID_LANGUAGE_PORTUGUESE:
                 case ID_LANGUAGE_TURKISH:
+                case ID_LANGUAGE_CANTONESE:
                     LoadLanguage(wmId);
                 break;
 
@@ -686,26 +715,26 @@ void GenericAcquire(LONG nWhichOne)
     if (nWhichOne == 0)
     {
         bRet = DTWAIN_AcquireNativeEx(
-            g_CurrentSource,
-            DTWAIN_PT_DEFAULT, /* Use default */
-            DTWAIN_ACQUIREALL, /* Get all pages */
-            GetToggleMenuState(IDM_USE_SOURCE_UI),
-            FALSE,  /* Close Source when UI is closed */
-            g_AcquireArray,
-            &ErrStatus /* Error Status */
-        );
+                                g_CurrentSource,
+                                DTWAIN_PT_DEFAULT, /* Use default */
+                                DTWAIN_ACQUIREALL, /* Get all pages */
+                                GetToggleMenuState(IDM_USE_SOURCE_UI),
+                                FALSE,  /* Close Source when UI is closed */
+                                g_AcquireArray,
+                                &ErrStatus /* Error Status */
+                            );
     }
     else
     {
         bRet = DTWAIN_AcquireBufferedEx(
-            g_CurrentSource,
-            DTWAIN_PT_DEFAULT, /* Use default */
-            DTWAIN_ACQUIREALL, /* Get all pages */
-            GetToggleMenuState(IDM_USE_SOURCE_UI),
-            TRUE,  /* Close Source when UI is closed */
-            g_AcquireArray,
-            &ErrStatus /* Error Status */
-        );
+                                g_CurrentSource,
+                                DTWAIN_PT_DEFAULT, /* Use default */
+                                DTWAIN_ACQUIREALL, /* Get all pages */
+                                GetToggleMenuState(IDM_USE_SOURCE_UI),
+                                TRUE,  /* Close Source when UI is closed */
+                                g_AcquireArray,
+                                &ErrStatus /* Error Status */
+                            );
     }
     EnableSourceItems(TRUE);
     if (!bRet)
@@ -744,7 +773,7 @@ void AcquireBuffered()
     GenericAcquire(1);
 }
 
-void AcquireFile(BOOL bUseSource, LONG fileType)
+void AcquireFile(BOOL bUseSource, LONG resourceID, LONG fileType)
 {
     LONG ErrStatus;
     LONG FileFlags = DTWAIN_USELONGNAME;
@@ -762,6 +791,41 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     else
         FileFlags |= DTWAIN_USENATIVE;
 
+    if (IsAcquirePDF(resourceID))
+    {
+        memset(&AllPDFInfo, 0, sizeof(PDFInfo));
+        DisplayPDFOptionsDlg(resourceID != IDM_ACQUIREFILE_PDF && resourceID != IDM_ACQUIREFILE_PDF_ASCII85);
+        DTWAIN_SetPDFAuthorA(g_CurrentSource, AllPDFInfo.szPDFAuthor);
+        DTWAIN_SetPDFCreatorA(g_CurrentSource, AllPDFInfo.szPDFCreator);
+        DTWAIN_SetPDFTitleA(g_CurrentSource, AllPDFInfo.szPDFTitle);
+        DTWAIN_SetPDFKeywordsA(g_CurrentSource, AllPDFInfo.szPDFKeywords);
+        DTWAIN_SetPDFSubjectA(g_CurrentSource, AllPDFInfo.szPDFSubject);
+    }
+
+    if (IsAcquirePDFEncrypted(resourceID))
+    {
+        BOOL bUseStrong = FALSE;
+        switch (resourceID)
+        {
+            case IDM_ACQUIREFILE_PDF_RC4_128BIT:
+            case IDM_ACQUIREFILE_PDF_AES_256BIT:
+            case IDM_ACQUIREFILE_PDF_AES_128BIT:
+                bUseStrong = TRUE;
+        }
+        DTWAIN_SetPDFEncryptionA(g_CurrentSource, TRUE, AllPDFInfo.szPDFUserPass, AllPDFInfo.szPDFOwnerPass, 
+                                 DTWAIN_PDF_ALLOWALL, bUseStrong);
+        if (resourceID == IDM_ACQUIREFILE_PDF_AES_128BIT)
+            DTWAIN_SetPDFAESEncryption(g_CurrentSource, DTWAIN_PDF_AES128, TRUE);
+        else
+        if (resourceID == IDM_ACQUIREFILE_PDF_AES_256BIT)
+            DTWAIN_SetPDFAESEncryption(g_CurrentSource, DTWAIN_PDF_AES256, TRUE);
+    }
+
+    else
+    if (resourceID == IDM_ACQUIREFILE_PDF_ASCII85)
+    {
+        DTWAIN_SetPDFASCIICompression(g_CurrentSource, TRUE);
+    }
     retValue = DisplayGetFileNameDlg();
     if (g_FileName[0] == 0 && retValue != IDCANCEL)
     {
@@ -797,24 +861,18 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
 
     SetUpAcquire();
 
-    /* Create the array of names.  This function is to be used
-       since the user may have entered a file name that has
-       embedded spaces */
-    AFileNames = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, 1);
-    DTWAIN_ArraySetAt( AFileNames, 0, g_FileName );
-
     /* Acquire the file */
     UseUI = GetToggleMenuState(IDM_USE_SOURCE_UI);
     EnableSourceItems(FALSE);
-    bAcquireOK = DTWAIN_AcquireFileEx(g_CurrentSource,
-                                  AFileNames,
-                                  fileType,
-                                  FileFlags | DTWAIN_CREATE_DIRECTORY,
-                                  DTWAIN_PT_DEFAULT, /* Use default */
-                                  DTWAIN_ACQUIREALL, /* Get all pages */
-                                  UseUI,
-                                  TRUE,  /* Close Source when UI is closed */
-                                  &ErrStatus /* Error Status */
+    bAcquireOK = DTWAIN_AcquireFile(g_CurrentSource, 
+                                    g_FileName,
+                                    fileType,
+                                    FileFlags | DTWAIN_CREATE_DIRECTORY,
+                                    DTWAIN_PT_DEFAULT, /* Use default */
+                                    DTWAIN_ACQUIREALL, /* Get all pages */
+                                    UseUI,
+                                    TRUE,  /* Close Source when UI is closed */
+                                    &ErrStatus /* Error Status */
                                   );
     if (!bAcquireOK)
     {
@@ -824,7 +882,6 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     EnableWindow(g_hWnd, TRUE);
     EnableSourceItems(TRUE);
 
-    DTWAIN_ArrayDestroy( AFileNames );
     LONG pageCount = DTWAIN_GetFileSavePageCount(g_CurrentSource);
     if ( !bAcquireOK || pageCount == 0 || !bPageOK )
     {
@@ -836,11 +893,7 @@ void AcquireFile(BOOL bUseSource, LONG fileType)
     }
     else
     {
-        if (_taccess(g_FileName, 0) == 0)
-        {
-            MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_OK);
-            return;
-        }
+        MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_OK);
     }
 }
 
@@ -855,6 +908,12 @@ DTWAIN_SOURCE DisplayGetNameDlg()
 INT_PTR DisplayGetFileNameDlg()
 {
     return DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterFileName, g_hWnd, (DLGPROC)EnterFileNameProc);
+}
+
+INT_PTR DisplayPDFOptionsDlg(BOOL bIsEncrypted)
+{
+    AllPDFInfo.bUseEncryption = bIsEncrypted;
+    return DialogBox(g_hInstance, (LPCTSTR)IDD_dlgPDFOptions, g_hWnd, (DLGPROC)PDFSettingsProc);
 }
 
 void DisplayCustomLangDlg()
@@ -1110,6 +1169,79 @@ LRESULT CALLBACK DisplayBlankThresholdProc(HWND hDlg, UINT message, WPARAM wPara
         }
         break;
 
+    }
+    return FALSE;
+}
+
+/* Dialog box to display PDF options */
+LRESULT CALLBACK PDFSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    static const int ids[] = { IDC_edPDFTitle, IDC_edPDFSubject, IDC_edPDFAuthor,
+                               IDC_edPDFCreator, IDC_edPDFKeywords, IDC_edPDFProducer,
+                               IDC_edUserPassword, IDC_edOwnerPassword};
+    static const int idsEncrypt[] = { IDC_edUserPassword, IDC_edOwnerPassword, IDC_txtUserPassword, IDC_txtOwnerPassword };
+
+    const int producerField = 5;
+    const int userpassField = 6;
+    const int ownerpassField = 7;
+    static const int numIDs = sizeof(ids) / sizeof(ids[0]);
+    static HWND allWindowItems[sizeof(ids) / sizeof(ids[0])];
+    static char* pPDFInfo[] = { AllPDFInfo.szPDFTitle, AllPDFInfo.szPDFSubject,
+                                AllPDFInfo.szPDFAuthor, AllPDFInfo.szPDFCreator, 
+                                AllPDFInfo.szPDFKeywords, AllPDFInfo.szPDFProducer,
+                                AllPDFInfo.szPDFUserPass, AllPDFInfo.szPDFOwnerPass};
+    switch (message)
+    {
+        case WM_INITDIALOG:
+        {
+            int i = 0;
+            char szProducer[256];
+            for (i = 0; i < numIDs; ++i)
+            {
+                allWindowItems[i] = GetDlgItem(hDlg, ids[i]);
+                SetWindowTextA(allWindowItems[i], "(None)");
+            }
+            DTWAIN_GetResourceStringA(DTWAIN_RESOURCE_COPYRIGHT, szProducer, 255);
+            SetWindowTextA(allWindowItems[producerField], szProducer);
+            SetWindowTextA(allWindowItems[userpassField], "");
+            SetWindowTextA(allWindowItems[ownerpassField], "");
+            if (!AllPDFInfo.bUseEncryption)
+            {
+                const int nItems = sizeof(idsEncrypt) / sizeof(idsEncrypt[0]);
+                int i = 0;
+                for (int i = 0; i < nItems; ++i)
+                    EnableWindow(GetDlgItem(hDlg, idsEncrypt[i]), FALSE);
+            }
+            return TRUE;
+        }
+        break;
+
+        case WM_COMMAND:
+        {
+            int nControl = LOWORD(wParam);
+            int nNotification = HIWORD(wParam);
+
+            switch (nControl)
+            {
+                /* Quit the dialog */
+                case IDOK:
+                {
+                    int i;
+                    for (i = 0; i < numIDs; ++i)
+                        GetWindowTextA(allWindowItems[i], pPDFInfo[i], 255);
+                    EndDialog(hDlg, LOWORD(wParam));
+                }
+                break;
+
+                case IDCANCEL:
+                {
+                    EndDialog(hDlg, LOWORD(wParam));
+                    return TRUE;
+                }
+                break;
+            }
+            break;
+        }
     }
     return FALSE;
 }
@@ -1469,7 +1601,7 @@ void WaitLoop()
 
 LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserData)
 {
-    static pdf_page_count = 1;
+    static int pdf_page_count = 1;
     switch (wParam)
     {
         case DTWAIN_TN_ACQUIRESTARTED:
@@ -1652,4 +1784,32 @@ void EnableFileXFerMenuItems(DTWAIN_SOURCE source, BOOL bEnable)
             DTWAIN_ArrayDestroy(arrFileTypes);
         }
     }
+}
+
+BOOL IsAcquirePDFEncrypted(int PDFType)
+{
+    switch (PDFType)
+    {
+        case IDM_ACQUIREFILE_PDF_RC4_40BIT:     
+        case IDM_ACQUIREFILE_PDF_RC4_128BIT:
+        case IDM_ACQUIREFILE_PDF_AES_128BIT:
+        case IDM_ACQUIREFILE_PDF_AES_256BIT:
+            return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL IsAcquirePDF(int PDFType)
+{
+    switch (PDFType)
+    {
+        case IDM_ACQUIREFILE_PDF:
+        case IDM_ACQUIREFILE_PDF_ASCII85:
+        case IDM_ACQUIREFILE_PDF_RC4_40BIT:
+        case IDM_ACQUIREFILE_PDF_RC4_128BIT:
+        case IDM_ACQUIREFILE_PDF_AES_128BIT:
+        case IDM_ACQUIREFILE_PDF_AES_256BIT:
+            return TRUE;
+    }
+    return FALSE;
 }

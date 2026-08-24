@@ -22,6 +22,8 @@
 #define SOURCESELECTOPTS_H
 
 #include "ctliface.h"
+#include "ctltwainsource.h"
+#include "ctltwaindllhandle.h"
 
 enum {SELECTSOURCE=1, SELECTDEFAULTSOURCE, SELECTSOURCEBYNAME, SELECTSOURCE2};
 
@@ -65,14 +67,14 @@ namespace dynarithmic
     {
         LPCSTR nuller = "null";
         strm << ("whichOption=") << src.nWhich
-            << (", productName=") << (src.szProduct ? StringConversion::Convert_NativePtr_To_Ansi(src.szProduct) : nuller)
+            << (", productName=") << (src.szProduct ? stringconversion::Convert_NativePtr_To_Ansi(src.szProduct) : nuller)
             << (", parentWindow=") << src.hWndParent
-            << (", title=") << (src.szTitle ? StringConversion::Convert_NativePtr_To_Ansi(src.szTitle) : nuller)
+            << (", title=") << (src.szTitle ? stringconversion::Convert_NativePtr_To_Ansi(src.szTitle) : nuller)
             << (", xPos=") << src.xPos
             << (", yPos=") << src.yPos
-            << (", includeNames=") << (src.szIncludeNames ? StringConversion::Convert_NativePtr_To_Ansi(src.szIncludeNames) : nuller)
-            << (", excludeNames=") << (src.szExcludeNames ? StringConversion::Convert_NativePtr_To_Ansi(src.szExcludeNames) : nuller)
-            << (", nameMapping=") << (src.szNameMapping ? StringConversion::Convert_NativePtr_To_Ansi(src.szNameMapping) : nuller)
+            << (", includeNames=") << (src.szIncludeNames ? stringconversion::Convert_NativePtr_To_Ansi(src.szIncludeNames) : nuller)
+            << (", excludeNames=") << (src.szExcludeNames ? stringconversion::Convert_NativePtr_To_Ansi(src.szExcludeNames) : nuller)
+            << (", nameMapping=") << (src.szNameMapping ? stringconversion::Convert_NativePtr_To_Ansi(src.szNameMapping) : nuller)
             << (", options=") << src.nOptions;
         return strm;
     }
@@ -110,5 +112,27 @@ namespace dynarithmic
         }
     };
 
+    template <typename PtrType>
+    static void ParseFileNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY FileList, 
+                               PtrType lpszFiles, LPDTWAIN_ARRAY pArray)
+    {
+        auto& factory = pHandle->m_ArrayFactory;
+        if (FileList)
+        {
+            factory->copy(*pArray, FileList);
+            return;
+        }
+
+        const CTL_StringType szParseDelim(CTL_StaticData::GetFileParseDelimiters());
+        const CTL_StringType strTemp(lpszFiles);
+        std::vector<CTL_StringType> strArray;
+
+        const int nTokens = basicstringutils::TokenizeQuoted(strTemp, szParseDelim.c_str(), strArray);
+        factory->clear(*pArray);
+        std::for_each(strArray.begin(), strArray.begin() + nTokens, [&](CTL_StringType& s)
+        {
+            factory->add_to_back(*pArray, &s, 1);
+        });
+    }
 }
 #endif

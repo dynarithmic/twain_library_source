@@ -38,7 +38,6 @@ namespace dynarithmic
                                     TWAINAcquireType_AudioFile = 0xFB,
                                     TWAINAcquireType_FileUsingBuffered = 0xFC,
                                     TWAINAcquireType_FileUsingNative = 0xFD,
-                                    TWAINAcquireType_Clipboard = 0xFE,
                                     TWAINAcquireType_Invalid
                             };
 

@@ -21,340 +21,353 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
-#include "ctltmpl5.h"
+#include "ctlgetsetcapsinternal.h"
 #include "ctllogcalls.h"
 #include "ctlarray.h"
+#include "ctlstringutilsx.h"
+#include "ctlcapcollect.h"
+#include "ctldtwainhandle.h"
+#include "dtwainx.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = basicstringutils;
 
 /////////////////////////////////////////////////////////////////////////
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx(DTWAIN_SOURCE Source)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    DTWAIN_ARRAY pArray = nullptr;
-    DTWAIN_EnumCustomCaps(Source, &pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumExtendedCapsEx(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    DTWAIN_ARRAY pArray = nullptr;
-    DTWAIN_EnumExtendedCaps(Source, &pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    DTWAIN_ARRAY pArray = nullptr;
-    DTWAIN_EnumSupportedCaps(Source, &pArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Array))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-
-    // Check if Array is nullptr
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-
-    auto& factory = pHandle->m_ArrayFactory;
-
-    if (factory->is_valid(*Array))
-        factory->clear(*Array);
-
-    auto retvalue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !retvalue.second; }, retvalue.first, false, FUNC_MACRO);
-    auto ThisArray = retvalue.second;
-
-    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ThisArray);
-    auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
-
-    if (ThisArray)
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx(DTWAIN_SOURCE Source)
     {
-        if (pSource->RetrievedAllCaps())
-        {
-            // Check if this source has had capabilities negotiated and tested
-            const auto strProdName = pSource->GetProductName();
-            int nWhere;
-            FindFirstValue(strProdName, &pHandle->m_aSourceCapInfo, &nWhere);
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        DTWAIN_ARRAY pArray = nullptr;
+        DTWAIN_EnumCustomCaps(Source, &pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
+        CATCH_BLOCK(nullptr)
+    }
 
-            if (nWhere != -1) // Already negotiated
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumExtendedCapsEx(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        DTWAIN_ARRAY pArray = nullptr;
+        DTWAIN_EnumExtendedCaps(Source, &pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
+        CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        DTWAIN_ARRAY pArray = nullptr;
+        DTWAIN_EnumSupportedCaps(Source, &pArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
+        CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Array))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+
+        // Check if Array is nullptr
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
+        auto& factory = pHandle->m_ArrayFactory;
+
+        if (factory->is_valid(*Array))
+            factory->clear(*Array);
+
+        auto retvalue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !retvalue.second; }, retvalue.first, false, FUNC_MACRO);
+        auto ThisArray = retvalue.second;
+
+        DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ThisArray);
+        auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
+
+        if (ThisArray)
+        {
+            if (pSource->RetrievedAllCaps())
             {
-                // Get the cap array values
-                const CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
-                CTL_CapInfoMap *pCapInfoArray = std::get<1>(Info).get();
-                std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoMap::value_type& CapInfo)
-                                { vCaps.push_back(static_cast<int>(std::get<0>(CapInfo))); });
-                MoveArray(pHandle, Array, &ThisArray); 
-                LOG_FUNC_EXIT_NONAME_PARAMS(true)
-            }
-        }
+                // Check if this source has had capabilities negotiated and tested
+                const auto strProdName = pSource->GetProductName();
+                int nWhere;
+                FindFirstValue(strProdName, &pHandle->m_aSourceCapInfo, &nWhere);
 
-        // First time, so let's go
-        factory->clear(ThisArray);
-        CTL_TwainCapArray rArray;
-
-        // loop through all capabilities
-        CTL_TwainAppMgr::GetCapabilities(pSource, rArray);
-
-        // copy caps to our DTWAIN array
-        std::copy(rArray.begin(), rArray.end(), std::back_inserter(vCaps));
-        vCaps.erase(std::remove(vCaps.begin(), vCaps.end(), 0), vCaps.end());
-
-        // Cache this information and set source's flag that all caps were retrieved
-        DTWAIN_CacheCapabilityInfo(pSource, pHandle, &vCaps);
-        pSource->SetRetrievedAllCaps(true);
-        const bool bFound = !vCaps.empty();
-        MoveArray(pHandle, Array, &ThisArray);
-        if (bFound)
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-template <typename CacheFn>
-static void CopyCapsToUserArray(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Array, CacheFn fn)
-{
-    // Create the container to copy the caps to
-    auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-    if (!retValue.second)
-        return;
-    DTWAIN_ARRAY ThisArray = retValue.second;
-
-    // If anything goes wrong, make sure the array is deleted from memory
-    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ThisArray);
-
-    auto& factory = pHandle->m_ArrayFactory;
-
-    // Now copy the caps to to the container
-    auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
-    auto& capCache = (pSource->*fn)();
-    vCaps.insert(vCaps.begin(), capCache.begin(), capCache.end());
-
-    MoveArray(pHandle, Array, &ThisArray);
-}
-
-struct EnumCustomTraits
-{
-    static bool EnumAllCaps(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Array)
-    {
-        if (!pSource->RetrievedAllCaps())
-        {
-            if (!DTWAIN_EnumSupportedCaps(reinterpret_cast<DTWAIN_SOURCE>(pSource), Array))
-                return false;
-        }
-        return true;
-    }
-};
-
-struct EnumExtendedTraits
-{
-    static bool EnumAllCaps(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY /*Array*/)
-    {
-        pSource->RetrieveExtendedCaps();
-        return true;
-    }
-};
-
-template <typename EnumFn, typename CacheFn>
-static int32_t EnumCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, CacheFn fn)
-{
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
-
-    bool bRet = EnumFn::EnumAllCaps(pSource, Array);
-    if (bRet)
-        CopyCapsToUserArray(pHandle, pSource, Array, fn);
-    else
-        return DTWAIN_ERR_NO_CAPS_DEFINED;
-    return DTWAIN_NO_ERROR;
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Array))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-
-    // Enumerate the extended caps
-    auto retVal = EnumCaps<EnumExtendedTraits>(Source, Array, &CTL_ITwainSource::GetExtendedCapCache);
-
-    // Check for any error return code
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; },
-                                       retVal, false, FUNC_MACRO);
-
-    // Everything is ok
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Array))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-
-    // Enumerate the custom caps
-    auto retVal = EnumCaps<EnumCustomTraits>(Source, Array, &CTL_ITwainSource::GetCustomCapCache);
-
-    // Check for any error return code
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; },
-                                      retVal, false, FUNC_MACRO);
-
-    // Everything is ok.
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-static LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapability)
-{
-    CTL_CapInfo* CapInfo = GetCapInfo(pHandle, pSource, static_cast<TW_UINT16>(lCapability));
-    if (!CapInfo)
-        return 0;
-    // Try and get the operations now from TWAIN
-    return CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true);
-}
-
-template <TW_UINT16 msgType>
-static CTL_StringType GetCapLabelHelpInternal(CTL_TwainDLLHandle* pHandle, LONG lCapability)
-{
-    CTL_CapabilityLabelHelpTriplet<msgType> LabelHelpTrip(pHandle->m_pTwainSession, static_cast<TW_UINT16>(lCapability));
-    auto rc = LabelHelpTrip.Execute();
-    if (rc == TWRC_SUCCESS)
-        return StringConversion::Convert_Ansi_To_Native(LabelHelpTrip.GetString());
-    return {};
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
-    LONG val = 0;
-    DTWAIN_GetCapOperations(Source, lCapability, &val);
-    LOG_FUNC_EXIT_NONAME_PARAMS(val)
-    CATCH_BLOCK(0)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCapability, lpOps))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-
-    // Check for null lpOps
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return lpOps == nullptr; },
-                                      DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-
-    // Check for cap support
-    bool isSupported = pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCapability));
-    DTWAIN_Check_Error_Condition_WithThrow_Ex_WithParams(pHandle, [&] { return isSupported == false; },
-                                                 DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, 
-                                                { CTL_TwainAppMgr::GetCapNameFromCap(lCapability) });
-    // Get the capability operations
-    *lpOps = GetCapOperationsInternal(pHandle, pSource, lCapability);
-
-    // Log the cap operations if logging is turned on
-    if (CTL_StaticData::GetLogFilterFlags())
-    {
-        LogWriterUtils::WriteLogInfoIndentedA("Supported operations for capability " + CTL_TwainAppMgr::GetCapNameFromCap(lCapability) + ": ");
-        LogWriterUtils::WriteLogInfoIndentedA(CTL_TWAINTypeDecoder::DecodeCapOperations(*lpOps));
-    }
-
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOps))
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetCapLabel(LONG lCapability, LPTSTR lpszLabel, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((lCapability, lpszLabel, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-
-    // Get the cap label (if this is supported)
-    CTL_StringType label = GetCapLabelHelpInternal<MSG_GETLABEL>(pHandle, lCapability);
-    auto maxChars = StringWrapper::CopyInfoToCString(label, lpszLabel, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszLabel))
-    LOG_FUNC_EXIT_NONAME_PARAMS(maxChars)
-    CATCH_BLOCK(0)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetCapHelp(LONG lCapability, LPTSTR lpszHelp, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((lCapability, lpszHelp, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    // Get the cap help (if this is supported)
-    CTL_StringType label = GetCapLabelHelpInternal<MSG_GETHELP>(pHandle, lCapability);
-    auto maxChars = StringWrapper::CopyInfoToCString(label, lpszHelp, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszHelp))
-    LOG_FUNC_EXIT_NONAME_PARAMS(maxChars)
-    CATCH_BLOCK(0)
-}
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCapLabels(LONG lCapability)
-{
-    LOG_FUNC_ENTRY_PARAMS((lCapability))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    CTL_CapabilityLabelEnumTriplet Trip(pHandle->m_pTwainSession, static_cast<TW_UINT16>(lCapability));
-    DTWAIN_ARRAY arrayRet = {};
-    auto rc = Trip.Execute();
-    if (rc == TWRC_SUCCESS)
-        arrayRet = dynarithmic::CreateArrayFromContainer<std::vector<std::string>>(pHandle, Trip.GetStrings());
-    LOG_FUNC_EXIT_NONAME_PARAMS(arrayRet)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    auto& supportedCaps = pSource->GetCapSupportedList();
-
-    std::vector<int> Array{ 0 };
-
-    auto& logFilterFlags = GetLogFilterFlags();
-    // First try a RESETALL, since the source may support this MSG type
-    bool bResetAllOk = 
-        SetCapabilityValues(pSource, 1, DTWAIN_CAPRESETALL, static_cast<UINT>(TwainContainer_ONEVALUE), 0, Array);
-
-    if (!bResetAllOk)
-    {
-        std::vector<std::string> vFailed = { "DTWAIN_SetAllCapsToDefault failed for the following caps: " };
-        // RESETALL didn't work, so set each individual cap with RESET
-        for (auto cap : supportedCaps)
-        {
-            if (pSource->IsCapNegotiableInState(cap, pSource->GetState()))
-            {
-                // Note that some caps are read-only, so SetCapabilityValues will fail for those caps
-                auto Ops = GetCapOperationsInternal(pHandle, pSource, cap);
-                if (Ops & TWQC_RESET)
+                if (nWhere != -1) // Already negotiated
                 {
-                    bool bResetOk = SetCapabilityValues(pSource, cap, DTWAIN_CAPRESET, static_cast<UINT>(TwainContainer_ONEVALUE), 0, Array);
-                    if (logFilterFlags && !bResetOk)
+                    // Get the cap array values
+                    const CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
+                    CTL_CapInfoMap *pCapInfoArray = std::get<1>(Info).get();
+                    std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoMap::value_type& CapInfo)
+                                    { vCaps.push_back(std::get<0>(CapInfo)); });
+                    MoveArray(pHandle, Array, &ThisArray); 
+                    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+                }
+            }
+
+            // First time, so let's go
+            factory->clear(ThisArray);
+            CTL_TwainCapArray rArray;
+
+            // loop through all capabilities
+            CTL_TwainAppMgr::GetCapabilities(pSource, rArray);
+
+            // copy caps to our DTWAIN array
+            std::copy(rArray.begin(), rArray.end(), std::back_inserter(vCaps));
+            vCaps.erase(std::remove(vCaps.begin(), vCaps.end(), 0), vCaps.end());
+
+            // Cache this information and set source's flag that all caps were retrieved
+            DTWAIN_CacheCapabilityInfo(pSource, pHandle, &vCaps);
+            pSource->SetRetrievedAllCaps(true);
+            const bool bFound = !vCaps.empty();
+            MoveArray(pHandle, Array, &ThisArray);
+            if (bFound)
+                LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+}
+
+namespace
+{
+    template <typename CacheFn>
+    void CopyCapsToUserArray(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Array, CacheFn fn)
+    {
+        // Create the container to copy the caps to
+        auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+        if (!retValue.second)
+            return;
+        DTWAIN_ARRAY ThisArray = retValue.second;
+
+        // If anything goes wrong, make sure the array is deleted from memory
+        DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ThisArray);
+
+        auto& factory = pHandle->m_ArrayFactory;
+
+        // Now copy the caps to to the container
+        auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
+        auto& capCache = (pSource->*fn)();
+        vCaps.insert(vCaps.begin(), capCache.begin(), capCache.end());
+
+        MoveArray(pHandle, Array, &ThisArray);
+    }
+
+    struct EnumCustomTraits
+    {
+        static bool EnumAllCaps(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Array)
+        {
+            if (!pSource->RetrievedAllCaps())
+            {
+                if (!DTWAIN_EnumSupportedCaps(reinterpret_cast<DTWAIN_SOURCE>(pSource), Array))
+                    return false;
+            }
+            return true;
+        }
+    };
+
+    struct EnumExtendedTraits
+    {
+        static bool EnumAllCaps(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY /*Array*/)
+        {
+            pSource->RetrieveExtendedCaps();
+            return true;
+        }
+    };
+
+    template <typename EnumFn, typename CacheFn>
+    int32_t EnumCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, CacheFn fn)
+    {
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const auto pHandle = pSource->GetDTWAINHandle();
+
+        bool bRet = EnumFn::EnumAllCaps(pSource, Array);
+        if (bRet)
+            CopyCapsToUserArray(pHandle, pSource, Array, fn);
+        else
+            return DTWAIN_ERR_NO_CAPS_DEFINED;
+        return DTWAIN_NO_ERROR;
+    }
+
+    LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapability)
+    {
+        CTL_CapInfo* CapInfo = GetCapInfo(pHandle, pSource, static_cast<TW_UINT16>(lCapability));
+        if (!CapInfo)
+            return 0;
+        // Try and get the operations now from TWAIN
+        return static_cast<LONG>(CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true));
+    }
+
+    template <TW_UINT16 msgType>
+    CTL_StringType GetCapLabelHelpInternal(CTL_TwainDLLHandle* pHandle, LONG lCapability)
+    {
+        CTL_CapabilityLabelHelpTriplet<msgType> LabelHelpTrip(pHandle->m_pTwainSession, static_cast<TW_UINT16>(lCapability));
+        auto rc = LabelHelpTrip.Execute();
+        if (rc == TWRC_SUCCESS)
+            return stringconversion::Convert_Ansi_To_Native(LabelHelpTrip.GetString());
+        return {};
+    }
+}
+
+extern "C"
+{
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Array))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
+        // Enumerate the extended caps
+        auto retVal = EnumCaps<EnumExtendedTraits>(Source, Array, &CTL_ITwainSource::GetExtendedCapCache);
+
+        // Check for any error return code
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; },
+                                           retVal, false, FUNC_MACRO);
+
+        // Everything is ok
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Array))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
+        // Enumerate the custom caps
+        auto retVal = EnumCaps<EnumCustomTraits>(Source, Array, &CTL_ITwainSource::GetCustomCapCache);
+
+        // Check for any error return code
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; },
+                                          retVal, false, FUNC_MACRO);
+
+        // Everything is ok.
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
+        LONG val = 0;
+        DTWAIN_GetCapOperations(Source, lCapability, &val);
+        LOG_FUNC_EXIT_NONAME_PARAMS(val)
+        CATCH_BLOCK(0)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG lpOps)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCapability, lpOps))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+
+        // Check for null lpOps
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return lpOps == nullptr; },
+                                          DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
+        // Check for cap support
+        bool isSupported = pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCapability));
+        DTWAIN_Check_Error_Condition_WithThrow_Ex_WithParams(pHandle, [&] { return isSupported == false; },
+                                                     DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false, 
+                                                    { CTL_TwainAppMgr::GetCapNameFromCap(lCapability) });
+        // Get the capability operations
+        *lpOps = GetCapOperationsInternal(pHandle, pSource, lCapability);
+
+        // Log the cap operations if logging is turned on
+        if (CTL_StaticData::GetLogFilterFlags())
+        {
+            LogWriterUtils::WriteLogInfoIndentedA("Supported operations for capability " + CTL_TwainAppMgr::GetCapNameFromCap(lCapability) + ": ");
+            LogWriterUtils::WriteLogInfoIndentedA(CTL_TWAINTypeDecoder::DecodeCapOperations(*lpOps));
+        }
+
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOps))
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetCapLabel(LONG lCapability, LPTSTR lpszLabel, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lCapability, lpszLabel, nMaxLen))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+
+        // Get the cap label (if this is supported)
+        CTL_StringType label = GetCapLabelHelpInternal<MSG_GETLABEL>(pHandle, lCapability);
+        auto maxChars = CopyInfoToCString(label, lpszLabel, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszLabel))
+        LOG_FUNC_EXIT_NONAME_PARAMS(maxChars)
+        CATCH_BLOCK(0)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetCapHelp(LONG lCapability, LPTSTR lpszHelp, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lCapability, lpszHelp, nMaxLen))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        // Get the cap help (if this is supported)
+        CTL_StringType label = GetCapLabelHelpInternal<MSG_GETHELP>(pHandle, lCapability);
+        auto maxChars = CopyInfoToCString(label, lpszHelp, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszHelp))
+        LOG_FUNC_EXIT_NONAME_PARAMS(maxChars)
+        CATCH_BLOCK(0)
+    }
+
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCapLabels(LONG lCapability)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lCapability))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        CTL_CapabilityLabelEnumTriplet Trip(pHandle->m_pTwainSession, static_cast<TW_UINT16>(lCapability));
+        DTWAIN_ARRAY arrayRet = {};
+        auto rc = Trip.Execute();
+        if (rc == TWRC_SUCCESS)
+            arrayRet = CreateArrayFromContainer<std::vector<std::string>>(pHandle, Trip.GetStrings());
+        LOG_FUNC_EXIT_NONAME_PARAMS(arrayRet)
+        CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        auto& supportedCaps = pSource->GetCapSupportedList();
+
+        std::vector<int> Array{ 0 };
+
+        auto& logFilterFlags = GetLogFilterFlags();
+        // First try a RESETALL, since the source may support this MSG type
+        bool bResetAllOk = 
+            SetCapabilityValues(pSource, 1, DTWAIN_CAPRESETALL, TwainContainer_ONEVALUE, 0, Array);
+
+        if (!bResetAllOk)
+        {
+            std::vector<std::string> vFailed = { "DTWAIN_SetAllCapsToDefault failed for the following caps: " };
+            // RESETALL didn't work, so set each individual cap with RESET
+            for (auto cap : supportedCaps)
+            {
+                if (pSource->IsCapNegotiableInState(cap, pSource->GetState()))
+                {
+                    // Note that some caps are read-only, so SetCapabilityValues will fail for those caps
+                    auto Ops = GetCapOperationsInternal(pHandle, pSource, cap);
+                    if (Ops & TWQC_RESET)
                     {
-                        // Save the failed names if logging is on
-                        vFailed.push_back(CTL_TwainAppMgr::GetCapNameFromCap(cap));
+                        bool bResetOk = SetCapabilityValues(pSource, cap, DTWAIN_CAPRESET, TwainContainer_ONEVALUE, 0, Array);
+                        if (logFilterFlags && !bResetOk)
+                        {
+                            // Save the failed names if logging is on
+                            vFailed.push_back(CTL_TwainAppMgr::GetCapNameFromCap(cap));
+                        }
                     }
                 }
             }
+            if (logFilterFlags && vFailed.size() > 1)
+            {
+                auto sJoined = stringutils::Join<std::string>(vFailed, "\n");
+                LogWriterUtils::WriteMultiLineInfoIndentedA(sJoined, "\n");
+            }
         }
-        if (logFilterFlags && vFailed.size() > 1)
-        {
-            auto sJoined = StringWrapperA::Join(vFailed, "\n");
-            LogWriterUtils::WriteMultiLineInfoIndentedA(sJoined, "\n");
-        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
 }
-

@@ -25,6 +25,7 @@
     #include <bit>
 #endif
 #include <bitset>
+#include <vector>
 
 namespace dynarithmic
 {

@@ -25,8 +25,8 @@
 #define DIB_MULTI_NEXT      2
 #define DIB_MULTI_LAST      3
 
-#include <string>
-#include "ctlobstr.h"
+#include <memory>
+#include "ctlstringdefs.h"
 namespace dynarithmic
 {
     struct DibMultiPageData

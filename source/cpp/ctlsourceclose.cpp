@@ -22,72 +22,78 @@
 #include "ctltwainmanager.h"
 #include "ctlclosesource.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
 
-static DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, CTL_ITwainSource *pSource);
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
+namespace
 {
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto pS = pSource;
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pS->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
-    auto bRetval = CloseSourceInternal(pHandle, pSource);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
-    CATCH_BLOCK_LOG_PARAMS(false)
+    DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+
+        if (pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE && pSource->IsAcquireAttempt())
+        {
+            CTL_TwainAppMgr::DisableUserInterface(pSource);
+            pSource->SetAcquireAttempt(false);
+        }
+        else
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pSource->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+
+        bool bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, pSource) ? true : false;
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+        CATCH_BLOCK(false)
+    }
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    CTL_TwainAppMgr::EndTwainUI(pHandle->m_pTwainSession, pSource);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto pS = pSource;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pS->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+        auto bRetval = CloseSourceInternal(pHandle, pSource);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        CTL_TwainAppMgr::EndTwainUI(pHandle->m_pTwainSession, pSource);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }
 
-DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, CTL_ITwainSource *p)
+namespace dynarithmic
 {
-    LOG_FUNC_ENTRY_PARAMS(())
-    bool bRetval = false;
-
-    if (pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE && p->IsAcquireAttempt())
+    bool CloseSourceInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource)
     {
-        CTL_TwainAppMgr::DisableUserInterface(p);
-        p->SetAcquireAttempt(false);
+        const auto sProductName = pSource->GetProductName();
+        bool bRetval = DTWAIN_CloseSourceUnconditional(pHandle, pSource) ? true : false;
+        if (bRetval)
+        {
+            pHandle->m_mapStringToSource.erase(sProductName);
+            pHandle->m_aFeederSources.erase(reinterpret_cast<DTWAIN_SOURCE>(pSource));
+        }
+        std::string sProductNameA = stringconversion::Convert_Native_To_Ansi(sProductName);
+        auto& sourceMap = CTL_StaticData::GetSourceStatusMap();
+        auto iter = sourceMap.find(sProductNameA);
+        if (iter != sourceMap.end())
+        {
+            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, false);
+            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, false);
+            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
+            iter->second.SetSourceHandle({});
+            iter->second.SetThreadID({});
+        }
+        return bRetval;
     }
-    else
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{return p->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
-
-    bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, p)?true:false;
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
-    CATCH_BLOCK(false)
-}
-
-bool dynarithmic::CloseSourceInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource)
-{
-    bool bRetval = false;
-    const auto sProductName = pSource->GetProductName();
-    bRetval = DTWAIN_CloseSourceUnconditional(pHandle, pSource) ? true : false;
-    if (bRetval)
-    {
-        pHandle->m_mapStringToSource.erase(sProductName);
-        pHandle->m_aFeederSources.erase(reinterpret_cast<DTWAIN_SOURCE>(pSource));
-    }
-    std::string sProductNameA = StringConversion::Convert_Native_To_Ansi(sProductName);
-    auto& sourceMap = CTL_StaticData::GetSourceStatusMap();
-    auto iter = sourceMap.find(sProductNameA);
-    if (iter != sourceMap.end())
-    {
-        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, false);
-        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, false);
-        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
-        iter->second.SetSourceHandle({});
-        iter->second.SetThreadID({});
-    }
-    return bRetval;
 }

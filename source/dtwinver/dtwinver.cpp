@@ -1978,7 +1978,7 @@ _Success_(return != FALSE) BOOL COSVersion::GetVersion(_Inout_ LPOS_VERSION_INFO
 
       //Call to the helper method to do the heavy lifting (Note that the PlatformId can only be VER_PLATFORM_WIN32_NT because the check for GetVersionEx 
       //above can only fail on early versions of Windows NT)
-      _GetVersion((DWORD)(LOBYTE(LOWORD(dwVersion))), (DWORD)(HIBYTE(LOWORD(dwVersion))), dwBuildNumber, _T(""), 0, 0, VER_PLATFORM_WIN32_NT, FALSE, lpVersionInformation);
+      _GetVersion(LOBYTE(LOWORD(dwVersion)), HIBYTE(LOWORD(dwVersion)), dwBuildNumber, _T(""), 0, 0, VER_PLATFORM_WIN32_NT, FALSE, lpVersionInformation);
 
       //Get the Product Suites installed
       GetProductSuiteDetailsFromRegistry(lpVersionInformation);
@@ -5069,7 +5069,7 @@ WORD COSVersion::GetNTServicePackFromCSDString(_In_z_ LPCTSTR pszCSDVersion)
     //Parse out the CSDVersion string
     int i = 0;
 #pragma warning(suppress: 26481)
-    while (pszCSDVersion[i] != _T('\0') && !_istdigit((int)pszCSDVersion[i]))
+    while (pszCSDVersion[i] != _T('\0') && !_istdigit(pszCSDVersion[i]))
       i++;
 #pragma warning(suppress: 26481)
     wServicePack = (WORD)(_ttoi(&pszCSDVersion[i]));

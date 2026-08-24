@@ -21,7 +21,6 @@
 #include "capconst.h"
  #ifdef _WIN32
 #include <string>
-#include <cstdio>
 #include <tchar.h>
 #include "transym_ocrinterface.h"
 #include "versioninfo.h"
@@ -64,7 +63,7 @@ static CTL_StringType GetTOCRDLLName()
     const char* defName = "Transym";
     if ( customProfile )
         defName = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_OCRLIBRARY_KEY).data(), defName);
-    auto val = StringConversion::Convert_AnsiPtr_To_Native(defName);
+    auto val = stringconversion::Convert_AnsiPtr_To_Native(defName);
     if (val.empty())
         val = _T("TOCRDLL.DLL");
     return val;
@@ -500,7 +499,7 @@ void TransymOCR::SetAvailableCaps()
             StringArray strSplit;
 
             // Tokenize the comma delimited string
-            StringWrapperA::Tokenize(capsLongInfo[i].CommaDelValues, "," , strVals);
+            basicstringutils::Tokenize(capsLongInfo[i].CommaDelValues, "," , strVals);
 
             const size_t numVals = strVals.size();
 
@@ -509,7 +508,7 @@ void TransymOCR::SetAvailableCaps()
             for ( size_t j = 0; j < numVals; ++j )
             {
                 // Get the split of the two values
-                StringWrapperA::Tokenize(strVals[j],":", strSplit);
+                basicstringutils::Tokenize(strVals[j],":", strSplit);
                 LONG val1, val2;
                 val1 = strtol(strSplit[0].c_str(), &p, 0);
                 val2 = strtol(strSplit[1].c_str(), &p, 0);
@@ -576,7 +575,7 @@ void TransymOCR::SetAvailableCaps()
             StringArray strSplit;
 
             // Tokenize the comma delimited string
-            StringWrapperA::Tokenize(capsStringInfo[i].CommaDelValues,"," , strVals);
+            basicstringutils::Tokenize(capsStringInfo[i].CommaDelValues,"," , strVals);
 
             const size_t numVals = strVals.size();
 
@@ -584,7 +583,7 @@ void TransymOCR::SetAvailableCaps()
             for ( size_t j = 0; j < numVals; ++j )
             {
                 // Get the split of the two values
-                StringWrapperA::Tokenize(strVals[j],":", strSplit);
+                basicstringutils::Tokenize(strVals[j],":", strSplit);
                 std::string val1, val2;
                 val1 = strSplit[0];
                 val2 = strSplit[1];
@@ -715,7 +714,7 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
             *boolFuncs[i] = !static_cast<VBBOOL>(vals[0]);
     }
 
-    auto sInputFile = StringConversion::Convert_Native_To_Ansi(filename);
+    auto sInputFile = stringconversion::Convert_Native_To_Ansi(filename);
     JobInfo.InputFile = &sInputFile[0];
 
     // Now set the options
@@ -805,7 +804,7 @@ bool TransymOCR::SetOCRVersionIdentity()
         {
             const VersionInfoA ver( hInst );
             StringArray aTokens;
-            StringWrapperA::Tokenize(ver.getFileVersionDotted(),".", aTokens);
+            basicstringutils::Tokenize(ver.getFileVersionDotted(),".", aTokens);
             if ( aTokens.size() >= 2 )
             {
                 theIdentity.Version.MajorNum = atoi(aTokens[0].c_str());
@@ -859,7 +858,7 @@ std::string TransymOCR::GetOCRVersionInfo()
             try
             {
                 const char* pLicenseFeature = nullptr;
-                auto it = dynarithmic::generic_array_finder_if(LicenseMap, [&](const auto& pr) { return pr.first == TOCRLicenseValue; });
+                auto it = generic_array_finder_if(LicenseMap, [&](const auto& pr) { return pr.first == TOCRLicenseValue; });
                 if (it.first)
                     pLicenseFeature = LicenseMap[it.second].second;
                 else
@@ -1132,7 +1131,7 @@ int TransymOCR::GetNumPagesInFile(CTL_StringType szFileName, int& errCode)
 
     // Set the mode to not show the message box
     m_SDK.TOCRSetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);
-    const int fExists = file_exists(szFileName.c_str());
+    const int fExists = fileutils::file_exists(szFileName.c_str());
     bRet = m_SDK.TOCRGetNumPages(m_JobHandle, (char *)szFileName.c_str(), TOCRJOBTYPE_TIFFFILE, &nPages);
 
     // Set the old error mode back

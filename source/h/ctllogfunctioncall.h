@@ -21,14 +21,15 @@
 #ifndef CTLLOGFUNCTIONCALL_H
 #define CTLLOGFUNCTIONCALL_H
 #include "dtwain_config.h"
+#include "ctlstringutils.h"
 
 #if DTWAIN_BUILD_LOGCALLSTACK == 1
 
-#include <string.h>
 #include <winconst.h>
 #include <string>
 #include "logwriterutils.h"
 #include "ctlstringutils.h"
+#include "ctlstringconversion.h"
 #include "dtwaindefs.h"
 #include "dtwain_resource_constants2.h"
 #include "ctlloadresources.h"
@@ -48,26 +49,8 @@ namespace dynarithmic
         bool m_bOutputAsString;
 
     private:
-        void LogType(std::string_view outStr, const char* ptr)
-        {
-            // ptr must be a pointer to a valid null terminated string, or nullptr.
-            if (ptr)
-                strm << outStr << "=\"" << TruncateStringWithMore(ptr, 256)
-                     << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")" << std::dec;
-            else
-                strm << outStr << "=(null)";
-        }
-
-        void LogType(std::string_view outStr, const wchar_t* ptr)
-        {
-            // ptr must be a pointer to a valid null terminated string, or nullptr.
-            if (ptr)
-                strm << outStr << "=\"" << 
-                TruncateStringWithMore(StringConversion::Convert_WidePtr_To_Ansi(ptr), 256) <<
-                "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")" << std::dec;
-            else
-                strm << outStr << "=(null)";
-        }
+        void LogType(std::string_view outStr, const char* ptr);
+        void LogType(std::string_view outStr, const wchar_t* ptr);
 
         template <typename T>
         void LogType(std::string_view outStr, const T* ptr)
@@ -76,7 +59,7 @@ namespace dynarithmic
             if (ptr)
             {
                 if (!m_bOutputAsString)
-                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(ptr) << std::dec;
+                    strm << outStr << "=" << basicstringutils::PointerToString<std::string>(ptr) << std::dec;
                 else
                     strm << outStr << *ptr;
             }
@@ -103,7 +86,7 @@ namespace dynarithmic
                     LogType(outStr, static_cast<const wchar_t*>(t));
                 else
                 if (t)
-                    strm << outStr << "=0x" << std::hex << static_cast<void*>(t) << std::dec;
+                    strm << outStr << "=" << basicstringutils::PointerToString<std::string>(t) << std::dec;
                 else
                     strm << outStr << "=(null)";
             }
@@ -114,7 +97,7 @@ namespace dynarithmic
                     LogType(outStr, static_cast<const char*>(t));
                 else
                 if (t)
-                    strm << outStr << "=0x" << std::hex << static_cast<void*>(t) << std::dec;
+                    strm << outStr << "=" << basicstringutils::PointerToString<std::string>(t) << std::dec;
                 else
                     strm << outStr << "=(null)";
             }
@@ -132,7 +115,7 @@ namespace dynarithmic
                 else
                 {
                     if (t)
-                        strm << outStr << "=0x" << std::hex << static_cast<void*>(t) << std::dec;
+                        strm << outStr << "=" << basicstringutils::PointerToString<std::string>(t) << std::dec;
                     else
                         strm << outStr << "=" << "(null)";
                 }
@@ -141,7 +124,7 @@ namespace dynarithmic
             if constexpr (std::is_pointer_v<T>)
             {
                 if (t)
-                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(t) << std::dec;
+                    strm << outStr << "=" << basicstringutils::PointerToString<std::string>(t) << std::dec;
                 else
                     strm << outStr << "=" << "(null)";
             }
@@ -159,17 +142,17 @@ namespace dynarithmic
         ParamOutputter(std::string_view s, bool isReturnValue = false) :
             nWhich(0), m_bIsReturnValue(isReturnValue), m_bOutputAsString(false)
         {
-            StringWrapperA::Tokenize(s.data(), "(, )", aParamNames);
+            basicstringutils::Tokenize(std::string(s), "(, )", aParamNames);
             if (!aParamNames.empty())
             {
                 if (!m_bIsReturnValue)
                     strm << "(";
                 else
-                    strm << s << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+                    strm << s << " " << GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
             }
             else
             if (m_bIsReturnValue)
-                strm << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+                strm << " " << GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
         }
 
         ParamOutputter& setOutputAsString(bool bSet) noexcept
@@ -197,7 +180,7 @@ namespace dynarithmic
                 else
                 {
                     if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                        strm << StringConversion::Convert_WidePtr_To_Ansi(val).c_str();
+                        strm << basicstringutils::Narrow(val).c_str();
                     else
                         strm << val;
                 }
@@ -233,7 +216,7 @@ namespace dynarithmic
                 else
                 {
                     if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                        strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
+                        strm << basicstringutils::Narrow(t).c_str();
                     else
                         strm << t;
                 }
@@ -318,7 +301,7 @@ namespace dynarithmic
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
             //  terminated value into the output string).
             // So for now, we just output the pointer value of the string
-            strm << outStr << "=" << static_cast<void*>(ptr);
+            strm << outStr << "=" << ptr;
         }
 
         template <typename T>
@@ -327,7 +310,7 @@ namespace dynarithmic
             if (t)
             {
                 if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                    strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
+                    strm << basicstringutils::Narrow(t).c_str();
                 else
                     strm << outStr << "=" << t;
             }
@@ -349,7 +332,7 @@ namespace dynarithmic
             if (!m_bIsReturnValue)
                 strm << "(";
             else
-                strm << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+                strm << " " << GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
             outputParam(std::forward<Args>(theArgs)...);
         }
 
@@ -369,7 +352,7 @@ namespace dynarithmic
                     strm << "(null)";
                 else
                 if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                    strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
+                    strm << basicstringutils::Narrow(t).c_str();
                 else
                     strm << t;
             }
@@ -412,10 +395,10 @@ namespace dynarithmic
     template <typename TupleType>
     std::string CTL_LogFunctionCallAndParamsIn_String(LONG filterFlags, LPCSTR pFuncName, std::string_view paramList, TupleType theArgs)
     {
-        if (dynarithmic::GetLogFilterFlags() & filterFlags)
+        if (GetLogFilterFlags() & filterFlags)
         {
-            dynarithmic::ParamOutputter pm(paramList);
-            return dynarithmic::CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_IN) +
+            ParamOutputter pm(paramList);
+            return CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_IN) +
                                                      pm.processTupleArguments(theArgs, paramList, true, false); 
         }
         return {};
@@ -424,17 +407,17 @@ namespace dynarithmic
     template <typename TupleType>
     void CTL_LogFunctionCallAndParamsIn(LONG filterFlags, LPCSTR pFuncName, std::string_view paramList, TupleType theArgs)
     {
-        if (dynarithmic::GetLogFilterFlags() & filterFlags)
-            dynarithmic::LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallAndParamsIn_String(filterFlags, pFuncName, paramList, theArgs));
+        if (GetLogFilterFlags() & filterFlags)
+            LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallAndParamsIn_String(filterFlags, pFuncName, paramList, theArgs));
     }
 
     template <typename TupleType>
     std::string CTL_LogFunctionCallAndParamsOut_String(LONG filterFlags, LPCSTR pFuncName, TupleType theArgs)
     {
-        if (dynarithmic::GetLogFilterFlags() & filterFlags)
+        if (GetLogFilterFlags() & filterFlags)
         {
-            dynarithmic::ParamOutputter pm("", true);
-            return dynarithmic::CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_OUT) +
+            ParamOutputter pm("", true);
+            return CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_OUT) +
                                                     pm.processTupleArguments(theArgs, "", false, false);
         }
         return {};
@@ -443,19 +426,19 @@ namespace dynarithmic
     template <typename TupleType>
     void CTL_LogFunctionCallAndParamsOut(LONG filterFlags, LPCSTR pFuncName, TupleType theArgs)
     {
-        if (dynarithmic::GetLogFilterFlags() & filterFlags)
-            dynarithmic::LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallAndParamsOut_String(filterFlags, pFuncName, theArgs));
+        if (GetLogFilterFlags() & filterFlags)
+            LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallAndParamsOut_String(filterFlags, pFuncName, theArgs));
     }
 
     template <typename TupleType>
     void CTL_LogFunctionDerefParams(LPCSTR pFuncName, std::string_view paramList, TupleType theArgs)
     {
-        if (dynarithmic::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
+        if (GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
         {
-            dynarithmic::ParamOutputter pm(paramList);
-            std::string s = dynarithmic::CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_USELAST) +
+            ParamOutputter pm(paramList);
+            std::string s = CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_USELAST) +
                             pm.processTupleArguments(theArgs, paramList, true, true); 
-            dynarithmic::LogWriterUtils::WriteLogInfoA(s);
+            LogWriterUtils::WriteLogInfoA(s);
         }
     }
 }

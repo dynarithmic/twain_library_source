@@ -30,127 +30,128 @@ OF THIRD PARTY RIGHTS.
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 
-// ============================================================
-// TGA model
-// ============================================================
-
-enum class TgaPixelFlavor
+namespace dynarithmic
 {
-    Palette8,
-    Gray8,
-    Bgr24,
-    Bgra32
-};
+    // ============================================================
+    // TGA model
+    // ============================================================
 
-struct PreparedTgaDibPage
-{
-    uint32_t width = 0;
-    uint32_t height = 0;
-    uint16_t bitsPerPixel = 0;
-    uint32_t strideBytes = 0;
-    bool bottomUp = true;
+    enum class TgaPixelFlavor
+    {
+        Palette8,
+        Gray8,
+        Bgr24,
+        Bgra32
+    };
 
-    TgaPixelFlavor pixelFlavor = TgaPixelFlavor::Bgr24;
-    const uint8_t* bits = nullptr;
+    struct PreparedTgaDibPage
+    {
+        uint32_t width = 0;
+        uint32_t height = 0;
+        uint16_t bitsPerPixel = 0;
+        uint32_t strideBytes = 0;
+        bool bottomUp = true;
 
-    const RGBQUAD* palette = nullptr;
-    uint32_t paletteEntries = 0;
-};
+        TgaPixelFlavor pixelFlavor = TgaPixelFlavor::Bgr24;
+        const uint8_t* bits = nullptr;
 
-struct TgaSessionOptions
-{
-    bool useRle = false;
-    std::string comment;
-};
+        const RGBQUAD* palette = nullptr;
+        uint32_t paletteEntries = 0;
+    };
 
-// ============================================================
-// TGA header
-// ============================================================
+    struct TgaSessionOptions
+    {
+        bool useRle = false;
+        std::string comment;
+    };
 
-#pragma pack(push, 1)
-struct TgaHeader
-{
-    uint8_t  id_length;
-    uint8_t  color_map_type;
-    uint8_t  image_type;
-    uint16_t color_map_first_entry;
-    uint16_t color_map_length;
-    uint8_t  color_map_entry_size;
-    uint16_t x_origin;
-    uint16_t y_origin;
-    uint16_t width;
-    uint16_t height;
-    uint8_t  pixel_depth;
-    uint8_t  image_descriptor;
-};
-#pragma pack(pop)
+    // ============================================================
+    // TGA header
+    // ============================================================
 
-static_assert(sizeof(TgaHeader) == 18, "TgaHeader must be 18 bytes");
+    #pragma pack(push, 1)
+    struct TgaHeader
+    {
+        uint8_t  id_length;
+        uint8_t  color_map_type;
+        uint8_t  image_type;
+        uint16_t color_map_first_entry;
+        uint16_t color_map_length;
+        uint8_t  color_map_entry_size;
+        uint16_t x_origin;
+        uint16_t y_origin;
+        uint16_t width;
+        uint16_t height;
+        uint8_t  pixel_depth;
+        uint8_t  image_descriptor;
+    };
+    #pragma pack(pop)
 
-// ============================================================
-// TGA writer
-// ============================================================
-class TgaSessionWriter
-{
-public:
-    TgaSessionWriter() = default;
-    ~TgaSessionWriter();
-    TgaSessionWriter(const TgaSessionWriter&) = delete;
-    TgaSessionWriter& operator=(const TgaSessionWriter&) = delete;
+    static_assert(sizeof(TgaHeader) == 18, "TgaHeader must be 18 bytes");
 
-    bool Open(const std::wstring& filename, const TgaSessionOptions& options);
-    bool SetPageInfo(const PreparedTgaDibPage& page);
-    bool WriteCurrentPage();
-    void Close();
-    bool IsOpen() const noexcept;
-    static std::optional<PreparedTgaDibPage> MakePreparedTgaDibPage(const dynarithmic::DibPageView& view);
-
-private:
-    static bool ValidatePage(const PreparedTgaDibPage& page);
-    TgaHeader BuildHeader() const;
-    bool UsesColorMap() const;
-    uint16_t GetColorMapLength() const;
-    uint8_t GetImageType() const;
-    uint8_t GetPixelDepth() const;
-    uint8_t GetImageDescriptor() const;
-    bool WriteColorMap();
-    uint32_t PixelBytes() const;
-    const uint8_t* GetRowPtr(uint32_t y) const;
-    bool WriteImageRaw();
-    bool WriteImageRle();
-    bool PrepareRow(const uint8_t* src, uint8_t* dst, uint32_t rowBytes) const;
-    static bool PixelsEqual(const uint8_t* a, const uint8_t* b, uint32_t pixelBytes);
-    bool WriteRleRow(const uint8_t* row, uint32_t width, uint32_t pixelBytes);
-    bool WriteExtensionAreaWithComments();
-
-private:
-    FILE* file_ = nullptr;
-    std::wstring filename_;
-    TgaSessionOptions options_{};
-
-    PreparedTgaDibPage currentPage_{};
-    bool hasCurrentPage_ = false;
-
-    std::vector<uint8_t> rowBuffer_;
-    std::vector<uint8_t> packetBuffer_;
-};
-
-// ============================================================
-// DTWAIN-style wrapper
-//   FirstPage = open + write image
-//   LastPage  = close
-// ============================================================
-
-class DTWAINTgaOutput
-{
+    // ============================================================
+    // TGA writer
+    // ============================================================
+    class TgaSessionWriter
+    {
     public:
-        bool OnFirstPage(const std::wstring& filename, const TgaSessionOptions& options, const PreparedTgaDibPage& page);
-        bool OnLastPage();
+        TgaSessionWriter() = default;
+        ~TgaSessionWriter();
+        TgaSessionWriter(const TgaSessionWriter&) = delete;
+        TgaSessionWriter& operator=(const TgaSessionWriter&) = delete;
+
+        bool Open(const std::wstring& filename, const TgaSessionOptions& options);
+        bool SetPageInfo(const PreparedTgaDibPage& page);
+        bool WriteCurrentPage();
+        void Close();
         bool IsOpen() const noexcept;
+        static std::optional<PreparedTgaDibPage> MakePreparedTgaDibPage(const dynarithmic::DibPageView& view);
 
     private:
-        std::unique_ptr<TgaSessionWriter> writer_;
-};
+        static bool ValidatePage(const PreparedTgaDibPage& page);
+        TgaHeader BuildHeader() const;
+        bool UsesColorMap() const;
+        uint16_t GetColorMapLength() const;
+        uint8_t GetImageType() const;
+        uint8_t GetPixelDepth() const;
+        uint8_t GetImageDescriptor() const;
+        bool WriteColorMap() const;
+        uint32_t PixelBytes() const;
+        const uint8_t* GetRowPtr(uint32_t y) const;
+        bool WriteImageRaw();
+        bool WriteImageRle();
+        bool PrepareRow(const uint8_t* src, uint8_t* dst, uint32_t rowBytes) const;
+        static bool PixelsEqual(const uint8_t* a, const uint8_t* b, uint32_t pixelBytes);
+        bool WriteRleRow(const uint8_t* row, uint32_t width, uint32_t pixelBytes) const;
+        bool WriteExtensionAreaWithComments() const;
 
+    private:
+        FILE* file_ = nullptr;
+        std::wstring filename_;
+        TgaSessionOptions options_{};
 
+        PreparedTgaDibPage currentPage_{};
+        bool hasCurrentPage_ = false;
+
+        std::vector<uint8_t> rowBuffer_;
+        std::vector<uint8_t> packetBuffer_;
+    };
+
+    // ============================================================
+    // DTWAIN-style wrapper
+    //   FirstPage = open + write image
+    //   LastPage  = close
+    // ============================================================
+
+    class DTWAINTgaOutput
+    {
+        public:
+            bool OnFirstPage(const std::wstring& filename, const TgaSessionOptions& options, const PreparedTgaDibPage& page);
+            bool OnLastPage();
+            bool IsOpen() const noexcept;
+
+        private:
+            std::unique_ptr<TgaSessionWriter> writer_;
+    };
+}
 #endif

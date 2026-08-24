@@ -20,6 +20,10 @@
  */
 #ifndef CTLDEVNT_H
 #define CTLDEVNT_H
+#include "ctlstringdefs.h"
+#include "twain.h"
+#include "dtwtype.h"
+
 namespace dynarithmic
 {
     class CTL_TwainDLLHandle;
@@ -27,7 +31,7 @@ namespace dynarithmic
     class CTL_DeviceEvent
     {
         public:
-            CTL_DeviceEvent();
+            CTL_DeviceEvent() = default;
             operator pTW_DEVICEEVENT() { return &m_DeviceEvent; }
 
             TW_UINT32  GetEvent() const;                  /* One of the TWDE_xxxx values. */
@@ -46,7 +50,7 @@ namespace dynarithmic
             bool       GetEventInfoEx(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Array) const;
 
         private:
-            TW_DEVICEEVENT  m_DeviceEvent;
+            TW_DEVICEEVENT  m_DeviceEvent {};
     };
 }
 #endif

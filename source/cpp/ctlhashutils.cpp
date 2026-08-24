@@ -21,12 +21,13 @@
 
 #include <ctlhashutils.h>
 #include <boost/hash2/sha2.hpp>
-#include <ctlobstr.h>
+#include "ctlstringutils.h"
+#include "ctlstringutilsx.h"
 
-namespace dynarithmic
+namespace
 {
     template <typename hashType>
-    static std::vector<unsigned char> GenericHashSHA2(std::string_view message)
+    std::vector<unsigned char> GenericHashSHA2(std::string_view message)
     {
         std::vector<unsigned char> data(message.begin(), message.end());
         std::vector<unsigned char> retVal;
@@ -43,7 +44,10 @@ namespace dynarithmic
             retVal.push_back(byte);
         return retVal;
     }
+}
 
+namespace dynarithmic
+{
     std::vector<unsigned char> SHA2Hash(std::string_view message, SHA2HashType hashType)
     {
         std::vector<unsigned char> data(message.begin(), message.end());
@@ -62,7 +66,7 @@ namespace dynarithmic
 
     std::vector<unsigned char> SHA2Hash(const unsigned char* message, size_t messageLength, SHA2HashType hashType)
     {
-        return SHA2Hash(dynarithmic::StringWrapperA::StringFromUChars(message, messageLength), hashType);
+        return SHA2Hash(StringFromUChars<std::string>(message, messageLength), hashType);
     }
 
     void MD5Hasher::Add(const unsigned char* pData, size_t len)

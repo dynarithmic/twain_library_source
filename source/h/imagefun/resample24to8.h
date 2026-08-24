@@ -31,7 +31,7 @@
 
 inline HGLOBAL Create8bppGrayDib(uint32_t width, uint32_t height, bool bottomUp, LONG xPelsPerMeter,LONG yPelsPerMeter)
 {
-    const uint32_t paletteCount = 256;
+    constexpr uint32_t paletteCount = 256;
     const uint32_t stride = dynarithmic::dib::calc_stride_bytes(width, 8);
     const uint32_t imageSize = stride * height;
     const size_t totalSize = sizeof(BITMAPINFOHEADER) + paletteCount * sizeof(RGBQUAD) +imageSize;

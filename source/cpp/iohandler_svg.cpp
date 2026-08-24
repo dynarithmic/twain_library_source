@@ -18,12 +18,12 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
-#include <windows.h>
 #include <string>
-#include "ctliface.h"
 #include "iohandler_svg.h"
 #include "ctldib32ex.h"
 #include "svgwriter.h"
+#include "ctlstaticdata.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
@@ -65,7 +65,7 @@ int CTL_SVGIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     // Get the comment string (copyright information)
     opts.comment = CTL_StaticData::GetAppTitleHTML(); 
 
-    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToSvg(fName, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

@@ -20,15 +20,16 @@
  */
 #include <algorithm>
 #include <utility>
-#include <dtwain_filesystem.h>
 #include "imagexferfilewriter.h"
 #include "logwriterutils.h"
-
-#include "ctliface.h"
 #include "ctltr026.h"
 #include "ctltwainmanager.h"
 #include "ctlfilesave.h"
 #include "ctldib32ex.h"
+#include "ctlguidimpl.h"
+#include "ctltwaindllpath.h"
+#include "ctlglobalhandletraits.h"
+#include "dtwainx.h"
 
 #define DTWAIN_PAGEMISSINGSTR _T("<missing_page>")
 
@@ -113,7 +114,7 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
                 if ( !fh )
                 {
                     SendFileAcquireError(m_pSource, m_pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
-                                         StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
+                                         stringconversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
                     return DTWAIN_ERR_FILEWRITE;
                 }
                 fh.write(pImage, rawBytes);
@@ -122,7 +123,7 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
                 {
                     SendFileAcquireError(m_pSource, m_pSession,
                                          DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
-                                         StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
+                                         stringconversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
                     CTL_TwainAppMgr::SetError(DTWAIN_ERR_FILEWRITE, "", true);
                     return DTWAIN_ERR_FILEWRITE;
                 }
@@ -138,7 +139,7 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
             {
                 SendFileAcquireError(m_pSource, m_pSession,
                                      DTWAIN_ERR_DIB, DTWAIN_TN_FILESAVEERROR,
-                                     StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
+                                     stringconversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
                 return DTWAIN_ERR_DIB;
             }
         }
@@ -176,22 +177,21 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
     // Now check for Postscript file types.  We alias these
     // types as TIFF format
     const CTL_TwainFileFormatEnum FileType = acquireFileStatus.GetAcquireFileFormat();
-    if ( dynarithmic::IsFileTypePostscript( FileType ) )
+    if ( IsFileTypePostscript( FileType ) )
     {
         ImageInfo.IsPostscript = true;
-        ImageInfo.IsPostscriptMultipage =
-            dynarithmic::IsFileTypeMultiPage( FileType );
+        ImageInfo.IsPostscriptMultipage = IsFileTypeMultiPage( FileType );
         ImageInfo.PostscriptType = static_cast<LONG>(FileType);
     }
 
     if ( MultipageOption == 0 || (m_pSource->IsMultiPageModeSaveAtEnd()
-        && !dynarithmic::IsFileTypeMultiPage( FileType ))
+        && !IsFileTypeMultiPage( FileType ))
     )
     {
         const int retval = pCurDib->WriteDibBitmap(ImageInfo, strTempFile.data(), acquireFileStatus.GetAcquireFileFormat());
         if ( retval != 0 )
            SendFileAcquireError(m_pSource, m_pSession, retval, DTWAIN_TN_FILEPAGESAVEERROR, 
-                StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
+                stringconversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
 
         else
         {
@@ -216,7 +216,7 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
     {
         SendFileAcquireError(m_pSource, m_pSession,
                              nStatus, DTWAIN_TN_FILEPAGESAVEERROR,
-                             StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
+                             stringconversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
     }
     else
     {
@@ -558,7 +558,7 @@ void ImageXferFileWriter::ManualDuplexCleanUp(CTL_StringViewType strFile/* = ""*
 
     if ( nStatus != 0 )
         SendFileAcquireError(m_pSource, m_pSession, nStatus, DTWAIN_TN_FILESAVEERROR,
-                             StringConversion::Convert_Native_To_Ansi(m_pSource->GetAcquireFileStatusRef().GetActualFileName()));
+                             stringconversion::Convert_Native_To_Ansi(m_pSource->GetAcquireFileStatusRef().GetActualFileName()));
 
     else
     {
@@ -595,7 +595,7 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
             RecordBadDuplexPage();
             return DTWAIN_ERR_FILEWRITE;
         }
-        szTempPath += StringWrapper::GetGUID() + _T(".TMP");
+        szTempPath += GetGUID() + _T(".TMP");
         filesys::path p{ szTempPath };
         std::ofstream fh;
         // save the raw dib data to this file.
@@ -603,7 +603,7 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
         if ( !fh )
         {
             SendFileAcquireError(m_pSource, m_pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
-                                 StringConversion::Convert_Native_To_Ansi(m_pSource->GetAcquireFileStatusRef().GetActualFileName()));
+                                 stringconversion::Convert_Native_To_Ansi(m_pSource->GetAcquireFileStatusRef().GetActualFileName()));
             RecordBadDuplexPage();
             return DTWAIN_ERR_FILEWRITE;
         }
@@ -679,7 +679,7 @@ LONG ImageXferFileWriter::CloseMultiPageDibFile(bool bSaveFile/*=true*/) const
     auto& acquireFileStatus = m_pSource->GetAcquireFileStatusRef();
     if( m_pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative )
     {
-        const bool bTrueMultiPage = dynarithmic::IsFileTypeMultiPage(acquireFileStatus.GetAcquireFileFormat());
+        const bool bTrueMultiPage = IsFileTypeMultiPage(acquireFileStatus.GetAcquireFileFormat());
         const bool bIsMultiPageFile = bTrueMultiPage || m_pSource->IsMultiPageModeSaveAtEnd();
         if ( bIsMultiPageFile )
         {
@@ -740,7 +740,7 @@ LONG ImageXferFileWriter::CloseMultiPageDibFile(bool bSaveFile/*=true*/) const
 void ImageXferFileWriter::EndProcessingImageFile(bool bSaveFile/*=true*/) const
 {
     if ( m_pSource->IsMultiPageModeSaveAtEnd() &&
-         !dynarithmic::IsFileTypeMultiPage( m_pSource->GetAcquireFileStatusRef().GetAcquireFileFormat() ))
+         !IsFileTypeMultiPage( m_pSource->GetAcquireFileStatusRef().GetAcquireFileFormat() ))
     {
         m_pSource->ProcessMultipageFile();
     }
@@ -764,6 +764,3 @@ void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pS
     CTL_TwainAppMgr::SetAndLogError(Error, extraInfo, true);
     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, ErrorMsg, reinterpret_cast<LPARAM>(pSource));
 }
-
-
-

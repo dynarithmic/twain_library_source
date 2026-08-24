@@ -20,6 +20,7 @@
  */
 #ifndef CTLTHREADUTILS_H
 #define CTLTHREADUTILS_H
+#include <string>
 
 namespace dynarithmic
 {

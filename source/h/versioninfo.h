@@ -51,7 +51,7 @@ struct charTraitsUNICODE
   { return GetFileVersionInfoW(lptstrFilename, dwHandle, dwLen, lpData); }
 
   static BOOL VerQueryValueImpl(LPCVOID pBlock,LPCWSTR lpSubBlock, LPVOID * lplpBuffer, PUINT puLen )
-  { return VerQueryValueW((LPVOID)pBlock, lpSubBlock, lplpBuffer, puLen); }
+  { return VerQueryValueW(pBlock, lpSubBlock, lplpBuffer, puLen); }
 
   static TraitsStringType       Compat(const char* str)
   {
@@ -79,7 +79,7 @@ struct charTraitsANSI
     { return GetFileVersionInfoA(lptstrFilename, dwHandle, dwLen, lpData); }
 
     static BOOL VerQueryValueImpl(LPCVOID pBlock,LPCSTR lpSubBlock, LPVOID * lplpBuffer, PUINT puLen )
-    { return VerQueryValueA((LPVOID)pBlock, lpSubBlock, lplpBuffer, puLen); }
+    { return VerQueryValueA(pBlock, lpSubBlock, lplpBuffer, puLen); }
 
     static TraitsStringType      Compat(const char* str)
     { return str; }

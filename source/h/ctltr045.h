@@ -23,7 +23,7 @@
 
 #include "ctltr013.h"
 #include "ctltr014.h"
-#include "ctltmpl5.h"
+#include "ctlgetsetcapsinternal.h"
 
 namespace dynarithmic
 {
@@ -37,10 +37,9 @@ namespace dynarithmic
             CTL_CapabilityGetOneValTriplet(pSession, nullptr, msgType, gCap, TwainType)
             {
                 TW_CAPABILITY* pCap = GetCapabilityBuffer();
-                pCap->Cap = static_cast<TW_UINT16>(gCap);
+                pCap->Cap = gCap;
                 pCap->ConType = TWON_ONEVALUE;
                 pCap->hContainer = nullptr;
-                m_bIsSupported = false;
             }
 
             TW_UINT16  Execute() override
@@ -54,7 +53,7 @@ namespace dynarithmic
                 return rc;
             }
 
-            bool            IsSupported() const noexcept { return m_bIsSupported; }
+            bool            IsSupportedOp() const noexcept { return m_bIsSupported; }
             std::string     GetString() const { return m_strLabel; }
 
         protected:
@@ -83,7 +82,7 @@ namespace dynarithmic
             }
 
         private:
-            bool m_bIsSupported;
+            bool m_bIsSupported = false;
             std::string m_strLabel;
     };
 
@@ -96,7 +95,7 @@ namespace dynarithmic
             const std::vector<std::string>&  GetStrings() const noexcept { return m_aStrings; }
             TW_UINT16 Execute() override
             {
-                auto retValue = dynarithmic::GetCapabilityValues(nullptr, GetCapabilityBuffer()->Cap, MSG_GETLABELENUM,
+                auto retValue = GetCapabilityValues(nullptr, GetCapabilityBuffer()->Cap, MSG_GETLABELENUM,
                     DTWAIN_CONTARRAY, 1, TWTY_STR255, m_aStrings);
                 if (retValue.second == TWRC_SUCCESS)
                     m_bIsSupported = true;
@@ -104,7 +103,7 @@ namespace dynarithmic
             }
 
         private:
-            bool m_bIsSupported;
+            bool m_bIsSupported = false;
             std::vector<std::string> m_aStrings;
     };
 

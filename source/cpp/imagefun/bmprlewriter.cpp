@@ -20,12 +20,14 @@
  */
 #include "bmprlewriter.h"
 
+using namespace dynarithmic;
+
 std::optional<PreparedBmpRle8Page> BmpRle8Writer::MakePreparedBmpRle8Page(const dynarithmic::DibPageView& view)
 {
     if (view.bitsPerPixel != 8 || !view.palette || view.paletteEntries == 0)
         return std::nullopt;
 
-    PreparedBmpRle8Page page{};
+    PreparedBmpRle8Page page;
     page.width = view.width;
     page.height = view.height;
     page.bitsPerPixel = 8;
@@ -214,7 +216,7 @@ int BmpRle8Writer::RLEEncodeLineLikeFreeImage(uint8_t* target, const uint8_t* so
 bool BmpRle8Writer::encode_rle8()
 {
     // Reserve something reasonable; exact size is not known in advance
-    encodedData_.reserve(static_cast<size_t>(currentPage_.width) * currentPage_.height / 2);
+    encodedData_.reserve(currentPage_.width * currentPage_.height / 2);
 
     // FreeImage notes target can be same size as source line.
     lineEncodeBuffer_.resize(currentPage_.width > 0 ? currentPage_.width : 1);
@@ -252,17 +254,17 @@ bool BmpRle8Writer::encode_rle8()
 }
 
 
-bool BmpRle8Writer::write_bmp_file()
+bool BmpRle8Writer::write_bmp_file() const
 {
     static_assert(sizeof(BITMAPFILEHEADER) == 14, "BITMAPFILEHEADER must be 14 bytes");
     static_assert(sizeof(BITMAPINFOHEADER) == 40, "BITMAPINFOHEADER must be 40 bytes");
 
     const uint32_t paletteBytes =
-        static_cast<uint32_t>(currentPage_.paletteEntries * sizeof(RGBQUAD));
-    const uint32_t infoHeaderSize = sizeof(BITMAPINFOHEADER);
-    const uint32_t fileHeaderSize = sizeof(BITMAPFILEHEADER);
+        currentPage_.paletteEntries * sizeof(RGBQUAD);
+    constexpr uint32_t infoHeaderSize = sizeof(BITMAPINFOHEADER);
+    constexpr uint32_t fileHeaderSize = sizeof(BITMAPFILEHEADER);
     const uint32_t offBits = fileHeaderSize + infoHeaderSize + paletteBytes;
-    const uint32_t imageSize = static_cast<uint32_t>(encodedData_.size());
+    const uint32_t imageSize = encodedData_.size();
     const uint32_t fileSize = offBits + imageSize;
 
     BITMAPFILEHEADER bfh{};

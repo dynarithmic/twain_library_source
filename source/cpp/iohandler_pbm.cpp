@@ -18,11 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
 #include "pnmwriter.h"
 #include "iohandler_pbm.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
@@ -58,7 +57,7 @@ int CTL_PBMIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     opts.fixBilevelPolarity = true;
 
     opts.comment = GetCopyrightString();
-    std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring filename = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToPnm(filename, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

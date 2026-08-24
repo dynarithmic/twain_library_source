@@ -22,9 +22,6 @@ OF THIRD PARTY RIGHTS.
 #define TWAINFRAME_H
 
 #include <array>
-#if defined(_WIN32) || defined(_WIN64)
-    #include <windows.h>
-#endif
 #include <twain.h>
 #include "ctlconstexprutils.h"
 
@@ -52,15 +49,15 @@ namespace dynarithmic
             SetFrame(left, top, right, bottom);
         }
 
-        constexpr TwainFrameInternal(TW_FRAME frame)
+        constexpr TwainFrameInternal(const TW_FRAME& frame)
         {
-            SetFrame(static_cast<double>(Fix32ToFloat(frame.Left)),
-                static_cast<double>(Fix32ToFloat(frame.Top)),
-                static_cast<double>(Fix32ToFloat(frame.Right)),
-                static_cast<double>(Fix32ToFloat(frame.Bottom)));
+            SetFrame(Fix32ToFloat(frame.Left),
+                      Fix32ToFloat(frame.Top),
+                    Fix32ToFloat(frame.Right),
+                    Fix32ToFloat(frame.Bottom));
         }
 
-        constexpr TwainFrameInternal& operator=(TW_FRAME frame) { From_TWFRAME(frame); return *this; }
+        constexpr TwainFrameInternal& operator=(const TW_FRAME& frame) { From_TWFRAME(frame); return *this; }
 
         constexpr TW_FRAME To_TWFRAME() const
         {
@@ -72,13 +69,16 @@ namespace dynarithmic
             return ret;
         }
 
-        constexpr void From_TWFRAME(TW_FRAME frame)
+        constexpr void From_TWFRAME(const TW_FRAME& frame)
         {
-            SetFrame(static_cast<double>(Fix32ToFloat(frame.Left)),
-                static_cast<double>(Fix32ToFloat(frame.Top)),
-                static_cast<double>(Fix32ToFloat(frame.Right)),
-                static_cast<double>(Fix32ToFloat(frame.Bottom)));
+            SetFrame(Fix32ToFloat(frame.Left),
+                Fix32ToFloat(frame.Top),
+                Fix32ToFloat(frame.Right),
+                Fix32ToFloat(frame.Bottom));
         }
+
+        constexpr auto& GetFrameComponent()  { return m_FrameComponent; }
+        constexpr auto GetFrameComponent() const { return m_FrameComponent; }
 
         constexpr double Left() const
         {
@@ -108,5 +108,33 @@ namespace dynarithmic
             m_FrameComponent[FRAMEBOTTOM] = bottom;
         }
     };
+
+    inline bool operator == (TW_FRAME lhs, TW_FRAME rhs)
+    {
+        return std::tie(lhs.Bottom.Frac, lhs.Bottom.Whole,
+            lhs.Left.Frac, lhs.Left.Whole,
+            lhs.Right.Frac, lhs.Right.Whole,
+            lhs.Top.Frac, lhs.Top.Whole)
+            ==
+            std::tie(rhs.Bottom.Frac, rhs.Bottom.Whole,
+                rhs.Left.Frac, rhs.Left.Whole,
+                rhs.Right.Frac, rhs.Right.Whole,
+                rhs.Top.Frac, rhs.Top.Whole);
+    }
+
+    inline bool operator!=(const TW_FRAME& f1, const TW_FRAME& f2)
+    {
+        return !(operator==(f1, f2));
+    }
+
+    inline bool operator==(const TwainFrameInternal& lhs, const TwainFrameInternal& rhs)
+    {
+        return lhs.m_FrameComponent == rhs.m_FrameComponent;
+    }
+
+    inline bool operator!=(const TwainFrameInternal& lhs, const TwainFrameInternal& rhs)
+    {
+        return lhs.m_FrameComponent != rhs.m_FrameComponent;
+    }
 }
 #endif // TWAINFRAME_H

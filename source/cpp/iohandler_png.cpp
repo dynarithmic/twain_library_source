@@ -18,11 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
 #include "pngwriter.h"
 #include "iohandler_png.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
@@ -48,7 +47,7 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     LockedDibPage lockedPage(hDib);
     if (!lockedPage.IsValid())
         return DTWAIN_ERR_FILEWRITE;
-    std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring sFileName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     PngSessionOptions sessionOptions;
 

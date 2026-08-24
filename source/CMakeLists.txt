@@ -40,6 +40,11 @@ option(DTWAIN_ENABLE_SEH_EXCEPTIONS
 
 mark_as_advanced(DTWAIN_ENABLE_SEH_EXCEPTIONS)
 
+option(DTWAIN_BUILD_CPP_DEMOS
+       "Add a target that builds the existing C/C++ demo solution"
+       OFF)
+
+mark_as_advanced(DTWAIN_BUILD_CPP_DEMOS)
 # -----------------------------------------------------------------------------
 # Boost setup
 # -----------------------------------------------------------------------------
@@ -376,209 +381,223 @@ else()
 endif()
 
 set(DTWAIN_RESOURCE_FILES
-    ${PROJECT_SOURCE_DIR}/rc/twil32.rc
+    ${PROJECT_SOURCE_DIR}/rc/dtwain_resources.rc
+)
+
+set(DTWAIN_MISCELLANEOUS_FILES
     ${PROJECT_SOURCE_DIR}/rc/twainresourcestrings_english.rc2
     ${PROJECT_SOURCE_DIR}/rc/resource_verinfo.rc2
 )
 
 set(MAIN_HEADERS 
-	${PROJECT_SOURCE_DIR}/h/ansiwideconverter_generic.h
-	${PROJECT_SOURCE_DIR}/h/ansiwideconverter_win32.h
-	${PROJECT_SOURCE_DIR}/h/arrayfactory.h
-	${PROJECT_SOURCE_DIR}/h/blankpage.h
-	${PROJECT_SOURCE_DIR}/h/capconst.h
-	${PROJECT_SOURCE_DIR}/h/capinfomap.h
-	${PROJECT_SOURCE_DIR}/h/capstruc.h
-	${PROJECT_SOURCE_DIR}/h/cppfunc.h
-	${PROJECT_SOURCE_DIR}/h/ctlarray.h
-	${PROJECT_SOURCE_DIR}/h/ctlbimap.h
-	${PROJECT_SOURCE_DIR}/h/ctlclosesource.h
-	${PROJECT_SOURCE_DIR}/h/ctlcntry.h
-	${PROJECT_SOURCE_DIR}/h/ctlconstexprfind.h
-	${PROJECT_SOURCE_DIR}/h/ctlconstexprutils.h
-	${PROJECT_SOURCE_DIR}/h/ctldefsource.h
-	${PROJECT_SOURCE_DIR}/h/ctldevnt.h
-	${PROJECT_SOURCE_DIR}/h/ctldib.h
-	${PROJECT_SOURCE_DIR}/h/ctldib32.h
-	${PROJECT_SOURCE_DIR}/h/ctldib32ex.h
-	${PROJECT_SOURCE_DIR}/h/ctlenum.h
-	${PROJECT_SOURCE_DIR}/h/ctlfilesave.h
-	${PROJECT_SOURCE_DIR}/h/ctlfileutils.h
-	${PROJECT_SOURCE_DIR}/h/ctlguiddef.h
-	${PROJECT_SOURCE_DIR}/h/ctliface.h
-	${PROJECT_SOURCE_DIR}/h/ctlloadresources.h
-	${PROJECT_SOURCE_DIR}/h/ctllogcalls.h
-	${PROJECT_SOURCE_DIR}/h/ctllogfunctioncall.h
-	${PROJECT_SOURCE_DIR}/h/ctllogsourcecaps.h
-	${PROJECT_SOURCE_DIR}/h/ctlobstr.h
-	${PROJECT_SOURCE_DIR}/h/ctlobtyp.h
-	${PROJECT_SOURCE_DIR}/h/ctlrandnumutils.h
-	${PROJECT_SOURCE_DIR}/h/ctlsetgetcaps.h
-	${PROJECT_SOURCE_DIR}/h/ctlsourcedibs.h
-	${PROJECT_SOURCE_DIR}/h/ctlstringconversion.h
-	${PROJECT_SOURCE_DIR}/h/ctlstringutils.h
-	${PROJECT_SOURCE_DIR}/h/ctlsupport.h
-	${PROJECT_SOURCE_DIR}/h/ctlthreadutils.h
-	${PROJECT_SOURCE_DIR}/h/ctltimer.h
-	${PROJECT_SOURCE_DIR}/h/ctltmpl3.h
-	${PROJECT_SOURCE_DIR}/h/ctltmpl4.h
-	${PROJECT_SOURCE_DIR}/h/ctltmpl5.h
-	${PROJECT_SOURCE_DIR}/h/ctltr000.h
-	${PROJECT_SOURCE_DIR}/h/ctltr001.h
-	${PROJECT_SOURCE_DIR}/h/ctltr002.h
-	${PROJECT_SOURCE_DIR}/h/ctltr003.h
-	${PROJECT_SOURCE_DIR}/h/ctltr004.h
-	${PROJECT_SOURCE_DIR}/h/ctltr005.h
-	${PROJECT_SOURCE_DIR}/h/ctltr006.h
-	${PROJECT_SOURCE_DIR}/h/ctltr007.h
-	${PROJECT_SOURCE_DIR}/h/ctltr008.h
-	${PROJECT_SOURCE_DIR}/h/ctltr009.h
-	${PROJECT_SOURCE_DIR}/h/ctltr010.h
-	${PROJECT_SOURCE_DIR}/h/ctltr011.h
-	${PROJECT_SOURCE_DIR}/h/ctltr012.h
-	${PROJECT_SOURCE_DIR}/h/ctltr013.h
-	${PROJECT_SOURCE_DIR}/h/ctltr014.h
-	${PROJECT_SOURCE_DIR}/h/ctltr015.h
-	${PROJECT_SOURCE_DIR}/h/ctltr016.h
-	${PROJECT_SOURCE_DIR}/h/ctltr017.h
-	${PROJECT_SOURCE_DIR}/h/ctltr018.h
-	${PROJECT_SOURCE_DIR}/h/ctltr019.h
-	${PROJECT_SOURCE_DIR}/h/ctltr020.h
-	${PROJECT_SOURCE_DIR}/h/ctltr021.h
-	${PROJECT_SOURCE_DIR}/h/ctltr022.h
-	${PROJECT_SOURCE_DIR}/h/ctltr023.h
-	${PROJECT_SOURCE_DIR}/h/ctltr024.h
-	${PROJECT_SOURCE_DIR}/h/ctltr025.h
-	${PROJECT_SOURCE_DIR}/h/ctltr026.h
-	${PROJECT_SOURCE_DIR}/h/ctltr027.h
-	${PROJECT_SOURCE_DIR}/h/ctltr028.h
-	${PROJECT_SOURCE_DIR}/h/ctltr029.h
-	${PROJECT_SOURCE_DIR}/h/ctltr030.h
-	${PROJECT_SOURCE_DIR}/h/ctltr031.h
-	${PROJECT_SOURCE_DIR}/h/ctltr032.h
-	${PROJECT_SOURCE_DIR}/h/ctltr033.h
-	${PROJECT_SOURCE_DIR}/h/ctltr034.h
-	${PROJECT_SOURCE_DIR}/h/ctltr035.h
-	${PROJECT_SOURCE_DIR}/h/ctltr036.h
-	${PROJECT_SOURCE_DIR}/h/ctltr037.h
-	${PROJECT_SOURCE_DIR}/h/ctltr038.h
-	${PROJECT_SOURCE_DIR}/h/ctltr039.h
-	${PROJECT_SOURCE_DIR}/h/ctltr040.h
-	${PROJECT_SOURCE_DIR}/h/ctltr041.h
-	${PROJECT_SOURCE_DIR}/h/ctltr042.h
-	${PROJECT_SOURCE_DIR}/h/ctltr043.h
-	${PROJECT_SOURCE_DIR}/h/ctltr044.h
-	${PROJECT_SOURCE_DIR}/h/ctltr045.h
-	${PROJECT_SOURCE_DIR}/h/ctltrall.h
-	${PROJECT_SOURCE_DIR}/h/ctltripletbase.h
-	${PROJECT_SOURCE_DIR}/h/ctltwaincompliancy.h
-	${PROJECT_SOURCE_DIR}/h/ctltwaindecoder.h
-	${PROJECT_SOURCE_DIR}/h/ctltwainidentity.h
-	${PROJECT_SOURCE_DIR}/h/ctltwainmanager.h
-	${PROJECT_SOURCE_DIR}/h/ctltwainmsgloop.h
-	${PROJECT_SOURCE_DIR}/h/ctltwainsession.h
-	${PROJECT_SOURCE_DIR}/h/ctltwainsource.h
-	${PROJECT_SOURCE_DIR}/h/ctlutils.h
-	${PROJECT_SOURCE_DIR}/h/dibinfox.h
-	${PROJECT_SOURCE_DIR}/h/dibmulti.h
-	${PROJECT_SOURCE_DIR}/h/dtwain.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_anyutils.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_exception.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_filesystem.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_filetypes.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_float_utils.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_library_selector.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_raii.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_resource_constants.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_resource_constants2.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_standard_defs.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_verinfo.h
-	${PROJECT_SOURCE_DIR}/h/dtwain_version.h
-	${PROJECT_SOURCE_DIR}/h/dtwainc.h
-	${PROJECT_SOURCE_DIR}/h/dtwaindefs.h
-	${PROJECT_SOURCE_DIR}/h/dtwainx.h
-	${PROJECT_SOURCE_DIR}/h/dtwpdft.h
-	${PROJECT_SOURCE_DIR}/h/dtwstrfn.h
-	${PROJECT_SOURCE_DIR}/h/dtwtype.h
-	${PROJECT_SOURCE_DIR}/h/errorcheck.h
-	${PROJECT_SOURCE_DIR}/h/extendedimageinfo.h
-	${PROJECT_SOURCE_DIR}/h/funcmac.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/bmprlewriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/dibutil.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/dtwpdf/crc32_aux.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/dtwpdf/dtwainpdf.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/gifwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/icowriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/imagefilewriterbase.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/jpeg2kwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/jpegwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/jpegxrwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/metafilewriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/pcxwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/pdffun32.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/pngwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/pnmwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/postscriptwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/psdwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/resample24to8.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/resamplefactory.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/svgwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/tgawriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/tiffwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/txtfun32.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/wbmpwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/webpwriter.h
-	${PROJECT_SOURCE_DIR}/h/imagefun/winbit32.h
-	${PROJECT_SOURCE_DIR}/h/imagexferfilewriter.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_bmp.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_gif.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_ico.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_jpeg.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_jpeg2k.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_jpegxr.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_pbm.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_pcx.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_pdf.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_png.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_ps.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_psd.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_svg.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_text.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_tga.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_tiff.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_wbmp.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_webp.h
-	${PROJECT_SOURCE_DIR}/h/iohandler_wmf.h
-	${PROJECT_SOURCE_DIR}/h/logmsg.h
-	${PROJECT_SOURCE_DIR}/h/logwriterutils.h
-	${PROJECT_SOURCE_DIR}/h/notimpl.h
-	${PROJECT_SOURCE_DIR}/h/ocrengine/ocrinterface.h
-	${PROJECT_SOURCE_DIR}/h/ocrengine/transym_ocrinterface.h
-	${PROJECT_SOURCE_DIR}/h/sourceacquireopts.h
-	${PROJECT_SOURCE_DIR}/h/sourceselectopts.h
-	${PROJECT_SOURCE_DIR}/h/twain.h
-	${PROJECT_SOURCE_DIR}/h/twainfix32.h
-	${PROJECT_SOURCE_DIR}/h/twainframe.h
-	${PROJECT_SOURCE_DIR}/h/versioninfo.h
-	${PROJECT_SOURCE_DIR}/h/winconst.h
-  ${PROJECT_SOURCE_DIR}/h/aeslib/AES.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/a85encode.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/ahexencode.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/base64encode.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/flateencode.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/pdfencrypt.h
-  ${PROJECT_SOURCE_DIR}/h/pdflib32/pdflib32.h
-  ${PROJECT_SOURCE_DIR}/h/ImageFun/dtwpdf/pdffont_basic.h
+        ${PROJECT_SOURCE_DIR}/h/acquisitionarray.h
+        ${PROJECT_SOURCE_DIR}/h/aeslib/AES.h
+        ${PROJECT_SOURCE_DIR}/h/ansiwideconverter_generic.h
+        ${PROJECT_SOURCE_DIR}/h/ansiwideconverter_win32.h
+        ${PROJECT_SOURCE_DIR}/h/ansiwideconverter_win32ex.h
+        ${PROJECT_SOURCE_DIR}/h/arrayfactory.h
+        ${PROJECT_SOURCE_DIR}/h/ctlarraydefs.h
+        ${PROJECT_SOURCE_DIR}/h/blankpage.h
+        ${PROJECT_SOURCE_DIR}/h/capconst.h
+        ${PROJECT_SOURCE_DIR}/h/cppfunc.h
+        ${PROJECT_SOURCE_DIR}/h/crc32_aux.h
+        ${PROJECT_SOURCE_DIR}/h/ctlarray.h
+        ${PROJECT_SOURCE_DIR}/h/ctlarraydumper.h
+        ${PROJECT_SOURCE_DIR}/h/ctlbimap.h
+        ${PROJECT_SOURCE_DIR}/h/ctlcapcollect.h
+        ${PROJECT_SOURCE_DIR}/h/ctlcapcontainerfuncs.h
+        ${PROJECT_SOURCE_DIR}/h/ctlclosesource.h
+        ${PROJECT_SOURCE_DIR}/h/ctlcntry.h
+        ${PROJECT_SOURCE_DIR}/h/ctlconstexprfind.h
+        ${PROJECT_SOURCE_DIR}/h/ctlconstexprutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctldefsource.h
+        ${PROJECT_SOURCE_DIR}/h/ctldevicecontext.h
+        ${PROJECT_SOURCE_DIR}/h/ctldevnt.h
+        ${PROJECT_SOURCE_DIR}/h/ctldib.h
+        ${PROJECT_SOURCE_DIR}/h/ctldib32.h
+        ${PROJECT_SOURCE_DIR}/h/ctldib32ex.h
+        ${PROJECT_SOURCE_DIR}/h/ctldtwainhandle.h
+        ${PROJECT_SOURCE_DIR}/h/ctlencodeutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlenum.h
+        ${PROJECT_SOURCE_DIR}/h/ctlfeed.h
+        ${PROJECT_SOURCE_DIR}/h/ctlfilesave.h
+        ${PROJECT_SOURCE_DIR}/h/ctlfilesavedefs.h
+        ${PROJECT_SOURCE_DIR}/h/ctlfileutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlgetversion.h
+        ${PROJECT_SOURCE_DIR}/h/ctlguiddef.h
+        ${PROJECT_SOURCE_DIR}/h/ctlguidimpl.h
+        ${PROJECT_SOURCE_DIR}/h/ctlglobalhandletraits.h
+        ${PROJECT_SOURCE_DIR}/h/ctliface.h
+        ${PROJECT_SOURCE_DIR}/h/ctlloadresources.h
+        ${PROJECT_SOURCE_DIR}/h/ctllogcalls.h
+        ${PROJECT_SOURCE_DIR}/h/ctllogfunctioncall.h
+        ${PROJECT_SOURCE_DIR}/h/ctllogsourcecaps.h
+        ${PROJECT_SOURCE_DIR}/h/ctlobtyp.h
+        ${PROJECT_SOURCE_DIR}/h/ctlmapdefs.h
+        ${PROJECT_SOURCE_DIR}/h/ctlrandnumutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlsetgetcaps.h
+        ${PROJECT_SOURCE_DIR}/h/ctlshowuionly.h
+        ${PROJECT_SOURCE_DIR}/h/ctlsourceacquire.h
+        ${PROJECT_SOURCE_DIR}/h/ctlsourcedibs.h
+        ${PROJECT_SOURCE_DIR}/h/ctlsourceselect.h
+        ${PROJECT_SOURCE_DIR}/h/ctlsourceinfo.h
+        ${PROJECT_SOURCE_DIR}/h/ctlstringconversion.h
+        ${PROJECT_SOURCE_DIR}/h/ctlstringdefs.h
+        ${PROJECT_SOURCE_DIR}/h/ctlstringutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlstringutilsx.h
+        ${PROJECT_SOURCE_DIR}/h/ctlstaticdata.h
+        ${PROJECT_SOURCE_DIR}/h/ctlsupport.h
+        ${PROJECT_SOURCE_DIR}/h/ctlthreadutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctltimer.h
+        ${PROJECT_SOURCE_DIR}/h/ctltimeutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctl10tuple.h
+        ${PROJECT_SOURCE_DIR}/h/ctlgetsetcapsinternal.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr000.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr001.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr008.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr009.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr010.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr011.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr012.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr013.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr014.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr015.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr016.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr017.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr018.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr019.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr020.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr021.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr024.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr025.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr026.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr027.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr028.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr029.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr030.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr031.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr032.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr034.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr035.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr036.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr037.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr038.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr039.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr040.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr041.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr042.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr043.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr044.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr045.h
+        ${PROJECT_SOURCE_DIR}/h/ctltripletbase.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwaincompliancy.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwaindecoder.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwaindllpath.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwainidentity.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwainlogging.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwainmanager.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwainmemoryimpl.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwainmsgloop.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwainsession.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwainsource.h
+        ${PROJECT_SOURCE_DIR}/h/ctlutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlverinfoutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlwindowsimpl.h
+        ${PROJECT_SOURCE_DIR}/h/windowsinit_impl.h
+        ${PROJECT_SOURCE_DIR}/h/dibinfox.h
+        ${PROJECT_SOURCE_DIR}/h/dibmulti.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_anyutils.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_exception.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_filesystem.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_filetypes.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_float_utils.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_library_selector.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_raii.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_resource_constants.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_resource_constants2.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_standard_defs.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_verinfo.h
+        ${PROJECT_SOURCE_DIR}/h/dtwain_version.h
+        ${PROJECT_SOURCE_DIR}/h/dtwainc.h
+        ${PROJECT_SOURCE_DIR}/h/dtwaindefs.h
+        ${PROJECT_SOURCE_DIR}/h/dtwainx.h
+        ${PROJECT_SOURCE_DIR}/h/dtwpdft.h
+        ${PROJECT_SOURCE_DIR}/h/dtwstrfn.h
+        ${PROJECT_SOURCE_DIR}/h/dtwtype.h
+        ${PROJECT_SOURCE_DIR}/h/enumeratornode.h
+        ${PROJECT_SOURCE_DIR}/h/errorcheck.h
+        ${PROJECT_SOURCE_DIR}/h/extendedimageinfo.h
+        ${PROJECT_SOURCE_DIR}/h/funcmac.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/bmprlewriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/dibutil.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/dtwpdf/dtwainpdf.h
+        ${PROJECT_SOURCE_DIR}/h/ImageFun/dtwpdf/pdffont_basic.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/gifwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/icowriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/imagefilewriterbase.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/jpeg2kwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/jpegwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/jpegxrwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/metafilewriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/pcxwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/pdffun32.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/pngwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/pnmwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/postscriptwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/psdwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/resample24to8.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/resamplefactory.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/svgwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/tgawriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/tiffwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/txtfun32.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/wbmpwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/webpwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/winbit32.h
+        ${PROJECT_SOURCE_DIR}/h/imagexferfilewriter.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_bmp.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_gif.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_ico.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_jpeg.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_jpeg2k.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_jpegxr.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_pbm.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_pcx.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_pdf.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_png.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_ps.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_psd.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_svg.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_text.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_tga.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_tiff.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_wbmp.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_webp.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_wmf.h
+        ${PROJECT_SOURCE_DIR}/h/logmsg.h
+        ${PROJECT_SOURCE_DIR}/h/logwriterutils.h
+        ${PROJECT_SOURCE_DIR}/h/mapdefs.h
+        ${PROJECT_SOURCE_DIR}/h/monitorutils.h
+        ${PROJECT_SOURCE_DIR}/h/notimpl.h
+        ${PROJECT_SOURCE_DIR}/h/ocrengine/ocrinterface.h
+        ${PROJECT_SOURCE_DIR}/h/ocrengine/transym_ocrinterface.h
+        ${PROJECT_SOURCE_DIR}/h/pdflib32/pdfencrypt.h
+        ${PROJECT_SOURCE_DIR}/h/pdflib32/pdflib32.h
+        ${PROJECT_SOURCE_DIR}/h/sourceacquireopts.h
+        ${PROJECT_SOURCE_DIR}/h/sourceselectopts.h
+        ${PROJECT_SOURCE_DIR}/h/twain.h
+        ${PROJECT_SOURCE_DIR}/h/twainfix32.h
+        ${PROJECT_SOURCE_DIR}/h/twainframe.h
+        ${PROJECT_SOURCE_DIR}/h/versioninfo.h
+        ${PROJECT_SOURCE_DIR}/h/winconst.h
+        ${PROJECT_SOURCE_DIR}/h/capstructdefs.h
+        ${PROJECT_SOURCE_DIR}/h/ctlinternalconstants.h
+        ${PROJECT_SOURCE_DIR}/h/ctlloggercallback.h
+        ${PROJECT_SOURCE_DIR}/h/ctltwaindllhandle.h
 )
 
 set(MAIN_INL
-  ${PROJECT_SOURCE_DIR}/inl/ctlstrimpl.inl
-  ${PROJECT_SOURCE_DIR}/inl/ctltr016.inl
-  ${PROJECT_SOURCE_DIR}/inl/ctltr017.inl
-  ${PROJECT_SOURCE_DIR}/inl/ctltr018.inl
-  ${PROJECT_SOURCE_DIR}/inl/ctltr019.inl
-  ${PROJECT_SOURCE_DIR}/inl/ctltr020.inl
-  ${PROJECT_SOURCE_DIR}/inl/windowsinit_impl.inl
   ${PROJECT_SOURCE_DIR}/inl/windows_info.inl
   ${PROJECT_SOURCE_DIR}/inl/winget_twain.inl
   ${PROJECT_SOURCE_DIR}/inl/winlibraryloader_impl.inl
@@ -586,40 +605,75 @@ set(MAIN_INL
 
 set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/aeslib/AES.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/arrayfactory.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/crc32_aux.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquirearea.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlacquireaudio.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquirebuffered.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquireclipboard.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquirefile.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlacquirenative.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlansiunicodeimpl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlarray.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlarraydumper.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlblankpage.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlbufferstrip.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcalldsmproc.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcapcollect.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcapcontainerfuncs.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcapenumfuncs.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcapsupport.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlcompressionsize.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlcustomdsdata.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctldeviceevents.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctldevnt.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctldib32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctldtwaininit.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctldtwainmem2.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlduplex.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlencodeutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlerrorbuffer.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlerrorcallback.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlextimageinfo.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlfeed.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlfileappend.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlfilesave.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlfiletypes.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlfileutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlflipbmp.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlflog.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlgetcapinfo.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlgetmetrics.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlgetversion.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlglobalhandletraits.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlhashutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlhigh.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlimageerrorskip.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlimageinfo.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctljob.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctljpeg.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlloadresources.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctllogfunctioncall.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlloggercallback.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctllogmessage.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmanualduplex.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmaxacquires.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlmultipagescan.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlobtyp.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlpapersize.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlpatchsupport.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlpdf.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlpixbitdepth.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlprinter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlresourcestring.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsavefilename.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlselectdialog.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsetgetcaps.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlshowuionly.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceacquire.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceclose.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlsourcecompression.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlsourcedetails.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcedibs.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceenum.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceinfo.cpp
@@ -629,20 +683,18 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcescale.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceselect.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsrceoj.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr040.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltwaindllhandle.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltwainmsgloop.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctluicontrollable.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctluienabled.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlstringutilsx.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlsupport.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltempdir.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlthreadutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltiff.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltimeout.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltimeutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr008.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr010.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr011.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr015.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr016.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr017.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr018.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr019.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr020.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr024.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr025.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr026.cpp
@@ -651,85 +703,36 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctltr035.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr037.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr038.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlobtyp.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlunicodeimpl.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlhigh.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctljob.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlfeed.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctldevnt.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlsupport.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlverifysourcehandle.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/imagexferfilewriter.cpp
-  ${PROJECT_SOURCE_DIR}/dtwinver/Dtwinver.cpp
-  ${PROJECT_SOURCE_DIR}/dtwinver/Getwinver.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlflog.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/logmsg.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/a85decoder.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltempdir.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface_internal.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/transym_ocrinterface.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctljpeg.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltiff.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctldib32.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_base.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_bmp.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_gif.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_ico.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpeg.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpeg2k.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_pcx.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_pdf.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_png.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_ps.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_psd.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_text.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_tga.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_tiff.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_wbmp.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/iohandler_wmf.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/imagefun/winbit32.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlpdf.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/imagefun/pdffun32.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/imagefun/dtwpdf/dtwainpdf.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/arrayfactory.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlacquireaudio.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlarraydumper.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlbufferstrip.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlcustomdsdata.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlerrorbuffer.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlerrorcallback.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlextimageinfo.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlfileappend.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlfilesave.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlfileutils.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlgetmetrics.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlhashutils.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlloadresources.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlpapersize.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlselectdialog.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlsourcecompression.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlsourcedetails.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlstringutils.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlthreadutils.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltimeout.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr040.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr041.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr042.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr043.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltripletbase.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwainappinfo.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwainavailable.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwaincompliancy.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwaindecoder.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwaindllhandle.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwaindllpath.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwaindsm.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainfilesystem.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainidentity.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwainlogging.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainmanager.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltwainmsgloop.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainsession.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainsource.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctluicontrollable.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctluienabled.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlupdatedibproc.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlverifysourcehandle.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlwindowproc.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/dtwain_version.cpp
   ${PROJECT_SOURCE_DIR}/cpp/extendedimageinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/bmprlewriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/ctldibblank.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/dibutil.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagefun/dtwpdf/dtwainpdf.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/gifwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/icowriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/imagefilewriterbase.cpp
@@ -738,6 +741,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpegxrwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/metafilewriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/pcxwriter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagefun/pdffun32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/pngwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/pnmwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/postscriptwriter.cpp
@@ -749,22 +753,43 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/txtfun32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/wbmpwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/webpwriter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagefun/winbit32.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagexferfilewriter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_base.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_bmp.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_gif.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_ico.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpeg.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpeg2k.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpegxr.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_pbm.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_pcx.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_pdf.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_png.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_ps.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_psd.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_svg.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_text.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_tga.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_tiff.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_wbmp.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_webp.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_wmf.cpp
   ${PROJECT_SOURCE_DIR}/cpp/linux_versioninfo.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/logmsg.cpp
   ${PROJECT_SOURCE_DIR}/cpp/logwriterutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/monitorutils.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface_internal.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrselect.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/pdflib32/a85encode.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/pdflib32/ahexencode.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/pdflib32/base64encode.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/pdflib32/flateencode.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/transym_ocrinterface.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdfencrypt.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdflib32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/stdafx.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/windowsinit_impl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windows_versioninfo.cpp
-  ${PROJECT_SOURCE_DIR}/c/imagefun/dtwpdf/crc32_aux.cpp
+  ${PROJECT_SOURCE_DIR}/dtwinver/Dtwinver.cpp
+  ${PROJECT_SOURCE_DIR}/dtwinver/Getwinver.cpp
 )
 
 set(LIBGIF_SOURCES
@@ -1238,6 +1263,7 @@ set(TEXT_RESOURCE_FILES
   ${PROJECT_SOURCE_DIR}/text_resources/dtwain64.ini
   ${PROJECT_SOURCE_DIR}/text_resources/twaininfo.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainlanguage.txt
+  ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_cantonese.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_dutch.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_english.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_french.txt
@@ -1462,10 +1488,16 @@ file(GLOB DTWAIN_DEF_FILES
 
 target_sources(dtwain PRIVATE ${DTWAIN_DEF_FILES})
 source_group( "Module Definition Files" FILES ${DTWAIN_DEF_FILES})
-target_sources(dtwain PRIVATE ${PROJECT_SOURCE_DIR}/rc/twil32.rc)
+target_sources(dtwain PRIVATE ${PROJECT_SOURCE_DIR}/rc/dtwain_resources.rc)
+target_sources(dtwain PRIVATE ${DTWAIN_MISCELLANEOUS_FILES})
 target_sources(dtwain PRIVATE ${TEXT_RESOURCE_FILES})
 
 set(DTWAIN_RC_DEFINES /D_WIN32)
+
+target_compile_definitions(dtwain PRIVATE
+    RC_MSC_VER=${MSVC_VERSION}
+    $<$<CONFIG:Debug>:DTWAIN_DEBUG>
+)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     list(APPEND DTWAIN_RC_DEFINES /D_WIN64)
@@ -1494,13 +1526,17 @@ if(DTWAIN_USE_DYNAMIC_CRT)
 endif()
 
 set_source_files_properties(
-    ${PROJECT_SOURCE_DIR}/rc/twil32.rc
+    ${PROJECT_SOURCE_DIR}/rc/dtwain_resources.rc
     PROPERTIES
         COMPILE_OPTIONS "${DTWAIN_RC_DEFINES}"
 )
 
 source_group("Resource Files" FILES
     ${DTWAIN_RESOURCE_FILES}
+)
+
+source_group("Miscellaneous Files" FILES
+    ${DTWAIN_MISCELLANEOUS_FILES}
 )
 
 target_compile_definitions(dtwain PRIVATE
@@ -1602,7 +1638,6 @@ target_compile_definitions(dtwain PRIVATE
     OPJ_STATIC
     DISABLE_PERF_MEASUREMENT
     DTWAIN_OPENSOURCE_DISTRIBUTION
-    BUILDING_JPEG_DLL
     _DEBUGNDEBUG
     STRICT
     FUNCTION_MACRO_DEFINED
@@ -1746,9 +1781,19 @@ set(DTWAIN_PUBLIC_HEADERS
 )
 
 get_filename_component(
-    DTWAIN_DEMOS_DIR
+    DTWAIN_DEMOS_INCLUDE_DIR
     "${PROJECT_SOURCE_DIR}/../demos/C_C++/c_cpp_includes"
     ABSOLUTE
+)
+
+get_filename_component(
+    DTWAIN_CPP_DEMOS_DIR
+    "${PROJECT_SOURCE_DIR}/../demos/C_C++"
+    ABSOLUTE
+)
+
+set(DTWAIN_CPP_DEMOS_SOLUTION
+    "${DTWAIN_CPP_DEMOS_DIR}/AllDemos.sln"
 )
 
 add_custom_command(
@@ -1756,11 +1801,11 @@ add_custom_command(
     POST_BUILD
 
     COMMAND ${CMAKE_COMMAND} -E make_directory
-            "${DTWAIN_DEMOS_DIR}"
+            "${DTWAIN_DEMOS_INCLUDE_DIR}"
 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${DTWAIN_PUBLIC_HEADERS}
-            "${DTWAIN_DEMOS_DIR}"
+            "${DTWAIN_DEMOS_INCLUDE_DIR}"
 
     COMMENT "Copying DTWAIN public headers to demos directory"
 )
@@ -1771,6 +1816,53 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 else()
     set(DTWAIN_DEMOS_LIB_DIR
         "${PROJECT_SOURCE_DIR}/../demos/C_C++/libs/32bit")
+endif()
+
+
+if(DTWAIN_BUILD_CPP_DEMOS)
+    if(NOT MSVC)
+        message(FATAL_ERROR
+            "DTWAIN_BUILD_CPP_DEMOS requires Visual Studio/MSVC.")
+    endif()
+
+    if(NOT EXISTS "${DTWAIN_CPP_DEMOS_SOLUTION}")
+        message(FATAL_ERROR
+            "The C/C++ demo solution was not found:\n"
+            "  ${DTWAIN_CPP_DEMOS_SOLUTION}")
+    endif()
+
+    if(NOT CMAKE_VS_MSBUILD_COMMAND)
+        message(FATAL_ERROR
+            "CMake could not determine the Visual Studio MSBuild executable.")
+    endif()
+
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(DTWAIN_DEMOS_PLATFORM "x64")
+    else()
+        set(DTWAIN_DEMOS_PLATFORM "Win32")
+    endif()
+
+    add_custom_target(build_cpp_demos
+        COMMAND
+            "${CMAKE_VS_MSBUILD_COMMAND}"
+            "${DTWAIN_CPP_DEMOS_SOLUTION}"
+            /target:Build
+            "/property:Configuration=$<CONFIG>"
+            "/property:Platform=${DTWAIN_DEMOS_PLATFORM}"
+            /m
+            /nologo
+
+        WORKING_DIRECTORY
+            "${DTWAIN_CPP_DEMOS_DIR}"
+
+        COMMENT
+            "Building DTWAIN C/C++ demo solution"
+
+        VERBATIM
+        USES_TERMINAL
+    )
+
+    add_dependencies(build_cpp_demos dtwain)
 endif()
 
 add_custom_command(

@@ -23,15 +23,20 @@
 #include "dtwaindefs.h"
 #include "dtwtype.h"
 #include "ctliface.h"
+#include "ctlguidimpl.h"
+#include "ctltwaindllhandle.h"
+#include "ctlstringconversion.h"
+#include "ctlarray.h"
+using namespace dynarithmic;
 
-namespace dynarithmic
+namespace
 {
     template <typename ArraySourceT, typename ConversionFunc>
-    static void ArrayToNativeArray(CTL_TwainDLLHandle* pHandle, 
-                                   DTWAIN_ARRAY ArraySource,
-                                   DTWAIN_ARRAY ArrayDest,
-                                   int ArraySourceType,
-                                   ConversionFunc fn)
+    void ArrayToNativeArray(CTL_TwainDLLHandle* pHandle,
+        DTWAIN_ARRAY ArraySource,
+        DTWAIN_ARRAY ArrayDest,
+        int ArraySourceType,
+        ConversionFunc fn)
     {
         const auto& factory = pHandle->m_ArrayFactory;
         const auto TypeSource = factory->tag_type(CTL_ArrayFactory::from_void(ArraySource));
@@ -50,17 +55,20 @@ namespace dynarithmic
             factory->add_to_back(theDestTag, &sVal, 1);
         }
     }
+}
 
+namespace dynarithmic
+{
     void ArrayCopyWideToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
     {
         ArrayToNativeArray<CTL_ArrayFactory::tagged_array_wstring>(pHandle, ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::WStringType,
-            [](const std::wstring& val) { return StringConversion::Convert_Wide_To_Native(val); });
+            [](const std::wstring& val) { return stringconversion::Convert_Wide_To_Native(val); });
     }
 
     void ArrayCopyAnsiToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
     {
         ArrayToNativeArray<CTL_ArrayFactory::tagged_array_string>(pHandle, ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::StringType,
-            [](const std::string& val) { return StringConversion::Convert_Ansi_To_Native(val); });
+            [](const std::string& val) { return stringconversion::Convert_Ansi_To_Native(val); });
     }
 
     std::shared_ptr<CTL_ArrayFactory>& GetArrayFactoryFromHandle(CTL_TwainDLLHandle* pHandle)
@@ -314,15 +322,15 @@ namespace dynarithmic
         }
         if (pNewArray)
         {
-            auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
-            guidMap.Insert(StringWrapperA::GenerateUUIDv4(), pNewArray);
+            auto& guidMap = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
+            guidMap.Insert(GetGUIDImpl<std::string>(), pNewArray);
         }
         return pNewArray;
     }
 
     bool CTL_ArrayFactory::is_valid(arrayTag* pTag) const
     {
-        return m_tagMap.find(const_cast<arrayTag*>(pTag)) != m_tagMap.end();
+        return m_tagMap.find(pTag) != m_tagMap.end();
     }
 
     bool CTL_ArrayFactory::is_frame_valid(const void *frame) const
@@ -345,27 +353,30 @@ namespace dynarithmic
     {
         if (is_valid(pTag))
         {
-            const auto pTagTemp = static_cast<arrayTag*>(pTag);
+            const auto pTagTemp = pTag;
             return pTagTemp->getTag();
         }
         return -1;
     }
 
-    template <typename MapType>
-    typename MapType::const_iterator perform_operation(const MapType& theMap, int tag, const char* op)
+    namespace
     {
-        typename MapType::const_iterator iter = theMap.find(tag);
-        if (iter != theMap.end())
-            return iter;
-        else
+        template <typename MapType>
+        typename MapType::const_iterator perform_operation(const MapType& theMap, int tag, const char* op)
         {
-            char szBuf[100];
-            sprintf_s(szBuf, "%s operation not supported for array type", op);
-            throw std::invalid_argument::invalid_argument(szBuf);
+            typename MapType::const_iterator iter = theMap.find(tag);
+            if (iter != theMap.end())
+                return iter;
+            else
+            {
+                char szBuf[100];
+                sprintf_s(szBuf, "%s operation not supported for array type", op);
+                throw std::invalid_argument::invalid_argument(szBuf);
+            }
         }
     }
 
-    void CTL_ArrayFactory::copy(arrayTag *pTagDest, arrayTag* pTagSource)
+    void CTL_ArrayFactory::copy(arrayTag *pTagDest, arrayTag* pTagSource) const
     {
         if (!is_valid(pTagDest) || !is_valid(pTagSource))
             return;
@@ -381,11 +392,11 @@ namespace dynarithmic
         const auto iter = m_tagMap.find(pTag);
         if (iter != m_tagMap.end())
             m_tagMap.erase(iter);
-        auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
+        auto& guidMap = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
         guidMap.EraseRight(pTag);
     }
 
-    void CTL_ArrayFactory::add_to_back(arrayTag *pTag, void *value, size_t num)
+    void CTL_ArrayFactory::add_to_back(arrayTag *pTag, void *value, size_t num) const
     {
         if (!is_valid(pTag))
             return;
@@ -399,28 +410,28 @@ namespace dynarithmic
         return perform_operation(m_vfnGetMap, pTag->getTag(), "get_value()")->second(pTag, nWhere, value);
     }
 
-    void CTL_ArrayFactory::insert(arrayTag* pTag, void* value, size_t nWhere, size_t num)
+    void CTL_ArrayFactory::insert(arrayTag* pTag, void* value, size_t nWhere, size_t num) const
     {
         if (!is_valid(pTag))
             return;
         perform_operation(m_vfnInserterMap, pTag->getTag(), "insert()")->second(pTag, nWhere, num, value);
     }
 
-    void CTL_ArrayFactory::remove(arrayTag* pTag, std::size_t nWhere, std::size_t num)
+    void CTL_ArrayFactory::remove(arrayTag* pTag, std::size_t nWhere, std::size_t num) const
     {
         if (!is_valid(pTag))
             return;
         perform_operation(m_vfnRemoverMap, pTag->getTag(), "remove()")->second(pTag, nWhere, num);
     }
 
-    void CTL_ArrayFactory::clear(arrayTag *pTag)
+    void CTL_ArrayFactory::clear(arrayTag *pTag) const
     {
         if (!is_valid(pTag))
             return;
         perform_operation(m_vfnClearerMap, pTag->getTag(), "clear()")->second(pTag);
     }
 
-    void CTL_ArrayFactory::resize(arrayTag* pTag, std::size_t num)
+    void CTL_ArrayFactory::resize(arrayTag* pTag, std::size_t num) const
     {
         if (!is_valid(pTag))
             return;
@@ -434,7 +445,7 @@ namespace dynarithmic
         return perform_operation(m_vfnCounterMap, pTag->getTag(), "size()")->second(pTag);
     }
 
-    size_t CTL_ArrayFactory::find(arrayTag *pTag, void *value, double tol)
+    size_t CTL_ArrayFactory::find(arrayTag *pTag, void *value, double tol) const
     {
         if (!is_valid(pTag))
             return 0;
@@ -443,14 +454,14 @@ namespace dynarithmic
         return perform_operation(m_vfnFindMap, pTag->getTag(), "find()")->second(pTag, value, {});
     }
 
-    void CTL_ArrayFactory::set_value(arrayTag *pTag, std::size_t nWhere, void *value)
+    void CTL_ArrayFactory::set_value(arrayTag *pTag, std::size_t nWhere, void *value) const
     {
         if (!is_valid(pTag))
             return;
         perform_operation(m_vfnSetterMap, pTag->getTag(), "set_value()")->second(pTag, nWhere, value);
     }
 
-    void* CTL_ArrayFactory::get_buffer(arrayTag *pTag, std::size_t nWhere)
+    void* CTL_ArrayFactory::get_buffer(arrayTag *pTag, std::size_t nWhere) const
     {
         if (!is_valid(pTag))
             return nullptr;
@@ -463,10 +474,11 @@ namespace dynarithmic
         const auto frame = create_array(CTL_ArrayFrameSingleType, &status, 1);
         auto& vect = underlying_container_t<TwainFrameInternal>(frame);
         auto& frameInst = vect.front();
-        frameInst.m_FrameComponent[0] = left;
-        frameInst.m_FrameComponent[1] = top;
-        frameInst.m_FrameComponent[2] = right;
-        frameInst.m_FrameComponent[3] = bottom;
+        auto& frameComponent = frameInst.GetFrameComponent();
+        frameComponent[TwainFrameInternal::FRAMELEFT] = left;
+        frameComponent[TwainFrameInternal::FRAMETOP] = top;
+        frameComponent[TwainFrameInternal::FRAMERIGHT] = right;
+        frameComponent[TwainFrameInternal::FRAMEBOTTOM] = bottom;
         return frame;
     }
 

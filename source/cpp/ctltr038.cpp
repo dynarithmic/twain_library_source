@@ -19,10 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr038.h"
-
-#include "ctliface.h"
-#include "ctltr010.h"
 #include "ctltwainmanager.h"
+#include "ctlstaticdata.h"
 
 using namespace dynarithmic;
 #ifdef _MSC_VER
@@ -90,7 +88,7 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
             continue;
 
         // "Remove" the items by adding to the set
-        if (dynarithmic::GetTwainItemSize(pInfo->ItemType) * pInfo->NumItems > sizeof(TW_HANDLE))
+        if (GetTwainItemSize(pInfo->ItemType) * pInfo->NumItems > sizeof(TW_HANDLE))
         {
             TW_HANDLE SubHandle = reinterpret_cast<TW_HANDLE>(pInfo->Item);
             if (pInfo->ItemType == TWTY_HANDLE)
@@ -153,7 +151,7 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
     DestroyInfo();
 
     // Allocate memory for TW_INFO structure
-    m_memHandle = sessionHandle->m_TwainMemoryFunc->AllocateMemory(static_cast<TW_UINT32>(sizeof(TW_INFO) * nInfos + sizeof(TW_EXTIMAGEINFO)));
+    m_memHandle = sessionHandle->m_TwainMemoryFunc->AllocateMemory(sizeof(TW_INFO) * nInfos + sizeof(TW_EXTIMAGEINFO));
     m_pExtImageInfo = static_cast<TW_EXTIMAGEINFO*>(sessionHandle->m_TwainMemoryFunc->LockMemory(m_memHandle));
 
     // Set up the base triplet information here
@@ -162,7 +160,7 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
         m_pExtImageInfo->NumInfos = static_cast<TW_UINT32>(nInfos);
         // Get the app manager's AppID
         const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-        if ( pMgr && pMgr->IsValidTwainSession( pSession ))
+        if ( pMgr && CTL_TwainAppMgr::IsValidTwainSession( pSession ))
         {
             if ( pSource )
             {
@@ -171,7 +169,7 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
                       DG_IMAGE,
                       DAT_EXTIMAGEINFO,
                       MSG_GET,
-                      static_cast<TW_MEMREF>(static_cast<pTW_EXTIMAGEINFO>(m_pExtImageInfo)));
+                      m_pExtImageInfo);
                 SetAlive (true);
             }
         }
@@ -240,7 +238,7 @@ std::pair<bool, int32_t> CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, in
         Info.ReturnCode == TWRC_DATANOTAVAILABLE)
         return { false, Info.ReturnCode == TWRC_INFONOTSUPPORTED ? DTWAIN_ERR_UNSUPPORTED_EXTINFO : DTWAIN_ERR_UNAVAILABLE_EXTINFO };
 
-    const TW_UINT16 nSize = dynarithmic::GetTwainItemSize(Info.ItemType);
+    const TW_UINT16 nSize = GetTwainItemSize(Info.ItemType);
     if (Data && (nSize * Info.NumItems > sizeof(TW_HANDLE)))
     {
         TW_HANDLE SubHandle = reinterpret_cast<TW_HANDLE>(Info.Item);

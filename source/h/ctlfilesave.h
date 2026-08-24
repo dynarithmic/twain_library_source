@@ -20,11 +20,11 @@
  */
 #ifndef CTLFILESAVE_H
 #define CTLFILESAVE_H
-
-#include "ctliface.h"
-
+#include "ctlenum.h"
+#include "ctlstringdefs.h"
 namespace dynarithmic
 {
+    class CTL_TwainDLLHandle;
     CTL_StringType PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_TwainFileFormatEnum nFileAcquireType);
 }
 #endif

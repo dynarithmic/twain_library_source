@@ -18,19 +18,17 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <sstream>
 #include "ctltr011.h"
-
-#include "ctliface.h"
 #include "ctltwainmanager.h"
-#include "cppfunc.h"
+#include "ctlstaticdata.h"
+#include "logwriterutils.h"
 using namespace dynarithmic;
 CTL_CapabilityGetTriplet::CTL_CapabilityGetTriplet(CTL_ITwainSession* pSession,
                                                     CTL_ITwainSource* pSource,
                                                     TW_UINT16 gType,
                                                     TW_UINT16 gCap,
                                                     TW_UINT16 TwainDataType)
-                       :  CTL_CapabilityTriplet(pSession, pSource, static_cast<TW_UINT16>(gType), TwainDataType, true)
+                       :  CTL_CapabilityTriplet(pSession, pSource, gType, TwainDataType, true)
                        , m_gCap(gCap), m_gType(gType)
 {
     TW_CAPABILITY* pCap = GetCapabilityBuffer();

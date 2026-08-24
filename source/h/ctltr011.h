@@ -20,7 +20,11 @@
  */
 #ifndef CTLTR011_H
 #define CTLTR011_H
+#include "ctlconstexprutils.h"
+#include "ctlenum.h"
 #include "ctltr010.h"
+#include "ctltwainsession.h"
+
 namespace dynarithmic
 {
     class CTL_CapabilityGetTriplet : public CTL_CapabilityTriplet
@@ -80,7 +84,7 @@ namespace dynarithmic
                 TW_UINT16 nItemType = GetEffectiveItemType(pTwainContainer->ItemType);
 
                 // Get sizeof each item in Twain container
-                const int nItemSize = dynarithmic::GetTwainItemSize(nItemType);
+                const int nItemSize = GetTwainItemSize(nItemType);
 
                 // Unknown item type.  Do error condition here??
                 if (nItemSize == 0)

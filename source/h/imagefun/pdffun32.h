@@ -29,7 +29,7 @@ OF THIRD PARTY RIGHTS.
 #ifndef WINBIT32_H
 #include "winbit32.h"
 #endif
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "dibinfox.h"
 #include "pdffont_basic.h"
 
@@ -39,41 +39,31 @@ namespace dynarithmic
     using PdfDocumentPtr = std::shared_ptr<PdfDocument>;
     class PDFInterface
     {
-    public:
-        PdfDocumentPtr DTWLIB_PDFGetNewDocument();
-        bool DTWLIB_PDFOpenNewFile(PdfDocumentPtr pDoc, LPCTSTR szFile);
-        void DTWLIB_PDFSetCompression(PdfDocumentPtr pDoc, bool bCompress);
-        void DTWLIB_PDFSetNameField(PdfDocumentPtr pDoc, int32_t nWhich, const char* szName);
-        bool DTWLIB_PDFStartCreation(PdfDocumentPtr pDoc, int majorv, int minorv);
-        bool DTWLIB_PDFEndCreation(PdfDocumentPtr pDoc);
-        void DTWLIB_PDFSetImageType(PdfDocumentPtr pDoc, int32_t iType);
-        void DTWLIB_PDFSetLongField(PdfDocumentPtr pDoc, int32_t nWhich, int32_t nValue);
-        bool DTWLIB_PDFWritePage(PdfDocumentPtr pDoc, LPCTSTR szPath);
-        void DTWLIB_PDFSetScaling(PdfDocumentPtr pDoc, double xscale, double yscale);
-        void DTWLIB_PDFReleaseDocument(PdfDocumentPtr pDoc);
-        void DTWLIB_PDFSetThumbnailFile(PdfDocumentPtr pDoc, LPCTSTR szPath);
-        void DTWLIB_PDFSetDPI(PdfDocumentPtr pDoc, int32_t dpi);
-        void DTWLIB_PDFSetEncryption(PdfDocumentPtr pDoc, LPCTSTR szOwnerPass,
-                                     LPCTSTR szUserPass, int32_t Permissions,
-                                     bool bUseStrongEncrypt,
-                                     bool bUseAESEncryption,
-                                     uint32_t nKeyLength);
+        public:
+            PdfDocumentPtr DTWLIB_PDFGetNewDocument();
+            bool DTWLIB_PDFOpenNewFile(PdfDocumentPtr pDoc, LPCTSTR szFile);
+            void DTWLIB_PDFSetCompression(PdfDocumentPtr pDoc, bool bCompress);
+            void DTWLIB_PDFSetNameField(PdfDocumentPtr pDoc, int32_t nWhich, const char* szName);
+            bool DTWLIB_PDFStartCreation(PdfDocumentPtr pDoc, int majorv, int minorv);
+            bool DTWLIB_PDFEndCreation(PdfDocumentPtr pDoc);
+            void DTWLIB_PDFSetImageType(PdfDocumentPtr pDoc, int32_t iType);
+            void DTWLIB_PDFSetLongField(PdfDocumentPtr pDoc, int32_t nWhich, int32_t nValue);
+            bool DTWLIB_PDFWritePage(PdfDocumentPtr pDoc, LPCTSTR szPath);
+            void DTWLIB_PDFSetScaling(PdfDocumentPtr pDoc, double xscale, double yscale);
+            void DTWLIB_PDFReleaseDocument(PdfDocumentPtr pDoc);
+            void DTWLIB_PDFSetThumbnailFile(PdfDocumentPtr pDoc, LPCTSTR szPath);
+            void DTWLIB_PDFSetDPI(PdfDocumentPtr pDoc, int32_t dpi);
+            void DTWLIB_PDFSetEncryption(PdfDocumentPtr pDoc, LPCTSTR szOwnerPass,
+                                         LPCTSTR szUserPass, int32_t Permissions,
+                                         bool bUseStrongEncrypt,
+                                         bool bUseAESEncryption,
+                                         uint32_t nKeyLength);
 
-        LONG DTWLIB_PSWriteFile(LPCTSTR szFileIn,
-            LPCTSTR szFileOut,
-            LONG PSType,
-            LPCTSTR szTitle,
-            bool bUseEncapsulated);
-
-        void DTWLIB_PDFSetASCIICompression(PdfDocumentPtr pDoc, bool bCompression);
-        void DTWLIB_PDFSetNoCompression(PdfDocumentPtr pDoc, bool bCompression);
-        void DTWLIB_PDFSetSearchableText(PdfDocumentPtr pDoc, const char* text);
-        void DTWLIB_PDFAddPageText(PdfDocumentPtr pDoc, PDFTextElement* pElement); /*LPCSTR szTest, LONG xPos, LONG yPos,
-                                   LPCSTR fontName, double fontSize, LONG colorRGB,
-                                   LONG renderMode, double scaling, double charSpacing,
-                                   double wordSpacing,
-                                   LONG riseValue, LONG flags, double scalingX, double scalingY);*/
-        void DTWLIB_PDFSetPolarity(PdfDocumentPtr pDoc, int32_t Polarity);
+            void DTWLIB_PDFSetASCIICompression(PdfDocumentPtr pDoc, bool bCompression);
+            void DTWLIB_PDFSetNoCompression(PdfDocumentPtr pDoc, bool bCompression);
+            void DTWLIB_PDFSetSearchableText(PdfDocumentPtr pDoc, const char* text);
+            void DTWLIB_PDFAddPageText(PdfDocumentPtr pDoc, PDFTextElement* pElement);
+            void DTWLIB_PDFSetPolarity(PdfDocumentPtr pDoc, int32_t Polarity);
     };
 
     struct PDFINFO : DibMultiPageData

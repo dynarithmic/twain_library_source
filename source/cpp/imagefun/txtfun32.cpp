@@ -19,19 +19,25 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "txtfun32.h"
-#include "winbit32.h"
-#include "ctltwainmanager.h"
+
 #include "ctlfileutils.h"
-#include "logwriterutils.h"
+#include "winbit32.h"
 #include "iohandler_bmp.h"
 #include "iohandler_tiff.h"
+#include "ctlguidimpl.h"
+#include "ctltwaindllpath.h"
+#include "ctlstringconversion.h"
+#include "ctltwainsource.h"
+#include "logwriterutils.h"
+#include "ctlloadresources.h"
+#include "dtwain_resource_constants2.h"
 
 using namespace dynarithmic;
 bool CTextImageHandler::OpenOutputFile(LPCTSTR pFileName)
 {
     if (m_MultiPageStruct.Stage == DIB_MULTI_FIRST || m_MultiPageStruct.Stage == 0)
     {
-        m_fileName = StringConversion::Convert_NativePtr_To_Ansi(pFileName);
+        m_fileName = stringconversion::Convert_NativePtr_To_Ansi(pFileName);
         m_hFile = std::make_unique<std::ofstream>(m_fileName, std::ios::binary);
         if (m_hFile.get())
             return true;
@@ -78,7 +84,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
             {
                 // Always delete the temporary file
                 if (m_pTextPageInfo && !m_pTextPageInfo->szTempFile.empty())
-                    delete_file(m_pTextPageInfo->szTempFile.c_str());
+                    fileutils::delete_file(m_pTextPageInfo->szTempFile.c_str());
 
                 m_pTextPageInfo.reset();
                 try
@@ -101,7 +107,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
 
         // Open the file
         LPCTSTR fileName = reinterpret_cast<LPCTSTR>(path);
-        std::string fNameStr = StringConversion::Convert_NativePtr_To_Ansi(fileName);
+        std::string fNameStr = stringconversion::Convert_NativePtr_To_Ansi(fileName);
         auto isOk = OpenOutputFile(fileName);
         if (!isOk)
             return DTWAIN_ERR_FILEOPEN;
@@ -115,7 +121,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         if ( szTempPath.empty() )
             return DTWAIN_ERR_FILEWRITE;
 
-        szTempPath += StringWrapper::GetGUID() +  _T("OCR");
+        szTempPath += GetGUID() +  _T("OCR");
 
         LogWriterUtils::WriteLogInfo(GetResourceStringFromMap_Native(IDS_LOGMSG_TEMPIMAGEFILETEXT) + _T(" ") + szTempPath + _T("\n"));
 
@@ -124,7 +130,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         if ( m_InputFormat == DTWAIN_BMP)
             m_pTextPageInfo->m_pOrigHandler.reset(new CTL_BmpIOHandler(m_pDib, m_ImageInfoEx));
         else
-        if ( dynarithmic::IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(m_InputFormat)))
+        if ( IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(m_InputFormat)))
         {
             m_ImageInfoEx.IsOCRTempImage = true;
             m_pTextPageInfo->m_pOrigHandler.reset(new CTL_TiffIOHandler(m_pDib, m_InputFormat, m_ImageInfoEx));
@@ -155,7 +161,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
 
         // Write the new line at the end of the file
         char ff = '\x0c';
-        ptrStream->write(reinterpret_cast<char*>(&ff), 1);
+        ptrStream->write(&ff, 1);
 
         // Write the temp file and save the OCR output
         m_pOCREngine->SetCurrentPageNumber(m_pOCREngine->GetCurrentPageNumber() + 1);
@@ -193,7 +199,7 @@ int CTextImageHandler::SaveOCR()
     if ( m_pOCREngine->IsReturnCodeOk(bRet) )
     {
         const std::string theText = m_pOCREngine->GetOCRText();
-        m_pTextPageInfo->fh->write(reinterpret_cast<const char *>(theText.c_str()), theText.length()*sizeof(TCHAR));
+        m_pTextPageInfo->fh->write(theText.c_str(), theText.length()*sizeof(TCHAR));
     }
     return bRet;
 }

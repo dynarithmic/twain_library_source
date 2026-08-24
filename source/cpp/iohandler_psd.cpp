@@ -18,11 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
 #include "psdwriter.h"
 #include "iohandler_psd.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
@@ -60,7 +59,7 @@ int CTL_PsdIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
     opts.comment = GetCopyrightString();
 
-    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!WriteOneDibHandleToPsd(fName, opts, hDib))
         return DTWAIN_ERR_FILEWRITE;

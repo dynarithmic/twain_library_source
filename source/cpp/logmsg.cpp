@@ -18,21 +18,26 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
+#include <windows.h>
 #include "date/date.h"
 #include <ctime>
 #include <cstdio>
 #include <sstream>
+#include <iostream>
 #ifdef _WIN32
-#include <windows.h>
-#include <tchar.h>
 #else
 #include <dlfcn.h>
 #endif
 #include <string>
 #include "logmsg.h"
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "ctlfileutils.h"
 #include "ctlthreadutils.h"
+#include "ctltwainlogging.h"
+#include "ctlstringconversion.h"
+#include "dtwain_resource_constants2.h"
+#include "ctlloadresources.h"
+#include "ctliface.h"
 
 using namespace dynarithmic;
 using namespace date;
@@ -61,7 +66,7 @@ namespace dynarithmic
 
     std::string CBaseLogger::getThreadID()
     {
-        auto str = dynarithmic::getThreadIdAsString();
+        auto str = getThreadIdAsString();
         std::string result = "Thread [" + str + "] ";
         return result;
     }
@@ -98,7 +103,7 @@ namespace dynarithmic
         if (fTraits.m_bCreateDirectory)
         {
             // auto-create the directory
-            const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(fTraits.m_filename.c_str(), false).c_str());
+            const auto dirCreated = fileutils::create_directory(fileutils::get_parent_directory(fTraits.m_filename.c_str(), false).c_str());
             if (!dirCreated.first)
             {
                 m_bFileCreated = false;
@@ -176,7 +181,7 @@ namespace dynarithmic
             case CTRL_CLOSE_EVENT:
             case CTRL_LOGOFF_EVENT:
             case CTRL_SHUTDOWN_EVENT:
-                dynarithmic::SysDestroyNoCheck();
+                SysDestroyNoCheck();
                 return TRUE;
             default:
                 return FALSE;
@@ -259,7 +264,7 @@ bool CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
             break;
             case FILE_LOGGING:
             {
-                auto filelogging = std::make_shared<File_Logger>(StringConversion::Convert_NativePtr_To_Ansi(pOutputFilename).c_str(), lTraits);
+                auto filelogging = std::make_shared<File_Logger>(stringconversion::Convert_NativePtr_To_Ansi(pOutputFilename).c_str(), lTraits);
                 if (filelogging->isFileCreated())
                 {
                     app_logger_map[FILE_LOGGING] = filelogging;
@@ -379,8 +384,8 @@ bool CLogSystem::Flush()
 std::string CLogSystem::GetBaseName(std::string_view path) const
 {
     StringArray rArray;
-    StringWrapperA::SplitPath(path.data(), rArray);
-    return rArray[StringWrapper::NAME_POS];
+    filenameutils::SplitPath(path, rArray);
+    return rArray[filenameutils::NAME_POS];
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -388,8 +393,8 @@ std::string CLogSystem::GetBaseName(std::string_view path) const
 std::string CLogSystem::GetBaseDir(std::string_view path) const
 {
     StringArray rArray;
-    StringWrapperA::SplitPath(path.data(), rArray);
-    return rArray[StringWrapper::DIRECTORY_POS];
+    filenameutils::SplitPath(path, rArray);
+    return rArray[filenameutils::DIRECTORY_POS];
 }
 
 void CLogSystem::OutputDebugStringFull(std::string_view s)

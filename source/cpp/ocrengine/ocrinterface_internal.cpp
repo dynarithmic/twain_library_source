@@ -20,6 +20,25 @@
  */
 #include "dtwaindefs.h"
 #include "OCRInterface.h"
+#include "ctlstringutils.h"
+#include "ctlstringconversion.h"
+#include <tchar.h>
+
+namespace dynarithmic
+{
+    LONG GetOCRInfo(OCREngine* pEngine, OCRINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen)
+    {
+        const CTL_StringType pName = stringconversion::Convert_Ansi_To_Native((pEngine->*pFunc)());
+        const int nLen = static_cast<int>(pName.length());
+        if (szInfo == nullptr)
+            return nLen;
+        const int nRealLen = (std::min)(static_cast<int>(nMaxLen), nLen);
+        basicstringutils::CopyN(szInfo, pName.c_str(), nRealLen);
+        szInfo[nRealLen] = _T('\0');
+        return nRealLen;
+    }
+}
+
 using namespace dynarithmic;
 
 OCRCapInfo& OCREngine::GetOCRCapInfo(LONG nCap) { return m_AllCapValues[nCap]; }
@@ -275,15 +294,3 @@ bool OCREngine::SetPDFFileTypes(OCRPDFInfo::enumPDFColorType nWhich, LONG fileTy
     return true;
 }
 
-typedef std::string(OCREngine::* OCRINFOFUNC)() const;
-LONG dynarithmic::GetOCRInfo(OCREngine* pEngine, OCRINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen)
-{
-    const CTL_StringType pName = StringConversion::Convert_Ansi_To_Native((pEngine->*pFunc)());
-    const int nLen = static_cast<int>(pName.length());
-    if (szInfo == nullptr)
-        return static_cast<LONG>(nLen);
-    const int nRealLen = (std::min)(static_cast<int>(nMaxLen), nLen);
-    StringTraits::CopyN(szInfo, pName.c_str(), nRealLen);
-    szInfo[nRealLen] = _T('\0');
-    return nRealLen;
-}

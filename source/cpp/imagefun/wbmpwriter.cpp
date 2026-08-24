@@ -19,6 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "wbmpwriter.h"
+using namespace dynarithmic;
 
 std::optional<PreparedWbmpDibPage> WbmpSessionWriter::MakePreparedWbmpDibPage(const dynarithmic::DibPageView& view)
 {
@@ -127,12 +128,12 @@ uint8_t WbmpSessionWriter::ReverseBits(uint8_t v)
     return v;
 }
 
-bool WbmpSessionWriter::WriteByte(uint8_t b)
+bool WbmpSessionWriter::WriteByte(uint8_t b) const
 {
     return std::fwrite(&b, 1, 1, file_) == 1;
 }
 
-bool WbmpSessionWriter::WriteMultiByteUInt(uint32_t value)
+bool WbmpSessionWriter::WriteMultiByteUInt(uint32_t value) const
 {
     // WBMP uses big-endian variable-length 7-bit groups.
     uint8_t tmp[5]{};
@@ -157,7 +158,7 @@ bool WbmpSessionWriter::WriteMultiByteUInt(uint32_t value)
     return true;
 }
 
-bool WbmpSessionWriter::WriteHeader()
+bool WbmpSessionWriter::WriteHeader() const
 {
     // TypeField = 0, FixHeaderField = 0
     if (!WriteByte(0))
@@ -175,7 +176,7 @@ bool WbmpSessionWriter::WriteHeader()
 
 bool WbmpSessionWriter::WriteBitmapData()
 {
-    const uint32_t rowBytes = static_cast<uint32_t>((currentPage_.width + 7) / 8);
+    const uint32_t rowBytes = (currentPage_.width + 7) / 8;
     rowBuffer_.resize(rowBytes);
 
     for (uint32_t y = 0; y < currentPage_.height; ++y)

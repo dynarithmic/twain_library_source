@@ -26,7 +26,7 @@ OF THIRD PARTY RIGHTS.
 
 namespace dynarithmic
 {
-    template<class T>
+    template<typename T>
     typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
         float_equal(T x, T y, int ulp=2)
     {

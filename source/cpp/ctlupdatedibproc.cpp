@@ -19,43 +19,50 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "dtwain.h"
-#include "ctltwainmanager.h"
+#include "dtwainc.h"
+#include "ctldtwainhandle.h"
+#include "ctltwainlogging.h"
+#include "ctltwaindllhandle.h"
+#include "winbit32.h"
+#include "ctltwainsource.h"
 using namespace dynarithmic;
 
-DTWAIN_DIBUPDATE_PROC DLLENTRY_DEF DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((DibProc))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const DTWAIN_DIBUPDATE_PROC oldproc = pHandle->m_pDibUpdateProc;
-    pHandle->m_pDibUpdateProc = DibProc;
-    LOG_FUNC_EXIT_NONAME_PARAMS(oldproc)
-    CATCH_BLOCK(nullptr)
-}
+    DTWAIN_DIBUPDATE_PROC DLLENTRY_DEF DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc)
+    {
+        LOG_FUNC_ENTRY_PARAMS((DibProc))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        const DTWAIN_DIBUPDATE_PROC oldproc = pHandle->m_pDibUpdateProc;
+        pHandle->m_pDibUpdateProc = DibProc;
+        LOG_FUNC_EXIT_NONAME_PARAMS(oldproc)
+        CATCH_BLOCK(nullptr)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DeleteDIB(HANDLE Dib)
-{
-    LOG_FUNC_ENTRY_PARAMS((Dib))
-    if (!Dib)
-        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-    UINT flags = GlobalFlags(Dib);
-    if (flags == GMEM_INVALID_HANDLE)
-        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-    UINT lockCount = flags & GMEM_LOCKCOUNT;
-    for (UINT i = 0; i < lockCount; ++i)
-        ImageMemoryHandler::GlobalUnlock(Dib);
-    auto ret = ImageMemoryHandler::GlobalFree(Dib);
-    if ( ret != NULL )
-        dynarithmic::LogWin32Error(ImageMemoryHandler::GetLastError());
-    LOG_FUNC_EXIT_NONAME_PARAMS(ret == NULL?TRUE:FALSE)
-    CATCH_BLOCK(FALSE)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DeleteDIB(HANDLE Dib)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Dib))
+        if (!Dib)
+            LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+        UINT flags = GlobalFlags(Dib);
+        if (flags == GMEM_INVALID_HANDLE)
+            LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+        UINT lockCount = flags & GMEM_LOCKCOUNT;
+        for (UINT i = 0; i < lockCount; ++i)
+            ImageMemoryHandler::GlobalUnlock(Dib);
+        auto ret = ImageMemoryHandler::GlobalFree(Dib);
+        if ( ret != NULL )
+            LogWin32Error(ImageMemoryHandler::GetLastError());
+        LOG_FUNC_EXIT_NONAME_PARAMS(ret == NULL?TRUE:FALSE)
+        CATCH_BLOCK(FALSE)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, hNewDib))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    pSource->SetUpdatedDIB(hNewDib);
-    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
-    CATCH_BLOCK(FALSE)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UpdateCurrentAcquiredImage(DTWAIN_SOURCE Source, HANDLE hNewDib)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, hNewDib))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        pSource->SetUpdatedDIB(hNewDib);
+        LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+        CATCH_BLOCK(FALSE)
+    }
 }

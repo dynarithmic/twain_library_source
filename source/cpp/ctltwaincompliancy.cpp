@@ -23,34 +23,38 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
+#include "ctlcapcontainerfuncs.h"
 
 using namespace dynarithmic;
 
 // Resets the pixel type to the original setting before the compliancy tests were run
-struct ResetPixelType
+namespace
 {
-    LONG origValue;
-    CTL_ITwainSource* m_pSourceRAII;
-    ResetPixelType(CTL_ITwainSource* pSource, LONG oValue) : m_pSourceRAII(pSource), origValue(oValue) {}
-    ~ResetPixelType()
+    struct ResetPixelType
     {
-        try
+        LONG origValue;
+        CTL_ITwainSource* m_pSourceRAII;
+        ResetPixelType(CTL_ITwainSource* pSource, LONG oValue) : m_pSourceRAII(pSource), origValue(oValue) {}
+        ~ResetPixelType()
         {
-            auto arr = CreateArrayFromFactory(m_pSourceRAII->GetDTWAINHandle(), DTWAIN_ARRAYLONG, 1).second;
-            if (arr)
+            try
             {
-                DTWAINArrayLowLevelPtr_RAII raii(m_pSourceRAII->GetDTWAINHandle(), &arr);
-                // get pointer to internals of the array
-                auto& vCurPtr = m_pSourceRAII->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(arr);
-                vCurPtr[0] = origValue;
-                SetCapValuesEx2_Internal(m_pSourceRAII, ICAP_PIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+                auto arr = CreateArrayFromFactory(m_pSourceRAII->GetDTWAINHandle(), DTWAIN_ARRAYLONG, 1).second;
+                if (arr)
+                {
+                    DTWAINArrayLowLevelPtr_RAII raii(m_pSourceRAII->GetDTWAINHandle(), &arr);
+                    // get pointer to internals of the array
+                    auto& vCurPtr = m_pSourceRAII->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(arr);
+                    vCurPtr[0] = origValue;
+                    SetCapValuesEx2_Internal(m_pSourceRAII, ICAP_PIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+                }
+            }
+            catch (...)
+            {
             }
         }
-        catch (...)
-        {
-        }
-    }
-};
+    };
+}
 
 std::pair<bool, int> TWAINCompliancyTester::TestPixelTypeCompliancy()
 {

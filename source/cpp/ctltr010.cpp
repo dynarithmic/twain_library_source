@@ -19,10 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr010.h"
-
-#include "ctliface.h"
 #include "ctltwainmanager.h"
-#include "twainfix32.h"
+
 using namespace dynarithmic;
 
 CTL_CapabilityTriplet::CTL_CapabilityTriplet(CTL_ITwainSession *pSession,
@@ -90,7 +88,7 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
             {
                 // Need to specially decode this to determine ItemType
                 // Get pointer to data
-                void *pCapData = static_cast<void*>(memfnptr->LockMemory(m_Capability.hContainer));
+                void *pCapData = memfnptr->LockMemory(m_Capability.hContainer);
 
                 // dereference to a TW_ONEVALUE structure.  Don't really
                 // care if item is not really TW_ONEVALUE since first

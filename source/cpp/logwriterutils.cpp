@@ -19,9 +19,29 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "logwriterutils.h"
-#include "ctliface.h"
-#include "cppfunc.h"
 #include "ctlstringutils.h"
+#include "ctlstringutilsx.h"
+#include "ctltwainmanager.h"
+#include "ctlstaticdata.h"
+#include "dtwain_config.h"
+#include "dtwainx.h"
+#include "ctllogcalls.h"
+
+namespace stringutils = dynarithmic::basicstringutils;
+
+namespace
+{
+    void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, std::string_view s)
+    {
+        std::ostringstream strm;
+        if (!func)
+            func = "(Uninitialized DTWAIN DLL)";
+        strm << "DTWAIN Function " << func << " returned error code " << nError << std::endl << std::endl;
+        strm << s.data();
+        const std::string st = strm.str();
+        MessageBoxA(nullptr, st.c_str(), "DTWAIN Error", MB_ICONSTOP);
+    }
+}
 
 namespace dynarithmic
 {
@@ -47,12 +67,12 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteLogInfoW(std::wstring_view s, bool bFlush)
     {
-        WriteLogInfoA(StringConversion::Convert_Wide_To_Ansi(s.data()), bFlush);
+        WriteLogInfoA(stringconversion::Convert_Wide_To_Ansi(s.data()), bFlush);
     }
 
     void LogWriterUtils::WriteLogInfo(CTL_StringViewType s, bool bFlush)
     {
-        WriteLogInfoA(StringConversion::Convert_NativePtr_To_Ansi(s.data()));
+        WriteLogInfoA(stringconversion::Convert_NativePtr_To_Ansi(s.data()));
     }
 
     void LogWriterUtils::WriteLogInfoIndentedA(std::string_view s)
@@ -64,19 +84,19 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteLogInfoIndentedW(std::wstring_view s)
     {
-        WriteLogInfoIndentedA(StringConversion::Convert_WidePtr_To_Ansi(s.data()));
+        WriteLogInfoIndentedA(stringconversion::Convert_WidePtr_To_Ansi(s.data()));
     }
 
     void LogWriterUtils::WriteLogInfoIndented(CTL_StringViewType s)
     {
-        WriteLogInfoIndentedA(StringConversion::Convert_NativePtr_To_Ansi(s.data()));
+        WriteLogInfoIndentedA(stringconversion::Convert_NativePtr_To_Ansi(s.data()));
     }
 
     void LogWriterUtils::MultiLineWriter(std::string_view s, const char* pszDelim, int nWhich)
     {
         #if DTWAIN_BUILD_LOGCALLSTACK == 1
-        StringWrapperA::StringArrayType sArray;
-        StringWrapperA::Tokenize(s.data(), pszDelim, sArray, true);
+        std::vector<CTL_StringTypeA> sArray;
+        stringutils::Tokenize(s.data(), pszDelim, sArray, true);
         for (auto& oneString : sArray)
             CTL_LogFunctionCallA(CTL_StaticData::GetLogFilterFlags(), oneString.c_str(), nWhich);
         #endif
@@ -84,8 +104,8 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteMultiLineInfo(CTL_StringViewType s, const CTL_StringType::traits_type::char_type* pszDelim)
     {
-        WriteMultiLineInfoA(StringConversion::Convert_NativePtr_To_Ansi(s.data()), 
-                            StringConversion::Convert_NativePtr_To_Ansi(pszDelim).c_str());
+        WriteMultiLineInfoA(stringconversion::Convert_NativePtr_To_Ansi(s.data()), 
+                            stringconversion::Convert_NativePtr_To_Ansi(pszDelim).c_str());
     }
 
     void LogWriterUtils::WriteMultiLineInfoA(std::string_view s, const char* pszDelim)
@@ -95,14 +115,14 @@ namespace dynarithmic
     
     void LogWriterUtils::WriteMultiLineInfoW(std::wstring_view s, const wchar_t* pszDelim)
     {
-        WriteMultiLineInfoA(StringConversion::Convert_WidePtr_To_Ansi(s.data()),
-                            StringConversion::Convert_WidePtr_To_Ansi(pszDelim).c_str());
+        WriteMultiLineInfoA(stringconversion::Convert_WidePtr_To_Ansi(s.data()),
+                            stringconversion::Convert_WidePtr_To_Ansi(pszDelim).c_str());
     }
 
     void LogWriterUtils::WriteMultiLineInfoIndented(CTL_StringViewType s, const CTL_StringType::traits_type::char_type* pszDelim)
     {
-        WriteMultiLineInfoIndentedA(StringConversion::Convert_NativePtr_To_Ansi(s.data()),
-                                    StringConversion::Convert_NativePtr_To_Ansi(pszDelim).c_str());
+        WriteMultiLineInfoIndentedA(stringconversion::Convert_NativePtr_To_Ansi(s.data()),
+                                    stringconversion::Convert_NativePtr_To_Ansi(pszDelim).c_str());
     }
     
     void LogWriterUtils::WriteMultiLineInfoIndentedA(std::string_view s, const char* pszDelim)
@@ -112,7 +132,42 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteMultiLineInfoIndentedW(std::wstring_view s, const wchar_t* pszDelim)
     {
-        WriteMultiLineInfoIndentedA(StringConversion::Convert_WidePtr_To_Ansi(s.data()),
-                                    StringConversion::Convert_WidePtr_To_Ansi(pszDelim).c_str());
+        WriteMultiLineInfoIndentedA(stringconversion::Convert_WidePtr_To_Ansi(s.data()),
+                                    stringconversion::Convert_WidePtr_To_Ansi(pszDelim).c_str());
+    }
+
+    void OutputDTWAINErrorW(const CTL_TwainDLLHandle* pHandle, LPCWSTR pFunc)
+    {
+        if ( pFunc )
+            OutputDTWAINError(pHandle, stringconversion::Convert_Wide_To_Ansi(pFunc).c_str());
+        else
+            OutputDTWAINError(pHandle);
+    }
+
+    void OutputDTWAINErrorA(const CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
+    {
+        OutputDTWAINError(pHandle, pFunc);
+    }
+
+    void OutputDTWAINError(const CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
+    {
+        auto logFilterFlags = CTL_StaticData::GetLogFilterFlags();
+        if (!(logFilterFlags & DTWAIN_LOG_DTWAINERRORS))
+            return;
+        static constexpr int MaxMessage = DTWAIN_USERRES_MAXSIZE;
+        char szBuf[MaxMessage + 1]{};
+        if (!pHandle)
+            DTWAIN_GetErrorStringA(DTWAIN_ERR_BAD_HANDLE, szBuf, MaxMessage);
+        else
+            CTL_TwainAppMgr::GetLastErrorString(szBuf, MaxMessage);
+        std::string_view s(szBuf);
+        if (pHandle)
+            LogWriterUtils::WriteLogInfoIndentedA(s);
+
+        if (logFilterFlags & DTWAIN_LOG_ERRORMSGBOX && pHandle)
+            LogDTWAINErrorToMsgBox(pHandle->m_lLastError, pFunc, s);
+        else
+        if (!pHandle && logFilterFlags & DTWAIN_LOG_INITFAILURE)
+            LogDTWAINErrorToMsgBox(DTWAIN_ERR_BAD_HANDLE, nullptr, s);
     }
 }

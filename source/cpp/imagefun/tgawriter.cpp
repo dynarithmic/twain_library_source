@@ -18,11 +18,11 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <windows.h>
 #include <cstdint>
-#include <cstring>
 #include <array>
 #include "tgawriter.h"
+
+using namespace dynarithmic;
 
 std::optional<PreparedTgaDibPage> TgaSessionWriter::MakePreparedTgaDibPage(const dynarithmic::DibPageView& view)
 {
@@ -118,7 +118,7 @@ bool TgaSessionWriter::WriteCurrentPage()
         return WriteImageRaw();
 }
 
-bool TgaSessionWriter::WriteExtensionAreaWithComments()
+bool TgaSessionWriter::WriteExtensionAreaWithComments() const
 {
     const uint32_t extensionOffset =
         static_cast<uint32_t>(std::ftell(file_));
@@ -147,7 +147,7 @@ bool TgaSessionWriter::WriteExtensionAreaWithComments()
 
     footer.extensionOffset = extensionOffset;
     footer.developerOffset = 0;
-
+    
     std::memcpy(footer.signature, "TRUEVISION-XFILE.", 17);
     footer.signature[17] = '\0';
 
@@ -201,7 +201,7 @@ TgaHeader TgaSessionWriter::BuildHeader() const
     hdr.image_type = GetImageType();
     hdr.color_map_first_entry = 0;
     hdr.color_map_length = UsesColorMap()
-        ? static_cast<uint16_t>(GetColorMapLength())
+        ? GetColorMapLength()
         : 0;
     hdr.color_map_entry_size = UsesColorMap() ? 24 : 0;
     hdr.x_origin = 0;
@@ -269,7 +269,7 @@ uint8_t TgaSessionWriter::GetImageDescriptor() const
     return desc;
 }
 
-bool TgaSessionWriter::WriteColorMap()
+bool TgaSessionWriter::WriteColorMap() const
 {
     if (!UsesColorMap())
         return true;
@@ -364,16 +364,8 @@ bool TgaSessionWriter::PrepareRow(const uint8_t* src, uint8_t* dst, uint32_t row
     {
         case TgaPixelFlavor::Palette8:
         case TgaPixelFlavor::Gray8:
-            std::memcpy(dst, src, rowBytes);
-            return true;
-
         case TgaPixelFlavor::Bgr24:
-            // DIB is already BGR, same as TGA true-color byte order.
-            std::memcpy(dst, src, rowBytes);
-            return true;
-
         case TgaPixelFlavor::Bgra32:
-            // DIB is already BGRA, same as TGA true-color+alpha byte order.
             std::memcpy(dst, src, rowBytes);
             return true;
     }
@@ -385,7 +377,7 @@ bool TgaSessionWriter::PixelsEqual(const uint8_t* a, const uint8_t* b, uint32_t 
     return std::memcmp(a, b, pixelBytes) == 0;
 }
 
-bool TgaSessionWriter::WriteRleRow(const uint8_t* row, uint32_t width, uint32_t pixelBytes)
+bool TgaSessionWriter::WriteRleRow(const uint8_t* row, uint32_t width, uint32_t pixelBytes) const
 {
     uint32_t x = 0;
 
@@ -443,7 +435,7 @@ bool TgaSessionWriter::WriteRleRow(const uint8_t* row, uint32_t width, uint32_t 
         if (std::fwrite(&header, 1, 1, file_) != 1)
             return false;
 
-        const size_t rawBytes = static_cast<size_t>(rawLen) * pixelBytes;
+        const size_t rawBytes = rawLen * pixelBytes;
         if (std::fwrite(row + rawStart * pixelBytes, 1, rawBytes, file_) != rawBytes)
             return false;
     }

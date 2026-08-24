@@ -1,7 +1,8 @@
-#include "AES.h"
-
 #include <stdexcept>
 #include <string>
+#include "AES.h"
+
+using namespace dynarithmic;
 
 const unsigned char sbox[16][16] = {
     {0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b,
@@ -257,7 +258,7 @@ AES::AES(const AESKeyLength keyLength) {
 
 std::vector<unsigned char> AES::EncryptECB(const unsigned char in[], 
                                            unsigned int inLen,
-                                           const unsigned char key[]) 
+                                           const unsigned char key[]) const
 {
   CheckLength(inLen);
   std::vector<unsigned char> out(inLen);
@@ -272,7 +273,7 @@ std::vector<unsigned char> AES::EncryptECB(const unsigned char in[],
 }
 
 std::vector<unsigned char> AES::DecryptECB(const unsigned char in[], unsigned int inLen,
-                                           const unsigned char key[]) 
+                                           const unsigned char key[]) const
 {
     CheckLength(inLen);
     std::vector<unsigned char> out(inLen);
@@ -288,7 +289,7 @@ std::vector<unsigned char> AES::DecryptECB(const unsigned char in[], unsigned in
 
 std::vector<unsigned char> AES::EncryptCBC(const unsigned char in[], unsigned int inLen,
                                            const unsigned char key[],
-                                           const unsigned char *iv) 
+                                           const unsigned char *iv) const
 {
     CheckLength(inLen);
     std::vector<unsigned char> out(inLen);
@@ -307,7 +308,7 @@ std::vector<unsigned char> AES::EncryptCBC(const unsigned char in[], unsigned in
 
 std::vector<unsigned char> AES::DecryptCBC(const unsigned char in[], unsigned int inLen,
                                            const unsigned char key[],
-                                           const unsigned char *iv) 
+                                           const unsigned char *iv) const
 {
     CheckLength(inLen);
     std::vector<unsigned char> out(inLen);
@@ -326,7 +327,7 @@ std::vector<unsigned char> AES::DecryptCBC(const unsigned char in[], unsigned in
 
 std::vector<unsigned char> AES::EncryptCFB(const unsigned char in[], unsigned int inLen,
                                            const unsigned char key[],
-                                           const unsigned char *iv) 
+                                           const unsigned char *iv) const
 {
     CheckLength(inLen);
     std::vector<unsigned char> out(inLen);
@@ -346,7 +347,7 @@ std::vector<unsigned char> AES::EncryptCFB(const unsigned char in[], unsigned in
 
 std::vector<unsigned char> AES::DecryptCFB(const unsigned char in[], unsigned int inLen,
                                            const unsigned char key[],
-                                           const unsigned char *iv) 
+                                           const unsigned char *iv) const
 {
     CheckLength(inLen);
     std::vector<unsigned char> out(inLen);
@@ -372,9 +373,10 @@ void AES::CheckLength(unsigned int len) {
 }
 
 void AES::EncryptBlock(const unsigned char in[], unsigned char out[],
-                       unsigned char *roundKeys) {
+                       unsigned char *roundKeys) const
+{
   unsigned char state[4][Nb];
-  unsigned int i, j, round;
+  unsigned int i, j;
 
   for (i = 0; i < 4; i++) {
     for (j = 0; j < Nb; j++) {
@@ -384,7 +386,7 @@ void AES::EncryptBlock(const unsigned char in[], unsigned char out[],
 
   AddRoundKey(state, roundKeys);
 
-  for (round = 1; round <= Nr - 1; round++) {
+  for (unsigned int round = 1; round <= Nr - 1; round++) {
     SubBytes(state);
     ShiftRows(state);
     MixColumns(state);
@@ -403,9 +405,10 @@ void AES::EncryptBlock(const unsigned char in[], unsigned char out[],
 }
 
 void AES::DecryptBlock(const unsigned char in[], unsigned char out[],
-                       unsigned char *roundKeys) {
+                       unsigned char *roundKeys) const
+{
   unsigned char state[4][Nb];
-  unsigned int i, j, round;
+  unsigned int i, j;
 
   for (i = 0; i < 4; i++) {
     for (j = 0; j < Nb; j++) {
@@ -415,7 +418,7 @@ void AES::DecryptBlock(const unsigned char in[], unsigned char out[],
 
   AddRoundKey(state, roundKeys + Nr * 4 * Nb);
 
-  for (round = Nr - 1; round >= 1; round--) {
+  for (unsigned int round = Nr - 1; round >= 1; round--) {
     InvSubBytes(state);
     InvShiftRows(state);
     AddRoundKey(state, roundKeys + round * 4 * Nb);
@@ -530,7 +533,8 @@ void AES::Rcon(unsigned char *a, unsigned int n) {
   a[1] = a[2] = a[3] = 0;
 }
 
-void AES::KeyExpansion(const unsigned char key[], unsigned char w[]) {
+void AES::KeyExpansion(const unsigned char key[], unsigned char w[]) const
+{
   unsigned char temp[4];
   unsigned char rcon[4];
 
@@ -611,39 +615,39 @@ void AES::XorBlocks(const unsigned char *a, const unsigned char *b,
 std::vector<unsigned char> AES::EncryptECB(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key) 
 {
-   return EncryptECB(in.data(), (unsigned int)in.size(), key.data());
+   return EncryptECB(in.data(), in.size(), key.data());
 }
 
 std::vector<unsigned char> AES::DecryptECB(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key) 
 {
-    return DecryptECB(in.data(), (unsigned int)in.size(), key.data());
+    return DecryptECB(in.data(), in.size(), key.data());
 }
 
 std::vector<unsigned char> AES::EncryptCBC(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key,
                                            const std::vector<unsigned char>& iv) 
 {
-   return EncryptCBC(in.data(), (unsigned int)in.size(), key.data(), iv.data());
+   return EncryptCBC(in.data(), in.size(), key.data(), iv.data());
 }
 
 std::vector<unsigned char> AES::DecryptCBC(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key,
                                            const std::vector<unsigned char>& iv) 
 {
-    return DecryptCBC(in.data(), (unsigned int)in.size(), key.data(), iv.data());
+    return DecryptCBC(in.data(), in.size(), key.data(), iv.data());
 }
 
 std::vector<unsigned char> AES::EncryptCFB(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key,
                                            const std::vector<unsigned char>& iv) 
 {
-    return EncryptCFB(in.data(), (unsigned int)in.size(), key.data(), iv.data());
+    return EncryptCFB(in.data(), in.size(), key.data(), iv.data());
 }
 
 std::vector<unsigned char> AES::DecryptCFB(const std::vector<unsigned char>& in,
                                            const std::vector<unsigned char>& key,
                                            const std::vector<unsigned char>& iv) 
 {
-    return DecryptCFB(in.data(), (unsigned int)in.size(), key.data(), iv.data());
+    return DecryptCFB(in.data(), in.size(), key.data(), iv.data());
 }

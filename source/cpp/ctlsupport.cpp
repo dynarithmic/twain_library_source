@@ -18,54 +18,57 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "dtwain.h"
-#include "ctliface.h"
-#include "ctltwainmanager.h"
+
 #include "arrayfactory.h"
 #include "ctlsupport.h"
 #include "ctlsetgetcaps.h"
+#include "ctlstringutilsx.h"
+#include "ctltwaindllhandle.h"
+#include "ctltwainsource.h"
 
 using namespace dynarithmic;
 
 ///////////////////////////////////////////////////////////////////////////
-bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, LONG Cap, LONG GetType)
+namespace dynarithmic
 {
-    if ( nLen > 0 )
-        sz[0] = _T('\0');
-    DTWAIN_ARRAY Array = nullptr;
-    const bool bRet = DTWAIN_GetCapValuesEx2(Source, Cap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array)?true:false;
-    if (!bRet || !Array )
-        return false;
-    const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-    DTWAINArrayLowLevel_RAII raii(pHandle, Array);
-    CTL_StringType sVal;
-    pHandle->m_ArrayFactory->get_value(Array, 0, &sVal);
-    StringWrapper::CopyInfoToCString(sVal,sz,nLen);
-    return bRet;
+    bool GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, LONG Cap, LONG GetType)
+    {
+        if (nLen > 0)
+            sz[0] = _T('\0');
+        DTWAIN_ARRAY Array = nullptr;
+        const bool bRet = DTWAIN_GetCapValuesEx2(Source, Cap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+        if (!bRet || !Array)
+            return false;
+        const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+        DTWAINArrayLowLevel_RAII raii(pHandle, Array);
+        CTL_StringType sVal;
+        pHandle->m_ArrayFactory->get_value(Array, 0, &sVal);
+        CopyInfoToCString(sVal, sz, nLen);
+        return bRet;
+    }
+
+
+    bool EnumSupported(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG Cap)
+    {
+        const bool bRet = GetCapValuesEx2_Internal(reinterpret_cast<CTL_ITwainSource*>(Source), Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray) ? true : false;
+        return bRet;
+    }
+
+
+    bool SetSupportArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY Array, LONG Cap)
+    {
+        return DTWAIN_SetCapValuesEx2(Source, Cap, DTWAIN_CAPSETAVAILABLE, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array) ? true : false;
+    }
+
+    bool GetSupportArray(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, LONG Cap, LONG GetType/*=DTWAIN_CAPGET*/)
+    {
+        return DTWAIN_GetCapValuesEx2(Source, Cap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array) ? true : false;
+    }
+
+    LONG CheckEnabled(DTWAIN_SOURCE Source, LONG CapVal)
+    {
+        LONG IsEnabled = 0;
+        GetSupport<CTL_ArrayFactory::tagged_array_long>(Source, &IsEnabled, CapVal, DTWAIN_CAPGETCURRENT);
+        return IsEnabled;
+    }
 }
-
-
-bool dynarithmic::EnumSupported(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG Cap)
-{
-    const bool bRet = GetCapValuesEx2_Internal(reinterpret_cast<CTL_ITwainSource*>(Source), Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray)?true:false;
-    return bRet;
-}
-
-
-bool dynarithmic::SetSupportArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY Array, LONG Cap)
-{
-    return DTWAIN_SetCapValuesEx2(Source, Cap, DTWAIN_CAPSETAVAILABLE, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array)?true:false;
-}
-
-bool dynarithmic::GetSupportArray(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, LONG Cap, LONG GetType/*=DTWAIN_CAPGET*/)
-{
-    return DTWAIN_GetCapValuesEx2(Source, Cap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array)?true:false;
-}
-
-LONG dynarithmic::CheckEnabled(DTWAIN_SOURCE Source, LONG CapVal)
-{
-    LONG IsEnabled = 0;
-    GetSupport<CTL_ArrayFactory::tagged_array_long>(Source, &IsEnabled, CapVal, DTWAIN_CAPGETCURRENT);
-    return IsEnabled;
-}
-

@@ -18,16 +18,18 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
-#include "ctltwainmanager.h"
+
 #include "ctlloadresources.h"
 #include "ctldib32ex.h"
 #include "logwriterutils.h"
+#include "ctlstaticdata.h"
+#include "mapdefs.h"
+#include "ctldib32.h"
+#include "ctlinternalconstants.h"
 
 using namespace dynarithmic;
 
-boost::container::flat_map<LONG, std::vector<uint16_t>> CTL_ImageIOHandler::s_supportedBitDepths;
+BASIC_MAPTYPE_<LONG, std::vector<uint16_t>> CTL_ImageIOHandler::s_supportedBitDepths;
 
 CTL_ImageIOHandler::CTL_ImageIOHandler() : 
     pMultiDibData(nullptr), 

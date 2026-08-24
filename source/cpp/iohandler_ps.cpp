@@ -19,8 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "iohandler_ps.h"
-#include "ctliface.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
@@ -70,7 +70,7 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
                 break;
         }
 
-        std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+        std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
         opts.creator = GetCopyrightString();
 

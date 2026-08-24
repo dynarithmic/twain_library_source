@@ -22,8 +22,9 @@
 #define CTLTR010_H
 
 #include "ctltripletbase.h"
-#include "ctltwainsession.h"
 #include "ctlobtyp.h"
+#include "dtwaindefs.h"
+
 namespace dynarithmic
 {
     class CTL_CapabilityTriplet : public CTL_TwainTriplet

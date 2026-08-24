@@ -20,7 +20,7 @@
  */
 #include "ctltr015.h"
 #include "ctlobtyp.h"
-#include "twainfix32.h"
+#include "ctltwainsession.h"
 
 using namespace dynarithmic;
 
@@ -65,7 +65,7 @@ bool CTL_CapabilityGetRangeTriplet::EnumCapValues( void *pCapData )
     const CTL_TwainTypeObPtr pOb = std::make_shared<CTL_TwainTypeOb>(sessionHandle, static_cast<TW_UINT16>(sizeof(TW_RANGE)), false);
 
     // Copy Data to pOb
-    pOb->CopyData( static_cast<void*>(pRange) );
+    pOb->CopyData( pRange );
 
     // Store this object in object array
     pArray->push_back( pOb );

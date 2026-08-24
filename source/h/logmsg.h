@@ -22,12 +22,11 @@
 
 #ifndef CLogSystem_H
 #define CLogSystem_H
-#include "ctlobstr.h"
 #include <memory>
 #include <unordered_map>
 #include <fstream>
 #include <mutex>
-#include <string>
+#include "ctlstringdefs.h"
 
 /////////////////////////////////////////////////////////////////////////////
 namespace dynarithmic

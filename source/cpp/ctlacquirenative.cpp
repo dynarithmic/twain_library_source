@@ -22,72 +22,59 @@
 #include "ctltwainmanager.h"
 #include "ctltwainmsgloop.h"
 #include "sourceacquireopts.h"
-#include "ctllogfunctioncall.h"
-#include "sourceselectopts.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 #include <errorcheck.h>
+#include "ctldtwainhandle.h"
+#include "ctlsourceacquire.h"
 using namespace dynarithmic;
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus)) 
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    AcquireAttemptRAII aRaii(pSource);
-
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
-                                                           setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIRENATIVE);
-    const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if ( opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED )
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(),"",false);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-DTWAIN_BOOL   DLLENTRY_DEF  DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,DTWAIN_ARRAY Acquisitions,
-                                                   LPLONG pStatus)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    AcquireAttemptRAII aRaii(pSource);
-    SourceAcquireOptions opts = SourceAcquireOptions().setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
-            setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
-            setAcquireType(ACQUIRENATIVEEX).setHandle(pHandle);
-
-    const bool bRet = AcquireExHelper(opts);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireNative(SourceAcquireOptions& opts)
-{
-    opts.setActualAcquireType(TWAINAcquireType_Native);
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
-    const auto pHandle = pSource->GetDTWAINHandle();
-    if ( pHandle->m_lAcquireMode == DTWAIN_MODELESS )
-         return LLAcquireImage(opts);
-    auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
-    DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
-    if (pr.first != DTWAIN_NO_ERROR)
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
     {
-        CTL_TwainAppMgr::DisableUserInterface(pSource);
-        return DTWAIN_FAILURE1;
+        LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus)) 
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto aDibs = AcquireHelper(pHandle, pSource, ACQUIRENATIVE, 
+                                                       false, DTWAIN_USENATIVE, false, nullptr, 
+                                                       PixelType, nMaxPages, bShowUI, nullptr, pStatus);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(aDibs.first)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
     }
-    return pr.second;
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,DTWAIN_ARRAY Acquisitions,
+                                                       LPLONG pStatus)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const bool bRet = AcquireHelper(pHandle, pSource, ACQUIRENATIVEEX,
+                                        false, DTWAIN_USENATIVE, false, Acquisitions, 
+                                        PixelType, nMaxPages, bShowUI, nullptr, pStatus).second;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+}
+
+namespace dynarithmic
+{
+    DTWAIN_ACQUIRE DTWAIN_LLAcquireNative(SourceAcquireOptions& opts)
+    {
+        opts.setActualAcquireType(TWAINAcquireType_Native);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+        const auto pHandle = pSource->GetDTWAINHandle();
+        if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
+            return LLAcquireImage(opts);
+        auto pr = StartModalMessageLoop(pSource, opts);
+        DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
+        if (pr.first != DTWAIN_NO_ERROR)
+        {
+            CTL_TwainAppMgr::DisableUserInterface(pSource);
+            return DTWAIN_FAILURE1;
+        }
+        return pr.second;
+    }
 }

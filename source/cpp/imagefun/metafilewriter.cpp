@@ -19,33 +19,37 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "metafilewriter.h"
-#include <windows.h>
 
-#pragma pack(push, 1)
-struct AldusPlaceableHeader
+using namespace dynarithmic;
+
+namespace
 {
-    DWORD key = 0x9AC6CDD7;
-    WORD  hmf = 0;
-    SHORT left = 0;
-    SHORT top = 0;
-    SHORT right = 0;
-    SHORT bottom = 0;
-    WORD  inch = 1440;
-    DWORD reserved = 0;
-    WORD  checksum = 0;
-};
+#pragma pack(push, 1)
+    struct AldusPlaceableHeader
+    {
+        DWORD key = 0x9AC6CDD7;
+        WORD  hmf = 0;
+        SHORT left = 0;
+        SHORT top = 0;
+        SHORT right = 0;
+        SHORT bottom = 0;
+        WORD  inch = 1440;
+        DWORD reserved = 0;
+        WORD  checksum = 0;
+    };
 #pragma pack(pop)
 
-static WORD ComputePlaceableChecksum(const AldusPlaceableHeader& h)
-{
-    const WORD* p = reinterpret_cast<const WORD*>(&h);
-    WORD sum = 0;
+    WORD ComputePlaceableChecksum(const AldusPlaceableHeader& h)
+    {
+        const WORD* p = reinterpret_cast<const WORD*>(&h);
+        WORD sum = 0;
 
-    // checksum covers first 10 WORDs, excluding checksum itself
-    for (int i = 0; i < 10; ++i)
-        sum ^= p[i];
+        // checksum covers first 10 WORDs, excluding checksum itself
+        for (int i = 0; i < 10; ++i)
+            sum ^= p[i];
 
-    return sum;
+        return sum;
+    }
 }
 
 std::optional<PreparedMetafileDibPage> MetafileSessionWriter::MakePreparedMetafileDibPage(const dynarithmic::DibPageView& view)
@@ -125,7 +129,7 @@ int MetafileSessionWriter::To01mm(double pixels, double dpi)
     return static_cast<int>((pixels / dpi) * 25.4 * 100.0 + 0.5);
 }
 
-bool MetafileSessionWriter::WriteEmf(const PreparedMetafileDibPage& page)
+bool MetafileSessionWriter::WriteEmf(const PreparedMetafileDibPage& page) const
 {
     HDC refDC = GetDC(nullptr);
     if (!refDC)

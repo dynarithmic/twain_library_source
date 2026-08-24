@@ -21,12 +21,13 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCompressionSize(DTWAIN_SOURCE Source, LPLONG lBytes)
+extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCompressionSize(DTWAIN_SOURCE Source, LPDWORD lBytes)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lBytes))
     auto [pHandle, pSource] = VerifyHandles(Source);

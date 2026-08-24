@@ -21,14 +21,19 @@
 #include <webp/mux.h>
 #include "webpwriter.h"
 
-static int WebPWriterCallback(const uint8_t* data, size_t data_size, const WebPPicture* picture)
-{
-    if (!data || !picture || !picture->custom_ptr)
-        return 0;
+using namespace dynarithmic;
 
-    auto* ctx = static_cast<WebPMemoryWriterContext*>(picture->custom_ptr);
-    ctx->data.insert(ctx->data.end(), data, data + data_size);
-    return 1;
+namespace
+{
+    int WebPWriterCallback(const uint8_t* data, size_t data_size, const WebPPicture* picture)
+    {
+        if (!data || !picture || !picture->custom_ptr)
+            return 0;
+
+        auto* ctx = static_cast<WebPMemoryWriterContext*>(picture->custom_ptr);
+        ctx->data.insert(ctx->data.end(), data, data + data_size);
+        return 1;
+    }
 }
 
 std::optional<PreparedWebPDibPage> WebPSessionWriter::MakePreparedWebPDibPage(const dynarithmic::DibPageView& view)
@@ -194,7 +199,7 @@ bool WebPSessionWriter::ImportBgr24(WebPPicture& picture)
             currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
 
         uint8_t* dst =
-            rgbBuffer_.data() + static_cast<size_t>(y) * rowBytes;
+            rgbBuffer_.data() + y * rowBytes;
 
         for (uint32_t x = 0; x < currentPage_.width; ++x)
         {
@@ -223,7 +228,7 @@ bool WebPSessionWriter::ImportBgra32(WebPPicture& picture)
             currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
 
         uint8_t* dst =
-            rgbaBuffer_.data() + static_cast<size_t>(y) * rowBytes;
+            rgbaBuffer_.data() + y * rowBytes;
 
         for (uint32_t x = 0; x < currentPage_.width; ++x)
         {

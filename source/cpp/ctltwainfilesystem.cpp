@@ -19,552 +19,574 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "dtwain.h"
-#include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctltr037.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
+#include "dtwainx.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
+namespace stringutils = basicstringutils;
 
-#define GET_FIRST           0
-#define GET_NEXT            1
-#define GET_CLOSE           2
-#define GET_FILE_TYPE       3
-#define CHANGE_DIRECTORY    4
-#define CREATE_DIRECTORY    5
-#define COPY_DIRECTORY      6
-#define RENAME_DIRECTORY    7
-#define DELETE_DIRECTORY    8
-#define FORMAT_MEDIA        9
+enum
+{
+    GET_FIRST = 0,
+    GET_NEXT = 1,
+    GET_CLOSE = 2,
+    GET_FILE_TYPE = 3,
+    CHANGE_DIRECTORY = 4,
+    CREATE_DIRECTORY = 5,
+    COPY_DIRECTORY = 6,
+    RENAME_DIRECTORY = 7,
+    DELETE_DIRECTORY = 8,
+    FORMAT_MEDIA = 9
+};
 
-#define DTWAIN_FT_ALLCAMERAS     0xFFFF
+enum
+{
+    DTWAIN_FT_ALLCAMERAS = 0xFFFF
+};
 
 using FileSysRetType = std::pair<LONG, TW_MEMREF>;
-static FileSysRetType FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich);
-static FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHandle, LONG nWhich);
-static DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* Source, LPCTSTR szFileName, TW_FILESYSTEM* pFS);
-static bool FSGetCameras(CTL_ITwainSource *pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType );
-static bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFS, TW_UINT16 rc);
-static FileSysRetType FSFileOp(CTL_ITwainSource* pSource, LPCTSTR sInput, LPCTSTR sOutput, LONG nWhich);
-static DTWAIN_BOOL FSFileOp2(CTL_ITwainSource* pSource, LPCTSTR sInput, DTWAIN_BOOL bRecursive, LONG nWhich);
-
 typedef bool (*WALKFSPROC)(TW_FILESYSTEM* p, LPARAM UserParam);
-static bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szDir, LPARAM UserParam);
-static bool EnumCameraProc(TW_FILESYSTEM* p, LPARAM UserParam);
 
-static int CheckFileSystemSupport(CTL_ITwainSource* pSource)
+namespace
 {
-    // If source is not open, return an error
-    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
-        return DTWAIN_ERR_SOURCE_NOT_OPEN;
+    FileSysRetType FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich);
+    FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHandle, LONG nWhich);
+    DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* Source, LPCTSTR szFileName, TW_FILESYSTEM* pFS);
+    bool FSGetCameras(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType);
+    bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFS, TW_UINT16 rc);
+    FileSysRetType FSFileOp(CTL_ITwainSource* pSource, LPCTSTR sInput, LPCTSTR sOutput, LONG nWhich);
+    DTWAIN_BOOL FSFileOp2(CTL_ITwainSource* pSource, LPCTSTR sInput, DTWAIN_BOOL bRecursive, LONG nWhich);
+    bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart, LPARAM UserParam);
+    bool EnumCameraProc(TW_FILESYSTEM* p, LPARAM UserParam);
+    int CheckFileSystemSupport(CTL_ITwainSource* pSource);
+}
 
-    auto getSupport = pSource->IsFileSystemSupported();
+namespace
+{
+    struct CameraStruct {
+        DTWAIN_ARRAY aCameras = {};
+        TW_UINT16 CameraType;
+    };
 
-    // If already determined that source does not support
-    // file system, return error.
-    if (!getSupport)
-        return DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED;
-
-    if (getSupport.value == boost::tribool::indeterminate_value)
+    DTWAIN_ARRAY GenericEnumCameras(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
     {
-        // Test if source supports file system
-
-        // See if DAT_FILESYSTEM is one of the supported DATS
-        DTWAIN_BOOL bRet = false;
-        const auto& vDats = pSource->GetSupportedDATS();
-        if (std::find_if(vDats.begin(), vDats.end(), 
-            [](TW_UINT32 val) { return (val & 0x0000FFFF) == DAT_FILESYSTEM; }) != vDats.end())
-                bRet = true;
-        else
-            // No support directly, so try changing to the root directory
-            bRet = FSDirectory(pSource, _T("/"), CHANGE_DIRECTORY).first;
-        pSource->SetFileSystemSupported(bRet);
-
-        // return results
-        return bRet?DTWAIN_NO_ERROR:DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED;
-    }
-
-    // Already tested and determined that source supports file system
-    return DTWAIN_NO_ERROR;
-}
-
-/**********************************************************************************/
-/**********************************************************************************/
-/**********************************************************************************/
-struct GetFileOpTraits
-{
-    static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPTSTR sz, LPTSTR /* */, TW_MEMREF FSHandle, int operation)
-    {
-        return FSGetFile(pSource, sz, FSHandle, operation);
-    }
-};
-
-struct FileOpTraits
-{
-    static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPCTSTR sz, LPCTSTR sz2, TW_MEMREF /*FSHandle*/, int operation)
-    {
-        return FSFileOp(pSource, sz, sz2, operation);
-    }
-};
-
-struct DirectoryOpTraits
-{
-    static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPCTSTR sz, LPCTSTR sz2, TW_MEMREF /*FSHandle*/, int operation)
-    {
-        return FSDirectory(pSource, sz, operation);
-    }
-};
-
-template <typename StringType=LPTSTR, typename Fn = GetFileOpTraits>
-static std::pair<int, FileSysRetType> PerfomFileSystemOperation(DTWAIN_SOURCE Source, StringType szDir, StringType szDir2, TW_MEMREF FSHandle, int operation)
-{
-    CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    int fsSupported = CheckFileSystemSupport(pSource);
-    if (fsSupported != DTWAIN_NO_ERROR)
-        return { fsSupported, {false, {} } };
-    auto bRet = Fn::DoOperation(pSource, szDir, szDir2, FSHandle, operation); 
-    return { DTWAIN_NO_ERROR, {bRet.first, bRet.second } };
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source )
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    int fsSupported = CheckFileSystemSupport(pSource);
-    DTWAIN_Check_Error_Condition_NoThrow_Ex(pSource->GetDTWAINHandle(), [&] { return fsSupported != DTWAIN_NO_ERROR; },
-                                      fsSupported, false, FUNC_MACRO, true);
-
-    LOG_FUNC_EXIT_NONAME_PARAMS(fsSupported == DTWAIN_NO_ERROR)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-TW_MEMREF DTWAIN_FSGetFirstFile(DTWAIN_SOURCE Source, LPTSTR szDir)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szDir))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto retVal = PerfomFileSystemOperation<LPTSTR>(Source, szDir, nullptr, nullptr, GET_FIRST);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
-                                      retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.second)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetNextFile(DTWAIN_SOURCE Source, LPTSTR szDir, TW_MEMREF FSHandle)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szDir, FSHandle))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto retVal = PerfomFileSystemOperation<LPTSTR>(Source, szDir, nullptr, FSHandle, GET_NEXT);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
-                                      retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetClose(DTWAIN_SOURCE Source, TW_MEMREF FSHandle)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, FSHandle))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto retVal = PerfomFileSystemOperation<LPTSTR>(Source, nullptr, nullptr, FSHandle, GET_CLOSE);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
-                                      retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSCreateDirectory(DTWAIN_SOURCE Source, LPCTSTR szNewDir)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szNewDir))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto retVal = PerfomFileSystemOperation<LPCTSTR, DirectoryOpTraits>(Source, szNewDir, nullptr, 0, CREATE_DIRECTORY);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
-                                      retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSChangeDirectory(DTWAIN_SOURCE Source, LPCTSTR szNewDir)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szNewDir))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto retVal = PerfomFileSystemOperation<LPCTSTR, DirectoryOpTraits>(Source, szNewDir, nullptr, 0, CHANGE_DIRECTORY);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
-                                      retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSFormat(DTWAIN_SOURCE Source, LPCTSTR szDir)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szDir))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto retVal = PerfomFileSystemOperation<LPCTSTR, DirectoryOpTraits>(Source, szDir, nullptr, 0, FORMAT_MEDIA);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
-                                                    retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSRename(DTWAIN_SOURCE Source, LPCTSTR szInput, LPCTSTR szOutput)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szInput, szOutput))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto retVal = PerfomFileSystemOperation<LPCTSTR, FileOpTraits>(Source, szInput, szOutput, 0, RENAME_DIRECTORY);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
-                                                    retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSCopy(DTWAIN_SOURCE Source, LPCTSTR szInput, LPCTSTR szOutput)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szInput, szOutput))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto retVal = PerfomFileSystemOperation<LPCTSTR, FileOpTraits>(Source, szInput, szOutput, 0, COPY_DIRECTORY);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
-                                    retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSDelete(DTWAIN_SOURCE Source, LPCTSTR szInput,
-                                         DTWAIN_BOOL bRecursive)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szInput, bRecursive))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    int fsSupported = CheckFileSystemSupport(pSource);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
-        DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED, fsSupported, FUNC_MACRO);
-    const DTWAIN_BOOL bRet = FSFileOp2(pSource, szInput, bRecursive, DELETE_DIRECTORY);
-
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetFileType(DTWAIN_SOURCE Source, LPCTSTR szFileName, LPLONG pFileType)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szFileName, pFileType))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    int fsSupported = CheckFileSystemSupport(pSource);
-
-    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
-        fsSupported, false, FUNC_MACRO);
-
-    TW_FILESYSTEM* pFS = pSource->GetFileSystem();
-    const DTWAIN_BOOL bRet = FSGetFileInfo(pSource, szFileName, pFS);
-    if (bRet)
-        *pFileType = pFS->FileType;
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-struct CameraStruct {
-    DTWAIN_ARRAY aCameras = {};
-    TW_UINT16 CameraType;
-};
-
-static DTWAIN_ARRAY GenericEnumCameras(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
-{
-    auto retVal = DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
-    if (retVal)
-    {
-        CTL_TwainDLLHandle* pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-        MoveArray(pHandle, Cameras, &retVal);
-        return *Cameras;
-    }
-    return nullptr;
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
-    auto retVal = GenericEnumCameras(Source, DTWAIN_FT_ALLCAMERAS, Cameras);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumTopCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
-    auto retVal = GenericEnumCameras(Source, DTWAIN_FT_CAMERATOP, Cameras);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBottomCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
-    auto retVal = GenericEnumCameras(Source, DTWAIN_FT_CAMERABOTTOM, Cameras);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    DTWAIN_ARRAY arr = {};
-    DTWAIN_EnumCameras(Source, &arr);
-    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumTopCamerasEx(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    DTWAIN_ARRAY Cameras = {};
-    DTWAIN_EnumTopCameras(Source, &Cameras);
-    LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
-    CATCH_BLOCK(nullptr)
-}
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumBottomCamerasEx(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    DTWAIN_ARRAY Cameras = {};
-    DTWAIN_EnumBottomCameras(Source, &Cameras);
-    LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
-    CATCH_BLOCK(nullptr)
-}
-
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, LONG nWhichCamera)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, nWhichCamera))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DTWAIN_ARRAY Cameras = {};
-    int fsSupported = CheckFileSystemSupport(pSource);
-    DTWAIN_Check_Error_Condition_Throw_Ex(pSource->GetDTWAINHandle(), [&] {return fsSupported != DTWAIN_NO_ERROR; },
-                                      fsSupported, false, FUNC_MACRO);
-    FSGetCameras(pSource, &Cameras, static_cast<TW_UINT16>(nWhichCamera));
-    LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCamera(DTWAIN_SOURCE Source, LPCTSTR szCamera)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, szCamera))
-    VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const DTWAIN_BOOL bRet = DTWAIN_FSChangeDirectory(Source, szCamera);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-
-bool FSGetCameras(CTL_ITwainSource *pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType )
-{
-    LOG_FUNC_ENTRY_PARAMS((pSource, Cameras, CameraType))
-    DTWAIN_ARRAY aCameras = CreateArrayFromFactory(pSource->GetDTWAINHandle(), DTWAIN_ARRAYANSISTRING, 0).second;
-    if (!aCameras)
-        return false;
-    DTWAINArrayLowLevelPtr_RAII raii(pSource->GetDTWAINHandle(), &aCameras);
-    CameraStruct CS{};
-    CS.aCameras = aCameras;
-    CS.CameraType = CameraType;
-    WalkFileSystem(EnumCameraProc, pSource, _T("/"), reinterpret_cast<LPARAM>(&CS));
-    MoveArray(pSource->GetDTWAINHandle(), Cameras, &aCameras);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-bool EnumCameraProc(TW_FILESYSTEM* p, LPARAM UserParam)
-{
-    LOG_FUNC_ENTRY_PARAMS((p, UserParam))
-    const CameraStruct *pCS = reinterpret_cast<CameraStruct*>(UserParam);
-    if ( pCS->CameraType == DTWAIN_FT_ALLCAMERAS || p->FileType == pCS->CameraType )
-        DTWAIN_ArrayAdd(pCS->aCameras, p->OutputName);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart, LPARAM UserParam)
-{
-    LOG_FUNC_ENTRY_PARAMS((pProc, pSource, szStart, UserParam))
-    std::vector<TCHAR> szCurDir(256, 0);
-    bool bRes = FSDirectory(pSource, szStart, CHANGE_DIRECTORY).first;
-    TW_MEMREF Context = nullptr;
-    StringWrapper::SafeStrcpy(&szCurDir[0], szStart);
-    TW_FILESYSTEM *pFS = pSource->GetFileSystem();
-
-    // Get the first file in the directory
-    auto results = FSGetFile(pSource, szCurDir.data(), nullptr, GET_FIRST);
-    bRes = results.first;
-    Context = results.second;
-    while ( bRes )
-    {
-        auto FileType = static_cast<TW_UINT16>(pFS->FileType);
-        if ( !(*pProc)(pFS, UserParam))
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        switch ( FileType )
+        auto retVal = DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
+        if (retVal)
         {
-            case TWFY_DIRECTORY:
-                bRes = WalkFileSystem(pProc, pSource, &szCurDir[0], UserParam);
-                if ( bRes )
-                {
-                    FSGetFile( pSource, nullptr, static_cast<LPLONG>(pFS->Context), GET_CLOSE );
-                    LOG_FUNC_EXIT_NONAME_PARAMS(bRes ? true : false)
-                }
-            break;
+            CTL_TwainDLLHandle* pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+            MoveArray(pHandle, Cameras, &retVal);
+            return *Cameras;
         }
-        results = FSGetFile(pSource, szCurDir.data(), Context, GET_NEXT);
+        return nullptr;
+    }
+
+    FileSysRetType FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich)
+    {
+        const auto pSession = pSource->GetTwainSession();
+        CTL_FileSystemTriplet FS(pSession, pSource);
+        TW_UINT16 rc = 0;
+        switch (nWhich)
+        {
+            case CHANGE_DIRECTORY:
+                rc = FS.ChangeDirectory(sDir);
+                break;
+
+            case CREATE_DIRECTORY:
+                rc = FS.CreateDirectory(sDir);
+                break;
+
+            case FORMAT_MEDIA:
+                rc = FS.FormatMedia(sDir);
+                break;
+            default:;
+        }
+
+        DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
+        return { results,nullptr };
+    }
+
+    FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHandle, LONG nWhich)
+    {
+        const auto pSession = pSource->GetTwainSession();
+        CTL_FileSystemTriplet FS(pSession, pSource);
+        TW_UINT16 rc = 0;
+        TW_MEMREF returnedContext = nullptr;
+        switch (nWhich)
+        {
+            case GET_FIRST:
+                rc = FS.GetFirstFile();
+                break;
+
+            case GET_NEXT:
+                rc = FS.GetNextFile(FSHandle);
+                break;
+
+            case GET_CLOSE:
+                rc = FS.GetClose();
+                break;
+        }
+
+        const bool bRet = GetResults(pSource, &FS, rc);
+        if (bRet)
+        {
+            TW_FILESYSTEM* pFS = pSource->GetFileSystem();
+            if (nWhich != GET_CLOSE)
+            {
+                returnedContext = pFS->Context;
+                stringutils::SafeStrcpy(sDir, stringconversion::Convert_AnsiPtr_To_Native(pFS->OutputName).c_str());
+            }
+        }
+        return { bRet, returnedContext };
+    }
+
+    DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* pSource, LPCTSTR szFileName, TW_FILESYSTEM* pFS)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pSource, szFileName, pFS))
+        const auto pSession = pSource->GetTwainSession();
+        CTL_FileSystemTriplet FS(pSession, pSource);
+        const TW_UINT16 rc = FS.GetInfo(szFileName);
+        switch (rc)
+        {
+            case TWRC_SUCCESS:
+                *pFS = FS.GetTWFileSystem();
+                LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+            break;
+
+            case TWRC_FAILURE:
+            {
+                LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+            }
+            break;
+            default: {}
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+        CATCH_BLOCK(FALSE)
+    }
+
+    bool FSGetCameras(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pSource, Cameras, CameraType))
+        DTWAIN_ARRAY aCameras = CreateArrayFromFactory(pSource->GetDTWAINHandle(), DTWAIN_ARRAYANSISTRING, 0).second;
+        if (!aCameras)
+            return false;
+        DTWAINArrayLowLevelPtr_RAII raii(pSource->GetDTWAINHandle(), &aCameras);
+        CameraStruct CS{};
+        CS.aCameras = aCameras;
+        CS.CameraType = CameraType;
+        WalkFileSystem(EnumCameraProc, pSource, _T("/"), reinterpret_cast<LPARAM>(&CS));
+        MoveArray(pSource->GetDTWAINHandle(), Cameras, &aCameras);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    FileSysRetType FSFileOp(CTL_ITwainSource* pSource, LPCTSTR sInput, LPCTSTR sOutput, LONG nWhich)
+    {
+        const auto pSession = pSource->GetTwainSession();
+        CTL_FileSystemTriplet FS(pSession, pSource);
+        TW_UINT16 rc = 0;
+        switch (nWhich)
+        {
+            case COPY_DIRECTORY:
+                rc = FS.CopyFile(sInput, sOutput);
+                break;
+
+            case RENAME_DIRECTORY:
+                rc = FS.Rename(sInput, sOutput);
+                break;
+            default:;
+        }
+
+        DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
+        return { results,nullptr };
+    }
+
+    DTWAIN_BOOL FSFileOp2(CTL_ITwainSource* pSource, LPCTSTR sInput, DTWAIN_BOOL bRecursive, LONG nWhich)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pSource, sInput, bRecursive, nWhich))
+        const auto pSession = pSource->GetTwainSession();
+        CTL_FileSystemTriplet FS(pSession, pSource);
+        TW_UINT16 rc = 0;
+        switch (nWhich)
+        {
+            case DELETE_DIRECTORY:
+                rc = FS.DeleteFile(sInput, bRecursive ? true : false);
+                break;
+            default:;
+        }
+        DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
+        LOG_FUNC_EXIT_NONAME_PARAMS(results)
+        CATCH_BLOCK(FALSE)
+    }
+
+    bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart, LPARAM UserParam)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pProc, pSource, szStart, UserParam))
+        std::vector<TCHAR> szCurDir(256, 0);
+        bool bRes = FSDirectory(pSource, szStart, CHANGE_DIRECTORY).first;
+        TW_MEMREF Context = nullptr;
+        stringutils::SafeStrcpy(szCurDir.data(), szStart);
+        TW_FILESYSTEM* pFS = pSource->GetFileSystem();
+
+        // Get the first file in the directory
+        auto results = FSGetFile(pSource, szCurDir.data(), nullptr, GET_FIRST);
         bRes = results.first;
         Context = results.second;
-    }
-
-    FSGetFile(pSource, nullptr, static_cast<LPLONG>(pFS->Context), GET_CLOSE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* pSource, LPCTSTR szFileName, TW_FILESYSTEM* pFS)
-{
-    LOG_FUNC_ENTRY_PARAMS((pSource, szFileName, pFS))
-    const auto pSession = pSource->GetTwainSession();
-    CTL_FileSystemTriplet FS(pSession, pSource);
-    const TW_UINT16 rc = FS.GetInfo(szFileName);
-    switch(rc)
-    {
-        case TWRC_SUCCESS:
-            *pFS = FS.GetTWFileSystem();
-            LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
-        break;
-
-        case TWRC_FAILURE:
+        while (bRes)
         {
-            LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-        }
-        break;
-        default: {}
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-    CATCH_BLOCK(FALSE)
-}
-
-FileSysRetType FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich)
-{
-    const auto pSession = pSource->GetTwainSession();
-    CTL_FileSystemTriplet FS(pSession, pSource);
-    TW_UINT16 rc = 0;
-    switch(nWhich)
-    {
-        case CHANGE_DIRECTORY:
-            rc = FS.ChangeDirectory(sDir);
-        break;
-
-        case CREATE_DIRECTORY:
-            rc = FS.CreateDirectory(sDir);
-        break;
-
-        case FORMAT_MEDIA:
-            rc = FS.FormatMedia(sDir);
-        break;
-        default: ;
-    }
-
-    DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
-    return { results,nullptr };
-}
-
-
-FileSysRetType FSFileOp(CTL_ITwainSource* pSource, LPCTSTR sInput, LPCTSTR sOutput, LONG nWhich)
-{
-    const auto pSession = pSource->GetTwainSession();
-    CTL_FileSystemTriplet FS(pSession, pSource);
-    TW_UINT16 rc = 0;
-    switch(nWhich)
-    {
-        case COPY_DIRECTORY:
-            rc = FS.CopyFile(sInput, sOutput);
-        break;
-
-        case RENAME_DIRECTORY:
-            rc = FS.Rename(sInput, sOutput);
-        break;
-        default: ;
-    }
-
-    DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
-    return { results,nullptr };
-}
-
-
-DTWAIN_BOOL FSFileOp2(CTL_ITwainSource* pSource, LPCTSTR sInput, DTWAIN_BOOL bRecursive, LONG nWhich)
-{
-    LOG_FUNC_ENTRY_PARAMS((pSource, sInput, bRecursive, nWhich))
-    const auto pSession = pSource->GetTwainSession();
-    CTL_FileSystemTriplet FS(pSession, pSource);
-    TW_UINT16 rc = 0;
-    switch(nWhich)
-    {
-        case DELETE_DIRECTORY:
-            rc = FS.DeleteFile(sInput, bRecursive?true:false);
-        break;
-        default: ;
-    }
-    DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
-    LOG_FUNC_EXIT_NONAME_PARAMS(results)
-    CATCH_BLOCK(FALSE)
-}
-
-
-FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHandle, LONG nWhich)
-{
-    const auto pSession = pSource->GetTwainSession();
-    CTL_FileSystemTriplet FS(pSession, pSource);
-    TW_UINT16 rc = 0;
-    TW_MEMREF returnedContext = nullptr;
-    switch(nWhich)
-    {
-        case GET_FIRST:
-            rc = FS.GetFirstFile();
-        break;
-
-        case GET_NEXT:
-            rc = FS.GetNextFile(FSHandle);
-        break;
-
-        case GET_CLOSE:
-            rc = FS.GetClose();
-        break;
-    }
-
-    const bool bRet = GetResults(pSource, &FS, rc);
-    if ( bRet )
-    {
-        TW_FILESYSTEM *pFS = pSource->GetFileSystem();
-        if (nWhich != GET_CLOSE)
-        {
-            returnedContext = pFS->Context;
-            StringWrapper::SafeStrcpy(sDir, StringConversion::Convert_AnsiPtr_To_Native(pFS->OutputName).c_str());
-        }
-    }
-    return { bRet, returnedContext };
-}
-
-bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFST, TW_UINT16 rc)
-{
-    LOG_FUNC_ENTRY_PARAMS((pSource, pFST, rc))
-    switch (rc)
-    {
-        case TWRC_SUCCESS:
-        {
-            TW_FILESYSTEM *pFS = pSource->GetFileSystem();
-            *pFS = pFST->GetTWFileSystem();
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+            auto FileType = static_cast<TW_UINT16>(pFS->FileType);
+            if (!(*pProc)(pFS, UserParam))
+                LOG_FUNC_EXIT_NONAME_PARAMS(true)
+            switch (FileType)
+            {
+                case TWFY_DIRECTORY:
+                    bRes = WalkFileSystem(pProc, pSource, szCurDir.data(), UserParam);
+                    if (bRes)
+                    {
+                        FSGetFile(pSource, nullptr, pFS->Context, GET_CLOSE);
+                        LOG_FUNC_EXIT_NONAME_PARAMS(bRes ? true : false)
+                    }
+                    break;
+            }
+            results = FSGetFile(pSource, szCurDir.data(), Context, GET_NEXT);
+            bRes = results.first;
+            Context = results.second;
         }
 
-        case TWRC_FAILURE:
+        FSGetFile(pSource, nullptr, pFS->Context, GET_CLOSE);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFST, TW_UINT16 rc)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pSource, pFST, rc))
+        switch (rc)
         {
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+            case TWRC_SUCCESS:
+            {
+                TW_FILESYSTEM* pFS = pSource->GetFileSystem();
+                *pFS = pFST->GetTWFileSystem();
+                LOG_FUNC_EXIT_NONAME_PARAMS(true)
+            }
+
+            case TWRC_FAILURE:
+            {
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
+            }
+
+            default: {}
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK(false)
+    }
+
+    int CheckFileSystemSupport(CTL_ITwainSource* pSource)
+    {
+        // If source is not open, return an error
+        if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
+            return DTWAIN_ERR_SOURCE_NOT_OPEN;
+
+        auto getSupport = pSource->IsFileSystemSupported();
+
+        // If already determined that source does not support
+        // file system, return error.
+        if (!getSupport)
+            return DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED;
+
+        if (getSupport.value == boost::tribool::indeterminate_value)
+        {
+            // Test if source supports file system
+
+            // See if DAT_FILESYSTEM is one of the supported DATS
+            DTWAIN_BOOL bRet = false;
+            const auto& vDats = pSource->GetSupportedDATS();
+            if (std::find_if(vDats.begin(), vDats.end(), 
+                [](TW_UINT32 val) { return (val & 0x0000FFFF) == DAT_FILESYSTEM; }) != vDats.end())
+                    bRet = true;
+            else
+                // No support directly, so try changing to the root directory
+                bRet = FSDirectory(pSource, _T("/"), CHANGE_DIRECTORY).first;
+            pSource->SetFileSystemSupported(bRet);
+
+            // return results
+            return bRet?DTWAIN_NO_ERROR:DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED;
         }
 
-        default:{}
+        // Already tested and determined that source supports file system
+        return DTWAIN_NO_ERROR;
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK(false)
+
+    bool EnumCameraProc(TW_FILESYSTEM* p, LPARAM UserParam)
+    {
+        LOG_FUNC_ENTRY_PARAMS((p, UserParam))
+        const CameraStruct* pCS = reinterpret_cast<CameraStruct*>(UserParam);
+        if (pCS->CameraType == DTWAIN_FT_ALLCAMERAS || p->FileType == pCS->CameraType)
+            DTWAIN_ArrayAdd(pCS->aCameras, p->OutputName);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    struct GetFileOpTraits
+    {
+        static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPTSTR sz, LPTSTR /* */, TW_MEMREF FSHandle, int operation)
+        {
+            return FSGetFile(pSource, sz, FSHandle, operation);
+        }
+    };
+
+    struct FileOpTraits
+    {
+        static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPCTSTR sz, LPCTSTR sz2, TW_MEMREF /*FSHandle*/, int operation)
+        {
+            return FSFileOp(pSource, sz, sz2, operation);
+        }
+    };
+
+    struct DirectoryOpTraits
+    {
+        static FileSysRetType DoOperation(CTL_ITwainSource* pSource, LPCTSTR sz, LPCTSTR sz2, TW_MEMREF /*FSHandle*/, int operation)
+        {
+            return FSDirectory(pSource, sz, operation);
+        }
+    };
+
+    template <typename StringType = LPTSTR, typename Fn = GetFileOpTraits>
+    std::pair<int, FileSysRetType> PerfomFileSystemOperation(DTWAIN_SOURCE Source, StringType szDir, StringType szDir2, TW_MEMREF FSHandle, int operation)
+    {
+        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        int fsSupported = CheckFileSystemSupport(pSource);
+        if (fsSupported != DTWAIN_NO_ERROR)
+            return { fsSupported, {false, {} } };
+        auto bRet = Fn::DoOperation(pSource, szDir, szDir2, FSHandle, operation);
+        return { DTWAIN_NO_ERROR, {bRet.first, bRet.second } };
+    }
 }
+
+extern "C"
+{
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source )
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        int fsSupported = CheckFileSystemSupport(pSource);
+        DTWAIN_Check_Error_Condition_NoThrow_Ex(pSource->GetDTWAINHandle(), [&] { return fsSupported != DTWAIN_NO_ERROR; },
+                                          fsSupported, false, FUNC_MACRO, true);
+
+        LOG_FUNC_EXIT_NONAME_PARAMS(fsSupported == DTWAIN_NO_ERROR)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    TW_MEMREF DTWAIN_FSGetFirstFile(DTWAIN_SOURCE Source, LPTSTR szDir)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szDir))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto retVal = PerfomFileSystemOperation<LPTSTR>(Source, szDir, nullptr, nullptr, GET_FIRST);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
+                                          retVal.first, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.second)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
+    }
+
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetNextFile(DTWAIN_SOURCE Source, LPTSTR szDir, TW_MEMREF FSHandle)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szDir, FSHandle))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto retVal = PerfomFileSystemOperation<LPTSTR>(Source, szDir, nullptr, FSHandle, GET_NEXT);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
+                                          retVal.first, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetClose(DTWAIN_SOURCE Source, TW_MEMREF FSHandle)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, FSHandle))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto retVal = PerfomFileSystemOperation<LPTSTR>(Source, nullptr, nullptr, FSHandle, GET_CLOSE);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
+                                          retVal.first, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSCreateDirectory(DTWAIN_SOURCE Source, LPCTSTR szNewDir)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szNewDir))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto retVal = PerfomFileSystemOperation<LPCTSTR, DirectoryOpTraits>(Source, szNewDir, nullptr, 0, CREATE_DIRECTORY);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
+                                          retVal.first, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSChangeDirectory(DTWAIN_SOURCE Source, LPCTSTR szNewDir)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szNewDir))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto retVal = PerfomFileSystemOperation<LPCTSTR, DirectoryOpTraits>(Source, szNewDir, nullptr, 0, CHANGE_DIRECTORY);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
+                                          retVal.first, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSFormat(DTWAIN_SOURCE Source, LPCTSTR szDir)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szDir))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto retVal = PerfomFileSystemOperation<LPCTSTR, DirectoryOpTraits>(Source, szDir, nullptr, 0, FORMAT_MEDIA);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
+                                                        retVal.first, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSRename(DTWAIN_SOURCE Source, LPCTSTR szInput, LPCTSTR szOutput)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szInput, szOutput))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto retVal = PerfomFileSystemOperation<LPCTSTR, FileOpTraits>(Source, szInput, szOutput, 0, RENAME_DIRECTORY);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
+                                                        retVal.first, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSCopy(DTWAIN_SOURCE Source, LPCTSTR szInput, LPCTSTR szOutput)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szInput, szOutput))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto retVal = PerfomFileSystemOperation<LPCTSTR, FileOpTraits>(Source, szInput, szOutput, 0, COPY_DIRECTORY);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
+                                        retVal.first, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSDelete(DTWAIN_SOURCE Source, LPCTSTR szInput,
+                                             DTWAIN_BOOL bRecursive)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szInput, bRecursive))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        int fsSupported = CheckFileSystemSupport(pSource);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+            DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED, fsSupported, FUNC_MACRO);
+        const DTWAIN_BOOL bRet = FSFileOp2(pSource, szInput, bRecursive, DELETE_DIRECTORY);
+
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetFileType(DTWAIN_SOURCE Source, LPCTSTR szFileName, LPLONG pFileType)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szFileName, pFileType))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        int fsSupported = CheckFileSystemSupport(pSource);
+
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+            fsSupported, false, FUNC_MACRO);
+
+        TW_FILESYSTEM* pFS = pSource->GetFileSystem();
+        const DTWAIN_BOOL bRet = FSGetFileInfo(pSource, szFileName, pFS);
+        if (bRet)
+            *pFileType = pFS->FileType;
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+}
+
+extern "C"
+{
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
+        auto retVal = GenericEnumCameras(Source, DTWAIN_FT_ALLCAMERAS, Cameras);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumTopCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
+        auto retVal = GenericEnumCameras(Source, DTWAIN_FT_CAMERATOP, Cameras);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBottomCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
+        auto retVal = GenericEnumCameras(Source, DTWAIN_FT_CAMERABOTTOM, Cameras);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        DTWAIN_ARRAY arr = {};
+        DTWAIN_EnumCameras(Source, &arr);
+        LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
+    }
+
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumTopCamerasEx(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        DTWAIN_ARRAY Cameras = {};
+        DTWAIN_EnumTopCameras(Source, &Cameras);
+        LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
+        CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumBottomCamerasEx(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        DTWAIN_ARRAY Cameras = {};
+        DTWAIN_EnumBottomCameras(Source, &Cameras);
+        LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
+        CATCH_BLOCK(nullptr)
+    }
+
+
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, LONG nWhichCamera)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, nWhichCamera))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        DTWAIN_ARRAY Cameras = {};
+        int fsSupported = CheckFileSystemSupport(pSource);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pSource->GetDTWAINHandle(), [&] {return fsSupported != DTWAIN_NO_ERROR; },
+                                          fsSupported, false, FUNC_MACRO);
+        FSGetCameras(pSource, &Cameras, static_cast<TW_UINT16>(nWhichCamera));
+        LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCamera(DTWAIN_SOURCE Source, LPCTSTR szCamera)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szCamera))
+        VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        const DTWAIN_BOOL bRet = DTWAIN_FSChangeDirectory(Source, szCamera);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+}
+
+
+
+
+
+
+
+
+

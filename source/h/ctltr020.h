@@ -25,7 +25,7 @@
 
 namespace dynarithmic
 {
-    template <class T>
+    template <typename T>
     class CTL_CapabilitySetArrayTriplet : public CTL_CapabilitySetTriplet<T>
     {
         public:
@@ -46,8 +46,53 @@ namespace dynarithmic
             size_t      m_nAggSize;
     };
 
-    #ifndef USE_EXPLICIT_TEMPLATE_INSTANTIATIONS
-        #include "../inl/ctltr020.inl"
-    #endif
+    template <typename T>
+    CTL_CapabilitySetArrayTriplet<T>::CTL_CapabilitySetArrayTriplet(CTL_ITwainSession* pSession,
+                                                                    CTL_ITwainSource* pSource,
+                                                                    TW_UINT16 sType,
+                                                                    TW_UINT16  sCap,
+                                                                    TW_UINT16 TwainType,
+                                                                    const std::vector<T>& rArray)
+        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray), m_nAggSize(rArray.size()){}
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetArrayTriplet<T>::GetContainerTypeSize()
+    {
+        return sizeof(TW_ARRAY);
+    }
+
+    template <typename T>
+    size_t CTL_CapabilitySetArrayTriplet<T>::GetAggregateSize()
+    {
+        return m_nAggSize;
+    }
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetArrayTriplet<T>::GetContainerType()
+    {
+        return TWON_ARRAY;
+    }
+
+    template <typename T>
+    bool CTL_CapabilitySetArrayTriplet<T>::Encode(const std::vector<T>& rArray, void* pMemBlock)
+    {
+        // Get a TW_RANGE structure
+        pTW_ARRAY pArray = static_cast<pTW_ARRAY>(pMemBlock);
+
+        // Set the # of elements
+        pArray->NumItems = static_cast<TW_UINT32>(m_nAggSize);
+
+        // Set the data type
+        pArray->ItemType = CTL_CapabilitySetTripletBase::GetTwainType();
+
+        // Set the items in the list
+        size_t i = 0;
+        for_each(rArray.begin(), rArray.begin() + m_nAggSize, [&](T Data)
+            {
+                this->EncodeArrayValue(pArray, i, &Data);
+                ++i;
+            });
+        return true;
+    }
 }
 #endif

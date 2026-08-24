@@ -1,0 +1,174 @@
+/*
+    This file is part of the Dynarithmic TWAIN Library (DTWAIN).
+    Copyright (c) 2002-2026 Dynarithmic Software.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+    DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+    OF THIRD PARTY RIGHTS.
+ */
+
+#include <chrono>
+#include <iomanip>
+#include <string>
+#include <string_view>
+
+#include "cppfunc.h"
+#include "ctlstringutils.h"
+#include "ctlstringutilsx.h"
+#include "ctlconstexprfind.h"
+#include "ctlglobalhandletraits.h"
+
+using namespace dynarithmic;
+
+namespace
+{
+    template <typename StringType = DTWAIN_STRING_TYPE_, typename PointerTypeIn = typename StringType::value_type*,
+              typename PointerTypeOut = PointerTypeIn>
+    LONG ConvertToAPIString_InternalEx(const PointerTypeIn lpOrigString, PointerTypeOut outString, LONG nLength)
+    {
+        if (!lpOrigString)
+            return 0;
+        auto retval = ConvertToAPIStringEx<StringType>(lpOrigString);
+        if (retval)
+        {
+            HandleRAII raii(retval);
+            PointerTypeIn ptrData = (PointerTypeIn)raii.getData();
+            auto len = CharTraits<typename StringType::value_type>::Length(ptrData);
+            StringType str(ptrData, len);
+            return CopyInfoToCString(str, outString, nLength);
+        }
+        return 0;
+    }
+
+    template <typename StringType>
+    StringType ConvertToAPIString(const StringType& origString)
+    {
+        using CharType = typename StringType::value_type;
+
+        constexpr CharType CR = static_cast<CharType>('\r');
+        constexpr CharType LF = static_cast<CharType>('\n');
+
+        StringType result;
+        result.reserve(origString.size());
+
+        for (std::size_t i = 0; i < origString.size(); ++i)
+        {
+            if (origString[i] == LF &&
+                (i == 0 || origString[i - 1] != CR))
+            {
+                result.push_back(CR);
+            }
+
+            result.push_back(origString[i]);
+        }
+
+        return result;
+    }
+
+    template <typename StringType = DTWAIN_STRING_TYPE_>
+    HANDLE ConvertToAPIStringEx(std::basic_string_view<typename StringType::value_type> origString)
+    {
+        constexpr size_t cSize = sizeof(typename StringType::value_type);
+        StringType newString = ConvertToAPIString<StringType>(origString.data());
+        HANDLE newHandle = GlobalAlloc(GHND | GMEM_ZEROINIT, newString.size() * cSize + cSize);
+        if (newHandle)
+        {
+            auto pData = reinterpret_cast<typename StringType::value_type*>(GlobalLock(newHandle));
+            memcpy(pData, newString.data(), newString.size() * cSize);
+            GlobalUnlock(newHandle);
+            return newHandle;
+        }
+        return nullptr;
+    }
+}
+
+extern "C"
+{
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+        auto retval = ConvertToAPIStringEx(lpOrigString);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(nullptr)
+    }
+
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+        auto retval = ConvertToAPIStringEx<std::string>(lpOrigString);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(nullptr)
+    }
+
+
+    HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+        auto retval = ConvertToAPIStringEx<std::wstring>(lpOrigString);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(nullptr)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOutString, LONG nSize)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpOrigString, lpOutString, nSize))
+        LONG retval = ConvertToAPIString_InternalEx(lpOrigString, lpOutString, nSize);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOutString))
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(0)
+    }
+}
+
+namespace dynarithmic
+{
+    std::string TruncateStringWithMore(std::string_view origString, size_t maxLen)
+    {
+        // Truncate if text is too long
+        if (origString.size() > maxLen)
+        {
+            // Get the "More" text
+            std::string MoreText = "...(" + GetResourceStringFromMap(IDS_LOGMSG_MORETEXT) + ")...";
+            std::string origStringS = origString.data();
+
+            // Get original string and resize it
+            std::string tempS = origStringS.substr(0, maxLen);
+
+            // Add the "More" text
+            tempS += MoreText;
+            if (tempS.size() < origString.size())
+                return tempS;
+        }
+
+        // Just return the original string
+        return origString.data();
+    }
+
+    // convert a hex string to a byte array
+    std::vector<unsigned char> HexStringToByteArray(std::string_view hexString)
+    {
+        std::vector<unsigned char> byteArray;
+        if (hexString.size() % 2 != 0)
+        {
+            return byteArray;
+        }
+        for (size_t i = 0; i < hexString.length(); i += 2)
+        {
+            unsigned char highNibble = HexCharToByte(hexString[i]);
+            unsigned char lowNibble = HexCharToByte(hexString[i + 1]);
+            byteArray.push_back((highNibble << 4) | lowNibble);
+        }
+        return byteArray;
+    }
+}

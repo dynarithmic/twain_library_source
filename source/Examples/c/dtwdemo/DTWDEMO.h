@@ -92,6 +92,11 @@
 #define IDM_ACQUIREFILE_WINDOWSMETAFILE     453
 #define IDM_ACQUIREFILE_WIRELESSBITMAP      454
 #define IDM_ACQUIREFILE_POSTSCRIPTLEVEL3    455
+#define IDM_ACQUIREFILE_PDF_RC4_40BIT       456
+#define IDM_ACQUIREFILE_PDF_RC4_128BIT      457
+#define IDM_ACQUIREFILE_PDF_AES_128BIT      458 
+#define IDM_ACQUIREFILE_PDF_AES_256BIT      459
+#define IDM_ACQUIREFILE_PDF_ASCII85         460
 
 #define IDD_dlgEnterSourceName              1000
 #define IDC_edSourceName                    1001
@@ -117,8 +122,8 @@
 #define IDC_chkUseFeeder                    5001
 #define IDC_chkUseDuplex                    5002
 
-#define IDD_dlgFileType                        6000
-#define IDC_cmbFileType                        6001
+#define IDD_dlgFileType                     6000
+#define IDC_cmbFileType                     6001
 #define IDC_edFileName                      6002
 
 #define IDD_dlgDebug                        7000
@@ -137,6 +142,7 @@
 #define IDC_edBarCodes                      7013
 #define IDD_dlgBarCodes                     7014
 #define IDD_dlgEnterFileName                7015
+#define IDC_lstBadCapabilities              7016 
 
 #define IDD_dlgTestCap                      8000
 #define IDC_cmbGetTypes                     8001
@@ -145,7 +151,7 @@
 #define IDC_cmbContainer                    8004
 #define IDC_cmbDataType                     8005
 #define IDC_btnReset                        8006
-#define IDC_cmbSetTypes                        8007
+#define IDC_cmbSetTypes                     8007
 #define IDC_cmbDataTypeSet                  8008
 #define IDC_cmbContainerSet                 8009 
 #define IDC_btnTestSet                      8010  
@@ -163,6 +169,20 @@
 #define IDC_btnRefreshShowUIOnly            8022
 #define IDC_chkResetCapsOnClose             8023
 #define IDC_edSaveFileName                  8024
+#define IDC_btnCapabilityErrors             8025
+#define IDD_dlgBadCapabilities              8026
+#define IDD_dlgPDFOptions                   8027
+#define IDC_edPDFTitle                      8028  
+#define IDC_edPDFSubject                    8029
+#define IDC_edPDFAuthor                     8030 
+#define IDC_edPDFCreator                    8031
+#define IDC_edPDFKeywords                   8032   
+#define IDC_edPDFProducer                   8033   
+#define IDC_txtProducer                     8034  
+#define IDC_edUserPassword                  8035  
+#define IDC_edOwnerPassword                 8036  
+#define IDC_txtUserPassword                 8037  
+#define IDC_txtOwnerPassword                8038  
 
 #define IDD_dlgEnterBlankThreshold     9000
 #define IDC_edBlankThresholdPct        9001
@@ -183,6 +203,7 @@
 #define ID_LANGUAGE_KOREAN              32784
 #define ID_LANGUAGE_GREEK               32785
 #define ID_LANGUAGE_TURKISH             32786
+#define ID_LANGUAGE_CANTONESE           32787  
 
 
 #endif

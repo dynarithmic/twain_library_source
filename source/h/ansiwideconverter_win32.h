@@ -20,171 +20,48 @@
  */
 #ifndef ANSIWIDECONVERTER_WIN32_H
 #define ANSIWIDECONVERTER_WIN32_H
+#include <windows.h>
 #include <string>
-#include <vector>
 #include <limits>
 
-class ConvertW2A
+namespace dynarithmic
 {
-    std::string m_sz;
-    UINT nConvertCodePage;
-
-public:
-    explicit ConvertW2A(LPCWSTR psz) : nConvertCodePage(CP_THREAD_ACP)
+    namespace utfconverter
     {
-        Init(psz);
-    }
-
-    ConvertW2A(LPCWSTR psz, size_t len) : nConvertCodePage(CP_THREAD_ACP)
-    {
-        Init(psz, len);
-    }
-
-    explicit operator LPCSTR() const noexcept
-    {
-        return m_sz.c_str();
-    }
-
-private:
-    void Init(LPCWSTR psz, size_t len = (std::numeric_limits<size_t>::max)())
-    {
-        if (psz == nullptr || psz[0] == L'\0')
-            return;
-        size_t nLengthW;
-        if (len == (std::numeric_limits<size_t>::max)())
-            nLengthW = wcslen(psz) + 1;
-        else
-            nLengthW = len;
-        int nLengthA = static_cast<int>(nLengthW * 4);
-        m_sz.resize(nLengthA);
-        bool bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), m_sz.data(), nLengthA, nullptr, nullptr) ? true : false;
-        if (bFailed)
-        {
-            if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-            {
-                nLengthA = WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), nullptr, 0, nullptr, nullptr);
-                m_sz.resize(nLengthA);
-                bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), m_sz.data(), nLengthA, nullptr, nullptr) ? true : false;
-            }
-        }
-    }
-};
-
-class ConvertA2W
-{
-    std::wstring m_sz;
-    UINT nConvertCodePage;
-
-public:
-    explicit ConvertA2W(LPCSTR psz) : nConvertCodePage(CP_THREAD_ACP)
-    {
-        Init(psz);
-    }
-
-    ConvertA2W(LPCSTR psz, size_t len) : nConvertCodePage(CP_THREAD_ACP)
-    {
-        Init(psz, len);
-    }
-
-    explicit operator LPCWSTR() const noexcept
-    {
-        return m_sz.c_str();
-    }
-
-private:
-    void Init(LPCSTR psz, size_t len = (std::numeric_limits<size_t>::max)())
-    {
-        if (psz == nullptr || psz[0] == '\0')
-            return;
-        size_t nLengthA;
-        if (len == (std::numeric_limits<size_t>::max)())
-            nLengthA = strlen(psz) + 1;
-        else
-            nLengthA = len;
-        int nLengthW = static_cast<int>(nLengthA);
-        m_sz.resize(nLengthW);
-        bool bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), m_sz.data(), nLengthW) ? true : false;
-        if (bFailed)
-        {
-            if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-            {
-                nLengthW = MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), nullptr, 0);
-                m_sz.resize(nLengthW);
-                bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), m_sz.data(), nLengthW) ? true : false;
-            }
-        }
-    }
-};
-
-class UTF8_UTF16_Converter
-{
-    public:
-        static std::pair<std::wstring, bool> UTF8ToUTF16(std::string_view utf8)
+        inline std::pair<std::wstring, bool> UTF8ToUTF16(std::string_view utf8)
         {
             if (utf8.empty())
                 return { {}, true };
 
-            int size = MultiByteToWideChar(
-                CP_UTF8,
-                MB_ERR_INVALID_CHARS,
-                utf8.data(),
-                static_cast<int>(utf8.size()),
-                nullptr,
-                0
-            );
+            int size = MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.data(),static_cast<int>(utf8.size()),nullptr,0);
 
             if (size == 0)
                 return { {}, false };
 
             std::wstring result(size, 0);
 
-            MultiByteToWideChar(
-                CP_UTF8,
-                MB_ERR_INVALID_CHARS,
-                utf8.data(),
-                static_cast<int>(utf8.size()),
-                result.data(),
-                size
-            );
+            MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.data(),static_cast<int>(utf8.size()),result.data(),size);
 
             return { result, true };
         }
 
-        static std::pair<std::string, bool> UTF16ToUTF8(std::wstring_view utf16string)
+        inline std::pair<std::string, bool> UTF16ToUTF8(std::wstring_view utf16string)
         {
             if (utf16string.empty())
             {
                 return { {}, true };
             }
 
-            int size = WideCharToMultiByte(
-                CP_UTF8,
-                0,
-                utf16string.data(),
-                static_cast<int>(utf16string.size()),
-                nullptr,
-                0,
-                nullptr,
-                nullptr
-            );
+            int size = WideCharToMultiByte(CP_UTF8,0,utf16string.data(),static_cast<int>(utf16string.size()),nullptr,0,nullptr,nullptr);
 
             if (size == 0)
                 return { {}, false };
 
             std::string result(size, 0);
-            int chars_converted = WideCharToMultiByte(
-                CP_UTF8,
-                0,
-                utf16string.data(),
-                static_cast<int>(utf16string.size()),
-                &result[0],
-                size,
-                nullptr,
-                nullptr);
-
+            int chars_converted = WideCharToMultiByte(CP_UTF8,0,utf16string.data(),static_cast<int>(utf16string.size()),&result[0],size,nullptr,nullptr);
             result.resize(chars_converted);
             return { result, true };
         }
-};
-
+    }
+}
 #endif // ANSIWIDECONVERTER_WIN32_H

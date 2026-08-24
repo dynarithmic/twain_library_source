@@ -20,7 +20,6 @@ OF THIRD PARTY RIGHTS.
 */
 #ifndef _WIN32
 #include <sys/utsname.h>
-#include "ctlobstr.h"
 #include "dtwinverex.h"
 
 namespace dynarithmic
@@ -37,7 +36,7 @@ namespace dynarithmic
             "  Version: " << test.version <<
             "  Machine: " << test.machine <<
             "  Domain Name: " << test.domainname;
-        return StringConversion::Convert_Ansi_To_Native(strm.str());
+        return stringconversion::Convert_Ansi_To_Native(strm.str());
     }
 }
 #endif

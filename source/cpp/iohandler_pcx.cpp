@@ -18,12 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
-#include "ctltwainmanager.h"
 #include "pcxwriter.h"
 #include "iohandler_pcx.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
@@ -36,7 +34,7 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
     SetPageWriteStatus(m_nFormat, pMultiPageStruct ? pMultiPageStruct->Stage : 0);
 
-    std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring filename = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     if ( bIsFirstPage )
     {

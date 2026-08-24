@@ -46,42 +46,627 @@ uint8_t dynarithmic::dib::GetIndexedPixel(const uint8_t* row, uint32_t x, uint16
     }
 }
 
-static HGLOBAL CreateDibLikeEx(uint32_t width, int32_t height, uint16_t dstBpp, 
-                               LONG xPelsPerMeter, LONG yPelsPerMeter, uint32_t paletteEntries)
+namespace
 {
-    const uint32_t stride = calc_stride_bytes(width, dstBpp);
-    const uint32_t imageSize = stride * height;
-
-    const size_t totalSize = sizeof(BITMAPINFOHEADER) + paletteEntries * sizeof(RGBQUAD) + imageSize;
-
-    HGLOBAL hDst = GlobalAlloc(GHND, totalSize);
-    if (!hDst)
-        return nullptr;
-
-    auto* dst = static_cast<BITMAPINFOHEADER*>(GlobalLock(hDst));
-    if (!dst)
+    HGLOBAL CreateDibLikeEx(uint32_t width, int32_t height, uint16_t dstBpp,
+        LONG xPelsPerMeter, LONG yPelsPerMeter, uint32_t paletteEntries)
     {
-        GlobalFree(hDst);
-        return nullptr;
+        const uint32_t stride = calc_stride_bytes(width, dstBpp);
+        const uint32_t imageSize = stride * height;
+
+        const size_t totalSize = sizeof(BITMAPINFOHEADER) + paletteEntries * sizeof(RGBQUAD) + imageSize;
+
+        HGLOBAL hDst = GlobalAlloc(GHND, totalSize);
+        if (!hDst)
+            return nullptr;
+
+        auto* dst = static_cast<BITMAPINFOHEADER*>(GlobalLock(hDst));
+        if (!dst)
+        {
+            GlobalFree(hDst);
+            return nullptr;
+        }
+
+        std::memset(dst, 0, totalSize);
+
+        dst->biSize = sizeof(BITMAPINFOHEADER);
+        dst->biWidth = width;
+        dst->biHeight =
+            height > 0 ? height : -height;
+        dst->biPlanes = 1;
+        dst->biBitCount = dstBpp;
+        dst->biCompression = BI_RGB;
+        dst->biSizeImage = imageSize;
+        dst->biXPelsPerMeter = xPelsPerMeter;
+        dst->biYPelsPerMeter = yPelsPerMeter;
+        dst->biClrUsed = paletteEntries;
+        dst->biClrImportant = paletteEntries;
+
+        GlobalUnlock(hDst);
+        return hDst;
     }
 
-    std::memset(dst, 0, totalSize);
+    HGLOBAL CreateCroppedDibLike(const BITMAPINFOHEADER& src, uint32_t newWidth, uint32_t newHeight, uint16_t bpp, uint32_t paletteEntries)
+    {
+        return CreateDibLikeEx(newWidth, newHeight, bpp, src.biXPelsPerMeter, src.biYPelsPerMeter, paletteEntries);
+    }
 
-    dst->biSize = sizeof(BITMAPINFOHEADER);
-    dst->biWidth = width;
-    dst->biHeight =
-        height > 0 ? height : -height;
-    dst->biPlanes = 1;
-    dst->biBitCount = dstBpp;
-    dst->biCompression = BI_RGB;
-    dst->biSizeImage = imageSize;
-    dst->biXPelsPerMeter = xPelsPerMeter;
-    dst->biYPelsPerMeter = yPelsPerMeter;
-    dst->biClrUsed = paletteEntries;
-    dst->biClrImportant = paletteEntries;
+    uint8_t GrayFromRGB(uint8_t r, uint8_t g, uint8_t b)
+    {
+        return static_cast<uint8_t>(
+            (77u * r + 150u * g + 29u * b + 128u) >> 8);
+    }
 
-    GlobalUnlock(hDst);
-    return hDst;
+    uint8_t GrayFromRGBQUAD(const RGBQUAD& q)
+    {
+        return GrayFromRGB(q.rgbRed, q.rgbGreen, q.rgbBlue);
+    }
+
+    uint8_t GetPixelGray(const uint8_t* row, uint32_t x, uint16_t srcBpp, const RGBQUAD* srcPal, uint32_t srcPalEntries)
+    {
+        switch (srcBpp)
+        {
+            case 1:
+            case 4:
+            case 8:
+            {
+                const uint8_t idx = dynarithmic::dib::GetIndexedPixel(row, x, srcBpp);
+
+                if (srcPal && idx < srcPalEntries)
+                    return GrayFromRGBQUAD(srcPal[idx]);
+
+                if (srcBpp == 1)
+                    return idx ? 255 : 0;
+
+                return idx;
+            }
+
+            case 16:
+            {
+                const auto* p16 = reinterpret_cast<const uint16_t*>(row);
+                return static_cast<uint8_t>(p16[x] >> 8);
+            }
+
+            case 24:
+            case 32:
+            {
+                const uint8_t* p = row + x * (srcBpp/8);
+                return GrayFromRGB(p[2], p[1], p[0]); // BGR
+            }
+        }
+
+        return 0;
+    }
+    /// /////////////////////////////////////////////////////////////////////////
+    uint8_t GetPackedPixel(const uint8_t* row, uint32_t x, uint16_t bpp)
+    {
+        switch (bpp)
+        {
+            case 1:
+                return static_cast<uint8_t>((row[x / 8] >> (7 - (x & 7))) & 1);
+
+            case 4:
+                return static_cast<uint8_t>((x & 1)
+                        ? (row[x / 2] & 0x0F)
+                        : ((row[x / 2] >> 4) & 0x0F));
+
+            case 8:
+                return row[x];
+
+            default:
+                return 0;
+        }
+    }
+
+    void SetPackedPixel(uint8_t* row, uint32_t x, uint16_t bpp, uint8_t value)
+    {
+        switch (bpp)
+        {
+            case 1:
+            {
+                const uint8_t mask = static_cast<uint8_t>(0x80 >> (x & 7));
+                if (value)
+                    row[x / 8] |= mask;
+                else
+                    row[x / 8] &= static_cast<uint8_t>(~mask);
+                break;
+            }
+
+            case 4:
+            {
+                uint8_t& byte = row[x / 2];
+
+                if ((x & 1) == 0)
+                    byte = static_cast<uint8_t>((byte & 0x0F) | ((value & 0x0F) << 4));
+                else
+                    byte = static_cast<uint8_t>((byte & 0xF0) | (value & 0x0F));
+
+                break;
+            }
+
+            case 8:
+                row[x] = value;
+                break;
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////
+    double CubicWeight(double x)
+    {
+        // Catmull-Rom cubic filter, common bicubic interpolation kernel.
+        x = std::abs(x);
+
+        if (x <= 1.0)
+            return (1.5 * x * x * x) - (2.5 * x * x) + 1.0;
+
+        if (x < 2.0)
+            return (-0.5 * x * x * x) + (2.5 * x * x) - (4.0 * x) + 2.0;
+
+        return 0.0;
+    }
+
+    uint8_t ClampU8(double v)
+    {
+        if (v < 0.0) return 0;
+        if (v > 255.0) return 255;
+        return static_cast<uint8_t>(v + 0.5);
+    }
+
+    uint16_t ClampU16(double v)
+    {
+        if (v < 0.0) return 0;
+        if (v > 65535.0) return 65535;
+        return static_cast<uint16_t>(v + 0.5);
+    }
+
+    const uint8_t* LogicalSrcRow(const dynarithmic::dib::LockedDib& dib, uint32_t logicalY)
+    {
+        const uint32_t height = dib.Height();
+        const uint32_t physicalY =
+            dib.BottomUp()
+            ? (height - 1 - logicalY)
+            : logicalY;
+
+        return dib.Bits() + static_cast<size_t>(physicalY) * dib.StrideBytes();
+    }
+
+    uint8_t* LogicalDstRow(dynarithmic::dib::LockedDib& dib, uint32_t logicalY)
+    {
+        const uint32_t height = dib.Height();
+        const uint32_t physicalY =
+            dib.BottomUp()
+            ? (height - 1 - logicalY)
+            : logicalY;
+
+        return dib.Bits() + static_cast<size_t>(physicalY) * dib.StrideBytes();
+    }
+
+    uint8_t SampleBicubic8(const dynarithmic::dib::LockedDib& src, double srcX, double srcY)
+    {
+        const int width = static_cast<int>(src.Width());
+        const int height = static_cast<int>(src.Height());
+
+        const int ix = static_cast<int>(std::floor(srcX));
+        const int iy = static_cast<int>(std::floor(srcY));
+
+        double sum = 0.0;
+        double weightSum = 0.0;
+
+        for (int m = -1; m <= 2; ++m)
+        {
+            const int yy = std::clamp(iy + m, 0, height - 1);
+            const double wy = CubicWeight(srcY - static_cast<double>(iy + m));
+
+            const uint8_t* row = LogicalSrcRow(src, static_cast<uint32_t>(yy));
+
+            for (int n = -1; n <= 2; ++n)
+            {
+                const int xx = std::clamp(ix + n, 0, width - 1);
+                const double wx = CubicWeight(srcX - static_cast<double>(ix + n));
+                const double w = wx * wy;
+
+                sum += static_cast<double>(row[xx]) * w;
+                weightSum += w;
+            }
+        }
+
+        if (weightSum != 0.0)
+            sum /= weightSum;
+
+        return ClampU8(sum);
+    }
+
+    uint16_t SampleBicubic16(const dynarithmic::dib::LockedDib& src, double srcX, double srcY)
+    {
+        const int width = static_cast<int>(src.Width());
+        const int height = static_cast<int>(src.Height());
+
+        const int ix = static_cast<int>(std::floor(srcX));
+        const int iy = static_cast<int>(std::floor(srcY));
+
+        double sum = 0.0;
+        double weightSum = 0.0;
+
+        for (int m = -1; m <= 2; ++m)
+        {
+            const int yy = std::clamp(iy + m, 0, height - 1);
+            const double wy = CubicWeight(srcY - static_cast<double>(iy + m));
+
+            const auto* row =
+                reinterpret_cast<const uint16_t*>(LogicalSrcRow(src, static_cast<uint32_t>(yy)));
+
+            for (int n = -1; n <= 2; ++n)
+            {
+                const int xx = std::clamp(ix + n, 0, width - 1);
+                const double wx = CubicWeight(srcX - static_cast<double>(ix + n));
+                const double w = wx * wy;
+
+                sum += static_cast<double>(row[xx]) * w;
+                weightSum += w;
+            }
+        }
+
+        if (weightSum != 0.0)
+            sum /= weightSum;
+
+        return ClampU16(sum);
+    }
+
+    const uint8_t* LogicalRow(const dynarithmic::dib::LockedDib& d, uint32_t y)
+    {
+        const uint32_t physicalY = d.BottomUp() ? (d.Height() - 1 - y) : y;
+        return d.Bits() + static_cast<size_t>(physicalY) * d.StrideBytes();
+    }
+
+    uint8_t* LogicalRow(dynarithmic::dib::LockedDib& d, uint32_t y)
+    {
+        const uint32_t physicalY = d.BottomUp() ? (d.Height() - 1 - y) : y;
+        return d.Bits() + static_cast<size_t>(physicalY) * d.StrideBytes();
+    }
+
+    void CopyOnePixel(const dynarithmic::dib::LockedDib& src, uint32_t sx, uint32_t sy, dynarithmic::dib::LockedDib& dst, 
+                             uint32_t dx, uint32_t dy)
+    {
+        const uint16_t bpp = src.BitsPerPixel();
+
+        const uint8_t* srow = LogicalRow(src, sy);
+        uint8_t* drow = LogicalRow(dst, dy);
+
+        switch (bpp)
+        {
+            case 1:
+            case 4:
+            case 8:
+                SetPackedPixel(drow, dx, bpp, GetPackedPixel(srow, sx, bpp));
+                break;
+
+            case 16:
+                reinterpret_cast<uint16_t*>(drow)[dx] = reinterpret_cast<const uint16_t*>(srow)[sx];
+                break;
+
+            case 24:
+            case 32:
+                std::memcpy(drow + dx * (bpp / 8), srow + sx * (bpp / 8),  bpp / 8);
+                break;
+        }
+    }
+
+    void FillDibWhite(dynarithmic::dib::LockedDib& d)
+    {
+        const uint16_t bpp = d.BitsPerPixel();
+
+        for (uint32_t y = 0; y < d.Height(); ++y)
+        {
+            uint8_t* row = LogicalRow(d, y);
+
+            switch (bpp)
+            {
+                case 1:
+                    std::memset(row, 0xFF, d.StrideBytes());
+                    break;
+
+                case 4:
+                    std::memset(row, 0xFF, d.StrideBytes());
+                    break;
+
+                case 8:
+                    std::memset(row, 0xFF, d.StrideBytes());
+                    break;
+
+                case 16:
+                {
+                    auto* p = reinterpret_cast<uint16_t*>(row);
+                    for (uint32_t x = 0; x < d.Width(); ++x)
+                        p[x] = 0xFFFF;
+                    break;
+                }
+
+                case 24:
+                    for (uint32_t x = 0; x < d.Width(); ++x)
+                    {
+                        row[x * 3 + 0] = 255;
+                        row[x * 3 + 1] = 255;
+                        row[x * 3 + 2] = 255;
+                    }
+                    break;
+
+                case 32:
+                    for (uint32_t x = 0; x < d.Width(); ++x)
+                    {
+                        row[x * 4 + 0] = 255;
+                        row[x * 4 + 1] = 255;
+                        row[x * 4 + 2] = 255;
+                        row[x * 4 + 3] = 255;
+                    }
+                    break;
+            }
+        }
+    }
+
+
+    HANDLE RotateRightAngle(const dynarithmic::dib::LockedDib& src, int angle)
+    {
+        const uint32_t sw = src.Width();
+        const uint32_t sh = src.Height();
+        const uint16_t bpp = src.BitsPerPixel();
+
+        const uint32_t dw = (angle == 180) ? sw : sh;
+        const uint32_t dh = (angle == 180) ? sh : sw;
+
+        const uint32_t palEntries = bpp <= 8 ? src.PaletteEntries() : 0;
+
+        HANDLE hDst = CreateCroppedDibLike(*src.Header(), dw, dh, bpp, palEntries);
+        if (!hDst)
+            return nullptr;
+
+        dynarithmic::dib::LockedDib dst(hDst);
+        if (!dst.IsValid())
+        {
+            ::GlobalFree(hDst);
+            return nullptr;
+        }
+
+        if (bpp <= 8 && palEntries)
+            std::memcpy(dst.PalettePtrMutable(), src.Palette(), palEntries * sizeof(RGBQUAD));
+
+        FillDibWhite(dst);
+
+        for (uint32_t y = 0; y < sh; ++y)
+        {
+            for (uint32_t x = 0; x < sw; ++x)
+            {
+                uint32_t dx = 0;
+                uint32_t dy = 0;
+
+                if (angle == 90)
+                {
+                    dx = sh - 1 - y;
+                    dy = x;
+                }
+                else if (angle == 180)
+                {
+                    dx = sw - 1 - x;
+                    dy = sh - 1 - y;
+                }
+                else // 270
+                {
+                    dx = y;
+                    dy = sw - 1 - x;
+                }
+
+                CopyOnePixel(src, x, y, dst, dx, dy);
+            }
+        }
+
+        return hDst;
+    }
+
+    void SampleNearestToDst(const dynarithmic::dib::LockedDib& src, double sx, double sy,
+                                dynarithmic::dib::LockedDib& dst, uint32_t dx, uint32_t dy)
+    {
+        const uint32_t ix = static_cast<uint32_t>(
+            std::clamp<int>(static_cast<int>(std::floor(sx + 0.5)),
+                0,
+                static_cast<int>(src.Width() - 1)));
+
+        const uint32_t iy = static_cast<uint32_t>(
+            std::clamp<int>(static_cast<int>(std::floor(sy + 0.5)),
+                0,
+                static_cast<int>(src.Height() - 1)));
+
+        CopyOnePixel(src, ix, iy, dst, dx, dy);
+    }
+
+
+    void SampleBicubicToDst(const dynarithmic::dib::LockedDib& src, double sx, double sy,
+                                dynarithmic::dib::LockedDib& dst, uint32_t dx, uint32_t dy)
+    {
+        const uint16_t bpp = src.BitsPerPixel();
+        const int w = static_cast<int>(src.Width());
+        const int h = static_cast<int>(src.Height());
+
+        const int ix = static_cast<int>(std::floor(sx));
+        const int iy = static_cast<int>(std::floor(sy));
+
+        uint8_t* drow = LogicalRow(dst, dy);
+
+        if (bpp == 8)
+        {
+            double sum = 0.0, weight = 0.0;
+
+            for (int yy = -1; yy <= 2; ++yy)
+            {
+                const int py = std::clamp(iy + yy, 0, h - 1);
+                const double wy = CubicWeight(sy - (iy + yy));
+                const uint8_t* row = LogicalRow(src, py);
+
+                for (int xx = -1; xx <= 2; ++xx)
+                {
+                    const int px = std::clamp(ix + xx, 0, w - 1);
+                    const double wx = CubicWeight(sx - (ix + xx));
+                    const double ww = wx * wy;
+
+                    sum += row[px] * ww;
+                    weight += ww;
+                }
+            }
+
+            drow[dx] = ClampU8(weight ? sum / weight : sum);
+            return;
+        }
+
+        if (bpp == 16)
+        {
+            double sum = 0.0, weight = 0.0;
+
+            for (int yy = -1; yy <= 2; ++yy)
+            {
+                const int py = std::clamp(iy + yy, 0, h - 1);
+                const double wy = CubicWeight(sy - (iy + yy));
+                const auto* row = reinterpret_cast<const uint16_t*>(LogicalRow(src, py));
+
+                for (int xx = -1; xx <= 2; ++xx)
+                {
+                    const int px = std::clamp(ix + xx, 0, w - 1);
+                    const double wx = CubicWeight(sx - (ix + xx));
+                    const double ww = wx * wy;
+
+                    sum += row[px] * ww;
+                    weight += ww;
+                }
+            }
+
+            reinterpret_cast<uint16_t*>(drow)[dx] =
+                ClampU16(weight ? sum / weight : sum);
+            return;
+        }
+
+        const int bytes = bpp == 32 ? 4 : 3;
+        double acc[4] = { 0, 0, 0, bpp == 32 ? 0.0 : 255.0 };
+        double weight = 0.0;
+
+        for (int yy = -1; yy <= 2; ++yy)
+        {
+            const int py = std::clamp(iy + yy, 0, h - 1);
+            const double wy = CubicWeight(sy - (iy + yy));
+            const uint8_t* row = LogicalRow(src, py);
+
+            for (int xx = -1; xx <= 2; ++xx)
+            {
+                const int px = std::clamp(ix + xx, 0, w - 1);
+                const double wx = CubicWeight(sx - (ix + xx));
+                const double ww = wx * wy;
+
+                const uint8_t* p = row + px * bytes;
+
+                acc[0] += p[0] * ww;
+                acc[1] += p[1] * ww;
+                acc[2] += p[2] * ww;
+
+                if (bpp == 32)
+                    acc[3] += p[3] * ww;
+
+                weight += ww;
+            }
+        }
+
+        uint8_t* p = drow + dx * bytes;
+
+        p[0] = ClampU8(weight ? acc[0] / weight : acc[0]);
+        p[1] = ClampU8(weight ? acc[1] / weight : acc[1]);
+        p[2] = ClampU8(weight ? acc[2] / weight : acc[2]);
+
+        if (bpp == 32)
+            p[3] = ClampU8(weight ? acc[3] / weight : acc[3]);
+    }
+
+    HANDLE RotateArbitrary(const dynarithmic::dib::LockedDib& src, float angleDeg)
+    {
+        const uint32_t sw = src.Width();
+        const uint32_t sh = src.Height();
+        const uint16_t bpp = src.BitsPerPixel();
+
+        const double radians = angleDeg * 3.14159265358979323846 / 180.0;
+        const double c = std::cos(radians);
+        const double s = std::sin(radians);
+
+        const double cx = (static_cast<double>(sw) - 1.0) / 2.0;
+        const double cy = (static_cast<double>(sh) - 1.0) / 2.0;
+
+        const double corners[4][2] =
+        {
+            { -cx,       -cy        },
+            { sw - 1 - cx, -cy     },
+            { -cx,        sh - 1 - cy },
+            { sw - 1 - cx, sh - 1 - cy }
+        };
+
+        double minX = 1e30, maxX = -1e30;
+        double minY = 1e30, maxY = -1e30;
+
+        for (const auto& p : corners)
+        {
+            const double rx = p[0] * c - p[1] * s;
+            const double ry = p[0] * s + p[1] * c;
+
+            minX = std::min(minX, rx);
+            maxX = std::max(maxX, rx);
+            minY = std::min(minY, ry);
+            maxY = std::max(maxY, ry);
+        }
+
+        const uint32_t dw = static_cast<uint32_t>(std::ceil(maxX - minX + 1.0));
+        const uint32_t dh = static_cast<uint32_t>(std::ceil(maxY - minY + 1.0));
+
+        const uint32_t palEntries = bpp <= 8 ? src.PaletteEntries() : 0;
+
+        HANDLE hDst = CreateCroppedDibLike(*src.Header(), dw, dh, bpp, palEntries);
+        if (!hDst)
+            return nullptr;
+
+        dynarithmic::dib::LockedDib dst(hDst);
+        if (!dst.IsValid())
+        {
+            ::GlobalFree(hDst);
+            return nullptr;
+        }
+
+        if (bpp <= 8 && palEntries)
+            std::memcpy(dst.PalettePtrMutable(), src.Palette(), palEntries * sizeof(RGBQUAD));
+
+        FillDibWhite(dst);
+
+        const double dcx = (static_cast<double>(dw) - 1.0) / 2.0;
+        const double dcy = (static_cast<double>(dh) - 1.0) / 2.0;
+
+        for (uint32_t y = 0; y < dh; ++y)
+        {
+            for (uint32_t x = 0; x < dw; ++x)
+            {
+                const double dx = static_cast<double>(x) - dcx;
+                const double dy = static_cast<double>(y) - dcy;
+
+                // inverse rotate destination point back into source
+                const double sx = dx * c + dy * s + cx;
+                const double sy = -dx * s + dy * c + cy;
+
+                if (sx < 0.0 || sy < 0.0 ||
+                    sx > static_cast<double>(sw - 1) ||
+                    sy > static_cast<double>(sh - 1))
+                {
+                    continue;
+                }
+
+                if (bpp == 1 || bpp == 4)
+                    SampleNearestToDst(src, sx, sy, dst, x, y);
+                else
+                    SampleBicubicToDst(src, sx, sy, dst, x, y);
+            }
+        }
+
+        return hDst;
+    }
+
 }
 
 HGLOBAL dynarithmic::dib::CreateDibLike(const BITMAPINFOHEADER& src, uint16_t dstBpp, uint32_t paletteEntries)
@@ -89,10 +674,6 @@ HGLOBAL dynarithmic::dib::CreateDibLike(const BITMAPINFOHEADER& src, uint16_t ds
     return CreateDibLikeEx(src.biWidth, src.biHeight, dstBpp, src.biXPelsPerMeter, src.biYPelsPerMeter, paletteEntries);
 }
 
-static HGLOBAL CreateCroppedDibLike(const BITMAPINFOHEADER& src, uint32_t newWidth, uint32_t newHeight, uint16_t bpp, uint32_t paletteEntries)
-{
-    return CreateDibLikeEx(newWidth, newHeight, bpp, src.biXPelsPerMeter, src.biYPelsPerMeter, paletteEntries);
-}
 
 uint8_t dynarithmic::dib::NearestPaletteIndex(const RGBQUAD* pal, uint32_t count, const RGBQUAD& c)
 {
@@ -271,7 +852,7 @@ HANDLE dynarithmic::dib::IncreaseDibBpp(HANDLE hDib, uint16_t dstBpp)
     {
         FillGrayPalette(dstPal, 16);
 
-        if (srcPal && srcPalEntries > 0)
+        if (dstPal && srcPal && srcPalEntries > 0)
         {
             const uint32_t copyCount = std::min(srcPalEntries, dstPalEntries);
             std::memcpy(dstPal, srcPal, copyCount * sizeof(RGBQUAD));
@@ -280,9 +861,9 @@ HANDLE dynarithmic::dib::IncreaseDibBpp(HANDLE hDib, uint16_t dstBpp)
 
     for (uint32_t y = 0; y < height; ++y)
     {
-        const uint8_t* srow = srcBits + static_cast<size_t>(y) * srcStride;
+        const uint8_t* srow = srcBits + y * srcStride;
 
-        uint8_t* drow = dstBits + static_cast<size_t>(y) * dstStride;
+        uint8_t* drow = dstBits + y * dstStride;
 
         std::memset(drow, 0, dstStride);
 
@@ -377,54 +958,6 @@ HANDLE dynarithmic::dib::IncreaseDibBpp(HANDLE hDib, uint16_t dstBpp)
     return hDst;
 }
 
-
-static uint8_t GrayFromRGB(uint8_t r, uint8_t g, uint8_t b)
-{
-    return static_cast<uint8_t>(
-        (77u * r + 150u * g + 29u * b + 128u) >> 8);
-}
-
-static uint8_t GrayFromRGBQUAD(const RGBQUAD& q)
-{
-    return GrayFromRGB(q.rgbRed, q.rgbGreen, q.rgbBlue);
-}
-
-static uint8_t GetPixelGray(const uint8_t* row, uint32_t x, uint16_t srcBpp, const RGBQUAD* srcPal, uint32_t srcPalEntries)
-{
-    switch (srcBpp)
-    {
-        case 1:
-        case 4:
-        case 8:
-        {
-            const uint8_t idx = dynarithmic::dib::GetIndexedPixel(row, x, srcBpp);
-
-            if (srcPal && idx < srcPalEntries)
-                return GrayFromRGBQUAD(srcPal[idx]);
-
-            if (srcBpp == 1)
-                return idx ? 255 : 0;
-
-            return idx;
-        }
-
-        case 16:
-        {
-            const auto* p16 = reinterpret_cast<const uint16_t*>(row);
-            return static_cast<uint8_t>(p16[x] >> 8);
-        }
-
-        case 24:
-        case 32:
-        {
-            const uint8_t* p = row + x * (srcBpp/8);
-            return GrayFromRGB(p[2], p[1], p[0]); // BGR
-        }
-    }
-
-    return 0;
-}
-
 HANDLE dynarithmic::dib::DecreaseDibBpp(HANDLE hDib, uint16_t dstBpp)
 {
     LockedDib srcDib(hDib);
@@ -501,8 +1034,8 @@ HANDLE dynarithmic::dib::DecreaseDibBpp(HANDLE hDib, uint16_t dstBpp)
 
     for (uint32_t y = 0; y < height; ++y)
     {
-        const uint8_t* srow = srcBits + static_cast<size_t>(y) * srcStride;
-        uint8_t* drow = dstBits + static_cast<size_t>(y) * dstStride;
+        const uint8_t* srow = srcBits + y * srcStride;
+        uint8_t* drow = dstBits + y * dstStride;
         std::memset(drow, 0, dstStride);
         for (uint32_t x = 0; x < width; ++x)
         {
@@ -646,7 +1179,7 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
                 // invert actual pixel indices/data.
                 for (uint32_t y = 0; y < height; ++y)
                 {
-                    uint8_t* row = bits + static_cast<size_t>(y) * stride;
+                    uint8_t* row = bits + y * stride;
                     for (uint32_t i = 0; i < stride; ++i)
                         row[i] = static_cast<uint8_t>(~row[i]);
                 }
@@ -671,7 +1204,7 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
             for (uint32_t y = 0; y < height; ++y)
             {
                 auto* row = reinterpret_cast<uint16_t*>(
-                    bits + static_cast<size_t>(y) * stride);
+                    bits + y * stride);
 
                 for (uint32_t x = 0; x < width; ++x)
                     row[x] = static_cast<uint16_t>(0xFFFFu - row[x]);
@@ -684,7 +1217,7 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
         {
             for (uint32_t y = 0; y < height; ++y)
             {
-                uint8_t* row = bits + static_cast<size_t>(y) * stride;
+                uint8_t* row = bits + y * stride;
 
                 for (uint32_t x = 0; x < width; ++x)
                 {
@@ -704,58 +1237,6 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
     return hNew;
 }
 
-/// /////////////////////////////////////////////////////////////////////////
-static uint8_t GetPackedPixel(const uint8_t* row, uint32_t x, uint16_t bpp)
-{
-    switch (bpp)
-    {
-        case 1:
-            return static_cast<uint8_t>((row[x / 8] >> (7 - (x & 7))) & 1);
-
-        case 4:
-            return static_cast<uint8_t>((x & 1)
-                    ? (row[x / 2] & 0x0F)
-                    : ((row[x / 2] >> 4) & 0x0F));
-
-        case 8:
-            return row[x];
-
-        default:
-            return 0;
-    }
-}
-
-static void SetPackedPixel(uint8_t* row, uint32_t x, uint16_t bpp, uint8_t value)
-{
-    switch (bpp)
-    {
-        case 1:
-        {
-            const uint8_t mask = static_cast<uint8_t>(0x80 >> (x & 7));
-            if (value)
-                row[x / 8] |= mask;
-            else
-                row[x / 8] &= static_cast<uint8_t>(~mask);
-            break;
-        }
-
-        case 4:
-        {
-            uint8_t& byte = row[x / 2];
-
-            if ((x & 1) == 0)
-                byte = static_cast<uint8_t>((byte & 0x0F) | ((value & 0x0F) << 4));
-            else
-                byte = static_cast<uint8_t>((byte & 0xF0) | (value & 0x0F));
-
-            break;
-        }
-
-        case 8:
-            row[x] = value;
-            break;
-    }
-}
 
 HANDLE dynarithmic::dib::CropDib(HANDLE hDib, int left, int top, int right, int bottom)
 {
@@ -895,194 +1376,67 @@ HANDLE dynarithmic::dib::CropDib(HANDLE hDib, int left, int top, int right, int 
 
     return hDst;
 }
-//////////////////////////////////////////////////////////////////
-static double CubicWeight(double x)
+
+namespace
 {
-    // Catmull-Rom cubic filter, common bicubic interpolation kernel.
-    x = std::abs(x);
-
-    if (x <= 1.0)
-        return (1.5 * x * x * x) - (2.5 * x * x) + 1.0;
-
-    if (x < 2.0)
-        return (-0.5 * x * x * x) + (2.5 * x * x) - (4.0 * x) + 2.0;
-
-    return 0.0;
-}
-
-static uint8_t ClampU8(double v)
-{
-    if (v < 0.0) return 0;
-    if (v > 255.0) return 255;
-    return static_cast<uint8_t>(v + 0.5);
-}
-
-static uint16_t ClampU16(double v)
-{
-    if (v < 0.0) return 0;
-    if (v > 65535.0) return 65535;
-    return static_cast<uint16_t>(v + 0.5);
-}
-
-static const uint8_t* LogicalSrcRow(const dynarithmic::dib::LockedDib& dib,
-    uint32_t logicalY)
-{
-    const uint32_t height = dib.Height();
-    const uint32_t physicalY =
-        dib.BottomUp()
-        ? (height - 1 - logicalY)
-        : logicalY;
-
-    return dib.Bits() + static_cast<size_t>(physicalY) * dib.StrideBytes();
-}
-
-static uint8_t* LogicalDstRow(dynarithmic::dib::LockedDib& dib,
-    uint32_t logicalY)
-{
-    const uint32_t height = dib.Height();
-    const uint32_t physicalY =
-        dib.BottomUp()
-        ? (height - 1 - logicalY)
-        : logicalY;
-
-    return dib.Bits() + static_cast<size_t>(physicalY) * dib.StrideBytes();
-}
-
-static uint8_t SampleBicubic8(const dynarithmic::dib::LockedDib& src,
-    double srcX,
-    double srcY)
-{
-    const int width = static_cast<int>(src.Width());
-    const int height = static_cast<int>(src.Height());
-
-    const int ix = static_cast<int>(std::floor(srcX));
-    const int iy = static_cast<int>(std::floor(srcY));
-
-    double sum = 0.0;
-    double weightSum = 0.0;
-
-    for (int m = -1; m <= 2; ++m)
+    struct BgraD
     {
-        const int yy = std::clamp(iy + m, 0, height - 1);
-        const double wy = CubicWeight(srcY - static_cast<double>(iy + m));
+        double b = 0;
+        double g = 0;
+        double r = 0;
+        double a = 255;
+    };
 
-        const uint8_t* row = LogicalSrcRow(src, static_cast<uint32_t>(yy));
+    BgraD SampleBicubic24Or32(const dynarithmic::dib::LockedDib& src, double srcX, double srcY, uint16_t bpp)
+    {
+        const int width = static_cast<int>(src.Width());
+        const int height = static_cast<int>(src.Height());
+        const int bytesPerPixel = bpp == 32 ? 4 : 3;
 
-        for (int n = -1; n <= 2; ++n)
+        const int ix = static_cast<int>(std::floor(srcX));
+        const int iy = static_cast<int>(std::floor(srcY));
+
+        BgraD out{};
+        out.a = bpp == 32 ? 0.0 : 255.0;
+
+        double weightSum = 0.0;
+
+        for (int m = -1; m <= 2; ++m)
         {
-            const int xx = std::clamp(ix + n, 0, width - 1);
-            const double wx = CubicWeight(srcX - static_cast<double>(ix + n));
-            const double w = wx * wy;
+            const int yy = std::clamp(iy + m, 0, height - 1);
+            const double wy = CubicWeight(srcY - static_cast<double>(iy + m));
 
-            sum += static_cast<double>(row[xx]) * w;
-            weightSum += w;
+            const uint8_t* row = LogicalSrcRow(src, static_cast<uint32_t>(yy));
+
+            for (int n = -1; n <= 2; ++n)
+            {
+                const int xx = std::clamp(ix + n, 0, width - 1);
+                const double wx = CubicWeight(srcX - static_cast<double>(ix + n));
+                const double w = wx * wy;
+
+                const uint8_t* p = row + static_cast<size_t>(xx) * bytesPerPixel;
+
+                out.b += p[0] * w;
+                out.g += p[1] * w;
+                out.r += p[2] * w;
+
+                if (bpp == 32)
+                    out.a += p[3] * w;
+
+                weightSum += w;
+            }
         }
-    }
 
-    if (weightSum != 0.0)
-        sum /= weightSum;
-
-    return ClampU8(sum);
-}
-
-static uint16_t SampleBicubic16(const dynarithmic::dib::LockedDib& src,
-    double srcX,
-    double srcY)
-{
-    const int width = static_cast<int>(src.Width());
-    const int height = static_cast<int>(src.Height());
-
-    const int ix = static_cast<int>(std::floor(srcX));
-    const int iy = static_cast<int>(std::floor(srcY));
-
-    double sum = 0.0;
-    double weightSum = 0.0;
-
-    for (int m = -1; m <= 2; ++m)
-    {
-        const int yy = std::clamp(iy + m, 0, height - 1);
-        const double wy = CubicWeight(srcY - static_cast<double>(iy + m));
-
-        const auto* row =
-            reinterpret_cast<const uint16_t*>(LogicalSrcRow(src, static_cast<uint32_t>(yy)));
-
-        for (int n = -1; n <= 2; ++n)
+        if (weightSum != 0.0)
         {
-            const int xx = std::clamp(ix + n, 0, width - 1);
-            const double wx = CubicWeight(srcX - static_cast<double>(ix + n));
-            const double w = wx * wy;
-
-            sum += static_cast<double>(row[xx]) * w;
-            weightSum += w;
+            out.b /= weightSum;
+            out.g /= weightSum;
+            out.r /= weightSum;
+            out.a /= weightSum;
         }
+
+        return out;
     }
-
-    if (weightSum != 0.0)
-        sum /= weightSum;
-
-    return ClampU16(sum);
-}
-
-struct BgraD
-{
-    double b = 0;
-    double g = 0;
-    double r = 0;
-    double a = 255;
-};
-
-static BgraD SampleBicubic24Or32(const dynarithmic::dib::LockedDib& src,
-    double srcX,
-    double srcY,
-    uint16_t bpp)
-{
-    const int width = static_cast<int>(src.Width());
-    const int height = static_cast<int>(src.Height());
-    const int bytesPerPixel = bpp == 32 ? 4 : 3;
-
-    const int ix = static_cast<int>(std::floor(srcX));
-    const int iy = static_cast<int>(std::floor(srcY));
-
-    BgraD out{};
-    out.a = bpp == 32 ? 0.0 : 255.0;
-
-    double weightSum = 0.0;
-
-    for (int m = -1; m <= 2; ++m)
-    {
-        const int yy = std::clamp(iy + m, 0, height - 1);
-        const double wy = CubicWeight(srcY - static_cast<double>(iy + m));
-
-        const uint8_t* row = LogicalSrcRow(src, static_cast<uint32_t>(yy));
-
-        for (int n = -1; n <= 2; ++n)
-        {
-            const int xx = std::clamp(ix + n, 0, width - 1);
-            const double wx = CubicWeight(srcX - static_cast<double>(ix + n));
-            const double w = wx * wy;
-
-            const uint8_t* p = row + static_cast<size_t>(xx) * bytesPerPixel;
-
-            out.b += p[0] * w;
-            out.g += p[1] * w;
-            out.r += p[2] * w;
-
-            if (bpp == 32)
-                out.a += p[3] * w;
-
-            weightSum += w;
-        }
-    }
-
-    if (weightSum != 0.0)
-    {
-        out.b /= weightSum;
-        out.g /= weightSum;
-        out.r /= weightSum;
-        out.a /= weightSum;
-    }
-
-    return out;
 }
 
 HANDLE dynarithmic::dib::ResizeDib(HANDLE hDib, int32_t newx, int32_t newy)
@@ -1219,7 +1573,7 @@ HANDLE dynarithmic::dib::ResizeDib(HANDLE hDib, int32_t newx, int32_t newy)
 
                     const BgraD s = SampleBicubic24Or32(src, srcX, srcY, 24);
 
-                    uint8_t* p = dstRow + static_cast<size_t>(x) * 3;
+                    uint8_t* p = dstRow + x * 3;
                     p[0] = ClampU8(s.b);
                     p[1] = ClampU8(s.g);
                     p[2] = ClampU8(s.r);
@@ -1236,7 +1590,7 @@ HANDLE dynarithmic::dib::ResizeDib(HANDLE hDib, int32_t newx, int32_t newy)
 
                     const BgraD s = SampleBicubic24Or32(src, srcX, srcY, 32);
 
-                    uint8_t* p = dstRow + static_cast<size_t>(x) * 4;
+                    uint8_t* p = dstRow + x * 4;
                     p[0] = ClampU8(s.b);
                     p[1] = ClampU8(s.g);
                     p[2] = ClampU8(s.r);
@@ -1250,360 +1604,6 @@ HANDLE dynarithmic::dib::ResizeDib(HANDLE hDib, int32_t newx, int32_t newy)
     return hDst;
 }
 
-static const uint8_t* LogicalRow(const dynarithmic::dib::LockedDib& d, uint32_t y)
-{
-    const uint32_t physicalY = d.BottomUp() ? (d.Height() - 1 - y) : y;
-    return d.Bits() + static_cast<size_t>(physicalY) * d.StrideBytes();
-}
-
-static uint8_t* LogicalRow(dynarithmic::dib::LockedDib& d, uint32_t y)
-{
-    const uint32_t physicalY = d.BottomUp() ? (d.Height() - 1 - y) : y;
-    return d.Bits() + static_cast<size_t>(physicalY) * d.StrideBytes();
-}
-
-static void CopyOnePixel(const dynarithmic::dib::LockedDib& src, uint32_t sx, uint32_t sy, dynarithmic::dib::LockedDib& dst, 
-                         uint32_t dx, uint32_t dy)
-{
-    const uint16_t bpp = src.BitsPerPixel();
-
-    const uint8_t* srow = LogicalRow(src, sy);
-    uint8_t* drow = LogicalRow(dst, dy);
-
-    switch (bpp)
-    {
-        case 1:
-        case 4:
-        case 8:
-            SetPackedPixel(drow, dx, bpp, GetPackedPixel(srow, sx, bpp));
-            break;
-
-        case 16:
-            reinterpret_cast<uint16_t*>(drow)[dx] = reinterpret_cast<const uint16_t*>(srow)[sx];
-            break;
-
-        case 24:
-        case 32:
-            std::memcpy(drow + dx * (bpp / 8), srow + sx * (bpp / 8),  bpp / 8);
-            break;
-    }
-}
-
-static void FillDibWhite(dynarithmic::dib::LockedDib& d)
-{
-    const uint16_t bpp = d.BitsPerPixel();
-
-    for (uint32_t y = 0; y < d.Height(); ++y)
-    {
-        uint8_t* row = LogicalRow(d, y);
-
-        switch (bpp)
-        {
-            case 1:
-                std::memset(row, 0xFF, d.StrideBytes());
-                break;
-
-            case 4:
-                std::memset(row, 0xFF, d.StrideBytes());
-                break;
-
-            case 8:
-                std::memset(row, 0xFF, d.StrideBytes());
-                break;
-
-            case 16:
-            {
-                auto* p = reinterpret_cast<uint16_t*>(row);
-                for (uint32_t x = 0; x < d.Width(); ++x)
-                    p[x] = 0xFFFF;
-                break;
-            }
-
-            case 24:
-                for (uint32_t x = 0; x < d.Width(); ++x)
-                {
-                    row[x * 3 + 0] = 255;
-                    row[x * 3 + 1] = 255;
-                    row[x * 3 + 2] = 255;
-                }
-                break;
-
-            case 32:
-                for (uint32_t x = 0; x < d.Width(); ++x)
-                {
-                    row[x * 4 + 0] = 255;
-                    row[x * 4 + 1] = 255;
-                    row[x * 4 + 2] = 255;
-                    row[x * 4 + 3] = 255;
-                }
-                break;
-        }
-    }
-}
-
-
-static HANDLE RotateRightAngle(const dynarithmic::dib::LockedDib& src, int angle)
-{
-    const uint32_t sw = src.Width();
-    const uint32_t sh = src.Height();
-    const uint16_t bpp = src.BitsPerPixel();
-
-    const uint32_t dw = (angle == 180) ? sw : sh;
-    const uint32_t dh = (angle == 180) ? sh : sw;
-
-    const uint32_t palEntries = bpp <= 8 ? src.PaletteEntries() : 0;
-
-    HANDLE hDst = CreateCroppedDibLike(*src.Header(), dw, dh, bpp, palEntries);
-    if (!hDst)
-        return nullptr;
-
-    dynarithmic::dib::LockedDib dst(hDst);
-    if (!dst.IsValid())
-    {
-        ::GlobalFree(hDst);
-        return nullptr;
-    }
-
-    if (bpp <= 8 && palEntries)
-        std::memcpy(dst.PalettePtrMutable(), src.Palette(), palEntries * sizeof(RGBQUAD));
-
-    FillDibWhite(dst);
-
-    for (uint32_t y = 0; y < sh; ++y)
-    {
-        for (uint32_t x = 0; x < sw; ++x)
-        {
-            uint32_t dx = 0;
-            uint32_t dy = 0;
-
-            if (angle == 90)
-            {
-                dx = sh - 1 - y;
-                dy = x;
-            }
-            else if (angle == 180)
-            {
-                dx = sw - 1 - x;
-                dy = sh - 1 - y;
-            }
-            else // 270
-            {
-                dx = y;
-                dy = sw - 1 - x;
-            }
-
-            CopyOnePixel(src, x, y, dst, dx, dy);
-        }
-    }
-
-    return hDst;
-}
-
-static void SampleNearestToDst(const dynarithmic::dib::LockedDib& src, double sx, double sy,
-                            dynarithmic::dib::LockedDib& dst, uint32_t dx, uint32_t dy)
-{
-    const uint32_t ix = static_cast<uint32_t>(
-        std::clamp<int>(static_cast<int>(std::floor(sx + 0.5)),
-            0,
-            static_cast<int>(src.Width() - 1)));
-
-    const uint32_t iy = static_cast<uint32_t>(
-        std::clamp<int>(static_cast<int>(std::floor(sy + 0.5)),
-            0,
-            static_cast<int>(src.Height() - 1)));
-
-    CopyOnePixel(src, ix, iy, dst, dx, dy);
-}
-
-
-static void SampleBicubicToDst(const dynarithmic::dib::LockedDib& src, double sx, double sy,
-                            dynarithmic::dib::LockedDib& dst, uint32_t dx, uint32_t dy)
-{
-    const uint16_t bpp = src.BitsPerPixel();
-    const int w = static_cast<int>(src.Width());
-    const int h = static_cast<int>(src.Height());
-
-    const int ix = static_cast<int>(std::floor(sx));
-    const int iy = static_cast<int>(std::floor(sy));
-
-    uint8_t* drow = LogicalRow(dst, dy);
-
-    if (bpp == 8)
-    {
-        double sum = 0.0, weight = 0.0;
-
-        for (int yy = -1; yy <= 2; ++yy)
-        {
-            const int py = std::clamp(iy + yy, 0, h - 1);
-            const double wy = CubicWeight(sy - (iy + yy));
-            const uint8_t* row = LogicalRow(src, py);
-
-            for (int xx = -1; xx <= 2; ++xx)
-            {
-                const int px = std::clamp(ix + xx, 0, w - 1);
-                const double wx = CubicWeight(sx - (ix + xx));
-                const double ww = wx * wy;
-
-                sum += row[px] * ww;
-                weight += ww;
-            }
-        }
-
-        drow[dx] = ClampU8(weight ? sum / weight : sum);
-        return;
-    }
-
-    if (bpp == 16)
-    {
-        double sum = 0.0, weight = 0.0;
-
-        for (int yy = -1; yy <= 2; ++yy)
-        {
-            const int py = std::clamp(iy + yy, 0, h - 1);
-            const double wy = CubicWeight(sy - (iy + yy));
-            const auto* row = reinterpret_cast<const uint16_t*>(LogicalRow(src, py));
-
-            for (int xx = -1; xx <= 2; ++xx)
-            {
-                const int px = std::clamp(ix + xx, 0, w - 1);
-                const double wx = CubicWeight(sx - (ix + xx));
-                const double ww = wx * wy;
-
-                sum += row[px] * ww;
-                weight += ww;
-            }
-        }
-
-        reinterpret_cast<uint16_t*>(drow)[dx] =
-            ClampU16(weight ? sum / weight : sum);
-        return;
-    }
-
-    const int bytes = bpp == 32 ? 4 : 3;
-    double acc[4] = { 0, 0, 0, bpp == 32 ? 0.0 : 255.0 };
-    double weight = 0.0;
-
-    for (int yy = -1; yy <= 2; ++yy)
-    {
-        const int py = std::clamp(iy + yy, 0, h - 1);
-        const double wy = CubicWeight(sy - (iy + yy));
-        const uint8_t* row = LogicalRow(src, py);
-
-        for (int xx = -1; xx <= 2; ++xx)
-        {
-            const int px = std::clamp(ix + xx, 0, w - 1);
-            const double wx = CubicWeight(sx - (ix + xx));
-            const double ww = wx * wy;
-
-            const uint8_t* p = row + px * bytes;
-
-            acc[0] += p[0] * ww;
-            acc[1] += p[1] * ww;
-            acc[2] += p[2] * ww;
-
-            if (bpp == 32)
-                acc[3] += p[3] * ww;
-
-            weight += ww;
-        }
-    }
-
-    uint8_t* p = drow + dx * bytes;
-
-    p[0] = ClampU8(weight ? acc[0] / weight : acc[0]);
-    p[1] = ClampU8(weight ? acc[1] / weight : acc[1]);
-    p[2] = ClampU8(weight ? acc[2] / weight : acc[2]);
-
-    if (bpp == 32)
-        p[3] = ClampU8(weight ? acc[3] / weight : acc[3]);
-}
-
-static HANDLE RotateArbitrary(const dynarithmic::dib::LockedDib& src, float angleDeg)
-{
-    const uint32_t sw = src.Width();
-    const uint32_t sh = src.Height();
-    const uint16_t bpp = src.BitsPerPixel();
-
-    const double radians = angleDeg * 3.14159265358979323846 / 180.0;
-    const double c = std::cos(radians);
-    const double s = std::sin(radians);
-
-    const double cx = (static_cast<double>(sw) - 1.0) / 2.0;
-    const double cy = (static_cast<double>(sh) - 1.0) / 2.0;
-
-    const double corners[4][2] =
-    {
-        { -cx,       -cy        },
-        { sw - 1 - cx, -cy     },
-        { -cx,        sh - 1 - cy },
-        { sw - 1 - cx, sh - 1 - cy }
-    };
-
-    double minX = 1e30, maxX = -1e30;
-    double minY = 1e30, maxY = -1e30;
-
-    for (const auto& p : corners)
-    {
-        const double rx = p[0] * c - p[1] * s;
-        const double ry = p[0] * s + p[1] * c;
-
-        minX = std::min(minX, rx);
-        maxX = std::max(maxX, rx);
-        minY = std::min(minY, ry);
-        maxY = std::max(maxY, ry);
-    }
-
-    const uint32_t dw = static_cast<uint32_t>(std::ceil(maxX - minX + 1.0));
-    const uint32_t dh = static_cast<uint32_t>(std::ceil(maxY - minY + 1.0));
-
-    const uint32_t palEntries = bpp <= 8 ? src.PaletteEntries() : 0;
-
-    HANDLE hDst = CreateCroppedDibLike(*src.Header(), dw, dh, bpp, palEntries);
-    if (!hDst)
-        return nullptr;
-
-    dynarithmic::dib::LockedDib dst(hDst);
-    if (!dst.IsValid())
-    {
-        ::GlobalFree(hDst);
-        return nullptr;
-    }
-
-    if (bpp <= 8 && palEntries)
-        std::memcpy(dst.PalettePtrMutable(), src.Palette(), palEntries * sizeof(RGBQUAD));
-
-    FillDibWhite(dst);
-
-    const double dcx = (static_cast<double>(dw) - 1.0) / 2.0;
-    const double dcy = (static_cast<double>(dh) - 1.0) / 2.0;
-
-    for (uint32_t y = 0; y < dh; ++y)
-    {
-        for (uint32_t x = 0; x < dw; ++x)
-        {
-            const double dx = static_cast<double>(x) - dcx;
-            const double dy = static_cast<double>(y) - dcy;
-
-            // inverse rotate destination point back into source
-            const double sx = dx * c + dy * s + cx;
-            const double sy = -dx * s + dy * c + cy;
-
-            if (sx < 0.0 || sy < 0.0 ||
-                sx > static_cast<double>(sw - 1) ||
-                sy > static_cast<double>(sh - 1))
-            {
-                continue;
-            }
-
-            if (bpp == 1 || bpp == 4)
-                SampleNearestToDst(src, sx, sy, dst, x, y);
-            else
-                SampleBicubicToDst(src, sx, sy, dst, x, y);
-        }
-    }
-
-    return hDst;
-}
 
 
 HANDLE dynarithmic::dib::Rotate(HANDLE src, float angle)

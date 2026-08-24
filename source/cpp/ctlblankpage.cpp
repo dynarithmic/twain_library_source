@@ -21,94 +21,99 @@
 
  */
 #include "cppfunc.h"
-#include "dtwain.h"
-#include "ctliface.h"
+#include "dtwainc.h"
+#include "dtwainx.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionExString(DTWAIN_SOURCE Source, LPCTSTR threshold,
-                                                              LONG autodetect, LONG detectOpts, DTWAIN_BOOL bSet)
+using CharType = TCHAR;
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, detectOpts, bSet))
-    const DTWAIN_FLOAT val1 = StringWrapper::ToDouble(threshold, 100.0);
-    const DTWAIN_BOOL bRet = DTWAIN_SetBlankPageDetectionEx(Source, val1, autodetect, detectOpts, bSet);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionExString(DTWAIN_SOURCE Source, LPCTSTR threshold,
+                                                                  LONG autodetect, LONG detectOpts, DTWAIN_BOOL bSet)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, detectOpts, bSet))
+        const DTWAIN_FLOAT val1 = CharTraits<CharType>::ToDouble(threshold, 100.0);
+        const DTWAIN_BOOL bRet = DTWAIN_SetBlankPageDetectionEx(Source, val1, autodetect, detectOpts, bSet);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionString(DTWAIN_SOURCE Source, LPCTSTR threshold,
-                                                            LONG autodetect, DTWAIN_BOOL bSet)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, bSet))
-    const DTWAIN_FLOAT val1 = StringWrapper::ToDouble(threshold, 100.0);
-    const DTWAIN_BOOL bRet = DTWAIN_SetBlankPageDetection(Source, val1, autodetect, bSet);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionString(DTWAIN_SOURCE Source, LPCTSTR threshold,
+                                                                LONG autodetect, DTWAIN_BOOL bSet)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, bSet))
+        const DTWAIN_FLOAT val1 = CharTraits<CharType>::ToDouble(threshold, 100.0);
+        const DTWAIN_BOOL bRet = DTWAIN_SetBlankPageDetection(Source, val1, autodetect, bSet);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetection(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,
-                                                      LONG autodetect, DTWAIN_BOOL bSet)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, bSet))
-    const DTWAIN_BOOL bRet = DTWAIN_SetBlankPageDetectionEx(Source, threshold, autodetect,
-                                                            DTWAIN_BP_DETECTADJUSTED | DTWAIN_BP_DETECTORIGINAL, bSet);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetection(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,
+                                                          LONG autodetect, DTWAIN_BOOL bSet)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, bSet))
+        const DTWAIN_BOOL bRet = DTWAIN_SetBlankPageDetectionEx(Source, threshold, autodetect,
+                                                                DTWAIN_BP_DETECTADJUSTED | DTWAIN_BP_DETECTORIGINAL, bSet);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,
-                                                        LONG autodetect, LONG detectOpts, DTWAIN_BOOL bSet)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, detectOpts, bSet))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return threshold < 0.0 || threshold > 100.0; }, DTWAIN_ERR_INVALID_PARAM, 
-                                      FALSE, FUNC_MACRO);
-    if (detectOpts & DTWAIN_BP_DETECTORIGINAL )
-        pSource->SetBlankPageDetectionNoSampleOn(bSet ? true : false);
-    if (detectOpts & DTWAIN_BP_DETECTADJUSTED)
-        pSource->SetBlankPageDetectionSampleOn(bSet ? true : false);
-    pSource->SetBlankPageDetectionOn(pSource->IsBlankPageDetectionNoSampleOn() || pSource->IsBlankPageDetectionSampleOn());
-    pSource->SetBlankPageThreshold(threshold);
-    if (autodetect > DTWAIN_BP_AUTODISCARD_ANY || autodetect < DTWAIN_BP_AUTODISCARD_NONE)
-        autodetect = DTWAIN_BP_AUTODISCARD_NONE;
-    pSource->SetBlankPageAutoDetect(autodetect);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,
+                                                            LONG autodetect, LONG detectOpts, DTWAIN_BOOL bSet)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, detectOpts, bSet))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return threshold < 0.0 || threshold > 100.0; }, DTWAIN_ERR_INVALID_PARAM, 
+                                          FALSE, FUNC_MACRO);
+        if (detectOpts & DTWAIN_BP_DETECTORIGINAL )
+            pSource->SetBlankPageDetectionNoSampleOn(bSet ? true : false);
+        if (detectOpts & DTWAIN_BP_DETECTADJUSTED)
+            pSource->SetBlankPageDetectionSampleOn(bSet ? true : false);
+        pSource->SetBlankPageDetectionOn(pSource->IsBlankPageDetectionNoSampleOn() || pSource->IsBlankPageDetectionSampleOn());
+        pSource->SetBlankPageThreshold(threshold);
+        if (autodetect > DTWAIN_BP_AUTODISCARD_ANY || autodetect < DTWAIN_BP_AUTODISCARD_NONE)
+            autodetect = DTWAIN_BP_AUTODISCARD_NONE;
+        pSource->SetBlankPageAutoDetect(autodetect);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
-LONG DLLENTRY_DEF DTWAIN_GetBlankPageAutoDetection(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG retval = pSource->GetBlankPageAutoDetect();
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK_LOG_PARAMS(-1)
-}
+    LONG DLLENTRY_DEF DTWAIN_GetBlankPageAutoDetection(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const LONG retval = pSource->GetBlankPageAutoDetect();
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK_LOG_PARAMS(-1)
+    }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBlankPageDetectionOn(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const DTWAIN_BOOL retval = pSource->IsBlankPageDetectionOn()?1:0;
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBlankPageDetectionOn(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const DTWAIN_BOOL retval = pSource->IsBlankPageDetectionOn()?1:0;
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
 
-LONG DLLENTRY_DEF DTWAIN_IsDIBBlankString(HANDLE hDib, LPCTSTR threshold)
-{
-    LOG_FUNC_ENTRY_PARAMS((hDib, threshold))
-    const DTWAIN_FLOAT val = StringWrapper::ToDouble(threshold, 100.0);
-    const LONG retval = DTWAIN_IsDIBBlank(hDib, val);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(0)
-}
+    LONG DLLENTRY_DEF DTWAIN_IsDIBBlankString(HANDLE hDib, LPCTSTR threshold)
+    {
+        LOG_FUNC_ENTRY_PARAMS((hDib, threshold))
+        const DTWAIN_FLOAT val = CharTraits<CharType>::ToDouble(threshold, 100.0);
+        const LONG retval = DTWAIN_IsDIBBlank(hDib, val);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+        CATCH_BLOCK(0)
+    }
 
-LONG DLLENTRY_DEF DTWAIN_IsDIBBlank(HANDLE hDib, DTWAIN_FLOAT threshold)
-{
-    LOG_FUNC_ENTRY_PARAMS((hDib, threshold))
-    auto retval = CDibInterface::IsBlankDIBEx(hDib, threshold);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval.m_bIsBlank)
-    CATCH_BLOCK(0)
+    LONG DLLENTRY_DEF DTWAIN_IsDIBBlank(HANDLE hDib, DTWAIN_FLOAT threshold)
+    {
+        LOG_FUNC_ENTRY_PARAMS((hDib, threshold))
+        auto retval = CDibInterface::IsBlankDIBEx(hDib, threshold);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval.m_bIsBlank)
+        CATCH_BLOCK(0)
+    }
 }

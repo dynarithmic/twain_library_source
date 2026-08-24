@@ -28,7 +28,7 @@ namespace dynarithmic
     class CTL_WmfIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_WmfIOHandler() : CTL_ImageIOHandler(), m_nFormat{} {}
+            CTL_WmfIOHandler() : m_nFormat{} {}
             CTL_WmfIOHandler(CTL_TwainDib* pDib, int nFormat) :
                 CTL_ImageIOHandler(pDib), m_nFormat(nFormat) {}
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;

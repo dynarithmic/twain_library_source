@@ -26,7 +26,7 @@
 #include <vector>
 #include "imagefun/dtwpdf/pdffont_basic.h"
 #include "dtwtype.h"
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "dtwain_filetypes.h"
 #include "dtwaindefs.h"
 

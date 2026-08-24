@@ -18,11 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
 #include "iohandler_wmf.h"
 #include "metafilewriter.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
@@ -54,8 +53,8 @@ int CTL_WmfIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     else
         opts.type = MetafileType::Emf;
 
-    opts.description = StringConversion::Convert_Ansi_To_Wide(GetCopyrightString());
-    std::wstring sFileName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    opts.description = stringconversion::Convert_Ansi_To_Wide(GetCopyrightString());
+    std::wstring sFileName = stringconversion::Convert_NativePtr_To_Wide(szFile);
     auto retval = WriteOneDibHandleToMetafile(sFileName, m_pDib->GetHandle(), opts);
     if (!retval)
         return DTWAIN_ERR_FILEWRITE;

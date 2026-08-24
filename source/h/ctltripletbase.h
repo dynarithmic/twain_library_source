@@ -23,8 +23,7 @@
 
 #include <tuple>
 #include <utility>
-#include "ctltwainsession.h"
-#include "ctlobstr.h"
+#include "twain.h"
 
 namespace dynarithmic
 {
@@ -64,10 +63,10 @@ namespace dynarithmic
             virtual TW_UINT16 Execute();
             void    SetAlive( bool bSet );
             bool    IsAlive() const;
-            bool    IsMSGGetType() const;
-            bool    IsMSGSetType() const;
-            bool    IsMSGResetType() const;
-            bool    IsMSGSetOrResetType() const;
+            bool    IsMessageGetType() const;
+            bool    IsMessageSetType() const;
+            bool    IsMessageResetType() const;
+            bool    IsMessageSetOrResetType() const;
 
             pTW_IDENTITY GetOriginID() const { return std::get<ORIGINPOS_>(m_TwainTripletArg); }
             pTW_IDENTITY GetDestinationID() const { return std::get<DESTPOS_>(m_TwainTripletArg); }

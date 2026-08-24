@@ -20,14 +20,15 @@
  */
 #include "iohandler_bmp.h"
 #include "bmprlewriter.h"
-#include "ctliface.h"
 #include "ctldib32ex.h"
+#include "ctlglobalhandletraits.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
 static std::pair<bool, int> SaveBMPRLE(LPCTSTR szFile, HANDLE hDib)
 {
-    std::wstring filename = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring filename = stringconversion::Convert_NativePtr_To_Wide(szFile);
     LockedDibPage lockedPage(hDib);
     if (!lockedPage.IsValid())
         return { false, DTWAIN_ERR_DIB };
@@ -67,7 +68,7 @@ int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     {
         auto pBytes = static_cast<char *>(ImageMemoryHandler::GlobalLock(hHandleToWrite));
         DTWAINGlobalHandleUnlockFree_RAII raii(hHandleToWrite);
-        std::ofstream ofs(StringConversion::Convert_NativePtr_To_Ansi(szFile), std::ios::binary);
+        std::ofstream ofs(stringconversion::Convert_NativePtr_To_Ansi(szFile), std::ios::binary);
         if (!ofs)
             return DTWAIN_ERR_FILEWRITE;
         auto nBytes = ImageMemoryHandler::GlobalSize(hHandleToWrite);

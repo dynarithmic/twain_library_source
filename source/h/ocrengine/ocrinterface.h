@@ -26,8 +26,9 @@
 #include <unordered_map>
 #include <bitset>
 #include <algorithm>
+#include <array>
 #include <dtwtype.h>
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #define OCROPTION_GETINFO         0
 #define OCROPTION_STORECLEANTEXT1 1
 #define OCROPTION_STORECLEANTEXT2 2

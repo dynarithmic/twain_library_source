@@ -19,27 +19,31 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltwainmanager.h"
-#include "arrayfactory.h"
 #include "errorcheck.h"
+#include "ctlstringutilsx.h"
+#include "ctldtwainhandle.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
-
-LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG nSize)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((paperNumber, outName, nSize))
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto& pdfmediamap = CTL_StaticData::GetPDFMediaMap();
-    auto iter = pdfmediamap.find(paperNumber);
-    LONG nActualCharactersCopied = 0;
-    if (iter != pdfmediamap.end())
-    { 
-        CTL_StringType pageName = StringConversion::Convert_Ansi_To_Native(iter->second.first);
-        nActualCharactersCopied = StringWrapper::CopyInfoToCString(pageName, outName, nSize);
+    LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG nSize)
+    {
+        LOG_FUNC_ENTRY_PARAMS((paperNumber, outName, nSize))
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto& pdfmediamap = CTL_StaticData::GetPDFMediaMap();
+        auto iter = pdfmediamap.find(paperNumber);
+        LONG nActualCharactersCopied = 0;
+        if (iter != pdfmediamap.end())
+        { 
+            CTL_StringType pageName = stringconversion::Convert_Ansi_To_Native(iter->second.first);
+            nActualCharactersCopied = CopyInfoToCString(pageName, outName, nSize);
+        }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((outName))
+        LOG_FUNC_EXIT_NONAME_PARAMS(nActualCharactersCopied)
+        CATCH_BLOCK(-1)
     }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((outName))
-    LOG_FUNC_EXIT_NONAME_PARAMS(nActualCharactersCopied)
-    CATCH_BLOCK(-1)
 }

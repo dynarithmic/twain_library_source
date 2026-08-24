@@ -22,14 +22,12 @@
 #define CTLTWAINMANAGER_H
 
 #include <memory>
-#include <map>
 #include <string>
 #include <string_view>
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "ctlarray.h"
 #include "ctltwainsession.h"
 #include "ctlenum.h"
-#include "capstruc.h"
 #include "ctltwaindecoder.h"
 #include "ctltripletbase.h"
 #include "ctltr011.h"
@@ -306,9 +304,6 @@ namespace dynarithmic
                                         CTL_ITwainSource  *pSource,
                                         bool bIsMememoryFile = false );
 
-            static int  ClipboardTransfer( CTL_ITwainSession *pSession,
-                                           CTL_ITwainSource *pSource );
-
             static int  StartTransfer( CTL_ITwainSession *pSession,
                                        CTL_ITwainSource * pSource,
                                        CTL_ImageXferTriplet *pTrip);
@@ -426,9 +421,6 @@ namespace dynarithmic
 
             void DestroySession(const CTL_ITwainSession* pSession);
             void DestroyAllTwainSessions();
-            void WriteToLogFile(int rc);
-            void OpenLogFile(LPCSTR lpszFile);
-            void CloseLogFile();
             CTL_TwainDLLHandle* GetDLLHandle() const { return m_pDLLHandle; }
             static CTL_TwainSessionArray::iterator FindSession(const CTL_ITwainSession* pSession);
 

@@ -20,8 +20,9 @@
  */
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
-#include "ctltmpl5.h"
 #include "ctlsetgetcaps.h"
+#include "ctlarraydumper.h"
+#include "ctldtwainhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -32,76 +33,79 @@ using namespace dynarithmic;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Test a capability to see what data type and what container types produce a successful MSG_GET operation
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
-
-    static constexpr LONG DataTypeArray[] = {
-                                            TWTY_INT16,
-                                            TWTY_UINT16,
-                                            TWTY_INT32,
-                                            TWTY_UINT32,
-                                            TWTY_BOOL,
-                                            TWTY_FIX32,
-                                            TWTY_INT8,
-                                            TWTY_UINT8,
-                                            TWTY_STR32,
-                                            TWTY_STR64,
-                                            TWTY_STR255,
-                                            TWTY_STR128,
-                                            TWTY_STR1024,
-                                            TWTY_UNI512,
-                                            TWTY_FRAME
-                                        };
-
-    static constexpr LONG ContainerTypeArray[] = {
-                                            DTWAIN_CONTENUMERATION,
-                                            DTWAIN_CONTARRAY,
-                                            DTWAIN_CONTRANGE,
-                                            DTWAIN_CONTONEVALUE
-                                        };
-
-    static constexpr size_t DataTypeArraySize = std::size(DataTypeArray);
-    static constexpr size_t ContainerArraySize = std::size(ContainerTypeArray);
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-
-    DTWAIN_ARRAY outputArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0).second;
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return outputArray == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, nullptr, FUNC_MACRO);
-
-    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(outputArray);
-
-    // Loop and test MSG_GET for the capability.
-    for (size_t i = 0; i < DataTypeArraySize; ++i)
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability)
     {
-        for (size_t j = 0; j < ContainerArraySize; ++j)
+        LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
+
+        static constexpr LONG DataTypeArray[] = {
+                                                TWTY_INT16,
+                                                TWTY_UINT16,
+                                                TWTY_INT32,
+                                                TWTY_UINT32,
+                                                TWTY_BOOL,
+                                                TWTY_FIX32,
+                                                TWTY_INT8,
+                                                TWTY_UINT8,
+                                                TWTY_STR32,
+                                                TWTY_STR64,
+                                                TWTY_STR255,
+                                                TWTY_STR128,
+                                                TWTY_STR1024,
+                                                TWTY_UNI512,
+                                                TWTY_FRAME
+                                            };
+
+        static constexpr LONG ContainerTypeArray[] = {
+                                                DTWAIN_CONTENUMERATION,
+                                                DTWAIN_CONTARRAY,
+                                                DTWAIN_CONTRANGE,
+                                                DTWAIN_CONTONEVALUE
+                                            };
+
+        static constexpr size_t DataTypeArraySize = std::size(DataTypeArray);
+        static constexpr size_t ContainerArraySize = std::size(ContainerTypeArray);
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+
+        DTWAIN_ARRAY outputArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0).second;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return outputArray == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, nullptr, FUNC_MACRO);
+
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(outputArray);
+
+        // Loop and test MSG_GET for the capability.
+        for (size_t i = 0; i < DataTypeArraySize; ++i)
         {
-            DTWAIN_ARRAY testArray = {};
-            DTWAINArrayPtr_RAII raii(pHandle, &testArray);
-            bool ok = GetCapValuesEx2_Internal(pSource, lCapability, DTWAIN_CAPGET, ContainerTypeArray[j], DataTypeArray[i], &testArray);
-            if (ok)
+            for (size_t j = 0; j < ContainerArraySize; ++j)
             {
-                LONG statusValue = (LONG)DataTypeArray[i] << 16 | ContainerTypeArray[j];
-                vValues.push_back(statusValue);
-                DumpArrayContents(testArray, lCapability, false, 
-                                  dynarithmic::IsTwainUIntegralType(static_cast<TW_UINT16>(DataTypeArray[i])));
+                DTWAIN_ARRAY testArray = {};
+                DTWAINArrayPtr_RAII raii(pHandle, &testArray);
+                bool ok = GetCapValuesEx2_Internal(pSource, lCapability, DTWAIN_CAPGET, ContainerTypeArray[j], DataTypeArray[i], &testArray);
+                if (ok)
+                {
+                    LONG statusValue = static_cast<LONG>(DataTypeArray[i]) << 16 | ContainerTypeArray[j];
+                    vValues.push_back(statusValue);
+                    DumpArrayContents(testArray, lCapability, false, 
+                                      IsTwainUIntegralType(static_cast<TW_UINT16>(DataTypeArray[i])));
+                }
             }
         }
+        LOG_FUNC_EXIT_NONAME_PARAMS(outputArray)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(outputArray)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
 
-////////////////////////////////////////////////////////////////////////////////
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapability)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    ////////////////////////////////////////////////////////////////////////////////
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapability)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
-    // Test if the capability is supported
-    bool bInList = pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCapability));
-    DTWAIN_Check_Error_Condition_NoThrow_Ex_WithParams(pHandle, [&] {return !bInList; }, DTWAIN_ERR_CAP_NO_SUPPORT, 
-                                                        false, FUNC_MACRO, false, 
-                                                 { CTL_TwainAppMgr::GetCapNameFromCap(lCapability) });
-    LOG_FUNC_EXIT_NONAME_PARAMS(bInList)
-    CATCH_BLOCK_LOG_PARAMS(false)
+        // Test if the capability is supported
+        bool bInList = pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCapability));
+        DTWAIN_Check_Error_Condition_NoThrow_Ex_WithParams(pHandle, [&] {return !bInList; }, DTWAIN_ERR_CAP_NO_SUPPORT, 
+                                                            false, FUNC_MACRO, false, 
+                                                     { CTL_TwainAppMgr::GetCapNameFromCap(lCapability) });
+        LOG_FUNC_EXIT_NONAME_PARAMS(bInList)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }

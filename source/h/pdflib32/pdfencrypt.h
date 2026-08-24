@@ -28,8 +28,8 @@ OF THIRD PARTY RIGHTS.
     #include "..\aeslib\AES.h"
 #endif
 
-#include <ctlobstr.h>
-#include <ctlconstexprutils.h>
+#include "ctlstringdefs.h"
+#include "ctlconstexprutils.h"
 
 #define ENCRYPTION_OK           0
 #define ENCRYPTION_NOTSET       1
@@ -161,10 +161,10 @@ class PDFEncryptionRC4 : public PDFEncryption
 class PDFEncryptionAES: public PDFEncryption
 {
     protected:
-        UCHARArray GetExtendedKey(int number, int generation);
+        UCHARArray GetExtendedKey(int number, int generation) override;
 
     private:
-        unsigned char m_ivValue[AES_BLOCK_SIZE];
+        unsigned char m_ivValue[AES_BLOCK_SIZE] = {};
         bool m_bIsPaddingUsed = true;
         bool m_bIsIVAttached = true;
         void EncryptInternal(std::string_view dataIn, std::string& dataOut,

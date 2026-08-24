@@ -21,39 +21,43 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
+#include "ctldtwainhandle.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMaxAcquisitions(DTWAIN_SOURCE Source, LONG MaxAcquires)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, MaxAcquires))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    // Check if array is of the correct type
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return MaxAcquires < 0L && MaxAcquires != DTWAIN_MAXACQUIRE; },
-        DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    pSource->SetMaxAcquisitions(MaxAcquires);
-    pSource->SetUIMaxAcquisitions(MaxAcquires);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMaxAcquisitions(DTWAIN_SOURCE Source, LONG MaxAcquires)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, MaxAcquires))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        // Check if array is of the correct type
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return MaxAcquires < 0L && MaxAcquires != DTWAIN_MAXACQUIRE; },
+            DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        pSource->SetMaxAcquisitions(MaxAcquires);
+        pSource->SetUIMaxAcquisitions(MaxAcquires);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
-LONG DLLENTRY_DEF DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG Ret = pSource->GetMaxAcquisitions();
-    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
-}
+    LONG DLLENTRY_DEF DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const LONG Ret = pSource->GetMaxAcquisitions();
+        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+    }
 
-LONG DLLENTRY_DEF DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    const LONG Ret = pSource->GetMaxAcquireCount();
-    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE2)
+    LONG DLLENTRY_DEF DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const LONG Ret = pSource->GetMaxAcquireCount();
+        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE2)
+    }
 }

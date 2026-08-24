@@ -24,6 +24,9 @@ OF THIRD PARTY RIGHTS.
 
 //// Special bitmap routines
 #include <windows.h>
+#include <optional>
+#include <memory>
+#include <vector>
 #include "dtwaindefs.h"
 #include "blankpage.h"
 #include "fltrect.h"
@@ -202,15 +205,13 @@ namespace dynarithmic
             // Negate DIB
             int NegateDib();
 
-            static void ResolvePostscriptOptions(const DTWAINImageInfoEx& Info, int &nFormat );
-
             CTL_TwainDib();
             CTL_TwainDib(HANDLE hDib, HWND hWnd= nullptr);
             CTL_TwainDib(const CTL_TwainDib& rDib);
             void swap(CTL_TwainDib& left, CTL_TwainDib& rt) noexcept;
 
             static constexpr int PixelToBytes(int n) { return (n+7)/8; }
-            WORD               PaletteSize (void* pv);
+            static WORD               PaletteSize (void* pv);
             HPALETTE           GetPalette() const {return m_TwainDibInfo.GetPalette(); }
             static constexpr int WidthInBytes(int i)  { return (i+31)/32*4; }
             static             HANDLE CreateBMPBitmapFromDIB(HANDLE hDib);
@@ -251,7 +252,7 @@ namespace dynarithmic
 
             // Dib memory deletion
             bool          DeleteDibMemory(CTL_TwainDibPtr Dib);
-            bool          DeleteDibMemory(size_t nWhere );
+            bool          DeleteDibMemory(size_t nWhere ) const;
             bool          DeleteDibMemory(HANDLE hDib );
 
             // Remove All Dibs from array

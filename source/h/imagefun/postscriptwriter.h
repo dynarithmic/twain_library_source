@@ -28,130 +28,132 @@ OF THIRD PARTY RIGHTS.
 #include "dibutil.h"
 #include "imagefilewriterbase.h"
 
-// ============================================================
-// PostScript writer
-// ============================================================
-
-enum class PsPixelFlavor
+namespace dynarithmic
 {
-    BW1,
-    Gray8,
-    Gray16,
-    Bgr24,
-    Bgra32
-};
+    // ============================================================
+    // PostScript writer
+    // ============================================================
 
-enum class PsLevel
-{
-    Level1,
-    Level2,
-    Level3
-};
+    enum class PsPixelFlavor
+    {
+        BW1,
+        Gray8,
+        Gray16,
+        Bgr24,
+        Bgra32
+    };
 
-struct PreparedPsDibPage
-{
-    uint32_t width = 0;
-    uint32_t height = 0;
-    uint16_t bitsPerPixel = 0;
-    uint32_t strideBytes = 0;
-    bool bottomUp = true;
+    enum class PsLevel
+    {
+        Level1,
+        Level2,
+        Level3
+    };
 
-    PsPixelFlavor pixelFlavor = PsPixelFlavor::Bgr24;
-    const uint8_t* bits = nullptr;
-    const RGBQUAD* palette = nullptr;
-    uint32_t paletteEntries = 0;
+    struct PreparedPsDibPage
+    {
+        uint32_t width = 0;
+        uint32_t height = 0;
+        uint16_t bitsPerPixel = 0;
+        uint32_t strideBytes = 0;
+        bool bottomUp = true;
 
-    double xDpi = 300.0;
-    double yDpi = 300.0;
-};
+        PsPixelFlavor pixelFlavor = PsPixelFlavor::Bgr24;
+        const uint8_t* bits = nullptr;
+        const RGBQUAD* palette = nullptr;
+        uint32_t paletteEntries = 0;
 
-struct PsSessionOptions
-{
-    PsLevel level = PsLevel::Level2;
+        double xDpi = 300.0;
+        double yDpi = 300.0;
+    };
 
-    // Page size in PostScript points. 8.5 x 11 by default.
-    double pageWidthPts = 612.0;
-    double pageHeightPts = 792.0;
+    struct PsSessionOptions
+    {
+        PsLevel level = PsLevel::Level2;
 
-    // Margin in points.
-    double marginLeftPts = 36.0;
-    double marginBottomPts = 36.0;
-    double marginRightPts = 36.0;
-    double marginTopPts = 36.0;
+        // Page size in PostScript points. 8.5 x 11 by default.
+        double pageWidthPts = 612.0;
+        double pageHeightPts = 792.0;
 
-    bool preserveAspectRatio = true;
-    bool centerImage = true;
+        // Margin in points.
+        double marginLeftPts = 36.0;
+        double marginBottomPts = 36.0;
+        double marginRightPts = 36.0;
+        double marginTopPts = 36.0;
 
-    // For 1-bpp:
-    // false usually means DIB 0=black, 1=white becomes normal paper output.
-    // true reverses the Decode array.
-    bool invert1bpp = false;
-    bool useRunLength = true;
+        bool preserveAspectRatio = true;
+        bool centerImage = true;
 
-    std::string creator;
-};
+        // For 1-bpp:
+        // false usually means DIB 0=black, 1=white becomes normal paper output.
+        // true reverses the Decode array.
+        bool invert1bpp = false;
+        bool useRunLength = true;
 
-class PsSessionWriter
-{
-    public:
-        PsSessionWriter() = default;
-        ~PsSessionWriter();
-        PsSessionWriter(const PsSessionWriter&) = delete;
-        PsSessionWriter& operator=(const PsSessionWriter&) = delete;
+        std::string creator;
+    };
 
-        bool Open(const std::wstring& filename, const PsSessionOptions& options);
-        bool WritePage(const PreparedPsDibPage& page);
-        bool Close();
-        static std::optional<PreparedPsDibPage> MakePreparedPsDibPage(const dynarithmic::DibPageView& view);
+    class PsSessionWriter
+    {
+        public:
+            PsSessionWriter() = default;
+            ~PsSessionWriter();
+            PsSessionWriter(const PsSessionWriter&) = delete;
+            PsSessionWriter& operator=(const PsSessionWriter&) = delete;
 
-    private:
-        static bool ValidatePage(const PreparedPsDibPage& page);
-        bool WriteDocumentHeader();
-        bool WritePageHeader(const PreparedPsDibPage&);
-        bool WritePageSetup(const PreparedPsDibPage& page);
-        const char* ColorSpaceName(const PreparedPsDibPage& page) const;
-        uint32_t Components(const PreparedPsDibPage& page) const;
-        uint32_t BitsPerComponent(const PreparedPsDibPage& page) const;
-        const char* DecodeArray(const PreparedPsDibPage& page) const;
-        bool WriteLevel1Image(const PreparedPsDibPage& page);
-        bool WriteLevel2Or3Image(const PreparedPsDibPage& page);
-        const uint8_t* SourceRow(const PreparedPsDibPage& page, uint32_t y) const;
-        bool WriteHexByte(uint8_t v);
-        bool EndHexData();
-        bool WriteHexImageData(const PreparedPsDibPage& page);
-        bool Write1bppHex(const PreparedPsDibPage& page);
-        bool Write8bppGrayHex(const PreparedPsDibPage& page);
-        bool Write16bppGrayHex(const PreparedPsDibPage& page);
-        bool Write24bppRgbHex(const PreparedPsDibPage& page);
-        bool Write32bppRgbHex(const PreparedPsDibPage& page);
+            bool Open(const std::wstring& filename, const PsSessionOptions& options);
+            bool WritePage(const PreparedPsDibPage& page);
+            bool Close();
+            static std::optional<PreparedPsDibPage> MakePreparedPsDibPage(const DibPageView& view);
 
-    private:
-        bool BuildRawImageData(const PreparedPsDibPage& page, std::string& raw);
-        bool WriteAscii85ImageData(const PreparedPsDibPage& page);
-        bool WriteAscii85RunLengthImageData(const PreparedPsDibPage& page);
-        bool WriteAscii85FlateImageData(const PreparedPsDibPage& page);
+        private:
+            static bool ValidatePage(const PreparedPsDibPage& page);
+            bool WriteDocumentHeader() const;
+            bool WritePageHeader(const PreparedPsDibPage&) const;
+            bool WritePageSetup(const PreparedPsDibPage& page) const;
+            static const char* ColorSpaceName(const PreparedPsDibPage& page);
+            static uint32_t Components(const PreparedPsDibPage& page);
+            static uint32_t BitsPerComponent(const PreparedPsDibPage& page);
+            const char* DecodeArray(const PreparedPsDibPage& page) const;
+            bool WriteLevel1Image(const PreparedPsDibPage& page);
+            bool WriteLevel2Or3Image(const PreparedPsDibPage& page);
+            static const uint8_t* SourceRow(const PreparedPsDibPage& page, uint32_t y);
+            bool WriteHexByte(uint8_t v);
+            bool EndHexData();
+            bool WriteHexImageData(const PreparedPsDibPage& page);
+            bool Write1bppHex(const PreparedPsDibPage& page);
+            bool Write8bppGrayHex(const PreparedPsDibPage& page);
+            bool Write16bppGrayHex(const PreparedPsDibPage& page);
+            bool Write24bppRgbHex(const PreparedPsDibPage& page);
+            bool Write32bppRgbHex(const PreparedPsDibPage& page);
 
-        FILE* file_ = nullptr;
-        PsSessionOptions options_{};
-        bool opened_ = false;
-        uint32_t pageCount_ = 0;
-        uint32_t hexLineCount_ = 0;
-        std::vector<uint8_t> rowBuffer_;
-};
+        private:
+            static bool BuildRawImageData(const PreparedPsDibPage& page, std::string& raw);
+            bool WriteAscii85ImageData(const PreparedPsDibPage& page) const;
+            bool WriteAscii85RunLengthImageData(const PreparedPsDibPage& page) const;
+            bool WriteAscii85FlateImageData(const PreparedPsDibPage& page);
 
-// ============================================================
-// DTWAIN-style wrapper
-// ============================================================
+            FILE* file_ = nullptr;
+            PsSessionOptions options_{};
+            bool opened_ = false;
+            uint32_t pageCount_ = 0;
+            uint32_t hexLineCount_ = 0;
+            std::vector<uint8_t> rowBuffer_;
+    };
 
-class DTWAINPsOutput
-{
-    public:
-        bool OnFirstPage(const std::wstring& filename, const PsSessionOptions& options, const PreparedPsDibPage& page);
-        bool OnNextPage(const PreparedPsDibPage& page);
-        bool OnLastPage();
+    // ============================================================
+    // DTWAIN-style wrapper
+    // ============================================================
 
-    private:
-        std::unique_ptr<PsSessionWriter> writer_;
-};
+    class DTWAINPsOutput
+    {
+        public:
+            bool OnFirstPage(const std::wstring& filename, const PsSessionOptions& options, const PreparedPsDibPage& page);
+            bool OnNextPage(const PreparedPsDibPage& page) const;
+            bool OnLastPage();
 
+        private:
+            std::unique_ptr<PsSessionWriter> writer_;
+    };
+}
 #endif

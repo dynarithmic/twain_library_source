@@ -21,11 +21,14 @@
 #ifndef CTLCONSTEXPRUTILS_H
 #define CTLCONSTEXPRUTILS_H
 
+#include <array>
+#include <string_view>
+#include <tuple>
 #include "ctlconstexprfind.h"
 #include "twain.h"
 #include "ctlenum.h"
-#include "dtwain_version.h"
 #include "dtwpdft.h"
+#include "dtwain_config.h"
 
 namespace dynarithmic
 {
@@ -37,7 +40,7 @@ namespace dynarithmic
         constexpr RawTwainTriplet(TW_UINT32 dg, TW_UINT16 dat, TW_UINT16 msg) : nDG(dg), nDAT(dat), nMSG(msg) {}
     };
 
-    static constexpr bool IsTwainStringType(TW_UINT16 nItemType)
+    constexpr bool IsTwainStringType(TW_UINT16 nItemType)
     {
         switch (nItemType)
         {
@@ -52,7 +55,7 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsTwainShortStringType(TW_UINT16 nItemType)
+    constexpr bool IsTwainShortStringType(TW_UINT16 nItemType)
     {
         switch (nItemType)
         {
@@ -65,7 +68,7 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsTwainLongStringType(TW_UINT16 nItemType)
+    constexpr bool IsTwainLongStringType(TW_UINT16 nItemType)
     {
         switch (nItemType)
         {
@@ -75,7 +78,7 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsTwainUnicodeStringType(TW_UINT16 nItemType)
+    constexpr bool IsTwainUnicodeStringType(TW_UINT16 nItemType)
     {
         switch (nItemType)
         {
@@ -85,7 +88,7 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsTwainIntegralType(TW_UINT16 nItemType)
+    constexpr bool IsTwainIntegralType(TW_UINT16 nItemType)
     {
         switch (nItemType)
         {
@@ -101,7 +104,7 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsTwain32BitIntegralType(TW_UINT16 nDataType)
+    constexpr bool IsTwain32BitIntegralType(TW_UINT16 nDataType)
     {
         switch (nDataType)
         {
@@ -111,7 +114,7 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsTwain32BitUIntegralType(TW_UINT16 nDataType)
+    constexpr bool IsTwain32BitUIntegralType(TW_UINT16 nDataType)
     {
         switch (nDataType)
         {
@@ -121,7 +124,7 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsTwain16BitIntegralType(TW_UINT16 nItemType)
+    constexpr bool IsTwain16BitIntegralType(TW_UINT16 nItemType)
     {
         switch (nItemType)
         {
@@ -131,7 +134,7 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsTwain16BitUIntegralType(TW_UINT16 nItemType)
+    constexpr bool IsTwain16BitUIntegralType(TW_UINT16 nItemType)
     {
         switch (nItemType)
         {
@@ -141,17 +144,17 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsTwainANSIStringType(TW_UINT16 nItemType)
+    constexpr bool IsTwainANSIStringType(TW_UINT16 nItemType)
     {
         return IsTwainShortStringType(nItemType) || IsTwainLongStringType(nItemType);
     }
 
-    static constexpr bool IsTwainUIntegralType(TW_UINT16 nItemType)
+    constexpr bool IsTwainUIntegralType(TW_UINT16 nItemType)
     {
         return IsTwain16BitUIntegralType(nItemType) || IsTwain32BitUIntegralType(nItemType);
     }
 
-    static constexpr bool IsTwain8BitIntegralType(TW_UINT16 nItemType)
+    constexpr bool IsTwain8BitIntegralType(TW_UINT16 nItemType)
     {
         switch (nItemType)
         {
@@ -161,22 +164,22 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsTwainHandleType(TW_UINT16 nItemType)
+    constexpr bool IsTwainHandleType(TW_UINT16 nItemType)
     {
         return nItemType == TWTY_HANDLE;
     }
 
-    static constexpr bool IsTwainFix32Type(TW_UINT16 nItemType)
+    constexpr bool IsTwainFix32Type(TW_UINT16 nItemType)
     {
         return nItemType == TWTY_FIX32;
     }
 
-    static constexpr bool IsTwainFrameType(TW_UINT16 nItemType)
+    constexpr bool IsTwainFrameType(TW_UINT16 nItemType)
     {
         return nItemType == TWTY_FRAME;
     }
 
-    static constexpr TW_UINT16 GetTwainItemSize(TW_UINT16 nItemType)
+    constexpr TW_UINT16 GetTwainItemSize(TW_UINT16 nItemType)
     {
         switch (nItemType)
         {
@@ -216,7 +219,7 @@ namespace dynarithmic
         return 0;
     }
 
-    static constexpr bool IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType)
+    constexpr bool IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType)
     {
         return FileType == TWAINFileFormat_TIFFGROUP3MULTI ||
             FileType == TWAINFileFormat_TIFFGROUP4MULTI ||
@@ -242,7 +245,7 @@ namespace dynarithmic
             FileType == DTWAIN_FF_TIFFMULTI;
     }
 
-    static constexpr bool IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType)
+    constexpr bool IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType)
     {
         constexpr std::array<CTL_TwainFileFormatEnum,29> setInfo = {
                                 TWAINFileFormat_TIFFGROUP3MULTI,
@@ -277,7 +280,7 @@ namespace dynarithmic
         return generic_array_finder(setInfo, FileType).first;
     }
 
-    static constexpr bool IsFileTypeBigTiff(CTL_TwainFileFormatEnum FileType)
+    constexpr bool IsFileTypeBigTiff(CTL_TwainFileFormatEnum FileType)
     {
         constexpr std::array<CTL_TwainFileFormatEnum, 14> setInfo = {
                                 TWAINFileFormat_BIGTIFFLZWMULTI,
@@ -297,7 +300,7 @@ namespace dynarithmic
         return generic_array_finder(setInfo, FileType).first;
     }
 
-    static constexpr bool IsFileTypePostscript(CTL_TwainFileFormatEnum FileType)
+    constexpr bool IsFileTypePostscript(CTL_TwainFileFormatEnum FileType)
     {
         return FileType == TWAINFileFormat_POSTSCRIPT1 ||
             FileType == TWAINFileFormat_POSTSCRIPT1MULTI ||
@@ -307,7 +310,7 @@ namespace dynarithmic
             FileType == TWAINFileFormat_POSTSCRIPT3MULTI;
     }
 
-    static constexpr CTL_TwainFileFormatEnum GetMultiPageType(CTL_TwainFileFormatEnum FileType)
+    constexpr CTL_TwainFileFormatEnum GetMultiPageType(CTL_TwainFileFormatEnum FileType)
     {
         constexpr std::array<std::pair<CTL_TwainFileFormatEnum, CTL_TwainFileFormatEnum>, 21> pageMap =
         { {
@@ -341,7 +344,7 @@ namespace dynarithmic
     }
 
     /////////////// Supported formats for File transfers ////////////////
-    static constexpr auto EnumTwainFileFormats()
+    constexpr auto EnumTwainFileFormats()
     {
         constexpr std::array<int, 61> ca = {
             TWAINFileFormat_BMP, TWAINFileFormat_BMPRLE, TWAINFileFormat_PCX, TWAINFileFormat_DCX, TWAINFileFormat_TIFFLZW,
@@ -360,12 +363,12 @@ namespace dynarithmic
         return ca;
     }
 
-    static constexpr bool IsSupportedFileFormat(int nFileFormat) 
+    constexpr bool IsSupportedFileFormat(int nFileFormat) 
     {
         return generic_array_finder(EnumTwainFileFormats(), nFileFormat).first;
     }
 
-    static constexpr LONG GetArrayTypeFromCapType(TW_UINT16 CapType) noexcept
+    constexpr LONG GetArrayTypeFromCapType(TW_UINT16 CapType) noexcept
     {
         if (IsTwainANSIStringType(CapType))
             return DTWAIN_ARRAYANSISTRING;
@@ -378,7 +381,7 @@ namespace dynarithmic
         return DTWAIN_ARRAYLONG;
     }
 
-    static constexpr LONG GetArrayTypeFromTwainType(LONG TwainType) noexcept
+    constexpr LONG GetArrayTypeFromTwainType(LONG TwainType) noexcept
     {
         TW_UINT16 actualType = static_cast<TW_UINT16>(TwainType);
         if (IsTwainIntegralType(actualType))
@@ -394,7 +397,7 @@ namespace dynarithmic
         return DTWAIN_ARRAYLONG;
     }
 
-    static constexpr int GetCapMaskFromCap(TW_UINT16  Cap) noexcept
+    constexpr int GetCapMaskFromCap(TW_UINT16  Cap) noexcept
     {
         // Jump table
         constexpr int CapAll = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
@@ -437,12 +440,12 @@ namespace dynarithmic
         return 0;
     }
 
-    static constexpr float Fix32ToFloat(TW_FIX32 Fix32) noexcept
+    constexpr float Fix32ToFloat(TW_FIX32 Fix32) noexcept
     {
         return static_cast<float>(Fix32.Whole) + static_cast<float>(Fix32.Frac) / static_cast<float>(65536.0);
     }
 
-    static constexpr TW_FIX32 FloatToFix32(float fnum) noexcept
+    constexpr TW_FIX32 FloatToFix32(float fnum) noexcept
     {
         TW_FIX32 fix32_value{};
         const bool sign = fnum < 0 ? true : false;
@@ -452,7 +455,7 @@ namespace dynarithmic
         return fix32_value;
     }
 
-    static constexpr LONG GetTwainGetType(LONG gettype) noexcept
+    constexpr LONG GetTwainGetType(LONG gettype) noexcept
     {
         switch (gettype)
         {
@@ -468,7 +471,7 @@ namespace dynarithmic
         return gettype;
     }
 
-    static constexpr bool IsMSGGetType(TW_UINT16 msgType) noexcept
+    constexpr bool IsMSGGetType(TW_UINT16 msgType) noexcept
     {
         return  msgType == MSG_GET ||
             msgType == MSG_GETCURRENT ||
@@ -478,28 +481,28 @@ namespace dynarithmic
             msgType == MSG_GETLABELENUM;
     }
 
-    static constexpr bool IsMSGSetType(TW_UINT16 msgType) noexcept
+    constexpr bool IsMSGSetType(TW_UINT16 msgType) noexcept
     {
         return msgType == MSG_SET || msgType == MSG_SETCONSTRAINT;
     }
 
-    static constexpr bool IsMSGResetType(TW_UINT16 msgType) noexcept
+    constexpr bool IsMSGResetType(TW_UINT16 msgType) noexcept
     {
         return msgType == MSG_RESET || msgType == MSG_RESETALL;
     }
 
-    static constexpr bool IsMSGSetOrResetType(TW_UINT16 msgType) noexcept
+    constexpr bool IsMSGSetOrResetType(TW_UINT16 msgType) noexcept
     {
         return IsMSGSetType(msgType) || IsMSGResetType(msgType);
     }
 
-    static constexpr bool IsTwainDSM2(long DSMType) noexcept
+    constexpr bool IsTwainDSM2(long DSMType) noexcept
     {
         return DSMType == DTWAIN_TWAINDSM_VERSION2 ||
                DSMType == DTWAIN_TWAINDSM_LATESTVERSION;
     }
 
-    static constexpr std::tuple<int, std::string_view, std::wstring_view> GetType1FontNameFromType(int nType)
+    constexpr std::tuple<int, std::string_view, std::wstring_view> GetType1FontNameFromType(int nType)
     {
         using tupletype = std::tuple<int, std::string_view, std::wstring_view>;
         constexpr std::array<tupletype, 14> retValues =
@@ -526,7 +529,7 @@ namespace dynarithmic
         return {};
     }
 
-    static constexpr std::pair<std::array<const char*, 4>, int> GetContainerNamesFromType(int nType) noexcept
+    constexpr std::pair<std::array<const char*, 4>, int> GetContainerNamesFromType(int nType) noexcept
     {
         using arrayret_type = std::array<const char*, 4>;
         using arrayintret_type = std::pair<arrayret_type, int>;
@@ -557,24 +560,18 @@ namespace dynarithmic
         return retValues[nShifted];
     }
 
-    static constexpr bool IsCapMaskOnGet(TW_UINT16 Cap, TW_UINT16 GetType) noexcept
+    constexpr bool IsCapMaskOnGet(TW_UINT16 Cap, TW_UINT16 GetType) noexcept
     {
         return (GetCapMaskFromCap(Cap) & GetType);
     }
 
 
-    static constexpr bool IsCapMaskOnSet(TW_UINT16 Cap, TW_UINT16 SetType) noexcept
+    constexpr bool IsCapMaskOnSet(TW_UINT16 Cap, TW_UINT16 SetType) noexcept
     {
         return (GetCapMaskFromCap(Cap) & SetType);
     }
 
-    static constexpr std::array<int, 3> GetDTWAINDLLVersionInfo() noexcept
-    {
-        constexpr std::array<int, 3> aDLLVersion = { DTWAIN_MAJOR_VERSION,DTWAIN_MINOR_VERSION, DTWAIN_PATCHLEVEL_VERSION };
-        return aDLLVersion;
-    }
-
-    static constexpr bool IsTimeOutTripletIgnored(const RawTwainTriplet& trip)
+    constexpr bool IsTimeOutTripletIgnored(const RawTwainTriplet& trip)
     {
         constexpr std::array<RawTwainTriplet, 7> Trips = {
             {{DG_AUDIO, DAT_AUDIOFILEXFER, MSG_GET},
@@ -590,45 +587,12 @@ namespace dynarithmic
         return isFoundPr.first;
     }
 
-    static constexpr LONG GetDTWAINVersionType() noexcept
-    {
-        LONG lVersionType = 0;
-        #ifdef UNICODE
-            lVersionType |= DTWAIN_UNICODE_VERSION;
-        #endif
-
-        #ifdef DTWAIN_DEBUG
-            lVersionType |= DTWAIN_DEVELOP_VERSION;
-        #endif
-
-        #if defined (WIN64) || defined(_WIN64)
-            lVersionType |= DTWAIN_64BIT_VERSION;
-            #else
-            #if defined (WIN32) || defined(_WIN32)
-                lVersionType |= DTWAIN_32BIT_VERSION;
-            #endif
-        #endif
-
-        #ifdef DTWAIN_DEVELOP_DLL
-            lVersionType |= DTWAIN_DEVELOP_VERSION;
-        #endif
-
-        #if DTWAIN_BUILD_LOGCALLSTACK == 1
-            lVersionType |= DTWAIN_CALLSTACK_LOGGING;
-        #endif
-
-        #if DTWAIN_BUILD_LOGCALLSTACK == 1 && DTWAIN_BUILD_LOGPOINTERS == 1
-            lVersionType |= DTWAIN_CALLSTACK_LOGGING_PLUS;
-        #endif
-            return lVersionType;
-    }
-
-    static constexpr uint32_t RoundUpToNearest(uint32_t value, uint32_t upto) noexcept
+    constexpr uint32_t RoundUpToNearest(uint32_t value, uint32_t upto) noexcept
     {
         return  (value + (upto - 1)) / upto * upto;
     }
 
-    static constexpr int GetDTWAINContainerFromTWAINContainer(int containerType) noexcept
+    constexpr int GetDTWAINContainerFromTWAINContainer(int containerType) noexcept
     {
         switch (containerType)
         {
@@ -651,7 +615,7 @@ namespace dynarithmic
         return containerType;
     }
 
-    static constexpr int GetTWAINContainerFromDTWAINContainer(int containerType) noexcept
+    constexpr int GetTWAINContainerFromDTWAINContainer(int containerType) noexcept
     {
         switch (containerType)
         {
@@ -670,7 +634,7 @@ namespace dynarithmic
         return containerType;
     }
 
-    static constexpr bool IsValidContainerType(TW_UINT16 containerType, bool testDTWAINType = true)
+    constexpr bool IsValidContainerType(TW_UINT16 containerType, bool testDTWAINType = true)
     {
         switch (containerType)
         {
@@ -695,7 +659,7 @@ namespace dynarithmic
         return false;
     }
 
-    static constexpr bool IsValidMeasureUnit(LONG Unit)
+    constexpr bool IsValidMeasureUnit(LONG Unit)
     {
         return Unit == DTWAIN_INCHES ||
             Unit == DTWAIN_CENTIMETERS ||
@@ -705,7 +669,7 @@ namespace dynarithmic
             Unit == DTWAIN_PIXELS;
     }
 
-    static constexpr double GetScaleFactorPerInch(LONG Unit)
+    constexpr double GetScaleFactorPerInch(LONG Unit)
     {
         switch (Unit)
         {
@@ -720,6 +684,5 @@ namespace dynarithmic
         }
         return 1.0;
     }
-};
-
+}
 #endif

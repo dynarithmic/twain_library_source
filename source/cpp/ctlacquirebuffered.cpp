@@ -24,8 +24,10 @@
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
 #include "ctltwainmsgloop.h"
-#include "sourceselectopts.h"
 #include "ctlsetgetcaps.h"
+#include "ctldtwainhandle.h"
+#include "ctlsourceacquire.h"
+#include "ctltwaindllhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -34,107 +36,95 @@
 
 using namespace dynarithmic;
 
-DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions,
-                                                    LPLONG pStatus)
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    AcquireAttemptRAII aRaii(pSource);
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
-        setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
-        setAcquireType(ACQUIREBUFFEREX);
+    DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions,
+                                                        LPLONG pStatus)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        const bool bRet =  AcquireHelper(pHandle, pSource, ACQUIREBUFFEREDEX,
+                                         false, DTWAIN_USEBUFFERED, false, Acquisitions,
+                                         PixelType, nMaxPages, bShowUI, nullptr,pStatus).second;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 
-    const bool bRet = AcquireExHelper(opts);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
+
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG   pStatus)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto aDibs = AcquireHelper(pHandle, pSource, ACQUIREBUFFERED,
+                                                       false, DTWAIN_USEBUFFERED, false, nullptr,
+                                                       PixelType, nMaxPages, bShowUI, nullptr, pStatus);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
+        LOG_FUNC_EXIT_NONAME_PARAMS(aDibs.first)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
+    }
 }
 
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG   pStatus)
+namespace
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    AcquireAttemptRAII aRaii(pSource);
-
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
-                                                        setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
-                                                        setAcquireType(ACQUIREBUFFER);
-    const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
-    if (pStatus)
-        *pStatus = opts.getStatus();
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
-    else
-    if (pSource->GetLastAcquireError() != 0)
-        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
-{
-    // Check if we already tested for tiled buffer support
-    auto isSupported = pSource->IsBufferedTileModeSupported();
-    if (isSupported.value != boost::tribool::indeterminate_value)
-        return isSupported ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
-
-    // Check if cap is in supported list
-    if (!pSource->IsCapInSupportedList(ICAP_TILES))
+    int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
     {
-        pSource->SetBufferedTileModeSupported(false);
-        return DTWAIN_ERR_TILES_NOT_SUPPORTED;
-    }
+        // Check if we already tested for tiled buffer support
+        auto isSupported = pSource->IsBufferedTileModeSupported();
+        if (isSupported.value != boost::tribool::indeterminate_value)
+            return isSupported ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
 
-    // Test for capability setting
-    auto pHandle = pSource->GetDTWAINHandle();
-    DTWAIN_ARRAY arr = {};
-    DTWAINArrayPtr_RAII tempRAII(pHandle, &arr);
+        // Check if cap is in supported list
+        if (!pSource->IsCapInSupportedList(ICAP_TILES))
+        {
+            pSource->SetBufferedTileModeSupported(false);
+            return DTWAIN_ERR_TILES_NOT_SUPPORTED;
+        }
 
-    // Get the original capability
-    auto bRet = GetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPGET, 
-                                         DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
-    if (!bRet)
-    {
-        pSource->SetBufferedTileModeSupported(false);
-        return DTWAIN_ERR_TILES_NOT_SUPPORTED;
-    }
+        // Test for capability setting
+        auto pHandle = pSource->GetDTWAINHandle();
+        DTWAIN_ARRAY arr = {};
+        DTWAINArrayPtr_RAII tempRAII(pHandle, &arr);
 
-    // Check for an empty array of values.  If so, determine that support
-    // for Tiled mode is not available
-    const auto& factory = pHandle->m_ArrayFactory;
-    auto& vTiles = factory->underlying_container_t<LONG>(arr);
-    if (vTiles.empty())
-    {
-        pSource->SetBufferedTileModeSupported(false);
-        return DTWAIN_ERR_TILES_NOT_SUPPORTED;
-    }
+        // Get the original capability
+        auto bRet = GetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPGET,
+            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+        if (!bRet)
+        {
+            pSource->SetBufferedTileModeSupported(false);
+            return DTWAIN_ERR_TILES_NOT_SUPPORTED;
+        }
 
-    // Test for setting to tile mode temporarily
-    auto origValue = vTiles[0];
-    vTiles[0] = 1;
+        // Check for an empty array of values.  If so, determine that support
+        // for Tiled mode is not available
+        const auto& factory = pHandle->m_ArrayFactory;
+        auto& vTiles = factory->underlying_container_t<LONG>(arr);
+        if (vTiles.empty())
+        {
+            pSource->SetBufferedTileModeSupported(false);
+            return DTWAIN_ERR_TILES_NOT_SUPPORTED;
+        }
 
-    // Set the capability to see if it accepts TRUE for the ICAP_TILES cap
-    bRet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-    const int finalReturnValue = bRet ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
+        // Test for setting to tile mode temporarily
+        auto origValue = vTiles[0];
+        vTiles[0] = 1;
 
-    // Reset to original value
-    if (origValue != vTiles[0])
-    {
-        vTiles[0] = origValue;
+        // Set the capability to see if it accepts TRUE for the ICAP_TILES cap
         bRet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-    }
+        const int finalReturnValue = bRet ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
 
-    // Set the support and return the final results
-    pSource->SetBufferedTileModeSupported(finalReturnValue == DTWAIN_NO_ERROR);
-    return finalReturnValue;
+        // Reset to original value
+        if (origValue != vTiles[0])
+        {
+            vTiles[0] = origValue;
+            SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET,
+                DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+        }
+
+        // Set the support and return the final results
+        pSource->SetBufferedTileModeSupported(finalReturnValue == DTWAIN_NO_ERROR);
+        return finalReturnValue;
+    }
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBufferedTileMode(DTWAIN_SOURCE Source, DTWAIN_BOOL bTileMode)
@@ -166,43 +156,46 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBufferedTileModeSupported(DTWAIN_SOURCE Source
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
+namespace dynarithmic
 {
-    LOG_FUNC_ENTRY_PARAMS((opts))
-    const DTWAIN_SOURCE Source = opts.getSource();
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
-
-    if (pSource->IsTileModeOn())
+    DTWAIN_ACQUIRE DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
     {
-        // Set the ICAP_TILES capability on here
-        auto retValue = dynarithmic::CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retValue.second; }, retValue.first, -1, FUNC_MACRO);
-        auto arr = retValue.second;
-        DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arr);
-        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
-        vValues[0] = 1;
-        bool bTilesSet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, -1, FUNC_MACRO);
+        LOG_FUNC_ENTRY_PARAMS((opts))
+        const DTWAIN_SOURCE Source = opts.getSource();
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const auto pHandle = pSource->GetDTWAINHandle();
+
+        if (pSource->IsTileModeOn())
+        {
+            // Set the ICAP_TILES capability on here
+            auto retValue = CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !retValue.second; }, retValue.first, -1, FUNC_MACRO);
+            auto arr = retValue.second;
+            DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arr);
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
+            vValues[0] = 1;
+            bool bTilesSet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, -1, FUNC_MACRO);
+        }
+
+        LONG compressionType;
+
+        if (!DTWAIN_GetCompressionType(Source, &compressionType, TRUE))
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, -1, FUNC_MACRO);
+
+        pSource->SetCompressionType(compressionType);
+        opts.setActualAcquireType(TWAINAcquireType_Buffer);
+        if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
+            return LLAcquireImage(opts);
+        auto pr = StartModalMessageLoop(pSource, opts);
+        DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] 
+            { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
+        if (pr.first != DTWAIN_NO_ERROR)
+        {
+            CTL_TwainAppMgr::DisableUserInterface(pSource);
+            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
+        CATCH_BLOCK(DTWAIN_FAILURE1)
     }
-
-    LONG compressionType;
-
-    if (!DTWAIN_GetCompressionType(Source, &compressionType, TRUE))
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, -1, FUNC_MACRO);
-
-    pSource->SetCompressionType(compressionType);
-    opts.setActualAcquireType(TWAINAcquireType_Buffer);
-    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
-        return LLAcquireImage(opts);
-    auto pr = dynarithmic::StartModalMessageLoop(pSource, opts);
-    DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] 
-        { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
-    if (pr.first != DTWAIN_NO_ERROR)
-    {
-        CTL_TwainAppMgr::DisableUserInterface(pSource);
-        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
 }

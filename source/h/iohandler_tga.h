@@ -28,7 +28,7 @@ namespace dynarithmic
     class CTL_TgaIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_TgaIOHandler() : CTL_ImageIOHandler()
+            CTL_TgaIOHandler()
             {
                 SetSaveArgs();
             }

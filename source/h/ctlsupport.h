@@ -22,8 +22,10 @@
 #define CTLSUPPORT_H
 #include <algorithm>
 #include "dtwain.h"
-#include "ctliface.h"
 #include "ctlsetgetcaps.h"
+#include "ctlcapcontainerfuncs.h"
+#include "ctlarray.h"
+#include "ctldtwainhandle.h"
 
 ///////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
@@ -37,7 +39,7 @@ namespace dynarithmic
             return true;
         DTWAIN_ARRAY Array = {};
         auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-        auto pHandle = pSource->GetDTWAINHandle();
+        auto pHandle = GetDTWAINHandleFromSource(pSource);
         if (GetCapValuesEx2_Internal(pSource, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array))
         {
             DTWAINArrayLowLevel_RAII raii(pHandle, Array);
@@ -58,7 +60,7 @@ namespace dynarithmic
                 }
             }
             // get underlying vector and search it for the value
-            auto& vData = pHandle->m_ArrayFactory->underlying_container_t<T>(Array);
+            auto& vData = GetArrayFactoryFromHandle(pHandle)->underlying_container_t<T>(Array);
             return std::find(vData.begin(), vData.end(), SupportVal) != vData.end();
         }
         return false;
@@ -71,7 +73,7 @@ namespace dynarithmic
         if (DTWAIN_IsCapSupported(Source, Cap))
         {
             auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-            const auto pHandle = pSource->GetDTWAINHandle();
+            const auto pHandle = GetDTWAINHandleFromSource(pSource);
             DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, pSource, Cap, 1).second;
             if (!Array)
                 return false;
@@ -93,7 +95,7 @@ namespace dynarithmic
                     DTWAINArrayLowLevelPtr_RAII a2(pHandle, &Array2);
                     if (bRet)
                     {
-                        LONG nSize = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array2));
+                        LONG nSize = static_cast<LONG>(GetArrayFactoryFromHandle(pHandle)->size(Array2));
                         if (nSize > 0)
                             DTWAIN_RangeGetNearestValue(Array2, SupportVal, SupportVal, DTWAIN_ROUNDNEAREST);
                     }
@@ -110,10 +112,10 @@ namespace dynarithmic
     int GetSupport(DTWAIN_SOURCE Source, typename T::value_type* lpSupport, LONG Cap, LONG CapOp=DTWAIN_CAPGET)
     {
         auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-        const auto pHandle = pSource->GetDTWAINHandle();
-        if (lpSupport == NULL)
+        const auto pHandle = GetDTWAINHandleFromSource(pSource);
+        if (lpSupport == nullptr)
         {
-            pHandle->m_lLastError = DTWAIN_ERR_INVALID_PARAM;
+            SetLastErrorFromHandle(pHandle, DTWAIN_ERR_INVALID_PARAM);
             return -1;
         }
         DTWAIN_ARRAY Array = {};
@@ -122,7 +124,7 @@ namespace dynarithmic
         if ( isSupported )
         {
             // get underlying vector and search it for the value
-            auto& vData = pHandle->m_ArrayFactory->underlying_container<T>(Array);
+            auto& vData = GetArrayFactoryFromHandle(pHandle)->underlying_container<T>(Array);
             if (!vData.empty())
             {
                 *lpSupport = vData.front();
@@ -131,5 +133,11 @@ namespace dynarithmic
         }
         return 0;
     }
+
+    bool GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, LONG Cap, LONG GetType);
+    bool EnumSupported(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG Cap);
+    bool SetSupportArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY Array, LONG Cap);
+    bool GetSupportArray(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, LONG Cap, LONG GetType=DTWAIN_CAPGET);
+    LONG CheckEnabled(DTWAIN_SOURCE Source, LONG CapVal);
 }
 #endif

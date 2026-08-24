@@ -18,11 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
 #include "jpeg2kwriter.h"
 #include "iohandler_jpeg2k.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
@@ -63,7 +62,7 @@ CTL_Jpeg2KIOHandler::CTL_Jpeg2KIOHandler(CTL_TwainDib* pDib, const DTWAINImageIn
 int CTL_Jpeg2KIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
     HANDLE hDib = {};
-    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
+    if (!m_pDib || !((hDib = m_pDib->GetHandle())))
         return DTWAIN_ERR_DIB;
 
     if (!IsValidBitDepth(DTWAIN_JPEG2000, m_pDib->GetBitsPerPixel()))
@@ -73,7 +72,7 @@ int CTL_Jpeg2KIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
     opts.useJP2Container = false;   // J2K codestream
     opts.compressionRate = 16.0f;   // match FreeImage default
 
-    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     opts.text.copyright = GetCopyrightString();
 

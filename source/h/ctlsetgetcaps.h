@@ -20,13 +20,12 @@
  */
 #ifndef CTLSETGETCAPS_H
 #define CTLSETGETCAPS_H
-#include <algorithm>
-#include "dtwain.h"
-#include "ctliface.h"
+#include "dtwtype.h"
 
 ///////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
 {
+    class CTL_ITwainSource;
     bool GetCapValuesEx2_Internal(CTL_ITwainSource* pSource,
                                   LONG lCap, LONG lGetType, LONG lContainerType, LONG nDataType, LPDTWAIN_ARRAY pArray);
 

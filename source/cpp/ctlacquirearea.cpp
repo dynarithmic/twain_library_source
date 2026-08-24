@@ -22,236 +22,227 @@
 #include "errorcheck.h"
 #include "cppfunc.h"
 #include "arrayfactory.h"
+#include "ctlstringutilsx.h"
+#include "ctldtwainhandle.h"
+#include "ctltwaindllhandle.h"
+#include "dtwainx.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable : 4702)
 #pragma warning (disable : 4714)
 #endif
 
 using namespace dynarithmic;
+using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
 
-static bool GetImageSize(CTL_TwainDLLHandle* pHandle,  DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType);
-
-static bool GetImageSize2(CTL_ITwainSource *p,
-    LPDTWAIN_FLOAT left,
-    LPDTWAIN_FLOAT top,
-    LPDTWAIN_FLOAT right,
-    LPDTWAIN_FLOAT bottom,
-    LPLONG Unit);
-
-static bool SetImageSize(DTWAIN_SOURCE Source,
-    DTWAIN_ARRAY FloatArray,
-    DTWAIN_ARRAY ActualArray,
-    TW_UINT16 SetType);
-
-static bool SetImageSize2(CTL_ITwainSource *p,
-    DTWAIN_FLOAT left,
-    DTWAIN_FLOAT top,
-    DTWAIN_FLOAT right,
-    DTWAIN_FLOAT bottom,
-    LONG Unit,
-    LONG flags);
-
-///////////////////////////////////////////////////////////////////////
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquireAreaEx(DTWAIN_SOURCE Source, LONG lGetType)
+namespace
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, lGetType))
-    DTWAIN_ARRAY FloatArray = {};
-    DTWAIN_GetAcquireArea(Source, lGetType, &FloatArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(FloatArray)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetType, LPDTWAIN_ARRAY FloatArray)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !FloatArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<TW_UINT16>(lGetType));
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetType, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lSetType, FloatArray, ActualArray))
-    VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const DTWAIN_BOOL bRet = SetImageSize(Source, FloatArray, ActualArray,static_cast<TW_UINT16>(lSetType));
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2String(DTWAIN_SOURCE Source, LPCTSTR left, LPCTSTR top, LPCTSTR right, LPCTSTR bottom, LONG Unit, LONG flags)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
-    const DTWAIN_FLOAT val1 = StringWrapper::ToDouble(left);
-    const DTWAIN_FLOAT val2 = StringWrapper::ToDouble(top);
-    const DTWAIN_FLOAT val3 = StringWrapper::ToDouble(right);
-    const DTWAIN_FLOAT val4 = StringWrapper::ToDouble(bottom);
-    const DTWAIN_BOOL bRet = DTWAIN_SetAcquireArea2(Source, val1, val2, val3, val4, Unit, flags);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLOAT left, DTWAIN_FLOAT top, DTWAIN_FLOAT right, DTWAIN_FLOAT bottom, LONG Unit, LONG flags)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !IsValidMeasureUnit(Unit); },
-                                    DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    const DTWAIN_BOOL bRet = SetImageSize2(pSource, left, top, right, bottom, Unit, flags);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTSTR left, LPTSTR top, LPTSTR right, LPTSTR bottom, LPLONG Unit)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
-    std::array<DTWAIN_FLOAT, 4> val = {};
-    std::array<LPTSTR, 4> pStr = { left?left:nullptr, top?top:nullptr, right?right:nullptr, bottom?bottom:nullptr };
-    const DTWAIN_BOOL bRet = DTWAIN_GetAcquireArea2(Source, &val[0], &val[1], &val[2], &val[3], Unit);
-    if (bRet)
+    bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType)
     {
-        std::ostringstream strm;
-        auto numDigits = strm.precision();
-        for (size_t i = 0; i < val.size(); ++i)
+        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
+        DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, 4).second;
+        if (!FloatArrayOut)
+            return false;
+        DTWAINArrayLowLevelPtr_RAII aFloat(pHandle, &FloatArrayOut);
+        CTL_RealArray Array;
+        if (GetType == MSG_GETCURRENT)
+            GetType = MSG_GET;
+
+        const bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
+        if (!bOk)
         {
-            strm << std::setprecision(numDigits) << val[i];
-            if (pStr[i])
-            {
-                std::string sResult = strm.str();
-                StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sResult), pStr[i], static_cast<int32_t>(sResult.size()) + 1);
-            }
-            strm.str("");
+            MoveArray(pHandle, FloatArray, &FloatArrayOut);
+            return false;
         }
-    }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT  left, LPDTWAIN_FLOAT  top, LPDTWAIN_FLOAT  right, LPDTWAIN_FLOAT  bottom, LPLONG Unit)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const DTWAIN_BOOL bRet = GetImageSize2(pSource, left, top, right, bottom, Unit);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
-}
-
-static bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType)
-{
-    CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
-    DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, 4).second;
-    if (!FloatArrayOut)
-        return false;
-    DTWAINArrayLowLevelPtr_RAII aFloat(pHandle, &FloatArrayOut);
-    CTL_RealArray Array;
-    if (GetType == MSG_GETCURRENT)
-        GetType = MSG_GET;
-
-    const bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
-    if (!bOk)
-    {
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArrayOut);
+        std::copy(Array.begin(), Array.end(), vValues.begin());
         MoveArray(pHandle, FloatArray, &FloatArrayOut);
-        return false;
-    }
-    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArrayOut);
-    std::copy(Array.begin(), Array.end(), vValues.begin());
-    MoveArray(pHandle, FloatArray, &FloatArrayOut);
-    return true;
-}
-
-static bool FillActualArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ActualArray, const std::vector<double>& vValues)
-{
-    if (ActualArray != nullptr)
-    {
-        auto& vActual = pHandle->m_ArrayFactory->underlying_container_t<double>(ActualArray);
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
-            [&] {return !pHandle->m_ArrayFactory->is_valid(ActualArray, CTL_ArrayFactory::arrayTag::DoubleType); },
-            DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-        vActual.clear();
-        std::copy_n(vValues.begin(), std::min(std::size_t(4), vValues.size()), std::back_inserter(vActual));
         return true;
     }
-    return false;
-}
 
-static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray, TW_UINT16 SetType)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, FloatArray, ActualArray, SetType))
-    CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = p->GetDTWAINHandle();
-    if (SetType == MSG_RESET)
+    bool FillActualArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ActualArray, const std::vector<double>& vValues)
     {
-        CTL_RealArray dummy;
-        const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, {}, dummy, MSG_RESET);
-        if ( bOk )
-            FillActualArray(pHandle, ActualArray, dummy);
+        if (ActualArray != nullptr)
+        {
+            auto& vActual = pHandle->m_ArrayFactory->underlying_container_t<double>(ActualArray);
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
+                [&] {return !pHandle->m_ArrayFactory->is_valid(ActualArray, CTL_ArrayFactory::arrayTag::DoubleType); },
+                DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+            vActual.clear();
+            std::copy_n(vValues.begin(), std::min(std::size_t(4), vValues.size()), std::back_inserter(vActual));
+            return true;
+        }
+        return false;
+    }
+
+    bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray, TW_UINT16 SetType)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, FloatArray, ActualArray, SetType))
+            CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const auto pHandle = p->GetDTWAINHandle();
+        if (SetType == MSG_RESET)
+        {
+            CTL_RealArray dummy;
+            const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, {}, dummy, MSG_RESET);
+            if (bOk)
+                FillActualArray(pHandle, ActualArray, dummy);
+            LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
+        }
+
+        const DTWAIN_ARRAY pArray = FloatArray;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
+            [&] { return !pHandle->m_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::DoubleType); },
+            DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+        static const size_t minValue = 4;
+        const auto& vFloat = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArray);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
+            [&] { return vFloat.size() < minValue; },
+            DTWAIN_ERR_AREA_ARRAY_TOO_SMALL, false, FUNC_MACRO);
+
+        CTL_RealArray Array;
+        CTL_RealArray rArray;
+        std::copy_n(vFloat.begin(), minValue, std::back_inserter(Array));
+        const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, Array, rArray, SetType);
+        if (bOk)
+            FillActualArray(pHandle, ActualArray, rArray);
         LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
+        CATCH_BLOCK(false)
     }
 
-    const DTWAIN_ARRAY pArray = FloatArray;
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
-        [&] { return !pHandle->m_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::DoubleType); },
-        DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-    static const size_t minValue = 4;
-    const auto& vFloat = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArray);
-    DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
-        [&] { return vFloat.size() < minValue; },
-        DTWAIN_ERR_AREA_ARRAY_TOO_SMALL, false, FUNC_MACRO);
 
-    CTL_RealArray Array;
-    CTL_RealArray rArray;
-    std::copy_n(vFloat.begin(), minValue, std::back_inserter(Array));
-    const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, Array, rArray, SetType);
-    if (bOk)
-        FillActualArray(pHandle, ActualArray, rArray);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
-    CATCH_BLOCK(false)
+    bool SetImageSize2(CTL_ITwainSource* p,
+        DTWAIN_FLOAT left,
+        DTWAIN_FLOAT top,
+        DTWAIN_FLOAT right,
+        DTWAIN_FLOAT bottom,
+        LONG Unit,
+        LONG flags)
+    {
+        LOG_FUNC_ENTRY_PARAMS((p, left, top, right, bottom, Unit, flags))
+        p->SetAlternateAcquireArea(left, top, right, bottom, flags, Unit, flags ? true : false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
+    bool GetImageSize2(CTL_ITwainSource* p,
+        LPDTWAIN_FLOAT left,
+        LPDTWAIN_FLOAT top,
+        LPDTWAIN_FLOAT right,
+        LPDTWAIN_FLOAT bottom,
+        LPLONG Unit)
+    {
+        LOG_FUNC_ENTRY_PARAMS((p, left, top, right, bottom, Unit))
+            FloatRect r;
+        LONG flags;
+        p->GetAlternateAcquireArea(r, *Unit, flags);
+        if (!flags)
+        {
+            *Unit = -1;
+            *left = -1.0;
+            *right = -1.0;
+            *top = -1.0;
+            *bottom = -1.0;
+        }
+        else
+        {
+            *left = r.left;
+            *top = r.top;
+            *right = r.right;
+            *bottom = r.bottom;
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
 }
 
-
-static bool SetImageSize2(CTL_ITwainSource *p,
-                            DTWAIN_FLOAT left,
-                            DTWAIN_FLOAT top,
-                            DTWAIN_FLOAT right,
-                            DTWAIN_FLOAT bottom,
-                            LONG Unit,
-                            LONG flags)
+///////////////////////////////////////////////////////////////////////
+extern "C"
 {
-    LOG_FUNC_ENTRY_PARAMS((p, left, top, right, bottom, Unit, flags))
-    p->SetAlternateAcquireArea(left, top, right, bottom, flags, Unit, flags ? true : false);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquireAreaEx(DTWAIN_SOURCE Source, LONG lGetType)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lGetType))
+        DTWAIN_ARRAY FloatArray = {};
+        DTWAIN_GetAcquireArea(Source, lGetType, &FloatArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(FloatArray)
+        CATCH_BLOCK_LOG_PARAMS(nullptr)
+    }
 
-static bool GetImageSize2(CTL_ITwainSource *p,
-                            LPDTWAIN_FLOAT left,
-                            LPDTWAIN_FLOAT top,
-                            LPDTWAIN_FLOAT right,
-                            LPDTWAIN_FLOAT bottom,
-                            LPLONG Unit)
-{
-    LOG_FUNC_ENTRY_PARAMS((p, left, top, right, bottom, Unit))
-    FloatRect r;
-    LONG flags;
-    p->GetAlternateAcquireArea(r, *Unit, flags);
-    if (!flags)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetType, LPDTWAIN_ARRAY FloatArray)
     {
-        *Unit = -1;
-        *left = -1.0;
-        *right = -1.0;
-        *top = -1.0;
-        *bottom = -1.0;
+        LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !FloatArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<TW_UINT16>(lGetType));
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
     }
-    else
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetType, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray)
     {
-        *left = r.left;
-        *top = r.top;
-        *right = r.right;
-        *bottom = r.bottom;
+        LOG_FUNC_ENTRY_PARAMS((Source, lSetType, FloatArray, ActualArray))
+        VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        const DTWAIN_BOOL bRet = SetImageSize(Source, FloatArray, ActualArray,static_cast<TW_UINT16>(lSetType));
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2String(DTWAIN_SOURCE Source, LPCTSTR left, LPCTSTR top, LPCTSTR right, LPCTSTR bottom, LONG Unit, LONG flags)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
+        const DTWAIN_FLOAT val1 = CharTraits<CharType>::ToDouble(left);
+        const DTWAIN_FLOAT val2 = CharTraits<CharType>::ToDouble(top);
+        const DTWAIN_FLOAT val3 = CharTraits<CharType>::ToDouble(right);
+        const DTWAIN_FLOAT val4 = CharTraits<CharType>::ToDouble(bottom);
+        const DTWAIN_BOOL bRet = DTWAIN_SetAcquireArea2(Source, val1, val2, val3, val4, Unit, flags);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLOAT left, DTWAIN_FLOAT top, DTWAIN_FLOAT right, DTWAIN_FLOAT bottom, LONG Unit, LONG flags)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !IsValidMeasureUnit(Unit); },
+                                        DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+        const DTWAIN_BOOL bRet = SetImageSize2(pSource, left, top, right, bottom, Unit, flags);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTSTR left, LPTSTR top, LPTSTR right, LPTSTR bottom, LPLONG Unit)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
+        std::array<DTWAIN_FLOAT, 4> val = {};
+        std::array<LPTSTR, 4> pStr = { left?left:nullptr, top?top:nullptr, right?right:nullptr, bottom?bottom:nullptr };
+        const DTWAIN_BOOL bRet = DTWAIN_GetAcquireArea2(Source, &val[0], &val[1], &val[2], &val[3], Unit);
+        if (bRet)
+        {
+            std::ostringstream strm;
+            auto numDigits = strm.precision();
+            for (size_t i = 0; i < val.size(); ++i)
+            {
+                strm << std::setprecision(numDigits) << val[i];
+                if (pStr[i])
+                {
+                    std::string sResult = strm.str();
+                    CopyInfoToCString(stringconversion::Convert_Ansi_To_Native(sResult), 
+                                                   pStr[i], static_cast<int32_t>(sResult.size()) + 1);
+                }
+                strm.str("");
+            }
+        }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT  left, LPDTWAIN_FLOAT  top, LPDTWAIN_FLOAT  right, LPDTWAIN_FLOAT  bottom, LPLONG Unit)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        const DTWAIN_BOOL bRet = GetImageSize2(pSource, left, top, right, bottom, Unit);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }

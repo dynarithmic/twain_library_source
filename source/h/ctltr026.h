@@ -21,10 +21,14 @@
 #ifndef CTLTR026_H
 #define CTLTR026_H
 
+#include <string>
+#include "blankpage.h"
 #include "ctltr024.h"
 #include "ctltr027.h"
+#include "ctldib32ex.h"
 namespace dynarithmic
 {
+    struct DTWAINImageInfoEx;
     class CTL_ImageIOHandler;
     class ImageXferFileWriter;
 
@@ -68,7 +72,6 @@ namespace dynarithmic
             void            StopAcquisitions(int errfile);
             bool            StopFeeder();
             bool            IsJobControlPending(TW_PENDINGXFERS *pPending) const;
-            static bool     CopyDibToClipboard(CTL_ITwainSession *pSession, HANDLE hDib);
             TW_UINT16       GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UINT16 nMsg=MSG_ENDXFER);
             CTL_ImageIOHandler *GetImageHandler() const { return m_pImgHandler; }
             CTL_ImageIOHandler *m_pImgHandler;
@@ -80,9 +83,6 @@ namespace dynarithmic
                                     const CTL_TwainDibPtr& CurDib);
 
             static bool NegateDib(CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource, const CTL_TwainDibPtr& CurDib);
-            static bool ChangeBpp(CTL_ITwainSession* pSession,
-                                  const CTL_ITwainSource* pSource,
-                                  const CTL_TwainDibPtr& CurDib);
             static      BlankDIBInfo IsPageBlank(CTL_ITwainSession* pSession,
                                     const CTL_ITwainSource* pSource,
                                     bool resampled,

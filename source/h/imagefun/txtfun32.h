@@ -25,7 +25,7 @@
 
 #include <memory>
 
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "dibinfox.h"
 #include "winbit32.h"
 #include "ocrinterface.h"

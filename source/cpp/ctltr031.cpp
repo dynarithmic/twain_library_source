@@ -19,14 +19,13 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr031.h"
-#include "ctltr027.h"
 #include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
-#include "ctldib.h"
-#include "dtwain.h"
 #include "winbit32.h"
 #include "logwriterutils.h"
 #include "ctldib32ex.h"
+#include "ctltwainlogging.h"
+#include "dtwainx.h"
 
 using namespace dynarithmic;
 
@@ -46,7 +45,7 @@ CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
     // Lock the data.  It will be unlocked when the image has been transferred
     // either successfully or unsuccessfully, or if "this" is being destroyed
     pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(hDib));
-    m_nCurDibSize = static_cast<TW_UINT32>(ImageMemoryHandler::GlobalSize(hDib));
+    m_nCurDibSize = ImageMemoryHandler::GlobalSize(hDib);
 
     m_ptrDib = reinterpret_cast<unsigned char*>(pDibInfo);
     m_ptrOrig = m_ptrDib;
@@ -79,7 +78,7 @@ CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
         if (!hBuffer)
             m_ImageMemXferBuffer.Memory.TheMem = ImageMemoryHandler::GlobalAllocPr(GMEM_MOVEABLE, nNumBytes);
         else
-            m_ImageMemXferBuffer.Memory.TheMem = static_cast<TW_MEMREF>(ImageMemoryHandler::GlobalLock(hBuffer));
+            m_ImageMemXferBuffer.Memory.TheMem = ImageMemoryHandler::GlobalLock(hBuffer);
     }
 
     m_TempMemory.TheMem = nullptr;
@@ -385,7 +384,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             {
                                 // Lock the new data.  
                                 auto pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(hDib));
-                                m_nCurDibSize = static_cast<TW_UINT32>(ImageMemoryHandler::GlobalSize(hDib));
+                                m_nCurDibSize = ImageMemoryHandler::GlobalSize(hDib);
 
                                 m_ptrDib = reinterpret_cast<unsigned char*>(pDibInfo);
                                 m_ptrOrig = m_ptrDib;
@@ -403,7 +402,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             }
 
                             auto pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(m_hDataHandle));
-                            m_nCurDibSize = static_cast<TW_UINT32>(ImageMemoryHandler::GlobalSize(m_hDataHandle));
+                            m_nCurDibSize = ImageMemoryHandler::GlobalSize(m_hDataHandle);
                             m_ptrDib = reinterpret_cast<unsigned char*>(pDibInfo);
                             m_ptrOrig = m_ptrDib;
                             CurDib->SetHandle(m_hDataHandle);
@@ -433,18 +432,6 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             break;
                         }
 
-                        if ( pSource->GetAcquireType() == TWAINAcquireType_Clipboard )
-                        {
-                            // This may be a compressed image instead of a DIB.  Don't place in clipboard
-                            if ( m_nCompression == TWCP_NONE )
-                            {
-                                if ( pSource->GetSpecialTransferMode() == DTWAIN_USEBUFFERED )
-                                    bInClip = CopyDibToClipboard( pSession, CurDib->GetHandle());
-                            }
-                            else
-                                bInClip = false;
-                        }
-                        else
                         if ( pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative)
                         {
                             auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
@@ -473,7 +460,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             if (bKeepPage2 )
                             {
                                 // Check if multi page file is being used
-                                const bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(acquireFileStatus.GetAcquireFileFormat());
+                                const bool bIsMultiPageFile = IsFileTypeMultiPage(acquireFileStatus.GetAcquireFileFormat());
                                 int nMultiStage = 0;
                                 if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
                                 {
@@ -529,7 +516,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                 if ( bInClip )
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
                                                           DTWAIN_TN_CLIPTRANSFERDONE,
-                                                          static_cast<LPARAM>(pSource->GetAcquireNum()));
+                                                          pSource->GetAcquireNum());
                 if ( errfile != 0 )
                 {
                    CTL_TwainAppMgr::SetAndLogError(errfile, "", false);

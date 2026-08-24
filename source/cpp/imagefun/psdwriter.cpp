@@ -20,6 +20,8 @@
  */
 #include "psdwriter.h"
 
+using namespace dynarithmic;
+
 std::optional<PreparedPsdDibPage> PsdSessionWriter::MakePreparedPsdDibPage(const dynarithmic::DibPageView& view)
 {
     if (!view.bits)
@@ -127,7 +129,7 @@ bool PsdSessionWriter::ValidatePage(const PreparedPsdDibPage& page)
         page.strideBytes > 0;
 }
 
-bool PsdSessionWriter::WriteHeader()
+bool PsdSessionWriter::WriteHeader() const
 {
     static const uint8_t sig[4] = { '8', 'B', 'P', 'S' };
     if (std::fwrite(sig, 1, 4, file_) != 4)
@@ -158,7 +160,7 @@ bool PsdSessionWriter::WriteHeader()
     return true;
 }
 
-bool PsdSessionWriter::WriteColorModeDataSection()
+bool PsdSessionWriter::WriteColorModeDataSection() const
 {
     return dynarithmic::psd::write_u32_be(file_, 0);
 }
@@ -206,7 +208,7 @@ bool PsdSessionWriter::WriteImageResourcesSection()
             resources.push_back(0);
 
         // Data size
-        write_u32_be_vec(resources, static_cast<uint32_t>(data.size()));
+        write_u32_be_vec(resources, data.size());
 
         // Data
         resources.insert(resources.end(), data.begin(), data.end());
@@ -223,7 +225,7 @@ bool PsdSessionWriter::WriteImageResourcesSection()
     append_resource(1008, "Caption", captionData);
 
     if (!dynarithmic::psd::write_u32_be(file_,
-        static_cast<uint32_t>(resources.size())))
+        resources.size()))
     {
         return false;
     }
@@ -236,7 +238,7 @@ bool PsdSessionWriter::WriteImageResourcesSection()
     return true;
 }
 
-bool PsdSessionWriter::WriteLayerAndMaskSection()
+bool PsdSessionWriter::WriteLayerAndMaskSection() const
 {
     return dynarithmic::psd::write_u32_be(file_, 0);
 }
@@ -275,7 +277,7 @@ bool PsdSessionWriter::WriteImageDataSectionRle()
     rleLengths_.clear();
     rleData_.clear();
 
-    const size_t totalRows = static_cast<size_t>(currentPage_.height) * 3;
+    const size_t totalRows = currentPage_.height * 3;
     rleLengths_.reserve(totalRows);
 
     if (!BuildChannelPlaneRle(2))
@@ -322,7 +324,7 @@ bool PsdSessionWriter::BuildChannelPlaneRle(uint32_t bgrIndex)
 
         packBitsRow_.clear();
         EncodePackBitsRow(channelRow_.data(),
-            static_cast<uint32_t>(channelRow_.size()),
+            channelRow_.size(),
             packBitsRow_);
 
         if (packBitsRow_.size() > 65535)

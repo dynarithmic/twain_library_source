@@ -18,11 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
 #include "tgawriter.h"
 #include "iohandler_tga.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
@@ -58,7 +57,7 @@ int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 {
     HANDLE hDib = hDib = m_pDib->GetHandle();
 
-    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     TgaSessionOptions opts{};
     opts.useRle = m_ImageInfoEx.IsRLE;

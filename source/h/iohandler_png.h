@@ -28,7 +28,7 @@ namespace dynarithmic
     class CTL_PngIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_PngIOHandler() : CTL_ImageIOHandler() { SetSaveArgs(); };
+            CTL_PngIOHandler() { SetSaveArgs(); }
             CTL_PngIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib), m_ImageInfoEx(ImageInfoEx)
             {
                 SetSaveArgs();

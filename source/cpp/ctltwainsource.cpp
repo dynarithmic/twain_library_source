@@ -21,18 +21,13 @@
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
-#include <sstream>
 #include <iterator>
 #include <string>
-#include <boost/lexical_cast.hpp>
 #include <utility>
 #include "ctltwainsource.h"
 #include "ctltwaincompliancy.h"
 #include "ctltr001.h"
 #include "ctltwainmanager.h"
-#include "ctldib.h"
-#include "dtwain.h"
-#include "ctltmpl3.h"
 #include "imagexferfilewriter.h"
 #include "ctltr038.h"
 #include "arrayfactory.h"
@@ -40,6 +35,8 @@
 #include "tiff.h"
 #include "ctlclosesource.h"
 #include "ctldib32ex.h"
+#include "ctlcapcontainerfuncs.h"
+#include "ctlstaticdata.h"
 
 using namespace dynarithmic;
 
@@ -237,7 +234,6 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bProcessingPixelInfo(false),
     m_bSkipImageInfoErrors(false),
     m_bDoublePageCountOnDuplex(true),
-    m_nForcedBpp(0),
     m_bTileMode(false),
     m_bExtendedCapsRetrieved(false),
     m_bShutdownAcquire(false),
@@ -268,7 +264,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_nFeederWaitTimeOption(DTWAIN_FEEDER_TERMINATE)
 {
     if (lpszProduct)
-        m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
+        m_SourceId.set_product_name(stringconversion::Convert_NativePtr_To_Ansi(lpszProduct));
 
     // Image information default values
     m_ImageInfoEx.nJpegQuality = 75;
@@ -294,7 +290,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_ImageInfoEx.IsCreateDirectory = false;
     m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, 0);
     m_pExtendedImageInformation = std::make_unique<ExtendedImageInformation>(this);
-    SetPDFValue(PDFPRODUCERKEY,  StringConversion::Convert_Ansi_To_Native(CTL_StaticData::GetAppTitle()));
+    SetPDFValue(PDFPRODUCERKEY,  stringconversion::Convert_Ansi_To_Native(CTL_StaticData::GetAppTitle()));
 }
 
 void CTL_ITwainSource::Reset() const
@@ -630,7 +626,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         nCurImage = 0;
 
     if ( GetCurrentJobControl() != TWJC_NONE &&
-        dynarithmic::IsFileTypeMultiPage(m_AcquireFileStatus.GetAcquireFileFormat()) &&
+        IsFileTypeMultiPage(m_AcquireFileStatus.GetAcquireFileFormat()) &&
         IsJobFileHandlingOn())
     {
         // Get the next job number if multipage and job control
@@ -651,7 +647,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         if ( nCount > 0 )
         {
             auto strTemp = factory->get_value<CTL_StringType>(pDTWAINArray, 0); 
-            strAcquireFile = StringWrapper::CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
+            strAcquireFile = filenameutils::CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
         }
         else
             strAcquireFile.clear();
@@ -676,7 +672,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
             bNameAvailable = factory->get_value(pDTWAINArray, nCount-1, &strTemp)?true:false;
             if ( !bNameAvailable )
                 return strAcquireFile;
-            return StringWrapper::GetPageFileName( strTemp, nCurImage, lFlags & DTWAIN_USELONGNAME?true:false );
+            return filenameutils::GetPageFileName( strTemp, nCurImage, lFlags & DTWAIN_USELONGNAME?true:false );
         }
         else
             return strTemp;
@@ -726,103 +722,6 @@ CTL_ITwainSource::~CTL_ITwainSource()
 HWND CTL_ITwainSource::GetOutputWindow() const
 {
     return m_hOutWnd;
-}
-
-
-///////////// Specialized cap values that DTWAIN needs to keep in a cache ///////////////////
-void CTL_ITwainSource::SetCapCacheValue(LONG lCap, double dValue, bool bTurnOn)
-{
-    switch (lCap)
-    {
-        case ICAP_BRIGHTNESS:
-            CapCacheInfo.Brightness     = dValue;
-            CapCacheInfo.UseBrightness  = bTurnOn;
-            return;
-
-        case ICAP_CONTRAST:
-            CapCacheInfo.Contrast     = dValue;
-            CapCacheInfo.UseContrast  = bTurnOn;
-            return;
-
-        case ICAP_XRESOLUTION:
-            CapCacheInfo.XResolution   = dValue;
-            CapCacheInfo.UseXResolution= bTurnOn;
-            return;
-
-        case ICAP_YRESOLUTION:
-            CapCacheInfo.YResolution   = dValue;
-            CapCacheInfo.UseYResolution= bTurnOn;
-            return;
-
-        case ICAP_PIXELFLAVOR:
-            CapCacheInfo.PixelFlavor   = static_cast<int>(dValue);
-            CapCacheInfo.UsePixelFlavor= bTurnOn;
-            return;
-
-        case ICAP_XNATIVERESOLUTION:
-            CapCacheInfo.XNativeResolution   = dValue;
-            CapCacheInfo.UseXNativeResolution= bTurnOn;
-            return;
-
-        case ICAP_PIXELTYPE:
-            CapCacheInfo.PixelType = static_cast<int>(dValue);
-            CapCacheInfo.UsePixelType = bTurnOn;
-            return;
-
-        case ICAP_BITDEPTH:
-            CapCacheInfo.BitDepth = static_cast<int>(dValue);
-            CapCacheInfo.UseBitDepth = bTurnOn;
-            return;
-    }
-}
-
-double CTL_ITwainSource::GetCapCacheValue(LONG lCap, LONG* pTurnOn) const
-{
-    double dValue = 0;
-    switch (lCap)
-    {
-        case ICAP_BRIGHTNESS:
-            dValue = CapCacheInfo.Brightness;
-            *pTurnOn = CapCacheInfo.UseBrightness;
-            return dValue;
-
-        case ICAP_CONTRAST:
-            dValue = CapCacheInfo.Contrast;
-            *pTurnOn = CapCacheInfo.UseContrast;
-            return dValue;
-
-        case ICAP_XRESOLUTION:
-            dValue = CapCacheInfo.XResolution;
-            *pTurnOn = CapCacheInfo.UseXResolution;
-            return dValue;
-
-        case ICAP_YRESOLUTION:
-            dValue = CapCacheInfo.YResolution;
-            *pTurnOn = CapCacheInfo.UseYResolution;
-            return dValue;
-
-       case ICAP_PIXELFLAVOR:
-            dValue = static_cast<double>(CapCacheInfo.PixelFlavor);
-            *pTurnOn = CapCacheInfo.UsePixelFlavor;
-            return dValue;
-
-        case ICAP_XNATIVERESOLUTION:
-            dValue = CapCacheInfo.XNativeResolution;
-            *pTurnOn = CapCacheInfo.UseXNativeResolution;
-            return dValue;
-
-        case ICAP_PIXELTYPE:
-            dValue = static_cast<double>(CapCacheInfo.PixelType);
-            *pTurnOn = CapCacheInfo.UsePixelType;
-            return dValue;
-
-        case ICAP_BITDEPTH:
-            dValue = static_cast<double>(CapCacheInfo.BitDepth);
-            *pTurnOn = CapCacheInfo.UseBitDepth;
-            return dValue;
-    }
-    *pTurnOn = -1;
-    return 0.0;
 }
 
 void CTL_ITwainSource::AddDibsToAcquisition(DTWAIN_ARRAY aDibs) const
@@ -1008,33 +907,6 @@ void CTL_ITwainSource::SetPhotometric(LONG Setting)
 }
 
 
-
-bool CTL_ITwainSource::InitExtImageInfo(int nNum)
-{
-    if ( !CTL_TwainAppMgr::IsCapabilitySupported(this, ICAP_EXTIMAGEINFO) )
-        return false;
-
-    TW_UINT16 nValue;
-
-    if ( !CTL_TwainAppMgr::GetOneTwainCapValue( this, &nValue, ICAP_EXTIMAGEINFO, MSG_GET, TWTY_BOOL ) )
-        return false;
-
-    if ( !nValue )
-        return false;
-    return true;
-}
-
-
-bool CTL_ITwainSource::AddExtImageInfo(TW_INFO Info) const
-{
-    if ( m_pExtImageTriplet )
-    {
-        m_pExtImageTriplet->AddInfo(Info);
-        return true;
-    }
-    return false;
-}
-
 bool CTL_ITwainSource::GetExtImageInfo(bool bExecute)
 {
     if ( !m_pExtImageTriplet )
@@ -1090,12 +962,6 @@ bool CTL_ITwainSource::IsExtendedCapNegotiable(LONG nCap)
     return false;
 }
 
-bool CTL_ITwainSource::AddCapToExtendedCapList(LONG nCap)
-{
-    m_aExtendedCaps.insert(static_cast<unsigned short>(nCap));
-    return  true;
-}
-
 void CTL_ITwainSource::RetrieveExtendedCaps()
 {
     if (!m_bExtendedCapsRetrieved)
@@ -1111,7 +977,7 @@ void CTL_ITwainSource::RetrieveExtendedCaps()
 
 bool CTL_ITwainSource::InitFileAutoIncrementData(CTL_StringType sName)
 {
-    m_nCurFileNum = StringWrapper::GetInitialFileNumber(std::move(sName), m_nFileDigits);
+    m_nCurFileNum = filenameutils::GetInitialFileNumber(std::move(sName), m_nFileDigits);
     m_nStartFileNum = m_nCurFileNum;
     return true;
 }
@@ -1196,14 +1062,15 @@ void CTL_ITwainSource::DeleteDuplexFiles(int nWhich)
         pData = &m_DuplexFileData.first;
     else
         pData = &m_DuplexFileData.second;
-    for_each(pData->begin(), pData->end(), [](const sDuplexFileData& Data) {delete_file(Data.sFileName.c_str()); });
+    for_each(pData->begin(), pData->end(), [](const sDuplexFileData& Data) 
+        {fileutils::delete_file(Data.sFileName.c_str()); });
 }
 
 unsigned long CTL_ITwainSource::GetNumDuplexFiles(int nWhich) const
 {
     if ( nWhich == 0 )
-        return static_cast<unsigned long>(m_DuplexFileData.first.size());
-    return static_cast<unsigned long>(m_DuplexFileData.second.size());
+        return m_DuplexFileData.first.size();
+    return m_DuplexFileData.second.size();
 }
 
 void CTL_ITwainSource::GetImageInfoEx(DTWAINImageInfoEx &ImageInfoEx) const
@@ -1221,16 +1088,11 @@ void CTL_ITwainSource::ProcessMultipageFile()
     }
 }
 
-bool isIntCap(DTWAIN_SOURCE Source, LONG nCap)
-{
-    return dynarithmic::IsTwainIntegralType(static_cast<TW_UINT16>(DTWAIN_GetCapDataType(Source, nCap)));
-}
-
 template <typename T>
 static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
-    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size())).second;
+    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, nCap, static_cast<LONG>(dataArray.size())).second;
     if (theArray)
     {
         auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
@@ -1261,10 +1123,10 @@ DTWAIN_ARRAY CTL_ITwainSource::getCapCachedValues(TW_UINT16 lCap, LONG getType)
     if (iter == mapToUse->end() )
         return nullptr;
     const container_values& cValues = (*iter).second;
-    if (dynarithmic::IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
+    if (IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
         return PopulateArray<CTL_ArrayFactory::tagged_array_long>(cValues.m_data, this, lCap);
     else
-    if ( dynarithmic::IsTwainFix32Type(static_cast<TW_UINT16>(cValues.m_dataType)))
+    if ( IsTwainFix32Type(static_cast<TW_UINT16>(cValues.m_dataType)))
         return PopulateArray<CTL_ArrayFactory::tagged_array_double>(cValues.m_data, this, lCap);
     return nullptr;
 }
@@ -1279,8 +1141,8 @@ bool CTL_ITwainSource::setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LO
     if (iter != mapToUse->end())
         return true;
     container_values cValues;
-    cValues.m_dataType = dynarithmic::GetCapDataType(this, lCap);
-    if (dynarithmic::IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
+    cValues.m_dataType = GetCapDataType(this, lCap);
+    if (IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
     {
         const bool retVal = PopulateCache<CTL_ArrayFactory::tagged_array_long>(m_pDLLHandle, array, cValues.m_data);
         if (retVal)

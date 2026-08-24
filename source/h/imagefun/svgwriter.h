@@ -27,47 +27,49 @@ OF THIRD PARTY RIGHTS.
 #include <optional>
 #include "imagefilewriterbase.h"
 
-enum class SvgOutputType
+namespace dynarithmic
 {
-    Svg,
-    Svgz
-};
+    enum class SvgOutputType
+    {
+        Svg,
+        Svgz
+    };
 
-struct SvgSessionOptions
-{
-    SvgOutputType type = SvgOutputType::Svg;
-    std::string comment;
-};
+    struct SvgSessionOptions
+    {
+        SvgOutputType type = SvgOutputType::Svg;
+        std::string comment;
+    };
 
-struct PreparedSvgDibPage
-{
-    LPBITMAPINFOHEADER header = nullptr;
-    uint32_t offsetToBitsData = 0;
+    struct PreparedSvgDibPage
+    {
+        LPBITMAPINFOHEADER header = nullptr;
+        uint32_t offsetToBitsData = 0;
 
-    uint32_t width = 0;
-    uint32_t height = 0;
-    uint16_t bitsPerPixel = 0;
-};
+        uint32_t width = 0;
+        uint32_t height = 0;
+        uint16_t bitsPerPixel = 0;
+    };
 
-class SvgSessionWriter
-{
-    public:
-        bool Open(const std::wstring& filename, const SvgSessionOptions& options);
-        bool WritePage();
-        bool Close();
-        bool IsOpen() const noexcept;
-        bool SetPageInfo(const PreparedSvgDibPage& page);
-        static std::optional<PreparedSvgDibPage> MakePreparedSvgPage(const dynarithmic::DibPageView& view);
+    class SvgSessionWriter
+    {
+        public:
+            bool Open(const std::wstring& filename, const SvgSessionOptions& options);
+            bool WritePage();
+            bool Close();
+            bool IsOpen() const noexcept;
+            bool SetPageInfo(const PreparedSvgDibPage& page);
+            static std::optional<PreparedSvgDibPage> MakePreparedSvgPage(const DibPageView& view);
 
-    private:
-        static bool ValidatePage(const PreparedSvgDibPage& page);
-        bool SaveDIBAsSVGEx(const BITMAPINFOHEADER& bih, const uint8_t* bits, const std::string filename, bool isSVGZ,
-                            std::string& comment);
-        PreparedSvgDibPage currentPage_{};
-        std::wstring filename_;
-        SvgSessionOptions options_{};
-        bool isOpen_ = false;
-        bool wrotePage_ = false;
-};
-
+        private:
+            static bool ValidatePage(const PreparedSvgDibPage& page);
+            static bool SaveDIBAsSVGEx(const BITMAPINFOHEADER& bih, const uint8_t* bits, const std::string filename, bool isSVGZ,
+                                       std::string& comment);
+            PreparedSvgDibPage currentPage_{};
+            std::wstring filename_;
+            SvgSessionOptions options_{};
+            bool isOpen_ = false;
+            bool wrotePage_ = false;
+    };
+}
 #endif

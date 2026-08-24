@@ -23,7 +23,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_set>
-#include "ctlobstr.h"
+#include "ctlstringdefs.h"
 #include "ctlenum.h"
 #include "ctltwainsource.h"
 #include "ctltwainidentity.h"
@@ -37,6 +37,15 @@ namespace dynarithmic
   using CTL_ITwainSessionPtr = std::unique_ptr<CTL_ITwainSession>;
   using CTL_TwainSourceSet = std::unordered_set<CTL_ITwainSource*>;
 
+    // RAII class to close a TWAIN session locally
+    struct SessionCloserRAII
+    {
+        bool bMustClose;
+        SessionCloserRAII(bool bClose) : bMustClose(bClose) {}
+        ~SessionCloserRAII();
+    };
+
+
   class CTL_ITwainSession
   {
     public:
@@ -48,6 +57,7 @@ namespace dynarithmic
 
         HWND*               GetWindowHandlePtr() const { return const_cast<HWND*>(&m_AppWnd); }
         TW_IDENTITY*        GetAppIDPtr()              { return &m_AppId.get_identity(); }
+        const CTL_TwainIdentity&   GetTwainIdentity() const { return m_AppId; }
         CTL_ITwainSource*    CreateTwainSource( LPCTSTR pProduct );
         bool                AddTwainSource( CTL_ITwainSource *pSource );
         void                CopyAllSources( CTL_TwainSourceSet & rArray );
@@ -73,6 +83,8 @@ namespace dynarithmic
         void                SetTwainDLLHandle(CTL_TwainDLLHandle* pHandle) { m_pTwainDLLHandle = pHandle; }
         const CTL_TwainSourceSet& GetTwainSources();
         const CTL_TwainSourceSet& GetCurrentTwainSources() const { return m_arrTwainSource; }
+        void                FillTWIdentity(const CTL_TwainDLLHandle* pHandle);
+
         virtual ~CTL_ITwainSession();
 
     protected:

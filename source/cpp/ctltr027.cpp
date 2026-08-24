@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr027.h"
-#include "ctltwainmanager.h"
+#include "ctltwainsession.h"
 
 using namespace dynarithmic;
 CTL_ImagePendingTriplet::CTL_ImagePendingTriplet(CTL_ITwainSession *pSession,
@@ -42,7 +42,7 @@ bool CTL_ImagePendingTriplet::Reset( TW_UINT16 nMsg )
               DG_CONTROL,
               DAT_PENDINGXFERS,
               m_nMsg,
-              static_cast<TW_MEMREF>(&m_PendingXfers));
+              &m_PendingXfers);
         return true;
     }
     return false;

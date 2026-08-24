@@ -18,30 +18,32 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include <windows.h>
 #include "ctltripletbase.h"
-#include "ctltr010.h"
 #include "ctldevnt.h"
-#include "twainfix32.h"
+
 #include "arrayfactory.h"
+#include "ctlconstexprutils.h"
+#include "ctltwaindllhandle.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
-CTL_DeviceEvent::CTL_DeviceEvent() : m_DeviceEvent() {}
 
 TW_UINT32  CTL_DeviceEvent::GetEvent() const { return             m_DeviceEvent.Event;            }
-CTL_StringType CTL_DeviceEvent::GetDeviceName() const { return    StringConversion::Convert_AnsiPtr_To_Native(m_DeviceEvent.DeviceName); }
-std::string CTL_DeviceEvent::GetDeviceNameA() const { return    m_DeviceEvent.DeviceName?m_DeviceEvent.DeviceName:""; }
+CTL_StringType CTL_DeviceEvent::GetDeviceName() const { return    stringconversion::Convert_AnsiPtr_To_Native(m_DeviceEvent.DeviceName); }
+std::string CTL_DeviceEvent::GetDeviceNameA() const { return    m_DeviceEvent.DeviceName; }
 TW_UINT32  CTL_DeviceEvent::GetBatteryMinutes() const { return    m_DeviceEvent.BatteryMinutes;   }
 TW_INT16   CTL_DeviceEvent::GetBatteryPercentage() const { return m_DeviceEvent.BatteryPercentage;}
 TW_INT32   CTL_DeviceEvent::GetPowerSupply() const { return       m_DeviceEvent.PowerSupply;      }
 
 double CTL_DeviceEvent::GetXResolution() const
 {
-    return static_cast<double>(Fix32ToFloat(m_DeviceEvent.XResolution));
+    return Fix32ToFloat(m_DeviceEvent.XResolution);
 }
 
 double CTL_DeviceEvent::GetYResolution() const
 {
-    return static_cast<double>(Fix32ToFloat(m_DeviceEvent.YResolution));
+    return Fix32ToFloat(m_DeviceEvent.YResolution);
 }
 
 TW_UINT32  CTL_DeviceEvent::GetFlashUsed2() const { return             m_DeviceEvent.FlashUsed2;            }

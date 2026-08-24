@@ -19,7 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr041.h"
-#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 CTL_DSMMetricsTriplet::CTL_DSMMetricsTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource) : m_DSMMetrics{}

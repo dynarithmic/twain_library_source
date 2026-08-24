@@ -19,6 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "gifwriter.h"
+using namespace dynarithmic;
 
  // ============================================================
  // GIF writer
@@ -132,7 +133,7 @@ bool GifSessionWriter::WriteCurrentPage()
         std::memcpy(rowBuffer_.data(), src, currentPage_.width);
 
         if (EGifPutLine(gif_,
-            reinterpret_cast<GifPixelType*>(rowBuffer_.data()),
+            rowBuffer_.data(),
             static_cast<int>(currentPage_.width)) == GIF_ERROR)
         {
             return false;
@@ -227,7 +228,7 @@ bool GifSessionWriter::write_comment_extensions()
 
         if (EGifPutExtensionBlock(gif_,
             chunkSize,
-            const_cast<uint8_t*>(p)) == GIF_ERROR)
+            p) == GIF_ERROR)
         {
             return false;
         }

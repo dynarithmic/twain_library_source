@@ -18,12 +18,11 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctldib.h"
-#include "ctliface.h"
 #include "ctlfileutils.h"
 #include "icowriter.h"
 #include "iohandler_ico.h"
 #include "ctldib32ex.h"
+#include "ctlstringconversion.h"
 
 using namespace dynarithmic;
 
@@ -60,9 +59,9 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!hDib)
         return DTWAIN_ERR_DIB;
 
-    dynarithmic::dib::LockedDib dibHandle(m_pDib->GetHandle());
-    int height = dibHandle.Height();
-    int width = dibHandle.Width();
+    dib::LockedDib dibHandle(m_pDib->GetHandle());
+    auto height = dibHandle.Height();
+    auto width = dibHandle.Width();
 
     if (!m_ImageInfoEx.IsVistaIcon)
     {
@@ -78,10 +77,10 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
             return DTWAIN_ERR_INVALIDICONFORMAT;
     }
 
-    if (!parent_directory_exists(szFile).first)
+    if (!fileutils::parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
 
-    std::wstring fName = StringConversion::Convert_NativePtr_To_Wide(szFile);
+    std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 
     if (!m_ImageInfoEx.IsVistaIcon)
     {

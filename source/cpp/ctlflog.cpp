@@ -19,173 +19,183 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <sstream>
-#include "ctliface.h"
 #include "dtwain_exception.h"
 #include "ctllogcalls.h"
 #include "logwriterutils.h"
 #include "ctltwainmanager.h"
-#include <boost/format.hpp>
-
+#include "ctlstringutilsx.h"
+#include "ctlstaticdata.h"
+#include "dtwain_resource_constants2.h"
+#include "dtwain_config.h"
 using namespace dynarithmic;
 
-static void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText=nullptr);
+namespace
+{
+    void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
+    {
+        try
+        {
+            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            if (pHandle)
+                pHandle->m_lLastError = DTWAIN_ERR_EXCEPTION_ERROR;
+            else
+                return;
+            std::ostringstream strm;
+            strm << ReplacePlaceHolders<std::string>("**** DTWAIN %1 ****.  %2: %3\n", {
+                GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT),
+                GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT), fname });
+            if (sAdditionalText)
+                strm << "\nAdditional Information: " << sAdditionalText;
+#ifdef _WIN32
+            MessageBoxA(nullptr, strm.str().c_str(), GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT).c_str(), MB_ICONSTOP);
+#else
+            std::cout << strm.str() << '\n';
+#endif
+        }
+        catch (...) {}  // can't really do anything
+    }
+}
 
+namespace dynarithmic
+{
 #if DTWAIN_BUILD_LOGCALLSTACK == 1
-std::string dynarithmic::CTL_LogFunctionCallA(int32_t logFlags, const char *pFuncName, int nWhich, const char *pOptionalString/* = NULL*/)
-{
-    if (!(CTL_StaticData::GetLogFilterFlags() & logFlags))
-        return {};
-    std::string ret;
-    if (pOptionalString)
-        ret = CTL_LogFunctionCallHelper(pFuncName, nWhich, pOptionalString);
-    else
-        ret = CTL_LogFunctionCallHelper(pFuncName, nWhich );
-    return ret;
-}
+    static const constexpr char* EnterString = "==>>";
+    static const constexpr char* ExitString = "<<==";
 
-std::string dynarithmic::CTL_LogFunctionCallHelper(const char *pFuncName, int nWhich, const char *pString)
-{
-    if (CTL_StaticData::GetLogFilterFlags() == 0 )
-         return {};
-    auto& theLogger = CTL_StaticData::GetLogger();
-    int nIndent = theLogger.GetCurrentIndentLevel();
-    std::string s;
-    std::string s2;
-    if ( pString )
-        s2 = pString;
-    if ( nWhich != LOG_NO_INDENT )
+    std::string CTL_LogFunctionCallA(int32_t logFlags, const char* pFuncName, int nWhich, const char* pOptionalString/* = NULL*/)
     {
-        if ( nWhich == 0 || nWhich == LOG_INDENT_IN)
-        {
-            const std::string sTemp(nIndent, ' ');
-            auto resText = GetResourceStringFromMap(IDS_LOGMSG_ENTERTEXT);
-            if (resText.empty())
-                resText = "Entering";
-            s = sTemp + static_cast<std::string>("===>>>") + resText + " ";
-            theLogger.IndentLine();
-        }
+        if (!(CTL_StaticData::GetLogFilterFlags() & logFlags))
+            return {};
+        std::string ret;
+        if (pOptionalString)
+            ret = CTL_LogFunctionCallHelper(pFuncName, nWhich, pOptionalString);
         else
-        if ( nWhich == LOG_INDENT_OUT )
-        {
-            theLogger.OutdentLine();
-            nIndent = theLogger.GetCurrentIndentLevel();
-            const std::string sTemp(nIndent, ' ');
-            auto resText = GetResourceStringFromMap(IDS_LOGMSG_EXITTEXT);
-            if (resText.empty())
-                resText = "Exiting";
-            s = sTemp + static_cast<std::string>("<<<===") + resText + " ";
-        }
-        else
-        if (nWhich == LOG_INDENT_USELAST)
-        {
-            const std::string sTemp(nIndent, ' '); 
-            std::ostringstream strm;
-            strm << sTemp << pFuncName << ": " << GetResourceStringFromMap(IDS_LOGMSG_RETURNSETVALUES) << ": ";
-            s = strm.str();
-        }
-        else
-        if (nWhich == LOG_INDENT_USELAST_NOFUNCTION)
-        {
-            const std::string sTemp(nIndent + theLogger.GetIndentSize(), ' '); 
-            std::ostringstream strm;
-            strm << sTemp << pFuncName;
-            s = strm.str();
-        }
+            ret = CTL_LogFunctionCallHelper(pFuncName, nWhich);
+        return ret;
     }
-    else
+
+    std::string CTL_LogFunctionCallHelper(const char* pFuncName, int nWhich, const char* pString)
     {
-        s = std::string(nIndent, ' ');
-    }
-    if ( !pString && nWhich != LOG_INDENT_USELAST && nWhich != LOG_INDENT_USELAST_NOFUNCTION)
-        s += pFuncName;
-    else
-        s += s2;
-    if ( nWhich != LOG_INDENT_IN && nWhich != LOG_INDENT_OUT && nWhich != LOG_INDENT_USELAST)
-    {
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USEFILE)
+        if (CTL_StaticData::GetLogFilterFlags() == 0)
+            return {};
+        auto& theLogger = CTL_StaticData::GetLogger();
+        int nIndent = theLogger.GetCurrentIndentLevel();
+        std::string s;
+        std::string s2;
+        if (pString)
+            s2 = pString;
+        if (nWhich != LOG_NO_INDENT)
         {
-            if (!CTL_StaticData::GetLogger().StatusOutFast( s.c_str() ) )
+            if (nWhich == 0 || nWhich == LOG_INDENT_IN)
+            {
+                const std::string sTemp(nIndent, ' ');
+                auto resText = GetResourceStringFromMap(IDS_LOGMSG_ENTERTEXT);
+                if (resText.empty())
+                    resText = "Entering";
+                s = sTemp + static_cast<std::string>(EnterString) + resText + " ";
+                theLogger.IndentLine();
+            }
+            else
+            if (nWhich == LOG_INDENT_OUT)
+            {
+                theLogger.OutdentLine();
+                nIndent = theLogger.GetCurrentIndentLevel();
+                const std::string sTemp(nIndent, ' ');
+                auto resText = GetResourceStringFromMap(IDS_LOGMSG_EXITTEXT);
+                if (resText.empty())
+                    resText = "Exiting";
+                s = sTemp + static_cast<std::string>(ExitString) + resText + " ";
+            }
+            else
+            if (nWhich == LOG_INDENT_USELAST)
+            {
+                const std::string sTemp(nIndent, ' ');
+                std::ostringstream strm;
+                strm << sTemp << pFuncName << ": " << GetResourceStringFromMap(IDS_LOGMSG_RETURNSETVALUES) << ": ";
+                s = strm.str();
+            }
+            else
+            if (nWhich == LOG_INDENT_USELAST_NOFUNCTION)
+            {
+                const std::string sTemp(nIndent + theLogger.GetIndentSize(), ' ');
+                std::ostringstream strm;
+                strm << sTemp << pFuncName;
+                s = strm.str();
+            }
+        }
+        else
+        {
+            s = std::string(nIndent, ' ');
+        }
+        if (!pString && nWhich != LOG_INDENT_USELAST && nWhich != LOG_INDENT_USELAST_NOFUNCTION)
+            s += pFuncName;
+        else
+            s += s2;
+        if (nWhich != LOG_INDENT_IN && nWhich != LOG_INDENT_OUT && nWhich != LOG_INDENT_USELAST)
+        {
+            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USEFILE)
+            {
+                if (!CTL_StaticData::GetLogger().StatusOutFast(s.c_str()))
+                    CTL_StaticData::GetLogger().OutputDebugStringFull(s);
+            }
+            else
+            {
                 CTL_StaticData::GetLogger().OutputDebugStringFull(s);
+            }
         }
         else
+        if (nWhich == LOG_INDENT_OUT)
         {
-           CTL_StaticData::GetLogger().OutputDebugStringFull(s);
+            const auto* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            char buffer[1024] = {};
+            CTL_TwainAppMgr::GetErrorString(-pHandle->m_lLastError, buffer, 1023);
+            std::ostringstream strm;
+            std::string resString = GetResourceStringFromMap(IDS_LOGMSG_LASTERROR);
+            auto errorName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_ERROR_NAMES, pHandle->m_lLastError).second;
+            strm << " -- "
+                << resString
+                << " (" << errorName << ") "
+                << "(" << buffer << ")";
+            s += strm.str();
         }
+        return s;
     }
-    else 
-    if ( nWhich == LOG_INDENT_OUT )
-    {
-        const auto* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        char buffer[1024] = {};
-        CTL_TwainAppMgr::GetErrorString(-pHandle->m_lLastError, buffer, 1023);
-        std::ostringstream strm;
-        auto errorName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_ERROR_NAMES, pHandle->m_lLastError).second;
-        strm << " -- " 
-             << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_LASTERROR) 
-             << " (" << errorName  << ") " 
-             << "(" << buffer << ")";
-        s += strm.str();
-    }
-    return s;
-}
 #endif
 
-void dynarithmic::LogExceptionErrorA(const char * fname, bool bIsCatchAll, const char* sAdditionalText)
-{
-    if ( !(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_SHOWEXCEPTIONS) )
-         return;
-    try
+    void LogExceptionErrorA(const char* fname, bool bIsCatchAll, const char* sAdditionalText)
     {
-       const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-       if (pHandle)
-           pHandle->m_lLastError = DTWAIN_ERR_EXCEPTION_ERROR;
-       else
-           return;
-       std::ostringstream output;
-
-       output << "**** DTWAIN " << GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT) <<  " ****.  " <<
-                                   GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT) << ": " <<  fname;
-       if ( sAdditionalText )
-          output << "\nAdditional Information: " << sAdditionalText;
-       if (bIsCatchAll)
-           output << "\n(Catch all invoked)";
-       std::string s = output.str();
-       if (!(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USEFILE))
-            s += "\n";
-       LogWriterUtils::WriteLogInfoIndentedA(s);  // flush all writes to the log file
-       LogExceptionToConsole(fname, sAdditionalText);
-    }
-    catch(...)
-    {
-        LogExceptionToConsole(fname, sAdditionalText);
-    }
-}
-
-void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
-{
-    try
-    {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        if (pHandle)
-            pHandle->m_lLastError = DTWAIN_ERR_EXCEPTION_ERROR;
-        else
+        if (!(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_SHOWEXCEPTIONS))
             return;
-        std::ostringstream strm;
-        strm << boost::format("**** DTWAIN %1% ****.  %2%: %3%\n") %
-            GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT).c_str() %
-            GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT).c_str() % fname;
-        if (sAdditionalText)
-            strm << "\nAdditional Information: " << sAdditionalText;
-        #ifdef _WIN32
-        MessageBoxA(nullptr, strm.str().c_str(), GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT).c_str(), MB_ICONSTOP);
-        #else
-           std::cout << strm.str() << '\n';
-        #endif
-    }
-    catch (...) {}  // can't really do anything
-}
+        try
+        {
+            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            if (pHandle)
+                pHandle->m_lLastError = DTWAIN_ERR_EXCEPTION_ERROR;
+            else
+                return;
+            std::ostringstream output;
 
-uint32_t& dynarithmic::GetLogFilterFlags()
-{
-    return CTL_StaticData::GetLogFilterFlags();
+            output << "**** DTWAIN " << GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT) << " ****.  " <<
+                GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT) << ": " << fname;
+            if (sAdditionalText)
+                output << "\nAdditional Information: " << sAdditionalText;
+            if (bIsCatchAll)
+                output << "\n(Catch all invoked)";
+            std::string s = output.str();
+            if (!(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USEFILE))
+                s += "\n";
+            LogWriterUtils::WriteLogInfoIndentedA(s);  // flush all writes to the log file
+            LogExceptionToConsole(fname, sAdditionalText);
+        }
+        catch (...)
+        {
+            LogExceptionToConsole(fname, sAdditionalText);
+        }
+    }
+
+
+    uint32_t& GetLogFilterFlags()
+    {
+        return CTL_StaticData::GetLogFilterFlags();
+    }
 }
