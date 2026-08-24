@@ -234,7 +234,7 @@ namespace dynarithmic
             {
                 fileName = CreateFileNameWithDateTime_Impl(basicstringutils::Narrow(prefix),
                     basicstringutils::Narrow(ext), useUTC);
-                return basicstringutils::Widen(fileName);
+                return stringconversion::Convert_Ansi_To_Wide(fileName);
             }
             return {};
         }

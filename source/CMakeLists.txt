@@ -394,6 +394,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/aeslib/AES.h
         ${PROJECT_SOURCE_DIR}/h/ansiwideconverter_generic.h
         ${PROJECT_SOURCE_DIR}/h/ansiwideconverter_win32.h
+        ${PROJECT_SOURCE_DIR}/h/ansiwideconverter_win32ex.h
         ${PROJECT_SOURCE_DIR}/h/arrayfactory.h
         ${PROJECT_SOURCE_DIR}/h/ctlarraydefs.h
         ${PROJECT_SOURCE_DIR}/h/blankpage.h

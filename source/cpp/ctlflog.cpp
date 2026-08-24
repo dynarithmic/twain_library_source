@@ -150,9 +150,10 @@ namespace dynarithmic
             char buffer[1024] = {};
             CTL_TwainAppMgr::GetErrorString(-pHandle->m_lLastError, buffer, 1023);
             std::ostringstream strm;
+            std::string resString = GetResourceStringFromMap(IDS_LOGMSG_LASTERROR);
             auto errorName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_ERROR_NAMES, pHandle->m_lLastError).second;
             strm << " -- "
-                << GetResourceStringFromMap(IDS_LOGMSG_LASTERROR)
+                << resString
                 << " (" << errorName << ") "
                 << "(" << buffer << ")";
             s += strm.str();

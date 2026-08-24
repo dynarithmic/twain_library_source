@@ -702,7 +702,7 @@ namespace dynarithmic
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
-        auto native_str = basicstringutils::Widen(str);
+        auto native_str = stringconversion::Convert_Ansi_To_Wide(str); 
         return CopyInfoToCString(native_str, buffer, bufSize);
     }
 

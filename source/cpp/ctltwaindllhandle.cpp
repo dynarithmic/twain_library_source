@@ -189,7 +189,7 @@ std::pair<bool, CTL_StringType> CTL_StaticData::GetTwainNameFromConstant(int lCo
 std::pair<bool, std::wstring> CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant)
 {
     auto pr = CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant);
-    return { pr.first, basicstringutils::Widen(pr.second) };
+    return { pr.first, stringconversion::Convert_Ansi_To_Wide(pr.second) };
 }
 
 CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string_view sLang)

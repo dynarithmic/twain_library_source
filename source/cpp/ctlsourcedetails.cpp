@@ -920,7 +920,7 @@ extern "C"
 {
     LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh)
     {
-        LOG_FUNC_ENTRY_PARAMS((szBuf, nSize, indentFactor))
+        LOG_FUNC_ENTRY_PARAMS((szBuf, nSize, indentFactor, bRefresh))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         CTL_StringType details;
         if (!bRefresh &&  !pHandle->m_strSessionDetails.empty())
@@ -944,7 +944,7 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh)
     {
-        LOG_FUNC_ENTRY_PARAMS((szSources, szBuf, nSize, indentFactor))
+        LOG_FUNC_ENTRY_PARAMS((szSources, szBuf, nSize, indentFactor, bRefresh))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         if (bRefresh)
         {
@@ -964,5 +964,35 @@ extern "C"
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
         CATCH_BLOCK(0)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, LPTSTR szSourceInfo, LONG indentFactor, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, szSourceInfo, indentFactor, nMaxLen))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto sAllInfo = stringconversion::Convert_Ansi_To_Native(pSource->GetSourceInfoFormatted(indentFactor));
+        auto nLen = CopyInfoToCString(sAllInfo, szSourceInfo, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szSourceInfo))
+        LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetAllSessionInfo(LPTSTR szSessionInfo, LONG indentFactor, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((szSessionInfo, indentFactor, nMaxLen))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (pHandle->m_bSessionAllocated)
+        {
+            if (pHandle->m_pTwainSession)
+            {
+                auto sAllInfo = stringconversion::Convert_Ansi_To_Native(pHandle->m_pTwainSession->GetTwainIdentity().to_json_formatted(indentFactor));
+                auto nLen = CopyInfoToCString(sAllInfo, szSessionInfo, nMaxLen);
+                LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szSessionInfo))
+                LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
+            }
+        }
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, []{return true; }, DTWAIN_ERR_NO_SESSION, DTWAIN_FAILURE1, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
     }
 }

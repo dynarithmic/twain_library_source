@@ -98,17 +98,6 @@ extern "C"
         CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
     }
 
-    LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfo(DTWAIN_SOURCE Source, LPTSTR szSourceInfo, LONG indentFactor, LONG nMaxLen)
-    {
-        LOG_FUNC_ENTRY_PARAMS((Source, szSourceInfo, nMaxLen))
-        auto [pHandle, pSource] = VerifyHandles(Source);
-        auto sAllInfo = stringconversion::Convert_Ansi_To_Native(pSource->GetSourceInfoFormatted(indentFactor));
-        auto nLen = CopyInfoToCString(sAllInfo, szSourceInfo, nMaxLen);
-        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szSourceInfo))
-        LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
-        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
-    }
-
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetSourceVersionNumber( DTWAIN_SOURCE Source, LPLONG pMajor, LPLONG pMinor)
     {
         LOG_FUNC_ENTRY_PARAMS((Source, pMajor, pMinor))

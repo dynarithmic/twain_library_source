@@ -982,45 +982,6 @@ extern "C"
         CATCH_BLOCK(nullptr)
     }
 
-    DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLib(HINSTANCE hInstance)
-    {
-        LOG_FUNC_ENTRY_PARAMS((hInstance))
-
-    #ifdef DTWAIN_LIB
-        CTL_StaticData::s_DLLInstance = hInstance;
-    #endif
-        const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
-        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-        CATCH_BLOCK(nullptr)
-    }
-
-    DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLibEx2(HINSTANCE hInstance,
-                                                           LPCTSTR szINIPath,
-                                                           LPCTSTR szImageDLLPath,
-                                                           LPCTSTR szLangResourcePath)
-    {
-        LOG_FUNC_ENTRY_PARAMS((hInstance, szINIPath, szImageDLLPath,szLangResourcePath))
-
-        SetLangResourcePath(szLangResourcePath);
-
-        const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
-        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-        CATCH_BLOCK(nullptr)
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx(HINSTANCE hInstance, LPCTSTR szINIPath)
-    {
-        LOG_FUNC_ENTRY_PARAMS((hInstance, szINIPath))
-
-        CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
-
-        const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLib(hInstance);
-        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-        CATCH_BLOCK(nullptr)
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-
     ////////////////////////////// Initialize Library EX2 code //////////////////////////////////////
     DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
                                                        LPCTSTR szImageDLLPath,

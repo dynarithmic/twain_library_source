@@ -189,9 +189,9 @@ namespace dynarithmic
         std::string GetManufacturerA() const { return m_SourceId.get_manufacturer(); }
         std::string GetProductFamilyA() const { return m_SourceId.get_product_family(); }
         std::string GetProductNameA() const { return m_SourceId.get_product_name(); }
-        std::wstring GetManufacturerW() const { return basicstringutils::Widen(m_SourceId.get_manufacturer()); }
-        std::wstring GetProductFamilyW() const { return basicstringutils::Widen(m_SourceId.get_product_family()); }
-        std::wstring GetProductNameW() const { return basicstringutils::Widen(m_SourceId.get_product_name()); }
+        std::wstring GetManufacturerW() const { return stringconversion::Convert_Ansi_To_Wide(m_SourceId.get_manufacturer()); }
+        std::wstring GetProductFamilyW() const { return stringconversion::Convert_Ansi_To_Wide(m_SourceId.get_product_family()); }
+        std::wstring GetProductNameW() const { return stringconversion::Convert_Ansi_To_Wide(m_SourceId.get_product_name()); }
 
         std::string GetSourceInfo() const { return m_SourceId.to_json(); }
         std::string GetSourceInfoFormatted(int indentFactor) const { return m_SourceId.to_json_formatted(indentFactor);  }
