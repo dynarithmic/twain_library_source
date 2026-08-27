@@ -26,6 +26,10 @@ OF THIRD PARTY RIGHTS.
 #include "ctlstringutilsx.h"
 #include "zlib.h"
 
+#ifdef _MSC_VER
+    #pragma message ("Using ZLib version " ZLIB_VERSION)
+#endif
+
 using namespace dynarithmic;
 
 ////////////////////////////////////////////////////////
