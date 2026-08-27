@@ -521,41 +521,6 @@ extern "C"
         CATCH_BLOCK_LOG_PARAMS(false)
     }
 
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source,
-                                                 LPCTSTR szText, 
-                                                 LONG xPos, 
-                                                 LONG yPos,
-                                                 LPCTSTR fontName, 
-                                                 DTWAIN_FLOAT fontSize, 
-                                                 LONG colorRGB,
-                                                 LONG renderMode, 
-                                                 DTWAIN_FLOAT scaling,
-                                                 DTWAIN_FLOAT charSpacing, 
-                                                 DTWAIN_FLOAT wordSpacing,
-                                                 DTWAIN_FLOAT strokeWidth, 
-                                                 DTWAIN_FLOAT rotationAngle,
-                                                 DTWAIN_FLOAT skewAngleX,
-                                                 DTWAIN_FLOAT skewAngleY,
-                                                 DTWAIN_FLOAT scalingX,
-                                                  DTWAIN_FLOAT scalingY,
-                                                 LONG transformType)
-    {
-        LOG_FUNC_ENTRY_PARAMS((Source, szText, xPos, yPos, fontName, fontSize, colorRGB,
-                               renderMode, scaling, charSpacing, wordSpacing, strokeWidth, 
-                               rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType))
-        auto [pHandle, pSource] = VerifyHandles(Source);
-        auto ptrText = GenericAddPDFText(pSource, szText, xPos, yPos, fontName, fontSize, colorRGB,
-                                     renderMode, scaling, charSpacing, wordSpacing, strokeWidth, DTWAIN_PDFTEXT_CURRENTPAGE);
-        ptrText->rotationAngle = rotationAngle;
-        ptrText->skewAngleX = skewAngleX;
-        ptrText->skewAngleY = skewAngleY;
-        ptrText->scalingX = scalingX;
-        ptrText->scalingY = scalingY;
-        ptrText->textTransform = transformType;
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        CATCH_BLOCK_LOG_PARAMS(false)
-    }
-
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearPDFTextElements(DTWAIN_SOURCE Source)
     {
         LOG_FUNC_ENTRY_PARAMS((Source))

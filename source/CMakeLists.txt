@@ -636,7 +636,6 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlerrorcallback.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlextimageinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlfeed.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlfileappend.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlfilesave.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlfiletypes.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlfileutils.cpp

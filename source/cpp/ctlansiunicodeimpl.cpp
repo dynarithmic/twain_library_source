@@ -123,23 +123,6 @@ extern "C"
 #endif
     }
 
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddFileToAppendW(LPCWSTR szFile)
-    {
-#ifdef _UNICODE
-        return DTWAIN_AddFileToAppend(szFile);
-#else
-        return DTWAIN_AddFileToAppend(stringconversion::Convert_WidePtr_To_Native(szFile).c_str());
-#endif
-    }
-
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddFileToAppendA(LPCSTR szFile)
-    {
-#ifdef _UNICODE
-        return DTWAIN_AddFileToAppend(stringconversion::Convert_AnsiPtr_To_Native(szFile).c_str());
-#else
-        return DTWAIN_AddFileToAppend(szFile);
-#endif
-    }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags)
     {
@@ -1467,24 +1450,6 @@ extern "C"
         std::string args(1024, 0);
         DTWAIN_BOOL retVal = DTWAIN_GetYResolutionString(Source, args.data());
         return null_terminator_copier(get_view(args), Resolution, retVal);
-#endif
-    }
-
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitImageFileAppendW(LPCWSTR szFile, LONG fType)
-    {
-#ifdef _UNICODE
-        return DTWAIN_InitImageFileAppend(szFile, fType);
-#else
-        return DTWAIN_InitImageFileAppend(stringconversion::Convert_WidePtr_To_Native(szFile).c_str(), fType);
-#endif
-    }
-
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitImageFileAppendA(LPCSTR szFile, LONG fType)
-    {
-#ifdef _UNICODE
-        return DTWAIN_InitImageFileAppend(stringconversion::Convert_AnsiPtr_To_Native(szFile).c_str(), fType);
-#else
-        return DTWAIN_InitImageFileAppend(szFile, fType);
 #endif
     }
 
@@ -3167,31 +3132,6 @@ extern "C"
             stringconversion::Convert_WidePtr_To_Native(wordSpacing).c_str(),
             stringconversion::Convert_WidePtr_To_Native(strokeWidth).c_str(),
             Flags);
-#endif
-    }
-
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextExW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName,
-        DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType)
-    {
-#ifdef _UNICODE
-        return DTWAIN_AddPDFTextEx(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
-#else
-        return DTWAIN_AddPDFTextEx(Source,
-            stringconversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos,
-            stringconversion::Convert_WidePtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
-#endif
-    }
-
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextExA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName,
-        DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth,
-        DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType
-    )
-    {
-#ifdef _UNICODE
-        return DTWAIN_AddPDFTextEx(Source, stringconversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos, stringconversion::Convert_AnsiPtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode,
-            scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
-#else
-        return DTWAIN_AddPDFTextEx(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
 #endif
     }
 

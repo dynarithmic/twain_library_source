@@ -210,17 +210,6 @@ extern "C"
     }
 
     /* !!DEPRECATED as of version 5.6.2 !!
-       Application adds an item to query the image information.  Before getting the Extended
-       Image Information, the application will call DTWAIN_AddExtImageInfoQuery multiple times,
-       each time for each Image Information desired  */
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo)
-    {
-        LOG_FUNC_ENTRY_PARAMS((Source, ExtImageInfo))
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        CATCH_BLOCK(false)
-    }
-
-    /* !!DEPRECATED as of version 5.6.2 !!
        This function actually initiates the querying of the ext image information.  This function
        will query the TWAIN Source.  If your TWAIN Source has bugs, this will be where any problem
        will exist */

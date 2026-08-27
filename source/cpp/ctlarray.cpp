@@ -769,14 +769,6 @@ namespace
 
 extern "C"
 {
-    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayInit()
-    {
-        LOG_FUNC_ENTRY_PARAMS(())
-        LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
-        CATCH_BLOCK(nullptr)
-    }
-
-
     DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreate( LONG nEnumType, LONG nInitialSize )
     {
         static_assert(sizeof(DWORD) == sizeof(LONG), "Error -- DWORD must have the same size as LONG");
