@@ -20,6 +20,13 @@
  */
 #include <webp/mux.h>
 #include "webpwriter.h"
+#include "enc/vp8i_enc.h"
+
+#ifdef _MSC_VER
+    #define STRINGER_2_(x) #x
+    #define STRINGER_(x) STRINGER_2_(x)
+    #pragma message ("Using LibWebP version " STRINGER_(ENC_MAJ_VERSION) "." STRINGER_(ENC_MIN_VERSION) "." STRINGER_(ENC_REV_VERSION))
+#endif
 
 using namespace dynarithmic;
 

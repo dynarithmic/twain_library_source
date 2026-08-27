@@ -22,6 +22,13 @@
 #include "jpegwriter.h"
 #include "ctldib32ex.h"
 #include "ctlstringconversion.h"
+#include "jversion.h"
+
+#ifdef _MSC_VER
+    #define STRINGER_2_(x) #x
+    #define STRINGER_(x) STRINGER_2_(x)
+    #pragma message ("Using LibJPEG version " JVERSION)
+#endif
 
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
