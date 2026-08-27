@@ -29,6 +29,10 @@
 #include "ctlstringconversion.h"
 #include "ctltwainsource.h"
 
+#ifdef _MSC_VER
+    #pragma message ("Using LibTiff version " TIFFLIB_VERSION_STR_MAJ_MIN_MIC)
+#endif
+
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static constexpr TiffCompression TranslateCompression(int nCompression)
