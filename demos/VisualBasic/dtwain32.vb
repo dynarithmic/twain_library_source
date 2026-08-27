@@ -1772,11 +1772,8 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_AcquireNative Lib "dtwain32.dll" (Source As System.IntPtr, PixelType As Integer, nMaxPages As Integer, bShowUI As Integer, bCloseSource As Integer, ByRef pStatus As Integer) As System.IntPtr
     Public Declare Function DTWAIN_AcquireNativeEx Lib "dtwain32.dll" (Source As System.IntPtr, PixelType As Integer, nMaxPages As Integer, bShowUI As Integer, bCloseSource As Integer, Acquisitions As System.IntPtr, ByRef pStatus As Integer) As Integer
     Public Declare Function DTWAIN_AcquireToClipboard Lib "dtwain32.dll" (Source As System.IntPtr, PixelType As Integer, nMaxPages As Integer, nTransferMode As Integer, bDiscardDibs As Integer, bShowUI As Integer, bCloseSource As Integer, ByRef pStatus As Integer) As System.IntPtr
-    Public Declare Function DTWAIN_AddExtImageInfoQuery Lib "dtwain32.dll" (Source As System.IntPtr, ExtImageInfo As Integer) As Integer
-    Public Declare Ansi Function DTWAIN_AddFileToAppend Lib "dtwain32.dll" (szFile As String) As Integer
     Public Declare Ansi Function DTWAIN_AddPDFText Lib "dtwain32.dll" (Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, Flags As UInteger) As Integer
     Public Declare Function DTWAIN_AddPDFTextElement Lib "dtwain32.dll" (Source As System.IntPtr, TextElement As System.IntPtr) As Integer
-    Public Declare Ansi Function DTWAIN_AddPDFTextEx Lib "dtwain32.dll" (Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, rotationAngle As System.Double, skewAngleX As System.Double, skewAngleY As System.Double, scalingX As System.Double, scalingY As System.Double, transformType As Integer) As Integer
     Public Declare Ansi Function DTWAIN_AddPDFTextString Lib "dtwain32.dll" (Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
     Public Declare Function DTWAIN_AllocateMemory Lib "dtwain32.dll" (memSize As UInteger) As System.IntPtr
     Public Declare Function DTWAIN_AllocateMemory64 Lib "dtwain32.dll" (memSize As System.UInt64) As System.IntPtr
@@ -1859,7 +1856,6 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_ArrayGetSourceAt Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, ByRef ppSource As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayGetStringLength Lib "dtwain32.dll" (a As System.IntPtr, nWhichString As Integer) As Integer
     Public Declare Function DTWAIN_ArrayGetType Lib "dtwain32.dll" (pArray As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_ArrayInit Lib "dtwain32.dll" () As System.IntPtr
     Public Declare Function DTWAIN_ArrayInsertAt Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, pVariant As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_ArrayInsertAtANSIString Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, pVal As String) As Integer
     Public Declare Ansi Function DTWAIN_ArrayInsertAtANSIStringN Lib "dtwain32.dll" (pArray As System.IntPtr, nWhere As Integer, Val As String, num As Integer) As Integer
@@ -2269,7 +2265,6 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetSourceUnitEx Lib "dtwain32.dll" (Source As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_GetSourceVersionInfo Lib "dtwain32.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> szProduct As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetSourceVersionNumber Lib "dtwain32.dll" (Source As System.IntPtr, ByRef pMajor As Integer, ByRef pMinor As Integer) As Integer
-    Public Declare Function DTWAIN_GetStaticLibVersion Lib "dtwain32.dll" () As Integer
     Public Declare Ansi Function DTWAIN_GetTempFileDirectory Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPStr)> szFilePath As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetThreshold Lib "dtwain32.dll" (Source As System.IntPtr, ByRef Threshold As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_GetThresholdString Lib "dtwain32.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Threshold As StringBuilder) As Integer
@@ -2294,7 +2289,6 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetYResolution Lib "dtwain32.dll" (Source As System.IntPtr, ByRef Resolution As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_GetYResolutionString Lib "dtwain32.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Resolution As StringBuilder) As Integer
     Public Declare Function DTWAIN_InitExtImageInfo Lib "dtwain32.dll" (Source As System.IntPtr) As Integer
-    Public Declare Ansi Function DTWAIN_InitImageFileAppend Lib "dtwain32.dll" (szFile As String, fType As Integer) As Integer
     Public Declare Function DTWAIN_InitOCRInterface Lib "dtwain32.dll" () As Integer
     Public Declare Function DTWAIN_IsAcquiring Lib "dtwain32.dll" () As Integer
     Public Declare Function DTWAIN_IsAudioXferSupported Lib "dtwain32.dll" (Source As System.IntPtr, supportVal As Integer) As Integer
@@ -2587,7 +2581,6 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_SetPrinterStringMode Lib "dtwain32.dll" (Source As System.IntPtr, PrinterMode As Integer, bSetCurrent As Integer) As Integer
     Public Declare Function DTWAIN_SetPrinterStrings Lib "dtwain32.dll" (Source As System.IntPtr, ArrayString As System.IntPtr, ByRef pNumStrings As Integer) As Integer
     Public Declare Ansi Function DTWAIN_SetPrinterSuffixString Lib "dtwain32.dll" (Source As System.IntPtr, Suffix As String) As Integer
-    Public Declare Function DTWAIN_SetQueryCapSupport Lib "dtwain32.dll" (bSet As Integer) As Integer
     Public Declare Function DTWAIN_SetResolution Lib "dtwain32.dll" (Source As System.IntPtr, Resolution As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_SetResolutionString Lib "dtwain32.dll" (Source As System.IntPtr, Resolution As String) As Integer
     Public Declare Ansi Function DTWAIN_SetResourcePath Lib "dtwain32.dll" (ResourcePath As String) As Integer

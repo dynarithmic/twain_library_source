@@ -62,16 +62,9 @@
     D_ACQUIRENATIVEFUNC                           DYNDTWAIN_API::DTWAIN_AcquireNative = nullptr;
     D_ACQUIRENATIVEEXFUNC                         DYNDTWAIN_API::DTWAIN_AcquireNativeEx = nullptr;
     D_ACQUIRETOCLIPBOARDFUNC                      DYNDTWAIN_API::DTWAIN_AcquireToClipboard = nullptr;
-    D_ADDEXTIMAGEINFOQUERYFUNC                    DYNDTWAIN_API::DTWAIN_AddExtImageInfoQuery = nullptr;
-    D_ADDFILETOAPPENDFUNC                         DYNDTWAIN_API::DTWAIN_AddFileToAppend = nullptr;
-    D_ADDFILETOAPPENDAFUNC                        DYNDTWAIN_API::DTWAIN_AddFileToAppendA = nullptr;
-    D_ADDFILETOAPPENDWFUNC                        DYNDTWAIN_API::DTWAIN_AddFileToAppendW = nullptr;
     D_ADDPDFTEXTFUNC                              DYNDTWAIN_API::DTWAIN_AddPDFText = nullptr;
     D_ADDPDFTEXTAFUNC                             DYNDTWAIN_API::DTWAIN_AddPDFTextA = nullptr;
     D_ADDPDFTEXTELEMENTFUNC                       DYNDTWAIN_API::DTWAIN_AddPDFTextElement = nullptr;
-    D_ADDPDFTEXTEXFUNC                            DYNDTWAIN_API::DTWAIN_AddPDFTextEx = nullptr;
-    D_ADDPDFTEXTEXAFUNC                           DYNDTWAIN_API::DTWAIN_AddPDFTextExA = nullptr;
-    D_ADDPDFTEXTEXWFUNC                           DYNDTWAIN_API::DTWAIN_AddPDFTextExW = nullptr;
     D_ADDPDFTEXTSTRINGFUNC                        DYNDTWAIN_API::DTWAIN_AddPDFTextString = nullptr;
     D_ADDPDFTEXTSTRINGAFUNC                       DYNDTWAIN_API::DTWAIN_AddPDFTextStringA = nullptr;
     D_ADDPDFTEXTSTRINGWFUNC                       DYNDTWAIN_API::DTWAIN_AddPDFTextStringW = nullptr;
@@ -175,7 +168,6 @@
     D_ARRAYGETSOURCEATFUNC                        DYNDTWAIN_API::DTWAIN_ArrayGetSourceAt = nullptr;
     D_ARRAYGETSTRINGLENGTHFUNC                    DYNDTWAIN_API::DTWAIN_ArrayGetStringLength = nullptr;
     D_ARRAYGETTYPEFUNC                            DYNDTWAIN_API::DTWAIN_ArrayGetType = nullptr;
-    D_ARRAYINITFUNC                               DYNDTWAIN_API::DTWAIN_ArrayInit = nullptr;
     D_ARRAYINSERTATFUNC                           DYNDTWAIN_API::DTWAIN_ArrayInsertAt = nullptr;
     D_ARRAYINSERTATANSISTRINGFUNC                 DYNDTWAIN_API::DTWAIN_ArrayInsertAtANSIString = nullptr;
     D_ARRAYINSERTATANSISTRINGNFUNC                DYNDTWAIN_API::DTWAIN_ArrayInsertAtANSIStringN = nullptr;
@@ -722,7 +714,6 @@
     D_GETSOURCEVERSIONINFOAFUNC                   DYNDTWAIN_API::DTWAIN_GetSourceVersionInfoA = nullptr;
     D_GETSOURCEVERSIONINFOWFUNC                   DYNDTWAIN_API::DTWAIN_GetSourceVersionInfoW = nullptr;
     D_GETSOURCEVERSIONNUMBERFUNC                  DYNDTWAIN_API::DTWAIN_GetSourceVersionNumber = nullptr;
-    D_GETSTATICLIBVERSIONFUNC                     DYNDTWAIN_API::DTWAIN_GetStaticLibVersion = nullptr;
     D_GETTEMPFILEDIRECTORYFUNC                    DYNDTWAIN_API::DTWAIN_GetTempFileDirectory = nullptr;
     D_GETTEMPFILEDIRECTORYAFUNC                   DYNDTWAIN_API::DTWAIN_GetTempFileDirectoryA = nullptr;
     D_GETTEMPFILEDIRECTORYWFUNC                   DYNDTWAIN_API::DTWAIN_GetTempFileDirectoryW = nullptr;
@@ -772,9 +763,6 @@
     D_GETYRESOLUTIONSTRINGAFUNC                   DYNDTWAIN_API::DTWAIN_GetYResolutionStringA = nullptr;
     D_GETYRESOLUTIONSTRINGWFUNC                   DYNDTWAIN_API::DTWAIN_GetYResolutionStringW = nullptr;
     D_INITEXTIMAGEINFOFUNC                        DYNDTWAIN_API::DTWAIN_InitExtImageInfo = nullptr;
-    D_INITIMAGEFILEAPPENDFUNC                     DYNDTWAIN_API::DTWAIN_InitImageFileAppend = nullptr;
-    D_INITIMAGEFILEAPPENDAFUNC                    DYNDTWAIN_API::DTWAIN_InitImageFileAppendA = nullptr;
-    D_INITIMAGEFILEAPPENDWFUNC                    DYNDTWAIN_API::DTWAIN_InitImageFileAppendW = nullptr;
     D_INITOCRINTERFACEFUNC                        DYNDTWAIN_API::DTWAIN_InitOCRInterface = nullptr;
     D_ISACQUIRINGFUNC                             DYNDTWAIN_API::DTWAIN_IsAcquiring = nullptr;
     D_ISAUDIOXFERSUPPORTEDFUNC                    DYNDTWAIN_API::DTWAIN_IsAudioXferSupported = nullptr;
@@ -1167,7 +1155,6 @@
     D_SETPRINTERSUFFIXSTRINGFUNC                  DYNDTWAIN_API::DTWAIN_SetPrinterSuffixString = nullptr;
     D_SETPRINTERSUFFIXSTRINGAFUNC                 DYNDTWAIN_API::DTWAIN_SetPrinterSuffixStringA = nullptr;
     D_SETPRINTERSUFFIXSTRINGWFUNC                 DYNDTWAIN_API::DTWAIN_SetPrinterSuffixStringW = nullptr;
-    D_SETQUERYCAPSUPPORTFUNC                      DYNDTWAIN_API::DTWAIN_SetQueryCapSupport = nullptr;
     D_SETRESOLUTIONFUNC                           DYNDTWAIN_API::DTWAIN_SetResolution = nullptr;
     D_SETRESOLUTIONSTRINGFUNC                     DYNDTWAIN_API::DTWAIN_SetResolutionString = nullptr;
     D_SETRESOLUTIONSTRINGAFUNC                    DYNDTWAIN_API::DTWAIN_SetResolutionStringA = nullptr;
@@ -1315,16 +1302,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_AcquireNative, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AcquireNativeEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AcquireToClipboard, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_AddExtImageInfoQuery, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_AddFileToAppend, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_AddFileToAppendA, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_AddFileToAppendW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFText, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextElement, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextEx, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextExA, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextExW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextStringW, hModule);
@@ -1428,7 +1408,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetSourceAt, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetStringLength, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetType, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_ArrayInit, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayInsertAt, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayInsertAtANSIString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayInsertAtANSIStringN, hModule);
@@ -1975,7 +1954,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetSourceVersionInfoA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSourceVersionInfoW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSourceVersionNumber, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_GetStaticLibVersion, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetTempFileDirectory, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetTempFileDirectoryA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetTempFileDirectoryW, hModule);
@@ -2025,9 +2003,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetYResolutionStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetYResolutionStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_InitExtImageInfo, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_InitImageFileAppend, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_InitImageFileAppendA, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_InitImageFileAppendW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_InitOCRInterface, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsAcquiring, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsAudioXferSupported, hModule);
@@ -2420,7 +2395,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SetPrinterSuffixString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPrinterSuffixStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPrinterSuffixStringW, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SetQueryCapSupport, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetResolution, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetResolutionString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetResolutionStringA, hModule);
