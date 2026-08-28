@@ -29,7 +29,7 @@
 #include "ctltr001.h"
 #include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
-#include "ctltr038.h"
+#include "ctltr029.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
 #include "tiff.h"

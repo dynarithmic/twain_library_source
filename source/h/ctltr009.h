@@ -20,5 +20,42 @@
  */
 #ifndef CTLTR009_H
 #define CTLTR009_H
-#include "ctltr001.h"
+
+#include "ctltr005.h"
+
+namespace dynarithmic
+{
+    typedef union tagRangeType
+    {
+        TW_UINT32 ival;
+        float     fval;
+    } CTL_RangeType;
+
+    class CTL_CapabilityGetRangeTriplet : public CTL_CapabilityGetTriplet
+    {
+        public:
+            CTL_CapabilityGetRangeTriplet(
+                                        CTL_ITwainSession *pSession,
+                                        CTL_ITwainSource* pSource,
+                                        TW_UINT16 gType,
+                                        TW_UINT16   gCap,
+                                        TW_UINT16 TwainDataType);
+
+            bool            GetValue(void *pData, size_t nWhichVal) override;
+            TW_UINT16       GetDataType();
+
+        protected:
+            bool            EnumCapValues( void *pCapData ) override;
+            pTW_RANGE       GetRangePtr();
+            void            Decode( void *pCapData ) override;
+
+        private:
+            CTL_RangeType   m_FirstVal;
+            CTL_RangeType   m_LastVal;
+            CTL_RangeType   m_StepVal;
+            CTL_RangeType   m_DefaultVal;
+            CTL_RangeType   m_CurrentVal;
+            static constexpr size_t  m_nNumRangeItems = 5;
+    };
+}
 #endif

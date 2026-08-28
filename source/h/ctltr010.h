@@ -20,49 +20,119 @@
  */
 #ifndef CTLTR010_H
 #define CTLTR010_H
-
-#include "ctltripletbase.h"
-#include "ctlobtyp.h"
-#include "dtwaindefs.h"
-
+#include <vector>
+#include "ctltr004.h"
+#include "ctlenum.h"
 namespace dynarithmic
 {
-    class CTL_CapabilityTriplet : public CTL_TwainTriplet
+    class CTL_CapabilitySetTripletBase : public CTL_CapabilityTriplet
     {
         public:
-            CTL_CapabilityTriplet(CTL_ITwainSession *pSession,
-                                   CTL_ITwainSource *pSource,
-                                   TW_UINT16 nMsg,
-                                   TW_UINT16 nItemType,
-                                   bool     bReading);
-            ~CTL_CapabilityTriplet() override;
-            TW_UINT16       Execute() override;
-            void            SetTestMode( bool bSet = true );
-            bool            IsTesting() const;
-            bool            IsFindDefaultItemType() const { return m_bGetDefaultType; }
-            void            SetFindDefaultItemType(bool bSet) { m_bGetDefaultType = bSet; }
-            bool            IsCapabilitySupported();
-            virtual bool    IsSupported();
-            TW_UINT16       GetItemType() const { return m_nItemType; }
-            static constexpr bool IsCapOperationReset(LONG lCapOp) { return lCapOp == DTWAIN_CAPRESET || lCapOp == DTWAIN_CAPRESETALL; }
-            static constexpr bool IsCapOperationSet(LONG lCapOp) { return !IsCapOperationReset(lCapOp); }
+            TW_UINT16         CapSetType() const;
+            TW_UINT16         CapToSet() const;
+            TW_UINT16         GetTwainType() const;
+
+            CTL_CapabilitySetTripletBase(CTL_ITwainSession *pSession,
+                                         CTL_ITwainSource* pSource,
+                                         TW_UINT16 sType,
+                                         TW_UINT16 sCap,
+                                         TW_UINT16 TwainType);
 
         protected:
-            virtual void        Decode(void *pData);
-            bool                IsReading() const;
-            TW_CAPABILITY*      GetCapabilityBuffer();
-            CTL_TwainTypeArray* GetTwainTypeArray();
-            void                SetItemType(TW_UINT16 nItemType) { m_nItemType = nItemType; }
-            void                RemoveAllTypeObjects();
+            virtual TW_UINT16       GetContainerTypeSize() { return 0; }
+            virtual size_t          GetAggregateSize() { return 0; }
+            virtual TW_UINT16       GetContainerType() { return 0; }
+
+            void * PreEncode();
+            TW_UINT16 PostEncode(TW_UINT16);
+
+            static void EncodeOneValue(pTW_ONEVALUE pVal, void *pData);
+            void EncodeRange(pTW_RANGE pVal, void *pData1, void *pData2,void *pData3) const;
+            static void EncodeEnumValue(pTW_ENUMERATION pArray, int valuePos, size_t nItemSize,void *pData);
+            static void EncodeArrayValue(pTW_ARRAY pArray, size_t valuePos,void *pData);
 
         private:
-            TW_CAPABILITY       m_Capability;
-            bool                m_bReading;
-            bool                m_bTesting;
-            CTL_TwainTypeArray  m_ObArray;
-            bool                m_bSupported;
-            TW_UINT16           m_nItemType;
-            bool                m_bGetDefaultType;
+            TW_UINT16       m_gType;
+            TW_UINT16       m_gCap;
+            TW_UINT16       m_nTwainType;
+    };
+
+
+    template <typename T>
+    class CTL_CapabilitySetTriplet : public CTL_CapabilitySetTripletBase
+    {
+        public:
+            CTL_CapabilitySetTriplet(CTL_ITwainSession *pSession,
+                                     CTL_ITwainSource* pSource,
+                                     TW_UINT16 sType,
+                                     TW_UINT16  sCap,
+                                     TW_UINT16 TwainType,
+                                     const std::vector<T> & rArray);
+
+            TW_UINT16                Execute() override;
+
+        protected:
+            virtual bool Encode( const std::vector<T>& /*rArray*/, void * /*pMemBlock*/) { return false; }
+
+        private:
+            std::vector<T>              m_Array;
+    };
+
+    template <typename T>
+    CTL_CapabilitySetTriplet<T>::CTL_CapabilitySetTriplet(CTL_ITwainSession* pSession,
+                                                        CTL_ITwainSource* pSource,
+                                                        TW_UINT16 sType,
+                                                        TW_UINT16    sCap,
+                                                        TW_UINT16 TwainType,
+                                                        const std::vector<T>& rArray
+    ) : CTL_CapabilitySetTripletBase(pSession, pSource, sType, sCap, TwainType), m_Array(rArray) {}
+
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetTriplet<T>::Execute()
+    {
+        // Ensures we clean up any memory if an exception is thrown
+        struct PrePostEncoderRAII
+        {
+            TW_UINT16* m_pRC;
+            CTL_CapabilitySetTriplet<T>* m_pThis;
+            PrePostEncoderRAII(CTL_CapabilitySetTriplet<T>* pThis, TW_UINT16* pRC) : m_pThis(pThis), m_pRC(pRC) {}
+
+            // The PostEncode() releases any memory allocated by PreEncode().
+            ~PrePostEncoderRAII() { m_pThis->PostEncode(*m_pRC); }
+        };
+
+        TW_UINT16 rc = TWRC_FAILURE;
+        {
+            PrePostEncoderRAII raii(this, &rc);
+
+            // Allocate memory for the container.
+            void* pCapPtr = PreEncode();
+            if (pCapPtr)
+            {
+                if (Encode(m_Array, pCapPtr))
+                    // Call base class
+                    rc = CTL_CapabilityTriplet::Execute();
+            }
+        }
+        return rc;
+    }
+
+    class CTL_CapabilityResetTriplet : public CTL_CapabilityTriplet
+    {
+        public:
+
+            CTL_CapabilityResetTriplet(CTL_ITwainSession *pSession,
+                                       CTL_ITwainSource* pSource,
+                                       TW_UINT16  sCap,
+                                       TW_UINT16 SetType = MSG_RESET
+                                       );
+    };
+
+    class CTL_CapabilityResetAllTriplet : public CTL_CapabilityResetTriplet
+    {
+        public:
+            CTL_CapabilityResetAllTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource);
     };
 }
 #endif

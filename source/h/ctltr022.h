@@ -18,38 +18,37 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTR040_H
-#define CTLTR040_H
+#ifndef CTLTR022_H
+#define CTLTR022_H
 
 #include "ctltripletbase.h"
+#include "ctltwainmanager.h"
+
 namespace dynarithmic
 {
-    class CTL_ITwainSession;
-
-    class CTL_DSMCallbackTriplet : public CTL_TwainTriplet
+    template <TW_UINT16 MsgType>
+    class CTL_Palette8Triplet : public CTL_TwainTriplet
     {
         public:
-            CTL_DSMCallbackTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, TW_UINT16 msg);
-            void setDSMEntryProc(DSMENTRYPROC proc)
+            CTL_Palette8Triplet(CTL_ITwainSession* pSession,
+                                CTL_ITwainSource* pSource) : m_Palette8()
             {
-                m_DSMEntryProc = proc;
-                m_TWCallback.CallBackProc = reinterpret_cast<TW_MEMREF>(proc);
-                m_TWCallback.RefCon = 0;
+                InitGeneric(pSession, pSource, DG_IMAGE, DAT_PALETTE8, MsgType, &m_Palette8);
             }
-            DSMENTRYPROC getEntryProc() const { return m_DSMEntryProc; }
-            TW_CALLBACK getCallback() const { return m_TWCallback; }
+
+            TW_PALETTE8* GetPalette8Buffer()
+            {
+                return &m_Palette8;
+            }
 
         private:
-            DSMENTRYPROC m_DSMEntryProc;
-            TW_CALLBACK m_TWCallback;
+            TW_PALETTE8         m_Palette8;
     };
 
-    class CTL_DSMCallbackTripletRegister : public CTL_DSMCallbackTriplet
-    {
-        public:
-            CTL_DSMCallbackTripletRegister(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, DSMENTRYPROC proc) :
-                CTL_DSMCallbackTriplet(pSession, pSource, MSG_REGISTER_CALLBACK)
-            { setDSMEntryProc(proc); }
-    };
+    using CTL_GetPalette8Triplet = CTL_Palette8Triplet<MSG_GET>;
+    using CTL_GetDefaultPalette8Triplet = CTL_Palette8Triplet<MSG_GETDEFAULT>;
+    using CTL_SetPalette8Triplet = CTL_Palette8Triplet<MSG_SET>;
+    using CTL_ResetPalette8Triplet = CTL_Palette8Triplet<MSG_RESET>;
 }
 #endif
+

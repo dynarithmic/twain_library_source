@@ -20,7 +20,7 @@
  */
 #include "ctltwainmanager.h"
 #include "sourceacquireopts.h"
-#include "ctltr040.h"
+#include "ctltr031.h"
 #include "ctltwainmsgloop.h"
 #include "windowsinit_impl.h"
 

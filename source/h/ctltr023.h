@@ -18,33 +18,44 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTR034_H
-#define CTLTR034_H
+#ifndef CTLTR023_H
+#define CTLTR023_H
 
 #include "ctltr018.h"
+#include "ctltwainmemoryimpl.h"
 
 namespace dynarithmic
 {
-    class CTL_ImageMemFileXferTriplet : public CTL_ImageXferTriplet
+    class CTL_ImageMemXferTriplet : public CTL_ImageXferTriplet
     {
         public:
-            CTL_ImageMemFileXferTriplet(CTL_ITwainSession *pSession,
-                                        CTL_ITwainSource* pSource,
-                                        TW_UINT32 numBytes,
-                                        bool bHandleMemory = false);
+            CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
+                                    CTL_ITwainSource* pSource,
+                                    HANDLE hDib = {},
+                                    TW_UINT32 nFlags = 0,
+                                    TW_UINT16 nPixelType = 0,
+                                    TW_UINT32 nNumBytes = 0,
+                                    TW_UINT16 nCompression=TWCP_NONE);
 
             TW_UINT16           Execute() override;
-            ~CTL_ImageMemFileXferTriplet() override;
-            CTL_ImageMemFileXferTriplet(const CTL_ImageMemFileXferTriplet&) = delete;
-            CTL_ImageMemFileXferTriplet& operator=(const CTL_ImageMemFileXferTriplet&) = delete;
+            ~CTL_ImageMemXferTriplet() override;
+            CTL_ImageMemXferTriplet(const CTL_ImageMemXferTriplet&) = delete;
+            CTL_ImageMemXferTriplet& operator=(const CTL_ImageMemXferTriplet&) = delete;
 
         protected:
             void InitXferBuffer();
             TW_IMAGEMEMXFER& GetMemXferBuffer() { return m_ImageMemXferBuffer; }
         private:
             TW_IMAGEMEMXFER m_ImageMemXferBuffer;
-            TW_UINT32 m_nCompressPos;
-            HANDLE hLocalHandle;
+            TW_MEMORY       m_TempMemory;
+            HANDLE          m_DibStrip;
+            unsigned char TW_HUGE * m_ptrDib;
+            unsigned char TW_HUGE * m_ptrOrig;
+            TW_UINT16       m_nPixelType;
+            TW_UINT32       m_nCurDibSize;
+            TW_UINT16       m_nCompression;
+            TW_UINT32       m_nCompressPos;
+            CTL_TwainDynMemoryHandler m_dynMemoryHandler;
     };
 }
 #endif

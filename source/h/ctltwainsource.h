@@ -27,7 +27,7 @@
 #include <map>
 
 #include "ctlarray.h"
-#include "ctldib.h"
+#include "ctldib32.h"
 #include "ctlenum.h"
 #include "dtwtype.h"
 #include "ctldevnt.h"

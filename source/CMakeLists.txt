@@ -413,7 +413,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctldefsource.h
         ${PROJECT_SOURCE_DIR}/h/ctldevicecontext.h
         ${PROJECT_SOURCE_DIR}/h/ctldevnt.h
-        ${PROJECT_SOURCE_DIR}/h/ctldib.h
         ${PROJECT_SOURCE_DIR}/h/ctldib32.h
         ${PROJECT_SOURCE_DIR}/h/ctldib32ex.h
         ${PROJECT_SOURCE_DIR}/h/ctldtwainhandle.h
@@ -454,6 +453,12 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlgetsetcapsinternal.h
         ${PROJECT_SOURCE_DIR}/h/ctltr000.h
         ${PROJECT_SOURCE_DIR}/h/ctltr001.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr002.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr003.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr004.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr005.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr006.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr007.h
         ${PROJECT_SOURCE_DIR}/h/ctltr008.h
         ${PROJECT_SOURCE_DIR}/h/ctltr009.h
         ${PROJECT_SOURCE_DIR}/h/ctltr010.h
@@ -468,6 +473,8 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltr019.h
         ${PROJECT_SOURCE_DIR}/h/ctltr020.h
         ${PROJECT_SOURCE_DIR}/h/ctltr021.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr022.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr023.h
         ${PROJECT_SOURCE_DIR}/h/ctltr024.h
         ${PROJECT_SOURCE_DIR}/h/ctltr025.h
         ${PROJECT_SOURCE_DIR}/h/ctltr026.h
@@ -477,18 +484,10 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltr030.h
         ${PROJECT_SOURCE_DIR}/h/ctltr031.h
         ${PROJECT_SOURCE_DIR}/h/ctltr032.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr033.h
         ${PROJECT_SOURCE_DIR}/h/ctltr034.h
         ${PROJECT_SOURCE_DIR}/h/ctltr035.h
         ${PROJECT_SOURCE_DIR}/h/ctltr036.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr037.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr038.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr039.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr040.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr041.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr042.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr043.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr044.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr045.h
         ${PROJECT_SOURCE_DIR}/h/ctltripletbase.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaincompliancy.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaindecoder.h
@@ -688,23 +687,23 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlthreadutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltiff.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltimeutils.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr008.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr002.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr004.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr005.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr009.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr010.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr011.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr015.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr016.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr024.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr025.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr017.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr018.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr019.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr023.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr026.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr027.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr028.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr029.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr031.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr035.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr037.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr038.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr040.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr041.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr042.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr043.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr032.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr033.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr034.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltripletbase.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainappinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainavailable.cpp

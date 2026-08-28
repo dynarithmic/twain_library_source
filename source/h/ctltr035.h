@@ -21,48 +21,31 @@
 #ifndef CTLTR035_H
 #define CTLTR035_H
 
-#include "ctltr013.h"
+#include "ctltripletbase.h"
+#include "ctltwainsession.h"
+#include "ctltwainmanager.h"
 
 namespace dynarithmic
 {
-    class CTL_CapabilityQueryTriplet : public CTL_CapabilityGetOneValTriplet
+    template <TW_UINT16 nMsg = MSG_GET>
+    class CTL_JPEGCompressionTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_CapabilityQueryTriplet(CTL_ITwainSession *pSession,
-                                       CTL_ITwainSource *pSource,
-                                       TW_UINT16 gCap,
-                                       TW_UINT16 TwainType=0xFFFF);
-            TW_UINT16       Execute() override;
+            CTL_JPEGCompressionTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource)
+            {
+                InitGeneric(pSession, pSource, DG_IMAGE, DAT_JPEGCOMPRESSION, nMsg, &m_JPEGCompressionInfo);
+            }
 
-            bool            IsGet() const
-                            { return m_lCapSupport & TWQC_GET?true:false; }
-
-            bool            IsGetDefault() const
-                            { return m_lCapSupport & TWQC_GETDEFAULT?true:false; }
-
-            bool            IsGetCurrent() const
-                            { return m_lCapSupport & TWQC_GETCURRENT ? true : false; }
-
-            bool            IsSet() const
-                            { return m_lCapSupport & TWQC_SET?true:false; }
-
-            bool            IsReset() const
-                            { return m_lCapSupport & TWQC_RESET?true:false; }
-
-            bool            IsSetConstraint() const
-                            { return m_lCapSupport & TWQC_SETCONSTRAINT ? true : false;}
-
-            bool            IsAnySupport() const
-                            { return m_lCapSupport?true:false; }
-
-            UINT            GetSupport() const { return static_cast<UINT>(m_lCapSupport); }
+            TW_JPEGCOMPRESSION& GetJPEGCompressionInfo() { return m_JPEGCompressionInfo; }
 
         protected:
-            bool    GetValue( void *pData, size_t nWhere=0 ) override;
-            bool    EnumCapValues( void *pCapData ) override;
-
-        private:
-            TW_UINT32   m_lCapSupport;
+            TW_JPEGCOMPRESSION    m_JPEGCompressionInfo;
     };
+
+    using CTL_GetJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<>;
+    using CTL_GetDefaultJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_GETDEFAULT>;
+    using CTL_SetJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_SET>;
+    using CTL_ResetJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_RESET>;
 }
 #endif
+

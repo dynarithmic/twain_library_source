@@ -21,7 +21,7 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
-#include "ctltr025.h"
+#include "ctltr017.h"
 #include "ctlstringdefs.h"
 #include "ctldtwainhandle.h"
 #include "dtwainx.h"

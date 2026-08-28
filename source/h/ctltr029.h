@@ -22,21 +22,64 @@
 #define CTLTR029_H
 
 #include "ctltripletbase.h"
+#include "ctlarraydefs.h"
+#include "ctlmapdefs.h"
+
 namespace dynarithmic
 {
-    class CTL_SetupMemXferTriplet : public CTL_TwainTriplet
+    class CTL_ExtImageInfoTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_SetupMemXferTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : m_SetupMemXfer{}
-            {
-                InitGeneric(pSession, pSource, DG_CONTROL, DAT_SETUPMEMXFER, MSG_GET, &m_SetupMemXfer);
-            }
+            // Only MSG_GET is supported
+            CTL_ExtImageInfoTriplet() : m_pExtImageInfo(nullptr), m_memHandle{}, m_nNumInfo{}, m_bRetrievedInfo{} { }
+            CTL_ExtImageInfoTriplet(CTL_ITwainSession *pSession,
+                                   CTL_ITwainSource* pSource,
+                                   int nInfo);
+            CTL_ExtImageInfoTriplet(const CTL_ExtImageInfoTriplet&) = delete;
+            CTL_ExtImageInfoTriplet& operator =(const CTL_ExtImageInfoTriplet&) = delete;
+            CTL_ExtImageInfoTriplet(CTL_ExtImageInfoTriplet&& rhs) noexcept;
+            CTL_ExtImageInfoTriplet& operator = (CTL_ExtImageInfoTriplet&& rhs) = delete;
 
-            TW_SETUPMEMXFER *  GetSetupMemXferBuffer() { return &m_SetupMemXfer; }
+            static void swap(CTL_ExtImageInfoTriplet& left, const CTL_ExtImageInfoTriplet& right) noexcept;
+
+            void InitInfo(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, int nInfo);
+            void DestroyInfo();
+
+            TW_UINT16 Execute() override;
+
+            // Get the number of information structures
+            size_t GetNumInfo() const { return m_nNumInfo; }
+
+            // Get the TW_INFO information
+            TW_INFO GetInfo(size_t nWhich, int nSearch) const;
+
+            // Set the information for item nWhich
+            bool SetInfo(TW_INFO Info, size_t nWhich);
+
+            bool AddInfo(TW_INFO Info);
+
+            // Utility functions
+            std::pair<bool, int32_t> GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t *pItemSize= nullptr) const;
+
+            bool IsItemHandle(size_t nWhich) const;
+
+            ~CTL_ExtImageInfoTriplet() override;
+
+            static bool EnumSupported(CTL_ITwainSource *pSource, CTL_IntArray &rArray);
+
+            auto& RetrieveInfo() noexcept { return m_ExtInfoMap; } 
+            bool HasRetrievedInfo() const { return m_bRetrievedInfo; }
 
         private:
-            TW_SETUPMEMXFER        m_SetupMemXfer;
+            void ResolveTypes();
+            bool CreateExtImageInfo();
+            void CopyInfoToVector();
+
+            TW_EXTIMAGEINFO *m_pExtImageInfo;
+            TW_HANDLE m_memHandle;
+            size_t m_nNumInfo;
+            CTL_UINT16ToInfoMap m_ExtInfoMap;
+            bool m_bRetrievedInfo;
     };
 }
 #endif
-

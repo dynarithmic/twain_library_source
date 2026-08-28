@@ -18,7 +18,22 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLDIB_H
-#define CTLDIB_H
-#include "ctldib32.h"
+#ifndef CTLTR033_H
+#define CTLTR033_H
+
+#include "ctltripletbase.h"
+namespace dynarithmic
+{
+    class CTL_ITwainSession;
+
+    class CTL_TwainDirectTriplet : public CTL_TwainTriplet
+    {
+        public:
+            CTL_TwainDirectTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource);
+            const TW_TWAINDIRECT& getTwainDirect() const { return m_TwainDirect; }
+
+        private:
+            TW_TWAINDIRECT m_TwainDirect;
+    };
+}
 #endif

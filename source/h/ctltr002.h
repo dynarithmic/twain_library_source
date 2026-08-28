@@ -18,22 +18,33 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTR042_H
-#define CTLTR042_H
-
+#ifndef CTLTR002_H
+#define CTLTR002_H
 #include "ctltripletbase.h"
+#include "ctltwainsession.h"
 namespace dynarithmic
 {
-    class CTL_ITwainSession;
-
-    class CTL_TwainDirectTriplet : public CTL_TwainTriplet
+    class CTL_ProcessEventTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_TwainDirectTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource);
-            const TW_TWAINDIRECT& getTwainDirect() const { return m_TwainDirect; }
+            CTL_ProcessEventTriplet(CTL_ITwainSession* pSession,
+                                    CTL_ITwainSource* pSource,
+                                    MSG *pMsg,
+                                    bool isDSM2);
+
+            TW_UINT16       ExecuteEventHandler();
+            bool            ResetTransfer(TW_UINT16 Msg=MSG_RESET);
+            void            SetMessage(TW_UINT16 nMsg) { m_Event.TWMessage = nMsg;  }
+            void            CloseUI();
+            void            ResetAndCloseUI();
 
         private:
-            TW_TWAINDIRECT m_TwainDirect;
+            TW_EVENT   m_Event;
+            bool       m_bDSM2Used;
+            MSG        *m_pMsg;
+            void DeviceEvent();
+
     };
 }
 #endif
+

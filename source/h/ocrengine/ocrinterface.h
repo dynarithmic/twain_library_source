@@ -25,7 +25,6 @@
 #include <vector>
 #include <unordered_map>
 #include <bitset>
-#include <algorithm>
 #include <array>
 #include <dtwtype.h>
 #include "ctlstringdefs.h"
@@ -67,7 +66,7 @@ namespace dynarithmic
     };
 
     class OCREngine;
-    typedef std::shared_ptr<OCREngine> OCREnginePtr;
+    using OCREnginePtr = std::shared_ptr<OCREngine>;
 
     struct OCRCharacterInfo
     {
@@ -219,7 +218,7 @@ namespace dynarithmic
 
     struct OCRPDFInfo
     {
-        typedef enum {PDFINFO_BW, PDFINFO_COLOR, PDFINFO_GRAY} enumPDFColorType;
+        using enumPDFColorType = enum {PDFINFO_BW, PDFINFO_COLOR, PDFINFO_GRAY};
         std::array<LONG, 3> FileType = {};
         std::array<LONG, 3> PixelType = {};
         std::array<LONG, 3> BitDepth = {};
@@ -228,12 +227,12 @@ namespace dynarithmic
     class OCREngine
     {
     public:
-        typedef std::vector<LONG> OCRLongArrayValues;
-        typedef std::vector<std::string> OCRStringArrayValues;
-        typedef std::vector<UINT> FileTypeArray;
-        typedef std::bitset<16> OptionList;
-        typedef std::unordered_map<LONG, std::vector<OCRCharacterInfo> > OCRCharacterInfoMap;
-        typedef std::unordered_map<LONG, std::string> OCRPageTextMap;
+        using OCRLongArrayValues = std::vector<LONG>;
+        using OCRStringArrayValues = std::vector<std::string>;
+        using FileTypeArray = std::vector<UINT>;
+        using OptionList = std::bitset<16>;
+        using OCRCharacterInfoMap = std::unordered_map<LONG, std::vector<OCRCharacterInfo> >;
+        using OCRPageTextMap = std::unordered_map<LONG, std::string>;
 
         std::unordered_map<LONG, OCRCapInfo> m_AllCapValues;
         std::unordered_map<LONG, LONG> m_mapOperations;
@@ -265,8 +264,8 @@ namespace dynarithmic
         std::string GetManufacturer() const;
         std::string GetProductFamily() const;
         std::string GetProductName() const;
-        LONG GetPDFColorFileType() { return m_OCRPDFInfo.FileType[OCRPDFInfo::PDFINFO_COLOR]; }
-        LONG GetPDFBWFileType() { return m_OCRPDFInfo.FileType[OCRPDFInfo::PDFINFO_BW]; }
+        LONG GetPDFColorFileType() const { return m_OCRPDFInfo.FileType[OCRPDFInfo::PDFINFO_COLOR]; }
+        LONG GetPDFBWFileType() const { return m_OCRPDFInfo.FileType[OCRPDFInfo::PDFINFO_BW]; }
         OCRVersionIdentity GetOCRVersionIdentity();
         std::string GetCachedFile() const;
         std::string GetCachedText() const;
@@ -297,7 +296,7 @@ namespace dynarithmic
         std::vector<OCRCharacterInfo>& GetCharacterInfo(LONG nPage, int &status);
         void SetPageTextMap(LONG nPage, const std::string& sData);
         bool IsValidOCRPage(LONG nPage) const;
-        CTL_TwainDLLHandle* GetDTWAINHandle() { return m_pHandle; }
+        CTL_TwainDLLHandle* GetDTWAINHandle() const { return m_pHandle; }
 
 
     protected:
@@ -322,7 +321,7 @@ namespace dynarithmic
     std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandles(DTWAIN_OCRENGINE Engine = nullptr);
     std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine);
 
-    typedef std::string(OCREngine::* OCRINFOFUNC)() const;
+    using OCRINFOFUNC = std::string(OCREngine::*)() const;
     LONG GetOCRInfo(OCREngine* pEngine, OCRINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen);
 }
 #endif

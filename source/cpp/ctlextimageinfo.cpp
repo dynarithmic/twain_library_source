@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "errorcheck.h"
-#include "ctltr038.h"
+#include "ctltr029.h"
 #include "twain.h"
 #include "extendedimageinfo.h"
 #include "ctlarraydumper.h"

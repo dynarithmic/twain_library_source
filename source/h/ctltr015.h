@@ -21,41 +21,68 @@
 #ifndef CTLTR015_H
 #define CTLTR015_H
 
-#include "ctltr011.h"
+#include "ctltripletbase.h"
 
 namespace dynarithmic
 {
-    typedef union tagRangeType
-    {
-        TW_UINT32 ival;
-        float     fval;
-    } CTL_RangeType;
-
-    class CTL_CapabilityGetRangeTriplet : public CTL_CapabilityGetTriplet
+    template <TW_UINT16 nMsg, typename ExecuteFn = CTL_DefaultTripletExecute>
+    class CTL_UserInterfaceTripletImpl : public CTL_TwainTriplet
     {
         public:
-            CTL_CapabilityGetRangeTriplet(
-                                        CTL_ITwainSession *pSession,
+            CTL_UserInterfaceTripletImpl(CTL_ITwainSession* pSession,
                                         CTL_ITwainSource* pSource,
-                                        TW_UINT16 gType,
-                                        TW_UINT16   gCap,
-                                        TW_UINT16 TwainDataType);
+                                        TW_USERINTERFACE* pTWUI,
+                                        TW_BOOL bShowUI = TRUE)
+                                        : m_pUserInterface(pTWUI)
+            {
+                m_pUserInterface->ShowUI = bShowUI;
+                m_pUserInterface->ModalUI = 0;
+                const HWND* pWnd = pSession->GetWindowHandlePtr();
 
-            bool            GetValue(void *pData, size_t nWhichVal) override;
-            TW_UINT16       GetDataType();
+                m_pUserInterface->hParent = static_cast<TW_HANDLE>(*pWnd);
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_USERINTERFACE, nMsg, m_pUserInterface);
+            }
 
-        protected:
-            bool            EnumCapValues( void *pCapData ) override;
-            pTW_RANGE       GetRangePtr();
-            void            Decode( void *pCapData ) override;
+            bool    IsModal() const { return m_pUserInterface->ModalUI?true:false; }
+            TW_USERINTERFACE *GetTWUserInterface() const { return m_pUserInterface; }
 
+            TW_UINT16 Execute() override
+            {
+                return ExecuteFn::Execute(*this);
+            }
         private:
-            CTL_RangeType   m_FirstVal;
-            CTL_RangeType   m_LastVal;
-            CTL_RangeType   m_StepVal;
-            CTL_RangeType   m_DefaultVal;
-            CTL_RangeType   m_CurrentVal;
-            static constexpr size_t  m_nNumRangeItems = 5;
+            TW_USERINTERFACE    *m_pUserInterface;
     };
+
+    struct CTL_ExecuteEnableUIFn
+    {
+        static TW_UINT16 Execute(CTL_TwainTriplet& pTrip)
+        {
+            CTL_ITwainSource* pSource = pTrip.GetSourcePtr();
+
+            if (pSource->IsUIOpen())
+                return TWRC_SUCCESS;
+
+            const TW_UINT16 rc = CTL_DefaultTripletExecute::Execute(pTrip);
+            pSource->SetUIOpen(rc == TWRC_SUCCESS);
+            return rc;
+        }
+    };
+
+    struct CTL_ExecuteDisableUIFn
+    {
+        static TW_UINT16 Execute(CTL_TwainTriplet& pTrip)
+        {
+            const TW_UINT16 rc = CTL_DefaultTripletExecute::Execute(pTrip);
+            if (rc == TWRC_SUCCESS)
+                pTrip.GetSourcePtr()->SetUIOpen(false);
+            return rc;
+        }
+    };
+
+    using CTL_EnableUserInterfaceTriplet = CTL_UserInterfaceTripletImpl<MSG_ENABLEDS, CTL_ExecuteEnableUIFn>;
+    using CTL_DisableUserInterfaceTriplet = CTL_UserInterfaceTripletImpl<MSG_DISABLEDS, CTL_ExecuteDisableUIFn>;
+    using CTL_DisplayUserInterfaceOnlyTriplet = CTL_UserInterfaceTripletImpl<MSG_ENABLEDSUIONLY, CTL_ExecuteEnableUIFn>;
 }
 #endif
+

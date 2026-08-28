@@ -30,13 +30,14 @@
 #include "ctlenum.h"
 #include "ctltwaindecoder.h"
 #include "ctltripletbase.h"
-#include "ctltr011.h"
-#include "ctltr012.h"
-#include "ctltr014.h"
-#include "ctltr015.h"
-#include "ctltr035.h"
-#include "ctltr045.h"
+#include "ctltr005.h"
+#include "ctltr006.h"
+#include "ctltr008.h"
+#include "ctltr009.h"
+#include "ctltr026.h"
+#include "ctltr036.h"
 #include <boost/dll/shared_library.hpp>
+
 namespace dynarithmic
 {
     class CTL_TwainDibArray;

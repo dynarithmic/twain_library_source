@@ -21,20 +21,88 @@
 #ifndef CTLTR024_H
 #define CTLTR024_H
 
-#include "ctlenum.h"
-#include "ctltripletbase.h"
+#include "ctlarraydefs.h"
+#include "ctltr004.h"
+#include "ctlconstexprutils.h"
 
 namespace dynarithmic
 {
-    class CTL_TwainDibArray;
-
-    class CTL_ImageTriplet : public CTL_TwainTriplet
+    template <TW_UINT16 GetSetType>
+    class CTL_ImageLayoutTripletImpl: public CTL_TwainTriplet
     {
         public:
-            CTL_ImageTriplet(CTL_ITwainSession *pSession,
-                             CTL_ITwainSource *pSource);
-            bool QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_TwainDibArray& pArray, size_t nWhich);
+            CTL_ImageLayoutTripletImpl(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource,
+                                       const CTL_RealArray* rArray = nullptr) : m_ImageLayout{}
+            {
+                InitGeneric(pSession, pSource, DG_IMAGE, DAT_IMAGELAYOUT, GetSetType, &m_ImageLayout);
+
+                if (IsMSGSetOrResetType(GetSetType))
+                {
+                    TW_IMAGELAYOUT* pLayout = GetImageLayout();
+                    if (GetSetType != MSG_RESET && rArray && rArray->size() >= 4)
+                    {
+                        pLayout->Frame.Left = FloatToFix32(static_cast<float>((*rArray)[0]));
+                        pLayout->Frame.Top = FloatToFix32(static_cast<float>((*rArray)[1]));
+                        pLayout->Frame.Right = FloatToFix32(static_cast<float>((*rArray)[2]));
+                        pLayout->Frame.Bottom = FloatToFix32(static_cast<float>((*rArray)[3]));
+                    }
+                    pLayout->DocumentNumber = static_cast<TW_UINT32>(-1);
+                    pLayout->PageNumber = static_cast<TW_UINT32>(-1);
+                    pLayout->FrameNumber = static_cast<TW_UINT32>(-1);
+                }
+            }
+
+            double GetLeft() const
+            {
+                return Fix32ToFloat(m_ImageLayout.Frame.Left);
+            }
+
+            double GetRight() const
+            {
+                return Fix32ToFloat(m_ImageLayout.Frame.Right);
+            }
+
+            double GetTop() const
+            {
+                return Fix32ToFloat(m_ImageLayout.Frame.Top);
+            }
+
+            double GetBottom() const
+            {
+                return Fix32ToFloat(m_ImageLayout.Frame.Bottom);
+            }
+
+            TW_UINT32 GetDocumentNumber() const
+            {
+                return m_ImageLayout.DocumentNumber;
+            }
+
+            TW_UINT32 GetPageNumber() const
+            {
+                return m_ImageLayout.PageNumber;
+            }
+
+            TW_UINT32 GetFrameNumber() const
+            {
+                return m_ImageLayout.FrameNumber;
+            }
+
+            TW_FRAME GetFrame() const
+            {
+                return m_ImageLayout.Frame;
+            }
+
+            TW_IMAGELAYOUT* GetImageLayout() { return &m_ImageLayout; }
+
+        private:
+            TW_IMAGELAYOUT  m_ImageLayout;
     };
+
+    using CTL_GetImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_GET>;
+    using CTL_GetDefaultImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_GETDEFAULT>;
+    using CTL_SetImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_SET>;
+    using CTL_ResetImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_RESET>;
 }
 #endif
+
 

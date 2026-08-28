@@ -36,7 +36,7 @@ namespace dynarithmic
                 ReleaseDC(val.first, val.second);
             #endif
         }
-        void operator()(std::pair<HWND, HDC>* val) { Destroy(*val); }
+        void operator()(std::pair<HWND, HDC>* val) const { Destroy(*val); }
     };
 
     using DTWAINDeviceContextRelease_RAII = std::unique_ptr<std::pair<HWND, HDC>, DTWAINGlobalHandle_ReleaseDCTraits>;

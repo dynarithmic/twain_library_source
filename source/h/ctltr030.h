@@ -26,29 +26,35 @@
 
 namespace dynarithmic
 {
-    template <TW_UINT16 MsgType>
-    class CTL_Palette8Triplet : public CTL_TwainTriplet
+    class CTL_ITwainSession;
+
+    template <TW_UINT16 msg>
+    class CTL_EntryPointTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_Palette8Triplet(CTL_ITwainSession* pSession,
-                                CTL_ITwainSource* pSource) : m_Palette8()
+            CTL_EntryPointTriplet(CTL_ITwainSession* pSession) :
+                CTL_TwainTriplet(), m_bTripletFound(false), m_EntryPoint{}
             {
-                InitGeneric(pSession, pSource, DG_IMAGE, DAT_PALETTE8, MsgType, &m_Palette8);
+                m_EntryPoint.Size = sizeof(TW_ENTRYPOINT);
+                InitGeneric(pSession, nullptr, DG_CONTROL, DAT_ENTRYPOINT, msg, &m_EntryPoint);
+            }
+            TW_UINT16 Execute() override
+            {
+                const TW_UINT16 retVal = CTL_TwainTriplet::Execute();
+                if (retVal == TWRC_SUCCESS)
+                    m_bTripletFound = true;
+                return retVal;
             }
 
-            TW_PALETTE8* GetPalette8Buffer()
-            {
-                return &m_Palette8;
-            }
+            TW_ENTRYPOINT& getEntryPoint() { return m_EntryPoint; }
+
+            bool isTripletFound() const { return m_bTripletFound; }
 
         private:
-            TW_PALETTE8         m_Palette8;
+            TW_ENTRYPOINT m_EntryPoint{};
+            bool m_bTripletFound;
     };
-
-    using CTL_GetPalette8Triplet = CTL_Palette8Triplet<MSG_GET>;
-    using CTL_GetDefaultPalette8Triplet = CTL_Palette8Triplet<MSG_GETDEFAULT>;
-    using CTL_SetPalette8Triplet = CTL_Palette8Triplet<MSG_SET>;
-    using CTL_ResetPalette8Triplet = CTL_Palette8Triplet<MSG_RESET>;
+    using CTL_GetEntryPointTriplet = CTL_EntryPointTriplet<MSG_GET>;
+    using CTL_SetEntryPointTriplet = CTL_EntryPointTriplet<MSG_SET>; 
 }
 #endif
-
