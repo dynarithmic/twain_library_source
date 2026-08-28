@@ -40,7 +40,7 @@ namespace dynarithmic
         static constexpr int maxOutput = 256;
         static void  WriteLogInfo(CTL_StringViewType s, bool bFlush = false);
         static void  WriteLogInfoA(std::string_view s, bool bFlush = false);
-        static void  WriteLogInfoExA(long filterFlags, std::string_view s, bool bFlush = false);
+        static void  WriteLogInfoExA(uint32_t filterFlags, std::string_view s, bool bFlush = false);
         static void  WriteLogInfoW(std::wstring_view s, bool bFlush = false);
         static void  WriteLogInfoIndentedA(std::string_view s);
         static void  WriteLogInfoIndentedW(std::wstring_view s);

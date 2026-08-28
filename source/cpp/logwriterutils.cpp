@@ -42,7 +42,7 @@ namespace dynarithmic
         MessageBoxA(nullptr, st.c_str(), "DTWAIN Error", MB_ICONSTOP);
     }
 
-    void LogWriterUtils::WriteLogInfoExA(long filterFlags, std::string_view s, bool bFlush)
+    void LogWriterUtils::WriteLogInfoExA(uint32_t filterFlags, std::string_view s, bool bFlush)
     {
         if (CTL_StaticData::GetLogFilterFlags() & filterFlags)
         {
