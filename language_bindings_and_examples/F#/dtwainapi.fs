@@ -3420,9 +3420,6 @@ module TwainAPI =
     type DTWAIN_GetTwainNameFromConstantExDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_GetTwainTimeoutDelegate = delegate of unit -> LONG
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetVersionDelegate = delegate of int byref * int byref * int byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
@@ -4374,9 +4371,6 @@ module TwainAPI =
     type DTWAIN_SetTwainModeDelegate = delegate of LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_SetTwainTimeoutDelegate = delegate of LONG -> DTWAIN_BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SetXResolutionDelegate = delegate of DTWAIN_SOURCE * DTWAIN_FLOAT -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
@@ -4408,12 +4402,6 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SysInitializeDelegate = delegate of unit -> DTWAIN_HANDLE
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_SysInitializeExDelegate = delegate of string -> DTWAIN_HANDLE
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_SysInitializeEx2Delegate = delegate of string * string * string -> DTWAIN_HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SysInitializeNoBlockingDelegate = delegate of unit -> DTWAIN_HANDLE
@@ -4951,7 +4939,6 @@ module TwainAPI =
     let private GetTwainMode = lazy (DynamicDll.Bind "DTWAIN_GetTwainMode" : DTWAIN_GetTwainModeDelegate)
     let private GetTwainNameFromConstant = lazy (DynamicDll.Bind "DTWAIN_GetTwainNameFromConstant" : DTWAIN_GetTwainNameFromConstantDelegate)
     let private GetTwainNameFromConstantEx = lazy (DynamicDll.Bind "DTWAIN_GetTwainNameFromConstantEx" : DTWAIN_GetTwainNameFromConstantExDelegate)
-    let private GetTwainTimeout = lazy (DynamicDll.Bind "DTWAIN_GetTwainTimeout" : DTWAIN_GetTwainTimeoutDelegate)
     let private GetVersion = lazy (DynamicDll.Bind "DTWAIN_GetVersion" : DTWAIN_GetVersionDelegate)
     let private GetVersionCopyright = lazy (DynamicDll.Bind "DTWAIN_GetVersionCopyright" : DTWAIN_GetVersionCopyrightDelegate)
     let private GetVersionEx = lazy (DynamicDll.Bind "DTWAIN_GetVersionEx" : DTWAIN_GetVersionExDelegate)
@@ -5269,7 +5256,6 @@ module TwainAPI =
     let private SetTwainDSM = lazy (DynamicDll.Bind "DTWAIN_SetTwainDSM" : DTWAIN_SetTwainDSMDelegate)
     let private SetTwainLog = lazy (DynamicDll.Bind "DTWAIN_SetTwainLog" : DTWAIN_SetTwainLogDelegate)
     let private SetTwainMode = lazy (DynamicDll.Bind "DTWAIN_SetTwainMode" : DTWAIN_SetTwainModeDelegate)
-    let private SetTwainTimeout = lazy (DynamicDll.Bind "DTWAIN_SetTwainTimeout" : DTWAIN_SetTwainTimeoutDelegate)
     let private SetXResolution = lazy (DynamicDll.Bind "DTWAIN_SetXResolution" : DTWAIN_SetXResolutionDelegate)
     let private SetXResolutionString = lazy (DynamicDll.Bind "DTWAIN_SetXResolutionString" : DTWAIN_SetXResolutionStringDelegate)
     let private SetYResolution = lazy (DynamicDll.Bind "DTWAIN_SetYResolution" : DTWAIN_SetYResolutionDelegate)
@@ -5281,8 +5267,6 @@ module TwainAPI =
     let private StartTwainSession = lazy (DynamicDll.Bind "DTWAIN_StartTwainSession" : DTWAIN_StartTwainSessionDelegate)
     let private SysDestroy = lazy (DynamicDll.Bind "DTWAIN_SysDestroy" : DTWAIN_SysDestroyDelegate)
     let private SysInitialize = lazy (DynamicDll.Bind "DTWAIN_SysInitialize" : DTWAIN_SysInitializeDelegate)
-    let private SysInitializeEx = lazy (DynamicDll.Bind "DTWAIN_SysInitializeEx" : DTWAIN_SysInitializeExDelegate)
-    let private SysInitializeEx2 = lazy (DynamicDll.Bind "DTWAIN_SysInitializeEx2" : DTWAIN_SysInitializeEx2Delegate)
     let private SysInitializeNoBlocking = lazy (DynamicDll.Bind "DTWAIN_SysInitializeNoBlocking" : DTWAIN_SysInitializeNoBlockingDelegate)
     let private SysInitializeNoBlockingEx = lazy (DynamicDll.Bind "DTWAIN_SysInitializeNoBlockingEx" : DTWAIN_SysInitializeNoBlockingExDelegate)
     let private TestGetCap = lazy (DynamicDll.Bind "DTWAIN_TestGetCap" : DTWAIN_TestGetCapDelegate)
@@ -7374,10 +7358,6 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetTwainNameFromConstantEx.Value.Invoke(lconstanttype, ltwainconstant, lpszout, nsize)
 
-    let DTWAIN_GetTwainTimeout() : LONG =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainTimeout.Value.Invoke()
-
     let DTWAIN_GetVersion (lpmajor: int byref) (lpminor: int byref) (lpversiontype: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetVersion.Value.Invoke(&lpmajor, &lpminor, &lpversiontype)
@@ -8646,10 +8626,6 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SetTwainMode.Value.Invoke(lacquiremode)
 
-    let DTWAIN_SetTwainTimeout (milliseconds: LONG) : DTWAIN_BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        SetTwainTimeout.Value.Invoke(milliseconds)
-
     let DTWAIN_SetXResolution (source: DTWAIN_SOURCE) (xresolution: DTWAIN_FLOAT) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SetXResolution.Value.Invoke(source, xresolution)
@@ -8693,14 +8669,6 @@ module TwainAPI =
     let DTWAIN_SysInitialize() : DTWAIN_HANDLE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SysInitialize.Value.Invoke()
-
-    let DTWAIN_SysInitializeEx (szinipath: string) : DTWAIN_HANDLE =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        SysInitializeEx.Value.Invoke(szinipath)
-
-    let DTWAIN_SysInitializeEx2 (szinipath: string) (szimagedllpath: string) (szlangresourcepath: string) : DTWAIN_HANDLE =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        SysInitializeEx2.Value.Invoke(szinipath, szimagedllpath, szlangresourcepath)
 
     let DTWAIN_SysInitializeNoBlocking() : DTWAIN_HANDLE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

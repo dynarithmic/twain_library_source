@@ -2276,7 +2276,6 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetTwainMode Lib "dtwain64.dll" () As Integer
     Public Declare Ansi Function DTWAIN_GetTwainNameFromConstant Lib "dtwain64.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetTwainNameFromConstantEx Lib "dtwain64.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
-    Public Declare Function DTWAIN_GetTwainTimeout Lib "dtwain64.dll" () As Integer
     Public Declare Function DTWAIN_GetVersion Lib "dtwain64.dll" (ByRef lpMajor As Integer, ByRef lpMinor As Integer, ByRef lpVersionType As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetVersionCopyright Lib "dtwain64.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszApp As StringBuilder, nLength As Integer) As Integer
     Public Declare Function DTWAIN_GetVersionEx Lib "dtwain64.dll" (ByRef lMajor As Integer, ByRef lMinor As Integer, ByRef lVersionType As Integer, ByRef lPatchLevel As Integer) As Integer
@@ -2599,7 +2598,6 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_SetTwainDSM Lib "dtwain64.dll" (DSMType As Integer) As Integer
     Public Declare Ansi Function DTWAIN_SetTwainLog Lib "dtwain64.dll" (LogFlags As UInteger, lpszLogFile As String) As Integer
     Public Declare Function DTWAIN_SetTwainMode Lib "dtwain64.dll" (lAcquireMode As Integer) As Integer
-    Public Declare Function DTWAIN_SetTwainTimeout Lib "dtwain64.dll" (milliseconds As Integer) As Integer
     Public Declare Function DTWAIN_SetUpdateDibProc Lib "dtwain64.dll" (DibProc As DTwainDIBUpdateProc) As DTwainDIBUpdateProc
     Public Declare Function DTWAIN_SetXResolution Lib "dtwain64.dll" (Source As System.IntPtr, xResolution As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_SetXResolutionString Lib "dtwain64.dll" (Source As System.IntPtr, Resolution As String) As Integer
@@ -2612,8 +2610,6 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_StartTwainSession Lib "dtwain64.dll" (hWndMsg As System.IntPtr, lpszDLLName As String) As Integer
     Public Declare Function DTWAIN_SysDestroy Lib "dtwain64.dll" () As Integer
     Public Declare Function DTWAIN_SysInitialize Lib "dtwain64.dll" () As System.IntPtr
-    Public Declare Ansi Function DTWAIN_SysInitializeEx Lib "dtwain64.dll" (szINIPath As String) As System.IntPtr
-    Public Declare Ansi Function DTWAIN_SysInitializeEx2 Lib "dtwain64.dll" (szINIPath As String, szImageDLLPath As String, szLangResourcePath As String) As System.IntPtr
     Public Declare Function DTWAIN_SysInitializeNoBlocking Lib "dtwain64.dll" () As System.IntPtr
     Public Declare Function DTWAIN_SysInitializeNoBlockingEx Lib "dtwain64.dll" (bCreateLogFile As Integer) As System.IntPtr
     Public Declare Function DTWAIN_TestGetCap Lib "dtwain64.dll" (Source As System.IntPtr, lCapability As Integer) As System.IntPtr

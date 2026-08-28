@@ -2508,7 +2508,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetTwainNameFromConstantExA.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantExW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantW.restype = ct.c_long
-     theDLL.DTWAIN_GetTwainTimeout.restype = ct.c_long
      theDLL.DTWAIN_GetVersion.restype = ct.c_long
      theDLL.DTWAIN_GetVersionCopyright.restype = ct.c_long
      theDLL.DTWAIN_GetVersionCopyrightA.restype = ct.c_long
@@ -2959,7 +2958,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetTwainLogA.restype = ct.c_long
      theDLL.DTWAIN_SetTwainLogW.restype = ct.c_long
      theDLL.DTWAIN_SetTwainMode.restype = ct.c_long
-     theDLL.DTWAIN_SetTwainTimeout.restype = ct.c_long
      theDLL.DTWAIN_SetUpdateDibProc.restype = theDLL.DIBUPDATEPROC_TYPE
      theDLL.DTWAIN_SetXResolution.restype = ct.c_long
      theDLL.DTWAIN_SetXResolutionString.restype = ct.c_long
@@ -2978,12 +2976,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_StartTwainSessionW.restype = ct.c_long
      theDLL.DTWAIN_SysDestroy.restype = ct.c_long
      theDLL.DTWAIN_SysInitialize.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2A.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2W.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeExA.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeExW.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeNoBlocking.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeNoBlockingEx.restype = ct.c_void_p
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
@@ -4092,7 +4084,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetTwainLogA.argtypes = [ct.c_ulong, ct.c_char_p]
      theDLL.DTWAIN_SetTwainLogW.argtypes = [ct.c_ulong, ct.c_wchar_p]
      theDLL.DTWAIN_SetTwainMode.argtypes = [ct.c_long]
-     theDLL.DTWAIN_SetTwainTimeout.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetUpdateDibProc.argtypes = [theDLL.DIBUPDATEPROC_TYPE]
      theDLL.DTWAIN_SetXResolution.argtypes = [ct.c_void_p, ct.c_double]
      theDLL.DTWAIN_SetXResolutionString.argtypes = [ct.c_void_p, ct.c_wchar_p]
@@ -4109,12 +4100,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_StartTwainSession.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_StartTwainSessionA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_StartTwainSessionW.argtypes = [ct.c_void_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeEx.argtypes = [ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeEx2.argtypes = [ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeEx2A.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeEx2W.argtypes = [ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeExA.argtypes = [ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeExW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_SysInitializeNoBlockingEx.argtypes = [ct.c_long]
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
@@ -4827,7 +4812,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetTwainNameFromConstantExA.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantExW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantW.restype = ct.c_long
-     theDLL.DTWAIN_GetTwainTimeout.restype = ct.c_long
      theDLL.DTWAIN_GetVersion.restype = ct.c_long
      theDLL.DTWAIN_GetVersionCopyright.restype = ct.c_long
      theDLL.DTWAIN_GetVersionCopyrightA.restype = ct.c_long
@@ -5278,7 +5262,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetTwainLogA.restype = ct.c_long
      theDLL.DTWAIN_SetTwainLogW.restype = ct.c_long
      theDLL.DTWAIN_SetTwainMode.restype = ct.c_long
-     theDLL.DTWAIN_SetTwainTimeout.restype = ct.c_long
      theDLL.DTWAIN_SetUpdateDibProc.restype = theDLL.DIBUPDATEPROC_TYPE
      theDLL.DTWAIN_SetXResolution.restype = ct.c_long
      theDLL.DTWAIN_SetXResolutionString.restype = ct.c_long
@@ -5297,12 +5280,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_StartTwainSessionW.restype = ct.c_long
      theDLL.DTWAIN_SysDestroy.restype = ct.c_long
      theDLL.DTWAIN_SysInitialize.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2A.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2W.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeExA.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeExW.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeNoBlocking.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeNoBlockingEx.restype = ct.c_void_p
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
@@ -6411,7 +6388,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetTwainLogA.argtypes = [ct.c_ulong, ct.c_char_p]
      theDLL.DTWAIN_SetTwainLogW.argtypes = [ct.c_ulong, ct.c_wchar_p]
      theDLL.DTWAIN_SetTwainMode.argtypes = [ct.c_long]
-     theDLL.DTWAIN_SetTwainTimeout.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetUpdateDibProc.argtypes = [theDLL.DIBUPDATEPROC_TYPE]
      theDLL.DTWAIN_SetXResolution.argtypes = [ct.c_void_p, ct.c_double]
      theDLL.DTWAIN_SetXResolutionString.argtypes = [ct.c_void_p, ct.c_char_p]
@@ -6428,12 +6404,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_StartTwainSession.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_StartTwainSessionA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_StartTwainSessionW.argtypes = [ct.c_void_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeEx.argtypes = [ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeEx2.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeEx2A.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeEx2W.argtypes = [ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeExA.argtypes = [ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeExW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_SysInitializeNoBlockingEx.argtypes = [ct.c_long]
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]

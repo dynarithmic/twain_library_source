@@ -737,7 +737,6 @@ type DtwaingettwainnamefromconstantexFunc = unsafe extern "C" fn(i32,i32,*mut u1
 type DtwaingettwainnamefromconstantexaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
 type DtwaingettwainnamefromconstantexwFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainnamefromconstantwFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
-type DtwaingettwaintimeoutFunc = unsafe extern "C" fn() -> i32;
 type DtwaingetversionFunc = unsafe extern "C" fn(*mut i32,*mut i32,*mut i32) -> i32;
 type DtwaingetversioncopyrightFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
 type DtwaingetversioncopyrightaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
@@ -1188,7 +1187,6 @@ type DtwainsettwainlogFunc = unsafe extern "C" fn(u32,*const u16) -> i32;
 type DtwainsettwainlogaFunc = unsafe extern "C" fn(u32,*const c_char) -> i32;
 type DtwainsettwainlogwFunc = unsafe extern "C" fn(u32,*const u16) -> i32;
 type DtwainsettwainmodeFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainsettwaintimeoutFunc = unsafe extern "C" fn(i32) -> i32;
 type DtwainsetupdatedibprocFunc = unsafe extern "C" fn(DTWAIN_DIBUPDATE_PROC) -> DTWAIN_DIBUPDATE_PROC;
 type DtwainsetxresolutionFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
 type DtwainsetxresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
@@ -1207,12 +1205,6 @@ type DtwainstarttwainsessionaFunc = unsafe extern "C" fn(*const c_void,*const c_
 type DtwainstarttwainsessionwFunc = unsafe extern "C" fn(*const c_void,*const u16) -> i32;
 type DtwainsysdestroyFunc = unsafe extern "C" fn() -> i32;
 type DtwainsysinitializeFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwainsysinitializeexFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
-type Dtwainsysinitializeex2Func = unsafe extern "C" fn(*const u16,*const u16,*const u16) -> *mut c_void;
-type Dtwainsysinitializeex2aFunc = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char) -> *mut c_void;
-type Dtwainsysinitializeex2wFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16) -> *mut c_void;
-type DtwainsysinitializeexaFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
-type DtwainsysinitializeexwFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
 type DtwainsysinitializenoblockingFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwainsysinitializenoblockingexFunc = unsafe extern "C" fn(i32) -> *mut c_void;
 type DtwaintestgetcapFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
@@ -1912,7 +1904,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetTwainNameFromConstantExAFunc: Symbol<'a, DtwaingettwainnamefromconstantexaFunc>,
     DTWAIN_GetTwainNameFromConstantExWFunc: Symbol<'a, DtwaingettwainnamefromconstantexwFunc>,
     DTWAIN_GetTwainNameFromConstantWFunc: Symbol<'a, DtwaingettwainnamefromconstantwFunc>,
-    DTWAIN_GetTwainTimeoutFunc: Symbol<'a, DtwaingettwaintimeoutFunc>,
     DTWAIN_GetVersionFunc: Symbol<'a, DtwaingetversionFunc>,
     DTWAIN_GetVersionCopyrightFunc: Symbol<'a, DtwaingetversioncopyrightFunc>,
     DTWAIN_GetVersionCopyrightAFunc: Symbol<'a, DtwaingetversioncopyrightaFunc>,
@@ -2363,7 +2354,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_SetTwainLogAFunc: Symbol<'a, DtwainsettwainlogaFunc>,
     DTWAIN_SetTwainLogWFunc: Symbol<'a, DtwainsettwainlogwFunc>,
     DTWAIN_SetTwainModeFunc: Symbol<'a, DtwainsettwainmodeFunc>,
-    DTWAIN_SetTwainTimeoutFunc: Symbol<'a, DtwainsettwaintimeoutFunc>,
     DTWAIN_SetUpdateDibProcFunc: Symbol<'a, DtwainsetupdatedibprocFunc>,
     DTWAIN_SetXResolutionFunc: Symbol<'a, DtwainsetxresolutionFunc>,
     DTWAIN_SetXResolutionStringFunc: Symbol<'a, DtwainsetxresolutionstringFunc>,
@@ -2382,12 +2372,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_StartTwainSessionWFunc: Symbol<'a, DtwainstarttwainsessionwFunc>,
     DTWAIN_SysDestroyFunc: Symbol<'a, DtwainsysdestroyFunc>,
     DTWAIN_SysInitializeFunc: Symbol<'a, DtwainsysinitializeFunc>,
-    DTWAIN_SysInitializeExFunc: Symbol<'a, DtwainsysinitializeexFunc>,
-    DTWAIN_SysInitializeEx2Func: Symbol<'a, Dtwainsysinitializeex2Func>,
-    DTWAIN_SysInitializeEx2AFunc: Symbol<'a, Dtwainsysinitializeex2aFunc>,
-    DTWAIN_SysInitializeEx2WFunc: Symbol<'a, Dtwainsysinitializeex2wFunc>,
-    DTWAIN_SysInitializeExAFunc: Symbol<'a, DtwainsysinitializeexaFunc>,
-    DTWAIN_SysInitializeExWFunc: Symbol<'a, DtwainsysinitializeexwFunc>,
     DTWAIN_SysInitializeNoBlockingFunc: Symbol<'a, DtwainsysinitializenoblockingFunc>,
     DTWAIN_SysInitializeNoBlockingExFunc: Symbol<'a, DtwainsysinitializenoblockingexFunc>,
     DTWAIN_TestGetCapFunc: Symbol<'a, DtwaintestgetcapFunc>,
@@ -4750,7 +4734,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetTwainNameFromConstantExA: Symbol<DtwaingettwainnamefromconstantexaFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantExA")? };
         let DTWAIN_GetTwainNameFromConstantExW: Symbol<DtwaingettwainnamefromconstantexwFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantExW")? };
         let DTWAIN_GetTwainNameFromConstantW: Symbol<DtwaingettwainnamefromconstantwFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantW")? };
-        let DTWAIN_GetTwainTimeout: Symbol<DtwaingettwaintimeoutFunc> = unsafe { library.get(b"DTWAIN_GetTwainTimeout")? };
         let DTWAIN_GetVersion: Symbol<DtwaingetversionFunc> = unsafe { library.get(b"DTWAIN_GetVersion")? };
         let DTWAIN_GetVersionCopyright: Symbol<DtwaingetversioncopyrightFunc> = unsafe { library.get(b"DTWAIN_GetVersionCopyright")? };
         let DTWAIN_GetVersionCopyrightA: Symbol<DtwaingetversioncopyrightaFunc> = unsafe { library.get(b"DTWAIN_GetVersionCopyrightA")? };
@@ -5201,7 +5184,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_SetTwainLogA: Symbol<DtwainsettwainlogaFunc> = unsafe { library.get(b"DTWAIN_SetTwainLogA")? };
         let DTWAIN_SetTwainLogW: Symbol<DtwainsettwainlogwFunc> = unsafe { library.get(b"DTWAIN_SetTwainLogW")? };
         let DTWAIN_SetTwainMode: Symbol<DtwainsettwainmodeFunc> = unsafe { library.get(b"DTWAIN_SetTwainMode")? };
-        let DTWAIN_SetTwainTimeout: Symbol<DtwainsettwaintimeoutFunc> = unsafe { library.get(b"DTWAIN_SetTwainTimeout")? };
         let DTWAIN_SetUpdateDibProc: Symbol<DtwainsetupdatedibprocFunc> = unsafe { library.get(b"DTWAIN_SetUpdateDibProc")? };
         let DTWAIN_SetXResolution: Symbol<DtwainsetxresolutionFunc> = unsafe { library.get(b"DTWAIN_SetXResolution")? };
         let DTWAIN_SetXResolutionString: Symbol<DtwainsetxresolutionstringFunc> = unsafe { library.get(b"DTWAIN_SetXResolutionString")? };
@@ -5220,12 +5202,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_StartTwainSessionW: Symbol<DtwainstarttwainsessionwFunc> = unsafe { library.get(b"DTWAIN_StartTwainSessionW")? };
         let DTWAIN_SysDestroy: Symbol<DtwainsysdestroyFunc> = unsafe { library.get(b"DTWAIN_SysDestroy")? };
         let DTWAIN_SysInitialize: Symbol<DtwainsysinitializeFunc> = unsafe { library.get(b"DTWAIN_SysInitialize")? };
-        let DTWAIN_SysInitializeEx: Symbol<DtwainsysinitializeexFunc> = unsafe { library.get(b"DTWAIN_SysInitializeEx")? };
-        let DTWAIN_SysInitializeEx2: Symbol<Dtwainsysinitializeex2Func> = unsafe { library.get(b"DTWAIN_SysInitializeEx2")? };
-        let DTWAIN_SysInitializeEx2A: Symbol<Dtwainsysinitializeex2aFunc> = unsafe { library.get(b"DTWAIN_SysInitializeEx2A")? };
-        let DTWAIN_SysInitializeEx2W: Symbol<Dtwainsysinitializeex2wFunc> = unsafe { library.get(b"DTWAIN_SysInitializeEx2W")? };
-        let DTWAIN_SysInitializeExA: Symbol<DtwainsysinitializeexaFunc> = unsafe { library.get(b"DTWAIN_SysInitializeExA")? };
-        let DTWAIN_SysInitializeExW: Symbol<DtwainsysinitializeexwFunc> = unsafe { library.get(b"DTWAIN_SysInitializeExW")? };
         let DTWAIN_SysInitializeNoBlocking: Symbol<DtwainsysinitializenoblockingFunc> = unsafe { library.get(b"DTWAIN_SysInitializeNoBlocking")? };
         let DTWAIN_SysInitializeNoBlockingEx: Symbol<DtwainsysinitializenoblockingexFunc> = unsafe { library.get(b"DTWAIN_SysInitializeNoBlockingEx")? };
         let DTWAIN_TestGetCap: Symbol<DtwaintestgetcapFunc> = unsafe { library.get(b"DTWAIN_TestGetCap")? };
@@ -5924,7 +5900,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetTwainNameFromConstantExAFunc: DTWAIN_GetTwainNameFromConstantExA,
             DTWAIN_GetTwainNameFromConstantExWFunc: DTWAIN_GetTwainNameFromConstantExW,
             DTWAIN_GetTwainNameFromConstantWFunc: DTWAIN_GetTwainNameFromConstantW,
-            DTWAIN_GetTwainTimeoutFunc: DTWAIN_GetTwainTimeout,
             DTWAIN_GetVersionFunc: DTWAIN_GetVersion,
             DTWAIN_GetVersionCopyrightFunc: DTWAIN_GetVersionCopyright,
             DTWAIN_GetVersionCopyrightAFunc: DTWAIN_GetVersionCopyrightA,
@@ -6375,7 +6350,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_SetTwainLogAFunc: DTWAIN_SetTwainLogA,
             DTWAIN_SetTwainLogWFunc: DTWAIN_SetTwainLogW,
             DTWAIN_SetTwainModeFunc: DTWAIN_SetTwainMode,
-            DTWAIN_SetTwainTimeoutFunc: DTWAIN_SetTwainTimeout,
             DTWAIN_SetUpdateDibProcFunc: DTWAIN_SetUpdateDibProc,
             DTWAIN_SetXResolutionFunc: DTWAIN_SetXResolution,
             DTWAIN_SetXResolutionStringFunc: DTWAIN_SetXResolutionString,
@@ -6394,12 +6368,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_StartTwainSessionWFunc: DTWAIN_StartTwainSessionW,
             DTWAIN_SysDestroyFunc: DTWAIN_SysDestroy,
             DTWAIN_SysInitializeFunc: DTWAIN_SysInitialize,
-            DTWAIN_SysInitializeExFunc: DTWAIN_SysInitializeEx,
-            DTWAIN_SysInitializeEx2Func: DTWAIN_SysInitializeEx2,
-            DTWAIN_SysInitializeEx2AFunc: DTWAIN_SysInitializeEx2A,
-            DTWAIN_SysInitializeEx2WFunc: DTWAIN_SysInitializeEx2W,
-            DTWAIN_SysInitializeExAFunc: DTWAIN_SysInitializeExA,
-            DTWAIN_SysInitializeExWFunc: DTWAIN_SysInitializeExW,
             DTWAIN_SysInitializeNoBlockingFunc: DTWAIN_SysInitializeNoBlocking,
             DTWAIN_SysInitializeNoBlockingExFunc: DTWAIN_SysInitializeNoBlockingEx,
             DTWAIN_TestGetCapFunc: DTWAIN_TestGetCap,
@@ -9171,10 +9139,6 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainNameFromConstantWFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
     }
 
-    pub fn DTWAIN_GetTwainTimeout(&self) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainTimeoutFunc)();  }
-    }
-
     pub fn DTWAIN_GetVersion(&self, lpMajor: *mut i32, lpMinor: *mut i32, lpVersionType: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_GetVersionFunc)(lpMajor, lpMinor, lpVersionType);  }
     }
@@ -10975,10 +10939,6 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetTwainModeFunc)(lAcquireMode);  }
     }
 
-    pub fn DTWAIN_SetTwainTimeout(&self, milliseconds: i32) -> i32 {
-        unsafe { return (self.DTWAIN_SetTwainTimeoutFunc)(milliseconds);  }
-    }
-
     pub fn DTWAIN_SetUpdateDibProc(&self, DibProc: DTWAIN_DIBUPDATE_PROC) -> DTWAIN_DIBUPDATE_PROC {
         unsafe { return (self.DTWAIN_SetUpdateDibProcFunc)(DibProc);  }
     }
@@ -11049,30 +11009,6 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_SysInitialize(&self) -> *mut c_void {
         unsafe { return (self.DTWAIN_SysInitializeFunc)();  }
-    }
-
-    pub fn DTWAIN_SysInitializeEx(&self, szINIPath: *const u16) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeExFunc)(szINIPath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeEx2(&self, szINIPath: *const u16, szImageDLLPath: *const u16, szLangResourcePath: *const u16) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeEx2Func)(szINIPath, szImageDLLPath, szLangResourcePath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeEx2A(&self, szINIPath: *const c_char, szImageDLLPath: *const c_char, szLangResourcePath: *const c_char) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeEx2AFunc)(szINIPath, szImageDLLPath, szLangResourcePath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeEx2W(&self, szINIPath: *const u16, szImageDLLPath: *const u16, szLangResourcePath: *const u16) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeEx2WFunc)(szINIPath, szImageDLLPath, szLangResourcePath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeExA(&self, szINIPath: *const c_char) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeExAFunc)(szINIPath);  }
-    }
-
-    pub fn DTWAIN_SysInitializeExW(&self, szINIPath: *const u16) -> *mut c_void {
-        unsafe { return (self.DTWAIN_SysInitializeExWFunc)(szINIPath);  }
     }
 
     pub fn DTWAIN_SysInitializeNoBlocking(&self) -> *mut c_void {
