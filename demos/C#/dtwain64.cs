@@ -3537,9 +3537,6 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetTwainNameFromConstantEx(int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern int DTWAIN_GetTwainTimeout();
-
-        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetVersion(ref int lpMajor, ref int lpMinor, ref int lpVersionType);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
@@ -4539,9 +4536,6 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetTwainMode(int lAcquireMode);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern int DTWAIN_SetTwainTimeout(int milliseconds);
-
-        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTwainDIBUpdateProc DTWAIN_SetUpdateDibProc(DTwainDIBUpdateProc DibProc);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
@@ -4576,12 +4570,6 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_HANDLE DTWAIN_SysInitialize();
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        public static extern DTWAIN_HANDLE DTWAIN_SysInitializeEx([MarshalAs(UnmanagedType.LPStr)] string szINIPath);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        public static extern DTWAIN_HANDLE DTWAIN_SysInitializeEx2([MarshalAs(UnmanagedType.LPStr)] string szINIPath, [MarshalAs(UnmanagedType.LPStr)] string szImageDLLPath, [MarshalAs(UnmanagedType.LPStr)] string szLangResourcePath);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();

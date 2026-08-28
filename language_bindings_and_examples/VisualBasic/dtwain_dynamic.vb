@@ -3477,9 +3477,6 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetTwainNameFromConstantExDelegate(lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetTwainTimeoutDelegate() As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetVersionDelegate(ByRef lpMajor As Integer, ByRef lpMinor As Integer, ByRef lpVersionType As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
@@ -4446,9 +4443,6 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_SetTwainModeDelegate(lAcquireMode As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_SetTwainTimeoutDelegate(milliseconds As Integer) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetUpdateDibProcDelegate(DibProc As DTwainDIBUpdateProc) As DTwainDIBUpdateProc
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -4483,12 +4477,6 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SysInitializeDelegate() As System.IntPtr
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Private Delegate Function DTWAIN_SysInitializeExDelegate(szINIPath As String) As System.IntPtr
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Private Delegate Function DTWAIN_SysInitializeEx2Delegate(szINIPath As String, szImageDLLPath As String, szLangResourcePath As String) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SysInitializeNoBlockingDelegate() As System.IntPtr
@@ -6566,10 +6554,6 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut, nSize)
         End Function
         
-        Public Function DTWAIN_GetTwainTimeout() As Integer
-        Return api.DTWAIN_GetTwainTimeout()
-        End Function
-        
         Public Function DTWAIN_GetVersion(ByRef lpMajor As Integer, ByRef lpMinor As Integer, ByRef lpVersionType As Integer) As Integer
         Return api.DTWAIN_GetVersion(lpMajor, lpMinor, lpVersionType)
         End Function
@@ -7858,10 +7842,6 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetTwainMode(lAcquireMode)
         End Function
         
-        Public Function DTWAIN_SetTwainTimeout(milliseconds As Integer) As Integer
-        Return api.DTWAIN_SetTwainTimeout(milliseconds)
-        End Function
-        
         Public Function DTWAIN_SetUpdateDibProc(DibProc As DTwainDIBUpdateProc) As DTwainDIBUpdateProc
         Return api.DTWAIN_SetUpdateDibProc(DibProc)
         End Function
@@ -7908,14 +7888,6 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_SysInitialize() As System.IntPtr
         Return api.DTWAIN_SysInitialize()
-        End Function
-        
-        Public Function DTWAIN_SysInitializeEx(szINIPath As String) As System.IntPtr
-        Return api.DTWAIN_SysInitializeEx(szINIPath)
-        End Function
-        
-        Public Function DTWAIN_SysInitializeEx2(szINIPath As String, szImageDLLPath As String, szLangResourcePath As String) As System.IntPtr
-        Return api.DTWAIN_SysInitializeEx2(szINIPath, szImageDLLPath, szLangResourcePath)
         End Function
         
         Public Function DTWAIN_SysInitializeNoBlocking() As System.IntPtr
@@ -8460,7 +8432,6 @@ Namespace Dynarithmic
             Public DTWAIN_GetTwainMode As DTWAIN_GetTwainModeDelegate
             Public DTWAIN_GetTwainNameFromConstant As DTWAIN_GetTwainNameFromConstantDelegate
             Public DTWAIN_GetTwainNameFromConstantEx As DTWAIN_GetTwainNameFromConstantExDelegate
-            Public DTWAIN_GetTwainTimeout As DTWAIN_GetTwainTimeoutDelegate
             Public DTWAIN_GetVersion As DTWAIN_GetVersionDelegate
             Public DTWAIN_GetVersionCopyright As DTWAIN_GetVersionCopyrightDelegate
             Public DTWAIN_GetVersionEx As DTWAIN_GetVersionExDelegate
@@ -8783,7 +8754,6 @@ Namespace Dynarithmic
             Public DTWAIN_SetTwainDSM As DTWAIN_SetTwainDSMDelegate
             Public DTWAIN_SetTwainLog As DTWAIN_SetTwainLogDelegate
             Public DTWAIN_SetTwainMode As DTWAIN_SetTwainModeDelegate
-            Public DTWAIN_SetTwainTimeout As DTWAIN_SetTwainTimeoutDelegate
             Public DTWAIN_SetUpdateDibProc As DTWAIN_SetUpdateDibProcDelegate
             Public DTWAIN_SetXResolution As DTWAIN_SetXResolutionDelegate
             Public DTWAIN_SetXResolutionString As DTWAIN_SetXResolutionStringDelegate
@@ -8796,8 +8766,6 @@ Namespace Dynarithmic
             Public DTWAIN_StartTwainSession As DTWAIN_StartTwainSessionDelegate
             Public DTWAIN_SysDestroy As DTWAIN_SysDestroyDelegate
             Public DTWAIN_SysInitialize As DTWAIN_SysInitializeDelegate
-            Public DTWAIN_SysInitializeEx As DTWAIN_SysInitializeExDelegate
-            Public DTWAIN_SysInitializeEx2 As DTWAIN_SysInitializeEx2Delegate
             Public DTWAIN_SysInitializeNoBlocking As DTWAIN_SysInitializeNoBlockingDelegate
             Public DTWAIN_SysInitializeNoBlockingEx As DTWAIN_SysInitializeNoBlockingExDelegate
             Public DTWAIN_TestGetCap As DTWAIN_TestGetCapDelegate

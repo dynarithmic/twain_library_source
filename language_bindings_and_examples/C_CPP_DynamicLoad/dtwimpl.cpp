@@ -738,7 +738,6 @@
     D_GETTWAINNAMEFROMCONSTANTEXAFUNC             DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstantExA = nullptr;
     D_GETTWAINNAMEFROMCONSTANTEXWFUNC             DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstantExW = nullptr;
     D_GETTWAINNAMEFROMCONSTANTWFUNC               DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstantW = nullptr;
-    D_GETTWAINTIMEOUTFUNC                         DYNDTWAIN_API::DTWAIN_GetTwainTimeout = nullptr;
     D_GETVERSIONFUNC                              DYNDTWAIN_API::DTWAIN_GetVersion = nullptr;
     D_GETVERSIONCOPYRIGHTFUNC                     DYNDTWAIN_API::DTWAIN_GetVersionCopyright = nullptr;
     D_GETVERSIONCOPYRIGHTAFUNC                    DYNDTWAIN_API::DTWAIN_GetVersionCopyrightA = nullptr;
@@ -1192,7 +1191,6 @@
     D_SETTWAINLOGAFUNC                            DYNDTWAIN_API::DTWAIN_SetTwainLogA = nullptr;
     D_SETTWAINLOGWFUNC                            DYNDTWAIN_API::DTWAIN_SetTwainLogW = nullptr;
     D_SETTWAINMODEFUNC                            DYNDTWAIN_API::DTWAIN_SetTwainMode = nullptr;
-    D_SETTWAINTIMEOUTFUNC                         DYNDTWAIN_API::DTWAIN_SetTwainTimeout = nullptr;
     D_SETUPDATEDIBPROCFUNC                        DYNDTWAIN_API::DTWAIN_SetUpdateDibProc = nullptr;
     D_SETXRESOLUTIONFUNC                          DYNDTWAIN_API::DTWAIN_SetXResolution = nullptr;
     D_SETXRESOLUTIONSTRINGFUNC                    DYNDTWAIN_API::DTWAIN_SetXResolutionString = nullptr;
@@ -1211,12 +1209,6 @@
     D_STARTTWAINSESSIONWFUNC                      DYNDTWAIN_API::DTWAIN_StartTwainSessionW = nullptr;
     D_SYSDESTROYFUNC                              DYNDTWAIN_API::DTWAIN_SysDestroy = nullptr;
     D_SYSINITIALIZEFUNC                           DYNDTWAIN_API::DTWAIN_SysInitialize = nullptr;
-    D_SYSINITIALIZEEXFUNC                         DYNDTWAIN_API::DTWAIN_SysInitializeEx = nullptr;
-    D_SYSINITIALIZEEX2FUNC                        DYNDTWAIN_API::DTWAIN_SysInitializeEx2 = nullptr;
-    D_SYSINITIALIZEEX2AFUNC                       DYNDTWAIN_API::DTWAIN_SysInitializeEx2A = nullptr;
-    D_SYSINITIALIZEEX2WFUNC                       DYNDTWAIN_API::DTWAIN_SysInitializeEx2W = nullptr;
-    D_SYSINITIALIZEEXAFUNC                        DYNDTWAIN_API::DTWAIN_SysInitializeExA = nullptr;
-    D_SYSINITIALIZEEXWFUNC                        DYNDTWAIN_API::DTWAIN_SysInitializeExW = nullptr;
     D_SYSINITIALIZENOBLOCKINGFUNC                 DYNDTWAIN_API::DTWAIN_SysInitializeNoBlocking = nullptr;
     D_SYSINITIALIZENOBLOCKINGEXFUNC               DYNDTWAIN_API::DTWAIN_SysInitializeNoBlockingEx = nullptr;
     D_TESTGETCAPFUNC                              DYNDTWAIN_API::DTWAIN_TestGetCap = nullptr;
@@ -1978,7 +1970,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetTwainNameFromConstantExA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetTwainNameFromConstantExW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetTwainNameFromConstantW, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_GetTwainTimeout, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetVersion, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetVersionCopyright, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetVersionCopyrightA, hModule);
@@ -2432,7 +2423,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SetTwainLogA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetTwainLogW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetTwainMode, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SetTwainTimeout, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetUpdateDibProc, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetXResolution, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetXResolutionString, hModule);
@@ -2451,12 +2441,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_StartTwainSessionW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SysDestroy, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SysInitialize, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeEx, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeEx2, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeEx2A, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeEx2W, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeExA, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SysInitializeExW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SysInitializeNoBlocking, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SysInitializeNoBlockingEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_TestGetCap, hModule);

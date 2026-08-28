@@ -2496,7 +2496,6 @@
         public delegate int DTWAIN_GetTwainNameFromConstantDelegate_overload(int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize);
         public delegate int DTWAIN_GetTwainNameFromConstantExDelegate(int lConstantType, int lTwainConstant, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize);
         public delegate int DTWAIN_GetTwainNameFromConstantExDelegate_overload(int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize);
-        public delegate int DTWAIN_GetTwainTimeoutDelegate();
         public delegate int DTWAIN_GetVersionDelegate(ref int lpMajor, ref int lpMinor, ref int lpVersionType);
         public delegate int DTWAIN_GetVersionCopyrightDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszApp, int nLength);
         public delegate int DTWAIN_GetVersionCopyrightDelegate_overload(System.IntPtr lpszApp, int nLength);
@@ -2830,7 +2829,6 @@
         public delegate int DTWAIN_SetTwainDSMDelegate(int DSMType);
         public delegate int DTWAIN_SetTwainLogDelegate(uint LogFlags, [MarshalAs(UnmanagedType.LPTStr)] string lpszLogFile);
         public delegate int DTWAIN_SetTwainModeDelegate(int lAcquireMode);
-        public delegate int DTWAIN_SetTwainTimeoutDelegate(int milliseconds);
         public delegate DTwainDIBUpdateProc DTWAIN_SetUpdateDibProcDelegate(DTwainDIBUpdateProc DibProc);
         public delegate int DTWAIN_SetXResolutionDelegate(DTWAIN_SOURCE Source, DTWAIN_FLOAT xResolution);
         public delegate int DTWAIN_SetXResolutionStringDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string Resolution);
@@ -2843,8 +2841,6 @@
         public delegate int DTWAIN_StartTwainSessionDelegate(HWND hWndMsg, [MarshalAs(UnmanagedType.LPTStr)] string lpszDLLName);
         public delegate int DTWAIN_SysDestroyDelegate();
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeDelegate();
-        public delegate DTWAIN_HANDLE DTWAIN_SysInitializeExDelegate([MarshalAs(UnmanagedType.LPTStr)] string szINIPath);
-        public delegate DTWAIN_HANDLE DTWAIN_SysInitializeEx2Delegate([MarshalAs(UnmanagedType.LPTStr)] string szINIPath, [MarshalAs(UnmanagedType.LPTStr)] string szImageDLLPath, [MarshalAs(UnmanagedType.LPTStr)] string szLangResourcePath);
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingDelegate();
         public delegate DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingExDelegate(int bCreateLogFile);
         public delegate DTWAIN_ARRAY DTWAIN_TestGetCapDelegate(DTWAIN_SOURCE Source, int lCapability);
@@ -4594,9 +4590,6 @@
         [DTWAINNativeFunction("DTWAIN_GetTwainNameFromConstantEx")]
         private readonly DTWAIN_GetTwainNameFromConstantExDelegate_overload _DTWAIN_GetTwainNameFromConstantEx_overload; 
 
-        [DTWAINNativeFunction("DTWAIN_GetTwainTimeout")]
-        private readonly DTWAIN_GetTwainTimeoutDelegate  _DTWAIN_GetTwainTimeout;
-
         [DTWAINNativeFunction("DTWAIN_GetVersion")]
         private readonly DTWAIN_GetVersionDelegate  _DTWAIN_GetVersion;
 
@@ -5596,9 +5589,6 @@
         [DTWAINNativeFunction("DTWAIN_SetTwainMode")]
         private readonly DTWAIN_SetTwainModeDelegate  _DTWAIN_SetTwainMode;
 
-        [DTWAINNativeFunction("DTWAIN_SetTwainTimeout")]
-        private readonly DTWAIN_SetTwainTimeoutDelegate  _DTWAIN_SetTwainTimeout;
-
         [DTWAINNativeFunction("DTWAIN_SetUpdateDibProc")]
         private readonly DTWAIN_SetUpdateDibProcDelegate  _DTWAIN_SetUpdateDibProc;
 
@@ -5634,12 +5624,6 @@
 
         [DTWAINNativeFunction("DTWAIN_SysInitialize")]
         private readonly DTWAIN_SysInitializeDelegate  _DTWAIN_SysInitialize;
-
-        [DTWAINNativeFunction("DTWAIN_SysInitializeEx")]
-        private readonly DTWAIN_SysInitializeExDelegate  _DTWAIN_SysInitializeEx;
-
-        [DTWAINNativeFunction("DTWAIN_SysInitializeEx2")]
-        private readonly DTWAIN_SysInitializeEx2Delegate  _DTWAIN_SysInitializeEx2;
 
         [DTWAINNativeFunction("DTWAIN_SysInitializeNoBlocking")]
         private readonly DTWAIN_SysInitializeNoBlockingDelegate  _DTWAIN_SysInitializeNoBlocking;
@@ -7389,9 +7373,6 @@
         public  int DTWAIN_GetTwainNameFromConstantEx (int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize)
         => _DTWAIN_GetTwainNameFromConstantEx_overload(lConstantType, lTwainConstant, lpszOut, nSize);
 
-        public  int DTWAIN_GetTwainTimeout()
-        => _DTWAIN_GetTwainTimeout();
-
         public  int DTWAIN_GetVersion(ref int lpMajor, ref int lpMinor, ref int lpVersionType)
         => _DTWAIN_GetVersion(ref lpMajor, ref lpMinor, ref lpVersionType);
 
@@ -8391,9 +8372,6 @@
         public  int DTWAIN_SetTwainMode(int lAcquireMode)
         => _DTWAIN_SetTwainMode(lAcquireMode);
 
-        public  int DTWAIN_SetTwainTimeout(int milliseconds)
-        => _DTWAIN_SetTwainTimeout(milliseconds);
-
         public  DTwainDIBUpdateProc DTWAIN_SetUpdateDibProc(DTwainDIBUpdateProc DibProc)
         => _DTWAIN_SetUpdateDibProc(DibProc);
 
@@ -8429,12 +8407,6 @@
 
         public  DTWAIN_HANDLE DTWAIN_SysInitialize()
         => _DTWAIN_SysInitialize();
-
-        public  DTWAIN_HANDLE DTWAIN_SysInitializeEx([MarshalAs(UnmanagedType.LPTStr)] string szINIPath)
-        => _DTWAIN_SysInitializeEx(szINIPath);
-
-        public  DTWAIN_HANDLE DTWAIN_SysInitializeEx2([MarshalAs(UnmanagedType.LPTStr)] string szINIPath, [MarshalAs(UnmanagedType.LPTStr)] string szImageDLLPath, [MarshalAs(UnmanagedType.LPTStr)] string szLangResourcePath)
-        => _DTWAIN_SysInitializeEx2(szINIPath, szImageDLLPath, szLangResourcePath);
 
         public  DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking()
         => _DTWAIN_SysInitializeNoBlocking();

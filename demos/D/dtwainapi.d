@@ -2610,7 +2610,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LONG, LONG, LPSTR, LONG) DTWAIN_GetTwainNameFromConstantExA;
     extern(Windows) LONG function(LONG, LONG, LPWSTR, LONG) DTWAIN_GetTwainNameFromConstantExW;
     extern(Windows) LONG function(LONG, LONG, LPWSTR, LONG) DTWAIN_GetTwainNameFromConstantW;
-    extern(Windows) LONG function() DTWAIN_GetTwainTimeout;
     extern(Windows) DTWAIN_BOOL function(LPLONG, LPLONG, LPLONG) DTWAIN_GetVersion;
     extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetVersionCopyright;
     extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetVersionCopyrightA;
@@ -3057,7 +3056,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DWORD, LPCSTR) DTWAIN_SetTwainLogA;
     extern(Windows) DTWAIN_BOOL function(DWORD, LPCWSTR) DTWAIN_SetTwainLogW;
     extern(Windows) DTWAIN_BOOL function(LONG) DTWAIN_SetTwainMode;
-    extern(Windows) DTWAIN_BOOL function(LONG) DTWAIN_SetTwainTimeout;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_FLOAT) DTWAIN_SetXResolution;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CCHARPTRTYPE) DTWAIN_SetXResolutionString;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPCSTR) DTWAIN_SetXResolutionStringA;
@@ -3075,12 +3073,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(HWND, LPCWSTR) DTWAIN_StartTwainSessionW;
     extern(Windows) DTWAIN_BOOL function() DTWAIN_SysDestroy;
     extern(Windows) DTWAIN_HANDLE function() DTWAIN_SysInitialize;
-    extern(Windows) DTWAIN_HANDLE function(DTWAIN_CCHARPTRTYPE) DTWAIN_SysInitializeEx;
-    extern(Windows) DTWAIN_HANDLE function(DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE) DTWAIN_SysInitializeEx2;
-    extern(Windows) DTWAIN_HANDLE function(LPCSTR, LPCSTR, LPCSTR) DTWAIN_SysInitializeEx2A;
-    extern(Windows) DTWAIN_HANDLE function(LPCWSTR, LPCWSTR, LPCWSTR) DTWAIN_SysInitializeEx2W;
-    extern(Windows) DTWAIN_HANDLE function(LPCSTR) DTWAIN_SysInitializeExA;
-    extern(Windows) DTWAIN_HANDLE function(LPCWSTR) DTWAIN_SysInitializeExW;
     extern(Windows) DTWAIN_HANDLE function() DTWAIN_SysInitializeNoBlocking;
     extern(Windows) DTWAIN_HANDLE function(DTWAIN_BOOL) DTWAIN_SysInitializeNoBlockingEx;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG) DTWAIN_TestGetCap;
@@ -3778,7 +3770,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantExA, "DTWAIN_GetTwainNameFromConstantExA");
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantExW, "DTWAIN_GetTwainNameFromConstantExW");
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantW, "DTWAIN_GetTwainNameFromConstantW");
-        bindFunction(cast(void**)&DTWAIN_GetTwainTimeout, "DTWAIN_GetTwainTimeout");
         bindFunction(cast(void**)&DTWAIN_GetVersion, "DTWAIN_GetVersion");
         bindFunction(cast(void**)&DTWAIN_GetVersionCopyright, "DTWAIN_GetVersionCopyright");
         bindFunction(cast(void**)&DTWAIN_GetVersionCopyrightA, "DTWAIN_GetVersionCopyrightA");
@@ -4225,7 +4216,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_SetTwainLogA, "DTWAIN_SetTwainLogA");
         bindFunction(cast(void**)&DTWAIN_SetTwainLogW, "DTWAIN_SetTwainLogW");
         bindFunction(cast(void**)&DTWAIN_SetTwainMode, "DTWAIN_SetTwainMode");
-        bindFunction(cast(void**)&DTWAIN_SetTwainTimeout, "DTWAIN_SetTwainTimeout");
         bindFunction(cast(void**)&DTWAIN_SetXResolution, "DTWAIN_SetXResolution");
         bindFunction(cast(void**)&DTWAIN_SetXResolutionString, "DTWAIN_SetXResolutionString");
         bindFunction(cast(void**)&DTWAIN_SetXResolutionStringA, "DTWAIN_SetXResolutionStringA");
@@ -4243,12 +4233,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_StartTwainSessionW, "DTWAIN_StartTwainSessionW");
         bindFunction(cast(void**)&DTWAIN_SysDestroy, "DTWAIN_SysDestroy");
         bindFunction(cast(void**)&DTWAIN_SysInitialize, "DTWAIN_SysInitialize");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeEx, "DTWAIN_SysInitializeEx");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeEx2, "DTWAIN_SysInitializeEx2");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeEx2A, "DTWAIN_SysInitializeEx2A");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeEx2W, "DTWAIN_SysInitializeEx2W");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeExA, "DTWAIN_SysInitializeExA");
-        bindFunction(cast(void**)&DTWAIN_SysInitializeExW, "DTWAIN_SysInitializeExW");
         bindFunction(cast(void**)&DTWAIN_SysInitializeNoBlocking, "DTWAIN_SysInitializeNoBlocking");
         bindFunction(cast(void**)&DTWAIN_SysInitializeNoBlockingEx, "DTWAIN_SysInitializeNoBlockingEx");
         bindFunction(cast(void**)&DTWAIN_TestGetCap, "DTWAIN_TestGetCap");

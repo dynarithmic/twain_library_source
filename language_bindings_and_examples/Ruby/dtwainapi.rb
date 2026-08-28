@@ -825,7 +825,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetTwainNameFromConstantExA
    attr_reader :DTWAIN_GetTwainNameFromConstantExW
    attr_reader :DTWAIN_GetTwainNameFromConstantW
-   attr_reader :DTWAIN_GetTwainTimeout
    attr_reader :DTWAIN_GetVersion
    attr_reader :DTWAIN_GetVersionCopyright
    attr_reader :DTWAIN_GetVersionCopyrightA
@@ -1276,7 +1275,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_SetTwainLogA
    attr_reader :DTWAIN_SetTwainLogW
    attr_reader :DTWAIN_SetTwainMode
-   attr_reader :DTWAIN_SetTwainTimeout
    attr_reader :DTWAIN_SetUpdateDibProc
    attr_reader :DTWAIN_SetXResolution
    attr_reader :DTWAIN_SetXResolutionString
@@ -1295,12 +1293,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_StartTwainSessionW
    attr_reader :DTWAIN_SysDestroy
    attr_reader :DTWAIN_SysInitialize
-   attr_reader :DTWAIN_SysInitializeEx
-   attr_reader :DTWAIN_SysInitializeEx2
-   attr_reader :DTWAIN_SysInitializeEx2A
-   attr_reader :DTWAIN_SysInitializeEx2W
-   attr_reader :DTWAIN_SysInitializeExA
-   attr_reader :DTWAIN_SysInitializeExW
    attr_reader :DTWAIN_SysInitializeNoBlocking
    attr_reader :DTWAIN_SysInitializeNoBlockingEx
    attr_reader :DTWAIN_TestGetCap
@@ -3699,7 +3691,6 @@ class DTWAINAPI
        @DTWAIN_GetTwainNameFromConstantExA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantExA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainNameFromConstantExW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantExW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainNameFromConstantW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainTimeout = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainTimeout'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetVersion = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersion'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetVersionCopyright = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionCopyright'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetVersionCopyrightA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionCopyrightA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
@@ -4150,7 +4141,6 @@ class DTWAINAPI
        @DTWAIN_SetTwainLogA = Fiddle::Function::new(dtwain_dll['DTWAIN_SetTwainLogA'],[Fiddle::TYPE_UINT, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SetTwainLogW = Fiddle::Function::new(dtwain_dll['DTWAIN_SetTwainLogW'],[Fiddle::TYPE_UINT, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SetTwainMode = Fiddle::Function::new(dtwain_dll['DTWAIN_SetTwainMode'],[Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
-       @DTWAIN_SetTwainTimeout = Fiddle::Function::new(dtwain_dll['DTWAIN_SetTwainTimeout'],[Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetUpdateDibProc = Fiddle::Function::new(dtwain_dll['DTWAIN_SetUpdateDibProc'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_SetXResolution = Fiddle::Function::new(dtwain_dll['DTWAIN_SetXResolution'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_DOUBLE],Fiddle::TYPE_INT)
        @DTWAIN_SetXResolutionString = Fiddle::Function::new(dtwain_dll['DTWAIN_SetXResolutionString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
@@ -4169,12 +4159,6 @@ class DTWAINAPI
        @DTWAIN_StartTwainSessionW = Fiddle::Function::new(dtwain_dll['DTWAIN_StartTwainSessionW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SysDestroy = Fiddle::Function::new(dtwain_dll['DTWAIN_SysDestroy'],[],Fiddle::TYPE_INT)
        @DTWAIN_SysInitialize = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitialize'],[],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeEx = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeEx2'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeEx2A = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeEx2A'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeEx2W = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeEx2W'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeExA = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeExA'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_SysInitializeExW = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeExW'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_SysInitializeNoBlocking = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeNoBlocking'],[],Fiddle::TYPE_VOIDP)
        @DTWAIN_SysInitializeNoBlockingEx = Fiddle::Function::new(dtwain_dll['DTWAIN_SysInitializeNoBlockingEx'],[Fiddle::TYPE_INT],Fiddle::TYPE_VOIDP)
        @DTWAIN_TestGetCap = Fiddle::Function::new(dtwain_dll['DTWAIN_TestGetCap'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)

@@ -764,7 +764,6 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
-        LONG DTWAIN_GetTwainTimeout();
         DTWAIN_BOOL DTWAIN_GetVersion(LPLONG lpMajor, LPLONG lpMinor, LPLONG lpVersionType);
         LONG DTWAIN_GetVersionCopyright(DTWAIN_CHARPTRTYPE lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
@@ -1215,7 +1214,6 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainMode(LONG lAcquireMode);
-        DTWAIN_BOOL DTWAIN_SetTwainTimeout(LONG milliseconds);
         DTWAIN_DIBUPDATE_PROC DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc);
         DTWAIN_BOOL DTWAIN_SetXResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT xResolution);
         DTWAIN_BOOL DTWAIN_SetXResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
@@ -1234,12 +1232,6 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLLName);
         DTWAIN_BOOL DTWAIN_SysDestroy();
         DTWAIN_HANDLE DTWAIN_SysInitialize();
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx(DTWAIN_CCHARPTRTYPE szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2(DTWAIN_CCHARPTRTYPE szINIPath, DTWAIN_CCHARPTRTYPE szImageDLLPath, DTWAIN_CCHARPTRTYPE szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExA(LPCSTR szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExW(LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
@@ -1994,7 +1986,6 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
-        LONG DTWAIN_GetTwainTimeout();
         DTWAIN_BOOL DTWAIN_GetVersion(LPLONG lpMajor, LPLONG lpMinor, LPLONG lpVersionType);
         LONG DTWAIN_GetVersionCopyright(DTWAIN_CHARPTRTYPE lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
@@ -2445,7 +2436,6 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainMode(LONG lAcquireMode);
-        DTWAIN_BOOL DTWAIN_SetTwainTimeout(LONG milliseconds);
         DTWAIN_DIBUPDATE_PROC DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc);
         DTWAIN_BOOL DTWAIN_SetXResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT xResolution);
         DTWAIN_BOOL DTWAIN_SetXResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
@@ -2464,12 +2454,6 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLLName);
         DTWAIN_BOOL DTWAIN_SysDestroy();
         DTWAIN_HANDLE DTWAIN_SysInitialize();
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx(DTWAIN_CCHARPTRTYPE szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2(DTWAIN_CCHARPTRTYPE szINIPath, DTWAIN_CCHARPTRTYPE szImageDLLPath, DTWAIN_CCHARPTRTYPE szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExA(LPCSTR szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExW(LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
@@ -3224,7 +3208,6 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
-        LONG DTWAIN_GetTwainTimeout();
         DTWAIN_BOOL DTWAIN_GetVersion(LPLONG lpMajor, LPLONG lpMinor, LPLONG lpVersionType);
         LONG DTWAIN_GetVersionCopyright(DTWAIN_CHARPTRTYPE lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
@@ -3675,7 +3658,6 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainMode(LONG lAcquireMode);
-        DTWAIN_BOOL DTWAIN_SetTwainTimeout(LONG milliseconds);
         DTWAIN_DIBUPDATE_PROC DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc);
         DTWAIN_BOOL DTWAIN_SetXResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT xResolution);
         DTWAIN_BOOL DTWAIN_SetXResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
@@ -3694,12 +3676,6 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLLName);
         DTWAIN_BOOL DTWAIN_SysDestroy();
         DTWAIN_HANDLE DTWAIN_SysInitialize();
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx(DTWAIN_CCHARPTRTYPE szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2(DTWAIN_CCHARPTRTYPE szINIPath, DTWAIN_CCHARPTRTYPE szImageDLLPath, DTWAIN_CCHARPTRTYPE szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExA(LPCSTR szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExW(LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
@@ -4454,7 +4430,6 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
-        LONG DTWAIN_GetTwainTimeout();
         DTWAIN_BOOL DTWAIN_GetVersion(LPLONG lpMajor, LPLONG lpMinor, LPLONG lpVersionType);
         LONG DTWAIN_GetVersionCopyright(DTWAIN_CHARPTRTYPE lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
@@ -4905,7 +4880,6 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainMode(LONG lAcquireMode);
-        DTWAIN_BOOL DTWAIN_SetTwainTimeout(LONG milliseconds);
         DTWAIN_DIBUPDATE_PROC DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc);
         DTWAIN_BOOL DTWAIN_SetXResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT xResolution);
         DTWAIN_BOOL DTWAIN_SetXResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
@@ -4924,12 +4898,6 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLLName);
         DTWAIN_BOOL DTWAIN_SysDestroy();
         DTWAIN_HANDLE DTWAIN_SysInitialize();
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx(DTWAIN_CCHARPTRTYPE szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2(DTWAIN_CCHARPTRTYPE szINIPath, DTWAIN_CCHARPTRTYPE szImageDLLPath, DTWAIN_CCHARPTRTYPE szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExA(LPCSTR szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExW(LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
