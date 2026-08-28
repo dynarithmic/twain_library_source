@@ -2296,42 +2296,6 @@ extern "C"
 #endif
     }
 
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeExA(LPCSTR szINIPath)
-    {
-#ifdef _UNICODE
-        return DTWAIN_SysInitializeEx(stringconversion::Convert_AnsiPtr_To_Native(szINIPath).c_str());
-#else
-        return DTWAIN_SysInitializeEx(szINIPath);
-#endif
-    }
-
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeExW(LPCWSTR szINIPath)
-    {
-#ifdef _UNICODE
-        return DTWAIN_SysInitializeEx(szINIPath);
-#else
-        return DTWAIN_SysInitializeEx(stringconversion::Convert_WidePtr_To_Native(szINIPath).c_str());
-#endif
-    }
-
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath)
-    {
-#ifdef _UNICODE
-        return DTWAIN_SysInitializeEx2(szINIPath, szImageDLLPath, szLangResourcePath);
-#else
-        return DTWAIN_SysInitializeEx2(stringconversion::Convert_WidePtr_To_Native(szINIPath).c_str(), stringconversion::Convert_WidePtr_To_Native(szImageDLLPath).c_str(), stringconversion::Convert_WidePtr_To_Native(szLangResourcePath).c_str());
-#endif
-    }
-
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath)
-    {
-#ifdef _UNICODE
-        return DTWAIN_SysInitializeEx2(stringconversion::Convert_AnsiPtr_To_Native(szINIPath).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szImageDLLPath).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szLangResourcePath).c_str());
-#else
-        return DTWAIN_SysInitializeEx2(szINIPath, szImageDLLPath, szLangResourcePath);
-#endif
-    }
-
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoubleFeedDetectLengthStringA(DTWAIN_SOURCE Source, LPCSTR szLength)
     {
 #ifdef _UNICODE

@@ -124,23 +124,6 @@ namespace
         auto it = std::find_if(threadMap.begin(), threadMap.end(), [&](const auto& pr) { return pr.second->GetGUID() == guid; });
         return it != threadMap.end();
     }
-
-    template <class TypeInfo, class TypeArray>
-    bool FindFirstValue( TypeInfo SearchVal,
-                        std::vector<TypeArray> *pSearchArray,
-                        int *pWhere/*=NULL*/ )
-    {
-        if ( pWhere )
-            *pWhere = -1;
-        auto it = std::find_if(pSearchArray->begin(), pSearchArray->end(), [&](const TypeArray& val) { return val.GetValue1() == SearchVal;}); //Searcher(SearchVal));
-        if ( it != pSearchArray->end() )
-        {
-            if (pWhere)
-                *pWhere = static_cast<int>(std::distance(pSearchArray->begin(), it));
-            return true;
-        }
-        return false;
-    }
 }
 
 // Load resource functions
@@ -982,28 +965,7 @@ extern "C"
         CATCH_BLOCK(nullptr)
     }
 
-    ////////////////////////////// Initialize Library EX2 code //////////////////////////////////////
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
-                                                       LPCTSTR szImageDLLPath,
-                                                       LPCTSTR szLangResourcePath)
-    {
-        LOG_FUNC_ENTRY_PARAMS((szINIPath, szImageDLLPath, szLangResourcePath))
-
-        SetLangResourcePath(szLangResourcePath);
-        const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeEx(szINIPath);
-        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-        CATCH_BLOCK(nullptr)
-    }
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
-    {
-        LOG_FUNC_ENTRY_PARAMS((szINIPath))
-        CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
-        const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
-        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-        CATCH_BLOCK(nullptr)
-    }
-
     DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeNoBlocking()
     {
         return SysInitializeImpl({ false, false , false });

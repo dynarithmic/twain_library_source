@@ -687,7 +687,6 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctltempdir.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlthreadutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltiff.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltimeout.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltimeutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr008.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr010.cpp

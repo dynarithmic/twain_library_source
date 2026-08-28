@@ -441,7 +441,6 @@ namespace dynarithmic
             static int               s_nLastError;
             static std::string        s_strLastError;
             static HINSTANCE         s_ThisInstance;
-            static VOID CALLBACK TwainTimeOutProc(HWND, UINT, ULONG, DWORD);
     };
 
     #define DTWAIN_ERROR_CONDITION(Err, RetVal, mustReport) {               \

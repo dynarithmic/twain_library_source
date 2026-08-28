@@ -2648,19 +2648,6 @@ bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, CTL_ITwainS
     return true;
 }
 
-VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
-{
-#if 0
-#ifdef _WIN32
-    KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
-
-    LogWriterUtils::WriteLogInfoIndentedA("The last TWAIN triplet was not completed due to time out");
-    SetError(DTWAIN_ERR_TIMEOUT, "", false);
-    throw DTWAINException(DTWAIN_ERR_TIMEOUT);
-#endif
-#endif
-}
-
 CTL_StringType CTL_TwainAppMgr::GetDSMPath()
 {
     const auto mgr = GetInstance();

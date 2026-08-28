@@ -166,10 +166,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetYResolutionStringA(DTWAIN_SOURCE Source, LPCS
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetYResolutionStringW(DTWAIN_SOURCE Source, LPCWSTR Resolution);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSessionA(HWND hWndMsg, LPCSTR lpszDLLName);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLLName);
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath);
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath);
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeExA(LPCSTR szINIPath);
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeExW(LPCWSTR szINIPath);
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByNameA(LPCSTR lpszName);
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByNameW(LPCWSTR lpszName);
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2A(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos, LONG nOptions);
@@ -367,8 +363,6 @@ LONG DLLENTRY_DEF DTWAIN_GetAllSessionInfoW(LPWSTR lpszOut, LONG indentFactor, L
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //// These are the TCHAR versions (default to ANSI or Wide, depending on DTWAIN DLL type
-DTWAIN_HANDLE  DLLENTRY_DEF      DTWAIN_SysInitializeEx(DTWAIN_CCHARPTRTYPE szINIPath);
-DTWAIN_HANDLE  DLLENTRY_DEF      DTWAIN_SysInitializeEx2(DTWAIN_CCHARPTRTYPE szINIPath,DTWAIN_CCHARPTRTYPE szImageDLLPath,DTWAIN_CCHARPTRTYPE szLangResourcePath);
 LONG           DLLENTRY_DEF      DTWAIN_GetVersionString(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
 LONG           DLLENTRY_DEF      DTWAIN_GetLibraryPath(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
 LONG           DLLENTRY_DEF      DTWAIN_GetShortVersionString(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
