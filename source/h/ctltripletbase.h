@@ -35,7 +35,7 @@ namespace dynarithmic
             enum {TRIPCOMPONENTPOS_= 2};
             enum {DGPOS_ = 0, DATPOS_ = 1, MSGPOS_ = 2, MEMREFPOS_ = 3};
             enum {ORIGINPOS_ = 0, DESTPOS_ =1};
-            typedef std::tuple <TW_UINT32, TW_UINT16, TW_UINT16> TwainTripletComponents;
+            using TwainTripletComponents = std::tuple <TW_UINT32, TW_UINT16, TW_UINT16>;
 
             CTL_TwainTriplet();
             CTL_TwainTriplet( pTW_IDENTITY pOrigin,
@@ -52,7 +52,7 @@ namespace dynarithmic
                        TW_UINT16 nMSG,
                        TW_MEMREF pData);
 
-            typedef std::tuple<pTW_IDENTITY, pTW_IDENTITY, TwainTripletComponents, TW_MEMREF> TwainTripletArgs;
+            using TwainTripletArgs = std::tuple<pTW_IDENTITY, pTW_IDENTITY, TwainTripletComponents, TW_MEMREF>;
 
             const TwainTripletArgs& GetTripletArgs() const { return m_TwainTripletArg; }
             TwainTripletArgs& GetTripletArgs() { return m_TwainTripletArg; }

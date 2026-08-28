@@ -46,7 +46,7 @@ namespace dynarithmic
 
 
     class CTL_TwainAppMgr;
-    typedef std::shared_ptr<CTL_TwainAppMgr> CTL_TwainAppMgrPtr;
+    using CTL_TwainAppMgrPtr = std::shared_ptr<CTL_TwainAppMgr>;
 
     static constexpr int INVALID_CONDITION_CODE = -9999;
 

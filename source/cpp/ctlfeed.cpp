@@ -33,8 +33,8 @@
 using namespace dynarithmic;
 using namespace std::chrono_literals;
 
-typedef void (CTL_ITwainSource::*SetFunc)(bool);
-typedef bool (CTL_ITwainSource::*IsEnabledFunc)() const;
+using SetFunc = void(CTL_ITwainSource::*)(bool);
+using IsEnabledFunc = bool(CTL_ITwainSource::*)() const;
 
 namespace
 {

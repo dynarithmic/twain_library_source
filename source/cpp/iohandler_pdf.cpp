@@ -58,9 +58,9 @@ namespace
         }
     };
 
-    typedef std::pair<double, double> PDFPosition;
+    using PDFPosition = std::pair<double, double>;
 
-    typedef std::vector<PDFTextElement> PDFStringToTextElement;
+    using PDFStringToTextElement = std::vector<PDFTextElement>;
 
     struct AllPDFDimensions
     {

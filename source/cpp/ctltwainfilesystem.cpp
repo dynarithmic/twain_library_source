@@ -51,7 +51,7 @@ enum
 };
 
 using FileSysRetType = std::pair<LONG, TW_MEMREF>;
-typedef bool (*WALKFSPROC)(TW_FILESYSTEM* p, LPARAM UserParam);
+using WALKFSPROC = bool(*)(TW_FILESYSTEM* p, LPARAM UserParam);
 
 namespace
 {

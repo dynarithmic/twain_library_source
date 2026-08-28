@@ -109,6 +109,6 @@ namespace dynarithmic
         bool        m_bTwainMessageFlag;
 };
 
-typedef std::vector< CTL_ITwainSessionPtr > CTL_TwainSessionArray;
+using CTL_TwainSessionArray = std::vector< CTL_ITwainSessionPtr >;
 }
 #endif

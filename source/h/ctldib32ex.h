@@ -39,7 +39,7 @@ namespace dynarithmic
     struct DTWAINImageInfoEx;
     class CTL_ImageIOHandler;
 
-    typedef std::shared_ptr<CTL_ImageIOHandler> CTL_ImageIOHandlerPtr;
+    using CTL_ImageIOHandlerPtr = std::shared_ptr<CTL_ImageIOHandler>;
     ///////////////////////////////////////////////////////////////////////////////
     class CTL_HBitmap
     {
@@ -232,7 +232,7 @@ namespace dynarithmic
             bool        m_bIsValid;
     };
 
-    typedef std::shared_ptr<CTL_TwainDib> CTL_TwainDibPtr;
+    using CTL_TwainDibPtr = std::shared_ptr<CTL_TwainDib>;
 
     class CTL_TwainDibArray
     {

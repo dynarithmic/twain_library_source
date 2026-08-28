@@ -26,7 +26,6 @@ namespace dynarithmic
     template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8, class P9, class P10>
     struct CTL_ClassValues10 : public std::tuple<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10>
     {
-        typedef CTL_ClassValues10<P1,P2,P3,P4,P5,P6,P7, P8, P9, P10> Tuple8;
         CTL_ClassValues10(P1 a1, P2 a2, P3 a3, P4 a4, P5 a5, P6 a6, P7 a7, P8 a8, P9 a9, P10 a10) :
                 std::tuple<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10>(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10), m_bValid(true) {}
 

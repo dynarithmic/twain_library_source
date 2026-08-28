@@ -32,10 +32,10 @@ namespace dynarithmic
     class CTL_ITwainSource;
     class CTL_ImageIOHandler;
 
-    typedef std::shared_ptr<CTL_ImageIOHandler> CTL_ImageIOHandlerPtr;
+    using CTL_ImageIOHandlerPtr = std::shared_ptr<CTL_ImageIOHandler>;
 
     class CTL_TwainDib;
-    typedef std::shared_ptr<CTL_TwainDib> CTL_TwainDibPtr;
+    using CTL_TwainDibPtr = std::shared_ptr<CTL_TwainDib>;
 
     struct sDuplexFileData;
     class ImageXferFileWriter

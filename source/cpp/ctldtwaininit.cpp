@@ -464,7 +464,7 @@ namespace
     {
         bool bResourcesLoaded = false;
         CTL_StaticData::SetResourceLoadError(DTWAIN_NO_ERROR);
-        typedef std::function<bool(ResourceLoadingInfo&)> boolFuncs;
+        using boolFuncs = std::function<bool(ResourceLoadingInfo&)>;
         boolFuncs bf[] = { &LoadTwainResources };
         for (auto& fnBool : bf)
         {

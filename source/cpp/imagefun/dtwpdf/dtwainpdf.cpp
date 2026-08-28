@@ -1029,7 +1029,7 @@ void InfoObject::ComposeObject()
     }
     else
     {
-        typedef std::pair<std::string, std::string> EncryptedDataPair;
+        using EncryptedDataPair = std::pair<std::string, std::string>;
         std::vector< EncryptedDataPair > AllEncryptedData( 7 );
         AllEncryptedData[0].first = m_sCreator.substr(1, m_sCreator.length() - 2);
         AllEncryptedData[1].first = m_sProducer.substr(1, m_sProducer.length() - 2);
@@ -1237,8 +1237,8 @@ void ContentsObject::PreComposeObject()
 
 void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
 {
-    typedef std::pair<int, double> FontPairKey;
-    typedef std::unordered_map<FontPairKey, std::vector<PDFTextElement*>, boost::hash<FontPairKey>> FontToElementMap;
+    using FontPairKey = std::pair<int, double>;
+    using FontToElementMap = std::unordered_map<FontPairKey, std::vector<PDFTextElement*>, boost::hash<FontPairKey>>;
 
     FontToElementMap fontToElementMap;
 

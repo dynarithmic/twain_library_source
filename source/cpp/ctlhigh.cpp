@@ -41,13 +41,13 @@
 #endif
 namespace stringutils = dynarithmic::basicstringutils;
 
-typedef DTWAIN_BOOL (DLLENTRY_DEF *SetByStringFn)(DTWAIN_SOURCE, DTWAIN_FLOAT);
-typedef DTWAIN_BOOL (DLLENTRY_DEF *SetByStringFn2)(DTWAIN_SOURCE, DTWAIN_FLOAT, DTWAIN_BOOL);
-typedef DTWAIN_BOOL (DLLENTRY_DEF *GetByStringFn)(DTWAIN_SOURCE, LPDTWAIN_FLOAT);
-typedef DTWAIN_BOOL (*CapSetterByStringFn)(DTWAIN_SOURCE, LPCTSTR, SetByStringFn);
-typedef bool (*SetDoubleCapFn)(DTWAIN_SOURCE, LONG, double);
-typedef bool (*GetDoubleCapFn)(DTWAIN_SOURCE, LONG, double *);
-typedef LONG (*GetCapValuesFn)(DTWAIN_SOURCE, LPDTWAIN_ARRAY, LONG, DTWAIN_BOOL);
+using SetByStringFn = DTWAIN_BOOL(DLLENTRY_DEF *)(DTWAIN_SOURCE, DTWAIN_FLOAT);
+using SetByStringFn2 = DTWAIN_BOOL(DLLENTRY_DEF *)(DTWAIN_SOURCE, DTWAIN_FLOAT, DTWAIN_BOOL);
+using GetByStringFn = DTWAIN_BOOL(DLLENTRY_DEF *)(DTWAIN_SOURCE, LPDTWAIN_FLOAT);
+using CapSetterByStringFn = DTWAIN_BOOL(*)(DTWAIN_SOURCE, LPCTSTR, SetByStringFn);
+using SetDoubleCapFn = bool(*)(DTWAIN_SOURCE, LONG, double);
+using GetDoubleCapFn = bool(*)(DTWAIN_SOURCE, LONG, double *);
+using GetCapValuesFn = LONG(*)(DTWAIN_SOURCE, LPDTWAIN_ARRAY, LONG, DTWAIN_BOOL);
 
 using namespace dynarithmic;
 

@@ -1538,7 +1538,7 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
     CTL_TwainDibPtr CurDib = pArray->GetAt(nLastDib);
 
 
-    typedef bool (*AdjustFn)(CTL_ITwainSession*, const CTL_ITwainSource*, const CTL_TwainDibPtr&);
+    using AdjustFn = bool(*)(CTL_ITwainSession*, const CTL_ITwainSource*, const CTL_TwainDibPtr&);
     std::array<AdjustFn, 3> adjfn = { &CTL_ImageXferTriplet::CropDib,
                                       &CTL_ImageXferTriplet::ResampleDib, &CTL_ImageXferTriplet::NegateDib };
 

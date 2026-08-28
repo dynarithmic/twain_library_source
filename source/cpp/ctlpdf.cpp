@@ -183,7 +183,7 @@ extern "C"
     }
 }
 
-typedef DTWAIN_BOOL (DLLENTRY_DEF *SetPDFFn)(DTWAIN_SOURCE, LONG, DTWAIN_FLOAT, DTWAIN_FLOAT);
+using SetPDFFn = DTWAIN_BOOL(DLLENTRY_DEF *)(DTWAIN_SOURCE, LONG, DTWAIN_FLOAT, DTWAIN_FLOAT);
 using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
 
 static DTWAIN_BOOL SetPDFStringFunc(DTWAIN_SOURCE Source, LONG value, LPCTSTR val1, LPCTSTR val2, SetPDFFn fn)

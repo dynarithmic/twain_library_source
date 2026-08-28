@@ -59,7 +59,7 @@ namespace dynarithmic
                     m_capMap[ICAP_JPEGSUBSAMPLING] = TWCP_NONE;
                 }
             }
-            typedef std::unordered_map<TW_UINT16, LONG> FileXferCapMap;
+            using FileXferCapMap = std::unordered_map<TW_UINT16, LONG>;
 
             struct CapGetter
             {

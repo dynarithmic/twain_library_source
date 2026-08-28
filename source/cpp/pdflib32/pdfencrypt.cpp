@@ -45,6 +45,8 @@ OF THIRD PARTY RIGHTS.
 using namespace boost::multiprecision;
 namespace stringutils = dynarithmic::basicstringutils;
 
+using namespace dynarithmic;
+
 namespace
 {
     unsigned char ConvertToHex(unsigned char hi, unsigned char lo);

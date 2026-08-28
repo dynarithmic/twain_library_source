@@ -75,8 +75,8 @@ namespace dynarithmic
              HGLOBAL    m_hGlobal;
     };
 
-    typedef std::shared_ptr<CTL_TwainTypeOb> CTL_TwainTypeObPtr;
-    typedef std::vector<CTL_TwainTypeObPtr> CTL_TwainTypeArray;
+    using CTL_TwainTypeObPtr = std::shared_ptr<CTL_TwainTypeOb>;
+    using CTL_TwainTypeArray = std::vector<CTL_TwainTypeObPtr>;
 }
 #endif
 

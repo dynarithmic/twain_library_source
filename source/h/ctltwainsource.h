@@ -52,10 +52,10 @@ namespace dynarithmic
         ~SourceCloserRAII();
     };
 
-    typedef BASIC_MAPTYPE_<TW_UINT16, short int> CapToStateMap;
-    typedef std::set<TW_UINT16> CapList;
-    typedef std::vector<TW_UINT16> JobControlList;
-    typedef std::vector<TW_INFO> TWINFOVector;
+    using CapToStateMap = BASIC_MAPTYPE_<TW_UINT16, short int>;
+    using CapList = std::set<TW_UINT16>;
+    using JobControlList = std::vector<TW_UINT16>;
+    using TWINFOVector = std::vector<TW_INFO>;
 
     class CTL_TwainDLLHandle;
     class CTL_ITwainSource;
@@ -71,10 +71,10 @@ namespace dynarithmic
     using CTL_ITwainSessionPtr = std::unique_ptr<CTL_ITwainSession>;
 
     class CTL_TwainDib;
-    typedef std::shared_ptr<CTL_TwainDib> CTL_TwainDibPtr;
+    using CTL_TwainDibPtr = std::shared_ptr<CTL_TwainDib>;
 
     class CTL_ImageIOHandler;
-    typedef std::shared_ptr<CTL_ImageIOHandler> CTL_ImageIOHandlerPtr;
+    using CTL_ImageIOHandlerPtr = std::shared_ptr<CTL_ImageIOHandler>;
 
     enum SourceState {SOURCE_STATE_CLOSED=3,
                       SOURCE_STATE_OPENED=4,
@@ -93,9 +93,9 @@ namespace dynarithmic
         sDuplexFileData() : nBytes(0), bIsJobControlPage(false), m_pSource{} {}
     };
 
-    typedef  std::pair<
+    using DuplexData = std::pair<
              std::vector<sDuplexFileData>,
-             std::vector<sDuplexFileData> > DuplexData;
+             std::vector<sDuplexFileData>>;
 
     #define COMPRESSIONMAP_TYPE std::map
     using SourceCompressionMap = COMPRESSIONMAP_TYPE<int, COMPRESSIONMAP_TYPE<int, std::vector<LONG>>>;
@@ -136,7 +136,7 @@ namespace dynarithmic
             std::vector<anytype_> m_data;
         };
 
-        typedef BASIC_MAPTYPE_<TW_UINT16, container_values> CapToValuesMap;
+        using CapToValuesMap = BASIC_MAPTYPE_<TW_UINT16, container_values>;
         CapToValuesMap m_capToValuesMap_G;
         CapToValuesMap m_capToValuesMap_GD;
         SourceCompressionMap m_CompressionMap;
@@ -708,10 +708,10 @@ namespace dynarithmic
             TW_UINT16 nCap;
             bool      m_bSupported;
         };
-        typedef BASIC_MAPTYPE_<TW_UINT16, bool> CachedCapMap;
+        using CachedCapMap = BASIC_MAPTYPE_<TW_UINT16, bool>;
 
         public:
-            typedef BASIC_MAPTYPE_<int, std::set<int> > CachedPixelTypeMap;
+            using CachedPixelTypeMap = BASIC_MAPTYPE_<int, std::set<int> >;
             void        AddPixelTypeAndBitDepth(int PixelType, int BitDepth);
             CachedPixelTypeMap::iterator FindPixelType(int PixelType);
             bool IsBitDepthSupported(int PixelType, int BitDepth);
