@@ -40,34 +40,7 @@ namespace stringutils = basicstringutils;
 
 namespace
 {
-#ifdef _WIN32
-    HWND CreateTwainWindow(CTL_TwainDLLHandle* /*pHandle*/, HINSTANCE hInstance/*=NULL*/, HWND hWndParent)
-    {
-        if (hInstance == nullptr)
-            hInstance = CTL_StaticData::GetDLLInstanceHandle();
-        HWND hWndP;
-        if (!hWndParent)
-            hWndP = GetDesktopWindow();
-        else
-            hWndP = hWndParent;
-
-        RECT rect;
-
-        GetWindowRect(hWndP, &rect);
-        const HWND hwnd = CreateWindow(_T("DTWAINWindowClass"),              // class
-            _T("Twain Window"),                 // title
-            WS_OVERLAPPED | WS_POPUP | WS_CAPTION | WS_EX_TOOLWINDOW,    // style
-            0, 0,   // x, y
-            100, 100,   // width, height
-            hWndParent ? hWndP : NULL,
-            NULL,                            // hmenu
-            hInstance,
-            NULL);                          // lpvparam
-        return hwnd;
-    }
-
     ////////// Function to subclass the window ////////////////////////
-
     #define     TWSubclassWindow(hwnd, lpfn)  \
           (reinterpret_cast<WNDPROC>(SetWindowLongPtr((hwnd), GWLP_WNDPROC, (LONG_PTR)(WNDPROC)(lpfn))))
 
@@ -93,7 +66,6 @@ namespace
             wProc = wProcToUse;
         return wProc;
     }
-#endif
 }
 
 //////////////////// CTL_ITwainSession functions /////////////////////////////
@@ -163,6 +135,31 @@ CTL_ITwainSource* CTL_ITwainSession::CreateTwainSource( LPCTSTR pProduct )
         AddTwainSource(pSource);
     }
     return pSource;
+}
+
+HWND CTL_ITwainSession::CreateTwainWindow(CTL_TwainDLLHandle* /*pHandle*/, HINSTANCE hInstance/*=NULL*/, HWND hWndParent)
+{
+    if (hInstance == nullptr)
+        hInstance = CTL_StaticData::GetDLLInstanceHandle();
+    HWND hWndP;
+    if (!hWndParent)
+        hWndP = GetDesktopWindow();
+    else
+        hWndP = hWndParent;
+
+    RECT rect;
+
+    GetWindowRect(hWndP, &rect);
+    const HWND hwnd = CreateWindow(_T("DTWAINWindowClass"),              // class
+        _T("Twain Window"),                 // title
+        WS_OVERLAPPED | WS_POPUP | WS_CAPTION | WS_EX_TOOLWINDOW,    // style
+        0, 0,   // x, y
+        100, 100,   // width, height
+        hWndParent ? hWndP : NULL,
+        NULL,                            // hmenu
+        hInstance,
+        NULL);                          // lpvparam
+    return hwnd;
 }
 
 
@@ -540,7 +537,7 @@ extern "C"
         if ( !hWndMsgNotify )
         {
             // Create the window
-            hWndMsg = CreateTwainWindow(pHandle,nullptr,hWndMsgNotify);
+            hWndMsg = CTL_ITwainSession::CreateTwainWindow(pHandle,nullptr,hWndMsgNotify);
 
             // This is the window's instance handle
             hInstance = CTL_StaticData::GetDLLInstanceHandle();

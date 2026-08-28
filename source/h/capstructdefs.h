@@ -23,9 +23,9 @@
 
 #include <string>
 #include <memory>
+#include <tuple>
 
 #include "twain.h"
-#include "ctl10tuple.h"
 #include "mapdefs.h"
 #include "ctlstringdefs.h"
 
@@ -50,7 +50,7 @@ namespace dynarithmic
 
     using CTL_GeneralCapInfo = BASIC_MAPTYPE_<TW_UINT16, CTL_CapStruct>;
 
-    using CTL_CapInfo = CTL_ClassValues10<TW_UINT16,/* Capability*/
+    using CTL_CapInfo = std::tuple<TW_UINT16,/* Capability*/
         UINT,  /* Container for Get */
         UINT,  /* Container for Set*/
         UINT,  /* Data Type */
@@ -67,7 +67,7 @@ namespace dynarithmic
 
     // Create this statically when initializing.  Initialize the second
     // value with the dynamically created CTL_CapInfoMap above
-    using CTL_SourceCapInfo = CTL_ClassValues10<CTL_StringType, /* Product Name */
+    using CTL_SourceCapInfo = std::tuple<CTL_StringType, /* Product Name */
                              CTL_CapInfoMapPtr, /* Array of cap info*/
                              int,       /* dummy */
                              int,        /* dummy */

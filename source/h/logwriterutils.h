@@ -51,6 +51,7 @@ namespace dynarithmic
         static void  WriteMultiLineInfoIndented(CTL_StringViewType s, const CTL_StringType::traits_type::char_type* pszDelim);
         static void  WriteMultiLineInfoIndentedA(std::string_view s, const char* pszDelim);
         static void  WriteMultiLineInfoIndentedW(std::wstring_view s, const wchar_t* pszDelim);
+        static void  LogDTWAINErrorToMsgBox(int nError, LPCSTR pFunc, std::string_view s);
 
         private:
             static void MultiLineWriter(std::string_view s, const char* pszDelim, int nWhich);

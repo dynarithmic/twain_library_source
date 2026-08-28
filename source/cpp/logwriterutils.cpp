@@ -29,22 +29,19 @@
 
 namespace stringutils = dynarithmic::basicstringutils;
 
-namespace
+namespace dynarithmic
 {
-    void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, std::string_view s)
+    void LogWriterUtils::LogDTWAINErrorToMsgBox(int nError, LPCSTR func, std::string_view s)
     {
         std::ostringstream strm;
         if (!func)
             func = "(Uninitialized DTWAIN DLL)";
-        strm << "DTWAIN Function " << func << " returned error code " << nError << std::endl << std::endl;
+        strm << "DTWAIN Function " << func << " returned error code " << nError << '\n' << '\n';
         strm << s.data();
         const std::string st = strm.str();
         MessageBoxA(nullptr, st.c_str(), "DTWAIN Error", MB_ICONSTOP);
     }
-}
 
-namespace dynarithmic
-{
     void LogWriterUtils::WriteLogInfoExA(long filterFlags, std::string_view s, bool bFlush)
     {
         if (CTL_StaticData::GetLogFilterFlags() & filterFlags)
@@ -165,9 +162,9 @@ namespace dynarithmic
             LogWriterUtils::WriteLogInfoIndentedA(s);
 
         if (logFilterFlags & DTWAIN_LOG_ERRORMSGBOX && pHandle)
-            LogDTWAINErrorToMsgBox(pHandle->m_lLastError, pFunc, s);
+            LogWriterUtils::LogDTWAINErrorToMsgBox(pHandle->m_lLastError, pFunc, s);
         else
         if (!pHandle && logFilterFlags & DTWAIN_LOG_INITFAILURE)
-            LogDTWAINErrorToMsgBox(DTWAIN_ERR_BAD_HANDLE, nullptr, s);
+            LogWriterUtils::LogDTWAINErrorToMsgBox(DTWAIN_ERR_BAD_HANDLE, nullptr, s);
     }
 }

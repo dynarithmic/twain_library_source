@@ -52,7 +52,8 @@ namespace dynarithmic
         static CTL_ITwainSession*  Create(CTL_TwainDLLHandle *pHandle, LPCTSTR pAppName, HWND* hAppWnd);
 
         static void Destroy( CTL_ITwainSessionPtr& pSession );
-
+        static HWND CreateTwainWindow(CTL_TwainDLLHandle* /*pHandle*/, HINSTANCE hInstance/*=NULL*/, HWND hWndParent);
+        
         CTL_ITwainSession(CTL_TwainDLLHandle* pHandle, LPCTSTR pszAppName, HWND* hAppWnd );
 
         HWND*               GetWindowHandlePtr() const { return const_cast<HWND*>(&m_AppWnd); }

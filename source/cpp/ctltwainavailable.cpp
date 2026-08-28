@@ -19,6 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 
+#include <algorithm>
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include <ctlstringutilsx.h>
@@ -132,12 +133,8 @@ namespace
         if (maxCharsCopied)
             *maxCharsCopied = retVal;
         basicstringutils::Tokenize(dirsToUse, _T("|"), arr);
-        for (auto& s : arr)
-        {
-            if (s != s_NullEntry)
-                return true;
-        }
-        return false;
+        return std::any_of(arr.begin(), arr.end(), 
+                        [&](const auto& s) { return s != s_NullEntry; });
     }
 }
 

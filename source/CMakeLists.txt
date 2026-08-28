@@ -449,7 +449,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlthreadutils.h
         ${PROJECT_SOURCE_DIR}/h/ctltimer.h
         ${PROJECT_SOURCE_DIR}/h/ctltimeutils.h
-        ${PROJECT_SOURCE_DIR}/h/ctl10tuple.h
         ${PROJECT_SOURCE_DIR}/h/ctlgetsetcapsinternal.h
         ${PROJECT_SOURCE_DIR}/h/ctltr000.h
         ${PROJECT_SOURCE_DIR}/h/ctltr001.h

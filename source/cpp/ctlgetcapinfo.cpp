@@ -55,10 +55,7 @@ namespace dynarithmic
         const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
         if (iter != pArray->end())
         {
-            CTL_CapInfo* CapInfo = &iter->second;
-            if ( CapInfo )
-                CapInfo->SetValid(true);
-            return CapInfo;
+            return &iter->second;
         }
         return nullptr;
     }
