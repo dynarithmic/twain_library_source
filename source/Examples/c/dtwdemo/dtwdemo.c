@@ -42,6 +42,7 @@ LONG          g_FileType;
 TCHAR         g_FileName[256];
 int           g_LogType;
 TCHAR         g_LogFileName[MAX_PATH];
+LRESULT       g_StampPages;
 
 void SelectTheSource(int nWhich);
 void EnableSourceItems(BOOL bEnable);
@@ -308,11 +309,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     /* Call function to determine the DTWAIN version */
     DTWAIN_GetVersion(&nMajorVer, &nMinorVer, &nDTwainType);
-
-    DTWAIN_CheckDLLVersion(5, 9, 2, 0, DTWAIN_CHECKDLLVEREQUAL);
-    DTWAIN_CheckDLLVersion(5, 9, 3, 9, DTWAIN_CHECKDLLVEREQUAL);
-    DTWAIN_CheckDLLVersion(3, 9, 3, 9, DTWAIN_CHECKDLLVERGREATER);
-    DTWAIN_CheckDLLVersion(5, 9, 3, 100, DTWAIN_CHECKDLLVERLESSEQ);
 
     /* Create a PDF text element for usage when acquiring to a PDF file */
     g_PDFTextElement = DTWAIN_CreatePDFTextElement();
@@ -1227,6 +1223,8 @@ LRESULT CALLBACK PDFSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
                 case IDOK:
                 {
                     int i;
+                    HWND hStamp = GetDlgItem(hDlg, IDC_chkStampPageNumbers);
+                    g_StampPages = SendMessage(hStamp, BM_GETCHECK, 0, 0);
                     for (i = 0; i < numIDs; ++i)
                         GetWindowTextA(allWindowItems[i], pPDFInfo[i], 255);
                     EndDialog(hDlg, LOWORD(wParam));
@@ -1636,7 +1634,7 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
         /* If this is a PDF file, this code will put a page stamp on this page */
         case DTWAIN_TN_FILEPAGESAVING:
         {
-            if (g_FileType == DTWAIN_PDFMULTI)
+            if (g_FileType == DTWAIN_PDFMULTI && g_StampPages)
             {
                 /* Set the text to "Page x*, where x is the current page count */
                 TCHAR text[100];
