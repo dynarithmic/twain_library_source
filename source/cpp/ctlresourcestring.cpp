@@ -181,7 +181,7 @@ extern "C"
         VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         auto badValue = std::numeric_limits<LONG>::min();
         auto retVal = CTL_StaticData::GetIDFromTwainName(stringconversion::Convert_NativePtr_To_Ansi(lpszBuffer));
-        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first ? static_cast<LONG>(retVal.second) : badValue);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal.first ? static_cast<LONG>(retVal.second) : badValue)
         CATCH_BLOCK(std::numeric_limits<LONG>::min())
     }
 

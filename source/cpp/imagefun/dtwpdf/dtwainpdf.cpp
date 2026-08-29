@@ -1138,7 +1138,7 @@ void EncryptionObject::ComposeObject()
         char szLengthBuf[100] = {};
         if (m_bAESEncrypted)
             sprintf(szLengthBuf, " /Length 128");
-        sprintf(szBuf, "/Filter /Standard%s\n", szLengthBuf);;
+        sprintf(szBuf, "/Filter /Standard%s\n", szLengthBuf);
         AppendContents(szBuf);
 
         // Now for the owner and user passwords

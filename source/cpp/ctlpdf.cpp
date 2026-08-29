@@ -20,7 +20,7 @@
  */
 #include <algorithm>
 #include "cppfunc.h"
-#include "dtwainc.h"
+#include "dtwtype.h"
 #include "dtwainx.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
@@ -126,7 +126,8 @@ extern "C"
         // Even though the Permissions parameter is an unsigned 32-bit value from the user, 
         // this will be "converted" to a 32-bit signed integer internally, which is what the PDF 
         // specification requires.
-        pSource->SetPDFEncryption(bUseEncryption?true:false, user, owner, Permissions, UseStrongEncryption?true:false);
+        pSource->SetPDFEncryption(bUseEncryption?true:false, user, owner, 
+                                    static_cast<LONG>(Permissions), UseStrongEncryption?true:false);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
@@ -443,7 +444,7 @@ namespace
 
             // Set the "has already been displayed" to false
             pPtr->hasBeenDisplayed = false;
-            pPtr->displayFlags = Flags;
+            pPtr->displayFlags = static_cast<int>(Flags);
             return pPtr;
         }
         else
@@ -451,7 +452,7 @@ namespace
             pTextElement->hasBeenDisplayed = false;
             if (pSource)
                 pSource->SetPDFValue(PDFTEXTELEMENTKEY, pTextElement);
-            pTextElement->displayFlags = Flags;
+            pTextElement->displayFlags = static_cast<int>(Flags);
         }
         return pTextElement;
     }
