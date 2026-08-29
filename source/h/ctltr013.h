@@ -20,34 +20,81 @@
  */
 #ifndef CTLTR013_H
 #define CTLTR013_H
+#include <vector>
+#include "ctltr010.h"
 
-#include "ctltr011.h"
 namespace dynarithmic
 {
-    class CTL_CapabilityGetOneValTriplet : public CTL_CapabilityGetTriplet
+    template <typename T>
+    class CTL_CapabilitySetEnumTriplet : public CTL_CapabilitySetTriplet<T>
     {
         public:
-            CTL_CapabilityGetOneValTriplet(CTL_ITwainSession *pSession,
-                                           CTL_ITwainSource *pSource,
-                                           TW_UINT16   gType,
-                                           TW_UINT16 gCap,
-                                           TW_UINT16    TwainDataType)
-                : CTL_CapabilityGetTriplet(pSession,
-                    pSource,
-                    gType,
-                    gCap,
-                    TwainDataType) {}
+            CTL_CapabilitySetEnumTriplet(CTL_ITwainSession *pSession,
+                                           CTL_ITwainSource* pSource,
+                                           TW_UINT16 sType,
+                                           TW_UINT16  sCap,
+                                           TW_UINT16 TwainType,
+                                           const std::vector<T>& rArray);
 
-            bool   GetValue(void* pData, size_t nWhere = 0) override
-            {
-                return GenericGetValue(pData, 0);
-            }
 
         protected:
-            bool EnumCapValues(void* pCapData) override
-            {
-                return GenericEnumCapValues<TW_ONEVALUE>(pCapData);
-            }
+            TW_UINT16   GetContainerTypeSize() override;
+            size_t      GetAggregateSize() override;
+            TW_UINT16   GetContainerType() override;
+            bool        Encode(const std::vector<T>& rArray, void *pMemBlock)  override;
+
+        private:
+            size_t      m_nAggSize;
     };
+
+    template <typename T>
+    CTL_CapabilitySetEnumTriplet<T>::CTL_CapabilitySetEnumTriplet(CTL_ITwainSession* pSession,
+        CTL_ITwainSource* pSource,
+        TW_UINT16 sType,
+        TW_UINT16  sCap,
+        TW_UINT16 TwainType,
+        const std::vector<T>& rArray)
+        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray), m_nAggSize(rArray.size())
+    { }
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetEnumTriplet<T>::GetContainerTypeSize()
+    {
+        return sizeof(TW_ENUMERATION);
+    }
+
+    template <typename T>
+    size_t CTL_CapabilitySetEnumTriplet<T>::GetAggregateSize()
+    {
+        return m_nAggSize;
+    }
+
+    template <typename T>
+    TW_UINT16 CTL_CapabilitySetEnumTriplet<T>::GetContainerType()
+    {
+        return TWON_ENUMERATION;
+    }
+
+    template <typename T>
+    bool CTL_CapabilitySetEnumTriplet<T>::Encode(const std::vector<T>& rArray, void* pMemBlock)
+    {
+        // Get a TW_ENUMERATION structure
+        pTW_ENUMERATION pArray = static_cast<pTW_ENUMERATION>(pMemBlock);
+
+        // Set the # of elements
+        pArray->NumItems = static_cast<TW_UINT32>(m_nAggSize);
+
+        // Set the data type
+        pArray->ItemType = CTL_CapabilitySetTripletBase::GetTwainType();
+
+        // Get size of datatype
+        size_t nItemSize = GetTwainItemSize(pArray->ItemType);
+
+        // Set the items in the list
+        size_t i = 0;
+        std::for_each(rArray.begin(), rArray.begin() + m_nAggSize, [&](T Data)
+            { this->EncodeEnumValue(pArray, static_cast<int>(i), nItemSize, &Data); ++i; });
+        return true;
+    }
 }
 #endif

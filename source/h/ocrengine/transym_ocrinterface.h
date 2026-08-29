@@ -81,10 +81,10 @@ struct TOCRSDK
     HMODULE m_hMod;
 };
 
-typedef std::unordered_map<LONG,LONG> LongCapMap;
-typedef std::unordered_map<std::string,std::string> StringCapMap;
-typedef std::unordered_map<LONG, std::string> TOCRErrorCodeMap;
-typedef std::unordered_map<LONG, std::vector<LONG> > TOCRBitDepthMap;
+using LongCapMap = std::unordered_map<LONG,LONG>;
+using StringCapMap = std::unordered_map<std::string,std::string>;
+using TOCRErrorCodeMap = std::unordered_map<LONG, std::string>;
+using TOCRBitDepthMap = std::unordered_map<LONG, std::vector<LONG> >;
 
 class TransymOCR : public OCREngine
 {

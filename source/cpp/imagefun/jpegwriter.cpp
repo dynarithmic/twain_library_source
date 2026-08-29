@@ -21,6 +21,11 @@
 
 #include "jpegwriter.h"
 #include "imagefilewriterbase.h"
+#include "jversion.h"
+
+#ifdef _MSC_VER
+    #pragma message ("Using LibJPEG version " JVERSION)
+#endif
 
 using namespace dynarithmic;
 

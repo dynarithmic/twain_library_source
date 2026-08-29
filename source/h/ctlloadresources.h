@@ -35,7 +35,7 @@
 
 namespace dynarithmic
 {
-    typedef BASIC_MAPTYPE_<std::string, bool> CTL_ResourceRegistryMap;
+    using CTL_ResourceRegistryMap = BASIC_MAPTYPE_<std::string, bool>;
 
     bool LoadLanguageResourceA(const char* lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear);
     bool LoadLanguageResourceA(const char* lpszName, bool bClear);

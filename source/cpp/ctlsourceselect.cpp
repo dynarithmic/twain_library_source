@@ -37,7 +37,7 @@ using namespace dynarithmic;
 using namespace boost::logic;
 namespace stringutils = basicstringutils;
 
-typedef DTWAIN_SOURCE(*SourceFn)(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions&);
+using SourceFn = DTWAIN_SOURCE(*)(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions&);
 static constexpr std::array<std::pair<int, SourceFn>, 4> SourcefnMap = { {{SELECTSOURCE, DTWAIN_LLSelectSource},
                                                         {SELECTDEFAULTSOURCE, DTWAIN_LLSelectDefaultSource},
                                                         {SELECTSOURCEBYNAME, DTWAIN_LLSelectSourceByName},

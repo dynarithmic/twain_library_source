@@ -29,6 +29,7 @@
 #ifdef _MSC_VER
     #pragma warning (disable : 4786)
     #pragma warning (disable : 4611)
+    #pragma message ("Using LibPNG version " PNG_LIBPNG_VER_STRING)
 #endif
 
 using namespace dynarithmic;

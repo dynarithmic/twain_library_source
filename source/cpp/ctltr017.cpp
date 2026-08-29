@@ -18,24 +18,23 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTL10TUPLE_H
-#define CTL10TUPLE_H
+#include "ctltr017.h"
 
-namespace dynarithmic
+using namespace dynarithmic;
+
+CTL_ImageInfoTriplet::CTL_ImageInfoTriplet(CTL_ITwainSession* pSession,
+                                           CTL_ITwainSource*  pSource)
+                                           : CTL_ImageTriplet(pSession, pSource), m_ImageInfo()
 {
-    template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8, class P9, class P10>
-    struct CTL_ClassValues10 : public std::tuple<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10>
-    {
-        typedef CTL_ClassValues10<P1,P2,P3,P4,P5,P6,P7, P8, P9, P10> Tuple8;
-        CTL_ClassValues10(P1 a1, P2 a2, P3 a3, P4 a4, P5 a5, P6 a6, P7 a7, P8 a8, P9 a9, P10 a10) :
-                std::tuple<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10>(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10), m_bValid(true) {}
-
-        CTL_ClassValues10() : std::tuple<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10>(), m_bValid(true) {}
-        bool IsValid() const { return m_bValid; }
-        void SetValid(bool bSet=true) { m_bValid = bSet; }
-
-        private:
-             bool m_bValid;
-    };
+    InitGeneric(pSession, pSource, DG_IMAGE, DAT_IMAGEINFO, MSG_GET, &m_ImageInfo);
 }
-#endif
+
+
+TW_IMAGEINFO*  CTL_ImageInfoTriplet::GetImageInfoBuffer()
+{
+    return &m_ImageInfo;
+}
+
+
+
+

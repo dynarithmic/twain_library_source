@@ -39,18 +39,18 @@
 #include "ctldib32ex.h"
 #include "ctltr000.h"
 #include "ctltr001.h"
-#include "ctltr007.h"
-#include "ctltr008.h"
+#include "ctltr002.h"
+#include "ctltr003.h"
+#include "ctltr015.h"
+#include "ctltr017.h"
+#include "ctltr018.h"
+#include "ctltr020.h"
 #include "ctltr021.h"
-#include "ctltr025.h"
-#include "ctltr026.h"
-#include "ctltr028.h"
-#include "ctltr029.h"
+#include "ctltr022.h"
+#include "ctltr023.h"
+#include "ctltr024.h"
 #include "ctltr030.h"
-#include "ctltr031.h"
-#include "ctltr032.h"
-#include "ctltr039.h"
-#include "ctltr043.h"
+#include "ctltr034.h"
 #include "ctlguidimpl.h"
 #include "ctlstringutilsx.h"
 #include "ctlcapcollect.h"
@@ -2646,19 +2646,6 @@ bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, CTL_ITwainS
             return false;
     }
     return true;
-}
-
-VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
-{
-#if 0
-#ifdef _WIN32
-    KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
-
-    LogWriterUtils::WriteLogInfoIndentedA("The last TWAIN triplet was not completed due to time out");
-    SetError(DTWAIN_ERR_TIMEOUT, "", false);
-    throw DTWAINException(DTWAIN_ERR_TIMEOUT);
-#endif
-#endif
 }
 
 CTL_StringType CTL_TwainAppMgr::GetDSMPath()

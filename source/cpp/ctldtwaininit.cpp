@@ -23,14 +23,12 @@
 #include <string>
 #include <string_view>
 #include <sstream>
-#include <set>
 #include <vector>
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
     #pragma comment (lib, "shlwapi")
 #endif
-#include "ctllogsourcecaps.h"
 #include "ctlgetversion.h"
 #include "ctltwainlogging.h"
 #include "ctldtwainhandle.h"
@@ -45,7 +43,6 @@
 #include <arrayfactory.h>
 #include "ctlfileutils.h"
 #include "ctlguidimpl.h"
-#include "ctltwaindllpath.h"
 #include "ctldefsource.h"
 #include "windowsinit_impl.h"
 #include "ctltwainsource.h"
@@ -68,12 +65,8 @@ namespace stringutils = basicstringutils;
 namespace
 {
     bool RemoveThreadIdFromAssociation(unsigned long threadId);
-    void LogDTWAINErrorToMsgBox(int nError, LPCSTR pFunc, std::string_view s);
-    HWND CreateTwainWindow(CTL_TwainDLLHandle* /*pHandle*/, HINSTANCE hInstance/*=NULL*/, HWND hWndParent);
-    void RegisterTwainWindowClass();
     void UnhookAllDisplays();
     bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandle, bool bCheck=true);
-    std::string GetStaticLibVer();
 }
 
 namespace dynarithmic
@@ -103,15 +96,6 @@ namespace dynarithmic
 
 namespace
 {
-    DTWAIN_BOOL SetLangResourcePath(LPCTSTR szPath)
-    {
-        LOG_FUNC_ENTRY_PARAMS((szPath))
-        CTL_StaticData::GetLanguageResourcePath() = WindowsAPIImplDef::AddBackslashToDirectory(szPath);
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        CATCH_BLOCK(false)
-    }
-
-
     bool FindTask( DWORD hTask )
     {
         auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
@@ -123,23 +107,6 @@ namespace
         auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
         auto it = std::find_if(threadMap.begin(), threadMap.end(), [&](const auto& pr) { return pr.second->GetGUID() == guid; });
         return it != threadMap.end();
-    }
-
-    template <class TypeInfo, class TypeArray>
-    bool FindFirstValue( TypeInfo SearchVal,
-                        std::vector<TypeArray> *pSearchArray,
-                        int *pWhere/*=NULL*/ )
-    {
-        if ( pWhere )
-            *pWhere = -1;
-        auto it = std::find_if(pSearchArray->begin(), pSearchArray->end(), [&](const TypeArray& val) { return val.GetValue1() == SearchVal;}); //Searcher(SearchVal));
-        if ( it != pSearchArray->end() )
-        {
-            if (pWhere)
-                *pWhere = static_cast<int>(std::distance(pSearchArray->begin(), it));
-            return true;
-        }
-        return false;
     }
 }
 
@@ -481,7 +448,7 @@ namespace
     {
         bool bResourcesLoaded = false;
         CTL_StaticData::SetResourceLoadError(DTWAIN_NO_ERROR);
-        typedef std::function<bool(ResourceLoadingInfo&)> boolFuncs;
+        using boolFuncs = std::function<bool(ResourceLoadingInfo&)>;
         boolFuncs bf[] = { &LoadTwainResources };
         for (auto& fnBool : bf)
         {
@@ -635,7 +602,7 @@ namespace dynarithmic
 {
     DTWAIN_HANDLE SysInitializeImpl(const SysInitializeOptions& initOptions)
     {
-        std::lock_guard<std::mutex> lg(CTL_StaticData::s_mutexInitDestroy);
+        std::scoped_lock lg(CTL_StaticData::s_mutexInitDestroy);
     #ifdef DTWAIN_LIB
         if ( CTL_StaticData::s_DLLInstance == NULL )
         {
@@ -982,28 +949,7 @@ extern "C"
         CATCH_BLOCK(nullptr)
     }
 
-    ////////////////////////////// Initialize Library EX2 code //////////////////////////////////////
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
-                                                       LPCTSTR szImageDLLPath,
-                                                       LPCTSTR szLangResourcePath)
-    {
-        LOG_FUNC_ENTRY_PARAMS((szINIPath, szImageDLLPath, szLangResourcePath))
-
-        SetLangResourcePath(szLangResourcePath);
-        const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeEx(szINIPath);
-        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-        CATCH_BLOCK(nullptr)
-    }
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
-    {
-        LOG_FUNC_ENTRY_PARAMS((szINIPath))
-        CTL_StaticData::GetINIPath() = WindowsAPIImplDef::AddBackslashToDirectory(szINIPath);
-        const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
-        LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-        CATCH_BLOCK(nullptr)
-    }
-
     DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeNoBlocking()
     {
         return SysInitializeImpl({ false, false , false });
@@ -1020,28 +966,11 @@ extern "C"
     }
 }
 
-DTWAIN_BOOL DTWAIN_SetSourceCloseMode(LONG lCloseMode)
-{
-    LOG_FUNC_ENTRY_PARAMS((lCloseMode))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    pHandle->m_nSourceCloseMode = lCloseMode?true:false;
-    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
-    CATCH_BLOCK(FALSE)
-}
-
-LONG DTWAIN_GetSourceCloseMode()
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_nSourceCloseMode)
-    CATCH_BLOCK(0)
-}
-
 extern "C"
 {
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     {
-        std::lock_guard<std::mutex> lg(CTL_StaticData::s_mutexInitDestroy);
+        std::scoped_lock lg(CTL_StaticData::s_mutexInitDestroy);
         LOG_FUNC_ENTRY_PARAMS(())
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         if (!DTWAIN_EndTwainSession())

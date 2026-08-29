@@ -91,13 +91,9 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus);
         DTWAIN_BOOL DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions, LPLONG pStatus);
         DTWAIN_ARRAY DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus);
-        DTWAIN_BOOL DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo);
         DTWAIN_BOOL DTWAIN_AddPDFText(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
-        DTWAIN_BOOL DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
-        DTWAIN_BOOL DTWAIN_AddPDFTextExA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
-        DTWAIN_BOOL DTWAIN_AddPDFTextExW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
         DTWAIN_BOOL DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_CCHARPTRTYPE fontSize, LONG colorRGB, LONG renderMode, DTWAIN_CCHARPTRTYPE scaling, DTWAIN_CCHARPTRTYPE charSpacing, DTWAIN_CCHARPTRTYPE wordSpacing, DTWAIN_CCHARPTRTYPE strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, LPCSTR fontSize, LONG colorRGB, LONG renderMode, LPCSTR scaling, LPCSTR charSpacing, LPCSTR wordSpacing, LPCSTR strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, LPCWSTR fontSize, LONG colorRGB, LONG renderMode, LPCWSTR scaling, LPCWSTR charSpacing, LPCWSTR wordSpacing, LPCWSTR strokeWidth, DWORD Flags);
@@ -201,7 +197,6 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetSourceAt(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
         LONG DTWAIN_ArrayGetStringLength(DTWAIN_ARRAY a, LONG nWhichString);
         LONG DTWAIN_ArrayGetType(DTWAIN_ARRAY pArray);
-        DTWAIN_ARRAY DTWAIN_ArrayInit();
         DTWAIN_BOOL DTWAIN_ArrayInsertAt(DTWAIN_ARRAY pArray, LONG nWhere, LPVOID pVariant);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtANSIString(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtANSIStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR Val, LONG num);
@@ -746,7 +741,6 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetSourceVersionInfoA(DTWAIN_SOURCE Source, LPSTR szProduct, LONG nLength);
         LONG DTWAIN_GetSourceVersionInfoW(DTWAIN_SOURCE Source, LPWSTR szProduct, LONG nLength);
         DTWAIN_BOOL DTWAIN_GetSourceVersionNumber(DTWAIN_SOURCE Source, LPLONG pMajor, LPLONG pMinor);
-        LONG DTWAIN_GetStaticLibVersion();
         LONG DTWAIN_GetTempFileDirectory(DTWAIN_CHARPTRTYPE szFilePath, LONG nMaxLen);
         LONG DTWAIN_GetTempFileDirectoryA(LPSTR szFilePath, LONG nLength);
         LONG DTWAIN_GetTempFileDirectoryW(LPWSTR szFilePath, LONG nLength);
@@ -770,7 +764,6 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
-        LONG DTWAIN_GetTwainTimeout();
         DTWAIN_BOOL DTWAIN_GetVersion(LPLONG lpMajor, LPLONG lpMinor, LPLONG lpVersionType);
         LONG DTWAIN_GetVersionCopyright(DTWAIN_CHARPTRTYPE lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
@@ -795,9 +788,6 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetYResolutionStringA(DTWAIN_SOURCE Source, LPSTR Resolution);
         DTWAIN_BOOL DTWAIN_GetYResolutionStringW(DTWAIN_SOURCE Source, LPWSTR Resolution);
         DTWAIN_BOOL DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppend(DTWAIN_CCHARPTRTYPE szFile, LONG fType);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppendA(LPCSTR szFile, LONG fType);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppendW(LPCWSTR szFile, LONG fType);
         DTWAIN_BOOL DTWAIN_InitOCRInterface();
         DTWAIN_BOOL DTWAIN_IsAcquiring();
         DTWAIN_BOOL DTWAIN_IsAudioXferSupported(DTWAIN_SOURCE Source, LONG supportVal);
@@ -1188,7 +1178,6 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Suffix);
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixStringA(DTWAIN_SOURCE Source, LPCSTR Suffix);
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixStringW(DTWAIN_SOURCE Source, LPCWSTR Suffix);
-        DTWAIN_BOOL DTWAIN_SetQueryCapSupport(DTWAIN_BOOL bSet);
         DTWAIN_BOOL DTWAIN_SetResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT Resolution);
         DTWAIN_BOOL DTWAIN_SetResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
         DTWAIN_BOOL DTWAIN_SetResolutionStringA(DTWAIN_SOURCE Source, LPCSTR Resolution);
@@ -1225,7 +1214,6 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainMode(LONG lAcquireMode);
-        DTWAIN_BOOL DTWAIN_SetTwainTimeout(LONG milliseconds);
         DTWAIN_DIBUPDATE_PROC DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc);
         DTWAIN_BOOL DTWAIN_SetXResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT xResolution);
         DTWAIN_BOOL DTWAIN_SetXResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
@@ -1244,12 +1232,6 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLLName);
         DTWAIN_BOOL DTWAIN_SysDestroy();
         DTWAIN_HANDLE DTWAIN_SysInitialize();
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx(DTWAIN_CCHARPTRTYPE szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2(DTWAIN_CCHARPTRTYPE szINIPath, DTWAIN_CCHARPTRTYPE szImageDLLPath, DTWAIN_CCHARPTRTYPE szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExA(LPCSTR szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExW(LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
@@ -1331,13 +1313,9 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus);
         DTWAIN_BOOL DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions, LPLONG pStatus);
         DTWAIN_ARRAY DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus);
-        DTWAIN_BOOL DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo);
         DTWAIN_BOOL DTWAIN_AddPDFText(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
-        DTWAIN_BOOL DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
-        DTWAIN_BOOL DTWAIN_AddPDFTextExA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
-        DTWAIN_BOOL DTWAIN_AddPDFTextExW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
         DTWAIN_BOOL DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_CCHARPTRTYPE fontSize, LONG colorRGB, LONG renderMode, DTWAIN_CCHARPTRTYPE scaling, DTWAIN_CCHARPTRTYPE charSpacing, DTWAIN_CCHARPTRTYPE wordSpacing, DTWAIN_CCHARPTRTYPE strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, LPCSTR fontSize, LONG colorRGB, LONG renderMode, LPCSTR scaling, LPCSTR charSpacing, LPCSTR wordSpacing, LPCSTR strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, LPCWSTR fontSize, LONG colorRGB, LONG renderMode, LPCWSTR scaling, LPCWSTR charSpacing, LPCWSTR wordSpacing, LPCWSTR strokeWidth, DWORD Flags);
@@ -1441,7 +1419,6 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetSourceAt(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
         LONG DTWAIN_ArrayGetStringLength(DTWAIN_ARRAY a, LONG nWhichString);
         LONG DTWAIN_ArrayGetType(DTWAIN_ARRAY pArray);
-        DTWAIN_ARRAY DTWAIN_ArrayInit();
         DTWAIN_BOOL DTWAIN_ArrayInsertAt(DTWAIN_ARRAY pArray, LONG nWhere, LPVOID pVariant);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtANSIString(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtANSIStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR Val, LONG num);
@@ -1986,7 +1963,6 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetSourceVersionInfoA(DTWAIN_SOURCE Source, LPSTR szProduct, LONG nLength);
         LONG DTWAIN_GetSourceVersionInfoW(DTWAIN_SOURCE Source, LPWSTR szProduct, LONG nLength);
         DTWAIN_BOOL DTWAIN_GetSourceVersionNumber(DTWAIN_SOURCE Source, LPLONG pMajor, LPLONG pMinor);
-        LONG DTWAIN_GetStaticLibVersion();
         LONG DTWAIN_GetTempFileDirectory(DTWAIN_CHARPTRTYPE szFilePath, LONG nMaxLen);
         LONG DTWAIN_GetTempFileDirectoryA(LPSTR szFilePath, LONG nLength);
         LONG DTWAIN_GetTempFileDirectoryW(LPWSTR szFilePath, LONG nLength);
@@ -2010,7 +1986,6 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
-        LONG DTWAIN_GetTwainTimeout();
         DTWAIN_BOOL DTWAIN_GetVersion(LPLONG lpMajor, LPLONG lpMinor, LPLONG lpVersionType);
         LONG DTWAIN_GetVersionCopyright(DTWAIN_CHARPTRTYPE lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
@@ -2035,9 +2010,6 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetYResolutionStringA(DTWAIN_SOURCE Source, LPSTR Resolution);
         DTWAIN_BOOL DTWAIN_GetYResolutionStringW(DTWAIN_SOURCE Source, LPWSTR Resolution);
         DTWAIN_BOOL DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppend(DTWAIN_CCHARPTRTYPE szFile, LONG fType);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppendA(LPCSTR szFile, LONG fType);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppendW(LPCWSTR szFile, LONG fType);
         DTWAIN_BOOL DTWAIN_InitOCRInterface();
         DTWAIN_BOOL DTWAIN_IsAcquiring();
         DTWAIN_BOOL DTWAIN_IsAudioXferSupported(DTWAIN_SOURCE Source, LONG supportVal);
@@ -2428,7 +2400,6 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Suffix);
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixStringA(DTWAIN_SOURCE Source, LPCSTR Suffix);
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixStringW(DTWAIN_SOURCE Source, LPCWSTR Suffix);
-        DTWAIN_BOOL DTWAIN_SetQueryCapSupport(DTWAIN_BOOL bSet);
         DTWAIN_BOOL DTWAIN_SetResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT Resolution);
         DTWAIN_BOOL DTWAIN_SetResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
         DTWAIN_BOOL DTWAIN_SetResolutionStringA(DTWAIN_SOURCE Source, LPCSTR Resolution);
@@ -2465,7 +2436,6 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainMode(LONG lAcquireMode);
-        DTWAIN_BOOL DTWAIN_SetTwainTimeout(LONG milliseconds);
         DTWAIN_DIBUPDATE_PROC DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc);
         DTWAIN_BOOL DTWAIN_SetXResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT xResolution);
         DTWAIN_BOOL DTWAIN_SetXResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
@@ -2484,12 +2454,6 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLLName);
         DTWAIN_BOOL DTWAIN_SysDestroy();
         DTWAIN_HANDLE DTWAIN_SysInitialize();
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx(DTWAIN_CCHARPTRTYPE szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2(DTWAIN_CCHARPTRTYPE szINIPath, DTWAIN_CCHARPTRTYPE szImageDLLPath, DTWAIN_CCHARPTRTYPE szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExA(LPCSTR szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExW(LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
@@ -2571,13 +2535,9 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus);
         DTWAIN_BOOL DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions, LPLONG pStatus);
         DTWAIN_ARRAY DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus);
-        DTWAIN_BOOL DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo);
         DTWAIN_BOOL DTWAIN_AddPDFText(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
-        DTWAIN_BOOL DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
-        DTWAIN_BOOL DTWAIN_AddPDFTextExA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
-        DTWAIN_BOOL DTWAIN_AddPDFTextExW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
         DTWAIN_BOOL DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_CCHARPTRTYPE fontSize, LONG colorRGB, LONG renderMode, DTWAIN_CCHARPTRTYPE scaling, DTWAIN_CCHARPTRTYPE charSpacing, DTWAIN_CCHARPTRTYPE wordSpacing, DTWAIN_CCHARPTRTYPE strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, LPCSTR fontSize, LONG colorRGB, LONG renderMode, LPCSTR scaling, LPCSTR charSpacing, LPCSTR wordSpacing, LPCSTR strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, LPCWSTR fontSize, LONG colorRGB, LONG renderMode, LPCWSTR scaling, LPCWSTR charSpacing, LPCWSTR wordSpacing, LPCWSTR strokeWidth, DWORD Flags);
@@ -2681,7 +2641,6 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetSourceAt(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
         LONG DTWAIN_ArrayGetStringLength(DTWAIN_ARRAY a, LONG nWhichString);
         LONG DTWAIN_ArrayGetType(DTWAIN_ARRAY pArray);
-        DTWAIN_ARRAY DTWAIN_ArrayInit();
         DTWAIN_BOOL DTWAIN_ArrayInsertAt(DTWAIN_ARRAY pArray, LONG nWhere, LPVOID pVariant);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtANSIString(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtANSIStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR Val, LONG num);
@@ -3226,7 +3185,6 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetSourceVersionInfoA(DTWAIN_SOURCE Source, LPSTR szProduct, LONG nLength);
         LONG DTWAIN_GetSourceVersionInfoW(DTWAIN_SOURCE Source, LPWSTR szProduct, LONG nLength);
         DTWAIN_BOOL DTWAIN_GetSourceVersionNumber(DTWAIN_SOURCE Source, LPLONG pMajor, LPLONG pMinor);
-        LONG DTWAIN_GetStaticLibVersion();
         LONG DTWAIN_GetTempFileDirectory(DTWAIN_CHARPTRTYPE szFilePath, LONG nMaxLen);
         LONG DTWAIN_GetTempFileDirectoryA(LPSTR szFilePath, LONG nLength);
         LONG DTWAIN_GetTempFileDirectoryW(LPWSTR szFilePath, LONG nLength);
@@ -3250,7 +3208,6 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
-        LONG DTWAIN_GetTwainTimeout();
         DTWAIN_BOOL DTWAIN_GetVersion(LPLONG lpMajor, LPLONG lpMinor, LPLONG lpVersionType);
         LONG DTWAIN_GetVersionCopyright(DTWAIN_CHARPTRTYPE lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
@@ -3275,9 +3232,6 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetYResolutionStringA(DTWAIN_SOURCE Source, LPSTR Resolution);
         DTWAIN_BOOL DTWAIN_GetYResolutionStringW(DTWAIN_SOURCE Source, LPWSTR Resolution);
         DTWAIN_BOOL DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppend(DTWAIN_CCHARPTRTYPE szFile, LONG fType);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppendA(LPCSTR szFile, LONG fType);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppendW(LPCWSTR szFile, LONG fType);
         DTWAIN_BOOL DTWAIN_InitOCRInterface();
         DTWAIN_BOOL DTWAIN_IsAcquiring();
         DTWAIN_BOOL DTWAIN_IsAudioXferSupported(DTWAIN_SOURCE Source, LONG supportVal);
@@ -3668,7 +3622,6 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Suffix);
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixStringA(DTWAIN_SOURCE Source, LPCSTR Suffix);
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixStringW(DTWAIN_SOURCE Source, LPCWSTR Suffix);
-        DTWAIN_BOOL DTWAIN_SetQueryCapSupport(DTWAIN_BOOL bSet);
         DTWAIN_BOOL DTWAIN_SetResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT Resolution);
         DTWAIN_BOOL DTWAIN_SetResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
         DTWAIN_BOOL DTWAIN_SetResolutionStringA(DTWAIN_SOURCE Source, LPCSTR Resolution);
@@ -3705,7 +3658,6 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainMode(LONG lAcquireMode);
-        DTWAIN_BOOL DTWAIN_SetTwainTimeout(LONG milliseconds);
         DTWAIN_DIBUPDATE_PROC DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc);
         DTWAIN_BOOL DTWAIN_SetXResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT xResolution);
         DTWAIN_BOOL DTWAIN_SetXResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
@@ -3724,12 +3676,6 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLLName);
         DTWAIN_BOOL DTWAIN_SysDestroy();
         DTWAIN_HANDLE DTWAIN_SysInitialize();
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx(DTWAIN_CCHARPTRTYPE szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2(DTWAIN_CCHARPTRTYPE szINIPath, DTWAIN_CCHARPTRTYPE szImageDLLPath, DTWAIN_CCHARPTRTYPE szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExA(LPCSTR szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExW(LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);
@@ -3811,13 +3757,9 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_ARRAY DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus);
         DTWAIN_BOOL DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions, LPLONG pStatus);
         DTWAIN_ARRAY DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus);
-        DTWAIN_BOOL DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo);
         DTWAIN_BOOL DTWAIN_AddPDFText(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
-        DTWAIN_BOOL DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
-        DTWAIN_BOOL DTWAIN_AddPDFTextExA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
-        DTWAIN_BOOL DTWAIN_AddPDFTextExW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType);
         DTWAIN_BOOL DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_CCHARPTRTYPE fontSize, LONG colorRGB, LONG renderMode, DTWAIN_CCHARPTRTYPE scaling, DTWAIN_CCHARPTRTYPE charSpacing, DTWAIN_CCHARPTRTYPE wordSpacing, DTWAIN_CCHARPTRTYPE strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, LPCSTR fontSize, LONG colorRGB, LONG renderMode, LPCSTR scaling, LPCSTR charSpacing, LPCSTR wordSpacing, LPCSTR strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, LPCWSTR fontSize, LONG colorRGB, LONG renderMode, LPCWSTR scaling, LPCWSTR charSpacing, LPCWSTR wordSpacing, LPCWSTR strokeWidth, DWORD Flags);
@@ -3921,7 +3863,6 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetSourceAt(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
         LONG DTWAIN_ArrayGetStringLength(DTWAIN_ARRAY a, LONG nWhichString);
         LONG DTWAIN_ArrayGetType(DTWAIN_ARRAY pArray);
-        DTWAIN_ARRAY DTWAIN_ArrayInit();
         DTWAIN_BOOL DTWAIN_ArrayInsertAt(DTWAIN_ARRAY pArray, LONG nWhere, LPVOID pVariant);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtANSIString(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR pVal);
         DTWAIN_BOOL DTWAIN_ArrayInsertAtANSIStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR Val, LONG num);
@@ -4466,7 +4407,6 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetSourceVersionInfoA(DTWAIN_SOURCE Source, LPSTR szProduct, LONG nLength);
         LONG DTWAIN_GetSourceVersionInfoW(DTWAIN_SOURCE Source, LPWSTR szProduct, LONG nLength);
         DTWAIN_BOOL DTWAIN_GetSourceVersionNumber(DTWAIN_SOURCE Source, LPLONG pMajor, LPLONG pMinor);
-        LONG DTWAIN_GetStaticLibVersion();
         LONG DTWAIN_GetTempFileDirectory(DTWAIN_CHARPTRTYPE szFilePath, LONG nMaxLen);
         LONG DTWAIN_GetTempFileDirectoryA(LPSTR szFilePath, LONG nLength);
         LONG DTWAIN_GetTempFileDirectoryW(LPWSTR szFilePath, LONG nLength);
@@ -4490,7 +4430,6 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
         LONG DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
-        LONG DTWAIN_GetTwainTimeout();
         DTWAIN_BOOL DTWAIN_GetVersion(LPLONG lpMajor, LPLONG lpMinor, LPLONG lpVersionType);
         LONG DTWAIN_GetVersionCopyright(DTWAIN_CHARPTRTYPE lpszApp, LONG nLength);
         LONG DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength);
@@ -4515,9 +4454,6 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetYResolutionStringA(DTWAIN_SOURCE Source, LPSTR Resolution);
         DTWAIN_BOOL DTWAIN_GetYResolutionStringW(DTWAIN_SOURCE Source, LPWSTR Resolution);
         DTWAIN_BOOL DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppend(DTWAIN_CCHARPTRTYPE szFile, LONG fType);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppendA(LPCSTR szFile, LONG fType);
-        DTWAIN_BOOL DTWAIN_InitImageFileAppendW(LPCWSTR szFile, LONG fType);
         DTWAIN_BOOL DTWAIN_InitOCRInterface();
         DTWAIN_BOOL DTWAIN_IsAcquiring();
         DTWAIN_BOOL DTWAIN_IsAudioXferSupported(DTWAIN_SOURCE Source, LONG supportVal);
@@ -4908,7 +4844,6 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Suffix);
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixStringA(DTWAIN_SOURCE Source, LPCSTR Suffix);
         DTWAIN_BOOL DTWAIN_SetPrinterSuffixStringW(DTWAIN_SOURCE Source, LPCWSTR Suffix);
-        DTWAIN_BOOL DTWAIN_SetQueryCapSupport(DTWAIN_BOOL bSet);
         DTWAIN_BOOL DTWAIN_SetResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT Resolution);
         DTWAIN_BOOL DTWAIN_SetResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
         DTWAIN_BOOL DTWAIN_SetResolutionStringA(DTWAIN_SOURCE Source, LPCSTR Resolution);
@@ -4945,7 +4880,6 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile);
         DTWAIN_BOOL DTWAIN_SetTwainMode(LONG lAcquireMode);
-        DTWAIN_BOOL DTWAIN_SetTwainTimeout(LONG milliseconds);
         DTWAIN_DIBUPDATE_PROC DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc);
         DTWAIN_BOOL DTWAIN_SetXResolution(DTWAIN_SOURCE Source, DTWAIN_FLOAT xResolution);
         DTWAIN_BOOL DTWAIN_SetXResolutionString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Resolution);
@@ -4964,12 +4898,6 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLLName);
         DTWAIN_BOOL DTWAIN_SysDestroy();
         DTWAIN_HANDLE DTWAIN_SysInitialize();
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx(DTWAIN_CCHARPTRTYPE szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2(DTWAIN_CCHARPTRTYPE szINIPath, DTWAIN_CCHARPTRTYPE szImageDLLPath, DTWAIN_CCHARPTRTYPE szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2A(LPCSTR szINIPath, LPCSTR szImageDLLPath, LPCSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeEx2W(LPCWSTR szINIPath, LPCWSTR szImageDLLPath, LPCWSTR szLangResourcePath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExA(LPCSTR szINIPath);
-        DTWAIN_HANDLE DTWAIN_SysInitializeExW(LPCWSTR szINIPath);
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlocking();
         DTWAIN_HANDLE DTWAIN_SysInitializeNoBlockingEx(DTWAIN_BOOL bCreateLogFile);
         DTWAIN_ARRAY DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability);

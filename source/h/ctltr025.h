@@ -21,20 +21,41 @@
 #ifndef CTLTR025_H
 #define CTLTR025_H
 
-#include "ctltr024.h"
+#include "ctltr004.h"
 namespace dynarithmic
 {
-    class CTL_ImageInfoTriplet : public CTL_ImageTriplet
+    class CTL_DeviceEventTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_ImageInfoTriplet(CTL_ITwainSession *pSession,
-                                 CTL_ITwainSource *pSource);
+            CTL_DeviceEventTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource)
+            {
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_DEVICEEVENT, MSG_GET, &m_DeviceEvent);
+                m_bPassed = false;
+            }
 
-            TW_IMAGEINFO*   GetImageInfoBuffer();
+            TW_UINT16 Execute() override
+            {
+                m_bPassed = false;
+                const TW_UINT16 rc = CTL_TwainTriplet::Execute();
+                if (rc != TWRC_SUCCESS)
+                    return rc;
+                m_bPassed = true;
+                return rc;
+            }
 
-        private:
-            TW_IMAGEINFO          m_ImageInfo;
+            CTL_DeviceEvent GetDeviceEvent() const
+            {
+                return m_DeviceEvent;
+            }
+
+            bool IsSuccessful() const
+            {
+                return m_bPassed;
+            }
+    
+    private:
+            CTL_DeviceEvent     m_DeviceEvent;
+            bool                m_bPassed;
     };
 }
 #endif
-

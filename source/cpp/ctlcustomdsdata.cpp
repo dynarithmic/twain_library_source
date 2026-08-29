@@ -22,8 +22,8 @@
 #include <algorithm>
 #include "cppfunc.h"
 #include "errorcheck.h"
-#include "ctltr036.h"
 #include "ctlglobalhandletraits.h"
+#include "ctltr027.h"
 #include "dtwainx.h"
 using namespace dynarithmic;
 

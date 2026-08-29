@@ -61,8 +61,8 @@ namespace dynarithmic
         DTWAINScopedLogControllerEx& operator=(DTWAINScopedLogControllerEx&) = delete;
     };
 
-    typedef DTWAINScopedLogControllerEx<LogTraitsOff> DTWAINScopedLogControllerExclude;
-    typedef DTWAINScopedLogControllerEx<LogTraitsOn>  DTWAINScopedLogControllerInclude;
+    using DTWAINScopedLogControllerExclude = DTWAINScopedLogControllerEx<LogTraitsOff>;
+    using DTWAINScopedLogControllerInclude = DTWAINScopedLogControllerEx<LogTraitsOn>;
 
     bool AnyLoggerExists(CTL_TwainDLLHandle* pHandle);
     void WriteUserDefinedLogMsg(CTL_TwainDLLHandle* pHandle, LPCTSTR sz);

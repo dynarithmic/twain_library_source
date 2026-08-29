@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "errorcheck.h"
-#include "ctltr038.h"
+#include "ctltr029.h"
 #include "twain.h"
 #include "extendedimageinfo.h"
 #include "ctlarraydumper.h"
@@ -207,17 +207,6 @@ extern "C"
 
         LOG_FUNC_EXIT_NONAME_PARAMS(val)
         CATCH_BLOCK_LOG_PARAMS(false)
-    }
-
-    /* !!DEPRECATED as of version 5.6.2 !!
-       Application adds an item to query the image information.  Before getting the Extended
-       Image Information, the application will call DTWAIN_AddExtImageInfoQuery multiple times,
-       each time for each Image Information desired  */
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo)
-    {
-        LOG_FUNC_ENTRY_PARAMS((Source, ExtImageInfo))
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        CATCH_BLOCK(false)
     }
 
     /* !!DEPRECATED as of version 5.6.2 !!

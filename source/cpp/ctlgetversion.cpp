@@ -105,53 +105,8 @@ namespace dynarithmic
     }
 }
 
-namespace
-{
-    std::string GetStaticLibVer()
-    {
-        const LONG nVer = DTWAIN_GetStaticLibVersion();
-        if (nVer != 0)
-        {
-            switch (nVer)
-            {
-              case 81:
-                  return "Microsoft Visual Studio 2019";
-              case 91:
-                  return "Microsoft Visual Studio 2022";
-            }
-        }
-        return {};
-    }
-}
-
 extern "C"
 {
-    LONG DLLENTRY_DEF DTWAIN_GetStaticLibVersion()
-    {
-        LOG_FUNC_ENTRY_PARAMS(())
-        #ifndef DTWAIN_LIB
-            LOG_FUNC_EXIT_NONAME_PARAMS(0)
-            #pragma message ("Compiling DLL -- no static library")
-        #endif
-
-        #ifdef _MSC_VER
-            #if _MSC_VER < 1920
-                #error("C++ Compiler must be Visual Studio 2019 or greater")
-            #elif _MSC_VER >= 1920 && _MSC_VER < 1930
-                #pragma message ("Microsoft Visual Studio 2019 compiler used to build library")
-                LOG_FUNC_EXIT_NONAME_PARAMS(81)
-            #elif _MSC_VER >= 1930
-                #pragma message ("Microsoft Visual Studio 2022 compiler used to build library")
-                LOG_FUNC_EXIT_NONAME_PARAMS(91)
-            #endif
-        #endif
-        #ifndef _MSC_VER
-            #pragma message("Unsupported compiler being used to compile DTWAIN")
-        #endif
-
-        CATCH_BLOCK(-1)
-    }
-
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersion(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType)
     {
         LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType))

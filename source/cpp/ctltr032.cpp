@@ -18,7 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLDIB_H
-#define CTLDIB_H
-#include "ctldib32.h"
-#endif
+#include "ctltr032.h"
+
+using namespace dynarithmic;
+CTL_DSMMetricsTriplet::CTL_DSMMetricsTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource) : m_DSMMetrics{}
+{
+    InitGeneric(pSession, pSource, DG_CONTROL, DAT_METRICS, MSG_GET, &m_DSMMetrics);
+}

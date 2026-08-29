@@ -21,45 +21,33 @@
 #ifndef CTLTR007_H
 #define CTLTR007_H
 
-#include "ctltripletbase.h"
-#include "ctltwainsession.h"
-#include "ctltwainmanager.h"
-
+#include "ctltr005.h"
 namespace dynarithmic
 {
-    class CTL_ConditionCodeTriplet : public CTL_TwainTriplet
+    class CTL_CapabilityGetOneValTriplet : public CTL_CapabilityGetTriplet
     {
         public:
-            CTL_ConditionCodeTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource/* = nullptr*/) :
-                CTL_TwainTriplet(), m_Status{}
+            CTL_CapabilityGetOneValTriplet(CTL_ITwainSession *pSession,
+                                           CTL_ITwainSource *pSource,
+                                           TW_UINT16   gType,
+                                           TW_UINT16 gCap,
+                                           TW_UINT16    TwainDataType)
+                : CTL_CapabilityGetTriplet(pSession,
+                    pSource,
+                    gType,
+                    gCap,
+                    TwainDataType) {}
+
+            bool   GetValue(void* pData, size_t nWhere = 0) override
             {
-                InitGeneric(pSession, pSource, DG_CONTROL, DAT_STATUS, MSG_GET, &m_Status);
+                return GenericGetValue(pData, 0);
             }
 
-            CTL_ConditionCodeTriplet(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID)
+        protected:
+            bool EnumCapValues(void* pCapData) override
             {
-                SetValues(pSession, pSourceID);
+                return GenericEnumCapValues<TW_ONEVALUE>(pCapData);
             }
-
-            TW_UINT16 GetConditionCode() const
-            {
-                return m_Status.ConditionCode;
-            }
-
-            TW_UINT16 GetData() const
-            {
-                return m_Status.Data;
-            }
-
-        private:
-            void SetValues(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID)
-            {
-                Init(pSession, pSourceID, DG_CONTROL, DAT_STATUS, MSG_GET, &m_Status);
-                SetAlive(true);
-            }
-
-            TW_STATUS   m_Status;
     };
 }
 #endif
-

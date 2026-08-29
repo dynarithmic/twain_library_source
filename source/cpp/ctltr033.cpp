@@ -18,23 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltr025.h"
+#include "ctltr033.h"
 
 using namespace dynarithmic;
-
-CTL_ImageInfoTriplet::CTL_ImageInfoTriplet(CTL_ITwainSession* pSession,
-                                           CTL_ITwainSource*  pSource)
-                                           : CTL_ImageTriplet(pSession, pSource), m_ImageInfo()
+CTL_TwainDirectTriplet::CTL_TwainDirectTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_TwainDirect{}
 {
-    InitGeneric(pSession, pSource, DG_IMAGE, DAT_IMAGEINFO, MSG_GET, &m_ImageInfo);
+    InitGeneric(pSession, pSource, DG_CONTROL, DAT_TWAINDIRECT, MSG_SETTASK, &m_TwainDirect);
 }
-
-
-TW_IMAGEINFO*  CTL_ImageInfoTriplet::GetImageInfoBuffer()
-{
-    return &m_ImageInfo;
-}
-
-
-
-

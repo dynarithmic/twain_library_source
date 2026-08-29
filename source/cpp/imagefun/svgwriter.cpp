@@ -271,7 +271,7 @@ namespace
     };
 }
 
-typedef DTWAIN_RAII<void*, mz_DestroyTraits> mz_RAII;
+using mz_RAII = DTWAIN_RAII<void*, mz_DestroyTraits>;
 
 namespace
 {

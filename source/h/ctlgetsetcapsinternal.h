@@ -26,15 +26,15 @@
 #include <algorithm>
 #include <memory>
 #include "arrayfactory.h"
+#include "ctltr006.h"
+#include "ctltr007.h"
+#include "ctltr008.h"
+#include "ctltr009.h"
+#include "ctltr010.h"
+#include "ctltr011.h"
 #include "ctltr012.h"
 #include "ctltr013.h"
 #include "ctltr014.h"
-#include "ctltr015.h"
-#include "ctltr016.h"
-#include "ctltr017.h"
-#include "ctltr018.h"
-#include "ctltr019.h"
-#include "ctltr020.h"
 #include "ctltwaindllhandle.h"
 #include "ctlstringconversion.h"
 #define USE_NORMALSTRINGS  1

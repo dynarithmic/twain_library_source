@@ -21,46 +21,93 @@
 #ifndef CTLTR036_H
 #define CTLTR036_H
 
-#include "ctltr010.h"
-#include "ctltwainmanager.h"
+#include "ctltr007.h"
+#include "ctltr008.h"
+#include "ctlgetsetcapsinternal.h"
+
 namespace dynarithmic
 {
-    template <TW_UINT16 nMsg>
-    class CTL_CustomDSTripletImpl : public CTL_TwainTriplet
+    template <TW_UINT16 msgType>
+    class CTL_CapabilityLabelHelpTriplet : public CTL_CapabilityGetOneValTriplet
     {
         public:
-            CTL_CustomDSTripletImpl(CTL_ITwainSession* pSession,
-                CTL_ITwainSource* pSource) : m_CustomDSData{}
+            CTL_CapabilityLabelHelpTriplet(CTL_ITwainSession *pSession,
+                                           TW_UINT16 gCap,
+                                           TW_UINT16 TwainType=0xFFFF) :
+            CTL_CapabilityGetOneValTriplet(pSession, nullptr, msgType, gCap, TwainType)
             {
-                InitGeneric(pSession, pSource, DG_CONTROL, DAT_CUSTOMDSDATA, nMsg, &m_CustomDSData);
+                TW_CAPABILITY* pCap = GetCapabilityBuffer();
+                pCap->Cap = gCap;
+                pCap->ConType = TWON_ONEVALUE;
+                pCap->hContainer = nullptr;
             }
 
-            TW_UINT32 GetDataSize() const
+            TW_UINT16  Execute() override
             {
-                return m_CustomDSData.InfoLength;
+                const TW_UINT16 rc = CTL_CapabilityGetOneValTriplet::Execute();
+                if (rc == TWRC_SUCCESS)
+                {
+                    m_bIsSupported = true;
+                    GetValue(nullptr);
+                }
+                return rc;
             }
 
-            HANDLE GetData() const
-            {
-                return m_CustomDSData.hData;
-            }
+            bool            IsSupportedOp() const noexcept { return m_bIsSupported; }
+            std::string     GetString() const { return m_strLabel; }
 
-            void SetDataSize(TW_UINT32 nSize)
+        protected:
+            bool  GetValue(void* pData, size_t nWhere = 0) override {return true;}
+            bool  EnumCapValues(void* pCapData) override
             {
-                m_CustomDSData.InfoLength = nSize;
-            }
+                const bool bRetVal = CTL_CapabilityGetOneValTriplet::EnumCapValues(pCapData);
+                if (bRetVal)
+                {
+                    // dereference to a TW_ONEVALUE structure
+                    pTW_ONEVALUE pValOne = static_cast<pTW_ONEVALUE>(pCapData);
+                    HANDLE hStr = (HANDLE)(uintptr_t)pValOne->Item;
 
-            TW_UINT16 SetData(HANDLE hData, TW_UINT32 /*nSize*/)
-            {
-                m_CustomDSData.hData = hData;
-                return Execute();
+                    // Get the string 
+                    LPSTR label = (LPSTR)GlobalLock(hStr);
+                    if (label)
+                    {
+                        std::string s = label;
+                        GlobalUnlock(hStr);
+                    }
+
+                    if (GlobalFlags(hStr) != GMEM_INVALID_HANDLE)
+                        GlobalFree(hStr);
+                }
+                return bRetVal;
             }
 
         private:
-            TW_CUSTOMDSDATA     m_CustomDSData;
+            bool m_bIsSupported = false;
+            std::string m_strLabel;
     };
 
-    using CTL_GetCustomDSTriplet = CTL_CustomDSTripletImpl<MSG_GET>;
-    using CTL_SetCustomDSTriplet = CTL_CustomDSTripletImpl<MSG_SET>;
+    class CTL_CapabilityLabelEnumTriplet : public CTL_CapabilityTriplet
+    {
+        public:
+            CTL_CapabilityLabelEnumTriplet(CTL_ITwainSession* pSession, TW_UINT16 gCap) :
+                CTL_CapabilityTriplet(pSession, nullptr, MSG_GETLABELENUM, TWTY_STR255, true) {}
+            bool IsSupported() const noexcept { return m_bIsSupported; }
+            const std::vector<std::string>&  GetStrings() const noexcept { return m_aStrings; }
+            TW_UINT16 Execute() override
+            {
+                auto retValue = GetCapabilityValues(nullptr, GetCapabilityBuffer()->Cap, MSG_GETLABELENUM,
+                    DTWAIN_CONTARRAY, 1, TWTY_STR255, m_aStrings);
+                if (retValue.second == TWRC_SUCCESS)
+                    m_bIsSupported = true;
+                return retValue.second;
+            }
+
+        private:
+            bool m_bIsSupported = false;
+            std::vector<std::string> m_aStrings;
+    };
+
+    using CTL_CapabilityLabelTriplet = CTL_CapabilityLabelHelpTriplet<MSG_GETLABEL>;
+    using CTL_CapabilityHelpTriplet = CTL_CapabilityLabelHelpTriplet<MSG_GETHELP>;
 }
 #endif

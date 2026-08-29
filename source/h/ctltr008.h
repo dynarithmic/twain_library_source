@@ -20,31 +20,34 @@
  */
 #ifndef CTLTR008_H
 #define CTLTR008_H
-#include "ctltripletbase.h"
-#include "ctltwainsession.h"
+
+#include "ctltr005.h"
 namespace dynarithmic
 {
-    class CTL_ProcessEventTriplet : public CTL_TwainTriplet
+    class CTL_CapabilityGetArrayTriplet : public CTL_CapabilityGetTriplet
     {
         public:
-            CTL_ProcessEventTriplet(CTL_ITwainSession* pSession,
-                                    CTL_ITwainSource* pSource,
-                                    MSG *pMsg,
-                                    bool isDSM2);
+            CTL_CapabilityGetArrayTriplet(CTL_ITwainSession *pSession,
+                                         CTL_ITwainSource *pSource,
+                                         TW_UINT16   gType,
+                                         TW_UINT16      gCap,
+                                         TW_UINT16 TwainDataType)
+                : CTL_CapabilityGetTriplet(pSession,
+                    pSource,
+                    gType,
+                    gCap,
+                    TwainDataType) {}
 
-            TW_UINT16       ExecuteEventHandler();
-            bool            ResetTransfer(TW_UINT16 Msg=MSG_RESET);
-            void            SetMessage(TW_UINT16 nMsg) { m_Event.TWMessage = nMsg;  }
-            void            CloseUI();
-            void            ResetAndCloseUI();
+            bool GetValue(void* pData, size_t nWhere) override
+            {
+                return GenericGetValue(pData, nWhere);
+            }
 
-        private:
-            TW_EVENT   m_Event;
-            bool       m_bDSM2Used;
-            MSG        *m_pMsg;
-            void DeviceEvent();
-
+        protected:
+            bool EnumCapValues(void* pCapData) override
+            {
+                return GenericEnumCapValues<TW_ARRAY>(pCapData);
+            }
     };
 }
 #endif
-

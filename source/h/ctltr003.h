@@ -18,43 +18,48 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTR039_H
-#define CTLTR039_H
+#ifndef CTLTR003_H
+#define CTLTR003_H
 
 #include "ctltripletbase.h"
+#include "ctltwainsession.h"
 #include "ctltwainmanager.h"
 
 namespace dynarithmic
 {
-    class CTL_ITwainSession;
-
-    template <TW_UINT16 msg>
-    class CTL_EntryPointTriplet : public CTL_TwainTriplet
+    class CTL_ConditionCodeTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_EntryPointTriplet(CTL_ITwainSession* pSession) :
-                CTL_TwainTriplet(), m_bTripletFound(false), m_EntryPoint{}
+            CTL_ConditionCodeTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource/* = nullptr*/) :
+                CTL_TwainTriplet(), m_Status{}
             {
-                m_EntryPoint.Size = sizeof(TW_ENTRYPOINT);
-                InitGeneric(pSession, nullptr, DG_CONTROL, DAT_ENTRYPOINT, msg, &m_EntryPoint);
-            }
-            TW_UINT16 Execute() override
-            {
-                const TW_UINT16 retVal = CTL_TwainTriplet::Execute();
-                if (retVal == TWRC_SUCCESS)
-                    m_bTripletFound = true;
-                return retVal;
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_STATUS, MSG_GET, &m_Status);
             }
 
-            TW_ENTRYPOINT& getEntryPoint() { return m_EntryPoint; }
+            CTL_ConditionCodeTriplet(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID)
+            {
+                SetValues(pSession, pSourceID);
+            }
 
-            bool isTripletFound() const { return m_bTripletFound; }
+            TW_UINT16 GetConditionCode() const
+            {
+                return m_Status.ConditionCode;
+            }
+
+            TW_UINT16 GetData() const
+            {
+                return m_Status.Data;
+            }
 
         private:
-            TW_ENTRYPOINT m_EntryPoint{};
-            bool m_bTripletFound;
+            void SetValues(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID)
+            {
+                Init(pSession, pSourceID, DG_CONTROL, DAT_STATUS, MSG_GET, &m_Status);
+                SetAlive(true);
+            }
+
+            TW_STATUS   m_Status;
     };
-    using CTL_GetEntryPointTriplet = CTL_EntryPointTriplet<MSG_GET>;
-    using CTL_SetEntryPointTriplet = CTL_EntryPointTriplet<MSG_SET>; 
 }
 #endif
+

@@ -24,7 +24,7 @@
 #include <bitset>
 #include <map>
 #include <vector>
-#include "ctlstringdefs.h"
+#include <string>
 #include "ctlstringutilsx.h"
 
 namespace dynarithmic
@@ -69,8 +69,8 @@ namespace dynarithmic
         CTL_ITwainSource* GetSourceHandle() const { return m_pSource; }
     };
 
-    template <typename SourceFunc>
-    LONG GetSourceInfoImpl(CTL_ITwainSource* p, SourceFunc pFunc, LPTSTR szInfo, LONG nMaxLen)
+    template <typename SourceFunc, typename StringPtrType>
+    int32_t GetSourceInfoImpl(CTL_ITwainSource* p, SourceFunc pFunc, StringPtrType szInfo, int32_t nMaxLen)
     {
         return CopyInfoToCString((p->*pFunc)(), szInfo, nMaxLen);
     }

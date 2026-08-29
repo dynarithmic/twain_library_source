@@ -23,9 +23,9 @@
 
 #include <string>
 #include <memory>
+#include <tuple>
 
 #include "twain.h"
-#include "ctl10tuple.h"
 #include "mapdefs.h"
 #include "ctlstringdefs.h"
 
@@ -48,26 +48,26 @@ namespace dynarithmic
             operator std::string() const;
     };
 
-    typedef BASIC_MAPTYPE_<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;
+    using CTL_GeneralCapInfo = BASIC_MAPTYPE_<TW_UINT16, CTL_CapStruct>;
 
-    typedef CTL_ClassValues10<TW_UINT16 ,/* Capability*/
-        UINT, /* Container for Get */
-        UINT, /* Container for Set*/
+    using CTL_CapInfo = std::tuple<TW_UINT16,/* Capability*/
+        UINT,  /* Container for Get */
+        UINT,  /* Container for Set*/
         UINT,  /* Data Type */
         UINT,  /* Available cap support */
         UINT,  /* Container for Get Current */
-        UINT,   /* Container for Get Default  */
+        UINT,  /* Container for Get Default  */
         UINT,  /* Container for Set Constraint */
         UINT,  /* Container for Reset */
-        UINT                 /* Container for Query Support*/
-    > CTL_CapInfo;
+        UINT   /* Container for Query Support*/
+    >;
 
-    typedef BASIC_MAPTYPE_<TW_UINT16 , CTL_CapInfo>  CTL_CapInfoMap;
-    typedef std::shared_ptr<CTL_CapInfoMap> CTL_CapInfoMapPtr;
+    using CTL_CapInfoMap = BASIC_MAPTYPE_<TW_UINT16 , CTL_CapInfo>;
+    using CTL_CapInfoMapPtr = std::shared_ptr<CTL_CapInfoMap>;
 
     // Create this statically when initializing.  Initialize the second
     // value with the dynamically created CTL_CapInfoMap above
-    typedef CTL_ClassValues10<CTL_StringType, /* Product Name */
+    using CTL_SourceCapInfo = std::tuple<CTL_StringType, /* Product Name */
                              CTL_CapInfoMapPtr, /* Array of cap info*/
                              int,       /* dummy */
                              int,        /* dummy */
@@ -76,10 +76,11 @@ namespace dynarithmic
                              char,
                              char,
                              char,
-                             char> CTL_SourceCapInfo;
+                             char>;
 
     class CTL_TwainDLLHandle;
     class CTL_ITwainSource;
+
     CTL_CapInfoMapPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p);
 }
 #endif

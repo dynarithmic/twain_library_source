@@ -96,8 +96,6 @@ namespace dynarithmic
         bool                         s_bThrowExceptions = false;
         HINSTANCE                    s_DLLInstance = nullptr;
         uint32_t                     s_logFilterFlags = 0;
-        UINT_PTR                     s_nTimeoutID = 0;
-        UINT                         s_nTimeoutMilliseconds = 0;
         bool                         s_ResourcesInitialized = false;
         bool                         s_bTimerIDSet = false;
         CTL_StringType               s_FileParseDelimiters;
@@ -155,10 +153,6 @@ namespace dynarithmic
         static std::mutex               s_mutexInitDestroy;
         static std::unique_ptr<CSimpleIniA>    s_iniInterface;
         static CTL_StaticDataStruct s_StaticData;
-        static UINT_PTR GetTimeoutID() { return s_StaticData.s_nTimeoutID; }
-        static void SetTimeoutID(UINT_PTR val) { s_StaticData.s_nTimeoutID = val; }
-        static UINT GetTimeoutValue() { return s_StaticData.s_nTimeoutMilliseconds; }
-        static void SetTimeoutValue(UINT value) { s_StaticData.s_nTimeoutMilliseconds = value; }
         static CTL_ThreadMap& GetThreadMap() { return s_StaticData.s_ThreadMap; }
         static HFONT& GetDialogFont() { return s_StaticData.s_DialogFont; }
         static CLogSystem& GetLogger() { return s_StaticData.s_appLog; }

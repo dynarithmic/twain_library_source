@@ -22,7 +22,7 @@
 #include <utility>
 #include "imagexferfilewriter.h"
 #include "logwriterutils.h"
-#include "ctltr026.h"
+#include "ctltr018.h"
 #include "ctltwainmanager.h"
 #include "ctlfilesave.h"
 #include "ctldib32ex.h"

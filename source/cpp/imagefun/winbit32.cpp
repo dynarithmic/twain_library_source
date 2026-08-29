@@ -286,7 +286,7 @@ HANDLE CDibInterface::DecreaseBpp(HANDLE hDib, long newbpp)
 HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const FloatRect& RequestedRect, int sourceunit,
                               int destunit, int dpi, bool bConvertActual, int& retval)
 {
-    retval = IS_ERR_OK;
+    retval = 0;
 
     dib::LockedDib dibHandle(handle);
 
@@ -320,7 +320,7 @@ HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const 
 
     if (startx == endx || starty == endy)
     {
-        retval = IS_ERR_BADPARAM;
+        retval = DTWAIN_ERR_INVALID_PARAM;
         return nullptr;
     }
 

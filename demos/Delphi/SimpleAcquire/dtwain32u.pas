@@ -1870,16 +1870,9 @@ function DTWAIN_AcquireFileW(Source:DTWAIN_SOURCE; lpszFile:LPCWSTR; lFileType:L
 function DTWAIN_AcquireNative(Source:DTWAIN_SOURCE; PixelType:LONG; nMaxPages:LONG; bShowUI:BOOL; bCloseSource:BOOL; pStatus:LPLONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AcquireNative';
 function DTWAIN_AcquireNativeEx(Source:DTWAIN_SOURCE; PixelType:LONG; nMaxPages:LONG; bShowUI:BOOL; bCloseSource:BOOL; Acquisitions:DTWAIN_ARRAY; pStatus:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AcquireNativeEx';
 function DTWAIN_AcquireToClipboard(Source:DTWAIN_SOURCE; PixelType:LONG; nMaxPages:LONG; nTransferMode:LONG; bDiscardDibs:BOOL; bShowUI:BOOL; bCloseSource:BOOL; pStatus:LPLONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AcquireToClipboard';
-function DTWAIN_AddExtImageInfoQuery(Source:DTWAIN_SOURCE; ExtImageInfo:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddExtImageInfoQuery';
-function DTWAIN_AddFileToAppend(szFile:LPCTSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddFileToAppend';
-function DTWAIN_AddFileToAppendA(szFile:LPCSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddFileToAppendA';
-function DTWAIN_AddFileToAppendW(szFile:LPCWSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddFileToAppendW';
 function DTWAIN_AddPDFText(Source:DTWAIN_SOURCE; szText:LPCTSTR; xPos:LONG; yPos:LONG; fontName:LPCTSTR; fontSize:DTWAIN_FLOAT; colorRGB:LONG; renderMode:LONG; scaling:DTWAIN_FLOAT; charSpacing:DTWAIN_FLOAT; wordSpacing:DTWAIN_FLOAT; strokeWidth:DTWAIN_FLOAT; Flags:DWORD) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddPDFText';
 function DTWAIN_AddPDFTextA(Source:DTWAIN_SOURCE; szText:LPCSTR; xPos:LONG; yPos:LONG; fontName:LPCSTR; fontSize:DTWAIN_FLOAT; colorRGB:LONG; renderMode:LONG; scaling:DTWAIN_FLOAT; charSpacing:DTWAIN_FLOAT; wordSpacing:DTWAIN_FLOAT; strokeWidth:DTWAIN_FLOAT; Flags:DWORD) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddPDFTextA';
 function DTWAIN_AddPDFTextElement(Source:DTWAIN_SOURCE; TextElement:DTWAIN_PDFTEXTELEMENT) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddPDFTextElement';
-function DTWAIN_AddPDFTextEx(Source:DTWAIN_SOURCE; szText:LPCTSTR; xPos:LONG; yPos:LONG; fontName:LPCTSTR; fontSize:DTWAIN_FLOAT; colorRGB:LONG; renderMode:LONG; scaling:DTWAIN_FLOAT; charSpacing:DTWAIN_FLOAT; wordSpacing:DTWAIN_FLOAT; strokeWidth:DTWAIN_FLOAT; rotationAngle:DTWAIN_FLOAT; skewAngleX:DTWAIN_FLOAT; skewAngleY:DTWAIN_FLOAT; scalingX:DTWAIN_FLOAT; scalingY:DTWAIN_FLOAT; transformType:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddPDFTextEx';
-function DTWAIN_AddPDFTextExA(Source:DTWAIN_SOURCE; szText:LPCSTR; xPos:LONG; yPos:LONG; fontName:LPCSTR; fontSize:DTWAIN_FLOAT; colorRGB:LONG; renderMode:LONG; scaling:DTWAIN_FLOAT; charSpacing:DTWAIN_FLOAT; wordSpacing:DTWAIN_FLOAT; strokeWidth:DTWAIN_FLOAT; rotationAngle:DTWAIN_FLOAT; skewAngleX:DTWAIN_FLOAT; skewAngleY:DTWAIN_FLOAT; scalingX:DTWAIN_FLOAT; scalingY:DTWAIN_FLOAT; transformType:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddPDFTextExA';
-function DTWAIN_AddPDFTextExW(Source:DTWAIN_SOURCE; szText:LPCWSTR; xPos:LONG; yPos:LONG; fontName:LPCWSTR; fontSize:DTWAIN_FLOAT; colorRGB:LONG; renderMode:LONG; scaling:DTWAIN_FLOAT; charSpacing:DTWAIN_FLOAT; wordSpacing:DTWAIN_FLOAT; strokeWidth:DTWAIN_FLOAT; rotationAngle:DTWAIN_FLOAT; skewAngleX:DTWAIN_FLOAT; skewAngleY:DTWAIN_FLOAT; scalingX:DTWAIN_FLOAT; scalingY:DTWAIN_FLOAT; transformType:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddPDFTextExW';
 function DTWAIN_AddPDFTextString(Source:DTWAIN_SOURCE; szText:LPCTSTR; xPos:LONG; yPos:LONG; fontName:LPCTSTR; fontSize:LPCTSTR; colorRGB:LONG; renderMode:LONG; scaling:LPCTSTR; charSpacing:LPCTSTR; wordSpacing:LPCTSTR; strokeWidth:LPCTSTR; Flags:DWORD) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddPDFTextString';
 function DTWAIN_AddPDFTextStringA(Source:DTWAIN_SOURCE; szText:LPCSTR; xPos:LONG; yPos:LONG; fontName:LPCSTR; fontSize:LPCSTR; colorRGB:LONG; renderMode:LONG; scaling:LPCSTR; charSpacing:LPCSTR; wordSpacing:LPCSTR; strokeWidth:LPCSTR; Flags:DWORD) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddPDFTextStringA';
 function DTWAIN_AddPDFTextStringW(Source:DTWAIN_SOURCE; szText:LPCWSTR; xPos:LONG; yPos:LONG; fontName:LPCWSTR; fontSize:LPCWSTR; colorRGB:LONG; renderMode:LONG; scaling:LPCWSTR; charSpacing:LPCWSTR; wordSpacing:LPCWSTR; strokeWidth:LPCWSTR; Flags:DWORD) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AddPDFTextStringW';
@@ -1983,7 +1976,6 @@ function DTWAIN_ArrayGetMaxStringLength(a:DTWAIN_ARRAY) : LONG; stdcall;  extern
 function DTWAIN_ArrayGetSourceAt(pArray:DTWAIN_ARRAY; nWhere:LONG; ppSource:LPDTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayGetSourceAt';
 function DTWAIN_ArrayGetStringLength(a:DTWAIN_ARRAY; nWhichString:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayGetStringLength';
 function DTWAIN_ArrayGetType(pArray:DTWAIN_ARRAY) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayGetType';
-function DTWAIN_ArrayInit : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayInit';
 function DTWAIN_ArrayInsertAt(pArray:DTWAIN_ARRAY; nWhere:LONG; pVariant:LPVOID) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayInsertAt';
 function DTWAIN_ArrayInsertAtANSIString(pArray:DTWAIN_ARRAY; nWhere:LONG; pVal:LPCSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayInsertAtANSIString';
 function DTWAIN_ArrayInsertAtANSIStringN(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCSTR; num:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayInsertAtANSIStringN';
@@ -2530,7 +2522,6 @@ function DTWAIN_GetSourceVersionInfo(Source:DTWAIN_SOURCE; szProduct:LPTSTR; nMa
 function DTWAIN_GetSourceVersionInfoA(Source:DTWAIN_SOURCE; szProduct:LPSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetSourceVersionInfoA';
 function DTWAIN_GetSourceVersionInfoW(Source:DTWAIN_SOURCE; szProduct:LPWSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetSourceVersionInfoW';
 function DTWAIN_GetSourceVersionNumber(Source:DTWAIN_SOURCE; pMajor:LPLONG; pMinor:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetSourceVersionNumber';
-function DTWAIN_GetStaticLibVersion : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetStaticLibVersion';
 function DTWAIN_GetTempFileDirectory(szFilePath:LPTSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTempFileDirectory';
 function DTWAIN_GetTempFileDirectoryA(szFilePath:LPSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTempFileDirectoryA';
 function DTWAIN_GetTempFileDirectoryW(szFilePath:LPWSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTempFileDirectoryW';
@@ -2555,7 +2546,6 @@ function DTWAIN_GetTwainNameFromConstantEx(lConstantType:LONG; lTwainConstant:LO
 function DTWAIN_GetTwainNameFromConstantExA(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainNameFromConstantExA';
 function DTWAIN_GetTwainNameFromConstantExW(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPWSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainNameFromConstantExW';
 function DTWAIN_GetTwainNameFromConstantW(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPWSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainNameFromConstantW';
-function DTWAIN_GetTwainTimeout : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainTimeout';
 function DTWAIN_GetVersion(lpMajor:LPLONG; lpMinor:LPLONG; lpVersionType:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetVersion';
 function DTWAIN_GetVersionCopyright(lpszApp:LPTSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetVersionCopyright';
 function DTWAIN_GetVersionCopyrightA(lpszApp:LPSTR; nLength:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetVersionCopyrightA';
@@ -2580,9 +2570,6 @@ function DTWAIN_GetYResolutionString(Source:DTWAIN_SOURCE; Resolution:LPTSTR) : 
 function DTWAIN_GetYResolutionStringA(Source:DTWAIN_SOURCE; Resolution:LPSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetYResolutionStringA';
 function DTWAIN_GetYResolutionStringW(Source:DTWAIN_SOURCE; Resolution:LPWSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetYResolutionStringW';
 function DTWAIN_InitExtImageInfo(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_InitExtImageInfo';
-function DTWAIN_InitImageFileAppend(szFile:LPCTSTR; fType:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_InitImageFileAppend';
-function DTWAIN_InitImageFileAppendA(szFile:LPCSTR; fType:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_InitImageFileAppendA';
-function DTWAIN_InitImageFileAppendW(szFile:LPCWSTR; fType:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_InitImageFileAppendW';
 function DTWAIN_InitOCRInterface : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_InitOCRInterface';
 function DTWAIN_IsAcquiring : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsAcquiring';
 function DTWAIN_IsAudioXferSupported(Source:DTWAIN_SOURCE; supportVal:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsAudioXferSupported';
@@ -2975,7 +2962,6 @@ function DTWAIN_SetPrinterStrings(Source:DTWAIN_SOURCE; ArrayString:DTWAIN_ARRAY
 function DTWAIN_SetPrinterSuffixString(Source:DTWAIN_SOURCE; Suffix:LPCTSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetPrinterSuffixString';
 function DTWAIN_SetPrinterSuffixStringA(Source:DTWAIN_SOURCE; Suffix:LPCSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetPrinterSuffixStringA';
 function DTWAIN_SetPrinterSuffixStringW(Source:DTWAIN_SOURCE; Suffix:LPCWSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetPrinterSuffixStringW';
-function DTWAIN_SetQueryCapSupport(bSet:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetQueryCapSupport';
 function DTWAIN_SetResolution(Source:DTWAIN_SOURCE; Resolution:DTWAIN_FLOAT) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetResolution';
 function DTWAIN_SetResolutionString(Source:DTWAIN_SOURCE; Resolution:LPCTSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetResolutionString';
 function DTWAIN_SetResolutionStringA(Source:DTWAIN_SOURCE; Resolution:LPCSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetResolutionStringA';
@@ -3013,7 +2999,6 @@ function DTWAIN_SetTwainLog(LogFlags:DWORD; lpszLogFile:LPCTSTR) : BOOL; stdcall
 function DTWAIN_SetTwainLogA(LogFlags:DWORD; lpszLogFile:LPCSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetTwainLogA';
 function DTWAIN_SetTwainLogW(LogFlags:DWORD; lpszLogFile:LPCWSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetTwainLogW';
 function DTWAIN_SetTwainMode(lAcquireMode:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetTwainMode';
-function DTWAIN_SetTwainTimeout(milliseconds:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetTwainTimeout';
 function DTWAIN_SetUpdateDibProc(DibProc:DTwainDIBUpdateProc) : DTwainDIBUpdateProc; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetUpdateDibProc';
 function DTWAIN_SetXResolution(Source:DTWAIN_SOURCE; xResolution:DTWAIN_FLOAT) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetXResolution';
 function DTWAIN_SetXResolutionString(Source:DTWAIN_SOURCE; Resolution:LPCTSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetXResolutionString';
@@ -3032,12 +3017,6 @@ function DTWAIN_StartTwainSessionA(hWndMsg:NativeInt; lpszDLLName:LPCSTR) : BOOL
 function DTWAIN_StartTwainSessionW(hWndMsg:NativeInt; lpszDLLName:LPCWSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_StartTwainSessionW';
 function DTWAIN_SysDestroy : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SysDestroy';
 function DTWAIN_SysInitialize : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SysInitialize';
-function DTWAIN_SysInitializeEx(szINIPath:LPCTSTR) : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SysInitializeEx';
-function DTWAIN_SysInitializeEx2(szINIPath:LPCTSTR; szImageDLLPath:LPCTSTR; szLangResourcePath:LPCTSTR) : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SysInitializeEx2';
-function DTWAIN_SysInitializeEx2A(szINIPath:LPCSTR; szImageDLLPath:LPCSTR; szLangResourcePath:LPCSTR) : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SysInitializeEx2A';
-function DTWAIN_SysInitializeEx2W(szINIPath:LPCWSTR; szImageDLLPath:LPCWSTR; szLangResourcePath:LPCWSTR) : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SysInitializeEx2W';
-function DTWAIN_SysInitializeExA(szINIPath:LPCSTR) : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SysInitializeExA';
-function DTWAIN_SysInitializeExW(szINIPath:LPCWSTR) : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SysInitializeExW';
 function DTWAIN_SysInitializeNoBlocking : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SysInitializeNoBlocking';
 function DTWAIN_SysInitializeNoBlockingEx(bCreateLogFile:BOOL) : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SysInitializeNoBlockingEx';
 function DTWAIN_TestGetCap(Source:DTWAIN_SOURCE; lCapability:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_TestGetCap';

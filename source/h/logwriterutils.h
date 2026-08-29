@@ -40,7 +40,7 @@ namespace dynarithmic
         static constexpr int maxOutput = 256;
         static void  WriteLogInfo(CTL_StringViewType s, bool bFlush = false);
         static void  WriteLogInfoA(std::string_view s, bool bFlush = false);
-        static void  WriteLogInfoExA(long filterFlags, std::string_view s, bool bFlush = false);
+        static void  WriteLogInfoExA(uint32_t filterFlags, std::string_view s, bool bFlush = false);
         static void  WriteLogInfoW(std::wstring_view s, bool bFlush = false);
         static void  WriteLogInfoIndentedA(std::string_view s);
         static void  WriteLogInfoIndentedW(std::wstring_view s);
@@ -51,6 +51,7 @@ namespace dynarithmic
         static void  WriteMultiLineInfoIndented(CTL_StringViewType s, const CTL_StringType::traits_type::char_type* pszDelim);
         static void  WriteMultiLineInfoIndentedA(std::string_view s, const char* pszDelim);
         static void  WriteMultiLineInfoIndentedW(std::wstring_view s, const wchar_t* pszDelim);
+        static void  LogDTWAINErrorToMsgBox(int nError, LPCSTR pFunc, std::string_view s);
 
         private:
             static void MultiLineWriter(std::string_view s, const char* pszDelim, int nWhich);

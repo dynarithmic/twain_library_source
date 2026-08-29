@@ -39,12 +39,12 @@
 #include "ctlmapdefs.h"
 namespace dynarithmic
 {
-    typedef CTL_PDFMediaMap MediaBoxMap;
-    typedef std::map< unsigned int, PDFFont> FontRefToFontInfoMap;
-    typedef std::map< std::string, PDFFont> FontNameToFontInfoMap;
-    typedef std::map< unsigned int, PDFFont> FontNumberToFontInfoMap;
-    typedef std::set< std::string > StringSet;
-    typedef std::vector< std::string > StringVector;
+    using MediaBoxMap = CTL_PDFMediaMap;
+    using FontRefToFontInfoMap = std::map< unsigned int, PDFFont>;
+    using FontNameToFontInfoMap = std::map< std::string, PDFFont>;
+    using FontNumberToFontInfoMap = std::map< unsigned int, PDFFont>;
+    using StringSet = std::set< std::string >;
+    using StringVector = std::vector< std::string >;
 
     class PdfDocument;
     using PdfDocumentPtr = std::shared_ptr<PdfDocument>;
@@ -143,8 +143,8 @@ namespace dynarithmic
             double m_yscale;
     };
 
-    typedef std::map<unsigned long, unsigned long> CRCMapToObj;
-    typedef std::map<unsigned long, unsigned long> CRCMapToPage;
+    using CRCMapToObj = std::map<unsigned long, unsigned long>;
+    using CRCMapToPage = std::map<unsigned long, unsigned long>;
 
     class ImageObject : public PDFObject
     {

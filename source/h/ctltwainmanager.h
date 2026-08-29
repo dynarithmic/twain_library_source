@@ -30,13 +30,14 @@
 #include "ctlenum.h"
 #include "ctltwaindecoder.h"
 #include "ctltripletbase.h"
-#include "ctltr011.h"
-#include "ctltr012.h"
-#include "ctltr014.h"
-#include "ctltr015.h"
-#include "ctltr035.h"
-#include "ctltr045.h"
+#include "ctltr005.h"
+#include "ctltr006.h"
+#include "ctltr008.h"
+#include "ctltr009.h"
+#include "ctltr026.h"
+#include "ctltr036.h"
 #include <boost/dll/shared_library.hpp>
+
 namespace dynarithmic
 {
     class CTL_TwainDibArray;
@@ -46,7 +47,7 @@ namespace dynarithmic
 
 
     class CTL_TwainAppMgr;
-    typedef std::shared_ptr<CTL_TwainAppMgr> CTL_TwainAppMgrPtr;
+    using CTL_TwainAppMgrPtr = std::shared_ptr<CTL_TwainAppMgr>;
 
     static constexpr int INVALID_CONDITION_CODE = -9999;
 
@@ -441,7 +442,6 @@ namespace dynarithmic
             static int               s_nLastError;
             static std::string        s_strLastError;
             static HINSTANCE         s_ThisInstance;
-            static VOID CALLBACK TwainTimeOutProc(HWND, UINT, ULONG, DWORD);
     };
 
     #define DTWAIN_ERROR_CONDITION(Err, RetVal, mustReport) {               \

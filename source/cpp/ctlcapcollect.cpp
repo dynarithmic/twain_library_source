@@ -113,13 +113,3 @@ namespace dynarithmic
         return DTWAIN_CacheCapabilityInfo(p, pHandle, &vCaps);
     }
 }
-
-using namespace dynarithmic;
-
-extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetQueryCapSupport(DTWAIN_BOOL bSet)
-{
-    LOG_FUNC_ENTRY_PARAMS((bSet))
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-

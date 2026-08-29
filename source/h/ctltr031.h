@@ -21,43 +21,35 @@
 #ifndef CTLTR031_H
 #define CTLTR031_H
 
-#include "ctltr026.h"
-#include "ctltwainmemoryimpl.h"
-
+#include "ctltripletbase.h"
 namespace dynarithmic
 {
-    class CTL_ImageMemXferTriplet : public CTL_ImageXferTriplet
+    class CTL_ITwainSession;
+
+    class CTL_DSMCallbackTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
-                                    CTL_ITwainSource* pSource,
-                                    HANDLE hDib = {},
-                                    TW_UINT32 nFlags = 0,
-                                    TW_UINT16 nPixelType = 0,
-                                    TW_UINT32 nNumBytes = 0,
-                                    TW_UINT16 nCompression=TWCP_NONE);
+            CTL_DSMCallbackTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, TW_UINT16 msg);
+            void setDSMEntryProc(DSMENTRYPROC proc)
+            {
+                m_DSMEntryProc = proc;
+                m_TWCallback.CallBackProc = reinterpret_cast<TW_MEMREF>(proc);
+                m_TWCallback.RefCon = 0;
+            }
+            DSMENTRYPROC getEntryProc() const { return m_DSMEntryProc; }
+            TW_CALLBACK getCallback() const { return m_TWCallback; }
 
-            TW_UINT16           Execute() override;
-            ~CTL_ImageMemXferTriplet() override;
-            CTL_ImageMemXferTriplet(const CTL_ImageMemXferTriplet&) = delete;
-            CTL_ImageMemXferTriplet& operator=(const CTL_ImageMemXferTriplet&) = delete;
-
-        protected:
-            void InitXferBuffer();
-            TW_IMAGEMEMXFER& GetMemXferBuffer() { return m_ImageMemXferBuffer; }
         private:
-            TW_IMAGEMEMXFER m_ImageMemXferBuffer;
-            TW_MEMORY       m_TempMemory;
-            HANDLE          m_DibStrip;
-            unsigned char TW_HUGE * m_ptrDib;
-            unsigned char TW_HUGE * m_ptrOrig;
-            TW_UINT16       m_nPixelType;
-            TW_UINT32       m_nCurDibSize;
-            TW_UINT16       m_nCompression;
-            TW_UINT32       m_nCompressPos;
-            CTL_TwainDynMemoryHandler m_dynMemoryHandler;
+            DSMENTRYPROC m_DSMEntryProc;
+            TW_CALLBACK m_TWCallback;
+    };
+
+    class CTL_DSMCallbackTripletRegister : public CTL_DSMCallbackTriplet
+    {
+        public:
+            CTL_DSMCallbackTripletRegister(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, DSMENTRYPROC proc) :
+                CTL_DSMCallbackTriplet(pSession, pSource, MSG_REGISTER_CALLBACK)
+            { setDSMEntryProc(proc); }
     };
 }
 #endif
-
-

@@ -18,35 +18,37 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTR043_H
-#define CTLTR043_H
+#ifndef CTLTR006_H
+#define CTLTR006_H
 
-#include "ctltr026.h"
+#include "ctltr005.h"
 
 namespace dynarithmic
 {
-    class CTL_ImageMemFileXferTriplet : public CTL_ImageXferTriplet
+    class CTL_CapabilityGetEnumTriplet : public CTL_CapabilityGetTriplet
     {
         public:
-            CTL_ImageMemFileXferTriplet(CTL_ITwainSession *pSession,
-                                        CTL_ITwainSource* pSource,
-                                        TW_UINT32 numBytes,
-                                        bool bHandleMemory = false);
+            CTL_CapabilityGetEnumTriplet(CTL_ITwainSession *pSession,
+                                         CTL_ITwainSource *pSource,
+                                         TW_UINT16   gType,
+                                         TW_UINT16         gCap,
+                                         TW_UINT16 TwainDataType=0xFFFF)
+                : CTL_CapabilityGetTriplet(pSession,
+                    pSource,
+                    gType,
+                    gCap,
+                    TwainDataType) {}
 
-            TW_UINT16           Execute() override;
-            ~CTL_ImageMemFileXferTriplet() override;
-            CTL_ImageMemFileXferTriplet(const CTL_ImageMemFileXferTriplet&) = delete;
-            CTL_ImageMemFileXferTriplet& operator=(const CTL_ImageMemFileXferTriplet&) = delete;
+            bool GetValue(void* pData, size_t nWhere) override
+            {
+                return GenericGetValue(pData, nWhere);
+            }
 
         protected:
-            void InitXferBuffer();
-            TW_IMAGEMEMXFER& GetMemXferBuffer() { return m_ImageMemXferBuffer; }
-        private:
-            TW_IMAGEMEMXFER m_ImageMemXferBuffer;
-            TW_UINT32 m_nCompressPos;
-            HANDLE hLocalHandle;
+            bool EnumCapValues(void* pCapData) override
+            {
+                return GenericEnumCapValues<TW_ENUMERATION>(pCapData);
+            }
     };
 }
 #endif
-
-

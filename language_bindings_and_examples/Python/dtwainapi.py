@@ -1832,13 +1832,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_AcquireNative.restype = ct.c_void_p
      theDLL.DTWAIN_AcquireNativeEx.restype = ct.c_long
      theDLL.DTWAIN_AcquireToClipboard.restype = ct.c_void_p
-     theDLL.DTWAIN_AddExtImageInfoQuery.restype = ct.c_long
      theDLL.DTWAIN_AddPDFText.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextA.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextElement.restype = ct.c_long
-     theDLL.DTWAIN_AddPDFTextEx.restype = ct.c_long
-     theDLL.DTWAIN_AddPDFTextExA.restype = ct.c_long
-     theDLL.DTWAIN_AddPDFTextExW.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextString.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextStringA.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextStringW.restype = ct.c_long
@@ -1942,7 +1938,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayGetSourceAt.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetStringLength.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetType.restype = ct.c_long
-     theDLL.DTWAIN_ArrayInit.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayInsertAt.restype = ct.c_long
      theDLL.DTWAIN_ArrayInsertAtANSIString.restype = ct.c_long
      theDLL.DTWAIN_ArrayInsertAtANSIStringN.restype = ct.c_long
@@ -2489,7 +2484,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetSourceVersionInfoA.restype = ct.c_long
      theDLL.DTWAIN_GetSourceVersionInfoW.restype = ct.c_long
      theDLL.DTWAIN_GetSourceVersionNumber.restype = ct.c_long
-     theDLL.DTWAIN_GetStaticLibVersion.restype = ct.c_long
      theDLL.DTWAIN_GetTempFileDirectory.restype = ct.c_long
      theDLL.DTWAIN_GetTempFileDirectoryA.restype = ct.c_long
      theDLL.DTWAIN_GetTempFileDirectoryW.restype = ct.c_long
@@ -2514,7 +2508,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetTwainNameFromConstantExA.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantExW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantW.restype = ct.c_long
-     theDLL.DTWAIN_GetTwainTimeout.restype = ct.c_long
      theDLL.DTWAIN_GetVersion.restype = ct.c_long
      theDLL.DTWAIN_GetVersionCopyright.restype = ct.c_long
      theDLL.DTWAIN_GetVersionCopyrightA.restype = ct.c_long
@@ -2539,9 +2532,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetYResolutionStringA.restype = ct.c_long
      theDLL.DTWAIN_GetYResolutionStringW.restype = ct.c_long
      theDLL.DTWAIN_InitExtImageInfo.restype = ct.c_long
-     theDLL.DTWAIN_InitImageFileAppend.restype = ct.c_long
-     theDLL.DTWAIN_InitImageFileAppendA.restype = ct.c_long
-     theDLL.DTWAIN_InitImageFileAppendW.restype = ct.c_long
      theDLL.DTWAIN_InitOCRInterface.restype = ct.c_long
      theDLL.DTWAIN_IsAcquiring.restype = ct.c_long
      theDLL.DTWAIN_IsAudioXferSupported.restype = ct.c_long
@@ -2932,7 +2922,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetPrinterSuffixString.restype = ct.c_long
      theDLL.DTWAIN_SetPrinterSuffixStringA.restype = ct.c_long
      theDLL.DTWAIN_SetPrinterSuffixStringW.restype = ct.c_long
-     theDLL.DTWAIN_SetQueryCapSupport.restype = ct.c_long
      theDLL.DTWAIN_SetResolution.restype = ct.c_long
      theDLL.DTWAIN_SetResolutionString.restype = ct.c_long
      theDLL.DTWAIN_SetResolutionStringA.restype = ct.c_long
@@ -2969,7 +2958,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetTwainLogA.restype = ct.c_long
      theDLL.DTWAIN_SetTwainLogW.restype = ct.c_long
      theDLL.DTWAIN_SetTwainMode.restype = ct.c_long
-     theDLL.DTWAIN_SetTwainTimeout.restype = ct.c_long
      theDLL.DTWAIN_SetUpdateDibProc.restype = theDLL.DIBUPDATEPROC_TYPE
      theDLL.DTWAIN_SetXResolution.restype = ct.c_long
      theDLL.DTWAIN_SetXResolutionString.restype = ct.c_long
@@ -2988,12 +2976,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_StartTwainSessionW.restype = ct.c_long
      theDLL.DTWAIN_SysDestroy.restype = ct.c_long
      theDLL.DTWAIN_SysInitialize.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2A.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2W.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeExA.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeExW.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeNoBlocking.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeNoBlockingEx.restype = ct.c_void_p
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
@@ -3017,13 +2999,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_AcquireNative.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_AcquireNativeEx.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_AcquireToClipboard.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.POINTER(ct.c_long)]
-     theDLL.DTWAIN_AddExtImageInfoQuery.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_AddPDFText.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextElement.argtypes = [ct.c_void_p, ct.c_void_p]
-     theDLL.DTWAIN_AddPDFTextEx.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
-     theDLL.DTWAIN_AddPDFTextExA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
-     theDLL.DTWAIN_AddPDFTextExW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
      theDLL.DTWAIN_AddPDFTextString.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_ulong]
@@ -3693,9 +3671,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetYResolutionStringA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_GetYResolutionStringW.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_InitExtImageInfo.argtypes = [ct.c_void_p]
-     theDLL.DTWAIN_InitImageFileAppend.argtypes = [ct.c_wchar_p, ct.c_long]
-     theDLL.DTWAIN_InitImageFileAppendA.argtypes = [ct.c_char_p, ct.c_long]
-     theDLL.DTWAIN_InitImageFileAppendW.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_IsAudioXferSupported.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_IsAutoBorderDetectEnabled.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsAutoBorderDetectSupported.argtypes = [ct.c_void_p]
@@ -4073,7 +4048,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetPrinterSuffixString.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_SetPrinterSuffixStringA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetPrinterSuffixStringW.argtypes = [ct.c_void_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SetQueryCapSupport.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetResolution.argtypes = [ct.c_void_p, ct.c_double]
      theDLL.DTWAIN_SetResolutionString.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_SetResolutionStringA.argtypes = [ct.c_void_p, ct.c_char_p]
@@ -4110,7 +4084,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetTwainLogA.argtypes = [ct.c_ulong, ct.c_char_p]
      theDLL.DTWAIN_SetTwainLogW.argtypes = [ct.c_ulong, ct.c_wchar_p]
      theDLL.DTWAIN_SetTwainMode.argtypes = [ct.c_long]
-     theDLL.DTWAIN_SetTwainTimeout.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetUpdateDibProc.argtypes = [theDLL.DIBUPDATEPROC_TYPE]
      theDLL.DTWAIN_SetXResolution.argtypes = [ct.c_void_p, ct.c_double]
      theDLL.DTWAIN_SetXResolutionString.argtypes = [ct.c_void_p, ct.c_wchar_p]
@@ -4127,12 +4100,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_StartTwainSession.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_StartTwainSessionA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_StartTwainSessionW.argtypes = [ct.c_void_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeEx.argtypes = [ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeEx2.argtypes = [ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeEx2A.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeEx2W.argtypes = [ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeExA.argtypes = [ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeExW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_SysInitializeNoBlockingEx.argtypes = [ct.c_long]
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
@@ -4169,13 +4136,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_AcquireNative.restype = ct.c_void_p
      theDLL.DTWAIN_AcquireNativeEx.restype = ct.c_long
      theDLL.DTWAIN_AcquireToClipboard.restype = ct.c_void_p
-     theDLL.DTWAIN_AddExtImageInfoQuery.restype = ct.c_long
      theDLL.DTWAIN_AddPDFText.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextA.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextElement.restype = ct.c_long
-     theDLL.DTWAIN_AddPDFTextEx.restype = ct.c_long
-     theDLL.DTWAIN_AddPDFTextExA.restype = ct.c_long
-     theDLL.DTWAIN_AddPDFTextExW.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextString.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextStringA.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextStringW.restype = ct.c_long
@@ -4279,7 +4242,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayGetSourceAt.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetStringLength.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetType.restype = ct.c_long
-     theDLL.DTWAIN_ArrayInit.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayInsertAt.restype = ct.c_long
      theDLL.DTWAIN_ArrayInsertAtANSIString.restype = ct.c_long
      theDLL.DTWAIN_ArrayInsertAtANSIStringN.restype = ct.c_long
@@ -4826,7 +4788,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetSourceVersionInfoA.restype = ct.c_long
      theDLL.DTWAIN_GetSourceVersionInfoW.restype = ct.c_long
      theDLL.DTWAIN_GetSourceVersionNumber.restype = ct.c_long
-     theDLL.DTWAIN_GetStaticLibVersion.restype = ct.c_long
      theDLL.DTWAIN_GetTempFileDirectory.restype = ct.c_long
      theDLL.DTWAIN_GetTempFileDirectoryA.restype = ct.c_long
      theDLL.DTWAIN_GetTempFileDirectoryW.restype = ct.c_long
@@ -4851,7 +4812,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetTwainNameFromConstantExA.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantExW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantW.restype = ct.c_long
-     theDLL.DTWAIN_GetTwainTimeout.restype = ct.c_long
      theDLL.DTWAIN_GetVersion.restype = ct.c_long
      theDLL.DTWAIN_GetVersionCopyright.restype = ct.c_long
      theDLL.DTWAIN_GetVersionCopyrightA.restype = ct.c_long
@@ -4876,9 +4836,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetYResolutionStringA.restype = ct.c_long
      theDLL.DTWAIN_GetYResolutionStringW.restype = ct.c_long
      theDLL.DTWAIN_InitExtImageInfo.restype = ct.c_long
-     theDLL.DTWAIN_InitImageFileAppend.restype = ct.c_long
-     theDLL.DTWAIN_InitImageFileAppendA.restype = ct.c_long
-     theDLL.DTWAIN_InitImageFileAppendW.restype = ct.c_long
      theDLL.DTWAIN_InitOCRInterface.restype = ct.c_long
      theDLL.DTWAIN_IsAcquiring.restype = ct.c_long
      theDLL.DTWAIN_IsAudioXferSupported.restype = ct.c_long
@@ -5269,7 +5226,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetPrinterSuffixString.restype = ct.c_long
      theDLL.DTWAIN_SetPrinterSuffixStringA.restype = ct.c_long
      theDLL.DTWAIN_SetPrinterSuffixStringW.restype = ct.c_long
-     theDLL.DTWAIN_SetQueryCapSupport.restype = ct.c_long
      theDLL.DTWAIN_SetResolution.restype = ct.c_long
      theDLL.DTWAIN_SetResolutionString.restype = ct.c_long
      theDLL.DTWAIN_SetResolutionStringA.restype = ct.c_long
@@ -5306,7 +5262,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetTwainLogA.restype = ct.c_long
      theDLL.DTWAIN_SetTwainLogW.restype = ct.c_long
      theDLL.DTWAIN_SetTwainMode.restype = ct.c_long
-     theDLL.DTWAIN_SetTwainTimeout.restype = ct.c_long
      theDLL.DTWAIN_SetUpdateDibProc.restype = theDLL.DIBUPDATEPROC_TYPE
      theDLL.DTWAIN_SetXResolution.restype = ct.c_long
      theDLL.DTWAIN_SetXResolutionString.restype = ct.c_long
@@ -5325,12 +5280,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_StartTwainSessionW.restype = ct.c_long
      theDLL.DTWAIN_SysDestroy.restype = ct.c_long
      theDLL.DTWAIN_SysInitialize.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2A.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeEx2W.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeExA.restype = ct.c_void_p
-     theDLL.DTWAIN_SysInitializeExW.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeNoBlocking.restype = ct.c_void_p
      theDLL.DTWAIN_SysInitializeNoBlockingEx.restype = ct.c_void_p
      theDLL.DTWAIN_TestGetCap.restype = ct.c_void_p
@@ -5354,13 +5303,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_AcquireNative.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_AcquireNativeEx.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_AcquireToClipboard.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.c_long, ct.POINTER(ct.c_long)]
-     theDLL.DTWAIN_AddExtImageInfoQuery.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_AddPDFText.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextElement.argtypes = [ct.c_void_p, ct.c_void_p]
-     theDLL.DTWAIN_AddPDFTextEx.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
-     theDLL.DTWAIN_AddPDFTextExA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
-     theDLL.DTWAIN_AddPDFTextExW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
      theDLL.DTWAIN_AddPDFTextString.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_ulong]
@@ -6030,9 +5975,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetYResolutionStringA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_GetYResolutionStringW.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_InitExtImageInfo.argtypes = [ct.c_void_p]
-     theDLL.DTWAIN_InitImageFileAppend.argtypes = [ct.c_char_p, ct.c_long]
-     theDLL.DTWAIN_InitImageFileAppendA.argtypes = [ct.c_char_p, ct.c_long]
-     theDLL.DTWAIN_InitImageFileAppendW.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_IsAudioXferSupported.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_IsAutoBorderDetectEnabled.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsAutoBorderDetectSupported.argtypes = [ct.c_void_p]
@@ -6410,7 +6352,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetPrinterSuffixString.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetPrinterSuffixStringA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetPrinterSuffixStringW.argtypes = [ct.c_void_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SetQueryCapSupport.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetResolution.argtypes = [ct.c_void_p, ct.c_double]
      theDLL.DTWAIN_SetResolutionString.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetResolutionStringA.argtypes = [ct.c_void_p, ct.c_char_p]
@@ -6447,7 +6388,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetTwainLogA.argtypes = [ct.c_ulong, ct.c_char_p]
      theDLL.DTWAIN_SetTwainLogW.argtypes = [ct.c_ulong, ct.c_wchar_p]
      theDLL.DTWAIN_SetTwainMode.argtypes = [ct.c_long]
-     theDLL.DTWAIN_SetTwainTimeout.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetUpdateDibProc.argtypes = [theDLL.DIBUPDATEPROC_TYPE]
      theDLL.DTWAIN_SetXResolution.argtypes = [ct.c_void_p, ct.c_double]
      theDLL.DTWAIN_SetXResolutionString.argtypes = [ct.c_void_p, ct.c_char_p]
@@ -6464,12 +6404,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_StartTwainSession.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_StartTwainSessionA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_StartTwainSessionW.argtypes = [ct.c_void_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeEx.argtypes = [ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeEx2.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeEx2A.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeEx2W.argtypes = [ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
-     theDLL.DTWAIN_SysInitializeExA.argtypes = [ct.c_char_p]
-     theDLL.DTWAIN_SysInitializeExW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_SysInitializeNoBlockingEx.argtypes = [ct.c_long]
      theDLL.DTWAIN_TestGetCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_UnlockMemory.argtypes = [ct.c_void_p]
