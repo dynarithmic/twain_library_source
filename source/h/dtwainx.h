@@ -25,6 +25,7 @@
 #include "twain.h"
 #include "winconst.h"
 #include "capconst.h"
+#include "dtwainc.h"
 /* ///////////////////////////////// DTWAIN Exported functions //////////////////////////// */
 #ifdef __cplusplus
   extern "C" {
