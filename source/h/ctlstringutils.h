@@ -803,6 +803,14 @@ namespace dynarithmic
                     return concatFn(str, val);
                 });
         }
+
+        template <typename StringType = DTWAIN_STRING_TYPE_>
+        void StripTrailingCR(std::string& str)
+        {
+            using char_type = typename StringType::value_type;
+            if (!str.empty() && str.back() == char_type('\r'))
+                str.pop_back();
+        }
     }
 }
 #endif

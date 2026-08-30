@@ -269,8 +269,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     /* Initialize DTWAIN */
     while (1)
     {
-        /* Try initialization, but do not show error
-           message box if there is a failure */
         if (DTWAIN_SysInitializeNoBlocking())
             break; 
 

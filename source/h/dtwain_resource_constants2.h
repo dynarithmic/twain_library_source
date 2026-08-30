@@ -248,4 +248,9 @@
 #define IDS_DTWAIN_VERSIONSTRING_SUBBUILD1  11002
 #define IDS_DTWAIN_VERSIONSTRING_SUBBUILD2  11003
 
+// Embedded TWAIN resources
+#define IDR_TWAININFO                       12000
+#define IDR_DTWAININI_64                    12001
+#define IDR_DTWAININI_32                    12002
+#define IDR_DTWAINRESOURCESTRINGS           12003
 #endif

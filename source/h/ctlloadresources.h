@@ -68,7 +68,8 @@ namespace dynarithmic
         ResourceLoadingInfo() : errorValue{} { errorValue[2] = true; }
     };
 
-    bool LoadTwainResources(ResourceLoadingInfo& ret);
+    bool LoadTwainResources(HMODULE hDLL, ResourceLoadingInfo& ret);
+    std::string LoadEmbeddedTwainInfo(HMODULE hModule, int resID);
     void UnloadStringResources();
     void UnloadErrorResources();
     std::vector<std::string> GetLangResourceNames();
