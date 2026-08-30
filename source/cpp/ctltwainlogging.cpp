@@ -42,6 +42,31 @@ namespace
     };
 
     using LogMsg_RAII = DTWAIN_RAII<LPSTR, LogWin_DestroyTraits>;
+
+    nlohmann::json INIToJson(const CSimpleIniA& ini)
+    {
+        nlohmann::json j = nlohmann::json::object();
+
+        CSimpleIniA::TNamesDepend sections;
+        ini.GetAllSections(sections);
+
+        for (const auto& section : sections)
+        {
+            CSimpleIniA::TNamesDepend keys;
+
+            if (!ini.GetAllKeys(section.pItem, keys))
+                continue;
+
+            auto& jsonSection = j[section.pItem];
+
+            for (const auto& key : keys)
+            {
+                const char* value = ini.GetValue(section.pItem, key.pItem, "");
+                jsonSection[key.pItem] = value;
+            }
+        }
+        return j;
+    }
 }
 
 namespace dynarithmic
@@ -202,11 +227,10 @@ namespace dynarithmic
         auto iniInterface = CTL_StaticData::GetINIInterface();
         if (iniInterface)
         {
-            if (iniInterface->Save(iniDump) >= 0)
-            {
-                std::string sAll = "Current DTWAIN INI settings:\n" + iniDump + "\n";
-                LogWriterUtils::WriteLogInfoA(sAll);
-            }
+            auto jsonObj = INIToJson(*iniInterface);
+            iniDump = jsonObj.dump(2);
+            std::string sAll = "Current DTWAIN INI settings:\n" + iniDump + "\n";
+            LogWriterUtils::WriteLogInfoA(sAll);
         }
     }
 
