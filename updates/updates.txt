@@ -4,12 +4,14 @@ DTWAIN Version changes
 
 - The main twain resource files, twaininfo.txt, dtwain32.ini, and dtwain64.ini are now
   embedded into the DTWAIN DLL files.  This will remove the mandatory prerequisite that these
-  resource files are available when DTWAIN_SysInitialize() is called.  For most DTWAIN users, 
-  the only difference would be that the twaininfo.txt, dtwain32.ini, and dtwain64.ini as external 
-  files are no longer necessary.
+  resource files are available when DTWAIN_SysInitialize() is called.  
+
+  For most DTWAIN users, the only difference would be that the twaininfo.txt, dtwain32.ini, 
+  and dtwain64.ini as external files are no longer necessary for DTWAIN_SysInitialize() to 
+  correctly initialize DTWAIN.
 
   If there already is an existing dtwain32.ini or dtwain64.ini file that has been customized, the 
-  external settings in these INI files are merged into the default, embeeded INI settings when
+  external settings in these INI files are merged into the default, embedded INI settings when
   DTWAIN_SysInitialize() is called.
 
   On shutdown of DTWAIN (when DTWAIN_SysDestroy() is called), there will be a merged dtwain32.ini
