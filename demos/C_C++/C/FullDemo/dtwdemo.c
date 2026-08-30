@@ -269,9 +269,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     /* Initialize DTWAIN */
     while (1)
     {
-        /* Point to where the language text resources reside */
-        DTWAIN_SetResourcePathA(ALTERNATE_RESOURCE_PATH);
-
         if (DTWAIN_SysInitialize())
             break; 
 
@@ -285,6 +282,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         else
             return 0;
     }
+
+    /* Point to where the language text resources may reside */
+    DTWAIN_SetResourcePathA(ALTERNATE_RESOURCE_PATH);
+    BOOL bRet = DTWAIN_LoadCustomStringResourcesA("english");
+    if (!bRet)
+        DTWAIN_SetResourcePathA("");
+
     LONG major, minor, versiontype, patch;
     DTWAIN_GetVersionEx(&major, &minor, &versiontype, &patch);
 
