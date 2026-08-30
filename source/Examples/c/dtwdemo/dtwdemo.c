@@ -269,18 +269,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     /* Initialize DTWAIN */
     while (1)
     {
-        if (DTWAIN_SysInitializeNoBlocking())
-            break; 
-
-        /* Retry initialization with alternate path */
+        /* Point to where the language text resources reside */
         DTWAIN_SetResourcePathA(ALTERNATE_RESOURCE_PATH);
 
-        /* Try initialization again using the alternate path */
         if (DTWAIN_SysInitialize())
-            break;
-
-        /* Reset the resource path to the default (which is the DTWAIN DLL's path) */
-        DTWAIN_SetResourcePathA("");
+            break; 
 
         /* Failed, so either the user exits the program, or copies the 
            proper text resource files to a folder (on the path or to the 

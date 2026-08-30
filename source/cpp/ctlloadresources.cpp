@@ -129,16 +129,6 @@ namespace
         return true;
     }
 
-    std::string GetResourceString_Internal(UINT nResNumber)
-    {
-        // First check the external resources
-        auto str = GetResourceStringFromMap(static_cast<LONG>(nResNumber));
-        if (str.empty())
-            // Try the internal resources
-            str = LoadResourceFromRC(nResNumber);
-        return str;
-    }
-
     void ClearMapEntries(CTL_LongToStringMap& resourceMap, LONG border, bool deleteBeforeBorder = true)
     {
         if (resourceMap.empty())
@@ -663,6 +653,16 @@ namespace dynarithmic
         return resText;
     }
 
+    std::string GetResourceString_Internal(int nResNumber)
+    {
+        // First check the external resources
+        auto str = GetResourceStringFromMap(static_cast<LONG>(std::abs(nResNumber)));
+        if (str.empty())
+            // Try the internal resources
+            str = LoadResourceFromRC(nResNumber);
+        return str;
+    }
+
     bool LoadTwainResources(HMODULE hModule, ResourceLoadingInfo& retValue)
     {
         LOG_FUNC_ENTRY_PARAMS(())
@@ -835,8 +835,6 @@ namespace dynarithmic
                 try 
                 {
                     resNum = std::stoi(sArray[0]);
-                    if (resNum == 9700)
-                        OutputDebugStringA("");
                 }
                 catch(...)
                 {

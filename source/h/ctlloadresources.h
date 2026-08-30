@@ -46,6 +46,7 @@ namespace dynarithmic
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize);
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize);
     std::string GetErrorString_Internal(int nError);
+    std::string GetResourceString_Internal(int nResNumber);
 
     struct ResourceLoadingInfo
     {

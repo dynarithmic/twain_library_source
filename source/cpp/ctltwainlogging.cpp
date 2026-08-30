@@ -196,6 +196,20 @@ namespace dynarithmic
         }
     }
 
+    void LogDTWAININISettings()
+    {
+        std::string iniDump;
+        auto iniInterface = CTL_StaticData::GetINIInterface();
+        if (iniInterface)
+        {
+            if (iniInterface->Save(iniDump) >= 0)
+            {
+                std::string sAll = "Current DTWAIN INI settings:\n" + iniDump + "\n";
+                LogWriterUtils::WriteLogInfoA(sAll);
+            }
+        }
+    }
+
     std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const LoggingTraits& lTraits)
     {
         uint16_t nWhichLogging = 0;
@@ -348,9 +362,10 @@ extern "C"
                 DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO, false);
             }
 
-            // If there are opened sources, log the capabilities for each
+            // Log the INI settings, and if there are opened sources, log the capabilities for each
             if (logFilterFlags)
             {
+                LogDTWAININISettings();
                 auto pOpenedSources = GetOpenSources(pHandle);
                 for (auto* pCurSource : pOpenedSources)
                     LogSourceCapabilities(pCurSource, false);

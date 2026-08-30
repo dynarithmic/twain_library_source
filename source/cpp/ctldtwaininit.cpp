@@ -836,7 +836,13 @@ namespace
             }
 
             // Close out the other INI changes
-            customProfile->SaveFile(CTL_StaticData::GetINIPath().c_str());
+            auto saveResults = customProfile->SaveFile(CTL_StaticData::GetINIPath().c_str());
+            if ( saveResults < 0 )
+            {
+                std::string errorString = GetResourceString_Internal(DTWAIN_ERR_FILEWRITE) + " ";
+                errorString += DTWAIN_ININAME;
+                LogWriterUtils::WriteLogInfoIndentedA(errorString);
+            }
             CTL_StaticData::s_iniInterface.reset();
             CTL_StaticData::SetINIFileLoaded(false);
         }
