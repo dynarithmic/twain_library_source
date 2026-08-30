@@ -27,6 +27,7 @@
 #include "ctlgetversion.h"
 #include "dtwinverex.h"
 #include "ctltwainidentity.h"
+#include "../nlohmann/json.hpp"
 
 using namespace dynarithmic;
 
