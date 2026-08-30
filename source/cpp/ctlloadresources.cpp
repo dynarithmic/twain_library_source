@@ -821,7 +821,7 @@ namespace dynarithmic
         DTWAIN_GetShortVersionStringA(sVersion, 100);
 
         auto englishStrings = LoadEmbeddedTwainInfo(GetDLLInstance(), IDR_DTWAINRESOURCESTRINGS);
-        std::istringstream strm;
+        std::istringstream strm(englishStrings);
         std::string szBuffer;
         std::vector<std::string> sArray;
 
@@ -835,6 +835,8 @@ namespace dynarithmic
                 try 
                 {
                     resNum = std::stoi(sArray[0]);
+                    if (resNum == 9700)
+                        OutputDebugStringA("");
                 }
                 catch(...)
                 {
