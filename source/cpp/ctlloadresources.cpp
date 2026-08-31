@@ -771,7 +771,7 @@ namespace dynarithmic
 
     CTL_StringType GetResourceStringFromMap_Native(LONG nResourceID)
     {
-        return stringconversion::Convert_Ansi_To_Native(GetResourceStringFromMap(nResourceID));
+        return stringconversion::Convert_Ansi_To_Native(GetResourceStringFromMap(static_cast<LONG>(std::abs(nResourceID))));
     }
 
     std::string& GetResourceStringFromMap(LONG nResourceID)
