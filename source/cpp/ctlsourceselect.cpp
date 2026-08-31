@@ -53,22 +53,15 @@ namespace
         ~openSourceSaver() { DTWAIN_OpenSourcesOnSelect(m_bSaved); }
     };
 
-    bool SetDefaultSource_Internal(CTL_ITwainSource* pSource, const SourceSelectionOptions& opts)
+    std::pair<bool, int> SetDefaultSource_Internal(CTL_ITwainSource* pSource, const SourceSelectionOptions& opts)
     {
-        bool bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
-        // Load the resources
-        auto* customProfile = CTL_StaticData::GetINIInterface();
+        if (pSource->GetDTWAINHandle()->m_SessionStruct.nSessionType != DTWAIN_TWAINDSM_VERSION2)
+            return { false, DTWAIN_ERR_DSMVERSION_NOTSUPPORTED };
 
-        // see if the default source is saved to the INI file
-        if (opts.setINIToDefault && customProfile && pSource->GetDTWAINHandle()->m_OnSourceOpenProperties.m_bSaveDefaultToINI)
-        {
-            // Set the dtwain*.ini file to the default source
-            customProfile->SetValue(
-                CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
-                CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_DEFAULT_ITEM).data(),
-                pSource->GetProductNameA().c_str());
-        }
-        return bRet;
+        bool bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
+        if (bRet)
+            return { true, DTWAIN_NO_ERROR };
+        return { false, DTWAIN_ERR_TWAIN };
     }
 
     LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOptions& opts)
@@ -446,16 +439,16 @@ extern "C"
         CATCH_BLOCK_LOG_PARAMS(FALSE)
     }
 
-
-
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
     {
         LOG_FUNC_ENTRY_PARAMS((Source))
         auto [pHandle, pSource] = VerifyHandles(Source);
         SourceSelectionOptions sOpts(0,0);
         sOpts.setINIToDefault = pHandle->m_OnSourceOpenProperties.m_bSaveDefaultToINI;
-        bool bRet = SetDefaultSource_Internal(pSource, sOpts);
-        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        auto bRet = SetDefaultSource_Internal(pSource, sOpts);
+        DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] 
+            { return !bRet.first; }, bRet.second, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
 }
