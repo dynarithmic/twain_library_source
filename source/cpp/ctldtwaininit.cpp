@@ -836,12 +836,13 @@ namespace
             }
 
             // Close out the other INI changes
-            auto saveResults = customProfile->SaveFile(CTL_StaticData::GetINIPath().c_str());
+            auto& iniPath = CTL_StaticData::GetINIPath();
+            auto saveResults = customProfile->SaveFile(iniPath.c_str());
             if ( saveResults < 0 )
             {
-                std::string errorString = GetResourceString_Internal(DTWAIN_ERR_FILEWRITE) + " ";
-                errorString += DTWAIN_ININAME;
-                LogWriterUtils::WriteLogInfoIndentedA(errorString);
+                auto errorString = GetResourceStringFromMap_Native(DTWAIN_ERR_FILEWRITE) + _T(" ");
+                auto fullPath = basicstringutils::QuoteString(WindowsAPIImplDef::AddBackslashToDirectory(CTL_StaticData::GetINIPath()) + _T(DTWAIN_ININAME));
+                LogWriterUtils::WriteLogInfoIndented(errorString + fullPath);
             }
             CTL_StaticData::s_iniInterface.reset();
             CTL_StaticData::SetINIFileLoaded(false);
