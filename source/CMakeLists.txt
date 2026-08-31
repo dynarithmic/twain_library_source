@@ -387,6 +387,9 @@ set(DTWAIN_RESOURCE_FILES
 set(DTWAIN_MISCELLANEOUS_FILES
     ${PROJECT_SOURCE_DIR}/rc/twainresourcestrings_english.rc2
     ${PROJECT_SOURCE_DIR}/rc/resource_verinfo.rc2
+    ${PROJECT_SOURCE_DIR}/rc/dtwain32_ini.rc2
+    ${PROJECT_SOURCE_DIR}/rc/dtwain64_ini.rc2
+    ${PROJECT_SOURCE_DIR}/rc/twaininfo.rc2
 )
 
 set(MAIN_HEADERS 
@@ -410,7 +413,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlcntry.h
         ${PROJECT_SOURCE_DIR}/h/ctlconstexprfind.h
         ${PROJECT_SOURCE_DIR}/h/ctlconstexprutils.h
-        ${PROJECT_SOURCE_DIR}/h/ctldefsource.h
         ${PROJECT_SOURCE_DIR}/h/ctldevicecontext.h
         ${PROJECT_SOURCE_DIR}/h/ctldevnt.h
         ${PROJECT_SOURCE_DIR}/h/ctldib32.h
