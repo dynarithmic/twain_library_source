@@ -283,12 +283,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             return 0;
     }
 
-    /* Point to where the language text resources may reside */
-    DTWAIN_SetResourcePathA(ALTERNATE_RESOURCE_PATH);
-    BOOL bRet = DTWAIN_LoadCustomStringResourcesA("english");
-    if (!bRet)
-        DTWAIN_SetResourcePathA("");
-
     LONG major, minor, versiontype, patch;
     DTWAIN_GetVersionEx(&major, &minor, &versiontype, &patch);
 
@@ -553,11 +547,24 @@ void LoadLanguage(int message)
 
 void LoadLanguageStrings(LPCTSTR szLang)
 {
-    BOOL bRet = DTWAIN_LoadCustomStringResources(szLang);
-    if (!bRet)
-        MessageBox(NULL, _T("Could not load language resource"), _T("Language Resource Error"), MB_ICONSTOP);
-    else
-        MessageBox(g_hWnd, _T("Custom resource loaded.  Select a Source or choose Logging to see the new language being used"), _T("Success"), MB_OK);
+    const char* szPath[] = { "", ALTERNATE_RESOURCE_PATH };
+    int i;
+    for (i = 0; i < 2; ++i)
+    {
+        DTWAIN_SetResourcePathA(szPath[i]);
+        BOOL bRet = DTWAIN_LoadCustomStringResources(szLang);
+        if (bRet)
+        {
+            MessageBox(g_hWnd, _T("Custom resource loaded.  Select a Source or choose Logging to see the new language being used"), _T("Success"), MB_OK);
+            break;
+        }
+        else
+        if (i == 1)
+        {
+            MessageBox(NULL, _T("Could not load language resource"), _T("Language Resource Error"), MB_ICONSTOP);
+            break;
+        }
+    }
 }
 
 void ToggleCheckedItem(UINT resId)
@@ -608,7 +615,7 @@ void SelectTheSource(int nWhich)
     switch (nWhich)
     {
         case IDM_SELECT_SOURCE:
-            tempSource = DTWAIN_SelectSource2(NULL, NULL,0,0, DTWAIN_DLG_CENTER_CURRENT_MONITOR| DTWAIN_DLG_SORTNAMES);
+            tempSource = DTWAIN_SelectSource2(NULL, NULL,0,0, DTWAIN_DLG_CENTER_CURRENT_MONITOR | DTWAIN_DLG_SORTNAMES);
         break;
 
         case IDM_SELECT_DEFAULT_SOURCE:
