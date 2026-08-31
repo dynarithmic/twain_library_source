@@ -36,6 +36,7 @@
 #include "ctltwaindllpath.h"
 #include "ctlstaticdata.h"
 #include "dtwainx.h"
+#include "ctlstringutils.h"
 namespace stringutils = dynarithmic::basicstringutils;
 
 using namespace dynarithmic;
@@ -128,16 +129,6 @@ namespace
         return true;
     }
 
-    std::string GetResourceString_Internal(UINT nResNumber)
-    {
-        // First check the external resources
-        auto str = GetResourceStringFromMap(static_cast<LONG>(nResNumber));
-        if (str.empty())
-            // Try the internal resources
-            str = LoadResourceFromRC(nResNumber);
-        return str;
-    }
-
     void ClearMapEntries(CTL_LongToStringMap& resourceMap, LONG border, bool deleteBeforeBorder = true)
     {
         if (resourceMap.empty())
@@ -223,32 +214,9 @@ namespace
         }
         return open;
     }
-}
 
-namespace dynarithmic
-{
-    CTL_StringType CreateResourcePathName()
+    bool ReadResources(std::istream& ifs, const std::string& strResources, ResourceLoadingInfo& retValue)
     {
-        CTL_StringType sPath;
-        if (CTL_StaticData::GetResourcePath().empty())
-            sPath = GetDTWAINExecutionPath();
-        else
-            sPath = WindowsAPIImplDef::RemoveBackslashFromDirectory(CTL_StaticData::GetResourcePath());
-        sPath = WindowsAPIImplDef::AddBackslashToDirectory(sPath);
-        auto& resourcePath = CTL_StaticData::GetResourcePath();
-        if (resourcePath.empty())
-            resourcePath = sPath;
-        return sPath;
-    }
-
-    CTL_StringType CreateResourceFileName(LPCTSTR resName)
-    {
-        return CreateResourcePathName() + resName;
-    }
-
-    bool LoadTwainResources(ResourceLoadingInfo& retValue)
-    {
-        LOG_FUNC_ENTRY_PARAMS(())
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
@@ -259,28 +227,9 @@ namespace dynarithmic
         TW_UINT32 dg;
         TW_UINT16 dat, msg;
         int structtype, retcode, successcode;
-        auto sPath = CreateResourceFileName(DTWAINRESOURCEINFOFILE);
-        retValue.resourcePath = sPath;
-        auto sPathA = stringconversion::Convert_Native_To_Ansi(sPath, sPath.length());
-        std::ifstream ifs(sPathA);
-        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = ifs ? true : false;
-        
-        // Test for the INI file existing
-        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = CTL_StaticData::IsINIFileLoaded();
-
-        // Error if twaininfo.txt or the INI file is missing or cannot be opened
-        if (!retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] || 
-            !retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED])
-            return false;
-
-        auto iniInterface = CTL_StaticData::GetINIInterface();
 
         // Read in warning
-        std::string sWarning;
         int curLine = 0;
-        std::getline(ifs, sWarning);
-        ++curLine;
-
         std::string totalLine;
 
         // Read in the minimum version number for this resource
@@ -433,6 +382,8 @@ namespace dynarithmic
             availableFileMap.insert({ fileType, {name,vExt} });
         }
 
+        auto iniInterface = CTL_StaticData::GetINIInterface();
+
         // Read in the TWAIN constants
         bool bAllowDuplicate = iniInterface->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
                                                           CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_ALLOWDUP_RESOURCE).data(), true);
@@ -479,6 +430,7 @@ namespace dynarithmic
                 else
                     stringutils::Tokenize(name, ", ", saNames);
                 iter->second.insert({twainValue, saNames});
+
                 if (!bAllowDuplicate)
                 {
                     if (stringToConstantMap.find(name) != stringToConstantMap.end())
@@ -490,6 +442,7 @@ namespace dynarithmic
                         return false;
                     }
                 }
+
                 // Always insert the special name that has more than one entry
                 if (bPlaceInMap)
                 {
@@ -586,7 +539,7 @@ namespace dynarithmic
 
             // Parse the line containing the file save dialog information for the 
             // file type being saved
-            stringutils::TokenizeQuoted(stringutils::TrimAll(totalLine), " ", vParsedComponents);
+            basicstringutils::TokenizeQuoted(basicstringutils::TrimAll(totalLine), " ", vParsedComponents);
             if (vParsedComponents.size() != 5)
             {
                 retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
@@ -639,7 +592,7 @@ namespace dynarithmic
                 retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
                 retValue.m_dupInfo.lineNumber = curLine;
                 retValue.m_dupInfo.line = line;
-                return false;
+                 return false;
             }
             auto compressionValue = compressionValuePr.second;
             auto allFileTypes = totalLine.substr(bracketPosStart+1);
@@ -655,20 +608,124 @@ namespace dynarithmic
                 compressionMap[static_cast<int>(compressionValue)].push_back(static_cast<int>(oneVal.second));
             }
         }
+        return true;
+    }
+}
 
-        // Check the CRC value
-        CTL_StaticData::GetResourceVersion() = stringconversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
-        bool doResourceCheck = iniInterface->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
-                                                          CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_RESOURCECHECK_ITEM).data(), true);
-        if (doResourceCheck)
+namespace dynarithmic
+{
+    CTL_StringType CreateResourcePathName()
+    {
+        CTL_StringType sPath;
+        if (CTL_StaticData::GetResourcePath().empty())
+            sPath = GetDTWAINExecutionPath();
+        else
+            sPath = WindowsAPIImplDef::RemoveBackslashFromDirectory(CTL_StaticData::GetResourcePath());
+        sPath = WindowsAPIImplDef::AddBackslashToDirectory(sPath);
+        auto& resourcePath = CTL_StaticData::GetResourcePath();
+        if (resourcePath.empty())
+            resourcePath = sPath;
+        return sPath;
+    }
+
+    CTL_StringType CreateResourceFileName(LPCTSTR resName)
+    {
+        return CreateResourcePathName() + resName;
+    }
+
+    std::string LoadEmbeddedTwainInfo(HMODULE hModule, int resID)
+    {
+        HRSRC hRes = ::FindResource(hModule,MAKEINTRESOURCE(resID),RT_RCDATA);
+        if (!hRes)
+            return {};
+
+        HGLOBAL hData = ::LoadResource(hModule, hRes);
+        if (!hData)
+            return {};
+
+        const DWORD size = ::SizeofResource(hModule, hRes);
+        const void* pData = ::LockResource(hData);
+        if (!pData || size == 0)
+            return {};
+        const char* first = static_cast<const char*>(pData);
+        auto resText = std::string(first, first + size);
+        resText.erase(std::remove(resText.begin(), resText.end(), '\r'), resText.end());
+        return resText;
+    }
+
+    std::string GetResourceString_Internal(int nResNumber)
+    {
+        // First check the external resources
+        auto str = GetResourceStringFromMap(static_cast<LONG>(std::abs(nResNumber)));
+        if (str.empty())
+            // Try the internal resources
+            str = LoadResourceFromRC(nResNumber);
+        return str;
+    }
+
+    bool LoadTwainResources(HMODULE hModule, ResourceLoadingInfo& retValue)
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+
+        auto iniInterface = CTL_StaticData::GetINIInterface();
+
+        bool bUseExternalResource =
+            iniInterface->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
+                                       CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_USEEXTERNALRC_ITEM).data(), false);
+
+        if (!bUseExternalResource)
         {
-            ifs.close();
-            ifs.open(sPathA);
-            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = GetDataCRC(ifs, 2);
+            auto resTest = LoadEmbeddedTwainInfo(hModule, IDR_TWAININFO);
+            if (hModule && !resTest.empty())
+            {
+                std::istringstream strm(resTest);
+                auto retVal = ReadResources(strm, resTest, retValue);
+                CTL_StaticData::GetResourceVersion() = stringconversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
+                return retVal;
+            }
+            return false;
         }
         else
-            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = true;
+        {
+            CTL_TWAINDecoderStruct ErrorStruct;
+            TW_UINT32 dg;
+            TW_UINT16 dat, msg;
+            int structtype, retcode, successcode;
+            auto sPath = CreateResourceFileName(DTWAINRESOURCEINFOFILE);
+            retValue.resourcePath = sPath;
+            auto sPathA = stringconversion::Convert_Native_To_Ansi(sPath, sPath.length());
+            std::ifstream ifs(sPathA);
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = ifs ? true : false;
 
+            // Error if twaininfo.txt or the INI file is missing or cannot be opened
+            if (!retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED])
+                return false;
+
+            bool bRet = ReadResources(ifs, {}, retValue);
+            if (!bRet)
+                return false;
+
+            // Test for the INI file existing
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = CTL_StaticData::IsINIFileLoaded();
+
+            // Error if twaininfo.txt or the INI file is missing or cannot be opened
+            if (!retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] || 
+                !retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED])
+                return false;
+
+            // Check the CRC value
+            CTL_StaticData::GetResourceVersion() = stringconversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
+            bool doResourceCheck = iniInterface->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
+                                                              CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_RESOURCECHECK_ITEM).data(), true);
+            if (doResourceCheck)
+            {
+                ifs.close();
+                ifs.open(sPathA);
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = GetDataCRC(ifs, 2);
+            }
+            else
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = true;
+        }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -762,18 +819,34 @@ namespace dynarithmic
         CTL_StringToMapLongToStringMap::mapped_type resourceMap;
         std::string::value_type sVersion[100];
         DTWAIN_GetShortVersionStringA(sVersion, 100);
-        // Assume resource ID's are numbered from 0 to 20000
-        char szBuffer[DTWAIN_USERRES_MAXSIZE + 1];
-        for (int i = 0; i < DTWAIN_USERRES_START; ++i)
+
+        auto englishStrings = LoadEmbeddedTwainInfo(GetDLLInstance(), IDR_DTWAINRESOURCESTRINGS);
+        std::istringstream strm(englishStrings);
+        std::string szBuffer;
+        std::vector<std::string> sArray;
+
+        int resNum = 0;
+        std::string descr;
+        while (std::getline(strm, szBuffer))
         {
-            if (::LoadStringA(CTL_StaticData::GetDLLInstanceHandle(), i, szBuffer, DTWAIN_USERRES_MAXSIZE))
+            stringutils::TokenizeQuoted(szBuffer, ", ", sArray);
+            if (sArray.size() == 2)
             {
-                std::string descr = szBuffer;
+                try 
+                {
+                    resNum = std::stoi(sArray[0]);
+                }
+                catch(...)
+                {
+                    continue;
+                }
+                descr = sArray[1];
                 stringutils::TrimAll(descr);
-                descr = stringutils::ReplaceAll<std::string>(descr, "{short_version}", sVersion);
+                descr = stringutils::ReplaceAll<std::string>(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
                 descr = stringutils::ReplaceAll<std::string>(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
                 descr = stringutils::ReplaceAll<std::string>(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
-                resourceMap.insert({ i, descr });
+                descr = stringutils::ReplaceAll<std::string>(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
+                resourceMap.insert({ resNum, descr });
             }
         }
         allLanguages.insert({ lang, resourceMap});

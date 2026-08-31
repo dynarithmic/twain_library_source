@@ -67,6 +67,7 @@ namespace
     bool RemoveThreadIdFromAssociation(unsigned long threadId);
     void UnhookAllDisplays();
     bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandle, bool bCheck=true);
+    bool LoadINIResources(HMODULE hModule);
 }
 
 namespace dynarithmic
@@ -448,12 +449,12 @@ namespace
     {
         bool bResourcesLoaded = false;
         CTL_StaticData::SetResourceLoadError(DTWAIN_NO_ERROR);
-        using boolFuncs = std::function<bool(ResourceLoadingInfo&)>;
+        using boolFuncs = std::function<bool(HMODULE, ResourceLoadingInfo&)>;
         boolFuncs bf[] = { &LoadTwainResources };
         for (auto& fnBool : bf)
         {
             ResourceLoadingInfo ret;
-            fnBool(ret);
+            fnBool(GetDLLInstance(), ret);
 
             // If there are any errors loading the twaininfo.txt or INI files, report them here.
             if (std::any_of(ret.errorValue.begin(), ret.errorValue.end(), [](bool b) { return b == false; }))
@@ -653,9 +654,8 @@ namespace dynarithmic
                 auto* ptrIni = CTL_StaticData::GetINIInterface();
                 if (!CTL_StaticData::IsINIFileLoaded())
                 {
-                    auto err = ptrIni->LoadFile(GetDTWAININIPathA().c_str());
-                    CTL_StaticData::SetINIFileLoaded(err == SI_OK);
-                    CTL_StaticData::GetINIPath() = GetDTWAININIPath();
+                    bool iniLoaded = LoadINIResources(GetDLLInstance());
+                    CTL_StaticData::SetINIFileLoaded(true);
                 }
 
                 bool resourcesLoaded = LoadGeneralResources(initOptions);
@@ -820,7 +820,7 @@ namespace
             // Write the last select source save position
             auto& lastPos = CTL_StaticData::GetSelectSourcePos();
 
-            // Check if the "saveselectsourcepos" key value is in INI file, and if so, ifthe value is true
+            // Check if the "saveselectsourcepos" key value is in INI file, and if so, if the value is true
             bool bSaveLastPos = customProfile->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
                                                             CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SAVESELECTSOURCEPOS_KEY).data(), false);
 
@@ -836,7 +836,13 @@ namespace
             }
 
             // Close out the other INI changes
-            customProfile->SaveFile(CTL_StaticData::GetINIPath().c_str());
+            auto saveResults = customProfile->SaveFile(CTL_StaticData::GetINIPath().c_str());
+            if ( saveResults < 0 )
+            {
+                std::string errorString = GetResourceString_Internal(DTWAIN_ERR_FILEWRITE) + " ";
+                errorString += DTWAIN_ININAME;
+                LogWriterUtils::WriteLogInfoIndentedA(errorString);
+            }
             CTL_StaticData::s_iniInterface.reset();
             CTL_StaticData::SetINIFileLoaded(false);
         }
@@ -893,6 +899,53 @@ namespace
         return false;
     }
 
+    bool MergeINISettings(CSimpleIniA& destination, const CSimpleIniA& source)
+    {
+        CSimpleIniA::TNamesDepend sections;
+        source.GetAllSections(sections);
+
+        for (const auto& section : sections)
+        {
+            CSimpleIniA::TNamesDepend keys;
+
+            if (!source.GetAllKeys(section.pItem, keys))
+                continue;
+
+            for (const auto& key : keys)
+            {
+                const char* value = source.GetValue(section.pItem, key.pItem);
+
+                if (!value)
+                    continue;
+
+                const SI_Error rc = destination.SetValue(section.pItem, key.pItem,value);
+
+                if (rc < 0)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    bool LoadINIResources(HMODULE hModule)
+    {
+        auto* ptrIni = CTL_StaticData::GetINIInterface();
+        if (!CTL_StaticData::IsINIFileLoaded())
+        {
+            #ifdef UNICODE
+            std::string sINIData = LoadEmbeddedTwainInfo(hModule, IDR_DTWAININI_64);
+            #else
+            std::string sINIData = LoadEmbeddedTwainInfo(hModule, IDR_DTWAININI_32);
+            #endif
+            ptrIni->LoadData(sINIData);
+            // Merge the external DTWAIN INI file if it exists
+            CSimpleIniA externalINI;
+            if (externalINI.LoadFile(GetDTWAININIPathA().c_str()) >= SI_OK)
+                MergeINISettings(*ptrIni, externalINI);
+            CTL_StaticData::GetINIPath() = GetDTWAININIPath();
+        }
+        return true;
+    }
 }
 
 extern "C"
@@ -964,10 +1017,7 @@ extern "C"
     {
         return SysInitializeImpl({ true, false , false });
     }
-}
 
-extern "C"
-{
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     {
         std::scoped_lock lg(CTL_StaticData::s_mutexInitDestroy);

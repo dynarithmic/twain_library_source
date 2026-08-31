@@ -1253,12 +1253,12 @@ set(DATEMASTER_SOURCES
   ${PROJECT_SOURCE_DIR}/date-master/include/date/date.h
   )
 
+set(NLOHMANN_SOURCES
+  ${PROJECT_SOURCE_DIR}/nlohmann/json.hpp
+  ${PROJECT_SOURCE_DIR}/nlohmann/json_fwd.hpp
+  )
 
 set(TEXT_RESOURCE_FILES
-  ${PROJECT_SOURCE_DIR}/text_resources/dtwain32.ini
-  ${PROJECT_SOURCE_DIR}/text_resources/dtwain64.ini
-  ${PROJECT_SOURCE_DIR}/text_resources/twaininfo.txt
-  ${PROJECT_SOURCE_DIR}/text_resources/twainlanguage.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_cantonese.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_dutch.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_english.txt
@@ -1392,6 +1392,7 @@ add_library(dtwain SHARED
     ${MINIZ_SOURCES}
     ${SIMPLEINI_SOURCES}
     ${DATEMASTER_SOURCES}
+    ${NLOHMANN_SOURCES}
 )
 
 target_link_libraries(dtwain PRIVATE
@@ -1674,6 +1675,7 @@ source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${ZLIB_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${MINIZ_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${SIMPLEINI_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${DATEMASTER_SOURCES})
+source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${NLOHMANN_SOURCES})
 
 if(MSVC)
     if(DTWAIN_USE_DYNAMIC_CRT)

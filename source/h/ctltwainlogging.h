@@ -74,6 +74,7 @@ namespace dynarithmic
     void LogToDebugMonitorW(std::wstring sMsg);
     void LogToDebugMonitor(CTL_StringType sMsg);
     void LogDTWAINMessage(HWND, UINT, WPARAM, LPARAM, bool bCallback=false);
+    void LogDTWAININISettings();
 
     struct LoggingTraits;
     std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const LoggingTraits& fTraits = {});

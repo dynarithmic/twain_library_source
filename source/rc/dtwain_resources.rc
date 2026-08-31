@@ -23,7 +23,6 @@
 #include "winuser.h"
 #include "winver.h"
 #include "..\h\dtwain_resource_constants.h"
-#include "..\rc\twainresourcestrings_english.rc2"
 
 // Twain dialog
 IDC_DLGSELECTSOURCE DIALOG DISCARDABLE  0, 0, 214, 95
@@ -48,6 +47,10 @@ BEGIN
 
 END
 
+IDR_TWAININFO RCDATA "twaininfo.rc2"
+IDR_DTWAININI_64 RCDATA "dtwain64_ini.rc2"
+IDR_DTWAININI_32 RCDATA "dtwain32_ini.rc2"
+IDR_DTWAINRESOURCESTRINGS RCDATA "twainresourcestrings_english.rc2"
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version

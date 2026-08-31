@@ -161,6 +161,7 @@ CTL_StaticDataStruct::CTL_StaticDataStruct() :
                 {INI_TESTGET_ITEM,               "Testget"},
                 {INI_AUTOCLOSEUI_KEY,            "AutocloseUI"},
                 {INI_PARSEDELIMS_ITEM,           "parsedelims"},
+                {INI_USEEXTERNALRC_ITEM,         "useexternalresource" }
              } }, s_SavedSelectSourcePos{ std::numeric_limits<int32_t>::max(), std::numeric_limits<int32_t>::max() } {}
 
 std::pair<bool, std::string> CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
