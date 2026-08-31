@@ -1172,3 +1172,9 @@ DTWAIN_UnlockMemoryEx                             @1168
 DTWAIN_UpdateCurrentAcquiredImage                 @1169   
 DTWAIN_UseMultipleThreads                         @1170   
 DTWAIN_WindowProc                                 @1171   
+DTWAIN_GetCurrentCustomResourceName               @1172
+DTWAIN_GetCurrentCustomResourceNameA              @1173
+DTWAIN_GetCurrentCustomResourceNameW              @1174 
+DTWAIN_GetCurrentCustomResourceName               @1172
+DTWAIN_GetCurrentCustomResourceNameA              @1173
+DTWAIN_GetCurrentCustomResourceNameW              @1174 

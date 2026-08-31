@@ -3262,4 +3262,26 @@ extern "C"
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
 #endif
     }
+
+    LONG DLLENTRY_DEF DTWAIN_GetCurrentCustomResourceNameA(LPSTR lpszOut, LONG nMaxLen)
+    {
+    #ifdef _UNICODE
+        std::wstring arg((std::max)(nMaxLen, 0L), 0);
+        LONG retVal = DTWAIN_GetCurrentCustomResourceName(lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        return null_terminator_copier(get_view(arg), lpszOut, retVal);
+    #else
+        return DTWAIN_GetCurrentCustomResourceName(lpszOut, nMaxLen);
+    #endif
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetCurrentCustomResourceNameW(LPWSTR lpszOut, LONG nMaxLen)
+    {
+    #ifdef _UNICODE
+        return DTWAIN_GetCurrentCustomResourceName(lpszOut, nMaxLen);
+    #else
+        std::string arg((std::max)(nMaxLen, 0L), 0);
+        LONG retVal = DTWAIN_GetCurrentCustomResourceName(lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        return null_terminator_copier(get_view(arg), lpszOut, retVal);
+    #endif
+    }
 }

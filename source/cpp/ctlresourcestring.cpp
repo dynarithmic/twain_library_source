@@ -146,6 +146,16 @@ extern "C"
         CATCH_BLOCK(false)
     }
 
+    LONG DLLENTRY_DEF  DTWAIN_GetCurrentCustomResourceName(LPTSTR lpszOut, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpszOut, nMaxLen))
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto actualString = stringconversion::Convert_Ansi_To_Native(CTL_StaticData::GetCurrentLanguageResourceKey());
+        auto numChars = CopyInfoToCString(actualString, lpszOut, nMaxLen);
+        LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+        CATCH_BLOCK(0)
+    }
+
     LONG DLLENTRY_DEF  DTWAIN_GetResourceString(LONG ResourceID, LPTSTR lpszBuffer, LONG nMaxLen)
     {
         LOG_FUNC_ENTRY_PARAMS((ResourceID, lpszBuffer, nMaxLen))
