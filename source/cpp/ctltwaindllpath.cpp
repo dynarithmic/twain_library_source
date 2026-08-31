@@ -26,7 +26,7 @@
 #include "ctlinternalconstants.h"
 #include "ctlverinfoutils.h"
 
-using namespace dynarithmic; 
+using namespace dynarithmic;    
 
 namespace dynarithmic
 {
