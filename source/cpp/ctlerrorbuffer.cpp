@@ -31,11 +31,6 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS(())
 
-        // Test stuff
-        std::string sTest = "VueScan TWAIN";
-
-        auto sNew = basicstringutils::TrimAll(sTest);
-
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
         if ( !pHandle )
         {
