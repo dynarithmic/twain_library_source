@@ -842,9 +842,10 @@ namespace dynarithmic
                 }
                 descr = sArray[1];
                 stringutils::TrimAll(descr);
-                descr = stringutils::ReplaceAll<std::string>(descr, "{short_version}", sVersion);
+                descr = stringutils::ReplaceAll<std::string>(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
                 descr = stringutils::ReplaceAll<std::string>(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
                 descr = stringutils::ReplaceAll<std::string>(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                descr = stringutils::ReplaceAll<std::string>(descr, "{copyright_html}", DTWAIN_VERINFO_LEGALCOPYRIGHT_HTML);
                 resourceMap.insert({ resNum, descr });
             }
         }
