@@ -23,6 +23,7 @@
 #include "dtwainc.h"
 #include "dtwainx.h"
 #include "ctlstringconversion.h"
+#include "ctlstringutils.h"
 #include "arrayfactory.h"
 
 namespace strview = std;

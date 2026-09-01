@@ -25,6 +25,7 @@
 #include "svgwriter.h"
 #include "dtwaindefs.h"
 #include "ctlstringconversion.h"
+#include "ctlstringutils.h"
 #include "ctlencodeutils.h"
 #include <gdiplus.h>
 #include <fstream>

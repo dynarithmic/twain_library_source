@@ -19,8 +19,10 @@
     OF THIRD PARTY RIGHTS.
  */
 
+#include <vector>
 #include "jpeg2kwriter.h"
 #include "ctlstringconversion.h"
+#include "ctlstringutils.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable : 4244)
