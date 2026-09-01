@@ -509,6 +509,9 @@ type DtwaingetcontraststringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char
 type DtwaingetcontraststringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
 type DtwaingetcountryFunc = unsafe extern "C" fn() -> i32;
 type DtwaingetcurrentacquiredimageFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwaingetcurrentcustomresourcenameFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetcurrentcustomresourcenameaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingetcurrentcustomresourcenamewFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
 type DtwaingetcurrentfilenameFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
 type DtwaingetcurrentfilenameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
 type DtwaingetcurrentfilenamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
@@ -1676,6 +1679,9 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetContrastStringWFunc: Symbol<'a, DtwaingetcontraststringwFunc>,
     DTWAIN_GetCountryFunc: Symbol<'a, DtwaingetcountryFunc>,
     DTWAIN_GetCurrentAcquiredImageFunc: Symbol<'a, DtwaingetcurrentacquiredimageFunc>,
+    DTWAIN_GetCurrentCustomResourceNameFunc: Symbol<'a, DtwaingetcurrentcustomresourcenameFunc>,
+    DTWAIN_GetCurrentCustomResourceNameAFunc: Symbol<'a, DtwaingetcurrentcustomresourcenameaFunc>,
+    DTWAIN_GetCurrentCustomResourceNameWFunc: Symbol<'a, DtwaingetcurrentcustomresourcenamewFunc>,
     DTWAIN_GetCurrentFileNameFunc: Symbol<'a, DtwaingetcurrentfilenameFunc>,
     DTWAIN_GetCurrentFileNameAFunc: Symbol<'a, DtwaingetcurrentfilenameaFunc>,
     DTWAIN_GetCurrentFileNameWFunc: Symbol<'a, DtwaingetcurrentfilenamewFunc>,
@@ -3103,6 +3109,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_ERR_DTWAINDLL_LOADERROR: i32 = -1089;
     pub const DTWAIN_ERR_DTWAINDLL_VERSION: i32 = -1090;
     pub const DTWAIN_ERR_ACTIVE_TWAINSESSION: i32 = -1091;
+    pub const DTWAIN_ERR_DSMVERSION_NOTSUPPORTED: i32 = -1091;
     pub const TWAIN_ERR_LOW_MEMORY: i32 = -1100;
     pub const TWAIN_ERR_FALSE_ALARM: i32 = -1101;
     pub const TWAIN_ERR_BUMMER: i32 = -1102;
@@ -4506,6 +4513,9 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetContrastStringW: Symbol<DtwaingetcontraststringwFunc> = unsafe { library.get(b"DTWAIN_GetContrastStringW")? };
         let DTWAIN_GetCountry: Symbol<DtwaingetcountryFunc> = unsafe { library.get(b"DTWAIN_GetCountry")? };
         let DTWAIN_GetCurrentAcquiredImage: Symbol<DtwaingetcurrentacquiredimageFunc> = unsafe { library.get(b"DTWAIN_GetCurrentAcquiredImage")? };
+        let DTWAIN_GetCurrentCustomResourceName: Symbol<DtwaingetcurrentcustomresourcenameFunc> = unsafe { library.get(b"DTWAIN_GetCurrentCustomResourceName")? };
+        let DTWAIN_GetCurrentCustomResourceNameA: Symbol<DtwaingetcurrentcustomresourcenameaFunc> = unsafe { library.get(b"DTWAIN_GetCurrentCustomResourceNameA")? };
+        let DTWAIN_GetCurrentCustomResourceNameW: Symbol<DtwaingetcurrentcustomresourcenamewFunc> = unsafe { library.get(b"DTWAIN_GetCurrentCustomResourceNameW")? };
         let DTWAIN_GetCurrentFileName: Symbol<DtwaingetcurrentfilenameFunc> = unsafe { library.get(b"DTWAIN_GetCurrentFileName")? };
         let DTWAIN_GetCurrentFileNameA: Symbol<DtwaingetcurrentfilenameaFunc> = unsafe { library.get(b"DTWAIN_GetCurrentFileNameA")? };
         let DTWAIN_GetCurrentFileNameW: Symbol<DtwaingetcurrentfilenamewFunc> = unsafe { library.get(b"DTWAIN_GetCurrentFileNameW")? };
@@ -5672,6 +5682,9 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetContrastStringWFunc: DTWAIN_GetContrastStringW,
             DTWAIN_GetCountryFunc: DTWAIN_GetCountry,
             DTWAIN_GetCurrentAcquiredImageFunc: DTWAIN_GetCurrentAcquiredImage,
+            DTWAIN_GetCurrentCustomResourceNameFunc: DTWAIN_GetCurrentCustomResourceName,
+            DTWAIN_GetCurrentCustomResourceNameAFunc: DTWAIN_GetCurrentCustomResourceNameA,
+            DTWAIN_GetCurrentCustomResourceNameWFunc: DTWAIN_GetCurrentCustomResourceNameW,
             DTWAIN_GetCurrentFileNameFunc: DTWAIN_GetCurrentFileName,
             DTWAIN_GetCurrentFileNameAFunc: DTWAIN_GetCurrentFileNameA,
             DTWAIN_GetCurrentFileNameWFunc: DTWAIN_GetCurrentFileNameW,
@@ -8225,6 +8238,18 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetCurrentAcquiredImage(&self, Source: *mut c_void) -> *mut c_void {
         unsafe { return (self.DTWAIN_GetCurrentAcquiredImageFunc)(Source);  }
+    }
+
+    pub fn DTWAIN_GetCurrentCustomResourceName(&self, lpszOut: *mut u16, nMaxLen: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetCurrentCustomResourceNameFunc)(lpszOut, nMaxLen);  }
+    }
+
+    pub fn DTWAIN_GetCurrentCustomResourceNameA(&self, lpszOut: *mut c_char, nMaxLen: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetCurrentCustomResourceNameAFunc)(lpszOut, nMaxLen);  }
+    }
+
+    pub fn DTWAIN_GetCurrentCustomResourceNameW(&self, lpszOut: *mut u16, nMaxLen: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetCurrentCustomResourceNameWFunc)(lpszOut, nMaxLen);  }
     }
 
     pub fn DTWAIN_GetCurrentFileName(&self, Source: *mut c_void, szName: *mut u16, MaxLen: i32) -> i32 {

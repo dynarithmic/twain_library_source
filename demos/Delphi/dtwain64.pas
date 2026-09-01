@@ -910,6 +910,7 @@ const
   DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089);
   DTWAIN_ERR_DTWAINDLL_VERSION = (-1090);
   DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091);
+  DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1091);
   TWAIN_ERR_LOW_MEMORY = (-1100);
   TWAIN_ERR_FALSE_ALARM = (-1101);
   TWAIN_ERR_BUMMER = (-1102);
@@ -2313,6 +2314,9 @@ function DTWAIN_GetContrastStringA(Source:DTWAIN_SOURCE; Contrast:LPSTR) : BOOL;
 function DTWAIN_GetContrastStringW(Source:DTWAIN_SOURCE; Contrast:LPWSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetContrastStringW';
 function DTWAIN_GetCountry : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCountry';
 function DTWAIN_GetCurrentAcquiredImage(Source:DTWAIN_SOURCE) : NativeInt; external 'dtwain64.dll'  name 'DTWAIN_GetCurrentAcquiredImage';
+function DTWAIN_GetCurrentCustomResourceName(lpszOut:LPTSTR; nMaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCurrentCustomResourceName';
+function DTWAIN_GetCurrentCustomResourceNameA(lpszOut:LPSTR; nMaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCurrentCustomResourceNameA';
+function DTWAIN_GetCurrentCustomResourceNameW(lpszOut:LPWSTR; nMaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCurrentCustomResourceNameW';
 function DTWAIN_GetCurrentFileName(Source:DTWAIN_SOURCE; szName:LPTSTR; MaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCurrentFileName';
 function DTWAIN_GetCurrentFileNameA(Source:DTWAIN_SOURCE; szName:LPSTR; MaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCurrentFileNameA';
 function DTWAIN_GetCurrentFileNameW(Source:DTWAIN_SOURCE; szName:LPWSTR; MaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCurrentFileNameW';

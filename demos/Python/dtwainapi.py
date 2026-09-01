@@ -780,6 +780,7 @@ DTWAIN_ERR_FEEDER_NOPAPERSENSOR = (-1088)
 DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089)
 DTWAIN_ERR_DTWAINDLL_VERSION = (-1090)
 DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091)
+DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1091)
 TWAIN_ERR_LOW_MEMORY = (-1100)
 TWAIN_ERR_FALSE_ALARM = (-1101)
 TWAIN_ERR_BUMMER = (-1102)
@@ -2280,6 +2281,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetContrastStringW.restype = ct.c_long
      theDLL.DTWAIN_GetCountry.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentAcquiredImage.restype = ct.c_void_p
+     theDLL.DTWAIN_GetCurrentCustomResourceName.restype = ct.c_long
+     theDLL.DTWAIN_GetCurrentCustomResourceNameA.restype = ct.c_long
+     theDLL.DTWAIN_GetCurrentCustomResourceNameW.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentFileName.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentFileNameA.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentFileNameW.restype = ct.c_long
@@ -3434,6 +3438,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetContrastStringA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_GetContrastStringW.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_GetCurrentAcquiredImage.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_GetCurrentCustomResourceName.argtypes = [ct.c_wchar_p, ct.c_long]
+     theDLL.DTWAIN_GetCurrentCustomResourceNameA.argtypes = [ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetCurrentCustomResourceNameW.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetCurrentFileName.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetCurrentFileNameA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetCurrentFileNameW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long]
@@ -4584,6 +4591,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetContrastStringW.restype = ct.c_long
      theDLL.DTWAIN_GetCountry.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentAcquiredImage.restype = ct.c_void_p
+     theDLL.DTWAIN_GetCurrentCustomResourceName.restype = ct.c_long
+     theDLL.DTWAIN_GetCurrentCustomResourceNameA.restype = ct.c_long
+     theDLL.DTWAIN_GetCurrentCustomResourceNameW.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentFileName.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentFileNameA.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentFileNameW.restype = ct.c_long
@@ -5738,6 +5748,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetContrastStringA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_GetContrastStringW.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_GetCurrentAcquiredImage.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_GetCurrentCustomResourceName.argtypes = [ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetCurrentCustomResourceNameA.argtypes = [ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetCurrentCustomResourceNameW.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetCurrentFileName.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetCurrentFileNameA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetCurrentFileNameW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long]

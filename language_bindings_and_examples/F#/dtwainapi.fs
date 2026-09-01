@@ -870,6 +870,7 @@ module TwainAPI =
     let public DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089)
     let public DTWAIN_ERR_DTWAINDLL_VERSION = (-1090)
     let public DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091)
+    let public DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1091)
     let public TWAIN_ERR_LOW_MEMORY = (-1100)
     let public TWAIN_ERR_FALSE_ALARM = (-1101)
     let public TWAIN_ERR_BUMMER = (-1102)
@@ -2994,6 +2995,9 @@ module TwainAPI =
     type DTWAIN_GetCurrentAcquiredImageDelegate = delegate of DTWAIN_SOURCE -> HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetCurrentCustomResourceNameDelegate = delegate of System.Text.StringBuilder * LONG -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetCurrentFileNameDelegate = delegate of DTWAIN_SOURCE * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4797,6 +4801,7 @@ module TwainAPI =
     let private GetContrastString = lazy (DynamicDll.Bind "DTWAIN_GetContrastString" : DTWAIN_GetContrastStringDelegate)
     let private GetCountry = lazy (DynamicDll.Bind "DTWAIN_GetCountry" : DTWAIN_GetCountryDelegate)
     let private GetCurrentAcquiredImage = lazy (DynamicDll.Bind "DTWAIN_GetCurrentAcquiredImage" : DTWAIN_GetCurrentAcquiredImageDelegate)
+    let private GetCurrentCustomResourceName = lazy (DynamicDll.Bind "DTWAIN_GetCurrentCustomResourceName" : DTWAIN_GetCurrentCustomResourceNameDelegate)
     let private GetCurrentFileName = lazy (DynamicDll.Bind "DTWAIN_GetCurrentFileName" : DTWAIN_GetCurrentFileNameDelegate)
     let private GetCurrentPageNum = lazy (DynamicDll.Bind "DTWAIN_GetCurrentPageNum" : DTWAIN_GetCurrentPageNumDelegate)
     let private GetCurrentRetryCount = lazy (DynamicDll.Bind "DTWAIN_GetCurrentRetryCount" : DTWAIN_GetCurrentRetryCountDelegate)
@@ -6789,6 +6794,10 @@ module TwainAPI =
     let DTWAIN_GetCurrentAcquiredImage (source: DTWAIN_SOURCE) : HANDLE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCurrentAcquiredImage.Value.Invoke(source)
+
+    let DTWAIN_GetCurrentCustomResourceName (lpszout: System.Text.StringBuilder) (nmaxlen: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetCurrentCustomResourceName.Value.Invoke(lpszout, nmaxlen)
 
     let DTWAIN_GetCurrentFileName (source: DTWAIN_SOURCE) (szname: System.Text.StringBuilder) (maxlen: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
