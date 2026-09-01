@@ -29,102 +29,104 @@
 #ifndef _WIN32
 #define __stdcall
 #endif
-using namespace dynarithmic;
 
-typedef LONG (__stdcall * TOCRINITIALIZEFUNC)(LONG*);
-typedef LONG (__stdcall * TOCRSHUTDOWNFUNC)(LONG);
-typedef LONG (__stdcall * TOCRGETERRORMODEFUNC)(long JobNo, long *ErrorMode);
-typedef LONG (__stdcall * TOCRSETERRORMODEFUNC)(long JobNo, long ErrorMode);
-typedef LONG (__stdcall * TOCRDOJOBFUNC)(long JobNo, TOCRJOBINFO *JobInfo);
-typedef LONG (__stdcall * TOCRWAITFORJOBFUNC)(long JobNo, long *JobStatus);
-typedef LONG (__stdcall * TOCRWAITFORANYJOBFUNC)(long *WaitAnyStatus, long *JobNo);
-typedef LONG (__stdcall * TOCRGETJOBDBINFOFUNC)(long *JobSlotInf);
-typedef LONG (__stdcall * TOCRGETJOBSTATUSFUNC)(long JobNo, long *JobStatus);
-typedef LONG (__stdcall * TOCRGETJOBSTATUSEXFUNC)(long JobNo, long *JobStatus, float *Progress, long *AutoOrientation);
-typedef LONG (__stdcall * TOCRGETJOBSTATUSMSGFUNC)(long JobNo, char *Msg);
-typedef LONG (__stdcall * TOCRGETNUMPAGESFUNC)(long JobNo, char *Filename, long JobType, long *NumPages);
-typedef LONG (__stdcall * TOCRGETJOBRESULTSFUNC)(long JobNo, long *ResultsInf, TOCRRESULTS *Results);
-typedef LONG (__stdcall * TOCRGETJOBRESULTSEXFUNC)(long JobNo, long Mode, long *ResultsInf, void *ResultsEx);
-typedef LONG (__stdcall * TOCRGETLICENCEINFOFUNC)(long *NumberOfJobSlots, long *Volume, long *Time, long *Remaining);
-typedef LONG (__stdcall * TOCRCONVERTTIFFTODIBFUNC)(long JobNo, char *InputFilename, char *OutputFilename, long PageNo);
-typedef LONG (__stdcall * TOCRROTATEMONOBITMAPFUNC)(long *hBmp, long Width, long Height, long Orientation);
-typedef LONG (__stdcall * TOCRCONVERTFORMATFUNC)(long JobNo, void *InputAddr, long InputFormat, void *OutputAddr, long OutputFormat, long PageNo);
-typedef LONG (__stdcall * TOCRGETLICENCEINFOEXFUNC)(long JobNo, char *Licence, long *Volume, long *Time, long *Remaining, long *Features);
-
-struct TOCRSDK
+namespace dynarithmic
 {
-    TOCRINITIALIZEFUNC         TOCRInitialise      ;
-    TOCRSHUTDOWNFUNC           TOCRShutdown        ;
-    TOCRGETERRORMODEFUNC       TOCRGetErrorMode    ;
-    TOCRSETERRORMODEFUNC       TOCRSetErrorMode    ;
-    TOCRDOJOBFUNC              TOCRDoJob           ;
-    TOCRWAITFORJOBFUNC         TOCRWaitForJob      ;
-    TOCRWAITFORANYJOBFUNC      TOCRWaitForAnyJob   ;
-    TOCRGETJOBDBINFOFUNC       TOCRGetJobDBInfo    ;
-    TOCRGETJOBSTATUSFUNC       TOCRGetJobStatus    ;
-    TOCRGETJOBSTATUSEXFUNC     TOCRGetJobStatusEx  ;
-    TOCRGETJOBSTATUSMSGFUNC    TOCRGetJobStatusMsg ;
-    TOCRGETNUMPAGESFUNC        TOCRGetNumPages     ;
-    TOCRGETJOBRESULTSFUNC      TOCRGetJobResults   ;
-    TOCRGETJOBRESULTSEXFUNC    TOCRGetJobResultsEx ;
-    TOCRGETLICENCEINFOFUNC     TOCRGetLicenceInfo  ;
-    TOCRCONVERTTIFFTODIBFUNC   TOCRConvertTIFFtoDIB;
-    TOCRROTATEMONOBITMAPFUNC   TOCRRotateMonoBitmap;
-    TOCRCONVERTFORMATFUNC      TOCRConvertFormat   ;
-    TOCRGETLICENCEINFOEXFUNC   TOCRGetLicenceInfoEx;
+    typedef LONG(__stdcall* TOCRINITIALIZEFUNC)(LONG*);
+    typedef LONG(__stdcall* TOCRSHUTDOWNFUNC)(LONG);
+    typedef LONG(__stdcall* TOCRGETERRORMODEFUNC)(long JobNo, long* ErrorMode);
+    typedef LONG(__stdcall* TOCRSETERRORMODEFUNC)(long JobNo, long ErrorMode);
+    typedef LONG(__stdcall* TOCRDOJOBFUNC)(long JobNo, TOCRJOBINFO* JobInfo);
+    typedef LONG(__stdcall* TOCRWAITFORJOBFUNC)(long JobNo, long* JobStatus);
+    typedef LONG(__stdcall* TOCRWAITFORANYJOBFUNC)(long* WaitAnyStatus, long* JobNo);
+    typedef LONG(__stdcall* TOCRGETJOBDBINFOFUNC)(long* JobSlotInf);
+    typedef LONG(__stdcall* TOCRGETJOBSTATUSFUNC)(long JobNo, long* JobStatus);
+    typedef LONG(__stdcall* TOCRGETJOBSTATUSEXFUNC)(long JobNo, long* JobStatus, float* Progress, long* AutoOrientation);
+    typedef LONG(__stdcall* TOCRGETJOBSTATUSMSGFUNC)(long JobNo, char* Msg);
+    typedef LONG(__stdcall* TOCRGETNUMPAGESFUNC)(long JobNo, char* Filename, long JobType, long* NumPages);
+    typedef LONG(__stdcall* TOCRGETJOBRESULTSFUNC)(long JobNo, long* ResultsInf, TOCRRESULTS* Results);
+    typedef LONG(__stdcall* TOCRGETJOBRESULTSEXFUNC)(long JobNo, long Mode, long* ResultsInf, void* ResultsEx);
+    typedef LONG(__stdcall* TOCRGETLICENCEINFOFUNC)(long* NumberOfJobSlots, long* Volume, long* Time, long* Remaining);
+    typedef LONG(__stdcall* TOCRCONVERTTIFFTODIBFUNC)(long JobNo, char* InputFilename, char* OutputFilename, long PageNo);
+    typedef LONG(__stdcall* TOCRROTATEMONOBITMAPFUNC)(long* hBmp, long Width, long Height, long Orientation);
+    typedef LONG(__stdcall* TOCRCONVERTFORMATFUNC)(long JobNo, void* InputAddr, long InputFormat, void* OutputAddr, long OutputFormat, long PageNo);
+    typedef LONG(__stdcall* TOCRGETLICENCEINFOEXFUNC)(long JobNo, char* Licence, long* Volume, long* Time, long* Remaining, long* Features);
 
-    TOCRSDK();
-    ~TOCRSDK();
-    HMODULE InitTOCR();
-    bool IsInitialized() const { return m_hMod!= nullptr; }
-    HMODULE GetModuleHandle() const { return m_hMod; }
-    HMODULE m_hMod;
-};
+    struct TOCRSDK
+    {
+        TOCRINITIALIZEFUNC         TOCRInitialise      ;
+        TOCRSHUTDOWNFUNC           TOCRShutdown        ;
+        TOCRGETERRORMODEFUNC       TOCRGetErrorMode    ;
+        TOCRSETERRORMODEFUNC       TOCRSetErrorMode    ;
+        TOCRDOJOBFUNC              TOCRDoJob           ;
+        TOCRWAITFORJOBFUNC         TOCRWaitForJob      ;
+        TOCRWAITFORANYJOBFUNC      TOCRWaitForAnyJob   ;
+        TOCRGETJOBDBINFOFUNC       TOCRGetJobDBInfo    ;
+        TOCRGETJOBSTATUSFUNC       TOCRGetJobStatus    ;
+        TOCRGETJOBSTATUSEXFUNC     TOCRGetJobStatusEx  ;
+        TOCRGETJOBSTATUSMSGFUNC    TOCRGetJobStatusMsg ;
+        TOCRGETNUMPAGESFUNC        TOCRGetNumPages     ;
+        TOCRGETJOBRESULTSFUNC      TOCRGetJobResults   ;
+        TOCRGETJOBRESULTSEXFUNC    TOCRGetJobResultsEx ;
+        TOCRGETLICENCEINFOFUNC     TOCRGetLicenceInfo  ;
+        TOCRCONVERTTIFFTODIBFUNC   TOCRConvertTIFFtoDIB;
+        TOCRROTATEMONOBITMAPFUNC   TOCRRotateMonoBitmap;
+        TOCRCONVERTFORMATFUNC      TOCRConvertFormat   ;
+        TOCRGETLICENCEINFOEXFUNC   TOCRGetLicenceInfoEx;
 
-using LongCapMap = std::unordered_map<LONG,LONG>;
-using StringCapMap = std::unordered_map<std::string,std::string>;
-using TOCRErrorCodeMap = std::unordered_map<LONG, std::string>;
-using TOCRBitDepthMap = std::unordered_map<LONG, std::vector<LONG> >;
+        TOCRSDK();
+        ~TOCRSDK();
+        HMODULE InitTOCR();
+        bool IsInitialized() const { return m_hMod!= nullptr; }
+        HMODULE GetModuleHandle() const { return m_hMod; }
+        HMODULE m_hMod;
+    };
 
-class TransymOCR : public OCREngine
-{
-#ifdef _WIN32
-public:
-    TransymOCR(CTL_TwainDLLHandle* pHandle);
-    ~TransymOCR() override;
-    bool IsInitialized() const override;
-    bool SetOptions(OCRJobOptions& options) override;
-    LONG StartOCR(CTL_StringType filename) override;
-    bool SetFileType() override { return true; }
-    std::string GetOCRVersionInfo() override;
-    bool SetOCRVersionIdentity() override;
-    bool IsReturnCodeOk(LONG returnCode) override;
-    std::string GetErrorString(LONG returnCode) override;
-    int GetNumPagesInFile(CTL_StringType szFileName, int& errCode) override;
-    bool ShutdownOCR(int& status) override;
-    LONG StartupOCREngine() override;
+    using LongCapMap = std::unordered_map<LONG,LONG>;
+    using StringCapMap = std::unordered_map<std::string,std::string>;
+    using TOCRErrorCodeMap = std::unordered_map<LONG, std::string>;
+    using TOCRBitDepthMap = std::unordered_map<LONG, std::vector<LONG> >;
 
-protected:
-    bool ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRLongArrayValues& vals) override;
-    bool ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRStringArrayValues& vals) override;
-    bool ProcessSetCapValues(LONG, LONG, const OCRLongArrayValues&) override;
-    bool ProcessSetCapValues(LONG nOCRCap, LONG CapType, const OCRStringArrayValues& vals) override;
+    class TransymOCR : public OCREngine
+    {
+    #ifdef _WIN32
+    public:
+        TransymOCR(CTL_TwainDLLHandle* pHandle);
+        ~TransymOCR() override;
+        bool IsInitialized() const override;
+        bool SetOptions(OCRJobOptions& options) override;
+        LONG StartOCR(CTL_StringType filename) override;
+        bool SetFileType() override { return true; }
+        std::string GetOCRVersionInfo() override;
+        bool SetOCRVersionIdentity() override;
+        bool IsReturnCodeOk(LONG returnCode) override;
+        std::string GetErrorString(LONG returnCode) override;
+        int GetNumPagesInFile(CTL_StringType szFileName, int& errCode) override;
+        bool ShutdownOCR(int& status) override;
+        LONG StartupOCREngine() override;
 
-private:
-    void SetAvailableCaps();
-    TOCRSDK m_SDK;
-    TOCRJOBINFO m_JobInfo;
-    UINT m_nJobRetrieveType;
-    HMODULE m_hMod;
-    LONG m_JobHandle;
-    std::string m_sOCRResults;
-    LONG ProcessTOCRJob();
-    LongCapMap m_OrientationMap;
-    TOCRRESULTS m_JobResults;
-    TOCRErrorCodeMap m_ErrorCode;
-    TOCRBitDepthMap m_BitDepths;
-    LongCapMap m_BitDepthsCurrent;
-    LongCapMap m_BitDepthsDefault;
-#endif
-};
+    protected:
+        bool ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRLongArrayValues& vals) override;
+        bool ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRStringArrayValues& vals) override;
+        bool ProcessSetCapValues(LONG, LONG, const OCRLongArrayValues&) override;
+        bool ProcessSetCapValues(LONG nOCRCap, LONG CapType, const OCRStringArrayValues& vals) override;
+
+    private:
+        void SetAvailableCaps();
+        TOCRSDK m_SDK;
+        TOCRJOBINFO m_JobInfo;
+        UINT m_nJobRetrieveType;
+        HMODULE m_hMod;
+        LONG m_JobHandle;
+        std::string m_sOCRResults;
+        LONG ProcessTOCRJob();
+        LongCapMap m_OrientationMap;
+        TOCRRESULTS m_JobResults;
+        TOCRErrorCodeMap m_ErrorCode;
+        TOCRBitDepthMap m_BitDepths;
+        LongCapMap m_BitDepthsCurrent;
+        LongCapMap m_BitDepthsDefault;
+    #endif
+    };
+}
 #endif

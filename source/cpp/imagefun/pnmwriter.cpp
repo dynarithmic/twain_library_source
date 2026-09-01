@@ -184,7 +184,7 @@ uint32_t PnmSessionWriter::MaxValue() const
     }
 }
 
-bool PnmSessionWriter::WriteHeader()
+bool PnmSessionWriter::WriteHeader() const
 {
     if (std::fprintf(file_, "%s\n", Magic()) < 0)
         return false;

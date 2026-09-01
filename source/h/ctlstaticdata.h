@@ -145,7 +145,7 @@ namespace dynarithmic
         SourceSheetcountMap      s_SourceSheetcountList;
         SourceToUIAutocloseMap   s_SourceToAutocloseMap;
         CTL_StringType           s_ApplicationName;
-
+        SupportedBitDepthsMap    s_supportedBitDepths;
         CTL_StaticDataStruct();
     };
 
@@ -244,7 +244,7 @@ namespace dynarithmic
         static CTL_StringType& GetApplicationName() { return s_StaticData.s_ApplicationName;  }
         static CTL_StringType& GetDLLParentPath() { return s_StaticData.s_DLLParentPath; }
         static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_StaticData.s_AvailableFileFormatsMap; }
-
+        static SupportedBitDepthsMap& GetSupportedBPPMap() { return s_StaticData.s_supportedBitDepths; }
     };
 }
 #endif

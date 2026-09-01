@@ -96,7 +96,7 @@ namespace dynarithmic
         {
             TW_UINT16* m_pRC;
             CTL_CapabilitySetTriplet<T>* m_pThis;
-            PrePostEncoderRAII(CTL_CapabilitySetTriplet<T>* pThis, TW_UINT16* pRC) : m_pThis(pThis), m_pRC(pRC) {}
+            PrePostEncoderRAII(CTL_CapabilitySetTriplet<T>* pThis, TW_UINT16* pRC) : m_pRC(pRC), m_pThis(pThis) {}
 
             // The PostEncode() releases any memory allocated by PreEncode().
             ~PrePostEncoderRAII() { m_pThis->PostEncode(*m_pRC); }

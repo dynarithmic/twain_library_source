@@ -181,8 +181,8 @@ namespace dynarithmic
     {
         public:
             std::pair<bool, int> OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedTiffDibPage& page,
-                                             TiffPageSettings settings);
-            std::pair<bool, int> OnNextPage(const PreparedTiffDibPage& page, TiffPageSettings settings);
+                                             const TiffPageSettings& settings);
+            std::pair<bool, int> OnNextPage(const PreparedTiffDibPage& page, const TiffPageSettings& settings);
             std::pair<bool, int> OnLastPage();
             bool IsOpen() const noexcept;
         private:

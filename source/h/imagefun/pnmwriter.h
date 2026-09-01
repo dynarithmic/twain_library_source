@@ -93,7 +93,7 @@ namespace dynarithmic
             static uint8_t ReverseBits(uint8_t v);
             const char* Magic() const;
             uint32_t MaxValue() const;
-            bool WriteHeader();
+            bool WriteHeader() const;
             bool WritePixels();
             const uint8_t* GetSourceRow(uint32_t y) const;
             bool WritePbmPlain() const;

@@ -43,8 +43,8 @@ CTL_TwainTypeOb::CTL_TwainTypeOb( CTL_TwainDLLHandle* pHandle, TW_UINT16 nType, 
 }
 
 CTL_TwainTypeOb::CTL_TwainTypeOb(CTL_TwainTypeOb&& rhs) noexcept : m_nSize(rhs.m_nSize), m_nType(rhs.m_nType),
-                                                                   m_pData(rhs.m_pData), m_hGlobal(rhs.m_hGlobal),
-                                                                   m_pDLLHandle(rhs.m_pDLLHandle)
+                                                                   m_pData(rhs.m_pData), m_pDLLHandle(rhs.m_pDLLHandle),
+                                                                   m_hGlobal(rhs.m_hGlobal)
 {
     rhs.m_pData = nullptr;
     rhs.m_pDLLHandle = nullptr;

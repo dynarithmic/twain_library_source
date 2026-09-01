@@ -77,5 +77,6 @@ namespace dynarithmic
     using SourceSheetcountMap = std::vector<std::pair<std::string, std::string>>;
     using SourcePaperDetectableMap = BASIC_MAPTYPE_<std::string, bool>;
     using CTL_PairToStringMap = std::unordered_map<std::pair<int, std::string>, std::string, CacheKeyHash>;
+    using SupportedBitDepthsMap = BASIC_MAPTYPE_<LONG, std::vector<uint16_t>>;
 }
 #endif

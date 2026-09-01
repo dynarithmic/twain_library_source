@@ -37,66 +37,66 @@ namespace dynarithmic
     {
     }
 
-    bool PDFInterface::DTWLIB_PDFOpenNewFile(PdfDocumentPtr pDoc, LPCTSTR szFile)
+    bool PDFInterface::DTWLIB_PDFOpenNewFile(const PdfDocumentPtr& pDoc, LPCTSTR szFile)
     {
         return pDoc->OpenNewPDFFile(szFile);
     }
 
-    void PDFInterface::DTWLIB_PDFSetCompression(PdfDocumentPtr pDoc, bool bCompress)
+    void PDFInterface::DTWLIB_PDFSetCompression(const PdfDocumentPtr& pDoc, bool bCompress)
     {
         pDoc->SetCompression(bCompress);
     }
 
-    void PDFInterface::DTWLIB_PDFSetNameField(PdfDocumentPtr pDoc, int32_t nWhich, const char *szName)
+    void PDFInterface::DTWLIB_PDFSetNameField(const PdfDocumentPtr& pDoc, int32_t nWhich, const char *szName)
     {
-    switch (nWhich)
-    {
-        case PDF_AUTHOR:
-            pDoc->SetAuthor(szName);
-        break;
-        case PDF_PRODUCER:
-            pDoc->SetProducer(szName);
-        break;
-        case PDF_TITLE:
-            pDoc->SetTitle(szName);
-        break;
-        case PDF_KEYWORDS:
-            pDoc->SetKeywords(szName);
-        break;
-        case PDF_SUBJECT:
-            pDoc->SetSubject(szName);
-        break;
-        case PDF_MEDIABOX:
-            pDoc->SetMediaBox(szName);
-        break;
-        case PDF_CREATOR:
-            pDoc->SetCreator(szName);
-        break;
-        default: ;
+        switch (nWhich)
+        {
+            case PDF_AUTHOR:
+                pDoc->SetAuthor(szName);
+            break;
+            case PDF_PRODUCER:
+                pDoc->SetProducer(szName);
+            break;
+            case PDF_TITLE:
+                pDoc->SetTitle(szName);
+            break;
+            case PDF_KEYWORDS:
+                pDoc->SetKeywords(szName);
+            break;
+            case PDF_SUBJECT:
+                pDoc->SetSubject(szName);
+            break;
+            case PDF_MEDIABOX:
+                pDoc->SetMediaBox(szName);
+            break;
+            case PDF_CREATOR:
+                pDoc->SetCreator(szName);
+            break;
+            default: ;
+        }
     }
-}
 
-    bool PDFInterface::DTWLIB_PDFStartCreation(PdfDocumentPtr pDoc, int majorv, int minorv)
+    bool PDFInterface::DTWLIB_PDFStartCreation(const PdfDocumentPtr& pDoc, int majorv, int minorv)
     {
         return pDoc->StartPDFCreation(majorv, minorv);
     }
 
-    bool PDFInterface::DTWLIB_PDFEndCreation(PdfDocumentPtr pDoc)
+    bool PDFInterface::DTWLIB_PDFEndCreation(const PdfDocumentPtr& pDoc)
     {
         return pDoc->EndPDFCreation();
     }
 
-    void PDFInterface::DTWLIB_PDFSetImageType(PdfDocumentPtr pDoc, int32_t iType)
+    void PDFInterface::DTWLIB_PDFSetImageType(const PdfDocumentPtr& pDoc, int32_t iType)
     {
         pDoc->SetImageType(iType);
     }
 
-    bool PDFInterface::DTWLIB_PDFWritePage(PdfDocumentPtr pDoc, LPCTSTR szPath)
+    bool PDFInterface::DTWLIB_PDFWritePage(const PdfDocumentPtr& pDoc, LPCTSTR szPath)
     {
         return pDoc->WritePage(szPath);
     }
 
-    void PDFInterface::DTWLIB_PDFSetLongField(PdfDocumentPtr pDoc, int32_t nWhich, int32_t nValue)
+    void PDFInterface::DTWLIB_PDFSetLongField(const PdfDocumentPtr& pDoc, int32_t nWhich, int32_t nValue)
     {
     switch (nWhich)
     {
@@ -115,22 +115,22 @@ namespace dynarithmic
     }
 }
 
-    void PDFInterface::DTWLIB_PDFSetScaling(PdfDocumentPtr pDoc, double xscale, double yscale)
+    void PDFInterface::DTWLIB_PDFSetScaling(const PdfDocumentPtr& pDoc, double xscale, double yscale)
     {
         pDoc->SetScaling(xscale, yscale);
     }
 
-    void PDFInterface::DTWLIB_PDFSetThumbnailFile(PdfDocumentPtr pDoc, LPCTSTR szPath)
+    void PDFInterface::DTWLIB_PDFSetThumbnailFile(const PdfDocumentPtr& pDoc, LPCTSTR szPath)
     {
         pDoc->SetThumbnailFile(szPath);
     }
 
-    void PDFInterface::DTWLIB_PDFSetDPI(PdfDocumentPtr pDoc, int32_t dpi)
+    void PDFInterface::DTWLIB_PDFSetDPI(const PdfDocumentPtr& pDoc, int32_t dpi)
     {
         pDoc->SetDPI(dpi);
     }
 
-    void PDFInterface::DTWLIB_PDFSetEncryption(PdfDocumentPtr pDoc, LPCTSTR szOwnerPass,
+    void PDFInterface::DTWLIB_PDFSetEncryption(const PdfDocumentPtr& pDoc, LPCTSTR szOwnerPass,
                                                LPCTSTR szUserPass, int32_t Permissions,
                                                bool bUseStrongEncrypt,
                                                bool bUseAESEncryption,
@@ -144,22 +144,22 @@ namespace dynarithmic
                                                    nKeyLength);
 }
 
-    void PDFInterface::DTWLIB_PDFSetASCIICompression(PdfDocumentPtr pDoc, bool bSetCompression)
+    void PDFInterface::DTWLIB_PDFSetASCIICompression(const PdfDocumentPtr& pDoc, bool bSetCompression)
     {
         pDoc->SetASCIICompression(bSetCompression);
     }
 
-    void PDFInterface::DTWLIB_PDFSetNoCompression(PdfDocumentPtr pDoc, bool bSetCompression)
+    void PDFInterface::DTWLIB_PDFSetNoCompression(const PdfDocumentPtr& pDoc, bool bSetCompression)
     {
         pDoc->SetNoCompression(bSetCompression);
     }
 
-    void PDFInterface::DTWLIB_PDFSetSearchableText(PdfDocumentPtr pDoc, const char *text)
+    void PDFInterface::DTWLIB_PDFSetSearchableText(const PdfDocumentPtr& pDoc, const char *text)
     {
         pDoc->SetSearchableText(text);
     }
 
-    void PDFInterface::DTWLIB_PDFAddPageText(PdfDocumentPtr pDoc, PDFTextElement* pElement)
+    void PDFInterface::DTWLIB_PDFAddPageText(const PdfDocumentPtr& pDoc, PDFTextElement* pElement)
 {
 /*    PDFTextElement element;
 
@@ -181,7 +181,7 @@ namespace dynarithmic
         pDoc->AddTextElement(pElement);
 }
 
-    void PDFInterface::DTWLIB_PDFSetPolarity(PdfDocumentPtr pDoc, int32_t Polarity)
+    void PDFInterface::DTWLIB_PDFSetPolarity(const PdfDocumentPtr& pDoc, int32_t Polarity)
 {
         pDoc->SetPolarity(Polarity);
     }

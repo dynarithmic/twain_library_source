@@ -80,7 +80,7 @@ CTL_ITwainSession*  CTL_ITwainSession::Create(CTL_TwainDLLHandle *pHandle,
 CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
                                      LPCTSTR pAppName,
                                      HWND* hAppWnd) : 
-                                     m_AppWnd{}, m_pTwainDLLHandle{}, m_pSelectedSource{}
+                                     m_AppWnd{}, m_pSelectedSource{}, m_pTwainDLLHandle{}
 {
     if ( pAppName )
         m_AppName = pAppName;

@@ -32,6 +32,8 @@
 using namespace VersionInformation;
 #endif
 
+using namespace dynarithmic;
+
 TOCRSDK::TOCRSDK()
         : TOCRInitialise(nullptr),
         TOCRShutdown        (nullptr),
@@ -135,7 +137,7 @@ TOCRSDK::~TOCRSDK()
 
 #define INIT_TOCR_ERROR_CODE(x) m_ErrorCode[x] = #x;
 ///////////////////////////////////////////////////////////////////
-TransymOCR::TransymOCR(CTL_TwainDLLHandle* DLLHandle) : OCREngine(DLLHandle), m_JobHandle{}, m_JobInfo{}, m_nJobRetrieveType{}, m_JobResults{}
+TransymOCR::TransymOCR(CTL_TwainDLLHandle* DLLHandle) : OCREngine(DLLHandle), m_JobInfo{}, m_nJobRetrieveType{}, m_JobHandle{}, m_JobResults{}
 {
     INIT_TOCR_ERROR_CODE(TOCRERR_ILLEGALJOBNO)
     INIT_TOCR_ERROR_CODE(TOCRERR_FAILLOCKDB)

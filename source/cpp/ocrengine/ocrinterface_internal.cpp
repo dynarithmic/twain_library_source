@@ -53,7 +53,7 @@ OCREngine::OCREngine(CTL_TwainDLLHandle* pHandle) : m_OCRIdentity{}, m_nCurrentP
     m_mapOperations[DTWAIN_CAPRESET] = DTWAIN_CO_RESET;
 }
 
-OCREngine::~OCREngine() {}
+OCREngine::~OCREngine() = default;
 bool OCREngine::IsInitialized() const { return false; }
 bool OCREngine::SetOptions(OCRJobOptions& /*options*/) { return false; }
 LONG OCREngine::StartOCR() { return 0; }

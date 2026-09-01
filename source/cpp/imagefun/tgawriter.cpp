@@ -120,8 +120,7 @@ bool TgaSessionWriter::WriteCurrentPage()
 
 bool TgaSessionWriter::WriteExtensionAreaWithComments() const
 {
-    const uint32_t extensionOffset =
-        static_cast<uint32_t>(std::ftell(file_));
+    const uint32_t extensionOffset = static_cast<uint32_t>(std::ftell(file_));
 
     std::array<uint8_t, 495> ext{};
     std::memset(ext.data(), 0, ext.size());
@@ -147,9 +146,10 @@ bool TgaSessionWriter::WriteExtensionAreaWithComments() const
 
     footer.extensionOffset = extensionOffset;
     footer.developerOffset = 0;
-    
-    std::memcpy(footer.signature, "TRUEVISION-XFILE.", 17);
-    footer.signature[17] = '\0';
+    constexpr char sigName[] = "TRUEVISION-XFILE.";
+    constexpr int numSigBytes = sizeof(sigName) - 1;
+    std::memcpy(footer.signature, sigName, numSigBytes);
+    footer.signature[numSigBytes] = '\0';
 
     if (std::fwrite(&footer, sizeof(footer), 1, file_) != 1)
         return false;
