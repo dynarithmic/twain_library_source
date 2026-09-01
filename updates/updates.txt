@@ -14,15 +14,16 @@ DTWAIN Version changes
   external settings in these INI files are merged into the default, embedded INI settings when
   DTWAIN_SysInitialize() is called.
 
-  On shutdown of DTWAIN (when DTWAIN_SysDestroy() is called), there will be a merged dtwain32.ini
-  or dtwain64.ini file written to the location where the usual resource files would be 
-  located.  The contents of the new file will contain all the settings within the embedded
-  INI file, plus the contents of the existing dtwain32/64.ini file, thus the customized settings will
-  not be lost.
-
   Note that the foreign language resources, for example, twainresourcestrings_french.txt, will still be 
   required to be external files.
 
+- The DTWAIN_SetDefaultSource() function will now issue an error code of DTWAIN_ERR_DSMVERSION_NOTSUPPORTED (-1019)
+  and return FALSE if this function is called on a TWAIN DSM version that is less than 2.x (in other words, 
+  if TWAIN_32.DLL is the current TWAIN Data Source Manager in use).  
+
+  The TWAIN specification does not allow setting the default TWAIN Source for DSM versions less than 2.x, thus 
+  issuing this call will result in an error.
+  
 - Removed the following obsolete and undocumented DTWAIN API functions:
 
     DTWAIN_AddExtImageInfoQuery 
