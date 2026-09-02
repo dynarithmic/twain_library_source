@@ -410,7 +410,6 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlcapcollect.h
         ${PROJECT_SOURCE_DIR}/h/ctlcapcontainerfuncs.h
         ${PROJECT_SOURCE_DIR}/h/ctlclosesource.h
-        ${PROJECT_SOURCE_DIR}/h/ctlcntry.h
         ${PROJECT_SOURCE_DIR}/h/ctlconstexprfind.h
         ${PROJECT_SOURCE_DIR}/h/ctlconstexprutils.h
         ${PROJECT_SOURCE_DIR}/h/ctldevicecontext.h

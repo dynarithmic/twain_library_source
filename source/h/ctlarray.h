@@ -41,7 +41,7 @@ namespace dynarithmic
     void ArrayCopyAnsiToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
     std::shared_ptr<CTL_ArrayFactory>& GetArrayFactoryFromHandle(CTL_TwainDLLHandle* pHandle);
     std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
-    void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
+    void DestroyArrayFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
 
     template <typename Container, typename DTWAINArrayType>
     static void CopyContainer(CTL_TwainDLLHandle* pHandle, const Container& theContainer, DTWAIN_ARRAY theArray)
@@ -173,6 +173,6 @@ namespace dynarithmic
     bool MoveArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
     LONG DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
     bool DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain);
-    bool TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil);
+    bool TWFRAMEToDTWAINFRAME(const TW_FRAME& pTwain, DTWAIN_FRAME pDdtwil);
 }
 #endif

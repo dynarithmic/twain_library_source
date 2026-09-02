@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <string>
+#include "mapdefs.h"
 #include "ctlstringdefs.h"
 
 namespace dynarithmic
@@ -46,7 +47,7 @@ namespace dynarithmic
             m_formatName(std::move(name)), m_vExtensions(std::move(vExt)) {}
     };
 
-    using CTL_FileSaveMap = std::map<int, FileSaveNode>;
-    using CTL_AvailableFileFormatsMap = std::map<LONG, FileFormatNode>;
+    using CTL_FileSaveMap = BASIC_MAPTYPE_<int, FileSaveNode>;
+    using CTL_AvailableFileFormatsMap = BASIC_MAPTYPE_<LONG, FileFormatNode>;
 }
 #endif

@@ -186,14 +186,6 @@ namespace dynarithmic
                              UINT      nContainerTypes,
                              TW_UINT16  nDataType,
                              std::vector<T> &rArray
-                            );
-    template <typename T>
-    bool SetCapabilityValues( const CTL_ITwainSource *pSource,
-                             TW_UINT16  nCap,
-                             TW_UINT16 SetType,
-                             UINT      nContainerTypes,
-                             TW_UINT16  nDataType,
-                             std::vector<T> &rArray
                             )
     {
         auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
@@ -258,16 +250,6 @@ namespace dynarithmic
 
         return pSetTriplet->Execute() == TWRC_SUCCESS;
     }
-
-    template <class TwainType, class AssignType>
-    std::pair<bool, int> GetOneCapValue( DTWAIN_HANDLE DLLHandle,
-                        DTWAIN_SOURCE Source,
-                        TW_UINT16 nCap,
-                        TW_UINT16 GetType,
-                        BOOL bUseStrings,
-                        AssignType *pAssign,
-                        TW_UINT16 TwainDataType
-                        );
 
     template <class TwainType, class AssignType>
     std::pair<bool, int> GetOneCapValue( DTWAIN_HANDLE DLLHandle,
