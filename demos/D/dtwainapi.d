@@ -987,7 +987,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089);
     public static const int DTWAIN_ERR_DTWAINDLL_VERSION = (-1090);
     public static const int DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091);
-    public static const int DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1091);
+    public static const int DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092);
     public static const int TWAIN_ERR_LOW_MEMORY = (-1100);
     public static const int TWAIN_ERR_FALSE_ALARM = (-1101);
     public static const int TWAIN_ERR_BUMMER = (-1102);

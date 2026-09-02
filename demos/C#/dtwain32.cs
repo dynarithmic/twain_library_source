@@ -867,7 +867,7 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089);
         public const int DTWAIN_ERR_DTWAINDLL_VERSION = (-1090);
         public const int DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091);
-        public const int DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1091);
+        public const int DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092);
         public const int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const int TWAIN_ERR_FALSE_ALARM = (-1101);
         public const int TWAIN_ERR_BUMMER = (-1102);

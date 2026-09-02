@@ -985,7 +985,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_ERR_DTWAINDLL_LOADERROR As Integer = (-1089)
         Public Const DTWAIN_ERR_DTWAINDLL_VERSION As Integer = (-1090)
         Public Const DTWAIN_ERR_ACTIVE_TWAINSESSION As Integer = (-1091)
-        Public Const DTWAIN_ERR_DSMVERSION_NOTSUPPORTED As Integer = (-1091)
+        Public Const DTWAIN_ERR_DSMVERSION_NOTSUPPORTED As Integer = (-1092)
         Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
         Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
         Public Const TWAIN_ERR_BUMMER As Integer = (-1102)
