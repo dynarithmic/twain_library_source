@@ -215,7 +215,7 @@ namespace
 
 namespace dynarithmic
 {
-    DTWAIN_SOURCE DTWAIN_LLSelectSource(const CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& /*opt*/)
+    DTWAIN_SOURCE DTWAIN_LLSelectSource(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& /*opt*/)
     {
         LOG_FUNC_ENTRY_PARAMS(())
         // Select a source from the source dialog
