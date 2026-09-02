@@ -231,7 +231,7 @@ std::pair<bool, std::wstring> CTL_StaticData::GetTwainNameFromConstantW(int lCon
 
 CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string_view sLang)
 {
-    auto resource_map = GetAllLanguagesResourceMap();
+    auto& resource_map = GetAllLanguagesResourceMap();
     auto iter = resource_map.find(sLang.data());
     if (iter != resource_map.end())
         return &iter->second;
