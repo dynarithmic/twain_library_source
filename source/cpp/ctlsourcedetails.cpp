@@ -954,7 +954,7 @@ extern "C"
             for (auto& name : vAllSourcesT)
                 vAllSources.push_back(stringconversion::Convert_Native_To_Ansi(name, name.length()));
             auto genDetails = generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor);
-            #ifdef UNICODE
+            #ifdef _UNICODE
             pHandle->m_strSourceDetails = stringconversion::Convert_Ansi_To_Native(genDetails, genDetails.length());
             #else
             pHandle->m_strSourceDetails = genDetails;

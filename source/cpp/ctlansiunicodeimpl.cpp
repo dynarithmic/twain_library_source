@@ -28,7 +28,7 @@
 
 namespace strview = std;
 
-#ifdef UNICODE
+#ifdef _UNICODE
     #pragma message ("Creating UNICODE version of DTWAIN functions")
 #else
     #pragma message ("Creating MBCS version of DTWAIN functions")

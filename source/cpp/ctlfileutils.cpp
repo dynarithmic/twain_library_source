@@ -50,11 +50,11 @@ namespace dynarithmic
         {
             auto p = filesys::path(filename);
             const auto& p2 = p.remove_filename();
-#ifdef UNICODE
+            #ifdef _UNICODE
             auto str = p2.wstring();
-#else
+            #else
             auto str = p2.string();
-#endif
+            #endif
             if (!bAddBackSlash)
                 str = WindowsAPIImplDef::RemoveBackslashFromDirectory(str);
             else

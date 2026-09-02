@@ -34,7 +34,7 @@ namespace dynarithmic
 #endif
     namespace stringconversion
     {
-#ifdef UNICODE
+        #ifdef _UNICODE
         inline std::wstring          Convert_Ansi_To_Native(std::string_view x) { return dynarithmic::ANSIToWide(x); }
         inline std::wstring          Convert_AnsiPtr_To_Native(const char* x) { return dynarithmic::ANSIToWide(x ? x : ""); }
 
@@ -59,7 +59,7 @@ namespace dynarithmic
         inline const std::wstring& Convert_Native_To_Wide(const std::wstring& x, size_t) { return x; }
         inline std::wstring          Convert_NativePtr_To_Wide(const wchar_t* x, size_t) { return x ? x : L""; }
 
-#else
+        #else
         inline const std::string& Convert_Ansi_To_Native(const std::string& x) { return x; }
         inline std::string    Convert_AnsiPtr_To_Native(const char* x) { return x ? x : ""; }
 
@@ -83,7 +83,7 @@ namespace dynarithmic
 
         inline std::wstring   Convert_Native_To_Wide(std::string_view x, size_t len) { return dynarithmic::ANSIToWide(x, len); }
         inline std::wstring   Convert_NativePtr_To_Wide(const char* x, size_t len) { return dynarithmic::ANSIToWide(x ? x : "", len); }
-#endif
+        #endif
         inline std::string     Convert_Wide_To_Ansi(std::wstring_view x) { return dynarithmic::WideToANSI(x); }
         inline std::wstring    Convert_Ansi_To_Wide(std::string_view x) { return dynarithmic::ANSIToWide(x); }
         inline std::string     Convert_WidePtr_To_Ansi(const wchar_t* x) { return x ? dynarithmic::WideToANSI(x) : ""; }
@@ -94,13 +94,13 @@ namespace dynarithmic
         inline std::string     Convert_WidePtr_To_Ansi(const wchar_t* x, size_t len) { return x ? dynarithmic::WideToANSI(x, len) : ""; }
         inline std::wstring    Convert_AnsiPtr_To_Wide(const char* x, size_t len) { return x ? dynarithmic::ANSIToWide(x, len) : L""; }
 
-#ifdef _WIN32
+        #ifdef _WIN32
         using utf16strType = std::wstring;
         using utf16viewType = std::wstring_view;
-#else
+        #else
         using utf16strType = std::u16string;
         using utf16viewType = std::u16string_view;
-#endif
+        #endif
         inline std::pair<utf16strType, bool> Convert_UTF8_To_UTF16(std::string_view utf8, bool bMakeWideIfError = true)
         {
             auto pr = dynarithmic::utfconverter::UTF8ToUTF16(utf8);
