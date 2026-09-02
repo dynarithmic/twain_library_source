@@ -134,7 +134,6 @@ namespace
     void create_stream_from_strings(std::ostringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
     {
         const auto pHandle = reinterpret_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-        std::vector<std::string> imageVals;
         DTWAIN_ARRAY arr = Fn::GetAllStringValues(Source, capValue);
         DTWAINArrayPtr_RAII raii(pHandle, &arr);
         if (arr)
@@ -145,8 +144,9 @@ namespace
                 strm << "\"<not available>\"";
             else
             {
+                std::vector<std::string> imageVals;
                 std::transform(vValues.begin(), vValues.end(),
-                    std::back_inserter(imageVals), [](auto& s) { return "\"" + s + "\""; });
+                               std::back_inserter(imageVals), [](auto& s) { return "\"" + s + "\""; });
                 strm << "{";
                 strm << "\"data-values\":[" << join_string(imageVals.begin(), imageVals.end()) << "]}";
             }
@@ -313,66 +313,66 @@ namespace
 
 using ResInfoMap = std::map<LONG, OneResInfo>;
 
-ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
-{
-    const auto pHandle = pSource->GetDTWAINHandle();
-    ResInfoMap resMap;
-
-    // get units of measure
-    DTWAIN_ARRAY aUnits = DTWAIN_EnumSourceUnitsEx(reinterpret_cast<DTWAIN_SOURCE>(pSource));
-    DTWAINArrayPtr_RAII raii(pHandle, &aUnits);
-    if ( aUnits )
-    {
-        auto& pUnitsVals = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aUnits);
-        size_t sizeLen = pUnitsVals.size();
-        auto retvalue = CreateArrayFromCap(pHandle, nullptr, ICAP_UNITS, 1);
-        if (!retvalue.second)
-            return resMap;
-        auto aSetUnit = retvalue.second;
-        auto& pSetUnitsVal = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aSetUnit);
-        DTWAINArrayPtr_RAII raii2(pHandle, &aSetUnit);
-        DTWAIN_ARRAY curUnit = nullptr;
-        GetCapValuesEx2_Internal(pSource, ICAP_UNITS, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &curUnit);
-        if ( curUnit )
-        {
-            auto& pCurUnit = pHandle->m_ArrayFactory->underlying_container_t<LONG>(curUnit);
-            if ( !pCurUnit.empty())
-            {
-                DTWAINArrayPtr_RAII raiiDefault(pHandle, &curUnit);
-                for (size_t i = 0; i < sizeLen; ++i)
-                {
-                    resMap.insert({pUnitsVals[i],{}});
-                    // Set the current unit of measure
-                    pSetUnitsVal[0] = pUnitsVals[i];
-                    if (SetCapValuesEx2_Internal(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aSetUnit))
-                    {
-                        // Get the resolution values for this unit of measure
-                        DTWAIN_ARRAY aResolutions = {};
-                        DTWAINArrayPtr_RAII raii3(pHandle, &aResolutions);
-                        GetCapValuesEx2_Internal(pSource, ICAP_XRESOLUTION, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aResolutions);
-                        if ( aResolutions )
-                        {
-                            auto& pResolutions = pHandle->m_ArrayFactory->underlying_container_t<double>(aResolutions);
-                            LONG nStatus = 0;
-                            bool isValidRange = DTWAIN_RangeIsValid(aResolutions, &nStatus);
-                            auto iter = resMap.find(pUnitsVals[i]);
-                            auto& vect = iter->second.m_AllRes;
-                            std::copy(pResolutions.begin(), pResolutions.end(), std::back_inserter(vect));
-                            iter->second.m_bIsRange = isValidRange;
-                        }
-                    }
-                }
-
-                // Set the unit back to the original
-                SetCapValuesEx2_Internal(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, curUnit);
-            }
-        }
-    }
-    return resMap;
-}
-
 namespace
 {
+    ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
+    {
+        const auto pHandle = pSource->GetDTWAINHandle();
+        ResInfoMap resMap;
+
+        // get units of measure
+        DTWAIN_ARRAY aUnits = DTWAIN_EnumSourceUnitsEx(reinterpret_cast<DTWAIN_SOURCE>(pSource));
+        DTWAINArrayPtr_RAII raii(pHandle, &aUnits);
+        if (aUnits)
+        {
+            auto& pUnitsVals = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aUnits);
+            size_t sizeLen = pUnitsVals.size();
+            auto retvalue = CreateArrayFromCap(pHandle, nullptr, ICAP_UNITS, 1);
+            if (!retvalue.second)
+                return resMap;
+            auto aSetUnit = retvalue.second;
+            auto& pSetUnitsVal = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aSetUnit);
+            DTWAINArrayPtr_RAII raii2(pHandle, &aSetUnit);
+            DTWAIN_ARRAY curUnit = nullptr;
+            GetCapValuesEx2_Internal(pSource, ICAP_UNITS, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &curUnit);
+            if (curUnit)
+            {
+                auto& pCurUnit = pHandle->m_ArrayFactory->underlying_container_t<LONG>(curUnit);
+                if (!pCurUnit.empty())
+                {
+                    DTWAINArrayPtr_RAII raiiDefault(pHandle, &curUnit);
+                    for (size_t i = 0; i < sizeLen; ++i)
+                    {
+                        resMap.insert({ pUnitsVals[i],{} });
+                        // Set the current unit of measure
+                        pSetUnitsVal[0] = pUnitsVals[i];
+                        if (SetCapValuesEx2_Internal(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aSetUnit))
+                        {
+                            // Get the resolution values for this unit of measure
+                            DTWAIN_ARRAY aResolutions = {};
+                            DTWAINArrayPtr_RAII raii3(pHandle, &aResolutions);
+                            GetCapValuesEx2_Internal(pSource, ICAP_XRESOLUTION, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aResolutions);
+                            if (aResolutions)
+                            {
+                                auto& pResolutions = pHandle->m_ArrayFactory->underlying_container_t<double>(aResolutions);
+                                LONG nStatus = 0;
+                                bool isValidRange = DTWAIN_RangeIsValid(aResolutions, &nStatus);
+                                auto iter = resMap.find(pUnitsVals[i]);
+                                auto& vect = iter->second.m_AllRes;
+                                std::copy(pResolutions.begin(), pResolutions.end(), std::back_inserter(vect));
+                                iter->second.m_bIsRange = isValidRange;
+                            }
+                        }
+                    }
+
+                    // Set the unit back to the original
+                    SetCapValuesEx2_Internal(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, curUnit);
+                }
+            }
+        }
+        return resMap;
+    }
+
     AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
     {
         const auto pHandle = pSource->GetDTWAINHandle();

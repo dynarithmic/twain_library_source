@@ -32,7 +32,7 @@ using namespace dynarithmic;
 
 namespace dynarithmic
 {
-    std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle)
+    std::vector<CTL_ITwainSource*> GetOpenSources(const CTL_TwainDLLHandle* pHandle)
     {
         std::vector<CTL_ITwainSource*> vSources;
         for (auto& pr : pHandle->m_mapStringToSource)

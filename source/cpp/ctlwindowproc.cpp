@@ -25,6 +25,7 @@
 #include "ctlsourcedibs.h"
 #include "ctltwainlogging.h"
 #include "windowsinit_impl.h"
+#include "ctltwaindllhandle.h"
 
 using namespace dynarithmic;
 

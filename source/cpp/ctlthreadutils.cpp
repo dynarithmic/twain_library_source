@@ -27,7 +27,8 @@
 #include "ctldtwainhandle.h"
 #include "ctlstaticdata.h"
 
-namespace dynarithmic
+using namespace dynarithmic;
+namespace
 {
     CTL_ThreadMap::iterator getThreadIdIter()
     {
@@ -42,7 +43,10 @@ namespace dynarithmic
         }
         return iter;
     }
+}
 
+namespace dynarithmic
+{
     unsigned long getThreadId()
     {
         auto iter = getThreadIdIter();
@@ -56,7 +60,6 @@ namespace dynarithmic
     }
 }
 
-using namespace dynarithmic;
 
 extern "C"
 {

@@ -35,9 +35,8 @@ namespace dynarithmic
 {
     CTL_StringType GetDTWAINTempFilePath(CTL_TwainDLLHandle* pHandle)
     {
-        static CTL_StringType sDummy;
         if (!pHandle)
-            return sDummy;
+            return {};
         if (pHandle->m_sTempFilePath.empty())
         {
             const auto tempPath = fileutils::temp_directory_path();

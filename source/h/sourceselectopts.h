@@ -95,7 +95,7 @@ namespace dynarithmic
         return strm;
     }
 
-    DTWAIN_SOURCE     DTWAIN_LLSelectSource(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts);
+    DTWAIN_SOURCE     DTWAIN_LLSelectSource(const CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts);
     DTWAIN_SOURCE     DTWAIN_LLSelectSourceByName(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts);
     DTWAIN_SOURCE     DTWAIN_LLSelectDefaultSource(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts);
     DTWAIN_SOURCE     DTWAIN_LLSelectSource2(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts);

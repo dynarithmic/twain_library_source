@@ -344,7 +344,7 @@ extern "C"
             BOOL bSupported = DTWAIN_IsFeederSupported(Source);
             if ( bSupported )
             {
-                CTL_TwainAppMgr::SetError(DTWAIN_ERR_FEEDER_COMPLIANCY, pSource->GetProductNameA().c_str(), false);
+                CTL_TwainAppMgr::SetError(DTWAIN_ERR_FEEDER_COMPLIANCY, pSource->GetProductNameA(), false);
                 LOG_FUNC_EXIT_NONAME_PARAMS(false)
             }
         }

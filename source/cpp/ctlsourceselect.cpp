@@ -104,7 +104,7 @@ namespace
             if (retVal != DTWAIN_NO_ERROR)
             {
                 if ( opts.nWhich == SELECTSOURCEBYNAME )
-                    CTL_TwainAppMgr::SetError(retVal, stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct).c_str(), false);
+                    CTL_TwainAppMgr::SetError(retVal, stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct), false);
                 return nullptr;
             }
             iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, CTL_TwainAppMgr::IsSourceOpen(pSource));
@@ -115,7 +115,8 @@ namespace
         }
 
         if ( !Source && opts.nWhich == SELECTSOURCEBYNAME )
-            CTL_TwainAppMgr::SetError(pHandle->m_lLastError, stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct).c_str(), false);
+            CTL_TwainAppMgr::SetError(pHandle->m_lLastError,
+                                      stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct), false);
         return Source;
     }
 
@@ -148,7 +149,7 @@ namespace
         return {};
     }
 
-    std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
+    std::vector<TCHAR> GetDefaultName(const SelectStruct& selectTraits)
     {
         bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
         bool bAlwaysHighlightFirst = selectTraits.CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST;
@@ -190,7 +191,7 @@ namespace
         return DefName;
     }
 
-    std::vector<CTL_StringType> GetNameList(SelectStruct& pS)
+    std::vector<CTL_StringType> GetNameList(const SelectStruct& pS)
     {
         std::vector<CTL_StringType> vSourceNames;
         // Fill the list box with the sources
@@ -214,7 +215,7 @@ namespace
 
 namespace dynarithmic
 {
-    DTWAIN_SOURCE DTWAIN_LLSelectSource(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& /*opt*/)
+    DTWAIN_SOURCE DTWAIN_LLSelectSource(const CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& /*opt*/)
     {
         LOG_FUNC_ENTRY_PARAMS(())
         // Select a source from the source dialog

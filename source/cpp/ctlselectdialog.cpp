@@ -227,7 +227,7 @@ namespace dynarithmic
                                                     reinterpret_cast<DLGPROC>(DisplayTwainDlgProc), reinterpret_cast<LPARAM>(&selectStruct));
         if (bRet == -1)
         {
-            CTL_TwainAppMgr::SetError(DTWAIN_ERR_WIN32_ERROR, LogWin32Error(::GetLastError()).c_str(), false);
+            CTL_TwainAppMgr::SetError(DTWAIN_ERR_WIN32_ERROR, LogWin32Error(::GetLastError()), false);
             return {};
         }
 
