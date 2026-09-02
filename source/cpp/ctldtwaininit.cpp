@@ -939,7 +939,7 @@ namespace
         auto* ptrIni = CTL_StaticData::GetINIInterface();
         if (!CTL_StaticData::IsINIFileLoaded())
         {
-            #ifdef UNICODE
+            #ifdef _WIN64
             std::string sINIData = LoadEmbeddedTwainInfo(hModule, IDR_DTWAININI_64);
             #else
             std::string sINIData = LoadEmbeddedTwainInfo(hModule, IDR_DTWAININI_32);

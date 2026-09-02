@@ -48,8 +48,11 @@ BEGIN
 END
 
 IDR_TWAININFO RCDATA "twaininfo.rc2"
-IDR_DTWAININI_64 RCDATA "dtwain64_ini.rc2"
-IDR_DTWAININI_32 RCDATA "dtwain32_ini.rc2"
+#ifdef _WIN64
+    IDR_DTWAININI_64 RCDATA "dtwain64_ini.rc2"
+#else
+    IDR_DTWAININI_32 RCDATA "dtwain32_ini.rc2"
+#endif
 IDR_DTWAINRESOURCESTRINGS RCDATA "twainresourcestrings_english.rc2"
 /////////////////////////////////////////////////////////////////////////////
 //
