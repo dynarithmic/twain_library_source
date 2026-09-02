@@ -49,7 +49,7 @@ namespace dynarithmic
         if (!pArray)
         {
             // create a new one
-            pArray.reset(new CTL_CapInfoMap);
+            pArray = std::make_shared<CTL_CapInfoMap>();
             bNewArray = true;
         }
 
