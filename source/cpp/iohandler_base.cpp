@@ -23,25 +23,22 @@
 #include "ctldib32ex.h"
 #include "logwriterutils.h"
 #include "ctlstaticdata.h"
-#include "mapdefs.h"
 #include "ctldib32.h"
 #include "ctlinternalconstants.h"
 
 using namespace dynarithmic;
 
-BASIC_MAPTYPE_<LONG, std::vector<uint16_t>> CTL_ImageIOHandler::s_supportedBitDepths;
-
 CTL_ImageIOHandler::CTL_ImageIOHandler() : 
+    m_pDib(nullptr), 
     pMultiDibData(nullptr), 
-    m_nPage(0), 
-    m_bOnePageWritten(false), 
-    m_pDib(nullptr),
-    m_sCopyright(GetResourceStringFromMap(IDS_DTWAIN_APPTITLE))
+    m_sCopyright(GetResourceStringFromMap(IDS_DTWAIN_APPTITLE)), 
+    m_nPage(0),
+    m_bOnePageWritten(false)
 {}
 
-CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): pMultiDibData(nullptr), m_nPage(0), m_bOnePageWritten(false), 
-                                        m_pDib(pDib),
-                                        m_sCopyright(GetResourceStringFromMap(IDS_DTWAIN_APPTITLE))
+CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): m_pDib(pDib), pMultiDibData(nullptr), m_sCopyright(GetResourceStringFromMap(IDS_DTWAIN_APPTITLE)), 
+                                        m_nPage(0),
+                                        m_bOnePageWritten(false)
 {}
 
 void CTL_ImageIOHandler::SetMultiDibInfo(const DibMultiPageStruct &s)
@@ -56,8 +53,9 @@ DibMultiPageStruct CTL_ImageIOHandler::GetMultiDibInfo() const
 
 bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
 {
-    const auto it = s_supportedBitDepths.find(FileType);
-    if (it != s_supportedBitDepths.end())
+    auto& bitDepthMap = CTL_StaticData::GetSupportedBPPMap();
+    const auto it = bitDepthMap.find(FileType);
+    if (it != bitDepthMap.end())
     {
         const auto it2 = std::find(it->second.begin(), it->second.end(), bitDepth);
         if (it2 == it->second.end())

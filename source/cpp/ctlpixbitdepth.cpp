@@ -267,7 +267,7 @@ extern "C"
         DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
         auto ThisArray = retVal.second;
         DTWAINArrayLowLevel_RAII arr(pHandle, ThisArray);
-        auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
+        auto& bppMap = CTL_StaticData::GetSupportedBPPMap();
         const auto iter = bppMap.find(FileType);
         if (iter != bppMap.end())
             for_each(iter->second.begin(), iter->second.end(),

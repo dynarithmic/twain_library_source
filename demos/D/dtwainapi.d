@@ -987,6 +987,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089);
     public static const int DTWAIN_ERR_DTWAINDLL_VERSION = (-1090);
     public static const int DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091);
+    public static const int DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092);
     public static const int TWAIN_ERR_LOW_MEMORY = (-1100);
     public static const int TWAIN_ERR_FALSE_ALARM = (-1101);
     public static const int TWAIN_ERR_BUMMER = (-1102);
@@ -2387,6 +2388,9 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPWSTR) DTWAIN_GetContrastStringW;
     extern(Windows) LONG function() DTWAIN_GetCountry;
     extern(Windows) HANDLE function(DTWAIN_SOURCE) DTWAIN_GetCurrentAcquiredImage;
+    extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetCurrentCustomResourceName;
+    extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetCurrentCustomResourceNameA;
+    extern(Windows) LONG function(LPWSTR, LONG) DTWAIN_GetCurrentCustomResourceNameW;
     extern(Windows) LONG function(DTWAIN_SOURCE, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetCurrentFileName;
     extern(Windows) LONG function(DTWAIN_SOURCE, LPSTR, LONG) DTWAIN_GetCurrentFileNameA;
     extern(Windows) LONG function(DTWAIN_SOURCE, LPWSTR, LONG) DTWAIN_GetCurrentFileNameW;
@@ -3547,6 +3551,9 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetContrastStringW, "DTWAIN_GetContrastStringW");
         bindFunction(cast(void**)&DTWAIN_GetCountry, "DTWAIN_GetCountry");
         bindFunction(cast(void**)&DTWAIN_GetCurrentAcquiredImage, "DTWAIN_GetCurrentAcquiredImage");
+        bindFunction(cast(void**)&DTWAIN_GetCurrentCustomResourceName, "DTWAIN_GetCurrentCustomResourceName");
+        bindFunction(cast(void**)&DTWAIN_GetCurrentCustomResourceNameA, "DTWAIN_GetCurrentCustomResourceNameA");
+        bindFunction(cast(void**)&DTWAIN_GetCurrentCustomResourceNameW, "DTWAIN_GetCurrentCustomResourceNameW");
         bindFunction(cast(void**)&DTWAIN_GetCurrentFileName, "DTWAIN_GetCurrentFileName");
         bindFunction(cast(void**)&DTWAIN_GetCurrentFileNameA, "DTWAIN_GetCurrentFileNameA");
         bindFunction(cast(void**)&DTWAIN_GetCurrentFileNameW, "DTWAIN_GetCurrentFileNameW");

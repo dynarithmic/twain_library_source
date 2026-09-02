@@ -49,11 +49,11 @@ namespace dynarithmic
         public:
             CTextImageHandler(DTWAINImageInfoEx &ImageInfoEx, OCREngine* pEngine, LONG inputFormat,
                                 CTL_TwainDib* pDib) :
+                                     m_bWriteOk(true),
                                      m_ImageInfoEx(ImageInfoEx),
                                      m_pOCREngine(pEngine),
                                      m_InputFormat(inputFormat),
-                                     m_pDib(pDib),
-                                     m_bWriteOk(true) {}
+                                     m_pDib(pDib) {}
             // Virtual interface
             int     WriteGraphicFile(CTL_ImageIOHandler *pHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo = nullptr)  override;
             int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht,

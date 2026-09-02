@@ -25,6 +25,7 @@
 #include "svgwriter.h"
 #include "dtwaindefs.h"
 #include "ctlstringconversion.h"
+#include "ctlstringutils.h"
 #include "ctlencodeutils.h"
 #include <gdiplus.h>
 #include <fstream>
@@ -43,18 +44,18 @@ extern "C" {
 
 using namespace dynarithmic;
 //////////////////////////////////////////////////////////////////////////////////////////
-class GdiplusInit
+namespace
 {
+    class GdiplusInit
+    {
     public:
         GdiplusInit() { Gdiplus::GdiplusStartup(&token, &input, nullptr); }
         ~GdiplusInit() { Gdiplus::GdiplusShutdown(token); }
     private:
         ULONG_PTR token{};
         Gdiplus::GdiplusStartupInput input{};
-};
+    };
 
-namespace
-{
     bool DIBToPNGBytes(const BITMAPINFOHEADER& bih, const uint8_t* dibBase, std::vector<uint8_t>& out)
     {
         GdiplusInit gdiplus;
@@ -158,7 +159,7 @@ namespace
         return false;
     }
 
-    std::string CreateMetaData(std::string& comment)
+    std::string CreateMetaData(const std::string& comment)
     {
         std::string sMetaData = "    <metadata>\n";
         sMetaData += "      <rdf:RDF>\n";
@@ -170,7 +171,7 @@ namespace
         return sMetaData;
     }
 
-    std::string VectorizeMonochromeToSVG(const uint8_t* bits, int width, int height, int stride, bool bottomUp, std::string& comment)
+    std::string VectorizeMonochromeToSVG(const uint8_t* bits, int width, int height, int stride, bool bottomUp, const std::string& comment)
     {
         std::ostringstream svg;
 
@@ -225,7 +226,7 @@ namespace
         return svg.str();
     }
 
-    std::string RasterToSVG(const BITMAPINFOHEADER& bih, const uint8_t* bits, std::string& comment)
+    std::string RasterToSVG(const BITMAPINFOHEADER& bih, const uint8_t* bits, const std::string& comment)
     {
         std::vector<uint8_t> png;
         if (!DIBToPNGBytes(bih, bits, png))
@@ -378,7 +379,7 @@ bool SvgSessionWriter::WritePage()
 
     auto bitsOffsetVal = reinterpret_cast<BYTE*>(header) + currentPage_.offsetToBitsData;
     const bool ok = SaveDIBAsSVGEx(*header, bitsOffsetVal,
-                                    filenameA.c_str(), options_.type == SvgOutputType::Svgz, options_.comment);
+                                    filenameA, options_.type == SvgOutputType::Svgz, options_.comment);
 
     if (!ok)
         return false;
@@ -432,8 +433,8 @@ bool SvgSessionWriter::ValidatePage(const PreparedSvgDibPage& page)
     }
 }
 
-bool SvgSessionWriter::SaveDIBAsSVGEx(const BITMAPINFOHEADER& bih, const uint8_t* bits, const std::string filename, bool isSVGZ,
-                                        std::string& comment)
+bool SvgSessionWriter::SaveDIBAsSVGEx(const BITMAPINFOHEADER& bih, const uint8_t* bits, const std::string& filename, bool isSVGZ,
+                                        const std::string& comment)
 {
     std::string svg;
     if (IsLikelyLineArt(bih) && bih.biBitCount == 1)

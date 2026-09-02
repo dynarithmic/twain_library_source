@@ -28,5 +28,7 @@ namespace dynarithmic
     CTL_StringType GetDTWAINExecutionPath();
     CTL_StringType GetDTWAINDLLPath();
     CTL_StringType GetDTWAINTempFilePath(CTL_TwainDLLHandle* pHandle);
+    CTL_StringType GetDTWAININIPath();
+    std::string GetDTWAININIPathA();
 }
 #endif

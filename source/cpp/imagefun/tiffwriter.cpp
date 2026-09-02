@@ -600,7 +600,7 @@ std::optional<PreparedTiffDibPage> TiffSessionWriter::MakePreparedTiffDibPage(co
 }
 
 std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedTiffDibPage& page,
-        TiffPageSettings settings)
+        const TiffPageSettings& settings)
 {
     if (writer_)
         return { false, DTWAIN_ERR_FILEWRITE };
@@ -616,7 +616,7 @@ std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename,
     return write_page(page, settings);
 }
 
-std::pair<bool, int> DTWAINTiffOutput::OnNextPage(const PreparedTiffDibPage& page, TiffPageSettings settings)
+std::pair<bool, int> DTWAINTiffOutput::OnNextPage(const PreparedTiffDibPage& page, const TiffPageSettings& settings)
 {
     if (!writer_)
         return { false, DTWAIN_ERR_FILEWRITE };

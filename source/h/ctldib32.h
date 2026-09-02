@@ -64,7 +64,6 @@ namespace dynarithmic
             const DTWAINImageInfoEx& GetBaseImageInfo() const { return m_ImageInfo; }
             CTL_TwainDib* GetDib() const { return m_pDib; }
             static bool IsValidBitDepth(LONG FileType, LONG bitDepth);
-            static auto& GetSupportedBPPMap() { return s_supportedBitDepths; }
             const std::string& GetCopyrightString() const { return m_sCopyright; }
             int WriteBitmapImpl(LPCTSTR szFile, int nFormat, bool bOpenFile, int fh, DibMultiPageStruct* pMultiDibStruct = nullptr);
 
@@ -77,7 +76,6 @@ namespace dynarithmic
             std::string m_sCopyright;
             unsigned m_nPage;
             bool m_bOnePageWritten;
-            static BASIC_MAPTYPE_<LONG, std::vector<uint16_t>> s_supportedBitDepths;
     };
 }
 #endif

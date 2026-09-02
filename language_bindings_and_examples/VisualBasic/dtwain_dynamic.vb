@@ -985,6 +985,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_ERR_DTWAINDLL_LOADERROR As Integer = (-1089)
         Public Const DTWAIN_ERR_DTWAINDLL_VERSION As Integer = (-1090)
         Public Const DTWAIN_ERR_ACTIVE_TWAINSESSION As Integer = (-1091)
+        Public Const DTWAIN_ERR_DSMVERSION_NOTSUPPORTED As Integer = (-1092)
         Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
         Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
         Public Const TWAIN_ERR_BUMMER As Integer = (-1102)
@@ -3055,6 +3056,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetCurrentAcquiredImageDelegate(Source As System.IntPtr) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Private Delegate Function DTWAIN_GetCurrentCustomResourceNameDelegate(<MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nMaxLen As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetCurrentFileNameDelegate(Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> szName As StringBuilder, MaxLen As Integer) As Integer
@@ -5994,6 +5998,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetCurrentAcquiredImage(Source)
         End Function
         
+        Public Function DTWAIN_GetCurrentCustomResourceName(<MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nMaxLen As Integer) As Integer
+        Return api.DTWAIN_GetCurrentCustomResourceName(lpszOut, nMaxLen)
+        End Function
+        
         Public Function DTWAIN_GetCurrentFileName(Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> szName As StringBuilder, MaxLen As Integer) As Integer
         Return api.DTWAIN_GetCurrentFileName(Source, szName, MaxLen)
         End Function
@@ -8292,6 +8300,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetContrastString As DTWAIN_GetContrastStringDelegate
             Public DTWAIN_GetCountry As DTWAIN_GetCountryDelegate
             Public DTWAIN_GetCurrentAcquiredImage As DTWAIN_GetCurrentAcquiredImageDelegate
+            Public DTWAIN_GetCurrentCustomResourceName As DTWAIN_GetCurrentCustomResourceNameDelegate
             Public DTWAIN_GetCurrentFileName As DTWAIN_GetCurrentFileNameDelegate
             Public DTWAIN_GetCurrentPageNum As DTWAIN_GetCurrentPageNumDelegate
             Public DTWAIN_GetCurrentRetryCount As DTWAIN_GetCurrentRetryCountDelegate

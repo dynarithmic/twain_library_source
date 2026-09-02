@@ -28,23 +28,63 @@
     #pragma warning (disable:4505)
 #endif
 
-static std::vector<TCHAR> GetDefaultOCRName(SelectStruct& selectTraits);
-static std::vector<CTL_StringType> GetNameList(SelectStruct& selectTraits);
+using namespace dynarithmic;
 
-static CTL_StringType DTWAIN_LLSelectOCR(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts)
+namespace
 {
-    opts.getDefaultFunc = &GetDefaultOCRName;
-    opts.getNameListFunc = &GetNameList;
-    CTL_StringType actualSourceName = LLSelectionDialog(pHandle, opts);
-    return actualSourceName;
-}
+    std::vector<TCHAR> GetDefaultOCRName(const SelectStruct& selectTraits)
+    {
+        std::vector<TCHAR> DefName;
+        TCHAR ProdName[256];
+        const auto DefaultEngine = selectTraits.pHandle->m_pOCRDefaultEngine.get();
+        GetOCRInfo(DefaultEngine, &OCREngine::GetProductName, ProdName, 255);
+        CTL_StringType sourceName = ProdName;
+        DefName = std::vector<TCHAR>(sourceName.begin(), sourceName.end());
+        DefName.push_back(0);
+        return DefName;
+    }
 
-static DTWAIN_OCRENGINE SelectOCREngine(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& selectOptions)
-{
-    auto OCRName = DTWAIN_LLSelectOCR(pHandle, selectOptions);
-    if (!OCRName.empty())
-        return DTWAIN_SelectOCREngineByName(OCRName.c_str());
-    return nullptr;
+    std::vector<CTL_StringType> GetNameList(const SelectStruct& selectTraits)
+    {
+        // Fill the list box with the sources
+        std::vector<CTL_StringType> vSourceNames;
+        DTWAIN_ARRAY Array = nullptr;
+        const auto pHandle = selectTraits.pHandle;
+        DTWAIN_EnumOCRInterfaces(&Array);
+        if (!Array)
+            return vSourceNames;
+        DTWAINArrayLowLevel_RAII arr(pHandle, Array);
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<OCREngine*>(Array);
+        if (!vValues.empty())
+        {
+            TCHAR ProdName[256];
+
+            std::transform(vValues.begin(), vValues.end(), std::back_inserter(vSourceNames),
+                [&](OCREngine* ptr)
+                {
+                    GetOCRInfo(ptr, &OCREngine::GetProductName, ProdName, 255);
+                    return ProdName;
+                });
+        }
+        return vSourceNames;
+    }
+
+    CTL_StringType DTWAIN_LLSelectOCR(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts)
+    {
+        opts.getDefaultFunc = &GetDefaultOCRName;
+        opts.getNameListFunc = &GetNameList;
+        CTL_StringType actualSourceName = LLSelectionDialog(pHandle, opts);
+        return actualSourceName;
+    }
+
+    DTWAIN_OCRENGINE SelectOCREngine(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& selectOptions)
+    {
+        auto OCRName = DTWAIN_LLSelectOCR(pHandle, selectOptions);
+        if (!OCRName.empty())
+            return DTWAIN_SelectOCREngineByName(OCRName.c_str());
+        return nullptr;
+    }
+
 }
 
 extern "C"
@@ -147,41 +187,4 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
         CATCH_BLOCK(nullptr)
     }
-}
-
-static std::vector<TCHAR> GetDefaultOCRName(SelectStruct& selectTraits)
-{
-    std::vector<TCHAR> DefName;
-    TCHAR ProdName[256];
-    const auto DefaultEngine = selectTraits.pHandle->m_pOCRDefaultEngine.get();
-    GetOCRInfo(DefaultEngine, &OCREngine::GetProductName, ProdName, 255);
-    CTL_StringType sourceName = ProdName;
-    DefName = std::vector<TCHAR>(sourceName.begin(), sourceName.end());
-    DefName.push_back(0);
-    return DefName;
-}
-
-static std::vector<CTL_StringType> GetNameList(SelectStruct& selectTraits)
-{
-    // Fill the list box with the sources
-    std::vector<CTL_StringType> vSourceNames;
-    DTWAIN_ARRAY Array = nullptr;
-    const auto pHandle = selectTraits.pHandle;
-    DTWAIN_EnumOCRInterfaces(&Array);
-    if (!Array)
-        return vSourceNames;
-    DTWAINArrayLowLevel_RAII arr(pHandle, Array);
-    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<OCREngine*>(Array);
-    if (!vValues.empty())
-    {
-        TCHAR ProdName[256];
-
-        std::transform(vValues.begin(), vValues.end(), std::back_inserter(vSourceNames),
-            [&](OCREngine* ptr)
-            {
-                GetOCRInfo(ptr, &OCREngine::GetProductName, ProdName, 255);
-                return ProdName;
-            });
-    }
-    return vSourceNames;
 }

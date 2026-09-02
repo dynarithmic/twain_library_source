@@ -814,6 +814,7 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_DTWAINDLL_LOADERROR As Integer = (-1089)
     Public Const DTWAIN_ERR_DTWAINDLL_VERSION As Integer = (-1090)
     Public Const DTWAIN_ERR_ACTIVE_TWAINSESSION As Integer = (-1091)
+    Public Const DTWAIN_ERR_DSMVERSION_NOTSUPPORTED As Integer = (-1092)
     Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
     Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
     Public Const TWAIN_ERR_BUMMER As Integer = (-1102)
@@ -2136,6 +2137,7 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_GetContrastString Lib "dtwain64d.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Contrast As StringBuilder) As Integer
     Public Declare Function DTWAIN_GetCountry Lib "dtwain64d.dll" () As Integer
     Public Declare Function DTWAIN_GetCurrentAcquiredImage Lib "dtwain64d.dll" (Source As System.IntPtr) As System.IntPtr
+    Public Declare Ansi Function DTWAIN_GetCurrentCustomResourceName Lib "dtwain64d.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetCurrentFileName Lib "dtwain64d.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> szName As StringBuilder, MaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetCurrentPageNum Lib "dtwain64d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetCurrentRetryCount Lib "dtwain64d.dll" (Source As System.IntPtr) As Integer

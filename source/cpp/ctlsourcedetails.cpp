@@ -477,7 +477,7 @@ namespace
         {
             bool m_bSelectStatus;
             CTL_TwainDLLHandle* m_pHandle;
-            SourceSelectStatusRAII(CTL_TwainDLLHandle* pHandle, bool bStatus) : m_pHandle(pHandle),  m_bSelectStatus(bStatus) {}
+            SourceSelectStatusRAII(CTL_TwainDLLHandle* pHandle, bool bStatus) : m_bSelectStatus(bStatus),  m_pHandle(pHandle) {}
             ~SourceSelectStatusRAII() 
             { 
                 m_pHandle->m_bOpenSourceOnSelect = m_bSelectStatus;

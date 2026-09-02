@@ -458,7 +458,7 @@ namespace
 
         // Read in the image resampling data
         auto& imageMap = CTL_StaticData::GetImageResamplerMap();
-        auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
+        auto& bppMap = CTL_StaticData::GetSupportedBPPMap();
         bppMap.clear();
         imageMap.clear();
         while (std::getline(ifs, totalLine))
@@ -861,7 +861,7 @@ namespace dynarithmic
     {
         const auto resPath = CreateResourceFileName(szPrefix);
         const std::string sPathA = stringconversion::Convert_Native_To_Ansi(resPath);
-        return sPathA + lpszName + (std::string)".txt";
+        return sPathA + lpszName + static_cast<std::string>(".txt");
     }
 
     bool LoadLanguageResourceA(const char* lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)

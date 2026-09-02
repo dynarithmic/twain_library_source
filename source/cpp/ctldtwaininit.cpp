@@ -43,13 +43,14 @@
 #include <arrayfactory.h>
 #include "ctlfileutils.h"
 #include "ctlguidimpl.h"
-#include "ctldefsource.h"
+#include "ctlstringdefs.h"
 #include "windowsinit_impl.h"
 #include "ctltwainsource.h"
 #include "ctltwainmanager.h"
 #include "ctlclosesource.h"
 #include "errorcheck.h"
 #include "dtwain_config.h"
+#include "ctltwaindllpath.h"
 
 #ifdef _WIN64
     #pragma message ("Compiling 64-bit DTWAIN")
@@ -824,6 +825,7 @@ namespace
             bool bSaveLastPos = customProfile->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
                                                             CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SAVESELECTSOURCEPOS_KEY).data(), false);
 
+            bool iniUpdated = false;
             if (bSaveLastPos && lastPos != std::make_pair(std::numeric_limits<int32_t>::max(), std::numeric_limits<int32_t>::max()))
             {
                 // Save the last value
@@ -833,16 +835,20 @@ namespace
                     CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
                     CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SELECTSOURCEPOS_KEY).data(),
                     strm.str().c_str());
+                iniUpdated = true;
             }
 
-            // Close out the other INI changes
-            auto& iniPath = CTL_StaticData::GetINIPath();
-            auto saveResults = customProfile->SaveFile(iniPath.c_str());
-            if ( saveResults < 0 )
+            if (iniUpdated)
             {
-                auto errorString = GetResourceStringFromMap_Native(DTWAIN_ERR_FILEWRITE) + _T(" ");
-                auto fullPath = basicstringutils::QuoteString(WindowsAPIImplDef::AddBackslashToDirectory(CTL_StaticData::GetINIPath()) + _T(DTWAIN_ININAME));
-                LogWriterUtils::WriteLogInfoIndented(errorString + fullPath);
+                // Close out the other INI changes
+                auto& iniPath = CTL_StaticData::GetINIPath();
+                auto saveResults = customProfile->SaveFile(iniPath.c_str());
+                if (saveResults < 0)
+                {
+                    auto errorString = GetResourceStringFromMap_Native(DTWAIN_ERR_FILEWRITE) + _T(" ");
+                    auto fullPath = basicstringutils::QuoteString(WindowsAPIImplDef::AddBackslashToDirectory(CTL_StaticData::GetINIPath()) + _T(DTWAIN_ININAME));
+                    LogWriterUtils::WriteLogInfoIndented(errorString + fullPath);
+                }
             }
             CTL_StaticData::s_iniInterface.reset();
             CTL_StaticData::SetINIFileLoaded(false);

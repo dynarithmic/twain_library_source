@@ -885,6 +885,7 @@
         public const int DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089);
         public const int DTWAIN_ERR_DTWAINDLL_VERSION = (-1090);
         public const int DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091);
+        public const int DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092);
         public const int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const int TWAIN_ERR_FALSE_ALARM = (-1101);
         public const int TWAIN_ERR_BUMMER = (-1102);
@@ -2313,6 +2314,8 @@
         public delegate int DTWAIN_GetContrastStringDelegate_overload(DTWAIN_SOURCE Source, System.IntPtr Contrast);
         public delegate int DTWAIN_GetCountryDelegate();
         public delegate HANDLE DTWAIN_GetCurrentAcquiredImageDelegate(DTWAIN_SOURCE Source);
+        public delegate int DTWAIN_GetCurrentCustomResourceNameDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nMaxLen);
+        public delegate int DTWAIN_GetCurrentCustomResourceNameDelegate_overload(System.IntPtr lpszOut, int nMaxLen);
         public delegate int DTWAIN_GetCurrentFileNameDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szName, int MaxLen);
         public delegate int DTWAIN_GetCurrentFileNameDelegate_overload(DTWAIN_SOURCE Source, System.IntPtr szName, int MaxLen);
         public delegate int DTWAIN_GetCurrentPageNumDelegate(DTWAIN_SOURCE Source);
@@ -4040,6 +4043,12 @@
 
         [DTWAINNativeFunction("DTWAIN_GetCurrentAcquiredImage")]
         private readonly DTWAIN_GetCurrentAcquiredImageDelegate  _DTWAIN_GetCurrentAcquiredImage;
+
+        [DTWAINNativeFunction("DTWAIN_GetCurrentCustomResourceName")]
+        private readonly DTWAIN_GetCurrentCustomResourceNameDelegate  _DTWAIN_GetCurrentCustomResourceName;
+
+        [DTWAINNativeFunction("DTWAIN_GetCurrentCustomResourceName")]
+        private readonly DTWAIN_GetCurrentCustomResourceNameDelegate_overload _DTWAIN_GetCurrentCustomResourceName_overload; 
 
         [DTWAINNativeFunction("DTWAIN_GetCurrentFileName")]
         private readonly DTWAIN_GetCurrentFileNameDelegate  _DTWAIN_GetCurrentFileName;
@@ -6823,6 +6832,12 @@
 
         public  HANDLE DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source)
         => _DTWAIN_GetCurrentAcquiredImage(Source);
+
+        public  int DTWAIN_GetCurrentCustomResourceName([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nMaxLen)
+        => _DTWAIN_GetCurrentCustomResourceName(lpszOut, nMaxLen);
+
+        public  int DTWAIN_GetCurrentCustomResourceName (System.IntPtr lpszOut, int nMaxLen)
+        => _DTWAIN_GetCurrentCustomResourceName_overload(lpszOut, nMaxLen);
 
         public  int DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szName, int MaxLen)
         => _DTWAIN_GetCurrentFileName(Source, szName, MaxLen);

@@ -539,6 +539,9 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetContrastStringW(DTWAIN_SOURCE Source, LPWSTR Contrast);
         LONG DTWAIN_GetCountry();
         HANDLE DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source);
+        LONG DTWAIN_GetCurrentCustomResourceName(DTWAIN_CHARPTRTYPE lpszOut, LONG nMaxLen);
+        LONG DTWAIN_GetCurrentCustomResourceNameA(LPSTR lpszOut, LONG nMaxLen);
+        LONG DTWAIN_GetCurrentCustomResourceNameW(LPWSTR lpszOut, LONG nMaxLen);
         LONG DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE szName, LONG MaxLen);
         LONG DTWAIN_GetCurrentFileNameA(DTWAIN_SOURCE Source, LPSTR szName, LONG MaxLen);
         LONG DTWAIN_GetCurrentFileNameW(DTWAIN_SOURCE Source, LPWSTR szName, LONG MaxLen);
@@ -1761,6 +1764,9 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetContrastStringW(DTWAIN_SOURCE Source, LPWSTR Contrast);
         LONG DTWAIN_GetCountry();
         HANDLE DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source);
+        LONG DTWAIN_GetCurrentCustomResourceName(DTWAIN_CHARPTRTYPE lpszOut, LONG nMaxLen);
+        LONG DTWAIN_GetCurrentCustomResourceNameA(LPSTR lpszOut, LONG nMaxLen);
+        LONG DTWAIN_GetCurrentCustomResourceNameW(LPWSTR lpszOut, LONG nMaxLen);
         LONG DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE szName, LONG MaxLen);
         LONG DTWAIN_GetCurrentFileNameA(DTWAIN_SOURCE Source, LPSTR szName, LONG MaxLen);
         LONG DTWAIN_GetCurrentFileNameW(DTWAIN_SOURCE Source, LPWSTR szName, LONG MaxLen);
@@ -2983,6 +2989,9 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetContrastStringW(DTWAIN_SOURCE Source, LPWSTR Contrast);
         LONG DTWAIN_GetCountry();
         HANDLE DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source);
+        LONG DTWAIN_GetCurrentCustomResourceName(DTWAIN_CHARPTRTYPE lpszOut, LONG nMaxLen);
+        LONG DTWAIN_GetCurrentCustomResourceNameA(LPSTR lpszOut, LONG nMaxLen);
+        LONG DTWAIN_GetCurrentCustomResourceNameW(LPWSTR lpszOut, LONG nMaxLen);
         LONG DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE szName, LONG MaxLen);
         LONG DTWAIN_GetCurrentFileNameA(DTWAIN_SOURCE Source, LPSTR szName, LONG MaxLen);
         LONG DTWAIN_GetCurrentFileNameW(DTWAIN_SOURCE Source, LPWSTR szName, LONG MaxLen);
@@ -4205,6 +4214,9 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetContrastStringW(DTWAIN_SOURCE Source, LPWSTR Contrast);
         LONG DTWAIN_GetCountry();
         HANDLE DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source);
+        LONG DTWAIN_GetCurrentCustomResourceName(DTWAIN_CHARPTRTYPE lpszOut, LONG nMaxLen);
+        LONG DTWAIN_GetCurrentCustomResourceNameA(LPSTR lpszOut, LONG nMaxLen);
+        LONG DTWAIN_GetCurrentCustomResourceNameW(LPWSTR lpszOut, LONG nMaxLen);
         LONG DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE szName, LONG MaxLen);
         LONG DTWAIN_GetCurrentFileNameA(DTWAIN_SOURCE Source, LPSTR szName, LONG MaxLen);
         LONG DTWAIN_GetCurrentFileNameW(DTWAIN_SOURCE Source, LPWSTR szName, LONG MaxLen);

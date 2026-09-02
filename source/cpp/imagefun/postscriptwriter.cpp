@@ -30,7 +30,7 @@ using namespace dynarithmic;
 
 namespace
 {
-    static void PsRunLengthEncode(std::string_view input, std::string& output)
+    void PsRunLengthEncode(std::string_view input, std::string& output)
     {
         output.clear();
 

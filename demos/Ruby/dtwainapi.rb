@@ -597,6 +597,9 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetContrastStringW
    attr_reader :DTWAIN_GetCountry
    attr_reader :DTWAIN_GetCurrentAcquiredImage
+   attr_reader :DTWAIN_GetCurrentCustomResourceName
+   attr_reader :DTWAIN_GetCurrentCustomResourceNameA
+   attr_reader :DTWAIN_GetCurrentCustomResourceNameW
    attr_reader :DTWAIN_GetCurrentFileName
    attr_reader :DTWAIN_GetCurrentFileNameA
    attr_reader :DTWAIN_GetCurrentFileNameW
@@ -2021,6 +2024,7 @@ class DTWAINAPI
    DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089)
    DTWAIN_ERR_DTWAINDLL_VERSION = (-1090)
    DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091)
+   DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092)
    TWAIN_ERR_LOW_MEMORY = (-1100)
    TWAIN_ERR_FALSE_ALARM = (-1101)
    TWAIN_ERR_BUMMER = (-1102)
@@ -3463,6 +3467,9 @@ class DTWAINAPI
        @DTWAIN_GetContrastStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetContrastStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetCountry = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCountry'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetCurrentAcquiredImage = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCurrentAcquiredImage'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
+       @DTWAIN_GetCurrentCustomResourceName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCurrentCustomResourceName'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetCurrentCustomResourceNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCurrentCustomResourceNameA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetCurrentCustomResourceNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCurrentCustomResourceNameW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetCurrentFileName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCurrentFileName'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetCurrentFileNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCurrentFileNameA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetCurrentFileNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetCurrentFileNameW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)

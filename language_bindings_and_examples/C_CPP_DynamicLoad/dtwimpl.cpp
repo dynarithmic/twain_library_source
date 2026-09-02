@@ -510,6 +510,9 @@
     D_GETCONTRASTSTRINGWFUNC                      DYNDTWAIN_API::DTWAIN_GetContrastStringW = nullptr;
     D_GETCOUNTRYFUNC                              DYNDTWAIN_API::DTWAIN_GetCountry = nullptr;
     D_GETCURRENTACQUIREDIMAGEFUNC                 DYNDTWAIN_API::DTWAIN_GetCurrentAcquiredImage = nullptr;
+    D_GETCURRENTCUSTOMRESOURCENAMEFUNC            DYNDTWAIN_API::DTWAIN_GetCurrentCustomResourceName = nullptr;
+    D_GETCURRENTCUSTOMRESOURCENAMEAFUNC           DYNDTWAIN_API::DTWAIN_GetCurrentCustomResourceNameA = nullptr;
+    D_GETCURRENTCUSTOMRESOURCENAMEWFUNC           DYNDTWAIN_API::DTWAIN_GetCurrentCustomResourceNameW = nullptr;
     D_GETCURRENTFILENAMEFUNC                      DYNDTWAIN_API::DTWAIN_GetCurrentFileName = nullptr;
     D_GETCURRENTFILENAMEAFUNC                     DYNDTWAIN_API::DTWAIN_GetCurrentFileNameA = nullptr;
     D_GETCURRENTFILENAMEWFUNC                     DYNDTWAIN_API::DTWAIN_GetCurrentFileNameW = nullptr;
@@ -1742,6 +1745,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetContrastStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCountry, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCurrentAcquiredImage, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCurrentCustomResourceName, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCurrentCustomResourceNameA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetCurrentCustomResourceNameW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCurrentFileName, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCurrentFileNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetCurrentFileNameW, hModule);

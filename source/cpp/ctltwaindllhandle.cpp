@@ -113,7 +113,14 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
     }
     auto iter = m_ResourceRegistry.find(pLangDLL);
     if (iter != m_ResourceRegistry.end())
+    {
+        if (!iter->second)
+        {
+		    // Check if resource file exists
+            iter->second = filesys::exists(GetResourceFileNameA(pLangDLL, DTWAINLANGRESOURCEFILE));
+        }
         return { iter, true };
+    }
     // This is a new resource that may not have shown up in the "official" list of resources
     return m_ResourceRegistry.insert({ pLangDLL, filesys::exists(GetResourceFileNameA(pLangDLL, DTWAINLANGRESOURCEFILE)) });
 }

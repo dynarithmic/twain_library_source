@@ -55,5 +55,5 @@ namespace dynarithmic
         #endif
     }
 
-    HandleRAII::HandleRAII(HANDLE h) : m_raii(h), m_pByte(static_cast<LPBYTE>(GlobalLock(h))) {}
+    HandleRAII::HandleRAII(HANDLE h) : m_pByte(static_cast<LPBYTE>(GlobalLock(h))), m_raii(h) {}
 }

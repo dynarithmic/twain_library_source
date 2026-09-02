@@ -141,8 +141,8 @@ namespace dynarithmic
             bIsPDFEncrypted(false),
             bIsAESEncrypted(false),
             bIsAES256Encrypted(false),
-            nPDFKeyLength(5),
             bUseStrongEncryption(false),
+            nPDFKeyLength(5),
             PDFUseASCIICompression(false),
             PDFUseNoCompression(false),
             PDFPermissions(0),
@@ -160,6 +160,10 @@ namespace dynarithmic
             nPDFPolarity(DTWAIN_PDFPOLARITY_POSITIVE),
             theSession{},
             IsSearchableTextOnPage(false),
+            IsCreateDirectory(false),
+            IsIcoResized(false),
+            IsWBMPResized(false),
+            IsRLE(false),
             nJpegQuality(100),
             bProgressiveJpeg(false),
             nJpegXRQuality(100),
@@ -168,14 +172,10 @@ namespace dynarithmic
             PDFUseCompression(true),
             PDFUseThumbnail(false),
             PhotoMetric{},
+            IsBigTiff(false),
             PDFThumbnailScale{},
             PDFCustomSize{},
-            PDFCustomScale{},
-            IsCreateDirectory(false),
-            IsIcoResized(false),
-            IsWBMPResized(false),
-            IsRLE(false),
-            IsBigTiff(false)
+            PDFCustomScale{}
         {
         }
     };

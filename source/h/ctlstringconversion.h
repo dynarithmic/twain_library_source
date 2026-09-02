@@ -23,7 +23,6 @@
 
 #include <string>
 #include <string_view>
-#include "ctlstringutils.h"
 
 namespace dynarithmic
 {
@@ -36,64 +35,64 @@ namespace dynarithmic
     namespace stringconversion
     {
 #ifdef UNICODE
-        static std::wstring          Convert_Ansi_To_Native(std::string_view x) { return dynarithmic::ANSIToWide(x); }
-        static std::wstring          Convert_AnsiPtr_To_Native(const char* x) { return dynarithmic::ANSIToWide(x ? x : ""); }
+        inline std::wstring          Convert_Ansi_To_Native(std::string_view x) { return dynarithmic::ANSIToWide(x); }
+        inline std::wstring          Convert_AnsiPtr_To_Native(const char* x) { return dynarithmic::ANSIToWide(x ? x : ""); }
 
-        static const std::wstring&   Convert_Wide_To_Native(const std::wstring& x) { return x; }
-        static std::wstring          Convert_WidePtr_To_Native(const wchar_t* x) { return x ? x : L""; }
+        inline const std::wstring&   Convert_Wide_To_Native(const std::wstring& x) { return x; }
+        inline std::wstring          Convert_WidePtr_To_Native(const wchar_t* x) { return x ? x : L""; }
 
-        static std::string           Convert_Native_To_Ansi(std::wstring_view x) { return dynarithmic::WideToANSI(x); }
-        static std::string           Convert_NativePtr_To_Ansi(const wchar_t* x) { return dynarithmic::WideToANSI(x ? x : L""); }
+        inline std::string           Convert_Native_To_Ansi(std::wstring_view x) { return dynarithmic::WideToANSI(x); }
+        inline std::string           Convert_NativePtr_To_Ansi(const wchar_t* x) { return dynarithmic::WideToANSI(x ? x : L""); }
 
-        static const std::wstring& Convert_Native_To_Wide(const std::wstring& x) { return x; }
-        static std::wstring          Convert_NativePtr_To_Wide(const wchar_t* x) { return x ? x : L""; }
+        inline const std::wstring& Convert_Native_To_Wide(const std::wstring& x) { return x; }
+        inline std::wstring          Convert_NativePtr_To_Wide(const wchar_t* x) { return x ? x : L""; }
 
-        static std::wstring          Convert_Ansi_To_Native(std::string_view x, size_t len) { return dynarithmic::ANSIToWide(x, len); }
-        static std::wstring          Convert_AnsiPtr_To_Native(const char* x, size_t len) { return dynarithmic::ANSIToWide(x ? x : "", len); }
+        inline std::wstring          Convert_Ansi_To_Native(std::string_view x, size_t len) { return dynarithmic::ANSIToWide(x, len); }
+        inline std::wstring          Convert_AnsiPtr_To_Native(const char* x, size_t len) { return dynarithmic::ANSIToWide(x ? x : "", len); }
 
-        static const std::wstring& Convert_Wide_To_Native(const std::wstring& x, size_t len) { return x; }
-        static std::wstring          Convert_WidePtr_To_Native(const wchar_t* x, size_t len) { if (x) return { x, len }; return {}; }
+        inline const std::wstring& Convert_Wide_To_Native(const std::wstring& x, size_t len) { return x; }
+        inline std::wstring          Convert_WidePtr_To_Native(const wchar_t* x, size_t len) { if (x) return { x, len }; return {}; }
 
-        static std::string           Convert_Native_To_Ansi(std::wstring_view x, size_t len) { return dynarithmic::WideToANSI(x, len); }
-        static std::string           Convert_NativePtr_To_Ansi(const wchar_t* x, size_t len) { return dynarithmic::WideToANSI(x ? x : L"", len); }
+        inline std::string           Convert_Native_To_Ansi(std::wstring_view x, size_t len) { return dynarithmic::WideToANSI(x, len); }
+        inline std::string           Convert_NativePtr_To_Ansi(const wchar_t* x, size_t len) { return dynarithmic::WideToANSI(x ? x : L"", len); }
 
-        static const std::wstring& Convert_Native_To_Wide(const std::wstring& x, size_t) { return x; }
-        static std::wstring          Convert_NativePtr_To_Wide(const wchar_t* x, size_t) { return x ? x : L""; }
+        inline const std::wstring& Convert_Native_To_Wide(const std::wstring& x, size_t) { return x; }
+        inline std::wstring          Convert_NativePtr_To_Wide(const wchar_t* x, size_t) { return x ? x : L""; }
 
 #else
-        static const std::string& Convert_Ansi_To_Native(const std::string& x) { return x; }
-        static std::string    Convert_AnsiPtr_To_Native(const char* x) { return x ? x : ""; }
+        inline const std::string& Convert_Ansi_To_Native(const std::string& x) { return x; }
+        inline std::string    Convert_AnsiPtr_To_Native(const char* x) { return x ? x : ""; }
 
-        static std::string    Convert_Wide_To_Native(std::wstring_view x) { return dynarithmic::WideToANSI(x); }
-        static std::string    Convert_WidePtr_To_Native(const wchar_t* x) { return dynarithmic::WideToANSI(x ? x : L""); }
+        inline std::string    Convert_Wide_To_Native(std::wstring_view x) { return dynarithmic::WideToANSI(x); }
+        inline std::string    Convert_WidePtr_To_Native(const wchar_t* x) { return dynarithmic::WideToANSI(x ? x : L""); }
 
-        static const std::string& Convert_Native_To_Ansi(const std::string& x) { return x; }
-        static std::string    Convert_NativePtr_To_Ansi(const char* x) { return x ? x : ""; }
+        inline const std::string& Convert_Native_To_Ansi(const std::string& x) { return x; }
+        inline std::string    Convert_NativePtr_To_Ansi(const char* x) { return x ? x : ""; }
 
-        static std::wstring   Convert_Native_To_Wide(std::string_view x) { return dynarithmic::ANSIToWide(x); }
-        static std::wstring   Convert_NativePtr_To_Wide(const char* x) { return dynarithmic::ANSIToWide(x ? x : ""); }
+        inline std::wstring   Convert_Native_To_Wide(std::string_view x) { return dynarithmic::ANSIToWide(x); }
+        inline std::wstring   Convert_NativePtr_To_Wide(const char* x) { return dynarithmic::ANSIToWide(x ? x : ""); }
 
-        static const std::string& Convert_Ansi_To_Native(const std::string& x, size_t len) { return x; }
-        static std::string    Convert_AnsiPtr_To_Native(const char* x, size_t len) { if (x) return { x, len }; return {}; }
+        inline const std::string& Convert_Ansi_To_Native(const std::string& x, size_t len) { return x; }
+        inline std::string    Convert_AnsiPtr_To_Native(const char* x, size_t len) { if (x) return { x, len }; return {}; }
 
-        static std::string    Convert_Wide_To_Native(std::wstring_view x, size_t len) { return dynarithmic::WideToANSI(x, len); }
-        static std::string    Convert_WidePtr_To_Native(const wchar_t* x, size_t len) { return dynarithmic::WideToANSI(x ? x : L"", len); }
+        inline std::string    Convert_Wide_To_Native(std::wstring_view x, size_t len) { return dynarithmic::WideToANSI(x, len); }
+        inline std::string    Convert_WidePtr_To_Native(const wchar_t* x, size_t len) { return dynarithmic::WideToANSI(x ? x : L"", len); }
 
-        static const std::string& Convert_Native_To_Ansi(const std::string& x, size_t) { return x; }
-        static std::string    Convert_NativePtr_To_Ansi(const char* x, size_t) { return x ? x : ""; }
+        inline const std::string& Convert_Native_To_Ansi(const std::string& x, size_t) { return x; }
+        inline std::string    Convert_NativePtr_To_Ansi(const char* x, size_t) { return x ? x : ""; }
 
-        static std::wstring   Convert_Native_To_Wide(std::string_view x, size_t len) { return dynarithmic::ANSIToWide(x, len); }
-        static std::wstring   Convert_NativePtr_To_Wide(const char* x, size_t len) { return dynarithmic::ANSIToWide(x ? x : "", len); }
+        inline std::wstring   Convert_Native_To_Wide(std::string_view x, size_t len) { return dynarithmic::ANSIToWide(x, len); }
+        inline std::wstring   Convert_NativePtr_To_Wide(const char* x, size_t len) { return dynarithmic::ANSIToWide(x ? x : "", len); }
 #endif
-        static std::string     Convert_Wide_To_Ansi(std::wstring_view x) { return dynarithmic::WideToANSI(x); }
-        static std::wstring    Convert_Ansi_To_Wide(std::string_view x) { return dynarithmic::ANSIToWide(x); }
-        static std::string     Convert_WidePtr_To_Ansi(const wchar_t* x) { return x ? dynarithmic::WideToANSI(x) : ""; }
-        static std::wstring     Convert_AnsiPtr_To_Wide(const char* x) { return x ? dynarithmic::ANSIToWide(x) : L""; }
+        inline std::string     Convert_Wide_To_Ansi(std::wstring_view x) { return dynarithmic::WideToANSI(x); }
+        inline std::wstring    Convert_Ansi_To_Wide(std::string_view x) { return dynarithmic::ANSIToWide(x); }
+        inline std::string     Convert_WidePtr_To_Ansi(const wchar_t* x) { return x ? dynarithmic::WideToANSI(x) : ""; }
+        inline std::wstring     Convert_AnsiPtr_To_Wide(const char* x) { return x ? dynarithmic::ANSIToWide(x) : L""; }
 
-        static std::string     Convert_Wide_To_Ansi(std::wstring_view x, size_t len) { return dynarithmic::WideToANSI(x, len); }
-        static std::wstring    Convert_Ansi_To_Wide(std::string_view x, size_t len) { return dynarithmic::ANSIToWide(x, len); }
-        static std::string     Convert_WidePtr_To_Ansi(const wchar_t* x, size_t len) { return x ? dynarithmic::WideToANSI(x, len) : ""; }
-        static std::wstring    Convert_AnsiPtr_To_Wide(const char* x, size_t len) { return x ? dynarithmic::ANSIToWide(x, len) : L""; }
+        inline std::string     Convert_Wide_To_Ansi(std::wstring_view x, size_t len) { return dynarithmic::WideToANSI(x, len); }
+        inline std::wstring    Convert_Ansi_To_Wide(std::string_view x, size_t len) { return dynarithmic::ANSIToWide(x, len); }
+        inline std::string     Convert_WidePtr_To_Ansi(const wchar_t* x, size_t len) { return x ? dynarithmic::WideToANSI(x, len) : ""; }
+        inline std::wstring    Convert_AnsiPtr_To_Wide(const char* x, size_t len) { return x ? dynarithmic::ANSIToWide(x, len) : L""; }
 
 #ifdef _WIN32
         using utf16strType = std::wstring;

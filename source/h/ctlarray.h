@@ -132,6 +132,9 @@ namespace dynarithmic
         bool m_bDestroy;
         DTWAINArrayLowLevel_RAII_Impl() : m_pHandle{}, m_Array{}, m_bDestroy(true) {}
         DTWAINArrayLowLevel_RAII_Impl(CTL_TwainDLLHandle* pHandle, ArrayType a) : m_pHandle(pHandle), m_Array(a), m_bDestroy(true) {}
+        DTWAINArrayLowLevel_RAII_Impl(const DTWAINArrayLowLevel_RAII_Impl&) = delete;
+        DTWAINArrayLowLevel_RAII_Impl& operator=(const DTWAINArrayLowLevel_RAII_Impl&) = delete;
+
         void SetDestroy(bool bSet) { m_bDestroy = bSet; }
         void SetArray(ArrayType arr) { m_Array = arr; }
         void SetHandle(CTL_TwainDLLHandle* pHandle) { m_pHandle = pHandle; }

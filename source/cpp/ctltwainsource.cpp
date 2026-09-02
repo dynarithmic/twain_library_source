@@ -258,8 +258,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_TwainCompliancy(this),
     m_bImageInfoRetrieved(false),
     m_bExtendedImageInfoSupported(false),
-    m_bSupportedCustomCapsRetrieved(false),
     m_bSupportedExtImageInfo(false),
+    m_bSupportedCustomCapsRetrieved(false),
     m_nFeederWaitTime(0),
     m_nFeederWaitTimeOption(DTWAIN_FEEDER_TERMINATE)
 {
