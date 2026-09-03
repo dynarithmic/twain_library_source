@@ -27,6 +27,7 @@
 #include <mutex>
 #include <map>
 #include <vector>
+#include <queue>
 #include <tchar.h>
 #include "ctlstringdefs.h"
 #include "ctlmapdefs.h"
@@ -146,6 +147,7 @@ namespace dynarithmic
         SourceToUIAutocloseMap   s_SourceToAutocloseMap;
         CTL_StringType           s_ApplicationName;
         SupportedBitDepthsMap    s_supportedBitDepths;
+        std::queue<MSG>          s_TwainV2MessageQueue;
         CTL_StaticDataStruct();
     };
 
@@ -250,6 +252,7 @@ namespace dynarithmic
         static CTL_StringType& GetDLLParentPath() { return Get().s_DLLParentPath; }
         static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return Get().s_AvailableFileFormatsMap; }
         static SupportedBitDepthsMap& GetSupportedBPPMap() { return Get().s_supportedBitDepths; }
+        static auto& GetTwainV2MessageQueue() { return Get().s_TwainV2MessageQueue; }
     };
 }
 #endif
