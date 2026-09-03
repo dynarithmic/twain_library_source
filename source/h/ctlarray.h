@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <iterator>
 #include "dtwtype.h"
 #include "twain.h"
 #include "dtwaindefs.h"

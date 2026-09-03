@@ -301,7 +301,7 @@ namespace dynarithmic
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
             //  terminated value into the output string).
             // So for now, we just output the pointer value of the string
-            strm << outStr << "=" << ptr;
+            strm << outStr << "=" << basicstringutils::PointerToString<std::string>(ptr);
         }
 
         template <typename T>
