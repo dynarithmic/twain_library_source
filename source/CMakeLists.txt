@@ -45,6 +45,17 @@ option(DTWAIN_BUILD_CPP_DEMOS
        OFF)
 
 mark_as_advanced(DTWAIN_BUILD_CPP_DEMOS)
+
+option(DTWAIN_USE_CPP20
+       "Use C++20 instead of C++17 (Visual Studio 2022/2026 only)"
+       OFF)
+
+mark_as_advanced(DTWAIN_USE_CPP20)
+
+if(DTWAIN_USE_CPP20 AND NOT MSVC_TOOLSET_VERSION MATCHES "^(143|145)$")
+    message(FATAL_ERROR
+        "DTWAIN_USE_CPP20 is supported only with Visual Studio 2022 or Visual Studio 2026.")
+endif()
 # -----------------------------------------------------------------------------
 # Boost setup
 # -----------------------------------------------------------------------------
@@ -1584,7 +1595,11 @@ if(MSVC)
 )
 endif()
 
-target_compile_features(dtwain PRIVATE cxx_std_17)
+if(DTWAIN_USE_CPP20)
+    target_compile_features(dtwain PRIVATE cxx_std_20)
+else()
+    target_compile_features(dtwain PRIVATE cxx_std_17)
+endif()
 
 target_include_directories(dtwain PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -1620,7 +1635,6 @@ set_target_properties(dtwain PROPERTIES
     OUTPUT_NAME "dtwain"
 )
 
-target_compile_features(dtwain PRIVATE cxx_std_17)
 
 target_compile_definitions(dtwain PRIVATE
     $<$<BOOL:${DTWAIN_BUILD_UNICODE}>:UNICODE>
