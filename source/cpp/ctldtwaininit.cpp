@@ -751,7 +751,6 @@ namespace dynarithmic
                 CATCH_BLOCK(nullptr)
             }
             CATCH_BLOCK(nullptr)
-            LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
         }
         catch (std::exception& ex)
         {

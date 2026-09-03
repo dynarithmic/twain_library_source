@@ -262,10 +262,11 @@ namespace dynarithmic
             case WM_INITDIALOG:
             {
                 DTWAINDeviceContextRelease_RAII contextRAII;
-                if (CTL_StaticData::GetDialogFont())
+                HFONT dlgFont = CTL_StaticData::GetDialogFont();
+                if (dlgFont)
                 {
-                    SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_StaticData::GetDialogFont()), 0);
-                    EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_StaticData::GetDialogFont()));
+                    SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(dlgFont), 0);
+                    EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(dlgFont));
                 }
 
                 HWND lstSources;

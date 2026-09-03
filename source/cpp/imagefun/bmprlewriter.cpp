@@ -135,7 +135,7 @@ void BmpRle8Writer::emit_word(uint8_t a, uint8_t b)
 // - literal buffer flushes at 254 bytes
 int BmpRle8Writer::RLEEncodeLineLikeFreeImage(uint8_t* target, const uint8_t* source, int size)
 {
-    uint8_t buffer[256];
+    uint8_t buffer[256]{};
     int buffer_size = 0;
     int target_pos = 0;
 

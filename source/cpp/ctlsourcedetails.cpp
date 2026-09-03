@@ -358,9 +358,12 @@ namespace
                                 LONG nStatus = 0;
                                 bool isValidRange = DTWAIN_RangeIsValid(aResolutions, &nStatus);
                                 auto iter = resMap.find(pUnitsVals[i]);
-                                auto& vect = iter->second.m_AllRes;
-                                std::copy(pResolutions.begin(), pResolutions.end(), std::back_inserter(vect));
-                                iter->second.m_bIsRange = isValidRange;
+                                if (iter != resMap.end())
+                                {
+                                    auto& vect = iter->second.m_AllRes;
+                                    std::copy(pResolutions.begin(), pResolutions.end(), std::back_inserter(vect));
+                                    iter->second.m_bIsRange = isValidRange;
+                                }
                             }
                         }
                     }

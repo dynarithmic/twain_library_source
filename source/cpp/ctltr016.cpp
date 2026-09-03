@@ -39,7 +39,7 @@ CTL_ImageTriplet::CTL_ImageTriplet(CTL_ITwainSession *pSession,
 
 bool CTL_ImageTriplet::QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_TwainDibArray& pArray, size_t nWhich)
 {
-    int bKeepPage = true;
+    int bKeepPage = 1;
     const CTL_ITwainSession* pSession = GetSessionPtr();
     CTL_ITwainSource* pSource = GetSourcePtr();
 

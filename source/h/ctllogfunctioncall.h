@@ -292,7 +292,7 @@ namespace dynarithmic
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
             //  terminated value into the output string).
             // So for now, we just output the pointer value of the string
-            strm << outStr << "=" << static_cast<void*>(ptr);
+            strm << outStr << "=" << basicstringutils::PointerToString<std::string>(ptr);
         }
 
         void LogInputType(std::string_view outStr, wchar_t* ptr)
@@ -387,7 +387,7 @@ namespace dynarithmic
                 s = CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, func.data(), LOG_INDENT_IN) + ParamOutputter2(false, std::forward<P>(p)...).getString();
             else
                 s = CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, func.data(), LOG_INDENT_OUT) + ParamOutputter2(true, retValue).getString();
-                LogWriterUtils::WriteLogInfoA(s);
+            LogWriterUtils::WriteLogInfoA(s);
         }
         return s;
     }

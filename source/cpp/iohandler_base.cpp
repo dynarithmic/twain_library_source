@@ -84,19 +84,22 @@ void CTL_ImageIOHandler::SetPageWriteStatus(int nFormat, int Stage)
 
         auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
         auto iter = availableFileTypes.find(nFormat);
-        std::string fileFormat = iter->second.m_formatName;
+        if ( iter != availableFileTypes.end())
+        {
+            std::string fileFormat = iter->second.m_formatName;
 
-        if (isFirstPage)
-        {
-            LogWriterUtils::WriteLogInfoIndentedA("Writing " + fileFormat + " file");
-            SetNumPagesWritten(1);
-        }
-        else
-        if (!isLastPage)
-        {
-            auto numPages = GetNumPagesWritten();
-            SetNumPagesWritten(numPages + 1);
-            LogWriterUtils::WriteLogInfoIndentedA("Writing " + fileFormat + " page " + std::to_string(numPages + 1));
+            if (isFirstPage)
+            {
+                LogWriterUtils::WriteLogInfoIndentedA("Writing " + fileFormat + " file");
+                SetNumPagesWritten(1);
+            }
+            else
+            if (!isLastPage)
+            {
+                auto numPages = GetNumPagesWritten();
+                SetNumPagesWritten(numPages + 1);
+                LogWriterUtils::WriteLogInfoIndentedA("Writing " + fileFormat + " page " + std::to_string(numPages + 1));
+            }
         }
     }
 }

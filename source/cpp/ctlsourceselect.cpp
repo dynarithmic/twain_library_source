@@ -32,6 +32,7 @@
 #endif
 #include <dtwainx.h>
 #include <ctlthreadutils.h>
+#include "dtwtype.h"
 
 using namespace dynarithmic;
 using namespace boost::logic;
@@ -221,7 +222,7 @@ namespace dynarithmic
         // Select a source from the source dialog
         const CTL_ITwainSource *pSource = CTL_TwainAppMgr::SelectSourceDlg( pHandle->m_pTwainSession );
         // Check if a source was selected
-        LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_SOURCE)pSource)
+        LOG_FUNC_EXIT_NONAME_PARAMS(reinterpret_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource*>(pSource)))
         CATCH_BLOCK(nullptr)
     }
 
