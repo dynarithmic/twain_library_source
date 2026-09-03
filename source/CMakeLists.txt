@@ -692,6 +692,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcescale.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceselect.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsrceoj.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlstaticdata.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlstringutilsx.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsupport.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltempdir.cpp

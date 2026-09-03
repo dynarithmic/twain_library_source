@@ -155,11 +155,7 @@ namespace dynarithmic
     {
         static std::mutex               s_mutexInitDestroy;
         static std::unique_ptr<CSimpleIniA>    s_iniInterface;
-        static CTL_StaticDataStruct& Get()
-        {
-            static CTL_StaticDataStruct data;
-            return data;
-        }
+        static CTL_StaticDataStruct& Get();
         static CTL_ThreadMap& GetThreadMap() { return Get().s_ThreadMap; }
         static HFONT& GetDialogFont() { return Get().s_DialogFont; }
         static CLogSystem& GetLogger() { return Get().s_appLog; }
