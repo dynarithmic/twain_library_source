@@ -1,6 +1,6 @@
 DTWAIN Version changes
 
-5.10.1
+5.10.0
 
 - The main twain resource files, twaininfo.txt, dtwain32.ini, and dtwain64.ini are now
   embedded into the DTWAIN DLL files.  This will remove the mandatory prerequisite that these
