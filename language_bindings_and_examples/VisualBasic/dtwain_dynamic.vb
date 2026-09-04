@@ -1774,6 +1774,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_PDFTEXT_NOROTATION As Integer = &H10000000
         Public Const DTWAIN_PDFTEXT_NOSKEWING As Integer = &H20000000
         Public Const DTWAIN_PDFTEXT_NOSCALINGXY As Integer = &H40000000
+        Public Const DTWAIN_PDFTEXT_COPYTEXTELEMENT As Integer = &H80000000
         Public Const DTWAIN_PDFTEXT_IGNOREALL As UInteger = &HFFF00000UI
         Public Const DTWAIN_FONT_COURIER As Integer = 0
         Public Const DTWAIN_FONT_COURIERBOLD As Integer = 1
