@@ -64,11 +64,11 @@ namespace dynarithmic
     using DTWAINScopedLogControllerExclude = DTWAINScopedLogControllerEx<LogTraitsOff>;
     using DTWAINScopedLogControllerInclude = DTWAINScopedLogControllerEx<LogTraitsOn>;
 
-    bool AnyLoggerExists(CTL_TwainDLLHandle* pHandle);
+    bool AnyLoggerExists(const CTL_TwainDLLHandle* pHandle);
     void WriteUserDefinedLogMsg(CTL_TwainDLLHandle* pHandle, LPCTSTR sz);
     void WriteUserDefinedLogMsgA(CTL_TwainDLLHandle* pHandle, LPCSTR sz);
     void WriteUserDefinedLogMsgW(CTL_TwainDLLHandle* pHandle, LPCWSTR sz);
-    bool UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle);
+    bool UserDefinedLoggerExists(const CTL_TwainDLLHandle* pHandle);
     std::string LogWin32Error(DWORD lastError);
     void LogToDebugMonitorA(std::string sMsg);
     void LogToDebugMonitorW(std::wstring sMsg);

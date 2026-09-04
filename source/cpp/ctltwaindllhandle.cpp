@@ -21,10 +21,40 @@
 #include "ctltwainmanager.h"
 #include "ctlloadresources.h"
 #include "ctlstaticdata.h"
+#include "ctltwaindllhandle.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
+
+namespace dynarithmic
+{
+    CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay)
+    {
+        auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+        const auto it = std::find_if(threadMap.begin(), threadMap.end(),
+            [&](auto& ptr)
+            {
+                if (bIsDisplay)
+                    return false;
+                return ptr.second.get() && ptr.second.get()->m_hWndTwain == hWnd;
+            });
+        if (it != threadMap.end())
+            return it->second.get();
+        return nullptr;
+    }
+
+    CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst)
+    {
+        auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+        const auto it = std::find_if(threadMap.begin(), threadMap.end(),
+            [&](auto& ptr)
+            { return ptr.second.get() && ptr.second.get()->m_hInstance == hInst; });
+        if (it != threadMap.end())
+            return it->second.get();
+        return nullptr;
+    }
+}
 
 using namespace dynarithmic;
 ////////////////////////////////////////////////////////////////////////
@@ -126,13 +156,12 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-CTL_StaticDataStruct        CTL_StaticData::s_StaticData;
 std::unique_ptr<CSimpleIniA>   CTL_StaticData::s_iniInterface;
 std::mutex                  CTL_StaticData::s_mutexInitDestroy;
 
 FileSaveNode::FileSaveNode() : m_FileType(0) {}
 
-FileSaveNode::FileSaveNode(int fType, CTL_StringType filter1, CTL_StringType filter2, CTL_StringType ext) :
+FileSaveNode::FileSaveNode(int fType, const CTL_StringType& filter1, const CTL_StringType& filter2, CTL_StringType ext) :
                             m_FileType(fType), m_sTotalFilter(filter1), m_sExtension(ext)
 {
     m_sTotalFilter += _T('\0');
@@ -174,7 +203,7 @@ CTL_StaticDataStruct::CTL_StaticDataStruct() :
 std::pair<bool, std::string> CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
 {
     // Get the map of constant types
-    auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
+    auto& constantsmap = GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
     if (iter1 == constantsmap.end())
         return { false, std::to_string(lTwainConstant) };
@@ -190,27 +219,28 @@ std::pair<bool, std::string> CTL_StaticData::GetTwainNameFromConstantA(int lCons
 
 std::pair<bool, CTL_StringType> CTL_StaticData::GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant)
 {
-    auto pr = CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant);
+    auto pr = GetTwainNameFromConstantA(lConstantType, lTwainConstant);
     return { pr.first, stringconversion::Convert_Ansi_To_Native(pr.second) };
 }
 
 std::pair<bool, std::wstring> CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant)
 {
-    auto pr = CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant);
+    auto pr = GetTwainNameFromConstantA(lConstantType, lTwainConstant);
     return { pr.first, stringconversion::Convert_Ansi_To_Wide(pr.second) };
 }
 
 CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string_view sLang)
 {
-    auto iter = s_StaticData.s_AllLoadedResourcesMap.find(sLang.data());
-    if (iter != s_StaticData.s_AllLoadedResourcesMap.end())
+    auto& resource_map = GetAllLanguagesResourceMap();
+    auto iter = resource_map.find(sLang.data());
+    if (iter != resource_map.end())
         return &iter->second;
     return nullptr;
 }
 
 CTL_LongToStringMap* CTL_StaticData::GetCurrentLanguageResource()
 {
-    return CTL_StaticData::GetLanguageResource(s_StaticData.s_CurrentResourceKey);
+    return GetLanguageResource(GetCurrentLanguageResourceKey());
 }
 
 
@@ -221,38 +251,10 @@ void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM 
 
 std::pair<bool, TwainConstantType> CTL_StaticData::GetIDFromTwainName(std::string_view sName)
 {
-    auto& constantsMap = CTL_StaticData::GetStringToConstantMap();
+    auto& constantsMap = GetStringToConstantMap();
     auto iter = constantsMap.find(sName.data());
     if (iter != constantsMap.end())
         return { true, iter->second };
     return { false, (std::numeric_limits<TwainConstantType>::min)() };
 }
 
-namespace dynarithmic
-{
-    CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay)
-    {
-        auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
-        const auto it = std::find_if(threadMap.begin(), threadMap.end(),
-            [&](auto& ptr)
-            {
-                if (bIsDisplay)
-                    return false;
-                return ptr.second.get() && ptr.second.get()->m_hWndTwain == hWnd;
-            });
-        if (it != threadMap.end())
-            return it->second.get();
-        return nullptr;
-    }
-
-    CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst)
-    {
-        auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
-        const auto it = std::find_if(threadMap.begin(), threadMap.end(),
-            [&](auto& ptr)
-            { return ptr.second.get() && ptr.second.get()->m_hInstance == hInst; });
-        if (it != threadMap.end())
-            return it->second.get();
-        return nullptr;
-    }
-}

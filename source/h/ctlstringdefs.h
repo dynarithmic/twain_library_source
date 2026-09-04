@@ -46,7 +46,7 @@ namespace dynarithmic
     using CTL_StringTypeA = std::string;
     using CTL_StringTypeW = std::wstring;
  
-#ifdef UNICODE 
+    #ifdef _UNICODE 
     using CTL_StringType = std::wstring;
     using CTL_StringViewType = std::wstring_view;
     using CTL_StringArrayType = StringArrayW;
@@ -56,7 +56,7 @@ namespace dynarithmic
     using CTL_InputBaseStreamType = std::wistream; 
     using CTL_OutputFileStreamType = std::wofstream;
     using CTL_OutputBaseStreamType = std::wostream; 
-#else 
+    #else 
     using CTL_StringType = std::string;
     using CTL_StringViewType = std::string_view;
     using CTL_StringArrayType = StringArray;
@@ -66,6 +66,6 @@ namespace dynarithmic
     using CTL_InputBaseStreamType = std::istream; 
     using CTL_OutputFileStreamType = std::ofstream;
     using CTL_OutputBaseStreamType = std::ostream; 
-#endif
+    #endif
 }
 #endif

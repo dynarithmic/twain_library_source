@@ -30,6 +30,7 @@
 #include <cctype>
 #include <cwctype>
 #include <charconv>
+#include <locale>
 
 // Widening string macros
 #define WIDEN2(x) L##x
@@ -747,6 +748,10 @@ namespace dynarithmic
             return to_lower_upper_copy<StringType>(std::basic_string_view<typename StringType::value_type>(str), true);
         }
 
+        template <typename StringType, typename Iter>
+        StringType Join(Iter iter1, Iter iter2, const typename StringType::value_type* separator =
+                        CharTraits<typename StringType::value_type>::EmptyString());
+
         template <typename StringType = DTWAIN_STRING_TYPE_, typename Container>
         StringType Join(const Container& ct, const StringType& seperator = {})
         {
@@ -755,16 +760,15 @@ namespace dynarithmic
 
         template <typename StringType = DTWAIN_STRING_TYPE_, typename Container>
         StringType Join(const Container& ct, const typename StringType::value_type* seperator = 
-                            CharTraits<typename StringType::value_type>::EmptyString())
+                        CharTraits<typename StringType::value_type>::EmptyString())
         {
-            StringType sSep(seperator);
-            return Join<StringType, typename Container::const_iterator>(ct.begin(), ct.end(), sSep);
+            return Join<StringType, typename Container::const_iterator>(ct.begin(), ct.end(), seperator);
         }
 
         template <typename StringType, typename val>
         StringType defaultJoinImpl(const StringType& str,
-                                    const val& value,
-                                    const typename StringType::value_type* separator
+                                   const val& value,
+                                   const typename StringType::value_type* separator
                                     = CharTraits<typename StringType::value_type>::EmptyString())
         {
             using StreamType = std::basic_ostringstream<typename StringType::value_type>;
@@ -778,8 +782,7 @@ namespace dynarithmic
 
         template <typename StringType, typename Iter>
         StringType Join(Iter iter1, Iter iter2, 
-                        const typename StringType::value_type* separator = 
-                            CharTraits<typename StringType::value_type>::EmptyString())
+                        const typename StringType::value_type* separator)
         {
             return std::accumulate(iter1, iter2, StringType(),
                 [&](const auto& str, typename std::iterator_traits<Iter>::value_type val)

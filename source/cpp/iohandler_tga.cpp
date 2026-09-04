@@ -55,7 +55,7 @@ static bool WriteOneDibHandleToTga(const std::wstring& filename, const TgaSessio
 
 int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = hDib = m_pDib->GetHandle();
+    HANDLE hDib = m_pDib->GetHandle();
 
     std::wstring fName = stringconversion::Convert_NativePtr_To_Wide(szFile);
 

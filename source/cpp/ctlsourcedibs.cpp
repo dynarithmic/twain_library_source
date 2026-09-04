@@ -23,6 +23,8 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsourcedibs.h"
+
+#include "acquisitionarray.h"
 #include "ctldtwainhandle.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -118,6 +120,12 @@ namespace dynarithmic
 
         return { true, DTWAIN_NO_ERROR };
     }
+
+    AcquisitionArrayRAII::~AcquisitionArrayRAII()
+    {
+        if (bDestroy)
+            DestroyAcquisitionArray(m_pHandle, acqArray, bDestroyDibs);
+    }
 }
 
 extern "C"
@@ -192,8 +200,6 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second)
         CATCH_BLOCK(nullptr)
     }
-
-
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAIN_BOOL bDestroyDibs)
     {

@@ -227,7 +227,7 @@ namespace dynarithmic
                                                     reinterpret_cast<DLGPROC>(DisplayTwainDlgProc), reinterpret_cast<LPARAM>(&selectStruct));
         if (bRet == -1)
         {
-            CTL_TwainAppMgr::SetError(DTWAIN_ERR_WIN32_ERROR, LogWin32Error(::GetLastError()).c_str(), false);
+            CTL_TwainAppMgr::SetError(DTWAIN_ERR_WIN32_ERROR, LogWin32Error(::GetLastError()), false);
             return {};
         }
 
@@ -262,10 +262,11 @@ namespace dynarithmic
             case WM_INITDIALOG:
             {
                 DTWAINDeviceContextRelease_RAII contextRAII;
-                if (CTL_StaticData::GetDialogFont())
+                HFONT dlgFont = CTL_StaticData::GetDialogFont();
+                if (dlgFont)
                 {
-                    SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_StaticData::GetDialogFont()), 0);
-                    EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_StaticData::GetDialogFont()));
+                    SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(dlgFont), 0);
+                    EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(dlgFont));
                 }
 
                 HWND lstSources;

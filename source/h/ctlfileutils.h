@@ -33,6 +33,7 @@
 #include "ctlstringdefs.h"
 #include "dtwain_filesystem.h"
 #include "dtwain_standard_defs.h"
+#include "ctlstringconversion.h"
 
 namespace dynarithmic
 {

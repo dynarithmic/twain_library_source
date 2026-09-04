@@ -72,14 +72,14 @@ namespace
 
 namespace dynarithmic
 {
-    bool UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle)
+    bool UserDefinedLoggerExists(const CTL_TwainDLLHandle* pHandle)
     {
         return pHandle->m_LoggerCallbackInfo.m_pLoggerCallback ||
             pHandle->m_LoggerCallbackInfo.m_pLoggerCallbackA ||
             pHandle->m_LoggerCallbackInfo.m_pLoggerCallbackW;
     }
 
-    bool AnyLoggerExists(CTL_TwainDLLHandle* pHandle)
+    bool AnyLoggerExists(const CTL_TwainDLLHandle* pHandle)
     {
         return UserDefinedLoggerExists(pHandle) || CTL_StaticData::GetLogFilterFlags() != 0;
     }

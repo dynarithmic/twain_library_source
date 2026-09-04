@@ -52,7 +52,7 @@ static bool WriteOneDibHandleToPsd(const std::wstring& filename, const PsdSessio
 
 int CTL_PsdIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    HANDLE hDib = hDib = m_pDib->GetHandle();
+    HANDLE hDib = m_pDib->GetHandle();
 
     PsdSessionOptions opts{};
     opts.useRle = true; // raw only in this implementation

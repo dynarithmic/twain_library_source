@@ -177,15 +177,15 @@ namespace dynarithmic
         TW_UINT16    GetProtocolMajor() const { return m_SourceId.get_protocol_major(); }
         TW_UINT16    GetProtocolMinor() const { return m_SourceId.get_protocol_minor(); }
         TW_UINT32    GetSupportedGroups() const { return m_SourceId.get_supported_groups(); }
-#ifdef UNICODE
+        #ifdef _UNICODE
         CTL_StringType GetManufacturer() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_manufacturer()); }
         CTL_StringType GetProductFamily() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_product_family()); }
         CTL_StringType GetProductName() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_product_name()); }
-#else
+        #else
         CTL_StringType GetManufacturer() const { return m_SourceId.get_manufacturer(); }
         CTL_StringType GetProductFamily() const { return m_SourceId.get_product_family(); }
         CTL_StringType GetProductName() const { return m_SourceId.get_product_name(); }
-#endif
+        #endif
         std::string GetManufacturerA() const { return m_SourceId.get_manufacturer(); }
         std::string GetProductFamilyA() const { return m_SourceId.get_product_family(); }
         std::string GetProductNameA() const { return m_SourceId.get_product_name(); }

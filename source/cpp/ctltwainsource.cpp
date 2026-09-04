@@ -386,8 +386,11 @@ void CTL_ITwainSource::SetCapCached(TW_UINT16 nCapability, bool bSet)
     if (bSet && !bCached)
         m_aCapCache[nVal] = true;   // Add to cache
     else
-    if (!bSet && bCached)
-        m_aCapCache.erase(found); // Delete from cache
+    if ( found != m_aCapCache.end())
+    {
+        if (!bSet && bCached)
+            m_aCapCache.erase(found); // Delete from cache
+    }
 }
 
 int CTL_ITwainSource::IsCapSupportedFromCache(TW_UINT16 nCap)

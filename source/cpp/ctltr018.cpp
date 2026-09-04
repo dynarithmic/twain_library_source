@@ -47,7 +47,7 @@ namespace
 
     struct DSM2UnlockTraits
     {
-        static void Unlock(DSMPair* pr)
+        static void Unlock(const DSMPair* pr)
         {
             pr->first->m_TwainMemoryFunc->UnlockMemory(pr->second);
         }
@@ -62,7 +62,7 @@ namespace
 
     struct DSM2FreeTraits
     {
-        static void Free(DSMPair* pr)
+        static void Free(const DSMPair* pr)
         {
             pr->first->m_TwainMemoryFunc->FreeMemory(pr->second);
         }

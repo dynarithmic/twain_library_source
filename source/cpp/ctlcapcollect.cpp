@@ -41,15 +41,14 @@ namespace dynarithmic
         // Check if this source has had capabilities negotiated and tested
         int nWhere;
 
-        CTL_CapInfoMapPtr pArray;
         bool bNewArray = false;
 
         // get the array of cap info for this source
-        pArray = GetCapInfoArray(pHandle, pSource);
+        CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, pSource);
         if (!pArray)
         {
             // create a new one
-            pArray.reset(new CTL_CapInfoMap);
+            pArray = std::make_shared<CTL_CapInfoMap>();
             bNewArray = true;
         }
 

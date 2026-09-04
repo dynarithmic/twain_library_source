@@ -25,6 +25,7 @@
 #include "acquisitionarray.h"
 #include "ctldtwainhandle.h"
 #include "ctlsourceacquire.h"
+#include "dtwainx.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -36,10 +37,9 @@ extern "C"
                                                         DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
     {
         LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
-        VerifyHandles(Source);
-
+        auto [ptrHandle, ptrSource] = VerifyHandles(Source);
         DTWAIN_ARRAY Acquisitions = DTWAIN_CreateAcquisitionArray();
-        AcquisitionArrayRAII raii(Acquisitions, false);
+        AcquisitionArrayRAII raii(ptrHandle, Acquisitions, false);
         if (DTWAIN_AcquireAudioNativeEx(Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus))
             raii.bDestroy = false;
 

@@ -341,8 +341,10 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
         while ( currentside < 2 )
         {
             // front side
-            if ( currentside == 0 || (currentside == 0 && m_pSource->IsMultiPageModeContinuous()))
-                DupData = m_pSource->GetDuplexFileData( nCurPage[0], nWhichSide[0] );
+            if (currentside == 0)
+            {
+                DupData = m_pSource->GetDuplexFileData(nCurPage[0], nWhichSide[0]);
+            }
             else
             if ( bNotManualDuplex )
             {

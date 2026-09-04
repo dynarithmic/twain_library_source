@@ -228,12 +228,16 @@ extern "C"
         if (pSource->IsPixelTypeSupported(PixelType) )
         {
             auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
             auto arr = retVal.second;
             auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
             const CTL_ITwainSource::CachedPixelTypeMap& theMap = pSource->GetPixelTypeMap();
-            auto& pBitDepths = theMap.find(PixelType)->second;
-            std::copy(pBitDepths.begin(), pBitDepths.end(), std::back_inserter(vIn));
+            auto iter = theMap.find(PixelType);
+            if (iter != theMap.end())
+            {
+                auto& pBitDepths = iter->second;
+                std::copy(pBitDepths.begin(), pBitDepths.end(), std::back_inserter(vIn));
+            }
             LOG_FUNC_EXIT_NONAME_PARAMS(arr)
         }
         LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)

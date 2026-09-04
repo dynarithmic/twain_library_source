@@ -32,6 +32,7 @@
 #endif
 #include <dtwainx.h>
 #include <ctlthreadutils.h>
+#include "dtwtype.h"
 
 using namespace dynarithmic;
 using namespace boost::logic;
@@ -104,7 +105,7 @@ namespace
             if (retVal != DTWAIN_NO_ERROR)
             {
                 if ( opts.nWhich == SELECTSOURCEBYNAME )
-                    CTL_TwainAppMgr::SetError(retVal, stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct).c_str(), false);
+                    CTL_TwainAppMgr::SetError(retVal, stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct), false);
                 return nullptr;
             }
             iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, CTL_TwainAppMgr::IsSourceOpen(pSource));
@@ -115,7 +116,8 @@ namespace
         }
 
         if ( !Source && opts.nWhich == SELECTSOURCEBYNAME )
-            CTL_TwainAppMgr::SetError(pHandle->m_lLastError, stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct).c_str(), false);
+            CTL_TwainAppMgr::SetError(pHandle->m_lLastError,
+                                      stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct), false);
         return Source;
     }
 
@@ -148,7 +150,7 @@ namespace
         return {};
     }
 
-    std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
+    std::vector<TCHAR> GetDefaultName(const SelectStruct& selectTraits)
     {
         bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
         bool bAlwaysHighlightFirst = selectTraits.CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST;
@@ -190,7 +192,7 @@ namespace
         return DefName;
     }
 
-    std::vector<CTL_StringType> GetNameList(SelectStruct& pS)
+    std::vector<CTL_StringType> GetNameList(const SelectStruct& pS)
     {
         std::vector<CTL_StringType> vSourceNames;
         // Fill the list box with the sources
@@ -220,7 +222,7 @@ namespace dynarithmic
         // Select a source from the source dialog
         const CTL_ITwainSource *pSource = CTL_TwainAppMgr::SelectSourceDlg( pHandle->m_pTwainSession );
         // Check if a source was selected
-        LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_SOURCE)pSource)
+        LOG_FUNC_EXIT_NONAME_PARAMS(reinterpret_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource*>(pSource)))
         CATCH_BLOCK(nullptr)
     }
 

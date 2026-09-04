@@ -18,17 +18,18 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLCNTRY_H
-#define CTLCNTRY_H
 
-#include "ctlstringdefs.h"
-#include "twain.h"
+#include <windows.h>
+#include "ctlstaticdata.h"
+
+using namespace dynarithmic;
+
+///////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
 {
-    struct TW_CountryInfo
+    CTL_StaticDataStruct& CTL_StaticData::Get()
     {
-        CTL_StringType        m_strCountry;
-        TW_UINT16 m_Country;
-    };
+        static CTL_StaticDataStruct static_data;
+        return static_data;
+    }
 }
-#endif

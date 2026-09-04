@@ -54,7 +54,7 @@ static bool WriteOneDibHandleToSvg(const std::wstring& filename, const SvgSessio
 
 int CTL_SVGIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-    HANDLE hDib = hDib = m_pDib->GetHandle();
+    HANDLE hDib = m_pDib->GetHandle();
 
     SvgSessionOptions opts{};
     if (m_isSVGZ)

@@ -71,7 +71,7 @@ namespace
 {
     struct CameraStruct {
         DTWAIN_ARRAY aCameras = {};
-        TW_UINT16 CameraType;
+        TW_UINT16 CameraType = {};
     };
 
     DTWAIN_ARRAY GenericEnumCameras(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)

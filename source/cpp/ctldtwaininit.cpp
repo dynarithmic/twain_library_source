@@ -751,7 +751,6 @@ namespace dynarithmic
                 CATCH_BLOCK(nullptr)
             }
             CATCH_BLOCK(nullptr)
-            LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
         }
         catch (std::exception& ex)
         {
@@ -939,7 +938,7 @@ namespace
         auto* ptrIni = CTL_StaticData::GetINIInterface();
         if (!CTL_StaticData::IsINIFileLoaded())
         {
-            #ifdef UNICODE
+            #ifdef _WIN64
             std::string sINIData = LoadEmbeddedTwainInfo(hModule, IDR_DTWAININI_64);
             #else
             std::string sINIData = LoadEmbeddedTwainInfo(hModule, IDR_DTWAININI_32);

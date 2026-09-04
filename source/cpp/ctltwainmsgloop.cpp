@@ -154,12 +154,17 @@ namespace dynarithmic
                 break;
         }
     }
+    void TwainMessageLoopV2::PrepareLoop()
+    {
+        // remove elements from the queue
+        std::queue<MSG> empty;
+        auto& msgQueue = CTL_StaticData::GetTwainV2MessageQueue();
+        std::swap(msgQueue, empty);
+    }
 
 }
 
 using namespace dynarithmic;
-
-std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
 
 extern "C"
 {
@@ -232,7 +237,6 @@ namespace
 {
     struct ContinueLoopTraitsPeek
     {
-        static constexpr bool isPeekMsg = true;
         static bool ContinueLoop(MSG* msg)
         {
             PeekMessage(msg, nullptr, 0, 0, PM_REMOVE);
@@ -242,7 +246,6 @@ namespace
 
     struct ContinueLoopTraitsGet
     {
-        static constexpr bool isPeekMsg = false;
         static bool ContinueLoop(MSG* msg)
         {
             auto bRet = GetMessage(msg, nullptr, 0, 0);
@@ -409,13 +412,13 @@ TW_UINT16 TW_CALLINGSTYLE TwainMessageLoopV2::TwainVersion2MsgProc(pTW_IDENTITY 
 {
     MSG msg{};
     msg.message = MSG_;
-    s_MessageQueue.push(msg);
+    CTL_StaticData::GetTwainV2MessageQueue().push(msg);
     return TWRC_SUCCESS;
 }
 
 bool TwainMessageLoopV2::IsSourceOpen(CTL_ITwainSource* pSource)
 {
-    return !s_MessageQueue.empty() || TwainMessageLoopImpl::IsSourceOpen(pSource);
+    return !CTL_StaticData::GetTwainV2MessageQueue().empty() || TwainMessageLoopImpl::IsSourceOpen(pSource);
 }
 
 extern "C"
@@ -463,10 +466,11 @@ extern "C"
         if (!(logFlags & DTWAIN_LOG_ISTWAINMSG))
             logFlags = logFlags & ~DTWAIN_LOG_LOWLEVELTWAIN;
 
-        if (!TwainMessageLoopV2::s_MessageQueue.empty())
+        auto& msgQueue = CTL_StaticData::GetTwainV2MessageQueue();
+        if (!msgQueue.empty())
         {
-            MSG msg = TwainMessageLoopV2::s_MessageQueue.front();
-            TwainMessageLoopV2::s_MessageQueue.pop();
+            MSG msg = msgQueue.front();
+            msgQueue.pop();
             CTL_TwainAppMgr::IsTwainMsg(&msg, true);  // make sure we perform what we need to do for TWAIN 2.x.
         }
         // make sure we perform any default message handling here.

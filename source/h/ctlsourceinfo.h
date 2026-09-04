@@ -76,6 +76,6 @@ namespace dynarithmic
     }
 
     class CTL_TwainDLLHandle;
-    std::vector<CTL_ITwainSource*> GetOpenSources(CTL_TwainDLLHandle* pHandle);
+    std::vector<CTL_ITwainSource*> GetOpenSources(const CTL_TwainDLLHandle* pHandle);
 }
 #endif

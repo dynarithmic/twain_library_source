@@ -37,7 +37,7 @@ namespace dynarithmic
     constexpr LONG GetDTWAINVersionType() noexcept
     {
         LONG lVersionType = 0;
-        #ifdef UNICODE
+        #ifdef _UNICODE
             lVersionType |= DTWAIN_UNICODE_VERSION;
         #endif
 
