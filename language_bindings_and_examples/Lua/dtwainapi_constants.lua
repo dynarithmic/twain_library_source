@@ -1492,6 +1492,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_PDFTEXT_NOROTATION = 0x10000000
    dtwain_constants.DTWAIN_PDFTEXT_NOSKEWING = 0x20000000
    dtwain_constants.DTWAIN_PDFTEXT_NOSCALINGXY = 0x40000000
+   dtwain_constants.DTWAIN_PDFTEXT_COPYTEXTELEMENT = 0x80000000
    dtwain_constants.DTWAIN_PDFTEXT_IGNOREALL = 0xFFF00000
    dtwain_constants.DTWAIN_FONT_COURIER = 0
    dtwain_constants.DTWAIN_FONT_COURIERBOLD = 1

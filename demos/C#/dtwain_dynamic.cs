@@ -1674,6 +1674,7 @@
         public const int DTWAIN_PDFTEXT_NOROTATION = 0x10000000;
         public const int DTWAIN_PDFTEXT_NOSKEWING = 0x20000000;
         public const int DTWAIN_PDFTEXT_NOSCALINGXY = 0x40000000;
+        public const int DTWAIN_PDFTEXT_COPYTEXTELEMENT = 0x80000000;
         public const uint DTWAIN_PDFTEXT_IGNOREALL = 0xFFF00000U;
         public const int DTWAIN_FONT_COURIER = 0;
         public const int DTWAIN_FONT_COURIERBOLD = 1;
