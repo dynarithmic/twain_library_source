@@ -426,13 +426,18 @@ namespace
         if (Flags & DTWAIN_PDFTEXT_NOABSPOSITION)
             element.stockPosition = Flags & 0x000FFF00;
 
-        if (!pTextElement)
+        auto copyElement = Flags & DTWAIN_PDFTEXT_COPYTEXTELEMENT;
+        if (!pTextElement || (pTextElement && copyElement))
         {
             auto pPtr = std::make_shared<PDFTextElement>();
 
             auto& guidMap = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal())->GetGUIDMap(GUID_PDFTEXTELEMENTS);
             guidMap.Insert(GenerateUUIDv4Impl<std::string>(), pPtr.get());
-
+            if (copyElement && pTextElement)
+            {
+                Flags |= DTWAIN_PDFTEXT_CURRENTPAGE;
+                element = *pTextElement;
+            }
             *pPtr = element;
             // Add to the global list
             auto& globalTextElementList = CTL_StaticData::GetPDFTextElementList();
