@@ -650,4 +650,21 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, pCurrentIndex, pDefaultIndex))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        DTWAIN_BOOL bRet = FALSE;
+        auto& capGetInfo = pSource->GetCapGetInfo();
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return capGetInfo.ContainerType != TWON_ENUMERATION;} , 
+                DTWAIN_ERR_TWENUMERATOR_NOTUSED, false, FUNC_MACRO, false);
+        if (pCurrentIndex)
+            *pCurrentIndex = capGetInfo.CurrentIndex;
+        if (pDefaultIndex)
+            *pDefaultIndex = capGetInfo.DefaultIndex;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pCurrentIndex, pDefaultIndex))
+        LOG_FUNC_EXIT_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }

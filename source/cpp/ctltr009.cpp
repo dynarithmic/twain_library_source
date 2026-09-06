@@ -95,6 +95,31 @@ bool CTL_CapabilityGetRangeTriplet::EnumCapValues( void *pCapData )
     }
 
     m_nNumItems = m_nNumRangeItems;
+
+    // Set the Source internal CapGetInfo data
+    auto& capGetInfo = GetSourcePtr()->GetCapGetInfoRef();
+    capGetInfo = CapGetInfo();
+    capGetInfo.Capability = CapToRetrieve();
+    capGetInfo.DataType = nItemType;
+    capGetInfo.GetType = CapRetrievalType();
+    capGetInfo.ContainerType = TWON_RANGE;
+    capGetInfo.HasRangeInfo = true;
+    if ( nItemType == TWTY_FIX32 )
+    {
+        capGetInfo.MinValue = m_FirstVal.fval;
+        capGetInfo.MaxValue = m_LastVal.fval;
+        capGetInfo.StepSize = m_StepVal.fval;
+        capGetInfo.CurrentValue = m_CurrentVal.fval;
+        capGetInfo.DefaultValue = m_DefaultVal.fval;
+    }
+    else
+    {
+        capGetInfo.MinValue = static_cast<double>(pRange->MinValue);
+        capGetInfo.MaxValue = static_cast<double>(pRange->MaxValue);
+        capGetInfo.StepSize = static_cast<double>(pRange->StepSize);
+        capGetInfo.CurrentValue = static_cast<double>(pRange->CurrentValue);
+        capGetInfo.DefaultValue = static_cast<double>(pRange->DefaultValue);
+    }
     return true;
 }
 

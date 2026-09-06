@@ -1175,3 +1175,4 @@ DTWAIN_WindowProc                                 @1171
 DTWAIN_GetCurrentCustomResourceName               @1172
 DTWAIN_GetCurrentCustomResourceNameA              @1173
 DTWAIN_GetCurrentCustomResourceNameW              @1174 
+DTWAIN_GetLastCapEnumIndices                      @1175
