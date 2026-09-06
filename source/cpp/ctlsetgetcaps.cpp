@@ -656,7 +656,7 @@ extern "C"
         LOG_FUNC_ENTRY_PARAMS((Source, pCurrentIndex, pDefaultIndex))
         auto [pHandle, pSource] = VerifyHandles(Source);
         DTWAIN_BOOL bRet = FALSE;
-        auto& capGetInfo = pSource->GetCapGetInfo();
+        auto& capGetInfo = pSource->GetCapGetInfoRef();
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return capGetInfo.ContainerType != TWON_ENUMERATION;} , 
                 DTWAIN_ERR_TWENUMERATOR_NOTUSED, false, FUNC_MACRO, false);
         if (pCurrentIndex)
