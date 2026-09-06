@@ -585,6 +585,7 @@
     D_GETJPEGVALUESFUNC                           DYNDTWAIN_API::DTWAIN_GetJpegValues = nullptr;
     D_GETJPEGXRVALUESFUNC                         DYNDTWAIN_API::DTWAIN_GetJpegXRValues = nullptr;
     D_GETLANGUAGEFUNC                             DYNDTWAIN_API::DTWAIN_GetLanguage = nullptr;
+    D_GETLASTCAPENUMINDICESFUNC                   DYNDTWAIN_API::DTWAIN_GetLastCapEnumIndices = nullptr;
     D_GETLASTERRORFUNC                            DYNDTWAIN_API::DTWAIN_GetLastError = nullptr;
     D_GETLIBRARYPATHFUNC                          DYNDTWAIN_API::DTWAIN_GetLibraryPath = nullptr;
     D_GETLIBRARYPATHAFUNC                         DYNDTWAIN_API::DTWAIN_GetLibraryPathA = nullptr;
@@ -1820,6 +1821,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetJpegValues, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetJpegXRValues, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLanguage, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetLastCapEnumIndices, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLastError, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLibraryPath, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLibraryPathA, hModule);

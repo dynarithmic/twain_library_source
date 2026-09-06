@@ -988,6 +988,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ERR_DTWAINDLL_VERSION = (-1090);
     public static const int DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091);
     public static const int DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092);
+    public static const int DTWAIN_ERR_TWENUMERATOR_NOTUSED = (-1093);
     public static const int TWAIN_ERR_LOW_MEMORY = (-1100);
     public static const int TWAIN_ERR_FALSE_ALARM = (-1101);
     public static const int TWAIN_ERR_BUMMER = (-1102);
@@ -2462,6 +2463,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPLONG) DTWAIN_GetJpegValues;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPLONG) DTWAIN_GetJpegXRValues;
     extern(Windows) LONG function() DTWAIN_GetLanguage;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPLONG) DTWAIN_GetLastCapEnumIndices;
     extern(Windows) LONG function() DTWAIN_GetLastError;
     extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetLibraryPath;
     extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetLibraryPathA;
@@ -3625,6 +3627,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetJpegValues, "DTWAIN_GetJpegValues");
         bindFunction(cast(void**)&DTWAIN_GetJpegXRValues, "DTWAIN_GetJpegXRValues");
         bindFunction(cast(void**)&DTWAIN_GetLanguage, "DTWAIN_GetLanguage");
+        bindFunction(cast(void**)&DTWAIN_GetLastCapEnumIndices, "DTWAIN_GetLastCapEnumIndices");
         bindFunction(cast(void**)&DTWAIN_GetLastError, "DTWAIN_GetLastError");
         bindFunction(cast(void**)&DTWAIN_GetLibraryPath, "DTWAIN_GetLibraryPath");
         bindFunction(cast(void**)&DTWAIN_GetLibraryPathA, "DTWAIN_GetLibraryPathA");

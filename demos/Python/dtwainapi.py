@@ -781,6 +781,7 @@ DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089)
 DTWAIN_ERR_DTWAINDLL_VERSION = (-1090)
 DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091)
 DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092)
+DTWAIN_ERR_TWENUMERATOR_NOTUSED = (-1093)
 TWAIN_ERR_LOW_MEMORY = (-1100)
 TWAIN_ERR_FALSE_ALARM = (-1101)
 TWAIN_ERR_BUMMER = (-1102)
@@ -2357,6 +2358,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
      theDLL.DTWAIN_GetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_GetLanguage.restype = ct.c_long
+     theDLL.DTWAIN_GetLastCapEnumIndices.restype = ct.c_long
      theDLL.DTWAIN_GetLastError.restype = ct.c_long
      theDLL.DTWAIN_GetLibraryPath.restype = ct.c_long
      theDLL.DTWAIN_GetLibraryPathA.restype = ct.c_long
@@ -3508,6 +3510,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetJobControlEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_GetJpegValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetJpegXRValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetLastCapEnumIndices.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLibraryPath.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathW.argtypes = [ct.c_wchar_p, ct.c_long]
@@ -4667,6 +4670,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
      theDLL.DTWAIN_GetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_GetLanguage.restype = ct.c_long
+     theDLL.DTWAIN_GetLastCapEnumIndices.restype = ct.c_long
      theDLL.DTWAIN_GetLastError.restype = ct.c_long
      theDLL.DTWAIN_GetLibraryPath.restype = ct.c_long
      theDLL.DTWAIN_GetLibraryPathA.restype = ct.c_long
@@ -5818,6 +5822,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetJobControlEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_GetJpegValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetJpegXRValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetLastCapEnumIndices.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLibraryPath.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathW.argtypes = [ct.c_wchar_p, ct.c_long]

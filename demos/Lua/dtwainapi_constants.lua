@@ -742,6 +742,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_ERR_DTWAINDLL_VERSION = (-1090)
    dtwain_constants.DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091)
    dtwain_constants.DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092)
+   dtwain_constants.DTWAIN_ERR_TWENUMERATOR_NOTUSED = (-1093)
    dtwain_constants.TWAIN_ERR_LOW_MEMORY = (-1100)
    dtwain_constants.TWAIN_ERR_FALSE_ALARM = (-1101)
    dtwain_constants.TWAIN_ERR_BUMMER = (-1102)

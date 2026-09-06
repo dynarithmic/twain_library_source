@@ -672,6 +672,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetJpegValues
    attr_reader :DTWAIN_GetJpegXRValues
    attr_reader :DTWAIN_GetLanguage
+   attr_reader :DTWAIN_GetLastCapEnumIndices
    attr_reader :DTWAIN_GetLastError
    attr_reader :DTWAIN_GetLibraryPath
    attr_reader :DTWAIN_GetLibraryPathA
@@ -2025,6 +2026,7 @@ class DTWAINAPI
    DTWAIN_ERR_DTWAINDLL_VERSION = (-1090)
    DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091)
    DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092)
+   DTWAIN_ERR_TWENUMERATOR_NOTUSED = (-1093)
    TWAIN_ERR_LOW_MEMORY = (-1100)
    TWAIN_ERR_FALSE_ALARM = (-1101)
    TWAIN_ERR_BUMMER = (-1102)
@@ -3543,6 +3545,7 @@ class DTWAINAPI
        @DTWAIN_GetJpegValues = Fiddle::Function::new(dtwain_dll['DTWAIN_GetJpegValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetJpegXRValues = Fiddle::Function::new(dtwain_dll['DTWAIN_GetJpegXRValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetLanguage = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLanguage'],[],Fiddle::TYPE_LONG)
+       @DTWAIN_GetLastCapEnumIndices = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLastCapEnumIndices'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetLastError = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLastError'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetLibraryPath = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLibraryPath'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetLibraryPathA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLibraryPathA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)

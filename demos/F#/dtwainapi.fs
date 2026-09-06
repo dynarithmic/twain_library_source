@@ -871,6 +871,7 @@ module TwainAPI =
     let public DTWAIN_ERR_DTWAINDLL_VERSION = (-1090)
     let public DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091)
     let public DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092)
+    let public DTWAIN_ERR_TWENUMERATOR_NOTUSED = (-1093)
     let public TWAIN_ERR_LOW_MEMORY = (-1100)
     let public TWAIN_ERR_FALSE_ALARM = (-1101)
     let public TWAIN_ERR_BUMMER = (-1102)
@@ -3143,6 +3144,9 @@ module TwainAPI =
     type DTWAIN_GetLanguageDelegate = delegate of unit -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetLastCapEnumIndicesDelegate = delegate of DTWAIN_SOURCE * int byref * int byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetLastErrorDelegate = delegate of unit -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
@@ -4851,6 +4855,7 @@ module TwainAPI =
     let private GetJpegValues = lazy (DynamicDll.Bind "DTWAIN_GetJpegValues" : DTWAIN_GetJpegValuesDelegate)
     let private GetJpegXRValues = lazy (DynamicDll.Bind "DTWAIN_GetJpegXRValues" : DTWAIN_GetJpegXRValuesDelegate)
     let private GetLanguage = lazy (DynamicDll.Bind "DTWAIN_GetLanguage" : DTWAIN_GetLanguageDelegate)
+    let private GetLastCapEnumIndices = lazy (DynamicDll.Bind "DTWAIN_GetLastCapEnumIndices" : DTWAIN_GetLastCapEnumIndicesDelegate)
     let private GetLastError = lazy (DynamicDll.Bind "DTWAIN_GetLastError" : DTWAIN_GetLastErrorDelegate)
     let private GetLibraryPath = lazy (DynamicDll.Bind "DTWAIN_GetLibraryPath" : DTWAIN_GetLibraryPathDelegate)
     let private GetLightPath = lazy (DynamicDll.Bind "DTWAIN_GetLightPath" : DTWAIN_GetLightPathDelegate)
@@ -6991,6 +6996,10 @@ module TwainAPI =
     let DTWAIN_GetLanguage() : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetLanguage.Value.Invoke()
+
+    let DTWAIN_GetLastCapEnumIndices (source: DTWAIN_SOURCE) (pcurrentindex: int byref) (pdefaultindex: int byref) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetLastCapEnumIndices.Value.Invoke(source, &pcurrentindex, &pdefaultindex)
 
     let DTWAIN_GetLastError() : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

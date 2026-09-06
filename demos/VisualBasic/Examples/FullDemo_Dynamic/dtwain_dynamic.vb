@@ -986,6 +986,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_ERR_DTWAINDLL_VERSION As Integer = (-1090)
         Public Const DTWAIN_ERR_ACTIVE_TWAINSESSION As Integer = (-1091)
         Public Const DTWAIN_ERR_DSMVERSION_NOTSUPPORTED As Integer = (-1092)
+        Public Const DTWAIN_ERR_TWENUMERATOR_NOTUSED As Integer = (-1093)
         Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
         Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
         Public Const TWAIN_ERR_BUMMER As Integer = (-1102)
@@ -3204,6 +3205,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetLanguageDelegate() As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetLastCapEnumIndicesDelegate(Source As System.IntPtr, ByRef pCurrentIndex As Integer, ByRef pDefaultIndex As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetLastErrorDelegate() As Integer
@@ -6195,6 +6199,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetLanguage()
         End Function
         
+        Public Function DTWAIN_GetLastCapEnumIndices(Source As System.IntPtr, ByRef pCurrentIndex As Integer, ByRef pDefaultIndex As Integer) As Integer
+        Return api.DTWAIN_GetLastCapEnumIndices(Source, pCurrentIndex, pDefaultIndex)
+        End Function
+        
         Public Function DTWAIN_GetLastError() As Integer
         Return api.DTWAIN_GetLastError()
         End Function
@@ -8350,6 +8358,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetJpegValues As DTWAIN_GetJpegValuesDelegate
             Public DTWAIN_GetJpegXRValues As DTWAIN_GetJpegXRValuesDelegate
             Public DTWAIN_GetLanguage As DTWAIN_GetLanguageDelegate
+            Public DTWAIN_GetLastCapEnumIndices As DTWAIN_GetLastCapEnumIndicesDelegate
             Public DTWAIN_GetLastError As DTWAIN_GetLastErrorDelegate
             Public DTWAIN_GetLibraryPath As DTWAIN_GetLibraryPathDelegate
             Public DTWAIN_GetLightPath As DTWAIN_GetLightPathDelegate

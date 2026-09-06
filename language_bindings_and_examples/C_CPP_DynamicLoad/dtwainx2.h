@@ -578,6 +578,7 @@ typedef LONG (DLLENTRY_DEF * D_GETJOBCONTROLEXFUNC)                             
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETJPEGVALUESFUNC)                        (DTWAIN_SOURCE, LPLONG, LPLONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETJPEGXRVALUESFUNC)                      (DTWAIN_SOURCE, LPLONG, LPLONG);
 typedef LONG (DLLENTRY_DEF * D_GETLANGUAGEFUNC)                                 (VOID_PROTOTYPE);
+typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETLASTCAPENUMINDICESFUNC)                (DTWAIN_SOURCE, LPLONG, LPLONG);
 typedef LONG (DLLENTRY_DEF * D_GETLASTERRORFUNC)                                (VOID_PROTOTYPE);
 typedef LONG (DLLENTRY_DEF * D_GETLIBRARYPATHFUNC)                              (LPTSTR, LONG);
 typedef LONG (DLLENTRY_DEF * D_GETLIBRARYPATHAFUNC)                             (LPSTR, LONG);
@@ -1763,6 +1764,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_GETJPEGVALUESFUNC                              DTWAIN_GetJpegValues;
     STATIC D_GETJPEGXRVALUESFUNC                            DTWAIN_GetJpegXRValues;
     STATIC D_GETLANGUAGEFUNC                                DTWAIN_GetLanguage;
+    STATIC D_GETLASTCAPENUMINDICESFUNC                      DTWAIN_GetLastCapEnumIndices;
     STATIC D_GETLASTERRORFUNC                               DTWAIN_GetLastError;
     STATIC D_GETLIBRARYPATHFUNC                             DTWAIN_GetLibraryPath;
     STATIC D_GETLIBRARYPATHAFUNC                            DTWAIN_GetLibraryPathA;
