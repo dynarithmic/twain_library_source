@@ -781,6 +781,7 @@ DTWAIN_ERR_DTWAINDLL_LOADERROR = (-1089)
 DTWAIN_ERR_DTWAINDLL_VERSION = (-1090)
 DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091)
 DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092)
+DTWAIN_ERR_TWENUMERATOR_NOTUSED = (-1093)
 TWAIN_ERR_LOW_MEMORY = (-1100)
 TWAIN_ERR_FALSE_ALARM = (-1101)
 TWAIN_ERR_BUMMER = (-1102)
@@ -1808,16 +1809,16 @@ def setup_windll(theDLL, isAnsi):
 def setup_unicode(theDLL):
      # set up the callback types
      from ctypes.wintypes import WPARAM, LPARAM
-     theDLL.SETCALLBACK_TYPE = ct.CFUNCTYPE(ct.c_long, WPARAM, LPARAM, ct.c_long)
-     theDLL.SETCALLBACK64_TYPE = ct.CFUNCTYPE(ct.c_long, WPARAM, LPARAM, ct.c_int64)
-     theDLL.SETERRORPROC_TYPE = ct.CFUNCTYPE(ct.c_long, ct.c_long, ct.c_long)
-     theDLL.SETERRORPROC64_TYPE = ct.CFUNCTYPE(ct.c_long, ct.c_long, ct.c_int64)
-     theDLL.SETLOGGERPROC_TYPE = ct.CFUNCTYPE(ct.c_long, ct.c_wchar_p, ct.c_int64)
-     theDLL.SETLOGGERPROCA_TYPE = ct.CFUNCTYPE(ct.c_long, ct.c_char_p, ct.c_int64)
-     theDLL.SETLOGGERPROCW_TYPE = ct.CFUNCTYPE(ct.c_long, ct.c_wchar_p, ct.c_int64)
-     theDLL.ERRORPROC_TYPE = ct.CFUNCTYPE(ct.c_long, ct.c_long, ct.c_long)
-     theDLL.ERRORPROC64_TYPE = ct.CFUNCTYPE(ct.c_long, ct.c_long, ct.c_int64)
-     theDLL.DIBUPDATEPROC_TYPE = ct.CFUNCTYPE(ct.c_void_p, ct.c_void_p, ct.c_long, ct.c_void_p)
+     theDLL.SETCALLBACK_TYPE = ct.WINFUNCTYPE(ct.c_long, WPARAM, LPARAM, ct.c_long)
+     theDLL.SETCALLBACK64_TYPE = ct.WINFUNCTYPE(ct.c_long, WPARAM, LPARAM, ct.c_int64)
+     theDLL.SETERRORPROC_TYPE = ct.WINFUNCTYPE(ct.c_long, ct.c_long, ct.c_long)
+     theDLL.SETERRORPROC64_TYPE = ct.WINFUNCTYPE(ct.c_long, ct.c_long, ct.c_int64)
+     theDLL.SETLOGGERPROC_TYPE = ct.WINFUNCTYPE(ct.c_long, ct.c_wchar_p, ct.c_int64)
+     theDLL.SETLOGGERPROCA_TYPE = ct.WINFUNCTYPE(ct.c_long, ct.c_char_p, ct.c_int64)
+     theDLL.SETLOGGERPROCW_TYPE = ct.WINFUNCTYPE(ct.c_long, ct.c_wchar_p, ct.c_int64)
+     theDLL.ERRORPROC_TYPE = ct.WINFUNCTYPE(ct.c_long, ct.c_long, ct.c_long)
+     theDLL.ERRORPROC64_TYPE = ct.WINFUNCTYPE(ct.c_long, ct.c_long, ct.c_int64)
+     theDLL.DIBUPDATEPROC_TYPE = ct.WINFUNCTYPE(ct.c_void_p, ct.c_void_p, ct.c_long, ct.c_void_p)
 
      #set up the return types
      theDLL.DTWAIN_AcquireAudioFile.restype = ct.c_long
@@ -2357,6 +2358,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
      theDLL.DTWAIN_GetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_GetLanguage.restype = ct.c_long
+     theDLL.DTWAIN_GetLastCapEnumIndices.restype = ct.c_long
      theDLL.DTWAIN_GetLastError.restype = ct.c_long
      theDLL.DTWAIN_GetLibraryPath.restype = ct.c_long
      theDLL.DTWAIN_GetLibraryPathA.restype = ct.c_long
@@ -3508,6 +3510,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetJobControlEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_GetJpegValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetJpegXRValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetLastCapEnumIndices.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLibraryPath.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathW.argtypes = [ct.c_wchar_p, ct.c_long]
@@ -4667,6 +4670,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
      theDLL.DTWAIN_GetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_GetLanguage.restype = ct.c_long
+     theDLL.DTWAIN_GetLastCapEnumIndices.restype = ct.c_long
      theDLL.DTWAIN_GetLastError.restype = ct.c_long
      theDLL.DTWAIN_GetLibraryPath.restype = ct.c_long
      theDLL.DTWAIN_GetLibraryPathA.restype = ct.c_long
@@ -5818,6 +5822,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetJobControlEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_GetJpegValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetJpegXRValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetLastCapEnumIndices.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLibraryPath.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathW.argtypes = [ct.c_wchar_p, ct.c_long]

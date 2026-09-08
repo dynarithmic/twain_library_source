@@ -886,6 +886,7 @@
         public const int DTWAIN_ERR_DTWAINDLL_VERSION = (-1090);
         public const int DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091);
         public const int DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092);
+        public const int DTWAIN_ERR_TWENUMERATOR_NOTUSED = (-1093);
         public const int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const int TWAIN_ERR_FALSE_ALARM = (-1101);
         public const int TWAIN_ERR_BUMMER = (-1102);
@@ -2376,6 +2377,7 @@
         public delegate int DTWAIN_GetJpegValuesDelegate(DTWAIN_SOURCE Source, ref int pQuality, ref int Progressive);
         public delegate int DTWAIN_GetJpegXRValuesDelegate(DTWAIN_SOURCE Source, ref int pQuality, ref int Progressive);
         public delegate int DTWAIN_GetLanguageDelegate();
+        public delegate int DTWAIN_GetLastCapEnumIndicesDelegate(DTWAIN_SOURCE Source, ref int pCurrentIndex, ref int pDefaultIndex);
         public delegate int DTWAIN_GetLastErrorDelegate();
         public delegate int DTWAIN_GetLibraryPathDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszVer, int nLength);
         public delegate int DTWAIN_GetLibraryPathDelegate_overload(System.IntPtr lpszVer, int nLength);
@@ -4227,6 +4229,9 @@
 
         [DTWAINNativeFunction("DTWAIN_GetLanguage")]
         private readonly DTWAIN_GetLanguageDelegate  _DTWAIN_GetLanguage;
+
+        [DTWAINNativeFunction("DTWAIN_GetLastCapEnumIndices")]
+        private readonly DTWAIN_GetLastCapEnumIndicesDelegate  _DTWAIN_GetLastCapEnumIndices;
 
         [DTWAINNativeFunction("DTWAIN_GetLastError")]
         private readonly DTWAIN_GetLastErrorDelegate  _DTWAIN_GetLastError;
@@ -7016,6 +7021,9 @@
 
         public  int DTWAIN_GetLanguage()
         => _DTWAIN_GetLanguage();
+
+        public  int DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, ref int pCurrentIndex, ref int pDefaultIndex)
+        => _DTWAIN_GetLastCapEnumIndices(Source, ref pCurrentIndex, ref pDefaultIndex);
 
         public  int DTWAIN_GetLastError()
         => _DTWAIN_GetLastError();

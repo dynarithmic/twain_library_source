@@ -634,6 +634,19 @@ namespace dynarithmic
         return containerType;
     }
 
+    template <typename T>
+    constexpr TW_UINT16 GetTWAINContainerFromType()
+    {
+        if constexpr (std::is_same_v<T, TW_ONEVALUE>)
+            return TWON_ONEVALUE;
+        if constexpr (std::is_same_v<T, TW_ENUMERATION>)
+            return TWON_ENUMERATION;
+        if constexpr (std::is_same_v<T, TW_RANGE>)
+            return TWON_RANGE;
+        if constexpr (std::is_same_v<T, TW_ARRAY>)
+            return TWON_ARRAY;
+    }
+
     constexpr bool IsValidContainerType(TW_UINT16 containerType, bool testDTWAINType = true)
     {
         switch (containerType)

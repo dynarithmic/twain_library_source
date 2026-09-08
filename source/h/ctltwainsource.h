@@ -128,6 +128,28 @@ namespace dynarithmic
             void  SetAcquireFileFormat(CTL_TwainFileFormatEnum file_format) { m_nFileFormat = file_format; }
     };
 
+    struct CapGetInfo
+    {
+        LONG Capability = 0;
+        LONG GetType = 0;
+        LONG ContainerType = 0;
+        LONG DataType = 0;
+        TW_UINT32 NumItems = 0;
+
+        // TW_ENUMERATION
+        LONG CurrentIndex = 0;
+        LONG DefaultIndex = 0;
+        bool HasEnumInfo = false;
+
+        // TW_RANGE
+        double MinValue = 0;
+        double MaxValue = 0;
+        double StepSize = 0;
+        double DefaultValue = 0;
+        double CurrentValue = 0;
+        bool HasRangeInfo = false;
+    };
+
     class CTL_ITwainSource
     {
         struct container_values
@@ -554,6 +576,9 @@ namespace dynarithmic
         bool        IsUseAutocloseUI() const { return m_bAutocloseUI; }
         AcquireFileStatus& GetAcquireFileStatusRef() { return m_AcquireFileStatus; }
         AcquireFileStatus GetAcquireFileStatus() const { return m_AcquireFileStatus; }
+        CapGetInfo& GetCapGetInfoRef() { return m_CapGetInfo; }
+        CapGetInfo GetCapGetInfo() const { return m_CapGetInfo; }
+
         ExtendedImageInformation* GetExtendedImageInfo() { return m_pExtendedImageInformation.get(); }
         void        SetFeederWaitTime(int waitTime) { m_nFeederWaitTime = waitTime; }
         int         GetFeederWaitTime() const noexcept { return m_nFeederWaitTime; }
@@ -597,6 +622,7 @@ namespace dynarithmic
             } CapCacheInfo;
 
         AcquireFileStatus m_AcquireFileStatus;
+        CapGetInfo m_CapGetInfo;
         bool            m_bDSMVersion2;
         bool            m_bXferReadySent;
         bool            m_bIsOpened;

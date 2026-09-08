@@ -815,6 +815,7 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_DTWAINDLL_VERSION As Integer = (-1090)
     Public Const DTWAIN_ERR_ACTIVE_TWAINSESSION As Integer = (-1091)
     Public Const DTWAIN_ERR_DSMVERSION_NOTSUPPORTED As Integer = (-1092)
+    Public Const DTWAIN_ERR_TWENUMERATOR_NOTUSED As Integer = (-1093)
     Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
     Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
     Public Const TWAIN_ERR_BUMMER As Integer = (-1102)
@@ -2187,6 +2188,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetJpegValues Lib "dtwain32.dll" (Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
     Public Declare Function DTWAIN_GetJpegXRValues Lib "dtwain32.dll" (Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
     Public Declare Function DTWAIN_GetLanguage Lib "dtwain32.dll" () As Integer
+    Public Declare Function DTWAIN_GetLastCapEnumIndices Lib "dtwain32.dll" (Source As System.IntPtr, ByRef pCurrentIndex As Integer, ByRef pDefaultIndex As Integer) As Integer
     Public Declare Function DTWAIN_GetLastError Lib "dtwain32.dll" () As Integer
     Public Declare Ansi Function DTWAIN_GetLibraryPath Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszVer As StringBuilder, nLength As Integer) As Integer
     Public Declare Function DTWAIN_GetLightPath Lib "dtwain32.dll" (Source As System.IntPtr, ByRef lpLightPath As Integer) As Integer

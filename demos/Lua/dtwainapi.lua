@@ -613,6 +613,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         DTWAIN_BOOL DTWAIN_GetJpegXRValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         LONG DTWAIN_GetLanguage();
+        DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
         LONG DTWAIN_GetLastError();
         LONG DTWAIN_GetLibraryPath(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathA(LPSTR lpszVer, LONG nLength);
@@ -1838,6 +1839,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         DTWAIN_BOOL DTWAIN_GetJpegXRValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         LONG DTWAIN_GetLanguage();
+        DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
         LONG DTWAIN_GetLastError();
         LONG DTWAIN_GetLibraryPath(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathA(LPSTR lpszVer, LONG nLength);
@@ -3063,6 +3065,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         DTWAIN_BOOL DTWAIN_GetJpegXRValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         LONG DTWAIN_GetLanguage();
+        DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
         LONG DTWAIN_GetLastError();
         LONG DTWAIN_GetLibraryPath(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathA(LPSTR lpszVer, LONG nLength);
@@ -4288,6 +4291,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         DTWAIN_BOOL DTWAIN_GetJpegXRValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         LONG DTWAIN_GetLanguage();
+        DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
         LONG DTWAIN_GetLastError();
         LONG DTWAIN_GetLibraryPath(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathA(LPSTR lpszVer, LONG nLength);

@@ -45,10 +45,10 @@ namespace dynarithmic
 
 
         protected:
-            TW_UINT16         CapRetrievalType() const;
+            TW_UINT16       CapRetrievalType() const;
             TW_UINT16       CapToRetrieve()    const;
 
-            virtual bool            EnumCapValues( void * /*pCapData*/) { return false; }
+            virtual bool    EnumCapValues( void * /*pCapData*/) { return false; }
 
             bool GenericGetValue(void* pData, size_t nWhere = 0)
             {
@@ -125,7 +125,23 @@ namespace dynarithmic
                     // Store this object in object array
                     pArray->push_back(pOb);
                 }
-                this->m_nNumItems = nNumItems;
+                m_nNumItems = nNumItems;
+
+                // Set the Source internal CapGetInfo data
+                auto& capGetInfo = GetSourcePtr()->GetCapGetInfoRef();
+                capGetInfo = CapGetInfo();
+                capGetInfo.Capability = CapToRetrieve();
+                capGetInfo.DataType = nItemType;
+                capGetInfo.GetType = CapRetrievalType();
+                capGetInfo.ContainerType = GetTWAINContainerFromType<T>();
+                capGetInfo.HasEnumInfo = (capGetInfo.ContainerType == TWON_ENUMERATION);
+                capGetInfo.NumItems = nNumItems;
+                if constexpr (std::is_same_v<T, TW_ENUMERATION>)
+                {
+                    auto* pEnumeration = reinterpret_cast<TW_ENUMERATION*>(pTwainContainer);
+                    capGetInfo.CurrentIndex = pEnumeration->CurrentIndex;
+                    capGetInfo.DefaultIndex = pEnumeration->DefaultIndex;
+                }
                 return true;
             }
 
