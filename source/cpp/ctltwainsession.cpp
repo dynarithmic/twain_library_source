@@ -105,8 +105,10 @@ CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
 void CTL_ITwainSession::FillTWIdentity(const CTL_TwainDLLHandle* pHandle)
 {
     TW_IDENTITY& m_AppIdTemp = m_AppId.get_identity();
+    auto currentID = m_AppIdTemp.Id;
     m_AppIdTemp = {};
-    m_AppIdTemp.Id = 0;
+    if (pHandle->m_bSessionAllocated)
+        m_AppIdTemp.Id = currentID;
     m_AppIdTemp.Version.MajorNum = pHandle->m_SessionStruct.nMajorNum;
     m_AppIdTemp.Version.MinorNum = pHandle->m_SessionStruct.nMinorNum;
     m_AppIdTemp.Version.Language = pHandle->m_SessionStruct.nLanguage;
@@ -202,6 +204,9 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
     const TW_IDENTITY* pId = pSource->GetSourceIDPtr();
     const std::string strProduct = pId->ProductName;
 
+    if (pId->Id == 0)
+        return true;
+
     struct SourceFinder
     {
         std::string m_str;
@@ -223,11 +228,6 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
     }
     else
     {
-        // The source has already been selected, so update the info in the twain source array
-        // and destroy the previous instance.  Keep the UUID and status
-        CTL_ITwainSource::Destroy(*iterFound);
-        m_arrTwainSource.erase(iterFound);
-        m_arrTwainSource.insert(pSource);
         return true;
     }
     return false;

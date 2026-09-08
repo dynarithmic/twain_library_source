@@ -40,10 +40,20 @@ namespace dynarithmic
             {
                 case TWRC_SUCCESS:
                 {
-                    pSession->AddTwainSource(pCurSource);
-                    pSession->SetSelectedSource(pCurSource);
+                    // Copy the TW_IDENTITY from the successful call to the source pointer
+                    auto* pId = reinterpret_cast<TW_IDENTITY*>(pTrip.GetMemRef());
+                    if (pId)
+                    {
+                        pCurSource->GetTwainIdentity().set_identity(*pId);
+
+                        // Add this source to list of known sources so far
+                        pSession->AddTwainSource(pCurSource);
+                        pSession->SetSelectedSource(pCurSource);
+                        break;
+                    }
+
+                    // fall through if for some reason pId is nullptr
                 }
-                break;
 
                 case TWRC_FAILURE:
                 case TWRC_CANCEL:

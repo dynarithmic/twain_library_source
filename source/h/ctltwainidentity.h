@@ -122,6 +122,12 @@ namespace dynarithmic
             return &m_identity;
         }
 
+        TW_IDENTITY& set_identity(const TW_IDENTITY& srcId)
+        {
+            m_identity = srcId;
+            return m_identity;
+        }
+
         std::string to_json_formatted(int indentFactor) const;
 
         std::string to_json() const
