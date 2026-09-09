@@ -40,10 +40,20 @@ namespace dynarithmic
             {
                 case TWRC_SUCCESS:
                 {
-                    pSession->AddTwainSource(pCurSource);
-                    pSession->SetSelectedSource(pCurSource);
+                    // Copy the TW_IDENTITY from the successful call to the source pointer
+                    auto* pId = reinterpret_cast<TW_IDENTITY*>(pTrip.GetMemRef());
+                    if (pId)
+                    {
+                        pCurSource->GetTwainIdentity().set_identity(*pId);
+
+                        // Add this source to list of known sources so far
+                        pSession->AddTwainSource(pCurSource);
+                        pSession->SetSelectedSource(pCurSource);
+                        break;
+                    }
+
+                    // fall through if for some reason pId is nullptr
                 }
-                break;
 
                 case TWRC_FAILURE:
                 case TWRC_CANCEL:
@@ -91,7 +101,7 @@ namespace dynarithmic
                     // source's version of TW_IDENTITY.  The reason is that some drivers
                     // corrupt the saved TW_IDENTITY of the source when selecting and/or closing
                     // the source
-                    *(GetSourcePtr()->GetSourceIDPtr()) = m_tempSourceID;
+                    GetSourcePtr()->GetTwainIdentity().set_identity(m_tempSourceID);
                 }
                 return retval;
             }
@@ -111,7 +121,7 @@ namespace dynarithmic
                 // source's version of TW_IDENTITY.  The reason is that some drivers
                 // corrupt the saved TW_IDENTITY of the source when selecting and/or closing
                 // the source
-                m_tempSourceID = *(pSource->GetSourceIDPtr());
+                m_tempSourceID = GetSourcePtr()->GetTwainIdentity().get_identity();
                 InitGeneric(pSession, nullptr, DG_CONTROL, DAT_IDENTITY, nMsg, &m_tempSourceID, {true, false});
             }
             CTL_ITwainSource* GetSourceIDPtr() { return GetSourcePtr(); }
