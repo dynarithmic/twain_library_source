@@ -84,6 +84,7 @@ namespace dynarithmic
         const CTL_TwainSourceSet& GetTwainSources();
         const CTL_TwainSourceSet& GetCurrentTwainSources() const { return m_arrTwainSource; }
         void                FillTWIdentity(const CTL_TwainDLLHandle* pHandle);
+        static HWND         CreateTwainWindow(CTL_TwainDLLHandle* /*pHandle*/, HINSTANCE hInstance/*=NULL*/, HWND hWndParent);
 
         virtual ~CTL_ITwainSession();
 

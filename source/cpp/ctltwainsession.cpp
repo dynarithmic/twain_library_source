@@ -40,34 +40,7 @@ namespace stringutils = basicstringutils;
 
 namespace
 {
-#ifdef _WIN32
-    HWND CreateTwainWindow(CTL_TwainDLLHandle* /*pHandle*/, HINSTANCE hInstance/*=NULL*/, HWND hWndParent)
-    {
-        if (hInstance == nullptr)
-            hInstance = CTL_StaticData::GetDLLInstanceHandle();
-        HWND hWndP;
-        if (!hWndParent)
-            hWndP = GetDesktopWindow();
-        else
-            hWndP = hWndParent;
-
-        RECT rect;
-
-        GetWindowRect(hWndP, &rect);
-        const HWND hwnd = CreateWindow(_T("DTWAINWindowClass"),              // class
-            _T("Twain Window"),                 // title
-            WS_OVERLAPPED | WS_POPUP | WS_CAPTION | WS_EX_TOOLWINDOW,    // style
-            0, 0,   // x, y
-            100, 100,   // width, height
-            hWndParent ? hWndP : NULL,
-            NULL,                            // hmenu
-            hInstance,
-            NULL);                          // lpvparam
-        return hwnd;
-    }
-
     ////////// Function to subclass the window ////////////////////////
-
     #define     TWSubclassWindow(hwnd, lpfn)  \
           (reinterpret_cast<WNDPROC>(SetWindowLongPtr((hwnd), GWLP_WNDPROC, (LONG_PTR)(WNDPROC)(lpfn))))
 
@@ -93,7 +66,6 @@ namespace
             wProc = wProcToUse;
         return wProc;
     }
-#endif
 }
 
 //////////////////// CTL_ITwainSession functions /////////////////////////////
@@ -108,7 +80,7 @@ CTL_ITwainSession*  CTL_ITwainSession::Create(CTL_TwainDLLHandle *pHandle,
 CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
                                      LPCTSTR pAppName,
                                      HWND* hAppWnd) : 
-                                     m_AppWnd{}, m_pTwainDLLHandle{}, m_pSelectedSource{}
+                                     m_AppWnd{}, m_pSelectedSource{}, m_pTwainDLLHandle{}
 {
     if ( pAppName )
         m_AppName = pAppName;
@@ -133,8 +105,10 @@ CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
 void CTL_ITwainSession::FillTWIdentity(const CTL_TwainDLLHandle* pHandle)
 {
     TW_IDENTITY& m_AppIdTemp = m_AppId.get_identity();
+    auto currentID = m_AppIdTemp.Id;
     m_AppIdTemp = {};
-    m_AppIdTemp.Id = 0;
+    if (pHandle->m_bSessionAllocated)
+        m_AppIdTemp.Id = currentID;
     m_AppIdTemp.Version.MajorNum = pHandle->m_SessionStruct.nMajorNum;
     m_AppIdTemp.Version.MinorNum = pHandle->m_SessionStruct.nMinorNum;
     m_AppIdTemp.Version.Language = pHandle->m_SessionStruct.nLanguage;
@@ -163,6 +137,31 @@ CTL_ITwainSource* CTL_ITwainSession::CreateTwainSource( LPCTSTR pProduct )
         AddTwainSource(pSource);
     }
     return pSource;
+}
+
+HWND CTL_ITwainSession::CreateTwainWindow(CTL_TwainDLLHandle* /*pHandle*/, HINSTANCE hInstance/*=NULL*/, HWND hWndParent)
+{
+    if (hInstance == nullptr)
+        hInstance = CTL_StaticData::GetDLLInstanceHandle();
+    HWND hWndP;
+    if (!hWndParent)
+        hWndP = GetDesktopWindow();
+    else
+        hWndP = hWndParent;
+
+    RECT rect;
+
+    GetWindowRect(hWndP, &rect);
+    const HWND hwnd = CreateWindow(_T("DTWAINWindowClass"),              // class
+        _T("Twain Window"),                 // title
+        WS_OVERLAPPED | WS_POPUP | WS_CAPTION | WS_EX_TOOLWINDOW,    // style
+        0, 0,   // x, y
+        100, 100,   // width, height
+        hWndParent ? hWndP : NULL,
+        NULL,                            // hmenu
+        hInstance,
+        NULL);                          // lpvparam
+    return hwnd;
 }
 
 
@@ -205,6 +204,9 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
     const TW_IDENTITY* pId = pSource->GetSourceIDPtr();
     const std::string strProduct = pId->ProductName;
 
+    if (pId->Id == 0)
+        return true;
+
     struct SourceFinder
     {
         std::string m_str;
@@ -226,11 +228,6 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
     }
     else
     {
-        // The source has already been selected, so update the info in the twain source array
-        // and destroy the previous instance.  Keep the UUID and status
-        CTL_ITwainSource::Destroy(*iterFound);
-        m_arrTwainSource.erase(iterFound);
-        m_arrTwainSource.insert(pSource);
         return true;
     }
     return false;
@@ -540,7 +537,7 @@ extern "C"
         if ( !hWndMsgNotify )
         {
             // Create the window
-            hWndMsg = CreateTwainWindow(pHandle,nullptr,hWndMsgNotify);
+            hWndMsg = CTL_ITwainSession::CreateTwainWindow(pHandle,nullptr,hWndMsgNotify);
 
             // This is the window's instance handle
             hInstance = CTL_StaticData::GetDLLInstanceHandle();
