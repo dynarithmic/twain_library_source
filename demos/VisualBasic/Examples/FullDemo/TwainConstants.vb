@@ -1,4 +1,24 @@
-' Generated from the supplied TWAIN #define-only header. Do not edit manually.
+REM
+REM This file is part of the Dynarithmic TWAIN Library (DTWAIN).                          
+REM Copyright (c) 2002-2026 Dynarithmic Software.                                         
+REM                                                                                       
+REM Licensed under the Apache License, Version 2.0 (the "License");                       
+REM you may not use this file except in compliance with the License.                      
+REM You may obtain a copy of the License at                                               
+REM                                                                                       
+REM     http://www.apache.org/licenses/LICENSE-2.0                                        
+REM                                                                                       
+REM Unless required by applicable law or agreed to in writing, software                   
+REM distributed under the License is distributed on an "AS IS" BASIS,                     
+REM WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.              
+REM See the License for the specific language governing permissions and                   
+REM limitations under the License.                                                        
+REM                                                                                       
+REM FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY                   
+REM DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT 
+REM OF THIRD PARTY RIGHTS.                                                                
+REM
+
 Namespace Dynarithmic
     Public Module TwainConstants
         Public Const TWON_PROTOCOLMINOR As Long = 5
