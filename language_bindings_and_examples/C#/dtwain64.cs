@@ -1658,7 +1658,7 @@ namespace Dynarithmic
         public const int DTWAIN_PDFTEXT_NOSKEWING = 0x04000000;
         public const int DTWAIN_PDFTEXT_NOSCALINGXY = 0x08000000;
         public const int DTWAIN_PDFTEXT_COPYTEXTELEMENT = 0x10000000;
-        public const uint DTWAIN_PDFTEXT_IGNOREALL = 0xFFF00000;
+        public const uint DTWAIN_PDFTEXT_IGNOREALL = 0xFFF00000U;
         public const int DTWAIN_FONT_COURIER = 0;
         public const int DTWAIN_FONT_COURIERBOLD = 1;
         public const int DTWAIN_FONT_COURIERBOLDOBLIQUE = 2;
