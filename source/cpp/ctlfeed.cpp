@@ -86,13 +86,13 @@ namespace
 {
     bool IsFeederEnabledFunc(DTWAIN_SOURCE Source, IsEnabledFunc Func)
     {
-        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
-        return (p->*Func)();
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        return (pSource->*Func)();
     }
 
     bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
     {
-        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
         if (!pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCap)))
             return false;
 
@@ -293,8 +293,8 @@ extern "C"
         if (!DTWAIN_IsAutoFeedSupported(Source))
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
-        const bool bRet = EnableFeederFunc(Source, CAP_AUTOFEED, p,
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const bool bRet = EnableFeederFunc(Source, CAP_AUTOFEED, pSource,
                                            &CTL_ITwainSource::SetAutoFeedMode, bSet ? true : false);
         // Call general function to enable feeder
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -307,9 +307,8 @@ extern "C"
         auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
         auto isSensitive = DTWAIN_IsFeederSensitive(Source);
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !isSensitive; }, DTWAIN_ERR_FEEDER_NOPAPERSENSOR, false, FUNC_MACRO);
-        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
-        p->SetFeederWaitTime(std::max(DTWAIN_WAIT_INFINITE, static_cast<int>(waitTime)));
-        p->SetFeederWaitTimeOption(std::max(flags, static_cast<LONG>(DTWAIN_FEEDER_TERMINATE)));
+        pSource->SetFeederWaitTime(std::max(DTWAIN_WAIT_INFINITE, static_cast<int>(waitTime)));
+        pSource->SetFeederWaitTimeOption(std::max(flags, static_cast<LONG>(DTWAIN_FEEDER_TERMINATE)));
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }

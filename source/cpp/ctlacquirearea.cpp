@@ -78,7 +78,7 @@ namespace
     bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray, TW_UINT16 SetType)
     {
         LOG_FUNC_ENTRY_PARAMS((Source, FloatArray, ActualArray, SetType))
-            CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
+        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
         const auto pHandle = p->GetDTWAINHandle();
         if (SetType == MSG_RESET)
         {
@@ -93,7 +93,7 @@ namespace
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
             [&] { return !pHandle->m_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::DoubleType); },
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-        static const size_t minValue = 4;
+        constexpr size_t minValue = 4;
         const auto& vFloat = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArray);
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
             [&] { return vFloat.size() < minValue; },
