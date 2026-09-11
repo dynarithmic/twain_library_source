@@ -106,9 +106,9 @@ namespace dynarithmic
         return true;
     }
 
-    DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource* p, CTL_TwainDLLHandle* pHandle, TW_UINT16 nCapToCache)
+    DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource* pSource, CTL_TwainDLLHandle* pHandle, TW_UINT16 nCapToCache)
     {
         CTL_EnumeratorNode<LONG>::container_base_type vCaps(1, nCapToCache);
-        return DTWAIN_CacheCapabilityInfo(p, pHandle, &vCaps);
+        return DTWAIN_CacheCapabilityInfo(pSource, pHandle, &vCaps);
     }
 }

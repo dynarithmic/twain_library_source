@@ -30,7 +30,7 @@
 #include "ctldtwainhandle.h"
 #include "ctlverinfoutils.h"
 #include "dtwainx.h"
-
+#include "mapdefs.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -178,7 +178,7 @@ namespace
         return join_string(vRetVal.begin(), vRetVal.end());
     }
 
-    using pixelMap = std::map<LONG, std::vector<LONG>>;
+    using pixelMap = BASIC_MAPTYPE_<LONG, std::vector<LONG>>;
 
     pixelMap get_pixel_bitdepth_info(CTL_ITwainSource* pSource)
     {
@@ -301,7 +301,7 @@ namespace
         OneCapInfo(std::string name = "", LONG v = 0, std::string type = "") : capName(name), value(v), capType(type) {}
     };
 
-    using AllCapInfoMap = std::map<LONG, OneCapInfo>;
+    using AllCapInfoMap = BASIC_MAPTYPE_<LONG, OneCapInfo>;
 
     struct AllCapInfo
     {
@@ -311,7 +311,7 @@ namespace
     };
 }
 
-using ResInfoMap = std::map<LONG, OneResInfo>;
+using ResInfoMap = BASIC_MAPTYPE_<LONG, OneResInfo>;
 
 namespace
 {
