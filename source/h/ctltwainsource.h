@@ -586,8 +586,6 @@ namespace dynarithmic
         void        SetUpdatedDIB(HANDLE hDib) { m_UpdatedDIB = hDib; }
         HANDLE      GetUpdatedDIB() const { return m_UpdatedDIB; }
         SourceAcquireOptions& GetAcquireOptions() { return m_acquireOptions; }
-        TW_UINT16   GetPendingXferCount() const { return m_PendingXferCount; }
-        void        SetPendingXferCount(TW_UINT16 nCount) { m_PendingXferCount = nCount; }
 
         // Only public member
         void *      m_pUserPtr;
@@ -698,7 +696,6 @@ namespace dynarithmic
         int             m_nLastAcquireError;
         bool            m_bTwainMsgLoopStarted;
         bool            m_bAutocloseUI;
-        TW_UINT16       m_PendingXferCount = 0;
         boost::logic::tribool m_tbIsFileSystemSupported;
         boost::logic::tribool m_tbIsTileModeSupported;
         boost::logic::tribool m_tbIsFeederSupported;

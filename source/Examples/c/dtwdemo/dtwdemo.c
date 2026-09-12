@@ -617,7 +617,7 @@ void SelectTheSource(int nWhich)
         case IDM_SELECT_SOURCE:
             tempSource = DTWAIN_SelectSource2(NULL, NULL,0,0, 
                 DTWAIN_DLG_CENTER_CURRENT_MONITOR | DTWAIN_DLG_SORTNAMES 
-                        | DTWAIN_DLG_HORIZONTALSCROLL | DTWAIN_DLG_TOPMOSTWINDOW | DTWAIN_DLG_HIGHLIGHTFIRST);
+                | DTWAIN_DLG_TOPMOSTWINDOW | DTWAIN_DLG_HIGHLIGHTFIRST);
         break;
 
         case IDM_SELECT_DEFAULT_SOURCE:

@@ -722,15 +722,12 @@ HANDLE  CTL_ImageXferTriplet::GetDibHandle() const
 
 TW_UINT16 CTL_ImageXferTriplet::GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UINT16 nMsg  /* =MSG_ENDXFER */)
 {
-    CTL_ImagePendingTriplet Pending(GetSessionPtr(),
-                                    GetSourcePtr(),
-                                    nMsg);
+    CTL_ImagePendingTriplet Pending(GetSessionPtr(), GetSourcePtr(), nMsg);
     const TW_UINT16 rc = Pending.Execute();
 
     if (rc == TWRC_SUCCESS)
     {
         memcpy(pPI, Pending.GetPendingXferBuffer(), sizeof(TW_PENDINGXFERS));
-        GetSourcePtr()->SetPendingXferCount(pPI->Count);
     }
     return rc;
 }
