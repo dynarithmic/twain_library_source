@@ -586,6 +586,8 @@ namespace dynarithmic
         void        SetUpdatedDIB(HANDLE hDib) { m_UpdatedDIB = hDib; }
         HANDLE      GetUpdatedDIB() const { return m_UpdatedDIB; }
         SourceAcquireOptions& GetAcquireOptions() { return m_acquireOptions; }
+        TW_UINT16   GetPendingXferCount() const { return m_PendingXferCount; }
+        void        SetPendingXferCount(TW_UINT16 nCount) { m_PendingXferCount = nCount; }
 
         // Only public member
         void *      m_pUserPtr;
@@ -600,26 +602,6 @@ namespace dynarithmic
         void SetDibHandleProc(HANDLE hDib, size_t nWhich, bool bCreatePalette) const;
 
     private:
-
-        struct tagCapCacheInfo {
-                double Contrast;
-                double Brightness;
-                double XResolution;
-                double YResolution;
-                double XNativeResolution;
-                int    PixelFlavor;
-                int    BitDepth;
-                int    PixelType;
-                unsigned int UseContrast:1;
-                unsigned int UseBrightness:1;
-                unsigned int UseXResolution:1;
-                unsigned int UseYResolution:1;
-                unsigned int UsePixelFlavor:1;
-                unsigned int UseXNativeResolution:1;
-                unsigned int UseBitDepth:1;
-                unsigned int UsePixelType:1;
-            } CapCacheInfo;
-
         AcquireFileStatus m_AcquireFileStatus;
         CapGetInfo m_CapGetInfo;
         bool            m_bDSMVersion2;
@@ -716,6 +698,7 @@ namespace dynarithmic
         int             m_nLastAcquireError;
         bool            m_bTwainMsgLoopStarted;
         bool            m_bAutocloseUI;
+        TW_UINT16       m_PendingXferCount = 0;
         boost::logic::tribool m_tbIsFileSystemSupported;
         boost::logic::tribool m_tbIsTileModeSupported;
         boost::logic::tribool m_tbIsFeederSupported;
@@ -729,10 +712,6 @@ namespace dynarithmic
         SourceAcquireOptions m_acquireOptions;
         HANDLE m_UpdatedDIB = nullptr;
 
-        struct tagCapCachInfo {
-            TW_UINT16 nCap;
-            bool      m_bSupported;
-        };
         using CachedCapMap = BASIC_MAPTYPE_<TW_UINT16, bool>;
 
         public:

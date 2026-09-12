@@ -149,6 +149,15 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
+
+    LONG DLLENTRY_DEF DTWAIN_GetPendingXferCount(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto nCount = pSource->GetPendingXferCount();
+        LOG_FUNC_EXIT_NONAME_PARAMS(nCount)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE2)
+    }
 }
 
 namespace
@@ -539,7 +548,7 @@ namespace dynarithmic
         AcquireAttemptRAII aRaii(pSource);
         auto& actualOpts = pSource->GetAcquireOptions();
         actualOpts = {};
-
+        pSource->SetPendingXferCount(0);
         actualOpts.setHandle(pSource->GetDTWAINHandle()).
             setSource(pSource->GetDTWAINSource()).
             setPixelType(PixelType).

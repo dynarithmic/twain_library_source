@@ -727,8 +727,11 @@ TW_UINT16 CTL_ImageXferTriplet::GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UIN
                                     nMsg);
     const TW_UINT16 rc = Pending.Execute();
 
-    if ( rc == TWRC_SUCCESS )
+    if (rc == TWRC_SUCCESS)
+    {
         memcpy(pPI, Pending.GetPendingXferBuffer(), sizeof(TW_PENDINGXFERS));
+        GetSourcePtr()->SetPendingXferCount(pPI->Count);
+    }
     return rc;
 }
 
@@ -748,6 +751,9 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(AbortTraits abortTrait
     if ( !IsPendingXfersDone() )
     {
         rc = GetImagePendingInfo( &pPending );
+        if ( rc == TWRC_SUCCESS )
+            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, 
+                                                  DTWAIN_TN_PENDINGXFERSRETRIEVED, reinterpret_cast<LPARAM>(pSource));
         ptrPending = &pPending;
     }
     else
