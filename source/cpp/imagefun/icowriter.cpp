@@ -414,7 +414,7 @@ bool IcoSessionWriter::WriteCurrentPage()
     if (options_.mode == IcoMode::VistaPng)
     {
         IcoMemoryPngEncoder encoder;
-        if (!encoder.Encode(currentPage_, imageData_))
+        if (!dynarithmic::IcoMemoryPngEncoder::Encode(currentPage_, imageData_))
             return false;
     }
     else

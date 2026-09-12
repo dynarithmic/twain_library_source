@@ -724,7 +724,7 @@ namespace dynarithmic
             break;
             }
             // Send message to other notification windows
-            pHandle->NotifyWindows(uMsg, wParam, lParam);
+            CTL_TwainDLLHandle::NotifyWindows(uMsg, wParam, lParam);
 
             // Do not let window process this message again
             if (!bPassMsg)

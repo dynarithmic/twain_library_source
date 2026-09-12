@@ -2191,7 +2191,7 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
         #endif
             auto isSame = stringutils::CompareNoCase(lowerName, strTwainDLLName.c_str());
             if (isSame)
-                return { true, appMgrPtr->GetDSMPath() };
+                return { true, CTL_TwainAppMgr::GetDSMPath() };
         }
         else
             return { false, {} };
@@ -2577,7 +2577,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         {
             std::string sz;
             std::ostringstream strm;
-            sz = decoder.GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
+            sz = CTL_TWAINDecoderStruct::GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
             sTwainLogString = decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
             strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4",
                 { GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT),
