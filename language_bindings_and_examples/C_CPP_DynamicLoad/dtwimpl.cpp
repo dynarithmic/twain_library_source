@@ -657,6 +657,7 @@
     D_GETPATCHCODEPRIORITIESFUNC                  DYNDTWAIN_API::DTWAIN_GetPatchcodePriorities = nullptr;
     D_GETPATCHCODESEARCHMODEFUNC                  DYNDTWAIN_API::DTWAIN_GetPatchcodeSearchMode = nullptr;
     D_GETPATCHCODETIMEOUTFUNC                     DYNDTWAIN_API::DTWAIN_GetPatchcodeTimeOut = nullptr;
+    D_GETPENDINGXFERCOUNTFUNC                     DYNDTWAIN_API::DTWAIN_GetPendingXferCount = nullptr;
     D_GETPIXELFLAVORFUNC                          DYNDTWAIN_API::DTWAIN_GetPixelFlavor = nullptr;
     D_GETPIXELTYPEFUNC                            DYNDTWAIN_API::DTWAIN_GetPixelType = nullptr;
     D_GETPRINTERFUNC                              DYNDTWAIN_API::DTWAIN_GetPrinter = nullptr;
@@ -1893,6 +1894,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetPatchcodePriorities, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetPatchcodeSearchMode, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetPatchcodeTimeOut, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetPendingXferCount, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetPixelFlavor, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetPixelType, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetPrinter, hModule);

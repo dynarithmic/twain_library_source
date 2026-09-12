@@ -469,6 +469,7 @@ Class DTWAINAPI
     Public Const DTWAIN_TN_ACQUIREPAGESSTOPPED As Integer = 1307
     Public Const DTWAIN_TN_QUERYUPDATEDIBORIG As Integer = 1308
     Public Const DTWAIN_TN_QUERYUPDATEDIBRESAMPLED As Integer = 1309
+    Public Const DTWAIN_TN_PENDINGXFERSRETRIEVED As Integer = 1310
     Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
     Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
     Public Const DTWAIN_MODAL As Integer = 0
@@ -2237,6 +2238,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetPatchcodePriorities Lib "dtwain64u.dll" (Source As System.IntPtr, ByRef SearchPriorities As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetPatchcodeSearchMode Lib "dtwain64u.dll" (Source As System.IntPtr, ByRef pSearchMode As Integer, bCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetPatchcodeTimeOut Lib "dtwain64u.dll" (Source As System.IntPtr, ByRef pTimeOut As UInteger, bCurrent As Integer) As Integer
+    Public Declare Function DTWAIN_GetPendingXferCount Lib "dtwain64u.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetPixelFlavor Lib "dtwain64u.dll" (Source As System.IntPtr, ByRef lpPixelFlavor As Integer) As Integer
     Public Declare Function DTWAIN_GetPixelType Lib "dtwain64u.dll" (Source As System.IntPtr, ByRef PixelType As Integer, ByRef BitDepth As Integer, bCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetPrinter Lib "dtwain64u.dll" (Source As System.IntPtr, ByRef lpPrinter As Integer, bCurrent As Integer) As Integer

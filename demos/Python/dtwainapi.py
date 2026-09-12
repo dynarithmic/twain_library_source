@@ -435,6 +435,7 @@ DTWAIN_TN_ACQUIREPAGESSTOPPING = 1306
 DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
 DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
 DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
+DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310
 DTWAIN_PDFOCR_CLEANTEXT1 = 1
 DTWAIN_PDFOCR_CLEANTEXT2 = 2
 DTWAIN_MODAL = 0
@@ -2430,6 +2431,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetPatchcodePriorities.restype = ct.c_long
      theDLL.DTWAIN_GetPatchcodeSearchMode.restype = ct.c_long
      theDLL.DTWAIN_GetPatchcodeTimeOut.restype = ct.c_long
+     theDLL.DTWAIN_GetPendingXferCount.restype = ct.c_long
      theDLL.DTWAIN_GetPixelFlavor.restype = ct.c_long
      theDLL.DTWAIN_GetPixelType.restype = ct.c_long
      theDLL.DTWAIN_GetPrinter.restype = ct.c_long
@@ -3578,6 +3580,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetPatchcodePriorities.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetPatchcodeSearchMode.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_GetPatchcodeTimeOut.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ulong), ct.c_long]
+     theDLL.DTWAIN_GetPendingXferCount.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetPixelFlavor.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetPixelType.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_GetPrinter.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.c_long]
@@ -4742,6 +4745,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetPatchcodePriorities.restype = ct.c_long
      theDLL.DTWAIN_GetPatchcodeSearchMode.restype = ct.c_long
      theDLL.DTWAIN_GetPatchcodeTimeOut.restype = ct.c_long
+     theDLL.DTWAIN_GetPendingXferCount.restype = ct.c_long
      theDLL.DTWAIN_GetPixelFlavor.restype = ct.c_long
      theDLL.DTWAIN_GetPixelType.restype = ct.c_long
      theDLL.DTWAIN_GetPrinter.restype = ct.c_long
@@ -5890,6 +5894,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetPatchcodePriorities.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetPatchcodeSearchMode.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_GetPatchcodeTimeOut.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ulong), ct.c_long]
+     theDLL.DTWAIN_GetPendingXferCount.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetPixelFlavor.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetPixelType.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_GetPrinter.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.c_long]

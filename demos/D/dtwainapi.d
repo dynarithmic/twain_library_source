@@ -642,6 +642,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
     public static const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
     public static const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
+    public static const int DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310;
     public static const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
     public static const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
     public static const int DTWAIN_MODAL = 0;
@@ -2532,6 +2533,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_GetPatchcodePriorities;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, DTWAIN_BOOL) DTWAIN_GetPatchcodeSearchMode;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDWORD, DTWAIN_BOOL) DTWAIN_GetPatchcodeTimeOut;
+    extern(Windows) LONG function(DTWAIN_SOURCE) DTWAIN_GetPendingXferCount;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetPixelFlavor;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPLONG, DTWAIN_BOOL) DTWAIN_GetPixelType;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, DTWAIN_BOOL) DTWAIN_GetPrinter;
@@ -3696,6 +3698,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetPatchcodePriorities, "DTWAIN_GetPatchcodePriorities");
         bindFunction(cast(void**)&DTWAIN_GetPatchcodeSearchMode, "DTWAIN_GetPatchcodeSearchMode");
         bindFunction(cast(void**)&DTWAIN_GetPatchcodeTimeOut, "DTWAIN_GetPatchcodeTimeOut");
+        bindFunction(cast(void**)&DTWAIN_GetPendingXferCount, "DTWAIN_GetPendingXferCount");
         bindFunction(cast(void**)&DTWAIN_GetPixelFlavor, "DTWAIN_GetPixelFlavor");
         bindFunction(cast(void**)&DTWAIN_GetPixelType, "DTWAIN_GetPixelType");
         bindFunction(cast(void**)&DTWAIN_GetPrinter, "DTWAIN_GetPrinter");

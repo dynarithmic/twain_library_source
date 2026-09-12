@@ -656,6 +656,7 @@ type DtwaingetpatchcodemaxretriesFunc = unsafe extern "C" fn(*mut c_void,*mut u3
 type DtwaingetpatchcodeprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwaingetpatchcodesearchmodeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
 type DtwaingetpatchcodetimeoutFunc = unsafe extern "C" fn(*mut c_void,*mut u32,i32) -> i32;
+type DtwaingetpendingxfercountFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingetpixelflavorFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
 type DtwaingetpixeltypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32,i32) -> i32;
 type DtwaingetprinterFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
@@ -1827,6 +1828,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetPatchcodePrioritiesFunc: Symbol<'a, DtwaingetpatchcodeprioritiesFunc>,
     DTWAIN_GetPatchcodeSearchModeFunc: Symbol<'a, DtwaingetpatchcodesearchmodeFunc>,
     DTWAIN_GetPatchcodeTimeOutFunc: Symbol<'a, DtwaingetpatchcodetimeoutFunc>,
+    DTWAIN_GetPendingXferCountFunc: Symbol<'a, DtwaingetpendingxfercountFunc>,
     DTWAIN_GetPixelFlavorFunc: Symbol<'a, DtwaingetpixelflavorFunc>,
     DTWAIN_GetPixelTypeFunc: Symbol<'a, DtwaingetpixeltypeFunc>,
     DTWAIN_GetPrinterFunc: Symbol<'a, DtwaingetprinterFunc>,
@@ -2766,6 +2768,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_TN_ACQUIREPAGESSTOPPED: i32 = 1307;
     pub const DTWAIN_TN_QUERYUPDATEDIBORIG: i32 = 1308;
     pub const DTWAIN_TN_QUERYUPDATEDIBRESAMPLED: i32 = 1309;
+    pub const DTWAIN_TN_PENDINGXFERSRETRIEVED: i32 = 1310;
     pub const DTWAIN_PDFOCR_CLEANTEXT1: i32 = 1;
     pub const DTWAIN_PDFOCR_CLEANTEXT2: i32 = 2;
     pub const DTWAIN_MODAL: i32 = 0;
@@ -4664,6 +4667,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetPatchcodePriorities: Symbol<DtwaingetpatchcodeprioritiesFunc> = unsafe { library.get(b"DTWAIN_GetPatchcodePriorities")? };
         let DTWAIN_GetPatchcodeSearchMode: Symbol<DtwaingetpatchcodesearchmodeFunc> = unsafe { library.get(b"DTWAIN_GetPatchcodeSearchMode")? };
         let DTWAIN_GetPatchcodeTimeOut: Symbol<DtwaingetpatchcodetimeoutFunc> = unsafe { library.get(b"DTWAIN_GetPatchcodeTimeOut")? };
+        let DTWAIN_GetPendingXferCount: Symbol<DtwaingetpendingxfercountFunc> = unsafe { library.get(b"DTWAIN_GetPendingXferCount")? };
         let DTWAIN_GetPixelFlavor: Symbol<DtwaingetpixelflavorFunc> = unsafe { library.get(b"DTWAIN_GetPixelFlavor")? };
         let DTWAIN_GetPixelType: Symbol<DtwaingetpixeltypeFunc> = unsafe { library.get(b"DTWAIN_GetPixelType")? };
         let DTWAIN_GetPrinter: Symbol<DtwaingetprinterFunc> = unsafe { library.get(b"DTWAIN_GetPrinter")? };
@@ -5834,6 +5838,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetPatchcodePrioritiesFunc: DTWAIN_GetPatchcodePriorities,
             DTWAIN_GetPatchcodeSearchModeFunc: DTWAIN_GetPatchcodeSearchMode,
             DTWAIN_GetPatchcodeTimeOutFunc: DTWAIN_GetPatchcodeTimeOut,
+            DTWAIN_GetPendingXferCountFunc: DTWAIN_GetPendingXferCount,
             DTWAIN_GetPixelFlavorFunc: DTWAIN_GetPixelFlavor,
             DTWAIN_GetPixelTypeFunc: DTWAIN_GetPixelType,
             DTWAIN_GetPrinterFunc: DTWAIN_GetPrinter,
@@ -8832,6 +8837,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetPatchcodeTimeOut(&self, Source: *mut c_void, pTimeOut: *mut u32, bCurrent: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetPatchcodeTimeOutFunc)(Source, pTimeOut, bCurrent);  }
+    }
+
+    pub fn DTWAIN_GetPendingXferCount(&self, Source: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_GetPendingXferCountFunc)(Source);  }
     }
 
     pub fn DTWAIN_GetPixelFlavor(&self, Source: *mut c_void, lpPixelFlavor: *mut i32) -> i32 {

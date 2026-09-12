@@ -744,6 +744,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetPatchcodePriorities
    attr_reader :DTWAIN_GetPatchcodeSearchMode
    attr_reader :DTWAIN_GetPatchcodeTimeOut
+   attr_reader :DTWAIN_GetPendingXferCount
    attr_reader :DTWAIN_GetPixelFlavor
    attr_reader :DTWAIN_GetPixelType
    attr_reader :DTWAIN_GetPrinter
@@ -1680,6 +1681,7 @@ class DTWAINAPI
    DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
    DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
    DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
+   DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310
    DTWAIN_PDFOCR_CLEANTEXT1 = 1
    DTWAIN_PDFOCR_CLEANTEXT2 = 2
    DTWAIN_MODAL = 0
@@ -3617,6 +3619,7 @@ class DTWAINAPI
        @DTWAIN_GetPatchcodePriorities = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPatchcodePriorities'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetPatchcodeSearchMode = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPatchcodeSearchMode'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_GetPatchcodeTimeOut = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPatchcodeTimeOut'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
+       @DTWAIN_GetPendingXferCount = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPendingXferCount'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetPixelFlavor = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPixelFlavor'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetPixelType = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPixelType'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_GetPrinter = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPrinter'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)

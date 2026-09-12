@@ -522,6 +522,7 @@ namespace Dynarithmic
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
         public const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
         public const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
+        public const int DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
@@ -3349,6 +3350,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, ref DWORD pTimeOut, int bCurrent);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetPendingXferCount(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetPixelFlavor(DTWAIN_SOURCE Source, ref int lpPixelFlavor);

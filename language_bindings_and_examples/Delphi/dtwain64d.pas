@@ -565,6 +565,7 @@ const
   DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
   DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
   DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
+  DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310;
   DTWAIN_PDFOCR_CLEANTEXT1 = 1;
   DTWAIN_PDFOCR_CLEANTEXT2 = 2;
   DTWAIN_MODAL = 0;
@@ -2463,6 +2464,7 @@ function DTWAIN_GetPatchcodeMaxRetries(Source:DTWAIN_SOURCE; pMaxRetries:LPDWORD
 function DTWAIN_GetPatchcodePriorities(Source:DTWAIN_SOURCE; SearchPriorities:LPDTWAIN_ARRAY) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetPatchcodePriorities';
 function DTWAIN_GetPatchcodeSearchMode(Source:DTWAIN_SOURCE; pSearchMode:LPLONG; bCurrent:BOOL) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetPatchcodeSearchMode';
 function DTWAIN_GetPatchcodeTimeOut(Source:DTWAIN_SOURCE; pTimeOut:LPDWORD; bCurrent:BOOL) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetPatchcodeTimeOut';
+function DTWAIN_GetPendingXferCount(Source:DTWAIN_SOURCE) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetPendingXferCount';
 function DTWAIN_GetPixelFlavor(Source:DTWAIN_SOURCE; lpPixelFlavor:LPLONG) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetPixelFlavor';
 function DTWAIN_GetPixelType(Source:DTWAIN_SOURCE; PixelType:LPLONG; BitDepth:LPLONG; bCurrent:BOOL) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetPixelType';
 function DTWAIN_GetPrinter(Source:DTWAIN_SOURCE; lpPrinter:LPLONG; bCurrent:BOOL) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetPrinter';

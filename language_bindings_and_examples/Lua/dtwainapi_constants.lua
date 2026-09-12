@@ -397,6 +397,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
    dtwain_constants.DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
    dtwain_constants.DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
+   dtwain_constants.DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310
    dtwain_constants.DTWAIN_PDFOCR_CLEANTEXT1 = 1
    dtwain_constants.DTWAIN_PDFOCR_CLEANTEXT2 = 2
    dtwain_constants.DTWAIN_MODAL = 0

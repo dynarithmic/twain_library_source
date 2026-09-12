@@ -685,6 +685,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetPatchcodePriorities(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY SearchPriorities);
         DTWAIN_BOOL DTWAIN_GetPatchcodeSearchMode(DTWAIN_SOURCE Source, LPLONG pSearchMode, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, LPDWORD pTimeOut, DTWAIN_BOOL bCurrent);
+        LONG DTWAIN_GetPendingXferCount(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetPixelFlavor(DTWAIN_SOURCE Source, LPLONG lpPixelFlavor);
         DTWAIN_BOOL DTWAIN_GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPrinter(DTWAIN_SOURCE Source, LPLONG lpPrinter, DTWAIN_BOOL bCurrent);
@@ -1911,6 +1912,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetPatchcodePriorities(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY SearchPriorities);
         DTWAIN_BOOL DTWAIN_GetPatchcodeSearchMode(DTWAIN_SOURCE Source, LPLONG pSearchMode, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, LPDWORD pTimeOut, DTWAIN_BOOL bCurrent);
+        LONG DTWAIN_GetPendingXferCount(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetPixelFlavor(DTWAIN_SOURCE Source, LPLONG lpPixelFlavor);
         DTWAIN_BOOL DTWAIN_GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPrinter(DTWAIN_SOURCE Source, LPLONG lpPrinter, DTWAIN_BOOL bCurrent);
@@ -3137,6 +3139,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetPatchcodePriorities(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY SearchPriorities);
         DTWAIN_BOOL DTWAIN_GetPatchcodeSearchMode(DTWAIN_SOURCE Source, LPLONG pSearchMode, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, LPDWORD pTimeOut, DTWAIN_BOOL bCurrent);
+        LONG DTWAIN_GetPendingXferCount(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetPixelFlavor(DTWAIN_SOURCE Source, LPLONG lpPixelFlavor);
         DTWAIN_BOOL DTWAIN_GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPrinter(DTWAIN_SOURCE Source, LPLONG lpPrinter, DTWAIN_BOOL bCurrent);
@@ -4363,6 +4366,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetPatchcodePriorities(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY SearchPriorities);
         DTWAIN_BOOL DTWAIN_GetPatchcodeSearchMode(DTWAIN_SOURCE Source, LPLONG pSearchMode, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, LPDWORD pTimeOut, DTWAIN_BOOL bCurrent);
+        LONG DTWAIN_GetPendingXferCount(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetPixelFlavor(DTWAIN_SOURCE Source, LPLONG lpPixelFlavor);
         DTWAIN_BOOL DTWAIN_GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPrinter(DTWAIN_SOURCE Source, LPLONG lpPrinter, DTWAIN_BOOL bCurrent);

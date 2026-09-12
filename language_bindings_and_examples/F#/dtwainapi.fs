@@ -525,6 +525,7 @@ module TwainAPI =
     let public DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307
     let public DTWAIN_TN_QUERYUPDATEDIBORIG = 1308
     let public DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309
+    let public DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310
     let public DTWAIN_PDFOCR_CLEANTEXT1 = 1
     let public DTWAIN_PDFOCR_CLEANTEXT2 = 2
     let public DTWAIN_MODAL = 0
@@ -3288,6 +3289,9 @@ module TwainAPI =
     type DTWAIN_GetPatchcodeTimeOutDelegate = delegate of DTWAIN_SOURCE * DWORD byref * DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetPendingXferCountDelegate = delegate of DTWAIN_SOURCE -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetPixelFlavorDelegate = delegate of DTWAIN_SOURCE * int byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4903,6 +4907,7 @@ module TwainAPI =
     let private GetPatchcodePriorities = lazy (DynamicDll.Bind "DTWAIN_GetPatchcodePriorities" : DTWAIN_GetPatchcodePrioritiesDelegate)
     let private GetPatchcodeSearchMode = lazy (DynamicDll.Bind "DTWAIN_GetPatchcodeSearchMode" : DTWAIN_GetPatchcodeSearchModeDelegate)
     let private GetPatchcodeTimeOut = lazy (DynamicDll.Bind "DTWAIN_GetPatchcodeTimeOut" : DTWAIN_GetPatchcodeTimeOutDelegate)
+    let private GetPendingXferCount = lazy (DynamicDll.Bind "DTWAIN_GetPendingXferCount" : DTWAIN_GetPendingXferCountDelegate)
     let private GetPixelFlavor = lazy (DynamicDll.Bind "DTWAIN_GetPixelFlavor" : DTWAIN_GetPixelFlavorDelegate)
     let private GetPixelType = lazy (DynamicDll.Bind "DTWAIN_GetPixelType" : DTWAIN_GetPixelTypeDelegate)
     let private GetPrinter = lazy (DynamicDll.Bind "DTWAIN_GetPrinter" : DTWAIN_GetPrinterDelegate)
@@ -7188,6 +7193,10 @@ module TwainAPI =
     let DTWAIN_GetPatchcodeTimeOut (source: DTWAIN_SOURCE) (ptimeout: DWORD byref) (bcurrent: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetPatchcodeTimeOut.Value.Invoke(source, &ptimeout, bcurrent)
+
+    let DTWAIN_GetPendingXferCount (source: DTWAIN_SOURCE) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetPendingXferCount.Value.Invoke(source)
 
     let DTWAIN_GetPixelFlavor (source: DTWAIN_SOURCE) (lppixelflavor: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

@@ -540,6 +540,7 @@
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
         public const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
         public const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
+        public const int DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
@@ -2436,6 +2437,7 @@
         public delegate int DTWAIN_GetPatchcodePrioritiesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY SearchPriorities);
         public delegate int DTWAIN_GetPatchcodeSearchModeDelegate(DTWAIN_SOURCE Source, ref int pSearchMode, int bCurrent);
         public delegate int DTWAIN_GetPatchcodeTimeOutDelegate(DTWAIN_SOURCE Source, ref DWORD pTimeOut, int bCurrent);
+        public delegate int DTWAIN_GetPendingXferCountDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetPixelFlavorDelegate(DTWAIN_SOURCE Source, ref int lpPixelFlavor);
         public delegate int DTWAIN_GetPixelTypeDelegate(DTWAIN_SOURCE Source, ref int PixelType, ref int BitDepth, int bCurrent);
         public delegate int DTWAIN_GetPrinterDelegate(DTWAIN_SOURCE Source, ref int lpPrinter, int bCurrent);
@@ -4406,6 +4408,9 @@
 
         [DTWAINNativeFunction("DTWAIN_GetPatchcodeTimeOut")]
         private readonly DTWAIN_GetPatchcodeTimeOutDelegate  _DTWAIN_GetPatchcodeTimeOut;
+
+        [DTWAINNativeFunction("DTWAIN_GetPendingXferCount")]
+        private readonly DTWAIN_GetPendingXferCountDelegate  _DTWAIN_GetPendingXferCount;
 
         [DTWAINNativeFunction("DTWAIN_GetPixelFlavor")]
         private readonly DTWAIN_GetPixelFlavorDelegate  _DTWAIN_GetPixelFlavor;
@@ -7198,6 +7203,9 @@
 
         public  int DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, ref DWORD pTimeOut, int bCurrent)
         => _DTWAIN_GetPatchcodeTimeOut(Source, ref pTimeOut, bCurrent);
+
+        public  int DTWAIN_GetPendingXferCount(DTWAIN_SOURCE Source)
+        => _DTWAIN_GetPendingXferCount(Source);
 
         public  int DTWAIN_GetPixelFlavor(DTWAIN_SOURCE Source, ref int lpPixelFlavor)
         => _DTWAIN_GetPixelFlavor(Source, ref lpPixelFlavor);

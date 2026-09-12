@@ -640,6 +640,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_TN_ACQUIREPAGESSTOPPED As Integer = 1307
         Public Const DTWAIN_TN_QUERYUPDATEDIBORIG As Integer = 1308
         Public Const DTWAIN_TN_QUERYUPDATEDIBRESAMPLED As Integer = 1309
+        Public Const DTWAIN_TN_PENDINGXFERSRETRIEVED As Integer = 1310
         Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
         Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
         Public Const DTWAIN_MODAL As Integer = 0
@@ -3349,6 +3350,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetPatchcodeTimeOutDelegate(Source As System.IntPtr, ByRef pTimeOut As UInteger, bCurrent As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetPendingXferCountDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetPixelFlavorDelegate(Source As System.IntPtr, ByRef lpPixelFlavor As Integer) As Integer
@@ -6391,6 +6395,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetPatchcodeTimeOut(Source, pTimeOut, bCurrent)
         End Function
         
+        Public Function DTWAIN_GetPendingXferCount(Source As System.IntPtr) As Integer
+        Return api.DTWAIN_GetPendingXferCount(Source)
+        End Function
+        
         Public Function DTWAIN_GetPixelFlavor(Source As System.IntPtr, ByRef lpPixelFlavor As Integer) As Integer
         Return api.DTWAIN_GetPixelFlavor(Source, lpPixelFlavor)
         End Function
@@ -8406,6 +8414,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetPatchcodePriorities As DTWAIN_GetPatchcodePrioritiesDelegate
             Public DTWAIN_GetPatchcodeSearchMode As DTWAIN_GetPatchcodeSearchModeDelegate
             Public DTWAIN_GetPatchcodeTimeOut As DTWAIN_GetPatchcodeTimeOutDelegate
+            Public DTWAIN_GetPendingXferCount As DTWAIN_GetPendingXferCountDelegate
             Public DTWAIN_GetPixelFlavor As DTWAIN_GetPixelFlavorDelegate
             Public DTWAIN_GetPixelType As DTWAIN_GetPixelTypeDelegate
             Public DTWAIN_GetPrinter As DTWAIN_GetPrinterDelegate
