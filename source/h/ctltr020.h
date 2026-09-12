@@ -26,6 +26,7 @@
 #include "ctltripletbase.h"
 #include "ctlgetsetcapsinternal.h"
 #include "ctlstringutils.h"
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -59,7 +60,7 @@ namespace dynarithmic
                     m_capMap[ICAP_JPEGSUBSAMPLING] = TWCP_NONE;
                 }
             }
-            using FileXferCapMap = std::unordered_map<TW_UINT16, LONG>;
+            using FileXferCapMap = BASIC_UNORDERED_MAPTYPE_<TW_UINT16, LONG>;
 
             struct CapGetter
             {

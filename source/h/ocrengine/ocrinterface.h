@@ -28,6 +28,8 @@
 #include <array>
 #include <dtwtype.h>
 #include "ctlstringdefs.h"
+#include "mapdefs.h"
+
 #define OCROPTION_GETINFO         0
 #define OCROPTION_STORECLEANTEXT1 1
 #define OCROPTION_STORECLEANTEXT2 2
@@ -231,11 +233,11 @@ namespace dynarithmic
         using OCRStringArrayValues = std::vector<std::string>;
         using FileTypeArray = std::vector<UINT>;
         using OptionList = std::bitset<16>;
-        using OCRCharacterInfoMap = std::unordered_map<LONG, std::vector<OCRCharacterInfo> >;
-        using OCRPageTextMap = std::unordered_map<LONG, std::string>;
+        using OCRCharacterInfoMap = BASIC_UNORDERED_MAPTYPE_<LONG, std::vector<OCRCharacterInfo> >;
+        using OCRPageTextMap = BASIC_UNORDERED_MAPTYPE_<LONG, std::string>;
 
-        std::unordered_map<LONG, OCRCapInfo> m_AllCapValues;
-        std::unordered_map<LONG, LONG> m_mapOperations;
+        BASIC_UNORDERED_MAPTYPE_<LONG, OCRCapInfo> m_AllCapValues;
+        BASIC_UNORDERED_MAPTYPE_<LONG, LONG> m_mapOperations;
         OCRCacheInfo m_OCRCache;
         OCRPDFInfo m_OCRPDFInfo;
         OCRCapInfo& GetOCRCapInfo(LONG nCap);

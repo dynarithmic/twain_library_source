@@ -33,6 +33,7 @@
 #endif
 #include <unordered_map>
 #include <sstream>
+#include "mapdefs.h"
 
 struct charTraitsUNICODE
 {
@@ -88,7 +89,7 @@ struct charTraitsANSI
 template< typename charTraits>
 class VersionInfoImpl
 {
-    typedef std::unordered_map< typename charTraits::TraitsStringType,
+    typedef BASIC_UNORDERED_MAPTYPE_< typename charTraits::TraitsStringType,
                       typename charTraits::TraitsStringType> STLMapStringToString;
 
     typedef typename charTraits::TraitsCharType char_type;
@@ -119,7 +120,7 @@ class VersionInfoImpl
         typename charTraits::TraitsStringStreamType m_sBuf;
         bool getit( typename charTraits::TraitsCharType const * const iFilename );
 
-        typedef std::unordered_map<int, typename charTraits::TraitsStringType> lookupMapType;
+        typedef BASIC_UNORDERED_MAPTYPE_<int, typename charTraits::TraitsStringType> lookupMapType;
         lookupMapType m_lookUps;
 
         struct TranslationInfo

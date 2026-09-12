@@ -76,7 +76,7 @@ namespace dynarithmic
     using SourceGetMessageList = std::unordered_set<std::string>;
     using SourceSheetcountMap = std::vector<std::pair<std::string, std::string>>;
     using SourcePaperDetectableMap = BASIC_MAPTYPE_<std::string, bool>;
-    using CTL_PairToStringMap = std::unordered_map<std::pair<int, std::string>, std::string, CacheKeyHash>;
+    using CTL_PairToStringMap = BASIC_UNORDERED_MAPTYPE_<std::pair<int, std::string>, std::string, CacheKeyHash>;
     using SupportedBitDepthsMap = BASIC_MAPTYPE_<LONG, std::vector<uint16_t>>;
 }
 #endif

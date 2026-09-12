@@ -26,6 +26,7 @@
 #include <string>
 #include <boost/functional/hash.hpp>
 #include "twain.h"
+#include "mapdefs.h"
 
 /* Structure types are as follows
    0 - NONE
@@ -196,7 +197,7 @@ namespace dynarithmic
             TW_MEMREF  m_pData;
             key_type m_Key;
     };
-    using CTL_GeneralErrorInfo = std::unordered_map<CTL_TWAINDecoderStruct::key_type, CTL_TWAINDecoderStruct, boost::hash<CTL_TWAINDecoderStruct::key_type>>;
+    using CTL_GeneralErrorInfo = BASIC_UNORDERED_MAPTYPE_<CTL_TWAINDecoderStruct::key_type, CTL_TWAINDecoderStruct, boost::hash<CTL_TWAINDecoderStruct::key_type>>;
 }
 #endif
 

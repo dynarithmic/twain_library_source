@@ -27,4 +27,11 @@
         #include <map>
         #define BASIC_MAPTYPE_ std::map
     #endif
+    #ifdef DTWAIN_USE_BOOST_UNORDERED_MAP_
+        #include <boost/unordered/unordered_flat_map.hpp>
+        #define BASIC_UNORDERED_MAPTYPE_ boost::unordered_flat_map
+    #else
+        #include <unordered_map>
+        #define BASIC_UNORDERED_MAPTYPE_ std::unordered_map
+    #endif
 #endif

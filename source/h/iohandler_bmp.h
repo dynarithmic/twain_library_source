@@ -29,7 +29,7 @@ namespace dynarithmic
     {
         public:
             CTL_BmpIOHandler() = default;
-            CTL_BmpIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& imageInfo) : CTL_ImageIOHandler(pDib), m_ImageInfoEx(imageInfo) {}
+            CTL_BmpIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx& imageInfo) : CTL_ImageIOHandler(pDib), m_ImageInfoEx(imageInfo) {}
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
         private:

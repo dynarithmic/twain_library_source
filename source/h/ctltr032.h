@@ -28,12 +28,12 @@ namespace dynarithmic
 
     class CTL_DSMMetricsTriplet : public CTL_TwainTriplet
     {
-    public:
+        public:
             CTL_DSMMetricsTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource);
-        const TW_METRICS& getMetrics() const { return m_DSMMetrics; }
+            const TW_METRICS& getMetrics() const { return m_DSMMetrics; }
 
-    private:
-        TW_METRICS m_DSMMetrics;
+        private:
+            TW_METRICS m_DSMMetrics;
     };
 }
 #endif

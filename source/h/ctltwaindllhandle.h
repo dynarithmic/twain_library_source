@@ -45,6 +45,7 @@
 #include "ocrinterface.h"
 #include "ctlinternalconstants.h"
 #include "ctlstaticdata.h"
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -58,7 +59,7 @@ namespace dynarithmic
     class CTL_TwainDLLHandle
     {
         using OCRInterfaceContainer = std::vector<OCREnginePtr>;
-        using OCRProductNameToEngineMap = std::unordered_map<std::string, OCREnginePtr>;
+        using OCRProductNameToEngineMap = BASIC_UNORDERED_MAPTYPE_<std::string, OCREnginePtr>;
         using CTL_TwainDLLHandlePtr = std::shared_ptr<CTL_TwainDLLHandle>;
 
         public:

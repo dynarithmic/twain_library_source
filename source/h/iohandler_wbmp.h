@@ -28,7 +28,7 @@ namespace dynarithmic
     class CTL_WBMPIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_WBMPIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
+            CTL_WBMPIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
                 m_ImageInfoEx(ImageInfoEx)
             {
             }

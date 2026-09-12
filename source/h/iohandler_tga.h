@@ -33,7 +33,7 @@ namespace dynarithmic
                 SetSaveArgs();
             }
 
-            CTL_TgaIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib), m_ImageInfoEx(ImageInfoEx)
+            CTL_TgaIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib), m_ImageInfoEx(ImageInfoEx)
             {
                 SetSaveArgs();
             }
