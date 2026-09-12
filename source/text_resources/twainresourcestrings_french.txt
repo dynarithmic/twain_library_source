@@ -107,6 +107,7 @@
 1090 La DLL DTWAIN n’est pas de la bonne version
 1091 La session TWAIN est actuellement active
 1092 L'opération nécessite TWAIN DSM 2.x ou une version ultérieure
+1093 Le conteneur TWON_ENUMERATOR n'a pas été utilisé pour cette opération.
 1100 Condition de Twain ne pouvait pas Coder : ne pouvions pas parachever de l'opération.   Mémoire Insuffisante.
 1101 Faute de Code : de Condition de Twain
 1102 Twain Conditionne Code : Inconnu de la cause du raté

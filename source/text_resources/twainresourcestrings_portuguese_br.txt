@@ -107,6 +107,7 @@
 1090 DTWAIN DLL não é a versão correta
 1091 A sessão TWAIN está atualmente ativa
 1092 A operação requer TWAIN DSM 2.x ou posterior
+1093 O contêiner TWON_ENUMERATOR não foi usado para esta operação.
 1100 Código de Condição TWAIN: Não foi possível concluir a operação. Memória insuficiente.
 1101 Código de Condição TWAIN: Sem Erros
 1102 Código de Condição TWAIN: Falha de causa desconhecida
