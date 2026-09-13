@@ -3430,6 +3430,9 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
         public static extern int DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, System.IntPtr fName, int nMaxLen);
 
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_GetSaveFileType(DTWAIN_SOURCE Source);
+
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
         public static extern int DTWAIN_GetSessionDetails([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szBuf, int nSize, int indentFactor, int bRefresh);
 
@@ -4515,6 +4518,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
         public static extern int DTWAIN_SetSaveFileName(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string fName);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_SetSaveFileType(DTWAIN_SOURCE Source, int FileType);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_SetShadow(DTWAIN_SOURCE Source, DTWAIN_FLOAT Shadow);

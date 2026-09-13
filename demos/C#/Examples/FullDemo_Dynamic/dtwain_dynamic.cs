@@ -2463,6 +2463,7 @@
         public delegate int DTWAIN_GetRotationStringDelegate_overload(DTWAIN_SOURCE Source, System.IntPtr Rotation);
         public delegate int DTWAIN_GetSaveFileNameDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder fName, int nMaxLen);
         public delegate int DTWAIN_GetSaveFileNameDelegate_overload(DTWAIN_SOURCE Source, System.IntPtr fName, int nMaxLen);
+        public delegate int DTWAIN_GetSaveFileTypeDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetSessionDetailsDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szBuf, int nSize, int indentFactor, int bRefresh);
         public delegate int DTWAIN_GetSessionDetailsDelegate_overload(System.IntPtr szBuf, int nSize, int indentFactor, int bRefresh);
         public delegate int DTWAIN_GetShadowDelegate(DTWAIN_SOURCE Source, ref DTWAIN_FLOAT Shadow);
@@ -2825,6 +2826,7 @@
         public delegate int DTWAIN_SetRotationDelegate(DTWAIN_SOURCE Source, DTWAIN_FLOAT Rotation);
         public delegate int DTWAIN_SetRotationStringDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string Rotation);
         public delegate int DTWAIN_SetSaveFileNameDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string fName);
+        public delegate int DTWAIN_SetSaveFileTypeDelegate(DTWAIN_SOURCE Source, int FileType);
         public delegate int DTWAIN_SetShadowDelegate(DTWAIN_SOURCE Source, DTWAIN_FLOAT Shadow);
         public delegate int DTWAIN_SetShadowStringDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string Shadow);
         public delegate int DTWAIN_SetSourceUnitDelegate(DTWAIN_SOURCE Source, int Unit);
@@ -4487,6 +4489,9 @@
         [DTWAINNativeFunction("DTWAIN_GetSaveFileName")]
         private readonly DTWAIN_GetSaveFileNameDelegate_overload _DTWAIN_GetSaveFileName_overload; 
 
+        [DTWAINNativeFunction("DTWAIN_GetSaveFileType")]
+        private readonly DTWAIN_GetSaveFileTypeDelegate  _DTWAIN_GetSaveFileType;
+
         [DTWAINNativeFunction("DTWAIN_GetSessionDetails")]
         private readonly DTWAIN_GetSessionDetailsDelegate  _DTWAIN_GetSessionDetails;
 
@@ -5572,6 +5577,9 @@
 
         [DTWAINNativeFunction("DTWAIN_SetSaveFileName")]
         private readonly DTWAIN_SetSaveFileNameDelegate  _DTWAIN_SetSaveFileName;
+
+        [DTWAINNativeFunction("DTWAIN_SetSaveFileType")]
+        private readonly DTWAIN_SetSaveFileTypeDelegate  _DTWAIN_SetSaveFileType;
 
         [DTWAINNativeFunction("DTWAIN_SetShadow")]
         private readonly DTWAIN_SetShadowDelegate  _DTWAIN_SetShadow;
@@ -7282,6 +7290,9 @@
         public  int DTWAIN_GetSaveFileName (DTWAIN_SOURCE Source, System.IntPtr fName, int nMaxLen)
         => _DTWAIN_GetSaveFileName_overload(Source, fName, nMaxLen);
 
+        public  int DTWAIN_GetSaveFileType(DTWAIN_SOURCE Source)
+        => _DTWAIN_GetSaveFileType(Source);
+
         public  int DTWAIN_GetSessionDetails([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szBuf, int nSize, int indentFactor, int bRefresh)
         => _DTWAIN_GetSessionDetails(szBuf, nSize, indentFactor, bRefresh);
 
@@ -8367,6 +8378,9 @@
 
         public  int DTWAIN_SetSaveFileName(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string fName)
         => _DTWAIN_SetSaveFileName(Source, fName);
+
+        public  int DTWAIN_SetSaveFileType(DTWAIN_SOURCE Source, int FileType)
+        => _DTWAIN_SetSaveFileType(Source, FileType);
 
         public  int DTWAIN_SetShadow(DTWAIN_SOURCE Source, DTWAIN_FLOAT Shadow)
         => _DTWAIN_SetShadow(Source, Shadow);

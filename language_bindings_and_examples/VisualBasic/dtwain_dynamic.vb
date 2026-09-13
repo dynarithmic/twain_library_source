@@ -3414,6 +3414,9 @@ Namespace Dynarithmic
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetSaveFileNameDelegate(Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> fName As StringBuilder, nMaxLen As Integer) As Integer
         
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetSaveFileTypeDelegate(Source As System.IntPtr) As Integer
+        
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetSessionDetailsDelegate(<MarshalAs(UnmanagedType.LPTStr)> szBuf As StringBuilder, nSize As Integer, indentFactor As Integer, bRefresh As Integer) As Integer
         
@@ -4418,6 +4421,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_SetSaveFileNameDelegate(Source As System.IntPtr, fName As String) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_SetSaveFileTypeDelegate(Source As System.IntPtr, FileType As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetShadowDelegate(Source As System.IntPtr, Shadow As System.Double) As Integer
@@ -6479,6 +6485,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetSaveFileName(Source, fName, nMaxLen)
         End Function
         
+        Public Function DTWAIN_GetSaveFileType(Source As System.IntPtr) As Integer
+        Return api.DTWAIN_GetSaveFileType(Source)
+        End Function
+        
         Public Function DTWAIN_GetSessionDetails(<MarshalAs(UnmanagedType.LPTStr)> szBuf As StringBuilder, nSize As Integer, indentFactor As Integer, bRefresh As Integer) As Integer
         Return api.DTWAIN_GetSessionDetails(szBuf, nSize, indentFactor, bRefresh)
         End Function
@@ -7819,6 +7829,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetSaveFileName(Source, fName)
         End Function
         
+        Public Function DTWAIN_SetSaveFileType(Source As System.IntPtr, FileType As Integer) As Integer
+        Return api.DTWAIN_SetSaveFileType(Source, FileType)
+        End Function
+        
         Public Function DTWAIN_SetShadow(Source As System.IntPtr, Shadow As System.Double) As Integer
         Return api.DTWAIN_SetShadow(Source, Shadow)
         End Function
@@ -8435,6 +8449,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetRotationEx As DTWAIN_GetRotationExDelegate
             Public DTWAIN_GetRotationString As DTWAIN_GetRotationStringDelegate
             Public DTWAIN_GetSaveFileName As DTWAIN_GetSaveFileNameDelegate
+            Public DTWAIN_GetSaveFileType As DTWAIN_GetSaveFileTypeDelegate
             Public DTWAIN_GetSessionDetails As DTWAIN_GetSessionDetailsDelegate
             Public DTWAIN_GetShadow As DTWAIN_GetShadowDelegate
             Public DTWAIN_GetShadowString As DTWAIN_GetShadowStringDelegate
@@ -8770,6 +8785,7 @@ Namespace Dynarithmic
             Public DTWAIN_SetRotation As DTWAIN_SetRotationDelegate
             Public DTWAIN_SetRotationString As DTWAIN_SetRotationStringDelegate
             Public DTWAIN_SetSaveFileName As DTWAIN_SetSaveFileNameDelegate
+            Public DTWAIN_SetSaveFileType As DTWAIN_SetSaveFileTypeDelegate
             Public DTWAIN_SetShadow As DTWAIN_SetShadowDelegate
             Public DTWAIN_SetShadowString As DTWAIN_SetShadowStringDelegate
             Public DTWAIN_SetSourceUnit As DTWAIN_SetSourceUnitDelegate

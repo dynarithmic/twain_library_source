@@ -2259,6 +2259,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetRotationEx Lib "dtwain32ud.dll" (Source As System.IntPtr) As System.Double
     Public Declare Unicode Function DTWAIN_GetRotationString Lib "dtwain32ud.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> Rotation As StringBuilder) As Integer
     Public Declare Unicode Function DTWAIN_GetSaveFileName Lib "dtwain32ud.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> fName As StringBuilder, nMaxLen As Integer) As Integer
+    Public Declare Function DTWAIN_GetSaveFileType Lib "dtwain32ud.dll" (Source As System.IntPtr) As Integer
     Public Declare Unicode Function DTWAIN_GetSessionDetails Lib "dtwain32ud.dll" (<MarshalAs(UnmanagedType.LPTStr)> szBuf As StringBuilder, nSize As Integer, indentFactor As Integer, bRefresh As Integer) As Integer
     Public Declare Function DTWAIN_GetShadow Lib "dtwain32ud.dll" (Source As System.IntPtr, ByRef Shadow As System.Double) As Integer
     Public Declare Unicode Function DTWAIN_GetShadowString Lib "dtwain32ud.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> Shadow As StringBuilder) As Integer
@@ -2594,6 +2595,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_SetRotation Lib "dtwain32ud.dll" (Source As System.IntPtr, Rotation As System.Double) As Integer
     Public Declare Unicode Function DTWAIN_SetRotationString Lib "dtwain32ud.dll" (Source As System.IntPtr, Rotation As String) As Integer
     Public Declare Unicode Function DTWAIN_SetSaveFileName Lib "dtwain32ud.dll" (Source As System.IntPtr, fName As String) As Integer
+    Public Declare Function DTWAIN_SetSaveFileType Lib "dtwain32ud.dll" (Source As System.IntPtr, FileType As Integer) As Integer
     Public Declare Function DTWAIN_SetShadow Lib "dtwain32ud.dll" (Source As System.IntPtr, Shadow As System.Double) As Integer
     Public Declare Unicode Function DTWAIN_SetShadowString Lib "dtwain32ud.dll" (Source As System.IntPtr, Shadow As String) As Integer
     Public Declare Function DTWAIN_SetSourceUnit Lib "dtwain32ud.dll" (Source As System.IntPtr, Unit As Integer) As Integer

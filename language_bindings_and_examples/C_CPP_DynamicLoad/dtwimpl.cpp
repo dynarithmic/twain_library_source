@@ -688,6 +688,7 @@
     D_GETSAVEFILENAMEFUNC                         DYNDTWAIN_API::DTWAIN_GetSaveFileName = nullptr;
     D_GETSAVEFILENAMEAFUNC                        DYNDTWAIN_API::DTWAIN_GetSaveFileNameA = nullptr;
     D_GETSAVEFILENAMEWFUNC                        DYNDTWAIN_API::DTWAIN_GetSaveFileNameW = nullptr;
+    D_GETSAVEFILETYPEFUNC                         DYNDTWAIN_API::DTWAIN_GetSaveFileType = nullptr;
     D_GETSESSIONDETAILSFUNC                       DYNDTWAIN_API::DTWAIN_GetSessionDetails = nullptr;
     D_GETSESSIONDETAILSAFUNC                      DYNDTWAIN_API::DTWAIN_GetSessionDetailsA = nullptr;
     D_GETSESSIONDETAILSWFUNC                      DYNDTWAIN_API::DTWAIN_GetSessionDetailsW = nullptr;
@@ -1173,6 +1174,7 @@
     D_SETSAVEFILENAMEFUNC                         DYNDTWAIN_API::DTWAIN_SetSaveFileName = nullptr;
     D_SETSAVEFILENAMEAFUNC                        DYNDTWAIN_API::DTWAIN_SetSaveFileNameA = nullptr;
     D_SETSAVEFILENAMEWFUNC                        DYNDTWAIN_API::DTWAIN_SetSaveFileNameW = nullptr;
+    D_SETSAVEFILETYPEFUNC                         DYNDTWAIN_API::DTWAIN_SetSaveFileType = nullptr;
     D_SETSHADOWFUNC                               DYNDTWAIN_API::DTWAIN_SetShadow = nullptr;
     D_SETSHADOWSTRINGFUNC                         DYNDTWAIN_API::DTWAIN_SetShadowString = nullptr;
     D_SETSHADOWSTRINGAFUNC                        DYNDTWAIN_API::DTWAIN_SetShadowStringA = nullptr;
@@ -1925,6 +1927,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetSaveFileName, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSaveFileNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSaveFileNameW, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetSaveFileType, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSessionDetails, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSessionDetailsA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSessionDetailsW, hModule);
@@ -2410,6 +2413,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SetSaveFileName, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetSaveFileNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetSaveFileNameW, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_SetSaveFileType, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetShadow, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetShadowString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetShadowStringA, hModule);

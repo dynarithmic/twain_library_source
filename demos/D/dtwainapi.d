@@ -2564,6 +2564,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(DTWAIN_SOURCE, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetSaveFileName;
     extern(Windows) LONG function(DTWAIN_SOURCE, LPSTR, LONG) DTWAIN_GetSaveFileNameA;
     extern(Windows) LONG function(DTWAIN_SOURCE, LPWSTR, LONG) DTWAIN_GetSaveFileNameW;
+    extern(Windows) LONG function(DTWAIN_SOURCE) DTWAIN_GetSaveFileType;
     extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG, LONG, BOOL) DTWAIN_GetSessionDetails;
     extern(Windows) LONG function(LPSTR, LONG, LONG, BOOL) DTWAIN_GetSessionDetailsA;
     extern(Windows) LONG function(LPWSTR, LONG, LONG, BOOL) DTWAIN_GetSessionDetailsW;
@@ -3042,6 +3043,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CCHARPTRTYPE) DTWAIN_SetSaveFileName;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPCSTR) DTWAIN_SetSaveFileNameA;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPCWSTR) DTWAIN_SetSaveFileNameW;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetSaveFileType;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_FLOAT) DTWAIN_SetShadow;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CCHARPTRTYPE) DTWAIN_SetShadowString;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPCSTR) DTWAIN_SetShadowStringA;
@@ -3729,6 +3731,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetSaveFileName, "DTWAIN_GetSaveFileName");
         bindFunction(cast(void**)&DTWAIN_GetSaveFileNameA, "DTWAIN_GetSaveFileNameA");
         bindFunction(cast(void**)&DTWAIN_GetSaveFileNameW, "DTWAIN_GetSaveFileNameW");
+        bindFunction(cast(void**)&DTWAIN_GetSaveFileType, "DTWAIN_GetSaveFileType");
         bindFunction(cast(void**)&DTWAIN_GetSessionDetails, "DTWAIN_GetSessionDetails");
         bindFunction(cast(void**)&DTWAIN_GetSessionDetailsA, "DTWAIN_GetSessionDetailsA");
         bindFunction(cast(void**)&DTWAIN_GetSessionDetailsW, "DTWAIN_GetSessionDetailsW");
@@ -4207,6 +4210,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_SetSaveFileName, "DTWAIN_SetSaveFileName");
         bindFunction(cast(void**)&DTWAIN_SetSaveFileNameA, "DTWAIN_SetSaveFileNameA");
         bindFunction(cast(void**)&DTWAIN_SetSaveFileNameW, "DTWAIN_SetSaveFileNameW");
+        bindFunction(cast(void**)&DTWAIN_SetSaveFileType, "DTWAIN_SetSaveFileType");
         bindFunction(cast(void**)&DTWAIN_SetShadow, "DTWAIN_SetShadow");
         bindFunction(cast(void**)&DTWAIN_SetShadowString, "DTWAIN_SetShadowString");
         bindFunction(cast(void**)&DTWAIN_SetShadowStringA, "DTWAIN_SetShadowStringA");

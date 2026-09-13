@@ -681,6 +681,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETROTATIONSTRINGWFUNC)                   
 typedef LONG (DLLENTRY_DEF * D_GETSAVEFILENAMEFUNC)                             (DTWAIN_SOURCE, LPTSTR, LONG);
 typedef LONG (DLLENTRY_DEF * D_GETSAVEFILENAMEAFUNC)                            (DTWAIN_SOURCE, LPSTR, LONG);
 typedef LONG (DLLENTRY_DEF * D_GETSAVEFILENAMEWFUNC)                            (DTWAIN_SOURCE, LPWSTR, LONG);
+typedef LONG (DLLENTRY_DEF * D_GETSAVEFILETYPEFUNC)                             (DTWAIN_SOURCE);
 typedef LONG (DLLENTRY_DEF * D_GETSESSIONDETAILSFUNC)                           (LPTSTR, LONG, LONG, BOOL);
 typedef LONG (DLLENTRY_DEF * D_GETSESSIONDETAILSAFUNC)                          (LPSTR, LONG, LONG, BOOL);
 typedef LONG (DLLENTRY_DEF * D_GETSESSIONDETAILSWFUNC)                          (LPWSTR, LONG, LONG, BOOL);
@@ -1166,6 +1167,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETROTATIONSTRINGWFUNC)                   
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETSAVEFILENAMEFUNC)                      (DTWAIN_SOURCE, LPCTSTR);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETSAVEFILENAMEAFUNC)                     (DTWAIN_SOURCE, LPCSTR);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETSAVEFILENAMEWFUNC)                     (DTWAIN_SOURCE, LPCWSTR);
+typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETSAVEFILETYPEFUNC)                      (DTWAIN_SOURCE, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETSHADOWFUNC)                            (DTWAIN_SOURCE, DTWAIN_FLOAT);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETSHADOWSTRINGFUNC)                      (DTWAIN_SOURCE, LPCTSTR);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETSHADOWSTRINGAFUNC)                     (DTWAIN_SOURCE, LPCSTR);
@@ -1868,6 +1870,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_GETSAVEFILENAMEFUNC                            DTWAIN_GetSaveFileName;
     STATIC D_GETSAVEFILENAMEAFUNC                           DTWAIN_GetSaveFileNameA;
     STATIC D_GETSAVEFILENAMEWFUNC                           DTWAIN_GetSaveFileNameW;
+    STATIC D_GETSAVEFILETYPEFUNC                            DTWAIN_GetSaveFileType;
     STATIC D_GETSESSIONDETAILSFUNC                          DTWAIN_GetSessionDetails;
     STATIC D_GETSESSIONDETAILSAFUNC                         DTWAIN_GetSessionDetailsA;
     STATIC D_GETSESSIONDETAILSWFUNC                         DTWAIN_GetSessionDetailsW;
@@ -2353,6 +2356,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_SETSAVEFILENAMEFUNC                            DTWAIN_SetSaveFileName;
     STATIC D_SETSAVEFILENAMEAFUNC                           DTWAIN_SetSaveFileNameA;
     STATIC D_SETSAVEFILENAMEWFUNC                           DTWAIN_SetSaveFileNameW;
+    STATIC D_SETSAVEFILETYPEFUNC                            DTWAIN_SetSaveFileType;
     STATIC D_SETSHADOWFUNC                                  DTWAIN_SetShadow;
     STATIC D_SETSHADOWSTRINGFUNC                            DTWAIN_SetShadowString;
     STATIC D_SETSHADOWSTRINGAFUNC                           DTWAIN_SetShadowStringA;

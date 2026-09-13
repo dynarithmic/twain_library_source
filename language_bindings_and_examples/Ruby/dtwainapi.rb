@@ -775,6 +775,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetSaveFileName
    attr_reader :DTWAIN_GetSaveFileNameA
    attr_reader :DTWAIN_GetSaveFileNameW
+   attr_reader :DTWAIN_GetSaveFileType
    attr_reader :DTWAIN_GetSessionDetails
    attr_reader :DTWAIN_GetSessionDetailsA
    attr_reader :DTWAIN_GetSessionDetailsW
@@ -1258,6 +1259,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_SetSaveFileName
    attr_reader :DTWAIN_SetSaveFileNameA
    attr_reader :DTWAIN_SetSaveFileNameW
+   attr_reader :DTWAIN_SetSaveFileType
    attr_reader :DTWAIN_SetShadow
    attr_reader :DTWAIN_SetShadowString
    attr_reader :DTWAIN_SetShadowStringA
@@ -3650,6 +3652,7 @@ class DTWAINAPI
        @DTWAIN_GetSaveFileName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetSaveFileName'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetSaveFileNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetSaveFileNameA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetSaveFileNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetSaveFileNameW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetSaveFileType = Fiddle::Function::new(dtwain_dll['DTWAIN_GetSaveFileType'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetSessionDetails = Fiddle::Function::new(dtwain_dll['DTWAIN_GetSessionDetails'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_LONG)
        @DTWAIN_GetSessionDetailsA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetSessionDetailsA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_LONG)
        @DTWAIN_GetSessionDetailsW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetSessionDetailsW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_LONG)
@@ -4133,6 +4136,7 @@ class DTWAINAPI
        @DTWAIN_SetSaveFileName = Fiddle::Function::new(dtwain_dll['DTWAIN_SetSaveFileName'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SetSaveFileNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_SetSaveFileNameA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SetSaveFileNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_SetSaveFileNameW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_SetSaveFileType = Fiddle::Function::new(dtwain_dll['DTWAIN_SetSaveFileType'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetShadow = Fiddle::Function::new(dtwain_dll['DTWAIN_SetShadow'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_DOUBLE],Fiddle::TYPE_INT)
        @DTWAIN_SetShadowString = Fiddle::Function::new(dtwain_dll['DTWAIN_SetShadowString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SetShadowStringA = Fiddle::Function::new(dtwain_dll['DTWAIN_SetShadowStringA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)

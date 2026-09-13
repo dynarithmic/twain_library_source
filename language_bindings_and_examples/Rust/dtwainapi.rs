@@ -687,6 +687,7 @@ type DtwaingetrotationstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -
 type DtwaingetsavefilenameFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
 type DtwaingetsavefilenameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
 type DtwaingetsavefilenamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsavefiletypeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingetsessiondetailsFunc = unsafe extern "C" fn(*mut u16,i32,i32,i32) -> i32;
 type DtwaingetsessiondetailsaFunc = unsafe extern "C" fn(*mut c_char,i32,i32,i32) -> i32;
 type DtwaingetsessiondetailswFunc = unsafe extern "C" fn(*mut u16,i32,i32,i32) -> i32;
@@ -1170,6 +1171,7 @@ type DtwainsetrotationstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16)
 type DtwainsetsavefilenameFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
 type DtwainsetsavefilenameaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
 type DtwainsetsavefilenamewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetsavefiletypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainsetshadowFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
 type DtwainsetshadowstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
 type DtwainsetshadowstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
@@ -1859,6 +1861,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetSaveFileNameFunc: Symbol<'a, DtwaingetsavefilenameFunc>,
     DTWAIN_GetSaveFileNameAFunc: Symbol<'a, DtwaingetsavefilenameaFunc>,
     DTWAIN_GetSaveFileNameWFunc: Symbol<'a, DtwaingetsavefilenamewFunc>,
+    DTWAIN_GetSaveFileTypeFunc: Symbol<'a, DtwaingetsavefiletypeFunc>,
     DTWAIN_GetSessionDetailsFunc: Symbol<'a, DtwaingetsessiondetailsFunc>,
     DTWAIN_GetSessionDetailsAFunc: Symbol<'a, DtwaingetsessiondetailsaFunc>,
     DTWAIN_GetSessionDetailsWFunc: Symbol<'a, DtwaingetsessiondetailswFunc>,
@@ -2342,6 +2345,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_SetSaveFileNameFunc: Symbol<'a, DtwainsetsavefilenameFunc>,
     DTWAIN_SetSaveFileNameAFunc: Symbol<'a, DtwainsetsavefilenameaFunc>,
     DTWAIN_SetSaveFileNameWFunc: Symbol<'a, DtwainsetsavefilenamewFunc>,
+    DTWAIN_SetSaveFileTypeFunc: Symbol<'a, DtwainsetsavefiletypeFunc>,
     DTWAIN_SetShadowFunc: Symbol<'a, DtwainsetshadowFunc>,
     DTWAIN_SetShadowStringFunc: Symbol<'a, DtwainsetshadowstringFunc>,
     DTWAIN_SetShadowStringAFunc: Symbol<'a, DtwainsetshadowstringaFunc>,
@@ -4698,6 +4702,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetSaveFileName: Symbol<DtwaingetsavefilenameFunc> = unsafe { library.get(b"DTWAIN_GetSaveFileName")? };
         let DTWAIN_GetSaveFileNameA: Symbol<DtwaingetsavefilenameaFunc> = unsafe { library.get(b"DTWAIN_GetSaveFileNameA")? };
         let DTWAIN_GetSaveFileNameW: Symbol<DtwaingetsavefilenamewFunc> = unsafe { library.get(b"DTWAIN_GetSaveFileNameW")? };
+        let DTWAIN_GetSaveFileType: Symbol<DtwaingetsavefiletypeFunc> = unsafe { library.get(b"DTWAIN_GetSaveFileType")? };
         let DTWAIN_GetSessionDetails: Symbol<DtwaingetsessiondetailsFunc> = unsafe { library.get(b"DTWAIN_GetSessionDetails")? };
         let DTWAIN_GetSessionDetailsA: Symbol<DtwaingetsessiondetailsaFunc> = unsafe { library.get(b"DTWAIN_GetSessionDetailsA")? };
         let DTWAIN_GetSessionDetailsW: Symbol<DtwaingetsessiondetailswFunc> = unsafe { library.get(b"DTWAIN_GetSessionDetailsW")? };
@@ -5181,6 +5186,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_SetSaveFileName: Symbol<DtwainsetsavefilenameFunc> = unsafe { library.get(b"DTWAIN_SetSaveFileName")? };
         let DTWAIN_SetSaveFileNameA: Symbol<DtwainsetsavefilenameaFunc> = unsafe { library.get(b"DTWAIN_SetSaveFileNameA")? };
         let DTWAIN_SetSaveFileNameW: Symbol<DtwainsetsavefilenamewFunc> = unsafe { library.get(b"DTWAIN_SetSaveFileNameW")? };
+        let DTWAIN_SetSaveFileType: Symbol<DtwainsetsavefiletypeFunc> = unsafe { library.get(b"DTWAIN_SetSaveFileType")? };
         let DTWAIN_SetShadow: Symbol<DtwainsetshadowFunc> = unsafe { library.get(b"DTWAIN_SetShadow")? };
         let DTWAIN_SetShadowString: Symbol<DtwainsetshadowstringFunc> = unsafe { library.get(b"DTWAIN_SetShadowString")? };
         let DTWAIN_SetShadowStringA: Symbol<DtwainsetshadowstringaFunc> = unsafe { library.get(b"DTWAIN_SetShadowStringA")? };
@@ -5869,6 +5875,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetSaveFileNameFunc: DTWAIN_GetSaveFileName,
             DTWAIN_GetSaveFileNameAFunc: DTWAIN_GetSaveFileNameA,
             DTWAIN_GetSaveFileNameWFunc: DTWAIN_GetSaveFileNameW,
+            DTWAIN_GetSaveFileTypeFunc: DTWAIN_GetSaveFileType,
             DTWAIN_GetSessionDetailsFunc: DTWAIN_GetSessionDetails,
             DTWAIN_GetSessionDetailsAFunc: DTWAIN_GetSessionDetailsA,
             DTWAIN_GetSessionDetailsWFunc: DTWAIN_GetSessionDetailsW,
@@ -6352,6 +6359,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_SetSaveFileNameFunc: DTWAIN_SetSaveFileName,
             DTWAIN_SetSaveFileNameAFunc: DTWAIN_SetSaveFileNameA,
             DTWAIN_SetSaveFileNameWFunc: DTWAIN_SetSaveFileNameW,
+            DTWAIN_SetSaveFileTypeFunc: DTWAIN_SetSaveFileType,
             DTWAIN_SetShadowFunc: DTWAIN_SetShadow,
             DTWAIN_SetShadowStringFunc: DTWAIN_SetShadowString,
             DTWAIN_SetShadowStringAFunc: DTWAIN_SetShadowStringA,
@@ -8963,6 +8971,10 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetSaveFileNameWFunc)(Source, fName, nMaxLen);  }
     }
 
+    pub fn DTWAIN_GetSaveFileType(&self, Source: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_GetSaveFileTypeFunc)(Source);  }
+    }
+
     pub fn DTWAIN_GetSessionDetails(&self, szBuf: *mut u16, nSize: i32, indentFactor: i32, bRefresh: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetSessionDetailsFunc)(szBuf, nSize, indentFactor, bRefresh);  }
     }
@@ -10893,6 +10905,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_SetSaveFileNameW(&self, Source: *mut c_void, fName: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetSaveFileNameWFunc)(Source, fName);  }
+    }
+
+    pub fn DTWAIN_SetSaveFileType(&self, Source: *mut c_void, FileType: i32) -> i32 {
+        unsafe { return (self.DTWAIN_SetSaveFileTypeFunc)(Source, FileType);  }
     }
 
     pub fn DTWAIN_SetShadow(&self, Source: *mut c_void, Shadow: f64) -> i32 {

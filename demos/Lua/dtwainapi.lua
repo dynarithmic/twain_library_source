@@ -716,6 +716,7 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE fName, LONG nMaxLen);
         LONG DTWAIN_GetSaveFileNameA(DTWAIN_SOURCE Source, LPSTR fName, LONG nMaxLen);
         LONG DTWAIN_GetSaveFileNameW(DTWAIN_SOURCE Source, LPWSTR fName, LONG nMaxLen);
+        LONG DTWAIN_GetSaveFileType(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetSessionDetails(DTWAIN_CHARPTRTYPE szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
         LONG DTWAIN_GetSessionDetailsA(LPSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
         LONG DTWAIN_GetSessionDetailsW(LPWSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
@@ -1197,6 +1198,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetSaveFileName(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE fName);
         DTWAIN_BOOL DTWAIN_SetSaveFileNameA(DTWAIN_SOURCE Source, LPCSTR fName);
         DTWAIN_BOOL DTWAIN_SetSaveFileNameW(DTWAIN_SOURCE Source, LPCWSTR fName);
+        DTWAIN_BOOL DTWAIN_SetSaveFileType(DTWAIN_SOURCE Source, LONG FileType);
         DTWAIN_BOOL DTWAIN_SetShadow(DTWAIN_SOURCE Source, DTWAIN_FLOAT Shadow);
         DTWAIN_BOOL DTWAIN_SetShadowString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Shadow);
         DTWAIN_BOOL DTWAIN_SetShadowStringA(DTWAIN_SOURCE Source, LPCSTR Shadow);
@@ -1943,6 +1945,7 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE fName, LONG nMaxLen);
         LONG DTWAIN_GetSaveFileNameA(DTWAIN_SOURCE Source, LPSTR fName, LONG nMaxLen);
         LONG DTWAIN_GetSaveFileNameW(DTWAIN_SOURCE Source, LPWSTR fName, LONG nMaxLen);
+        LONG DTWAIN_GetSaveFileType(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetSessionDetails(DTWAIN_CHARPTRTYPE szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
         LONG DTWAIN_GetSessionDetailsA(LPSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
         LONG DTWAIN_GetSessionDetailsW(LPWSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
@@ -2424,6 +2427,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetSaveFileName(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE fName);
         DTWAIN_BOOL DTWAIN_SetSaveFileNameA(DTWAIN_SOURCE Source, LPCSTR fName);
         DTWAIN_BOOL DTWAIN_SetSaveFileNameW(DTWAIN_SOURCE Source, LPCWSTR fName);
+        DTWAIN_BOOL DTWAIN_SetSaveFileType(DTWAIN_SOURCE Source, LONG FileType);
         DTWAIN_BOOL DTWAIN_SetShadow(DTWAIN_SOURCE Source, DTWAIN_FLOAT Shadow);
         DTWAIN_BOOL DTWAIN_SetShadowString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Shadow);
         DTWAIN_BOOL DTWAIN_SetShadowStringA(DTWAIN_SOURCE Source, LPCSTR Shadow);
@@ -3170,6 +3174,7 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE fName, LONG nMaxLen);
         LONG DTWAIN_GetSaveFileNameA(DTWAIN_SOURCE Source, LPSTR fName, LONG nMaxLen);
         LONG DTWAIN_GetSaveFileNameW(DTWAIN_SOURCE Source, LPWSTR fName, LONG nMaxLen);
+        LONG DTWAIN_GetSaveFileType(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetSessionDetails(DTWAIN_CHARPTRTYPE szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
         LONG DTWAIN_GetSessionDetailsA(LPSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
         LONG DTWAIN_GetSessionDetailsW(LPWSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
@@ -3651,6 +3656,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetSaveFileName(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE fName);
         DTWAIN_BOOL DTWAIN_SetSaveFileNameA(DTWAIN_SOURCE Source, LPCSTR fName);
         DTWAIN_BOOL DTWAIN_SetSaveFileNameW(DTWAIN_SOURCE Source, LPCWSTR fName);
+        DTWAIN_BOOL DTWAIN_SetSaveFileType(DTWAIN_SOURCE Source, LONG FileType);
         DTWAIN_BOOL DTWAIN_SetShadow(DTWAIN_SOURCE Source, DTWAIN_FLOAT Shadow);
         DTWAIN_BOOL DTWAIN_SetShadowString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Shadow);
         DTWAIN_BOOL DTWAIN_SetShadowStringA(DTWAIN_SOURCE Source, LPCSTR Shadow);
@@ -4397,6 +4403,7 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE fName, LONG nMaxLen);
         LONG DTWAIN_GetSaveFileNameA(DTWAIN_SOURCE Source, LPSTR fName, LONG nMaxLen);
         LONG DTWAIN_GetSaveFileNameW(DTWAIN_SOURCE Source, LPWSTR fName, LONG nMaxLen);
+        LONG DTWAIN_GetSaveFileType(DTWAIN_SOURCE Source);
         LONG DTWAIN_GetSessionDetails(DTWAIN_CHARPTRTYPE szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
         LONG DTWAIN_GetSessionDetailsA(LPSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
         LONG DTWAIN_GetSessionDetailsW(LPWSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh);
@@ -4878,6 +4885,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetSaveFileName(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE fName);
         DTWAIN_BOOL DTWAIN_SetSaveFileNameA(DTWAIN_SOURCE Source, LPCSTR fName);
         DTWAIN_BOOL DTWAIN_SetSaveFileNameW(DTWAIN_SOURCE Source, LPCWSTR fName);
+        DTWAIN_BOOL DTWAIN_SetSaveFileType(DTWAIN_SOURCE Source, LONG FileType);
         DTWAIN_BOOL DTWAIN_SetShadow(DTWAIN_SOURCE Source, DTWAIN_FLOAT Shadow);
         DTWAIN_BOOL DTWAIN_SetShadowString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE Shadow);
         DTWAIN_BOOL DTWAIN_SetShadowStringA(DTWAIN_SOURCE Source, LPCSTR Shadow);

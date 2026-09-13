@@ -2258,6 +2258,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetRotationEx Lib "dtwain32.dll" (Source As System.IntPtr) As System.Double
     Public Declare Ansi Function DTWAIN_GetRotationString Lib "dtwain32.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Rotation As StringBuilder) As Integer
     Public Declare Ansi Function DTWAIN_GetSaveFileName Lib "dtwain32.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> fName As StringBuilder, nMaxLen As Integer) As Integer
+    Public Declare Function DTWAIN_GetSaveFileType Lib "dtwain32.dll" (Source As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_GetSessionDetails Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPStr)> szBuf As StringBuilder, nSize As Integer, indentFactor As Integer, bRefresh As Integer) As Integer
     Public Declare Function DTWAIN_GetShadow Lib "dtwain32.dll" (Source As System.IntPtr, ByRef Shadow As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_GetShadowString Lib "dtwain32.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Shadow As StringBuilder) As Integer
@@ -2593,6 +2594,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_SetRotation Lib "dtwain32.dll" (Source As System.IntPtr, Rotation As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_SetRotationString Lib "dtwain32.dll" (Source As System.IntPtr, Rotation As String) As Integer
     Public Declare Ansi Function DTWAIN_SetSaveFileName Lib "dtwain32.dll" (Source As System.IntPtr, fName As String) As Integer
+    Public Declare Function DTWAIN_SetSaveFileType Lib "dtwain32.dll" (Source As System.IntPtr, FileType As Integer) As Integer
     Public Declare Function DTWAIN_SetShadow Lib "dtwain32.dll" (Source As System.IntPtr, Shadow As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_SetShadowString Lib "dtwain32.dll" (Source As System.IntPtr, Shadow As String) As Integer
     Public Declare Function DTWAIN_SetSourceUnit Lib "dtwain32.dll" (Source As System.IntPtr, Unit As Integer) As Integer

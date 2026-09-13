@@ -2462,6 +2462,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetSaveFileName.restype = ct.c_long
      theDLL.DTWAIN_GetSaveFileNameA.restype = ct.c_long
      theDLL.DTWAIN_GetSaveFileNameW.restype = ct.c_long
+     theDLL.DTWAIN_GetSaveFileType.restype = ct.c_long
      theDLL.DTWAIN_GetSessionDetails.restype = ct.c_long
      theDLL.DTWAIN_GetSessionDetailsA.restype = ct.c_long
      theDLL.DTWAIN_GetSessionDetailsW.restype = ct.c_long
@@ -2945,6 +2946,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetSaveFileName.restype = ct.c_long
      theDLL.DTWAIN_SetSaveFileNameA.restype = ct.c_long
      theDLL.DTWAIN_SetSaveFileNameW.restype = ct.c_long
+     theDLL.DTWAIN_SetSaveFileType.restype = ct.c_long
      theDLL.DTWAIN_SetShadow.restype = ct.c_long
      theDLL.DTWAIN_SetShadowString.restype = ct.c_long
      theDLL.DTWAIN_SetShadowStringA.restype = ct.c_long
@@ -3610,6 +3612,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetSaveFileName.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetSaveFileNameA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetSaveFileNameW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long]
+     theDLL.DTWAIN_GetSaveFileType.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetSessionDetails.argtypes = [ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_long]
      theDLL.DTWAIN_GetSessionDetailsA.argtypes = [ct.c_char_p, ct.c_long, ct.c_long, ct.c_long]
      theDLL.DTWAIN_GetSessionDetailsW.argtypes = [ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_long]
@@ -4076,6 +4079,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetSaveFileName.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_SetSaveFileNameA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetSaveFileNameW.argtypes = [ct.c_void_p, ct.c_wchar_p]
+     theDLL.DTWAIN_SetSaveFileType.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_SetShadow.argtypes = [ct.c_void_p, ct.c_double]
      theDLL.DTWAIN_SetShadowString.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_SetShadowStringA.argtypes = [ct.c_void_p, ct.c_char_p]
@@ -4776,6 +4780,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetSaveFileName.restype = ct.c_long
      theDLL.DTWAIN_GetSaveFileNameA.restype = ct.c_long
      theDLL.DTWAIN_GetSaveFileNameW.restype = ct.c_long
+     theDLL.DTWAIN_GetSaveFileType.restype = ct.c_long
      theDLL.DTWAIN_GetSessionDetails.restype = ct.c_long
      theDLL.DTWAIN_GetSessionDetailsA.restype = ct.c_long
      theDLL.DTWAIN_GetSessionDetailsW.restype = ct.c_long
@@ -5259,6 +5264,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetSaveFileName.restype = ct.c_long
      theDLL.DTWAIN_SetSaveFileNameA.restype = ct.c_long
      theDLL.DTWAIN_SetSaveFileNameW.restype = ct.c_long
+     theDLL.DTWAIN_SetSaveFileType.restype = ct.c_long
      theDLL.DTWAIN_SetShadow.restype = ct.c_long
      theDLL.DTWAIN_SetShadowString.restype = ct.c_long
      theDLL.DTWAIN_SetShadowStringA.restype = ct.c_long
@@ -5924,6 +5930,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetSaveFileName.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetSaveFileNameA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetSaveFileNameW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long]
+     theDLL.DTWAIN_GetSaveFileType.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetSessionDetails.argtypes = [ct.c_char_p, ct.c_long, ct.c_long, ct.c_long]
      theDLL.DTWAIN_GetSessionDetailsA.argtypes = [ct.c_char_p, ct.c_long, ct.c_long, ct.c_long]
      theDLL.DTWAIN_GetSessionDetailsW.argtypes = [ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_long]
@@ -6390,6 +6397,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetSaveFileName.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetSaveFileNameA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetSaveFileNameW.argtypes = [ct.c_void_p, ct.c_wchar_p]
+     theDLL.DTWAIN_SetSaveFileType.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_SetShadow.argtypes = [ct.c_void_p, ct.c_double]
      theDLL.DTWAIN_SetShadowString.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetShadowStringA.argtypes = [ct.c_void_p, ct.c_char_p]

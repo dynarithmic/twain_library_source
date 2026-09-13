@@ -3351,6 +3351,9 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetSaveFileNameDelegate = delegate of DTWAIN_SOURCE * System.Text.StringBuilder * LONG -> LONG
 
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetSaveFileTypeDelegate = delegate of DTWAIN_SOURCE -> LONG
+
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetSessionDetailsDelegate = delegate of System.Text.StringBuilder * LONG * LONG * BOOL -> LONG
 
@@ -4348,6 +4351,9 @@ module TwainAPI =
     type DTWAIN_SetSaveFileNameDelegate = delegate of DTWAIN_SOURCE * string -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_SetSaveFileTypeDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SetShadowDelegate = delegate of DTWAIN_SOURCE * DTWAIN_FLOAT -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
@@ -4928,6 +4934,7 @@ module TwainAPI =
     let private GetRotationEx = lazy (DynamicDll.Bind "DTWAIN_GetRotationEx" : DTWAIN_GetRotationExDelegate)
     let private GetRotationString = lazy (DynamicDll.Bind "DTWAIN_GetRotationString" : DTWAIN_GetRotationStringDelegate)
     let private GetSaveFileName = lazy (DynamicDll.Bind "DTWAIN_GetSaveFileName" : DTWAIN_GetSaveFileNameDelegate)
+    let private GetSaveFileType = lazy (DynamicDll.Bind "DTWAIN_GetSaveFileType" : DTWAIN_GetSaveFileTypeDelegate)
     let private GetSessionDetails = lazy (DynamicDll.Bind "DTWAIN_GetSessionDetails" : DTWAIN_GetSessionDetailsDelegate)
     let private GetShadow = lazy (DynamicDll.Bind "DTWAIN_GetShadow" : DTWAIN_GetShadowDelegate)
     let private GetShadowString = lazy (DynamicDll.Bind "DTWAIN_GetShadowString" : DTWAIN_GetShadowStringDelegate)
@@ -5260,6 +5267,7 @@ module TwainAPI =
     let private SetRotation = lazy (DynamicDll.Bind "DTWAIN_SetRotation" : DTWAIN_SetRotationDelegate)
     let private SetRotationString = lazy (DynamicDll.Bind "DTWAIN_SetRotationString" : DTWAIN_SetRotationStringDelegate)
     let private SetSaveFileName = lazy (DynamicDll.Bind "DTWAIN_SetSaveFileName" : DTWAIN_SetSaveFileNameDelegate)
+    let private SetSaveFileType = lazy (DynamicDll.Bind "DTWAIN_SetSaveFileType" : DTWAIN_SetSaveFileTypeDelegate)
     let private SetShadow = lazy (DynamicDll.Bind "DTWAIN_SetShadow" : DTWAIN_SetShadowDelegate)
     let private SetShadowString = lazy (DynamicDll.Bind "DTWAIN_SetShadowString" : DTWAIN_SetShadowStringDelegate)
     let private SetSourceUnit = lazy (DynamicDll.Bind "DTWAIN_SetSourceUnit" : DTWAIN_SetSourceUnitDelegate)
@@ -7278,6 +7286,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetSaveFileName.Value.Invoke(source, fname, nmaxlen)
 
+    let DTWAIN_GetSaveFileType (source: DTWAIN_SOURCE) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetSaveFileType.Value.Invoke(source)
+
     let DTWAIN_GetSessionDetails (szbuf: System.Text.StringBuilder) (nsize: LONG) (indentfactor: LONG) (brefresh: BOOL) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetSessionDetails.Value.Invoke(szbuf, nsize, indentfactor, brefresh)
@@ -8605,6 +8617,10 @@ module TwainAPI =
     let DTWAIN_SetSaveFileName (source: DTWAIN_SOURCE) (fname: string) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SetSaveFileName.Value.Invoke(source, fname)
+
+    let DTWAIN_SetSaveFileType (source: DTWAIN_SOURCE) (filetype: LONG) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        SetSaveFileType.Value.Invoke(source, filetype)
 
     let DTWAIN_SetShadow (source: DTWAIN_SOURCE) (shadow: DTWAIN_FLOAT) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

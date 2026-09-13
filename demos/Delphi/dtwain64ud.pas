@@ -2500,6 +2500,7 @@ function DTWAIN_GetRotationStringW(Source:DTWAIN_SOURCE; Rotation:LPWSTR) : BOOL
 function DTWAIN_GetSaveFileName(Source:DTWAIN_SOURCE; fName:LPTSTR; nMaxLen:LONG) : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_GetSaveFileName';
 function DTWAIN_GetSaveFileNameA(Source:DTWAIN_SOURCE; fName:LPSTR; nMaxLen:LONG) : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_GetSaveFileNameA';
 function DTWAIN_GetSaveFileNameW(Source:DTWAIN_SOURCE; fName:LPWSTR; nMaxLen:LONG) : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_GetSaveFileNameW';
+function DTWAIN_GetSaveFileType(Source:DTWAIN_SOURCE) : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_GetSaveFileType';
 function DTWAIN_GetSessionDetails(szBuf:LPTSTR; nSize:LONG; indentFactor:LONG; bRefresh:BOOL) : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_GetSessionDetails';
 function DTWAIN_GetSessionDetailsA(szBuf:LPSTR; nSize:LONG; indentFactor:LONG; bRefresh:BOOL) : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_GetSessionDetailsA';
 function DTWAIN_GetSessionDetailsW(szBuf:LPWSTR; nSize:LONG; indentFactor:LONG; bRefresh:BOOL) : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_GetSessionDetailsW';
@@ -2985,6 +2986,7 @@ function DTWAIN_SetRotationStringW(Source:DTWAIN_SOURCE; Rotation:LPCWSTR) : BOO
 function DTWAIN_SetSaveFileName(Source:DTWAIN_SOURCE; fName:LPCTSTR) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetSaveFileName';
 function DTWAIN_SetSaveFileNameA(Source:DTWAIN_SOURCE; fName:LPCSTR) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetSaveFileNameA';
 function DTWAIN_SetSaveFileNameW(Source:DTWAIN_SOURCE; fName:LPCWSTR) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetSaveFileNameW';
+function DTWAIN_SetSaveFileType(Source:DTWAIN_SOURCE; FileType:LONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetSaveFileType';
 function DTWAIN_SetShadow(Source:DTWAIN_SOURCE; Shadow:DTWAIN_FLOAT) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetShadow';
 function DTWAIN_SetShadowString(Source:DTWAIN_SOURCE; Shadow:LPCTSTR) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetShadowString';
 function DTWAIN_SetShadowStringA(Source:DTWAIN_SOURCE; Shadow:LPCSTR) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetShadowStringA';
