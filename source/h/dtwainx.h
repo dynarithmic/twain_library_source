@@ -1079,6 +1079,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetMajorMinorVersion(LPDWORD nMajor, LPDWORD nMi
 /* Get the pending image transfer count */
 LONG DLLENTRY_DEF DTWAIN_GetPendingXferCount(DTWAIN_SOURCE source);
 
+/* Set the file save type (only available for single page file types) */
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetSaveFileType(DTWAIN_SOURCE Source, LONG FileType);
+LONG DLLENTRY_DEF DTWAIN_GetSaveFileType(DTWAIN_SOURCE Source);
+
 #ifdef __cplusplus
 }
 #endif

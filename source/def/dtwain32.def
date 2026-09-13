@@ -1181,3 +1181,5 @@ DTWAIN_GetCurrentCustomResourceNameA              @1173
 DTWAIN_GetCurrentCustomResourceNameW              @1174 
 DTWAIN_GetLastCapEnumIndices                      @1175
 DTWAIN_GetPendingXferCount                        @1176
+DTWAIN_SetSaveFileType                            @1177
+DTWAIN_GetSaveFileType                            @1178
