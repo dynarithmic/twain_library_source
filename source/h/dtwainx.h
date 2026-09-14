@@ -1083,6 +1083,9 @@ LONG DLLENTRY_DEF DTWAIN_GetPendingXferCount(DTWAIN_SOURCE source);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetSaveFileType(DTWAIN_SOURCE Source, LONG FileType);
 LONG DLLENTRY_DEF DTWAIN_GetSaveFileType(DTWAIN_SOURCE Source);
 
+/* Get document info (document number, page number, frame number */
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageLayoutInfo(DTWAIN_SOURCE Source, LONG lGetType, LPLONG DocumentNumber, LPLONG PageNumber, LPLONG FrameNumber);
+
 #ifdef __cplusplus
 }
 #endif

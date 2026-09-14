@@ -245,4 +245,26 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageLayoutInfo(DTWAIN_SOURCE Source, LONG lGetType, LPLONG DocumentNumber, 
+                                                       LPLONG PageNumber, LPLONG FrameNumber)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, lGetType, DocumentNumber, PageNumber, FrameNumber))
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+        CTL_RealArray Array;
+        const bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(pSource, Array, lGetType);
+        if ( bOk )
+        {
+            if (DocumentNumber)
+                *DocumentNumber = static_cast<LONG>(Array[CTL_EnumLayoutComponents::LAYOUT_DOCUMENTNUMBER]);
+            if (PageNumber)
+                *PageNumber = static_cast<LONG>(Array[CTL_EnumLayoutComponents::LAYOUT_PAGENUMBER]);
+            if (FrameNumber)
+                *FrameNumber = static_cast<LONG>(Array[CTL_EnumLayoutComponents::LAYOUT_FRAMENUMBER]);
+            LOG_FUNC_EXIT_DEREFERENCE_POINTERS((DocumentNumber, PageNumber, FrameNumber))
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
 }

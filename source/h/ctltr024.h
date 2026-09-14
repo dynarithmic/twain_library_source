@@ -99,6 +99,7 @@ namespace dynarithmic
     };
 
     using CTL_GetImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_GET>;
+    using CTL_GetCurrentImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_GETCURRENT>;
     using CTL_GetDefaultImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_GETDEFAULT>;
     using CTL_SetImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_SET>;
     using CTL_ResetImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_RESET>;

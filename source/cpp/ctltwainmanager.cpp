@@ -457,10 +457,14 @@ namespace
     template <typename LayoutTriplet>
     void GetLayoutComponents(LayoutTriplet* LayoutTrip, CTL_RealArray& rArray)
     {
-        rArray.push_back(LayoutTrip->GetLeft());
-        rArray.push_back(LayoutTrip->GetTop());
-        rArray.push_back(LayoutTrip->GetRight());
-        rArray.push_back(LayoutTrip->GetBottom());
+        rArray.resize(CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS);
+        rArray[CTL_EnumLayoutComponents::LAYOUT_LEFT] = LayoutTrip->GetLeft();
+        rArray[CTL_EnumLayoutComponents::LAYOUT_TOP] = LayoutTrip->GetTop();
+        rArray[CTL_EnumLayoutComponents::LAYOUT_RIGHT] = LayoutTrip->GetRight();
+        rArray[CTL_EnumLayoutComponents::LAYOUT_BOTTOM] = LayoutTrip->GetBottom();
+        rArray[CTL_EnumLayoutComponents::LAYOUT_DOCUMENTNUMBER] = LayoutTrip->GetDocumentNumber();
+        rArray[CTL_EnumLayoutComponents::LAYOUT_FRAMENUMBER] = LayoutTrip->GetFrameNumber();
+        rArray[CTL_EnumLayoutComponents::LAYOUT_PAGENUMBER] = LayoutTrip->GetPageNumber();
     }
 }
 
@@ -474,6 +478,9 @@ bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_Re
     if (GetType == MSG_GET)
         layOutTriplet = std::make_unique<CTL_GetImageLayoutTriplet>(pSession, pTempSource);
     else
+    if ( GetType == MSG_GETCURRENT)
+        layOutTriplet = std::make_unique<CTL_GetCurrentImageLayoutTriplet>(pSession, pTempSource);
+    else
         layOutTriplet = std::make_unique<CTL_GetDefaultImageLayoutTriplet>(pSession, pTempSource);
 
     const TW_UINT16 rc = layOutTriplet->Execute();
@@ -481,6 +488,9 @@ bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_Re
     {
         if ( GetType == MSG_GET )
             GetLayoutComponents(static_cast<CTL_GetImageLayoutTriplet*>(layOutTriplet.get()), rArray);
+        else
+        if ( GetType == MSG_GETCURRENT)    
+            GetLayoutComponents(static_cast<CTL_GetCurrentImageLayoutTriplet*>(layOutTriplet.get()), rArray);
         else
             GetLayoutComponents(static_cast<CTL_GetDefaultImageLayoutTriplet*>(layOutTriplet.get()), rArray);
         return true;

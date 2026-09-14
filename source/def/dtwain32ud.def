@@ -1179,3 +1179,5 @@ DTWAIN_GetLastCapEnumIndices                      @1175
 DTWAIN_GetPendingXferCount                        @1176
 DTWAIN_SetSaveFileType                            @1177
 DTWAIN_GetSaveFileType                            @1178
+DTWAIN_GetImageLayoutInfo                         @1179
+
