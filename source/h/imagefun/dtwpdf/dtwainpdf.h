@@ -40,9 +40,9 @@
 namespace dynarithmic
 {
     using MediaBoxMap = CTL_PDFMediaMap;
-    using FontRefToFontInfoMap = std::map< unsigned int, PDFFont>;
-    using FontNameToFontInfoMap = std::map< std::string, PDFFont>;
-    using FontNumberToFontInfoMap = std::map< unsigned int, PDFFont>;
+    using FontRefToFontInfoMap = BASIC_MAPTYPE_< unsigned int, PDFFont>;
+    using FontNameToFontInfoMap = BASIC_MAPTYPE_< std::string, PDFFont>;
+    using FontNumberToFontInfoMap = BASIC_MAPTYPE_< unsigned int, PDFFont>;
     using StringSet = std::set< std::string >;
     using StringVector = std::vector< std::string >;
 
@@ -143,8 +143,8 @@ namespace dynarithmic
             double m_yscale;
     };
 
-    using CRCMapToObj = std::map<unsigned long, unsigned long>;
-    using CRCMapToPage = std::map<unsigned long, unsigned long>;
+    using CRCMapToObj = BASIC_MAPTYPE_<unsigned long, unsigned long>;
+    using CRCMapToPage = BASIC_MAPTYPE_<unsigned long, unsigned long>;
 
     class ImageObject : public PDFObject
     {

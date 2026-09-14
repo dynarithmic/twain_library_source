@@ -32,6 +32,8 @@
 #include "windowsinit_impl.h"
 #include "ctltwainlogging.h"
 #include "dtwainx.h"
+#include "twain.h"
+#include "ctltr019.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -66,6 +68,15 @@ namespace
         // utilize only user-defined acquisition array
         pSource->ResetAcquisitionAttempts(nullptr);
         return bRet;
+    }
+
+    TW_UINT16 GetXferCount(CTL_ITwainSource *pSource)
+    {
+        CTL_ImagePendingTriplet Pending(pSource->GetTwainSession(), pSource, MSG_GET);
+        const TW_UINT16 rc = Pending.Execute();
+        if (rc == TWRC_SUCCESS)
+            return Pending.GetPendingXferBuffer()->Count;
+        return 0;
     }
 }
 
@@ -148,6 +159,15 @@ extern "C"
         const bool Ret = CTL_TwainAppMgr::IsMemFileTransferSupported(pSource);
         LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
         CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetPendingXferCount(DTWAIN_SOURCE Source)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        auto nCount = GetXferCount(pSource);
+        LOG_FUNC_EXIT_NONAME_PARAMS(nCount)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE2)
     }
 }
 
@@ -539,7 +559,6 @@ namespace dynarithmic
         AcquireAttemptRAII aRaii(pSource);
         auto& actualOpts = pSource->GetAcquireOptions();
         actualOpts = {};
-
         actualOpts.setHandle(pSource->GetDTWAINHandle()).
             setSource(pSource->GetDTWAINSource()).
             setPixelType(PixelType).

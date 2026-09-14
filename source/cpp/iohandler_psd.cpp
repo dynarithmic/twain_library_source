@@ -25,30 +25,32 @@
 
 using namespace dynarithmic;
 
-static bool WriteOneDibHandleToPsd(const std::wstring& filename, const PsdSessionOptions& options, HANDLE hDib)
+namespace
 {
-    LockedDibPage lockedPage(hDib);
-    if (!lockedPage.IsValid())
-        return false;
+    bool WriteOneDibHandleToPsd(const std::wstring& filename, const PsdSessionOptions& options, HANDLE hDib)
+    {
+        LockedDibPage lockedPage(hDib);
+        if (!lockedPage.IsValid())
+            return false;
 
-    PsdSessionWriter writer;
-    if (!writer.Open(filename, options))
-        return false;
+        PsdSessionWriter writer;
+        if (!writer.Open(filename, options))
+            return false;
 
-    auto pageInfo = PsdSessionWriter::MakePreparedPsdDibPage(lockedPage.GetView());
-    if (!pageInfo.has_value())
-        return false;
+        auto pageInfo = PsdSessionWriter::MakePreparedPsdDibPage(lockedPage.GetView());
+        if (!pageInfo.has_value())
+            return false;
 
-    if (!writer.SetPageInfo(pageInfo.value()))
-        return false;
+        if (!writer.SetPageInfo(pageInfo.value()))
+            return false;
 
-    if (!writer.WriteCurrentPage())
-        return false;
+        if (!writer.WriteCurrentPage())
+            return false;
 
-    writer.Close();
-    return true;
+        writer.Close();
+        return true;
+    }
 }
-
 
 int CTL_PsdIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {

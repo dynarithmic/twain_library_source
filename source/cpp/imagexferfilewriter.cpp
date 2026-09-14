@@ -556,7 +556,7 @@ void ImageXferFileWriter::ManualDuplexCleanUp(CTL_StringViewType strFile/* = ""*
     CTL_TwainDib Dib;
     int nStatus;
     // Clean up by officially closing out the multi-page processing
-    Dib.WriteLastPageDibMulti(m_pSource->GetImageHandlerPtr(), nStatus);
+    CTL_TwainDib::WriteLastPageDibMulti(m_pSource->GetImageHandlerPtr(), nStatus);
 
     if ( nStatus != 0 )
         SendFileAcquireError(m_pSource, m_pSession, nStatus, DTWAIN_TN_FILESAVEERROR,

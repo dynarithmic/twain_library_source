@@ -579,6 +579,7 @@ type DtwaingetimageinfoFunc = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64
 type DtwaingetimageinfostringFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
 type DtwaingetimageinfostringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
 type DtwaingetimageinfostringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
+type DtwaingetimagelayoutinfoFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,*mut i32,*mut i32) -> i32;
 type DtwaingetjobcontrolFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
 type DtwaingetjobcontrolexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwaingetjpegvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
@@ -656,6 +657,7 @@ type DtwaingetpatchcodemaxretriesFunc = unsafe extern "C" fn(*mut c_void,*mut u3
 type DtwaingetpatchcodeprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwaingetpatchcodesearchmodeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
 type DtwaingetpatchcodetimeoutFunc = unsafe extern "C" fn(*mut c_void,*mut u32,i32) -> i32;
+type DtwaingetpendingxfercountFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingetpixelflavorFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
 type DtwaingetpixeltypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32,i32) -> i32;
 type DtwaingetprinterFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
@@ -686,6 +688,7 @@ type DtwaingetrotationstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -
 type DtwaingetsavefilenameFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
 type DtwaingetsavefilenameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
 type DtwaingetsavefilenamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsavefiletypeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingetsessiondetailsFunc = unsafe extern "C" fn(*mut u16,i32,i32,i32) -> i32;
 type DtwaingetsessiondetailsaFunc = unsafe extern "C" fn(*mut c_char,i32,i32,i32) -> i32;
 type DtwaingetsessiondetailswFunc = unsafe extern "C" fn(*mut u16,i32,i32,i32) -> i32;
@@ -1169,6 +1172,7 @@ type DtwainsetrotationstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16)
 type DtwainsetsavefilenameFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
 type DtwainsetsavefilenameaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
 type DtwainsetsavefilenamewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetsavefiletypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainsetshadowFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
 type DtwainsetshadowstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
 type DtwainsetshadowstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
@@ -1750,6 +1754,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetImageInfoStringFunc: Symbol<'a, DtwaingetimageinfostringFunc>,
     DTWAIN_GetImageInfoStringAFunc: Symbol<'a, DtwaingetimageinfostringaFunc>,
     DTWAIN_GetImageInfoStringWFunc: Symbol<'a, DtwaingetimageinfostringwFunc>,
+    DTWAIN_GetImageLayoutInfoFunc: Symbol<'a, DtwaingetimagelayoutinfoFunc>,
     DTWAIN_GetJobControlFunc: Symbol<'a, DtwaingetjobcontrolFunc>,
     DTWAIN_GetJobControlExFunc: Symbol<'a, DtwaingetjobcontrolexFunc>,
     DTWAIN_GetJpegValuesFunc: Symbol<'a, DtwaingetjpegvaluesFunc>,
@@ -1827,6 +1832,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetPatchcodePrioritiesFunc: Symbol<'a, DtwaingetpatchcodeprioritiesFunc>,
     DTWAIN_GetPatchcodeSearchModeFunc: Symbol<'a, DtwaingetpatchcodesearchmodeFunc>,
     DTWAIN_GetPatchcodeTimeOutFunc: Symbol<'a, DtwaingetpatchcodetimeoutFunc>,
+    DTWAIN_GetPendingXferCountFunc: Symbol<'a, DtwaingetpendingxfercountFunc>,
     DTWAIN_GetPixelFlavorFunc: Symbol<'a, DtwaingetpixelflavorFunc>,
     DTWAIN_GetPixelTypeFunc: Symbol<'a, DtwaingetpixeltypeFunc>,
     DTWAIN_GetPrinterFunc: Symbol<'a, DtwaingetprinterFunc>,
@@ -1857,6 +1863,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetSaveFileNameFunc: Symbol<'a, DtwaingetsavefilenameFunc>,
     DTWAIN_GetSaveFileNameAFunc: Symbol<'a, DtwaingetsavefilenameaFunc>,
     DTWAIN_GetSaveFileNameWFunc: Symbol<'a, DtwaingetsavefilenamewFunc>,
+    DTWAIN_GetSaveFileTypeFunc: Symbol<'a, DtwaingetsavefiletypeFunc>,
     DTWAIN_GetSessionDetailsFunc: Symbol<'a, DtwaingetsessiondetailsFunc>,
     DTWAIN_GetSessionDetailsAFunc: Symbol<'a, DtwaingetsessiondetailsaFunc>,
     DTWAIN_GetSessionDetailsWFunc: Symbol<'a, DtwaingetsessiondetailswFunc>,
@@ -2340,6 +2347,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_SetSaveFileNameFunc: Symbol<'a, DtwainsetsavefilenameFunc>,
     DTWAIN_SetSaveFileNameAFunc: Symbol<'a, DtwainsetsavefilenameaFunc>,
     DTWAIN_SetSaveFileNameWFunc: Symbol<'a, DtwainsetsavefilenamewFunc>,
+    DTWAIN_SetSaveFileTypeFunc: Symbol<'a, DtwainsetsavefiletypeFunc>,
     DTWAIN_SetShadowFunc: Symbol<'a, DtwainsetshadowFunc>,
     DTWAIN_SetShadowStringFunc: Symbol<'a, DtwainsetshadowstringFunc>,
     DTWAIN_SetShadowStringAFunc: Symbol<'a, DtwainsetshadowstringaFunc>,
@@ -2766,6 +2774,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_TN_ACQUIREPAGESSTOPPED: i32 = 1307;
     pub const DTWAIN_TN_QUERYUPDATEDIBORIG: i32 = 1308;
     pub const DTWAIN_TN_QUERYUPDATEDIBRESAMPLED: i32 = 1309;
+    pub const DTWAIN_TN_PENDINGXFERSRETRIEVED: i32 = 1310;
     pub const DTWAIN_PDFOCR_CLEANTEXT1: i32 = 1;
     pub const DTWAIN_PDFOCR_CLEANTEXT2: i32 = 2;
     pub const DTWAIN_MODAL: i32 = 0;
@@ -3880,28 +3889,28 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_PDFTEXT_LASTPAGE: i32 = 0x00000010;
     pub const DTWAIN_PDFTEXT_CURRENTPAGE: i32 = 0x00000020;
     pub const DTWAIN_PDFTEXT_DISABLED: i32 = 0x00000040;
-    pub const DTWAIN_PDFTEXT_TOPLEFT: i32 = 0x00000080;
-    pub const DTWAIN_PDFTEXT_TOPRIGHT: i32 = 0x00000100;
-    pub const DTWAIN_PDFTEXT_HORIZCENTER: i32 = 0x00000200;
-    pub const DTWAIN_PDFTEXT_VERTCENTER: i32 = 0x00000400;
-    pub const DTWAIN_PDFTEXT_BOTTOMLEFT: i32 = 0x00000800;
-    pub const DTWAIN_PDFTEXT_BOTTOMRIGHT: i32 = 0x00001000;
-    pub const DTWAIN_PDFTEXT_BOTTOMCENTER: i32 = 0x00002000;
-    pub const DTWAIN_PDFTEXT_TOPCENTER: i32 = 0x00004000;
-    pub const DTWAIN_PDFTEXT_XCENTER: i32 = 0x00008000;
-    pub const DTWAIN_PDFTEXT_YCENTER: i32 = 0x00010000;
-    pub const DTWAIN_PDFTEXT_NOSCALING: i32 = 0x00020000;
-    pub const DTWAIN_PDFTEXT_NOCHARSPACING: i32 = 0x00040000;
-    pub const DTWAIN_PDFTEXT_NOWORDSPACING: i32 = 0x00080000;
-    pub const DTWAIN_PDFTEXT_NOSTROKEWIDTH: i32 = 0x00100000;
-    pub const DTWAIN_PDFTEXT_NORENDERMODE: i32 = 0x00200000;
-    pub const DTWAIN_PDFTEXT_NORGBCOLOR: i32 = 0x00400000;
-    pub const DTWAIN_PDFTEXT_NOFONTSIZE: i32 = 0x00800000;
-    pub const DTWAIN_PDFTEXT_NOABSPOSITION: i32 = 0x01000000;
-    pub const DTWAIN_PDFTEXT_NOROTATION: i32 = 0x02000000;
-    pub const DTWAIN_PDFTEXT_NOSKEWING: i32 = 0x04000000;
-    pub const DTWAIN_PDFTEXT_NOSCALINGXY: i32 = 0x08000000;
-    pub const DTWAIN_PDFTEXT_COPYTEXTELEMENT: i32 = 0x10000000;
+    pub const DTWAIN_PDFTEXT_COPYTEXTELEMENT: i32 = 0x00000080;
+    pub const DTWAIN_PDFTEXT_TOPLEFT: i32 = 0x00000100;
+    pub const DTWAIN_PDFTEXT_TOPRIGHT: i32 = 0x00000200;
+    pub const DTWAIN_PDFTEXT_HORIZCENTER: i32 = 0x00000400;
+    pub const DTWAIN_PDFTEXT_VERTCENTER: i32 = 0x00000800;
+    pub const DTWAIN_PDFTEXT_BOTTOMLEFT: i32 = 0x00001000;
+    pub const DTWAIN_PDFTEXT_BOTTOMRIGHT: i32 = 0x00002000;
+    pub const DTWAIN_PDFTEXT_BOTTOMCENTER: i32 = 0x00004000;
+    pub const DTWAIN_PDFTEXT_TOPCENTER: i32 = 0x00008000;
+    pub const DTWAIN_PDFTEXT_XCENTER: i32 = 0x00010000;
+    pub const DTWAIN_PDFTEXT_YCENTER: i32 = 0x00020000;
+    pub const DTWAIN_PDFTEXT_NOSCALING: i32 = 0x00100000;
+    pub const DTWAIN_PDFTEXT_NOCHARSPACING: i32 = 0x00200000;
+    pub const DTWAIN_PDFTEXT_NOWORDSPACING: i32 = 0x00400000;
+    pub const DTWAIN_PDFTEXT_NOSTROKEWIDTH: i32 = 0x00800000;
+    pub const DTWAIN_PDFTEXT_NORENDERMODE: i32 = 0x01000000;
+    pub const DTWAIN_PDFTEXT_NORGBCOLOR: i32 = 0x02000000;
+    pub const DTWAIN_PDFTEXT_NOFONTSIZE: i32 = 0x04000000;
+    pub const DTWAIN_PDFTEXT_NOABSPOSITION: i32 = 0x08000000;
+    pub const DTWAIN_PDFTEXT_NOROTATION: i32 = 0x10000000;
+    pub const DTWAIN_PDFTEXT_NOSKEWING: i32 = 0x20000000;
+    pub const DTWAIN_PDFTEXT_NOSCALINGXY: i32 = 0x40000000;
     pub const DTWAIN_PDFTEXT_IGNOREALL: u32 = 0xFFF00000;
     pub const DTWAIN_FONT_COURIER: i32 = 0;
     pub const DTWAIN_FONT_COURIERBOLD: i32 = 1;
@@ -4587,6 +4596,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetImageInfoString: Symbol<DtwaingetimageinfostringFunc> = unsafe { library.get(b"DTWAIN_GetImageInfoString")? };
         let DTWAIN_GetImageInfoStringA: Symbol<DtwaingetimageinfostringaFunc> = unsafe { library.get(b"DTWAIN_GetImageInfoStringA")? };
         let DTWAIN_GetImageInfoStringW: Symbol<DtwaingetimageinfostringwFunc> = unsafe { library.get(b"DTWAIN_GetImageInfoStringW")? };
+        let DTWAIN_GetImageLayoutInfo: Symbol<DtwaingetimagelayoutinfoFunc> = unsafe { library.get(b"DTWAIN_GetImageLayoutInfo")? };
         let DTWAIN_GetJobControl: Symbol<DtwaingetjobcontrolFunc> = unsafe { library.get(b"DTWAIN_GetJobControl")? };
         let DTWAIN_GetJobControlEx: Symbol<DtwaingetjobcontrolexFunc> = unsafe { library.get(b"DTWAIN_GetJobControlEx")? };
         let DTWAIN_GetJpegValues: Symbol<DtwaingetjpegvaluesFunc> = unsafe { library.get(b"DTWAIN_GetJpegValues")? };
@@ -4664,6 +4674,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetPatchcodePriorities: Symbol<DtwaingetpatchcodeprioritiesFunc> = unsafe { library.get(b"DTWAIN_GetPatchcodePriorities")? };
         let DTWAIN_GetPatchcodeSearchMode: Symbol<DtwaingetpatchcodesearchmodeFunc> = unsafe { library.get(b"DTWAIN_GetPatchcodeSearchMode")? };
         let DTWAIN_GetPatchcodeTimeOut: Symbol<DtwaingetpatchcodetimeoutFunc> = unsafe { library.get(b"DTWAIN_GetPatchcodeTimeOut")? };
+        let DTWAIN_GetPendingXferCount: Symbol<DtwaingetpendingxfercountFunc> = unsafe { library.get(b"DTWAIN_GetPendingXferCount")? };
         let DTWAIN_GetPixelFlavor: Symbol<DtwaingetpixelflavorFunc> = unsafe { library.get(b"DTWAIN_GetPixelFlavor")? };
         let DTWAIN_GetPixelType: Symbol<DtwaingetpixeltypeFunc> = unsafe { library.get(b"DTWAIN_GetPixelType")? };
         let DTWAIN_GetPrinter: Symbol<DtwaingetprinterFunc> = unsafe { library.get(b"DTWAIN_GetPrinter")? };
@@ -4694,6 +4705,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetSaveFileName: Symbol<DtwaingetsavefilenameFunc> = unsafe { library.get(b"DTWAIN_GetSaveFileName")? };
         let DTWAIN_GetSaveFileNameA: Symbol<DtwaingetsavefilenameaFunc> = unsafe { library.get(b"DTWAIN_GetSaveFileNameA")? };
         let DTWAIN_GetSaveFileNameW: Symbol<DtwaingetsavefilenamewFunc> = unsafe { library.get(b"DTWAIN_GetSaveFileNameW")? };
+        let DTWAIN_GetSaveFileType: Symbol<DtwaingetsavefiletypeFunc> = unsafe { library.get(b"DTWAIN_GetSaveFileType")? };
         let DTWAIN_GetSessionDetails: Symbol<DtwaingetsessiondetailsFunc> = unsafe { library.get(b"DTWAIN_GetSessionDetails")? };
         let DTWAIN_GetSessionDetailsA: Symbol<DtwaingetsessiondetailsaFunc> = unsafe { library.get(b"DTWAIN_GetSessionDetailsA")? };
         let DTWAIN_GetSessionDetailsW: Symbol<DtwaingetsessiondetailswFunc> = unsafe { library.get(b"DTWAIN_GetSessionDetailsW")? };
@@ -5177,6 +5189,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_SetSaveFileName: Symbol<DtwainsetsavefilenameFunc> = unsafe { library.get(b"DTWAIN_SetSaveFileName")? };
         let DTWAIN_SetSaveFileNameA: Symbol<DtwainsetsavefilenameaFunc> = unsafe { library.get(b"DTWAIN_SetSaveFileNameA")? };
         let DTWAIN_SetSaveFileNameW: Symbol<DtwainsetsavefilenamewFunc> = unsafe { library.get(b"DTWAIN_SetSaveFileNameW")? };
+        let DTWAIN_SetSaveFileType: Symbol<DtwainsetsavefiletypeFunc> = unsafe { library.get(b"DTWAIN_SetSaveFileType")? };
         let DTWAIN_SetShadow: Symbol<DtwainsetshadowFunc> = unsafe { library.get(b"DTWAIN_SetShadow")? };
         let DTWAIN_SetShadowString: Symbol<DtwainsetshadowstringFunc> = unsafe { library.get(b"DTWAIN_SetShadowString")? };
         let DTWAIN_SetShadowStringA: Symbol<DtwainsetshadowstringaFunc> = unsafe { library.get(b"DTWAIN_SetShadowStringA")? };
@@ -5757,6 +5770,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetImageInfoStringFunc: DTWAIN_GetImageInfoString,
             DTWAIN_GetImageInfoStringAFunc: DTWAIN_GetImageInfoStringA,
             DTWAIN_GetImageInfoStringWFunc: DTWAIN_GetImageInfoStringW,
+            DTWAIN_GetImageLayoutInfoFunc: DTWAIN_GetImageLayoutInfo,
             DTWAIN_GetJobControlFunc: DTWAIN_GetJobControl,
             DTWAIN_GetJobControlExFunc: DTWAIN_GetJobControlEx,
             DTWAIN_GetJpegValuesFunc: DTWAIN_GetJpegValues,
@@ -5834,6 +5848,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetPatchcodePrioritiesFunc: DTWAIN_GetPatchcodePriorities,
             DTWAIN_GetPatchcodeSearchModeFunc: DTWAIN_GetPatchcodeSearchMode,
             DTWAIN_GetPatchcodeTimeOutFunc: DTWAIN_GetPatchcodeTimeOut,
+            DTWAIN_GetPendingXferCountFunc: DTWAIN_GetPendingXferCount,
             DTWAIN_GetPixelFlavorFunc: DTWAIN_GetPixelFlavor,
             DTWAIN_GetPixelTypeFunc: DTWAIN_GetPixelType,
             DTWAIN_GetPrinterFunc: DTWAIN_GetPrinter,
@@ -5864,6 +5879,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetSaveFileNameFunc: DTWAIN_GetSaveFileName,
             DTWAIN_GetSaveFileNameAFunc: DTWAIN_GetSaveFileNameA,
             DTWAIN_GetSaveFileNameWFunc: DTWAIN_GetSaveFileNameW,
+            DTWAIN_GetSaveFileTypeFunc: DTWAIN_GetSaveFileType,
             DTWAIN_GetSessionDetailsFunc: DTWAIN_GetSessionDetails,
             DTWAIN_GetSessionDetailsAFunc: DTWAIN_GetSessionDetailsA,
             DTWAIN_GetSessionDetailsWFunc: DTWAIN_GetSessionDetailsW,
@@ -6347,6 +6363,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_SetSaveFileNameFunc: DTWAIN_SetSaveFileName,
             DTWAIN_SetSaveFileNameAFunc: DTWAIN_SetSaveFileNameA,
             DTWAIN_SetSaveFileNameWFunc: DTWAIN_SetSaveFileNameW,
+            DTWAIN_SetSaveFileTypeFunc: DTWAIN_SetSaveFileType,
             DTWAIN_SetShadowFunc: DTWAIN_SetShadow,
             DTWAIN_SetShadowStringFunc: DTWAIN_SetShadowString,
             DTWAIN_SetShadowStringAFunc: DTWAIN_SetShadowStringA,
@@ -8526,6 +8543,10 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetImageInfoStringWFunc)(Source, lpXResolution, lpYResolution, lpWidth, lpLength, lpNumSamples, lpBitsPerSample, lpBitsPerPixel, lpPlanar, lpPixelType, lpCompression);  }
     }
 
+    pub fn DTWAIN_GetImageLayoutInfo(&self, Source: *mut c_void, lGetType: i32, DocumentNumber: *mut i32, PageNumber: *mut i32, FrameNumber: *mut i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetImageLayoutInfoFunc)(Source, lGetType, DocumentNumber, PageNumber, FrameNumber);  }
+    }
+
     pub fn DTWAIN_GetJobControl(&self, Source: *mut c_void, pJobControl: *mut i32, bCurrent: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetJobControlFunc)(Source, pJobControl, bCurrent);  }
     }
@@ -8834,6 +8855,10 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetPatchcodeTimeOutFunc)(Source, pTimeOut, bCurrent);  }
     }
 
+    pub fn DTWAIN_GetPendingXferCount(&self, Source: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_GetPendingXferCountFunc)(Source);  }
+    }
+
     pub fn DTWAIN_GetPixelFlavor(&self, Source: *mut c_void, lpPixelFlavor: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_GetPixelFlavorFunc)(Source, lpPixelFlavor);  }
     }
@@ -8952,6 +8977,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetSaveFileNameW(&self, Source: *mut c_void, fName: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetSaveFileNameWFunc)(Source, fName, nMaxLen);  }
+    }
+
+    pub fn DTWAIN_GetSaveFileType(&self, Source: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_GetSaveFileTypeFunc)(Source);  }
     }
 
     pub fn DTWAIN_GetSessionDetails(&self, szBuf: *mut u16, nSize: i32, indentFactor: i32, bRefresh: i32) -> i32 {
@@ -10884,6 +10913,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_SetSaveFileNameW(&self, Source: *mut c_void, fName: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetSaveFileNameWFunc)(Source, fName);  }
+    }
+
+    pub fn DTWAIN_SetSaveFileType(&self, Source: *mut c_void, FileType: i32) -> i32 {
+        unsafe { return (self.DTWAIN_SetSaveFileTypeFunc)(Source, FileType);  }
     }
 
     pub fn DTWAIN_SetShadow(&self, Source: *mut c_void, Shadow: f64) -> i32 {

@@ -27,6 +27,7 @@
 #include "ctlstaticdata.h"
 #include "dtwain_resource_constants2.h"
 #include "ctlstringutils.h"
+#include "mapdefs.h"
 /*#define FMT_HEADER_ONLY
 #include "../fmt/format.h"
 */
@@ -805,7 +806,7 @@ namespace
     }
 
     using TwainDecodeFn = std::function<std::string(TW_MEMREF)>;
-    using MapTwainDecodeFn = std::map<DecoderStructTypes, TwainDecodeFn>;
+    using MapTwainDecodeFn = BASIC_MAPTYPE_<DecoderStructTypes, TwainDecodeFn>;
 
     MapTwainDecodeFn mapTwainCodes = {
         {DECODERSTRUCT_TW_CUSTOMDSDATA, DecodeCustomDSData},

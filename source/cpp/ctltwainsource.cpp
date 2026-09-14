@@ -152,7 +152,6 @@ bool CTL_ITwainSource::IsActive() const
 CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProduct, CTL_TwainDLLHandle* pHandle)
     :
     m_pUserPtr(nullptr),
-    CapCacheInfo(),
     m_bDSMVersion2(false),
     m_bXferReadySent(false),
     m_bIsOpened(false),

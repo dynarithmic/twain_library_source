@@ -640,6 +640,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_TN_ACQUIREPAGESSTOPPED As Integer = 1307
         Public Const DTWAIN_TN_QUERYUPDATEDIBORIG As Integer = 1308
         Public Const DTWAIN_TN_QUERYUPDATEDIBRESAMPLED As Integer = 1309
+        Public Const DTWAIN_TN_PENDINGXFERSRETRIEVED As Integer = 1310
         Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
         Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
         Public Const DTWAIN_MODAL As Integer = 0
@@ -1754,29 +1755,29 @@ Namespace Dynarithmic
         Public Const DTWAIN_PDFTEXT_LASTPAGE As Integer = &H00000010
         Public Const DTWAIN_PDFTEXT_CURRENTPAGE As Integer = &H00000020
         Public Const DTWAIN_PDFTEXT_DISABLED As Integer = &H00000040
-        Public Const DTWAIN_PDFTEXT_TOPLEFT As Integer = &H00000080
-        Public Const DTWAIN_PDFTEXT_TOPRIGHT As Integer = &H00000100
-        Public Const DTWAIN_PDFTEXT_HORIZCENTER As Integer = &H00000200
-        Public Const DTWAIN_PDFTEXT_VERTCENTER As Integer = &H00000400
-        Public Const DTWAIN_PDFTEXT_BOTTOMLEFT As Integer = &H00000800
-        Public Const DTWAIN_PDFTEXT_BOTTOMRIGHT As Integer = &H00001000
-        Public Const DTWAIN_PDFTEXT_BOTTOMCENTER As Integer = &H00002000
-        Public Const DTWAIN_PDFTEXT_TOPCENTER As Integer = &H00004000
-        Public Const DTWAIN_PDFTEXT_XCENTER As Integer = &H00008000
-        Public Const DTWAIN_PDFTEXT_YCENTER As Integer = &H00010000
-        Public Const DTWAIN_PDFTEXT_NOSCALING As Integer = &H00020000
-        Public Const DTWAIN_PDFTEXT_NOCHARSPACING As Integer = &H00040000
-        Public Const DTWAIN_PDFTEXT_NOWORDSPACING As Integer = &H00080000
-        Public Const DTWAIN_PDFTEXT_NOSTROKEWIDTH As Integer = &H00100000
-        Public Const DTWAIN_PDFTEXT_NORENDERMODE As Integer = &H00200000
-        Public Const DTWAIN_PDFTEXT_NORGBCOLOR As Integer = &H00400000
-        Public Const DTWAIN_PDFTEXT_NOFONTSIZE As Integer = &H00800000
-        Public Const DTWAIN_PDFTEXT_NOABSPOSITION As Integer = &H01000000
-        Public Const DTWAIN_PDFTEXT_NOROTATION As Integer = &H02000000
-        Public Const DTWAIN_PDFTEXT_NOSKEWING As Integer = &H04000000
-        Public Const DTWAIN_PDFTEXT_NOSCALINGXY As Integer = &H08000000
-        Public Const DTWAIN_PDFTEXT_COPYTEXTELEMENT As Integer = &H10000000
-        Public Const DTWAIN_PDFTEXT_IGNOREALL As UInteger = &HFFF00000
+        Public Const DTWAIN_PDFTEXT_COPYTEXTELEMENT As Integer = &H00000080
+        Public Const DTWAIN_PDFTEXT_TOPLEFT As Integer = &H00000100
+        Public Const DTWAIN_PDFTEXT_TOPRIGHT As Integer = &H00000200
+        Public Const DTWAIN_PDFTEXT_HORIZCENTER As Integer = &H00000400
+        Public Const DTWAIN_PDFTEXT_VERTCENTER As Integer = &H00000800
+        Public Const DTWAIN_PDFTEXT_BOTTOMLEFT As Integer = &H00001000
+        Public Const DTWAIN_PDFTEXT_BOTTOMRIGHT As Integer = &H00002000
+        Public Const DTWAIN_PDFTEXT_BOTTOMCENTER As Integer = &H00004000
+        Public Const DTWAIN_PDFTEXT_TOPCENTER As Integer = &H00008000
+        Public Const DTWAIN_PDFTEXT_XCENTER As Integer = &H00010000
+        Public Const DTWAIN_PDFTEXT_YCENTER As Integer = &H00020000
+        Public Const DTWAIN_PDFTEXT_NOSCALING As Integer = &H00100000
+        Public Const DTWAIN_PDFTEXT_NOCHARSPACING As Integer = &H00200000
+        Public Const DTWAIN_PDFTEXT_NOWORDSPACING As Integer = &H00400000
+        Public Const DTWAIN_PDFTEXT_NOSTROKEWIDTH As Integer = &H00800000
+        Public Const DTWAIN_PDFTEXT_NORENDERMODE As Integer = &H01000000
+        Public Const DTWAIN_PDFTEXT_NORGBCOLOR As Integer = &H02000000
+        Public Const DTWAIN_PDFTEXT_NOFONTSIZE As Integer = &H04000000
+        Public Const DTWAIN_PDFTEXT_NOABSPOSITION As Integer = &H08000000
+        Public Const DTWAIN_PDFTEXT_NOROTATION As Integer = &H10000000
+        Public Const DTWAIN_PDFTEXT_NOSKEWING As Integer = &H20000000
+        Public Const DTWAIN_PDFTEXT_NOSCALINGXY As Integer = &H40000000
+        Public Const DTWAIN_PDFTEXT_IGNOREALL As UInteger = &HFFF00000UI
         Public Const DTWAIN_FONT_COURIER As Integer = 0
         Public Const DTWAIN_FONT_COURIERBOLD As Integer = 1
         Public Const DTWAIN_FONT_COURIERBOLDOBLIQUE As Integer = 2
@@ -3192,6 +3193,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetImageInfoStringDelegate(Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> lpXResolution As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> lpYResolution As StringBuilder, ByRef lpWidth As Integer, ByRef lpLength As Integer, ByRef lpNumSamples As Integer, ByRef lpBitsPerSample As System.IntPtr, ByRef lpBitsPerPixel As Integer, ByRef lpPlanar As Integer, ByRef lpPixelType As Integer, ByRef lpCompression As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetImageLayoutInfoDelegate(Source As System.IntPtr, lGetType As Integer, ByRef DocumentNumber As Integer, ByRef PageNumber As Integer, ByRef FrameNumber As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetJobControlDelegate(Source As System.IntPtr, ByRef pJobControl As Integer, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -3351,6 +3355,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetPatchcodeTimeOutDelegate(Source As System.IntPtr, ByRef pTimeOut As UInteger, bCurrent As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetPendingXferCountDelegate(Source As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetPixelFlavorDelegate(Source As System.IntPtr, ByRef lpPixelFlavor As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -3409,6 +3416,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetSaveFileNameDelegate(Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> fName As StringBuilder, nMaxLen As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetSaveFileTypeDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetSessionDetailsDelegate(<MarshalAs(UnmanagedType.LPTStr)> szBuf As StringBuilder, nSize As Integer, indentFactor As Integer, bRefresh As Integer) As Integer
@@ -4414,6 +4424,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_SetSaveFileNameDelegate(Source As System.IntPtr, fName As String) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_SetSaveFileTypeDelegate(Source As System.IntPtr, FileType As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetShadowDelegate(Source As System.IntPtr, Shadow As System.Double) As Integer
@@ -6179,6 +6192,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetImageInfoString(Source, lpXResolution, lpYResolution, lpWidth, lpLength, lpNumSamples, lpBitsPerSample, lpBitsPerPixel, lpPlanar, lpPixelType, lpCompression)
         End Function
         
+        Public Function DTWAIN_GetImageLayoutInfo(Source As System.IntPtr, lGetType As Integer, ByRef DocumentNumber As Integer, ByRef PageNumber As Integer, ByRef FrameNumber As Integer) As Integer
+        Return api.DTWAIN_GetImageLayoutInfo(Source, lGetType, DocumentNumber, PageNumber, FrameNumber)
+        End Function
+        
         Public Function DTWAIN_GetJobControl(Source As System.IntPtr, ByRef pJobControl As Integer, bCurrent As Integer) As Integer
         Return api.DTWAIN_GetJobControl(Source, pJobControl, bCurrent)
         End Function
@@ -6391,6 +6408,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetPatchcodeTimeOut(Source, pTimeOut, bCurrent)
         End Function
         
+        Public Function DTWAIN_GetPendingXferCount(Source As System.IntPtr) As Integer
+        Return api.DTWAIN_GetPendingXferCount(Source)
+        End Function
+        
         Public Function DTWAIN_GetPixelFlavor(Source As System.IntPtr, ByRef lpPixelFlavor As Integer) As Integer
         Return api.DTWAIN_GetPixelFlavor(Source, lpPixelFlavor)
         End Function
@@ -6469,6 +6490,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_GetSaveFileName(Source As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> fName As StringBuilder, nMaxLen As Integer) As Integer
         Return api.DTWAIN_GetSaveFileName(Source, fName, nMaxLen)
+        End Function
+        
+        Public Function DTWAIN_GetSaveFileType(Source As System.IntPtr) As Integer
+        Return api.DTWAIN_GetSaveFileType(Source)
         End Function
         
         Public Function DTWAIN_GetSessionDetails(<MarshalAs(UnmanagedType.LPTStr)> szBuf As StringBuilder, nSize As Integer, indentFactor As Integer, bRefresh As Integer) As Integer
@@ -7811,6 +7836,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetSaveFileName(Source, fName)
         End Function
         
+        Public Function DTWAIN_SetSaveFileType(Source As System.IntPtr, FileType As Integer) As Integer
+        Return api.DTWAIN_SetSaveFileType(Source, FileType)
+        End Function
+        
         Public Function DTWAIN_SetShadow(Source As System.IntPtr, Shadow As System.Double) As Integer
         Return api.DTWAIN_SetShadow(Source, Shadow)
         End Function
@@ -8353,6 +8382,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetHighlightString As DTWAIN_GetHighlightStringDelegate
             Public DTWAIN_GetImageInfo As DTWAIN_GetImageInfoDelegate
             Public DTWAIN_GetImageInfoString As DTWAIN_GetImageInfoStringDelegate
+            Public DTWAIN_GetImageLayoutInfo As DTWAIN_GetImageLayoutInfoDelegate
             Public DTWAIN_GetJobControl As DTWAIN_GetJobControlDelegate
             Public DTWAIN_GetJobControlEx As DTWAIN_GetJobControlExDelegate
             Public DTWAIN_GetJpegValues As DTWAIN_GetJpegValuesDelegate
@@ -8406,6 +8436,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetPatchcodePriorities As DTWAIN_GetPatchcodePrioritiesDelegate
             Public DTWAIN_GetPatchcodeSearchMode As DTWAIN_GetPatchcodeSearchModeDelegate
             Public DTWAIN_GetPatchcodeTimeOut As DTWAIN_GetPatchcodeTimeOutDelegate
+            Public DTWAIN_GetPendingXferCount As DTWAIN_GetPendingXferCountDelegate
             Public DTWAIN_GetPixelFlavor As DTWAIN_GetPixelFlavorDelegate
             Public DTWAIN_GetPixelType As DTWAIN_GetPixelTypeDelegate
             Public DTWAIN_GetPrinter As DTWAIN_GetPrinterDelegate
@@ -8426,6 +8457,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetRotationEx As DTWAIN_GetRotationExDelegate
             Public DTWAIN_GetRotationString As DTWAIN_GetRotationStringDelegate
             Public DTWAIN_GetSaveFileName As DTWAIN_GetSaveFileNameDelegate
+            Public DTWAIN_GetSaveFileType As DTWAIN_GetSaveFileTypeDelegate
             Public DTWAIN_GetSessionDetails As DTWAIN_GetSessionDetailsDelegate
             Public DTWAIN_GetShadow As DTWAIN_GetShadowDelegate
             Public DTWAIN_GetShadowString As DTWAIN_GetShadowStringDelegate
@@ -8761,6 +8793,7 @@ Namespace Dynarithmic
             Public DTWAIN_SetRotation As DTWAIN_SetRotationDelegate
             Public DTWAIN_SetRotationString As DTWAIN_SetRotationStringDelegate
             Public DTWAIN_SetSaveFileName As DTWAIN_SetSaveFileNameDelegate
+            Public DTWAIN_SetSaveFileType As DTWAIN_SetSaveFileTypeDelegate
             Public DTWAIN_SetShadow As DTWAIN_SetShadowDelegate
             Public DTWAIN_SetShadowString As DTWAIN_SetShadowStringDelegate
             Public DTWAIN_SetSourceUnit As DTWAIN_SetSourceUnitDelegate

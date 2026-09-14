@@ -97,8 +97,7 @@ namespace dynarithmic
              std::vector<sDuplexFileData>,
              std::vector<sDuplexFileData>>;
 
-    #define COMPRESSIONMAP_TYPE std::map
-    using SourceCompressionMap = COMPRESSIONMAP_TYPE<int, COMPRESSIONMAP_TYPE<int, std::vector<LONG>>>;
+    using SourceCompressionMap = BASIC_MAPTYPE_<int, BASIC_MAPTYPE_<int, std::vector<LONG>>>;
 
     struct AcquireFileStatus
     {
@@ -601,26 +600,6 @@ namespace dynarithmic
         void SetDibHandleProc(HANDLE hDib, size_t nWhich, bool bCreatePalette) const;
 
     private:
-
-        struct tagCapCacheInfo {
-                double Contrast;
-                double Brightness;
-                double XResolution;
-                double YResolution;
-                double XNativeResolution;
-                int    PixelFlavor;
-                int    BitDepth;
-                int    PixelType;
-                unsigned int UseContrast:1;
-                unsigned int UseBrightness:1;
-                unsigned int UseXResolution:1;
-                unsigned int UseYResolution:1;
-                unsigned int UsePixelFlavor:1;
-                unsigned int UseXNativeResolution:1;
-                unsigned int UseBitDepth:1;
-                unsigned int UsePixelType:1;
-            } CapCacheInfo;
-
         AcquireFileStatus m_AcquireFileStatus;
         CapGetInfo m_CapGetInfo;
         bool            m_bDSMVersion2;
@@ -730,10 +709,6 @@ namespace dynarithmic
         SourceAcquireOptions m_acquireOptions;
         HANDLE m_UpdatedDIB = nullptr;
 
-        struct tagCapCachInfo {
-            TW_UINT16 nCap;
-            bool      m_bSupported;
-        };
         using CachedCapMap = BASIC_MAPTYPE_<TW_UINT16, bool>;
 
         public:

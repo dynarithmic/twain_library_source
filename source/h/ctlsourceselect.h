@@ -27,6 +27,7 @@
 #include "dtwtype.h"
 #include "ctlstringdefs.h"
 #include "dtwain_standard_defs.h"
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -42,7 +43,7 @@ namespace dynarithmic
         std::wstring sTitle;  // This will always be a UTF16 title
         std::vector<CTL_StringType> aIncludeNames;
         std::vector<CTL_StringType> aExcludeNames;
-        std::unordered_map<CTL_StringType, CTL_StringType> mapNames;
+        BASIC_UNORDERED_MAPTYPE_<CTL_StringType, CTL_StringType> mapNames;
         CustomPlacement() : nOptions(0), xpos(0), ypos(0), hWndParent(nullptr) {}
     };
 

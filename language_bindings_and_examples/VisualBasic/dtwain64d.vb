@@ -469,6 +469,7 @@ Class DTWAINAPI
     Public Const DTWAIN_TN_ACQUIREPAGESSTOPPED As Integer = 1307
     Public Const DTWAIN_TN_QUERYUPDATEDIBORIG As Integer = 1308
     Public Const DTWAIN_TN_QUERYUPDATEDIBRESAMPLED As Integer = 1309
+    Public Const DTWAIN_TN_PENDINGXFERSRETRIEVED As Integer = 1310
     Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
     Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
     Public Const DTWAIN_MODAL As Integer = 0
@@ -1583,29 +1584,29 @@ Class DTWAINAPI
     Public Const DTWAIN_PDFTEXT_LASTPAGE As Integer = &H00000010
     Public Const DTWAIN_PDFTEXT_CURRENTPAGE As Integer = &H00000020
     Public Const DTWAIN_PDFTEXT_DISABLED As Integer = &H00000040
-    Public Const DTWAIN_PDFTEXT_TOPLEFT As Integer = &H00000080
-    Public Const DTWAIN_PDFTEXT_TOPRIGHT As Integer = &H00000100
-    Public Const DTWAIN_PDFTEXT_HORIZCENTER As Integer = &H00000200
-    Public Const DTWAIN_PDFTEXT_VERTCENTER As Integer = &H00000400
-    Public Const DTWAIN_PDFTEXT_BOTTOMLEFT As Integer = &H00000800
-    Public Const DTWAIN_PDFTEXT_BOTTOMRIGHT As Integer = &H00001000
-    Public Const DTWAIN_PDFTEXT_BOTTOMCENTER As Integer = &H00002000
-    Public Const DTWAIN_PDFTEXT_TOPCENTER As Integer = &H00004000
-    Public Const DTWAIN_PDFTEXT_XCENTER As Integer = &H00008000
-    Public Const DTWAIN_PDFTEXT_YCENTER As Integer = &H00010000
-    Public Const DTWAIN_PDFTEXT_NOSCALING As Integer = &H00020000
-    Public Const DTWAIN_PDFTEXT_NOCHARSPACING As Integer = &H00040000
-    Public Const DTWAIN_PDFTEXT_NOWORDSPACING As Integer = &H00080000
-    Public Const DTWAIN_PDFTEXT_NOSTROKEWIDTH As Integer = &H00100000
-    Public Const DTWAIN_PDFTEXT_NORENDERMODE As Integer = &H00200000
-    Public Const DTWAIN_PDFTEXT_NORGBCOLOR As Integer = &H00400000
-    Public Const DTWAIN_PDFTEXT_NOFONTSIZE As Integer = &H00800000
-    Public Const DTWAIN_PDFTEXT_NOABSPOSITION As Integer = &H01000000
-    Public Const DTWAIN_PDFTEXT_NOROTATION As Integer = &H02000000
-    Public Const DTWAIN_PDFTEXT_NOSKEWING As Integer = &H04000000
-    Public Const DTWAIN_PDFTEXT_NOSCALINGXY As Integer = &H08000000
-    Public Const DTWAIN_PDFTEXT_COPYTEXTELEMENT As Integer = &H10000000
-    Public Const DTWAIN_PDFTEXT_IGNOREALL As UInteger = &HFFF00000
+    Public Const DTWAIN_PDFTEXT_COPYTEXTELEMENT As Integer = &H00000080
+    Public Const DTWAIN_PDFTEXT_TOPLEFT As Integer = &H00000100
+    Public Const DTWAIN_PDFTEXT_TOPRIGHT As Integer = &H00000200
+    Public Const DTWAIN_PDFTEXT_HORIZCENTER As Integer = &H00000400
+    Public Const DTWAIN_PDFTEXT_VERTCENTER As Integer = &H00000800
+    Public Const DTWAIN_PDFTEXT_BOTTOMLEFT As Integer = &H00001000
+    Public Const DTWAIN_PDFTEXT_BOTTOMRIGHT As Integer = &H00002000
+    Public Const DTWAIN_PDFTEXT_BOTTOMCENTER As Integer = &H00004000
+    Public Const DTWAIN_PDFTEXT_TOPCENTER As Integer = &H00008000
+    Public Const DTWAIN_PDFTEXT_XCENTER As Integer = &H00010000
+    Public Const DTWAIN_PDFTEXT_YCENTER As Integer = &H00020000
+    Public Const DTWAIN_PDFTEXT_NOSCALING As Integer = &H00100000
+    Public Const DTWAIN_PDFTEXT_NOCHARSPACING As Integer = &H00200000
+    Public Const DTWAIN_PDFTEXT_NOWORDSPACING As Integer = &H00400000
+    Public Const DTWAIN_PDFTEXT_NOSTROKEWIDTH As Integer = &H00800000
+    Public Const DTWAIN_PDFTEXT_NORENDERMODE As Integer = &H01000000
+    Public Const DTWAIN_PDFTEXT_NORGBCOLOR As Integer = &H02000000
+    Public Const DTWAIN_PDFTEXT_NOFONTSIZE As Integer = &H04000000
+    Public Const DTWAIN_PDFTEXT_NOABSPOSITION As Integer = &H08000000
+    Public Const DTWAIN_PDFTEXT_NOROTATION As Integer = &H10000000
+    Public Const DTWAIN_PDFTEXT_NOSKEWING As Integer = &H20000000
+    Public Const DTWAIN_PDFTEXT_NOSCALINGXY As Integer = &H40000000
+    Public Const DTWAIN_PDFTEXT_IGNOREALL As UInteger = &HFFF00000UI
     Public Const DTWAIN_FONT_COURIER As Integer = 0
     Public Const DTWAIN_FONT_COURIERBOLD As Integer = 1
     Public Const DTWAIN_FONT_COURIERBOLDOBLIQUE As Integer = 2
@@ -2183,6 +2184,7 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_GetHighlightString Lib "dtwain64d.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Highlight As StringBuilder) As Integer
     Public Declare Function DTWAIN_GetImageInfo Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef lpXResolution As System.Double, ByRef lpYResolution As System.Double, ByRef lpWidth As Integer, ByRef lpLength As Integer, ByRef lpNumSamples As Integer, ByRef lpBitsPerSample As System.IntPtr, ByRef lpBitsPerPixel As Integer, ByRef lpPlanar As Integer, ByRef lpPixelType As Integer, ByRef lpCompression As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetImageInfoString Lib "dtwain64d.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> lpXResolution As StringBuilder, <MarshalAs(UnmanagedType.LPStr)> lpYResolution As StringBuilder, ByRef lpWidth As Integer, ByRef lpLength As Integer, ByRef lpNumSamples As Integer, ByRef lpBitsPerSample As System.IntPtr, ByRef lpBitsPerPixel As Integer, ByRef lpPlanar As Integer, ByRef lpPixelType As Integer, ByRef lpCompression As Integer) As Integer
+    Public Declare Function DTWAIN_GetImageLayoutInfo Lib "dtwain64d.dll" (Source As System.IntPtr, lGetType As Integer, ByRef DocumentNumber As Integer, ByRef PageNumber As Integer, ByRef FrameNumber As Integer) As Integer
     Public Declare Function DTWAIN_GetJobControl Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pJobControl As Integer, bCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetJobControlEx Lib "dtwain64d.dll" (Source As System.IntPtr, bGetCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetJpegValues Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
@@ -2236,6 +2238,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetPatchcodePriorities Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef SearchPriorities As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetPatchcodeSearchMode Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pSearchMode As Integer, bCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetPatchcodeTimeOut Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pTimeOut As UInteger, bCurrent As Integer) As Integer
+    Public Declare Function DTWAIN_GetPendingXferCount Lib "dtwain64d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetPixelFlavor Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef lpPixelFlavor As Integer) As Integer
     Public Declare Function DTWAIN_GetPixelType Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef PixelType As Integer, ByRef BitDepth As Integer, bCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetPrinter Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef lpPrinter As Integer, bCurrent As Integer) As Integer
@@ -2256,6 +2259,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetRotationEx Lib "dtwain64d.dll" (Source As System.IntPtr) As System.Double
     Public Declare Ansi Function DTWAIN_GetRotationString Lib "dtwain64d.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Rotation As StringBuilder) As Integer
     Public Declare Ansi Function DTWAIN_GetSaveFileName Lib "dtwain64d.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> fName As StringBuilder, nMaxLen As Integer) As Integer
+    Public Declare Function DTWAIN_GetSaveFileType Lib "dtwain64d.dll" (Source As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_GetSessionDetails Lib "dtwain64d.dll" (<MarshalAs(UnmanagedType.LPStr)> szBuf As StringBuilder, nSize As Integer, indentFactor As Integer, bRefresh As Integer) As Integer
     Public Declare Function DTWAIN_GetShadow Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef Shadow As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_GetShadowString Lib "dtwain64d.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Shadow As StringBuilder) As Integer
@@ -2591,6 +2595,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_SetRotation Lib "dtwain64d.dll" (Source As System.IntPtr, Rotation As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_SetRotationString Lib "dtwain64d.dll" (Source As System.IntPtr, Rotation As String) As Integer
     Public Declare Ansi Function DTWAIN_SetSaveFileName Lib "dtwain64d.dll" (Source As System.IntPtr, fName As String) As Integer
+    Public Declare Function DTWAIN_SetSaveFileType Lib "dtwain64d.dll" (Source As System.IntPtr, FileType As Integer) As Integer
     Public Declare Function DTWAIN_SetShadow Lib "dtwain64d.dll" (Source As System.IntPtr, Shadow As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_SetShadowString Lib "dtwain64d.dll" (Source As System.IntPtr, Shadow As String) As Integer
     Public Declare Function DTWAIN_SetSourceUnit Lib "dtwain64d.dll" (Source As System.IntPtr, Unit As Integer) As Integer

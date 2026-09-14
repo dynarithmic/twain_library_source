@@ -352,12 +352,10 @@ void CTL_ITwainSession::DestroyTwainWindow()
 
 void CTL_ITwainSession::DestroyOneSource(CTL_ITwainSource *pSource)
 {
-    const auto found = find(m_arrTwainSource.begin(),
-                                            m_arrTwainSource.end(),
-                                            pSource);
+    const auto found = find(m_arrTwainSource.begin(), m_arrTwainSource.end(), pSource);
     if ( found != m_arrTwainSource.end())
     {
-        CTL_ITwainSource::Destroy( pSource );
+        CTL_ITwainSource::Destroy(pSource);
         m_arrTwainSource.erase(found);
     }
 }
@@ -576,9 +574,7 @@ extern "C"
         if ( !CTL_TwainAppMgr::GetInstance() )
         {
             // Create it with the parameters shown
-            if ( !CTL_TwainAppMgr::Create(pHandle,
-                                          hInstance,
-                                          CTL_StaticData::GetDLLInstanceHandle(),
+            if ( !CTL_TwainAppMgr::Create(pHandle, hInstance, CTL_StaticData::GetDLLInstanceHandle(),
                                           lpszDLLName?sDLLName.c_str():nullptr) )
             {
                 if ( pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||

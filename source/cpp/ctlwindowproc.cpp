@@ -540,6 +540,7 @@ namespace dynarithmic
             case DTWAIN_TN_QUERYACQUIREPAGES:
             case DTWAIN_TN_QUERYUPDATEDIBORIG:
             case DTWAIN_TN_QUERYUPDATEDIBRESAMPLED:
+            case DTWAIN_TN_PENDINGXFERSRETRIEVED:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))
@@ -724,7 +725,7 @@ namespace dynarithmic
             break;
             }
             // Send message to other notification windows
-            pHandle->NotifyWindows(uMsg, wParam, lParam);
+            CTL_TwainDLLHandle::NotifyWindows(uMsg, wParam, lParam);
 
             // Do not let window process this message again
             if (!bPassMsg)

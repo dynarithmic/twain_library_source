@@ -107,6 +107,7 @@
 1090 DTWAIN DLL ist nicht die korrekte Version
 1091 TWAIN-Sitzung ist derzeit aktiv
 1092 Der Vorgang erfordert TWAIN DSM 2.x oder höher
+1093 TWON_ENUMERATOR Container wurde für diesen Vorgang nicht verwendet.
 1100 TWAIN Zustandscode: Zu wenig Speicher
 1101 TWAIN Zustandscode: Kein Fehler
 1102 TWAIN Zustandscode: Unbekannte Fehlerursache

@@ -219,11 +219,11 @@ namespace
 
         // test scaling of normal PDF page
         AllPDFDimensions pdfdims;
-        auto it = generic_array_finder_if(pdfdims.m_mediamap, [&](const auto& pr) { return pr.first == imageInfoEx.PDFPageSize; });
+        auto it = generic_array_finder_if(AllPDFDimensions::m_mediamap, [&](const auto& pr) { return pr.first == imageInfoEx.PDFPageSize; });
         if (it.first)
         {
             double d1, d2, d3, d4;
-            pdfdims.m_mediamap[it.second].second.GetDimensions(d1, d2, d3, d4);
+            AllPDFDimensions::m_mediamap[it.second].second.GetDimensions(d1, d2, d3, d4);
             tInfo.m_ScaledDimensions.SetDimensions(d1, d2, d3, d4);
         }
         else

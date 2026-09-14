@@ -40,7 +40,7 @@ extern "C"
         if( !bSupported )
             LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
 
-        auto *p = reinterpret_cast<CTL_ITwainSource*>(Source);
+        auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
         // Call TWAIN to get the custom data
         const auto pSession = p->GetTwainSession();
         CTL_GetCustomDSTriplet DST(pSession, p);

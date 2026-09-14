@@ -26,6 +26,7 @@
 #include <vector>
 #include <string>
 #include "ctlstringutilsx.h"
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -47,7 +48,7 @@ namespace dynarithmic
         bool m_bSaveDefaultToINI;
     };
 
-    using SourceToXferReadyMap = std::map<std::string, SourceXferReadyOverride>;
+    using SourceToXferReadyMap = BASIC_MAPTYPE_<std::string, SourceXferReadyOverride>;
 
     struct SourceStatus
     {

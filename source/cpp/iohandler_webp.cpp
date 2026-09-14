@@ -32,28 +32,31 @@ OF THIRD PARTY RIGHTS.
 
 using namespace dynarithmic;
 
-static bool WriteOneDibHandleToWebP(const std::wstring& filename, const WebPSessionOptions& options, HANDLE hDib)
+namespace
 {
-    LockedDibPage lockedPage(hDib);
-    if (!lockedPage.IsValid())
-        return false;
+    bool WriteOneDibHandleToWebP(const std::wstring& filename, const WebPSessionOptions& options, HANDLE hDib)
+    {
+        LockedDibPage lockedPage(hDib);
+        if (!lockedPage.IsValid())
+            return false;
 
-    WebPSessionWriter writer;
-    if (!writer.Open(filename, options))
-        return false;
+        WebPSessionWriter writer;
+        if (!writer.Open(filename, options))
+            return false;
 
-    auto pageInfo = WebPSessionWriter::MakePreparedWebPDibPage(lockedPage.GetView());
-    if (!pageInfo.has_value())
-        return false;
+        auto pageInfo = WebPSessionWriter::MakePreparedWebPDibPage(lockedPage.GetView());
+        if (!pageInfo.has_value())
+            return false;
 
-    if (!writer.SetPageInfo(pageInfo.value()))
-        return false;
+        if (!writer.SetPageInfo(pageInfo.value()))
+            return false;
 
-    if (!writer.WriteCurrentPage())
-        return false;
+        if (!writer.WriteCurrentPage())
+            return false;
 
-    writer.Close();
-    return true;
+        writer.Close();
+        return true;
+    }
 }
 
 int CTL_WebpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )

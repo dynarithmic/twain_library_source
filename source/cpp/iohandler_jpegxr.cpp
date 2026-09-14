@@ -26,26 +26,28 @@
 using namespace dynarithmic;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static bool WriteOneDibHandleToJxr(const std::wstring& filename, const JxrSessionOptions& options, HANDLE hDib)
+namespace
 {
-    LockedDibPage lockedPage(hDib);
-    if (!lockedPage.IsValid())
-        return false;
+    bool WriteOneDibHandleToJxr(const std::wstring& filename, const JxrSessionOptions& options, HANDLE hDib)
+    {
+        LockedDibPage lockedPage(hDib);
+        if (!lockedPage.IsValid())
+            return false;
 
-    JxrSessionWriter writer;
-    if (!writer.Open(filename, options))
-        return false;
+        JxrSessionWriter writer;
+        if (!writer.Open(filename, options))
+            return false;
 
-    if (!writer.SetPageInfo(JxrSessionWriter::MakePreparedJxrPage(lockedPage.GetView()).value()))
-        return false;
+        if (!writer.SetPageInfo(JxrSessionWriter::MakePreparedJxrPage(lockedPage.GetView()).value()))
+            return false;
 
-    if (!writer.WriteCurrentPage())
-        return false;
+        if (!writer.WriteCurrentPage())
+            return false;
 
-    writer.Close();
-    return true;
+        writer.Close();
+        return true;
+    }
 }
-
 
 CTL_JpegXRIOHandler::CTL_JpegXRIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx)
 : CTL_ImageIOHandler( pDib ), m_nFormat(0), m_ImageInfoEx(ImageInfoEx)

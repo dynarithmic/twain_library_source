@@ -522,6 +522,7 @@ namespace Dynarithmic
         public const int DTWAIN_TN_ACQUIREPAGESSTOPPED = 1307;
         public const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
         public const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
+        public const int DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
@@ -1636,29 +1637,29 @@ namespace Dynarithmic
         public const int DTWAIN_PDFTEXT_LASTPAGE = 0x00000010;
         public const int DTWAIN_PDFTEXT_CURRENTPAGE = 0x00000020;
         public const int DTWAIN_PDFTEXT_DISABLED = 0x00000040;
-        public const int DTWAIN_PDFTEXT_TOPLEFT = 0x00000080;
-        public const int DTWAIN_PDFTEXT_TOPRIGHT = 0x00000100;
-        public const int DTWAIN_PDFTEXT_HORIZCENTER = 0x00000200;
-        public const int DTWAIN_PDFTEXT_VERTCENTER = 0x00000400;
-        public const int DTWAIN_PDFTEXT_BOTTOMLEFT = 0x00000800;
-        public const int DTWAIN_PDFTEXT_BOTTOMRIGHT = 0x00001000;
-        public const int DTWAIN_PDFTEXT_BOTTOMCENTER = 0x00002000;
-        public const int DTWAIN_PDFTEXT_TOPCENTER = 0x00004000;
-        public const int DTWAIN_PDFTEXT_XCENTER = 0x00008000;
-        public const int DTWAIN_PDFTEXT_YCENTER = 0x00010000;
-        public const int DTWAIN_PDFTEXT_NOSCALING = 0x00020000;
-        public const int DTWAIN_PDFTEXT_NOCHARSPACING = 0x00040000;
-        public const int DTWAIN_PDFTEXT_NOWORDSPACING = 0x00080000;
-        public const int DTWAIN_PDFTEXT_NOSTROKEWIDTH = 0x00100000;
-        public const int DTWAIN_PDFTEXT_NORENDERMODE = 0x00200000;
-        public const int DTWAIN_PDFTEXT_NORGBCOLOR = 0x00400000;
-        public const int DTWAIN_PDFTEXT_NOFONTSIZE = 0x00800000;
-        public const int DTWAIN_PDFTEXT_NOABSPOSITION = 0x01000000;
-        public const int DTWAIN_PDFTEXT_NOROTATION = 0x02000000;
-        public const int DTWAIN_PDFTEXT_NOSKEWING = 0x04000000;
-        public const int DTWAIN_PDFTEXT_NOSCALINGXY = 0x08000000;
-        public const int DTWAIN_PDFTEXT_COPYTEXTELEMENT = 0x10000000;
-        public const uint DTWAIN_PDFTEXT_IGNOREALL = 0xFFF00000;
+        public const int DTWAIN_PDFTEXT_COPYTEXTELEMENT = 0x00000080;
+        public const int DTWAIN_PDFTEXT_TOPLEFT = 0x00000100;
+        public const int DTWAIN_PDFTEXT_TOPRIGHT = 0x00000200;
+        public const int DTWAIN_PDFTEXT_HORIZCENTER = 0x00000400;
+        public const int DTWAIN_PDFTEXT_VERTCENTER = 0x00000800;
+        public const int DTWAIN_PDFTEXT_BOTTOMLEFT = 0x00001000;
+        public const int DTWAIN_PDFTEXT_BOTTOMRIGHT = 0x00002000;
+        public const int DTWAIN_PDFTEXT_BOTTOMCENTER = 0x00004000;
+        public const int DTWAIN_PDFTEXT_TOPCENTER = 0x00008000;
+        public const int DTWAIN_PDFTEXT_XCENTER = 0x00010000;
+        public const int DTWAIN_PDFTEXT_YCENTER = 0x00020000;
+        public const int DTWAIN_PDFTEXT_NOSCALING = 0x00100000;
+        public const int DTWAIN_PDFTEXT_NOCHARSPACING = 0x00200000;
+        public const int DTWAIN_PDFTEXT_NOWORDSPACING = 0x00400000;
+        public const int DTWAIN_PDFTEXT_NOSTROKEWIDTH = 0x00800000;
+        public const int DTWAIN_PDFTEXT_NORENDERMODE = 0x01000000;
+        public const int DTWAIN_PDFTEXT_NORGBCOLOR = 0x02000000;
+        public const int DTWAIN_PDFTEXT_NOFONTSIZE = 0x04000000;
+        public const int DTWAIN_PDFTEXT_NOABSPOSITION = 0x08000000;
+        public const int DTWAIN_PDFTEXT_NOROTATION = 0x10000000;
+        public const int DTWAIN_PDFTEXT_NOSKEWING = 0x20000000;
+        public const int DTWAIN_PDFTEXT_NOSCALINGXY = 0x40000000;
+        public const uint DTWAIN_PDFTEXT_IGNOREALL = 0xFFF00000U;
         public const int DTWAIN_FONT_COURIER = 0;
         public const int DTWAIN_FONT_COURIERBOLD = 1;
         public const int DTWAIN_FONT_COURIERBOLDOBLIQUE = 2;
@@ -3159,6 +3160,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source, System.IntPtr lpXResolution, System.IntPtr lpYResolution, ref int lpWidth, ref int lpLength, ref int lpNumSamples, ref DTWAIN_ARRAY lpBitsPerSample, ref int lpBitsPerPixel, ref int lpPlanar, ref int lpPixelType, ref int lpCompression);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetImageLayoutInfo(DTWAIN_SOURCE Source, int lGetType, ref int DocumentNumber, ref int PageNumber, ref int FrameNumber);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetJobControl(DTWAIN_SOURCE Source, ref int pJobControl, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
@@ -3351,6 +3355,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetPatchcodeTimeOut(DTWAIN_SOURCE Source, ref DWORD pTimeOut, int bCurrent);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetPendingXferCount(DTWAIN_SOURCE Source);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetPixelFlavor(DTWAIN_SOURCE Source, ref int lpPixelFlavor);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
@@ -3424,6 +3431,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, System.IntPtr fName, int nMaxLen);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetSaveFileType(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetSessionDetails([MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder szBuf, int nSize, int indentFactor, int bRefresh);
@@ -4510,6 +4520,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_SetSaveFileName(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string fName);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_SetSaveFileType(DTWAIN_SOURCE Source, int FileType);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_SetShadow(DTWAIN_SOURCE Source, DTWAIN_FLOAT Shadow);

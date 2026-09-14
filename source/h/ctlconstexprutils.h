@@ -645,6 +645,7 @@ namespace dynarithmic
             return TWON_RANGE;
         if constexpr (std::is_same_v<T, TW_ARRAY>)
             return TWON_ARRAY;
+        return TWON_ONEVALUE;
     }
 
     constexpr bool IsValidContainerType(TW_UINT16 containerType, bool testDTWAINType = true)

@@ -1238,7 +1238,7 @@ void ContentsObject::PreComposeObject()
 void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
 {
     using FontPairKey = std::pair<int, double>;
-    using FontToElementMap = std::unordered_map<FontPairKey, std::vector<PDFTextElement*>, boost::hash<FontPairKey>>;
+    using FontToElementMap = BASIC_UNORDERED_MAPTYPE_<FontPairKey, std::vector<PDFTextElement*>, boost::hash<FontPairKey>>;
 
     FontToElementMap fontToElementMap;
 

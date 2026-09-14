@@ -30,7 +30,7 @@ namespace dynarithmic
     {
         public:
             CTL_PcxIOHandler() : m_nFormat{} {}
-            CTL_PcxIOHandler(CTL_TwainDib* pDib, int nFormat, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
+            CTL_PcxIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
                 m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
 
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;

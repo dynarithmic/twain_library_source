@@ -180,6 +180,17 @@ namespace dynarithmic
             TwainRange_DEFAULT,
             TwainRange_CURRENT
     };
+
+    enum CTL_EnumLayoutComponents {
+        LAYOUT_LEFT,
+        LAYOUT_TOP,
+        LAYOUT_RIGHT,
+        LAYOUT_BOTTOM,
+        LAYOUT_DOCUMENTNUMBER,
+        LAYOUT_FRAMENUMBER,
+        LAYOUT_PAGENUMBER,
+        LAYOUT_NUMCOMPONENTS
+    };
 }
 #endif
 

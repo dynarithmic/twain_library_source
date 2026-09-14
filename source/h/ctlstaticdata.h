@@ -37,6 +37,7 @@
 #include "pdffont_basic.h"
 #include "ctlfilesavedefs.h"
 #include "dtwaindefs.h"
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -50,10 +51,10 @@ namespace dynarithmic
     {
         std::string m_sImageType;
         std::vector<uint16_t> m_vNoSamples;
-        std::map<uint16_t, uint16_t> m_mapFromTo;
+        BASIC_MAPTYPE_<uint16_t, uint16_t> m_mapFromTo;
     };
 
-    using ImageResamplerMap = std::map<int, ImageResamplerData>;
+    using ImageResamplerMap = BASIC_MAPTYPE_<int, ImageResamplerData>;
 
     struct CTL_StaticDataStruct
     {

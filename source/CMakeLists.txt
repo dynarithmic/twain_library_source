@@ -676,6 +676,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlprinter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlresourcestring.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsavefilename.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlsavefiletype.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlselectdialog.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsetgetcaps.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlshowuionly.cpp

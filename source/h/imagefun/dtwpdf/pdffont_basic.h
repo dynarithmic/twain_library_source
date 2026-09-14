@@ -24,12 +24,11 @@
 #include <string>
 #include <list>
 #include <unordered_set>
-#include <unordered_map>
 #include <memory>
 #include <utility>
 #include <set>
 #include "dtwpdft.h"
-
+#include "mapdefs.h"
 namespace dynarithmic
 {
     class CTL_ITwainSource;
@@ -86,7 +85,7 @@ namespace dynarithmic
     using CTL_TEXTELEMENTPTRLIST = std::list<PDFTextElementPtr>;
     using CTL_TEXTELEMENTNAKEDPTRLIST = std::list<PDFTextElement*>;
     using CTL_TEXTELEMENTNAKEDPTRSETLIST = std::pair<std::unordered_set<PDFTextElement*>, std::list<PDFTextElement*>>;
-    using CTL_TEXTELEMENTMAP = std::unordered_map<CTL_ITwainSource*, CTL_TEXTELEMENTNAKEDPTRSETLIST>;
+    using CTL_TEXTELEMENTMAP = BASIC_UNORDERED_MAPTYPE_<CTL_ITwainSource*, CTL_TEXTELEMENTNAKEDPTRSETLIST>;
     using CTL_SEARCHABLENAKEDTEXTRANGE = std::pair<CTL_TEXTELEMENTNAKEDPTRLIST::iterator,
                                                    CTL_TEXTELEMENTNAKEDPTRLIST::iterator>;
     using CTL_SEARCHABLETEXTRANGE = CTL_SEARCHABLENAKEDTEXTRANGE;

@@ -31,6 +31,6 @@ namespace dynarithmic
     class CTL_TwainDLLHandle;
 
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource* pSource, CTL_TwainDLLHandle* pHandle, CTL_EnumeratorNode<LONG>::container_pointer_type vCaps);
-    DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource* p, CTL_TwainDLLHandle* pHandle, TW_UINT16 nCapToCache);
+    DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource* pSource, CTL_TwainDLLHandle* pHandle, TW_UINT16 nCapToCache);
 }
 #endif

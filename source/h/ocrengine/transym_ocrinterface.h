@@ -82,10 +82,10 @@ namespace dynarithmic
         HMODULE m_hMod;
     };
 
-    using LongCapMap = std::unordered_map<LONG,LONG>;
-    using StringCapMap = std::unordered_map<std::string,std::string>;
-    using TOCRErrorCodeMap = std::unordered_map<LONG, std::string>;
-    using TOCRBitDepthMap = std::unordered_map<LONG, std::vector<LONG> >;
+    using LongCapMap = BASIC_UNORDERED_MAPTYPE_<LONG,LONG>;
+    using StringCapMap = BASIC_UNORDERED_MAPTYPE_<std::string,std::string>;
+    using TOCRErrorCodeMap = BASIC_UNORDERED_MAPTYPE_<LONG, std::string>;
+    using TOCRBitDepthMap = BASIC_UNORDERED_MAPTYPE_<LONG, std::vector<LONG> >;
 
     class TransymOCR : public OCREngine
     {

@@ -26,29 +26,32 @@
 
 using namespace dynarithmic;
 
-static std::pair<bool, int> SaveBMPRLE(LPCTSTR szFile, HANDLE hDib)
+namespace
 {
-    std::wstring filename = stringconversion::Convert_NativePtr_To_Wide(szFile);
-    LockedDibPage lockedPage(hDib);
-    if (!lockedPage.IsValid())
-        return { false, DTWAIN_ERR_DIB };
+    std::pair<bool, int> SaveBMPRLE(LPCTSTR szFile, HANDLE hDib)
+    {
+        std::wstring filename = stringconversion::Convert_NativePtr_To_Wide(szFile);
+        LockedDibPage lockedPage(hDib);
+        if (!lockedPage.IsValid())
+            return { false, DTWAIN_ERR_DIB };
 
-    BmpRle8Writer writer;
-    if (!writer.Open(filename))
-        return { false, DTWAIN_ERR_FILEOPEN };
+        BmpRle8Writer writer;
+        if (!writer.Open(filename))
+            return { false, DTWAIN_ERR_FILEOPEN };
 
-    auto pageInfo = BmpRle8Writer::MakePreparedBmpRle8Page(lockedPage.GetView());
-    if (!pageInfo.has_value())
-        return { false, DTWAIN_ERR_DIB };
+        auto pageInfo = BmpRle8Writer::MakePreparedBmpRle8Page(lockedPage.GetView());
+        if (!pageInfo.has_value())
+            return { false, DTWAIN_ERR_DIB };
 
-    if (!writer.SetPageInfo(pageInfo.value()))
-        return { false, DTWAIN_ERR_FILEWRITE };
+        if (!writer.SetPageInfo(pageInfo.value()))
+            return { false, DTWAIN_ERR_FILEWRITE };
 
-    if (!writer.WriteCurrentPage())
-        return { false, DTWAIN_ERR_FILEWRITE };
+        if (!writer.WriteCurrentPage())
+            return { false, DTWAIN_ERR_FILEWRITE };
 
-    writer.Close();
-    return { true, DTWAIN_NO_ERROR };
+        writer.Close();
+        return { true, DTWAIN_NO_ERROR };
+    }
 }
 
 int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)

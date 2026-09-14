@@ -27,6 +27,7 @@
 #include <fstream>
 #include <mutex>
 #include "ctlstringdefs.h"
+#include "mapdefs.h"
 
 /////////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
@@ -61,7 +62,7 @@ namespace dynarithmic
             void trace(std::string_view msg) override;
             static BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType);
             StdCout_Logger(const LoggingTraits& lTraits);
-            ~StdCout_Logger();
+            ~StdCout_Logger() override;
     };
 
     class DebugMonitor_Logger final : public CBaseLogger
@@ -83,7 +84,7 @@ namespace dynarithmic
 
         public:
             File_Logger(const LPCSTR filename, const LoggingTraits& fTraits);
-            ~File_Logger();
+            ~File_Logger() override;
             bool isFileCreated() const { return m_bFileCreated; }
             std::string getFileName() const { return m_fileName; }
             int64_t getAutoSaveThreshold() const { return m_autoSaveThreshold; }
@@ -105,7 +106,7 @@ namespace dynarithmic
         enum {FILE_LOGGING, DEBUG_WINDOW_LOGGING, CONSOLE_LOGGING, CALLBACK_LOGGING};
 
        /////////////////////////////////////////////////////////////////////////////
-        std::unordered_map<int, std::shared_ptr<CBaseLogger>> app_logger_map;
+        BASIC_UNORDERED_MAPTYPE_<int, std::shared_ptr<CBaseLogger>> app_logger_map;
         CLogSystem();
        ~CLogSystem() = default;
 

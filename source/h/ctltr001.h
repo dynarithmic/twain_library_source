@@ -41,7 +41,7 @@ namespace dynarithmic
                 case TWRC_SUCCESS:
                 {
                     // Copy the TW_IDENTITY from the successful call to the source pointer
-                    auto* pId = reinterpret_cast<TW_IDENTITY*>(pTrip.GetMemRef());
+                    auto* pId = static_cast<TW_IDENTITY*>(pTrip.GetMemRef());
                     if (pId)
                     {
                         pCurSource->GetTwainIdentity().set_identity(*pId);
