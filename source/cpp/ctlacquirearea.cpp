@@ -40,7 +40,7 @@ namespace
     bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType)
     {
         CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
-        DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, 4).second;
+        DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS).second;
         if (!FloatArrayOut)
             return false;
         DTWAINArrayLowLevelPtr_RAII aFloat(pHandle, &FloatArrayOut);
