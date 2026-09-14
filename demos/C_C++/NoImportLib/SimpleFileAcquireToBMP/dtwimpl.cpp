@@ -580,6 +580,7 @@
     D_GETIMAGEINFOSTRINGFUNC                      DYNDTWAIN_API::DTWAIN_GetImageInfoString = nullptr;
     D_GETIMAGEINFOSTRINGAFUNC                     DYNDTWAIN_API::DTWAIN_GetImageInfoStringA = nullptr;
     D_GETIMAGEINFOSTRINGWFUNC                     DYNDTWAIN_API::DTWAIN_GetImageInfoStringW = nullptr;
+    D_GETIMAGELAYOUTINFOFUNC                      DYNDTWAIN_API::DTWAIN_GetImageLayoutInfo = nullptr;
     D_GETJOBCONTROLFUNC                           DYNDTWAIN_API::DTWAIN_GetJobControl = nullptr;
     D_GETJOBCONTROLEXFUNC                         DYNDTWAIN_API::DTWAIN_GetJobControlEx = nullptr;
     D_GETJPEGVALUESFUNC                           DYNDTWAIN_API::DTWAIN_GetJpegValues = nullptr;
@@ -1819,6 +1820,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetImageInfoString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetImageInfoStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetImageInfoStringW, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetImageLayoutInfo, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetJobControl, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetJobControlEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetJpegValues, hModule);

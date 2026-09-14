@@ -2459,6 +2459,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CHARPTRTYPE, DTWAIN_CHARPTRTYPE, LPLONG, LPLONG, LPLONG, LPDTWAIN_ARRAY, LPLONG, LPLONG, LPLONG, LPLONG) DTWAIN_GetImageInfoString;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPSTR, LPSTR, LPLONG, LPLONG, LPLONG, LPDTWAIN_ARRAY, LPLONG, LPLONG, LPLONG, LPLONG) DTWAIN_GetImageInfoStringA;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPWSTR, LPWSTR, LPLONG, LPLONG, LPLONG, LPDTWAIN_ARRAY, LPLONG, LPLONG, LPLONG, LPLONG) DTWAIN_GetImageInfoStringW;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LPLONG, LPLONG, LPLONG) DTWAIN_GetImageLayoutInfo;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, DTWAIN_BOOL) DTWAIN_GetJobControl;
     extern(Windows) LONG function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_GetJobControlEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPLONG) DTWAIN_GetJpegValues;
@@ -3626,6 +3627,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetImageInfoString, "DTWAIN_GetImageInfoString");
         bindFunction(cast(void**)&DTWAIN_GetImageInfoStringA, "DTWAIN_GetImageInfoStringA");
         bindFunction(cast(void**)&DTWAIN_GetImageInfoStringW, "DTWAIN_GetImageInfoStringW");
+        bindFunction(cast(void**)&DTWAIN_GetImageLayoutInfo, "DTWAIN_GetImageLayoutInfo");
         bindFunction(cast(void**)&DTWAIN_GetJobControl, "DTWAIN_GetJobControl");
         bindFunction(cast(void**)&DTWAIN_GetJobControlEx, "DTWAIN_GetJobControlEx");
         bindFunction(cast(void**)&DTWAIN_GetJpegValues, "DTWAIN_GetJpegValues");

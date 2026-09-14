@@ -579,6 +579,7 @@ type DtwaingetimageinfoFunc = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64
 type DtwaingetimageinfostringFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
 type DtwaingetimageinfostringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
 type DtwaingetimageinfostringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
+type DtwaingetimagelayoutinfoFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,*mut i32,*mut i32) -> i32;
 type DtwaingetjobcontrolFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
 type DtwaingetjobcontrolexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwaingetjpegvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
@@ -1753,6 +1754,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetImageInfoStringFunc: Symbol<'a, DtwaingetimageinfostringFunc>,
     DTWAIN_GetImageInfoStringAFunc: Symbol<'a, DtwaingetimageinfostringaFunc>,
     DTWAIN_GetImageInfoStringWFunc: Symbol<'a, DtwaingetimageinfostringwFunc>,
+    DTWAIN_GetImageLayoutInfoFunc: Symbol<'a, DtwaingetimagelayoutinfoFunc>,
     DTWAIN_GetJobControlFunc: Symbol<'a, DtwaingetjobcontrolFunc>,
     DTWAIN_GetJobControlExFunc: Symbol<'a, DtwaingetjobcontrolexFunc>,
     DTWAIN_GetJpegValuesFunc: Symbol<'a, DtwaingetjpegvaluesFunc>,
@@ -4594,6 +4596,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetImageInfoString: Symbol<DtwaingetimageinfostringFunc> = unsafe { library.get(b"DTWAIN_GetImageInfoString")? };
         let DTWAIN_GetImageInfoStringA: Symbol<DtwaingetimageinfostringaFunc> = unsafe { library.get(b"DTWAIN_GetImageInfoStringA")? };
         let DTWAIN_GetImageInfoStringW: Symbol<DtwaingetimageinfostringwFunc> = unsafe { library.get(b"DTWAIN_GetImageInfoStringW")? };
+        let DTWAIN_GetImageLayoutInfo: Symbol<DtwaingetimagelayoutinfoFunc> = unsafe { library.get(b"DTWAIN_GetImageLayoutInfo")? };
         let DTWAIN_GetJobControl: Symbol<DtwaingetjobcontrolFunc> = unsafe { library.get(b"DTWAIN_GetJobControl")? };
         let DTWAIN_GetJobControlEx: Symbol<DtwaingetjobcontrolexFunc> = unsafe { library.get(b"DTWAIN_GetJobControlEx")? };
         let DTWAIN_GetJpegValues: Symbol<DtwaingetjpegvaluesFunc> = unsafe { library.get(b"DTWAIN_GetJpegValues")? };
@@ -5767,6 +5770,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetImageInfoStringFunc: DTWAIN_GetImageInfoString,
             DTWAIN_GetImageInfoStringAFunc: DTWAIN_GetImageInfoStringA,
             DTWAIN_GetImageInfoStringWFunc: DTWAIN_GetImageInfoStringW,
+            DTWAIN_GetImageLayoutInfoFunc: DTWAIN_GetImageLayoutInfo,
             DTWAIN_GetJobControlFunc: DTWAIN_GetJobControl,
             DTWAIN_GetJobControlExFunc: DTWAIN_GetJobControlEx,
             DTWAIN_GetJpegValuesFunc: DTWAIN_GetJpegValues,
@@ -8537,6 +8541,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetImageInfoStringW(&self, Source: *mut c_void, lpXResolution: *mut u16, lpYResolution: *mut u16, lpWidth: *mut i32, lpLength: *mut i32, lpNumSamples: *mut i32, lpBitsPerSample: *mut *mut c_void, lpBitsPerPixel: *mut i32, lpPlanar: *mut i32, lpPixelType: *mut i32, lpCompression: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_GetImageInfoStringWFunc)(Source, lpXResolution, lpYResolution, lpWidth, lpLength, lpNumSamples, lpBitsPerSample, lpBitsPerPixel, lpPlanar, lpPixelType, lpCompression);  }
+    }
+
+    pub fn DTWAIN_GetImageLayoutInfo(&self, Source: *mut c_void, lGetType: i32, DocumentNumber: *mut i32, PageNumber: *mut i32, FrameNumber: *mut i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetImageLayoutInfoFunc)(Source, lGetType, DocumentNumber, PageNumber, FrameNumber);  }
     }
 
     pub fn DTWAIN_GetJobControl(&self, Source: *mut c_void, pJobControl: *mut i32, bCurrent: i32) -> i32 {

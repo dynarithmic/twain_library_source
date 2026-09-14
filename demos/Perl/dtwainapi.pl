@@ -2219,6 +2219,7 @@ my $DTWAIN_GetImageInfo = new Win32::API($dtwain_dllName, 'DTWAIN_GetImageInfo',
 my $DTWAIN_GetImageInfoString = new Win32::API($dtwain_dllName, 'DTWAIN_GetImageInfoString', 'PPPPPPPPPPP', 'I');
 my $DTWAIN_GetImageInfoStringA = new Win32::API($dtwain_dllName, 'DTWAIN_GetImageInfoStringA', 'PPPPPPPPPPP', 'I');
 my $DTWAIN_GetImageInfoStringW = new Win32::API($dtwain_dllName, 'DTWAIN_GetImageInfoStringW', 'PPPPPPPPPPP', 'I');
+my $DTWAIN_GetImageLayoutInfo = new Win32::API($dtwain_dllName, 'DTWAIN_GetImageLayoutInfo', 'PiPPP', 'I');
 my $DTWAIN_GetJobControl = new Win32::API($dtwain_dllName, 'DTWAIN_GetJobControl', 'PPI', 'I');
 my $DTWAIN_GetJobControlEx = new Win32::API($dtwain_dllName, 'DTWAIN_GetJobControlEx', 'PI', 'i');
 my $DTWAIN_GetJpegValues = new Win32::API($dtwain_dllName, 'DTWAIN_GetJpegValues', 'PPP', 'I');

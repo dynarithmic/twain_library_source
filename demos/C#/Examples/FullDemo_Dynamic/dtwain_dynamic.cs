@@ -2373,6 +2373,7 @@
         public delegate int DTWAIN_GetImageInfoDelegate(DTWAIN_SOURCE Source, ref DTWAIN_FLOAT lpXResolution, ref DTWAIN_FLOAT lpYResolution, ref int lpWidth, ref int lpLength, ref int lpNumSamples, ref DTWAIN_ARRAY lpBitsPerSample, ref int lpBitsPerPixel, ref int lpPlanar, ref int lpPixelType, ref int lpCompression);
         public delegate int DTWAIN_GetImageInfoStringDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpXResolution, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpYResolution, ref int lpWidth, ref int lpLength, ref int lpNumSamples, ref DTWAIN_ARRAY lpBitsPerSample, ref int lpBitsPerPixel, ref int lpPlanar, ref int lpPixelType, ref int lpCompression);
         public delegate int DTWAIN_GetImageInfoStringDelegate_overload(DTWAIN_SOURCE Source, System.IntPtr lpXResolution, System.IntPtr lpYResolution, ref int lpWidth, ref int lpLength, ref int lpNumSamples, ref DTWAIN_ARRAY lpBitsPerSample, ref int lpBitsPerPixel, ref int lpPlanar, ref int lpPixelType, ref int lpCompression);
+        public delegate int DTWAIN_GetImageLayoutInfoDelegate(DTWAIN_SOURCE Source, int lGetType, ref int DocumentNumber, ref int PageNumber, ref int FrameNumber);
         public delegate int DTWAIN_GetJobControlDelegate(DTWAIN_SOURCE Source, ref int pJobControl, int bCurrent);
         public delegate int DTWAIN_GetJobControlExDelegate(DTWAIN_SOURCE Source, int bGetCurrent);
         public delegate int DTWAIN_GetJpegValuesDelegate(DTWAIN_SOURCE Source, ref int pQuality, ref int Progressive);
@@ -4218,6 +4219,9 @@
 
         [DTWAINNativeFunction("DTWAIN_GetImageInfoString")]
         private readonly DTWAIN_GetImageInfoStringDelegate_overload _DTWAIN_GetImageInfoString_overload; 
+
+        [DTWAINNativeFunction("DTWAIN_GetImageLayoutInfo")]
+        private readonly DTWAIN_GetImageLayoutInfoDelegate  _DTWAIN_GetImageLayoutInfo;
 
         [DTWAINNativeFunction("DTWAIN_GetJobControl")]
         private readonly DTWAIN_GetJobControlDelegate  _DTWAIN_GetJobControl;
@@ -7019,6 +7023,9 @@
 
         public  int DTWAIN_GetImageInfoString (DTWAIN_SOURCE Source, System.IntPtr lpXResolution, System.IntPtr lpYResolution, ref int lpWidth, ref int lpLength, ref int lpNumSamples, ref DTWAIN_ARRAY lpBitsPerSample, ref int lpBitsPerPixel, ref int lpPlanar, ref int lpPixelType, ref int lpCompression)
         => _DTWAIN_GetImageInfoString_overload(Source, lpXResolution, lpYResolution, ref lpWidth, ref lpLength, ref lpNumSamples, ref lpBitsPerSample, ref lpBitsPerPixel, ref lpPlanar, ref lpPixelType, ref lpCompression);
+
+        public  int DTWAIN_GetImageLayoutInfo(DTWAIN_SOURCE Source, int lGetType, ref int DocumentNumber, ref int PageNumber, ref int FrameNumber)
+        => _DTWAIN_GetImageLayoutInfo(Source, lGetType, ref DocumentNumber, ref PageNumber, ref FrameNumber);
 
         public  int DTWAIN_GetJobControl(DTWAIN_SOURCE Source, ref int pJobControl, int bCurrent)
         => _DTWAIN_GetJobControl(Source, ref pJobControl, bCurrent);

@@ -3130,6 +3130,9 @@ module TwainAPI =
     type DTWAIN_GetImageInfoStringDelegate = delegate of DTWAIN_SOURCE * System.Text.StringBuilder * System.Text.StringBuilder * int byref * int byref * int byref * DTWAIN_ARRAY byref * int byref * int byref * int byref * int byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetImageLayoutInfoDelegate = delegate of DTWAIN_SOURCE * LONG * int byref * int byref * int byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetJobControlDelegate = delegate of DTWAIN_SOURCE * int byref * DTWAIN_BOOL -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4860,6 +4863,7 @@ module TwainAPI =
     let private GetHighlightString = lazy (DynamicDll.Bind "DTWAIN_GetHighlightString" : DTWAIN_GetHighlightStringDelegate)
     let private GetImageInfo = lazy (DynamicDll.Bind "DTWAIN_GetImageInfo" : DTWAIN_GetImageInfoDelegate)
     let private GetImageInfoString = lazy (DynamicDll.Bind "DTWAIN_GetImageInfoString" : DTWAIN_GetImageInfoStringDelegate)
+    let private GetImageLayoutInfo = lazy (DynamicDll.Bind "DTWAIN_GetImageLayoutInfo" : DTWAIN_GetImageLayoutInfoDelegate)
     let private GetJobControl = lazy (DynamicDll.Bind "DTWAIN_GetJobControl" : DTWAIN_GetJobControlDelegate)
     let private GetJobControlEx = lazy (DynamicDll.Bind "DTWAIN_GetJobControlEx" : DTWAIN_GetJobControlExDelegate)
     let private GetJpegValues = lazy (DynamicDll.Bind "DTWAIN_GetJpegValues" : DTWAIN_GetJpegValuesDelegate)
@@ -6989,6 +6993,10 @@ module TwainAPI =
     let DTWAIN_GetImageInfoString (source: DTWAIN_SOURCE) (lpxresolution: System.Text.StringBuilder) (lpyresolution: System.Text.StringBuilder) (lpwidth: int byref) (lplength: int byref) (lpnumsamples: int byref) (lpbitspersample: DTWAIN_ARRAY byref) (lpbitsperpixel: int byref) (lpplanar: int byref) (lppixeltype: int byref) (lpcompression: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetImageInfoString.Value.Invoke(source, lpxresolution, lpyresolution, &lpwidth, &lplength, &lpnumsamples, &lpbitspersample, &lpbitsperpixel, &lpplanar, &lppixeltype, &lpcompression)
+
+    let DTWAIN_GetImageLayoutInfo (source: DTWAIN_SOURCE) (lgettype: LONG) (documentnumber: int byref) (pagenumber: int byref) (framenumber: int byref) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetImageLayoutInfo.Value.Invoke(source, lgettype, &documentnumber, &pagenumber, &framenumber)
 
     let DTWAIN_GetJobControl (source: DTWAIN_SOURCE) (pjobcontrol: int byref) (bcurrent: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
