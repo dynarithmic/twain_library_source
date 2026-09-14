@@ -41,14 +41,23 @@ namespace dynarithmic
                     TW_IMAGELAYOUT* pLayout = GetImageLayout();
                     if (GetSetType != MSG_RESET && rArray && rArray->size() >= 4)
                     {
-                        pLayout->Frame.Left = FloatToFix32(static_cast<float>((*rArray)[0]));
-                        pLayout->Frame.Top = FloatToFix32(static_cast<float>((*rArray)[1]));
-                        pLayout->Frame.Right = FloatToFix32(static_cast<float>((*rArray)[2]));
-                        pLayout->Frame.Bottom = FloatToFix32(static_cast<float>((*rArray)[3]));
+                        pLayout->Frame.Left = FloatToFix32(static_cast<float>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_LEFT]));
+                        pLayout->Frame.Top = FloatToFix32(static_cast<float>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_TOP]));
+                        pLayout->Frame.Right = FloatToFix32(static_cast<float>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_RIGHT]));
+                        pLayout->Frame.Bottom = FloatToFix32(static_cast<float>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_BOTTOM]));
                     }
-                    pLayout->DocumentNumber = static_cast<TW_UINT32>(-1);
-                    pLayout->PageNumber = static_cast<TW_UINT32>(-1);
-                    pLayout->FrameNumber = static_cast<TW_UINT32>(-1);
+                    if (rArray->size() >= CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS)
+                    {
+                        pLayout->DocumentNumber = static_cast<TW_UINT32>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_DOCUMENTNUMBER]);
+                        pLayout->PageNumber = static_cast<TW_UINT32>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_PAGENUMBER]);
+                        pLayout->FrameNumber = static_cast<TW_UINT32>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_FRAMENUMBER]);
+                    }
+                    else
+                    {
+                        pLayout->DocumentNumber = 0;
+                        pLayout->PageNumber = 0;
+                        pLayout->FrameNumber = 0;
+                    }
                 }
             }
 
@@ -95,7 +104,7 @@ namespace dynarithmic
             TW_IMAGELAYOUT* GetImageLayout() { return &m_ImageLayout; }
 
         private:
-            TW_IMAGELAYOUT  m_ImageLayout;
+            TW_IMAGELAYOUT  m_ImageLayout = {};
     };
 
     using CTL_GetImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_GET>;

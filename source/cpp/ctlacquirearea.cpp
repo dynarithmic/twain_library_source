@@ -37,9 +37,16 @@ using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
 
 namespace
 {
+    std::pair<bool, CTL_RealArray> GetImageSize_Internal(CTL_ITwainSource* pSource, LONG GetType)
+    {
+        CTL_RealArray Array;
+        const bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(pSource, Array, GetType);
+        return { bOk, Array };
+    }
+
     bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType)
     {
-        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
+        auto* p = reinterpret_cast<CTL_ITwainSource*>(Source);
         DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS).second;
         if (!FloatArrayOut)
             return false;
@@ -47,8 +54,9 @@ namespace
         CTL_RealArray Array;
         if (GetType == MSG_GETCURRENT)
             GetType = MSG_GET;
-
-        const bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
+        auto retVal = GetImageSize_Internal(p, GetType);
+        bool bOk = retVal.first; // CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
+        Array = retVal.second;
         if (!bOk)
         {
             MoveArray(pHandle, FloatArray, &FloatArrayOut);
@@ -68,8 +76,7 @@ namespace
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
                 [&] {return !pHandle->m_ArrayFactory->is_valid(ActualArray, CTL_ArrayFactory::arrayTag::DoubleType); },
                 DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-            vActual.clear();
-            std::copy_n(vValues.begin(), std::min(std::size_t(4), vValues.size()), std::back_inserter(vActual));
+            vActual = vValues;
             return true;
         }
         return false;
@@ -80,12 +87,26 @@ namespace
         LOG_FUNC_ENTRY_PARAMS((Source, FloatArray, ActualArray, SetType))
         CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
         const auto pHandle = p->GetDTWAINHandle();
+
+        // First get the current image layout
+        auto retVal = GetImageSize_Internal(p, MSG_GETCURRENT);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !retVal.first; }, DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
+
+        CTL_RealArray Array;
+        auto arrayFromGet = retVal.second;
+        Array.resize(CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS);
+        Array[CTL_EnumLayoutComponents::LAYOUT_DOCUMENTNUMBER] = arrayFromGet[CTL_EnumLayoutComponents::LAYOUT_DOCUMENTNUMBER];
+        Array[CTL_EnumLayoutComponents::LAYOUT_PAGENUMBER] = arrayFromGet[CTL_EnumLayoutComponents::LAYOUT_PAGENUMBER];
+        Array[CTL_EnumLayoutComponents::LAYOUT_FRAMENUMBER] = arrayFromGet[CTL_EnumLayoutComponents::LAYOUT_FRAMENUMBER];
+
         if (SetType == MSG_RESET)
         {
+            // reset the array
             CTL_RealArray dummy;
-            const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, {}, dummy, MSG_RESET);
+            arrayFromGet = CTL_RealArray(CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS);
+            const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, arrayFromGet, dummy, MSG_RESET);
             if (bOk)
-                FillActualArray(pHandle, ActualArray, dummy);
+                FillActualArray(pHandle, ActualArray, {});
             LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
         }
 
@@ -95,20 +116,17 @@ namespace
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
         constexpr size_t minValue = 4;
         const auto& vFloat = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArray);
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle,
-            [&] { return vFloat.size() < minValue; },
-            DTWAIN_ERR_AREA_ARRAY_TOO_SMALL, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return vFloat.size() < minValue; },
+                                                  DTWAIN_ERR_AREA_ARRAY_TOO_SMALL, false, FUNC_MACRO);
 
-        CTL_RealArray Array;
         CTL_RealArray rArray;
-        std::copy_n(vFloat.begin(), minValue, std::back_inserter(Array));
+        std::copy_n(vFloat.begin(), minValue, Array.begin());
         const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, Array, rArray, SetType);
         if (bOk)
             FillActualArray(pHandle, ActualArray, rArray);
         LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
         CATCH_BLOCK(false)
     }
-
 
     bool SetImageSize2(CTL_ITwainSource* p,
         DTWAIN_FLOAT left,
