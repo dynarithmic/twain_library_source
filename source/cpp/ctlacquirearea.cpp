@@ -47,16 +47,15 @@ namespace
     bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType)
     {
         auto* p = reinterpret_cast<CTL_ITwainSource*>(Source);
-        DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS).second;
+        DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, LAYOUT_NUMCOMPONENTS).second;
         if (!FloatArrayOut)
             return false;
         DTWAINArrayLowLevelPtr_RAII aFloat(pHandle, &FloatArrayOut);
-        CTL_RealArray Array;
         if (GetType == MSG_GETCURRENT)
             GetType = MSG_GET;
         auto retVal = GetImageSize_Internal(p, GetType);
-        bool bOk = retVal.first; // CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
-        Array = retVal.second;
+        bool bOk = retVal.first; 
+        CTL_RealArray Array = retVal.second;
         if (!bOk)
         {
             MoveArray(pHandle, FloatArray, &FloatArrayOut);
@@ -94,16 +93,16 @@ namespace
 
         CTL_RealArray Array;
         auto arrayFromGet = retVal.second;
-        Array.resize(CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS);
-        Array[CTL_EnumLayoutComponents::LAYOUT_DOCUMENTNUMBER] = arrayFromGet[CTL_EnumLayoutComponents::LAYOUT_DOCUMENTNUMBER];
-        Array[CTL_EnumLayoutComponents::LAYOUT_PAGENUMBER] = arrayFromGet[CTL_EnumLayoutComponents::LAYOUT_PAGENUMBER];
-        Array[CTL_EnumLayoutComponents::LAYOUT_FRAMENUMBER] = arrayFromGet[CTL_EnumLayoutComponents::LAYOUT_FRAMENUMBER];
+        Array.resize(LAYOUT_NUMCOMPONENTS);
+        Array[LAYOUT_DOCUMENTNUMBER] = arrayFromGet[LAYOUT_DOCUMENTNUMBER];
+        Array[LAYOUT_PAGENUMBER] = arrayFromGet[LAYOUT_PAGENUMBER];
+        Array[LAYOUT_FRAMENUMBER] = arrayFromGet[LAYOUT_FRAMENUMBER];
 
         if (SetType == MSG_RESET)
         {
             // reset the array
             CTL_RealArray dummy;
-            arrayFromGet = CTL_RealArray(CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS);
+            arrayFromGet = CTL_RealArray(LAYOUT_NUMCOMPONENTS);
             const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, arrayFromGet, dummy, MSG_RESET);
             if (bOk)
                 FillActualArray(pHandle, ActualArray, {});
@@ -142,15 +141,11 @@ namespace
         CATCH_BLOCK(false)
     }
 
-    bool GetImageSize2(CTL_ITwainSource* p,
-        LPDTWAIN_FLOAT left,
-        LPDTWAIN_FLOAT top,
-        LPDTWAIN_FLOAT right,
-        LPDTWAIN_FLOAT bottom,
-        LPLONG Unit)
+    bool GetImageSize2(CTL_ITwainSource* p, LPDTWAIN_FLOAT left, LPDTWAIN_FLOAT top, 
+                       LPDTWAIN_FLOAT right, LPDTWAIN_FLOAT bottom, LPLONG Unit)
     {
         LOG_FUNC_ENTRY_PARAMS((p, left, top, right, bottom, Unit))
-            FloatRect r;
+        FloatRect r;
         LONG flags;
         p->GetAlternateAcquireArea(r, *Unit, flags);
         if (!flags)
@@ -274,11 +269,11 @@ extern "C"
         if ( bOk )
         {
             if (DocumentNumber)
-                *DocumentNumber = static_cast<LONG>(Array[CTL_EnumLayoutComponents::LAYOUT_DOCUMENTNUMBER]);
+                *DocumentNumber = static_cast<LONG>(Array[LAYOUT_DOCUMENTNUMBER]);
             if (PageNumber)
-                *PageNumber = static_cast<LONG>(Array[CTL_EnumLayoutComponents::LAYOUT_PAGENUMBER]);
+                *PageNumber = static_cast<LONG>(Array[LAYOUT_PAGENUMBER]);
             if (FrameNumber)
-                *FrameNumber = static_cast<LONG>(Array[CTL_EnumLayoutComponents::LAYOUT_FRAMENUMBER]);
+                *FrameNumber = static_cast<LONG>(Array[LAYOUT_FRAMENUMBER]);
             LOG_FUNC_EXIT_DEREFERENCE_POINTERS((DocumentNumber, PageNumber, FrameNumber))
             LOG_FUNC_EXIT_NONAME_PARAMS(true)
         }

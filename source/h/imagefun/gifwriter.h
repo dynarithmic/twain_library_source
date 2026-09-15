@@ -99,7 +99,7 @@ namespace dynarithmic
             static bool ValidatePage(const PreparedGifDibPage& page);
             void prepare_color_map();
             std::string build_comment_text() const;
-            bool write_comment_extensions();
+            bool write_comment_extensions() const;
 
         private:
             FILE* file_ = nullptr;

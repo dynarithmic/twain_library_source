@@ -484,7 +484,7 @@ void TransymOCR::SetAvailableCaps()
             { DTWAIN_OCRCV_REMOVECONTROLCHARS, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", nullptr, false }
         };
 
-        const int numCaps = sizeof capsLongInfo / sizeof capsLongInfo[0];
+        constexpr int numCaps = sizeof capsLongInfo / sizeof capsLongInfo[0];
 
         std::vector<LONG> fArray;
         for (int i = 0; i < numCaps; ++i )

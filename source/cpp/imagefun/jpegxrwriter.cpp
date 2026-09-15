@@ -288,7 +288,7 @@ uint32_t JxrSessionWriter::EffectiveRowBytes() const
     return currentPage_.strideBytes;
 }
 
-void JxrSessionWriter::PrepareRow(const uint8_t* src, uint8_t* dst, uint32_t rowBytes) const
+void JxrSessionWriter::PrepareRow(const uint8_t* src, uint8_t* dst, uint32_t rowBytes)
 {
     // For the supported formats here, the in-memory Windows DIB layout is already
     // what jxrlib expects for these pixel formats: BW1, Gray8, Gray16, BGR24, BGRA32.

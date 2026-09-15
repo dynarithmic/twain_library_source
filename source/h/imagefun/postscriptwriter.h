@@ -131,7 +131,7 @@ namespace dynarithmic
             static bool BuildRawImageData(const PreparedPsDibPage& page, std::string& raw);
             bool WriteAscii85ImageData(const PreparedPsDibPage& page) const;
             bool WriteAscii85RunLengthImageData(const PreparedPsDibPage& page) const;
-            bool WriteAscii85FlateImageData(const PreparedPsDibPage& page);
+            bool WriteAscii85FlateImageData(const PreparedPsDibPage& page) const;
 
             FILE* file_ = nullptr;
             PsSessionOptions options_{};

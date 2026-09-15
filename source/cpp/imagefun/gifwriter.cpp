@@ -184,15 +184,18 @@ int GifSessionWriter::gif_write_callback(GifFileType* gif, const GifByteType* da
     return static_cast<int>(std::fwrite(data, 1, static_cast<size_t>(length), file));
 }
 
-static void append_metadata_line(std::string& out,const char* key, const std::string& value)
+namespace
 {
-    if (value.empty())
-        return;
+    void append_metadata_line(std::string& out, const char* key, const std::string& value)
+    {
+        if (value.empty())
+            return;
 
-    out += key;
-    out += ": ";
-    out += value;
-    out += "\n";
+        out += key;
+        out += ": ";
+        out += value;
+        out += "\n";
+    }
 }
 
 std::string GifSessionWriter::build_comment_text() const
@@ -210,7 +213,7 @@ std::string GifSessionWriter::build_comment_text() const
     return text;
 }
 
-bool GifSessionWriter::write_comment_extensions()
+bool GifSessionWriter::write_comment_extensions() const
 {
     const std::string text = build_comment_text();
     if (text.empty())

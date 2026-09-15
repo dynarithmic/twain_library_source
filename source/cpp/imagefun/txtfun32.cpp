@@ -185,14 +185,14 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
     return 0; 
 }
 
-int CTextImageHandler::WriteTempFile()
+int CTextImageHandler::WriteTempFile() const
 {
     m_pTextPageInfo->m_pOrigHandler->SetDib(m_pDib);
     const int retval = m_pTextPageInfo->m_pOrigHandler->WriteBitmap(m_pTextPageInfo->szTempFile.c_str(), true, 0);
     return retval;
 }
 
-int CTextImageHandler::SaveOCR()
+int CTextImageHandler::SaveOCR() const
 {
     // Now OCR the file and save to the text file specified by user
     const LONG bRet = m_pOCREngine->StartOCR(m_pTextPageInfo->szTempFile);

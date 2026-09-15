@@ -340,7 +340,7 @@ void CLogSystem::SetDLLHandle(CTL_TwainDLLHandle* pHandle)
     m_pDLLHandle = pHandle;
 }
 
-void CLogSystem::PrintBanner(bool bStarted)
+void CLogSystem::PrintBanner(bool bStarted) const
 {
     std::string LogMsg;
     if (bStarted)
@@ -358,7 +358,7 @@ void CLogSystem::Enable(bool bEnable)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-bool CLogSystem::StatusOutFast(LPCSTR fmt)
+bool CLogSystem::StatusOutFast(LPCSTR fmt) const
 {
     if (!m_bEnable)
         return true;
@@ -367,15 +367,15 @@ bool CLogSystem::StatusOutFast(LPCSTR fmt)
     return true;
 }
 
-bool CLogSystem::WriteOnDemand(std::string_view fmt)
+bool CLogSystem::WriteOnDemand(std::string_view fmt) const
 {
-    std::lock_guard<std::mutex> g(s_logMutex);
+    std::scoped_lock g(s_logMutex);
     for (const auto& m : app_logger_map)
         m.second->trace(fmt);
     return true;
 }
 
-bool CLogSystem::Flush()
+bool CLogSystem::Flush() const
 {
     return WriteOnDemand("");
 }

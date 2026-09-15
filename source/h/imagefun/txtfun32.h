@@ -67,8 +67,8 @@ namespace dynarithmic
             bool OpenOutputFile(LPCTSTR pFileName) override;
             bool CloseOutputFile() override;
             void DestroyAllObjects() override;
-            int WriteTempFile();
-            int SaveOCR();
+            int WriteTempFile() const;
+            int SaveOCR() const;
 
         private:
             bool m_bWriteOk;

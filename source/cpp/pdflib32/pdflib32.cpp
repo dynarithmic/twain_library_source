@@ -135,14 +135,14 @@ namespace dynarithmic
                                                bool bUseStrongEncrypt,
                                                bool bUseAESEncryption,
                                                uint32_t nKeyLength)
-{
+    {
         pDoc->SetEncryption(szOwnerPass ? szOwnerPass : _T(""),
                                                    szUserPass?szUserPass:_T(""),
                                                    Permissions,
                                                    bUseStrongEncrypt,
                                                    bUseAESEncryption,
                                                    nKeyLength);
-}
+    }
 
     void PDFInterface::DTWLIB_PDFSetASCIICompression(const PdfDocumentPtr& pDoc, bool bSetCompression)
     {
@@ -160,29 +160,12 @@ namespace dynarithmic
     }
 
     void PDFInterface::DTWLIB_PDFAddPageText(const PdfDocumentPtr& pDoc, PDFTextElement* pElement)
-{
-/*    PDFTextElement element;
-
-    element.m_text = szText;
-    element.xpos = xPos;
-    element.ypos = yPos;
-    element.m_font.m_fontName = fontName;
-    element.fontSize = fontSize;
-    element.colorRGB = colorRGB;
-    element.renderMode = renderMode;
-    element.strokeWidth = strokeWidth;
-    element.scaling = scaling;
-    element.wordSpacing = wordSpacing;
-    element.charSpacing = charSpacing;
-    element.displayFlags = flags;
-    element.scalingX = scalingX;
-    element.scalingY = scalingY;
-*/
+    {
         pDoc->AddTextElement(pElement);
-}
+    }
 
     void PDFInterface::DTWLIB_PDFSetPolarity(const PdfDocumentPtr& pDoc, int32_t Polarity)
-{
+    {
         pDoc->SetPolarity(Polarity);
     }
 }
