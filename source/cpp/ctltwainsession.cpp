@@ -587,11 +587,7 @@ extern "C"
 
         // Create a session
         auto Session = CTL_TwainAppMgr::CreateTwainSession( pHandle, szName.c_str(), &hWndMsg);
-
-        if ( Session == nullptr)
-        {
-            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, []{return 1;}, DTWAIN_ERR_TWAIN, false, FUNC_MACRO);
-        }
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&]{return !Session;}, DTWAIN_ERR_TWAINDSM_NOT_FOUND, false, FUNC_MACRO);
         #ifdef DTWAIN_LIB
         CTL_TwainAppMgr::SetDLLInstance( CTL_StaticData::s_DLLInstance );
         #else
