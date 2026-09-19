@@ -1228,51 +1228,66 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Implementation
-#ifdef __cplusplus
+static void AbortIfError(const char *fName)
+{
+    #ifndef IGNORE_FUNC_ERRORS
+        #ifndef _DEBUG
+            fprintf(stderr, "Unknown Function Name in DTWAIN DLL: %s\n", fName); 
+            exit(-1);
+        #else
+            char szTotalBuf[256];
+            sprintf_s(szTotalBuf, 256, "Unknown Function Name in DTWAIN DLL: %s\n", fName);
+            fprintf(stderr, szTotalBuf); 
+            OutputDebugStringA(szTotalBuf); 
+            assert(0);
+        #endif
+    #endif
+}
+
+static void AssertAPI(int condition, const char *msg)
+{
+#ifndef IGNORE_FUNC_ERRORS
+    if (!condition)
+    {
+        #ifdef _DEBUG
+            char szTotalBuf[256];
+            sprintf_s(szTotalBuf, 256, msg);
+            fprintf(stderr, szTotalBuf); 
+            OutputDebugStringA(szTotalBuf); 
+            assert(0);
+        #else
+            fprintf(stderr, msg); 
+            exit(-1);
+        #endif
+    }
+#endif
+}
+
 template <typename Fn>
 int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
 {
-    DTWAINAPI_ASSERT(apifn = reinterpret_cast<Fn>(::GetProcAddress(hModule, fnName)));
+    apifn = reinterpret_cast<Fn>(::GetProcAddress(hModule, fnName));
+    if (!apifn)
+    {
+        AbortIfError(fnName);
+    }
     return 1;
 }
+
 #define LOADFUNCTIONIMPL(fn, module) do { if (!LoadFunction(fn, module, #fn)) return 0;} while(false);
-#else
-#define LOADFUNCTIONIMPL(fn, module) do { \
-        DTWAINAPI_ASSERT(DTWAIN_INSTANCE fn = GetProcAddress(module, #fn)); } while(0);
-#endif
-#ifdef __cplusplus
-    #define DTWAIN_INSTANCE DYNDTWAIN_API::
-    int DYNDTWAIN_API::InitDTWAINInterface(HMODULE hModule)
-    {
-        return InitDTWAINInterface(nullptr, hModule);
-    }
 
-    int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
-    {
-#else
-    #define DTWAIN_INSTANCE pApi->
-    int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
-    {
-#endif
-#ifndef __cplusplus
-        memset(pApi, 0, sizeof(DYNDTWAIN_API));
-#endif
-    /* hModule must be the return value of LoadLibraryA(LibraryVersion);
-       where LibraryVersion is one of the following, depending on the DTWAIN DLL that is being used:
+#define DTWAIN_INSTANCE DYNDTWAIN_API::
+int DYNDTWAIN_API::InitDTWAINInterface(HMODULE hModule)
+{
+    return InitDTWAINInterface(nullptr, hModule);
+}
 
-       "dtwain32"
-       "dtwain32d"
-       "dtwain32u"
-       "dtwain32ud"
-       "dtwain64"
-       "dtwain64d"
-       "dtwain64u"
-       "dtwain64ud"
-       */
+int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
+{
     if ( hModule )
     {
-          LOADFUNCTIONIMPL(DTWAIN_GetVersion, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_GetVersionEx, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetVersion, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_GetVersionEx, hModule)
           if ( DTWAIN_INSTANCE DTWAIN_GetVersionEx )
           {
               LONG Major, Minor, VerType, Patch;
@@ -1280,12 +1295,12 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
               if (Major >= DTWAIN_MAJOR_VERSION)
               {
                   if (Minor >= DTWAIN_MINOR_VERSION)
-                      DTWAINAPI_ASSERT(Patch >= DTWAIN_PATCHLEVEL_VERSION)
+                      AssertAPI(Patch >= DTWAIN_PATCHLEVEL_VERSION, "Invalid DTWAIN DLL version");
                   else
-                      DTWAINAPI_ASSERT(Minor >= DTWAIN_MINOR_VERSION)
+                      AssertAPI(Minor >= DTWAIN_MINOR_VERSION, "Invalid DTWAIN DLL version");
               }
               else
-                  DTWAINAPI_ASSERT(Major >= DTWAIN_MAJOR_VERSION);
+                  AssertAPI(Major >= DTWAIN_MAJOR_VERSION, "Invalid DTWAIN DLL version");
           }
 
           LOADFUNCTIONIMPL(DTWAIN_AcquireAudioFile, hModule);
