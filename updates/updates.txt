@@ -34,6 +34,8 @@ DTWAIN Version changes
     The DocumentNumber, PageNumber, and FrameNumber will be filled in with the relevant information on return of this function (any of 
     these parameters can also be NULL, meaning that the value should be ignored).
 
+- Fix C language compilation issues using the LoadLibrary() / GetProcAddress() language wrapper (dtwimpl.c)
+
 - Removed the following obsolete and undocumented DTWAIN API functions:
 
     DTWAIN_AddExtImageInfoQuery 
