@@ -119,7 +119,7 @@ namespace dynarithmic
 
        /////////////////////////////////////////////////////////////////////////////
        // output text, just like TRACE or printf
-       bool     StatusOutFast(LPCSTR fmt);
+       bool     StatusOutFast(LPCSTR fmt) const;
 
 
        /////////////////////////////////////////////////////////////////////////////
@@ -138,11 +138,11 @@ namespace dynarithmic
        // override the default app name, which is the name the EXE (minus the ".exe")
        void     SetAppName(LPCSTR pName) {m_csAppName = pName;}
 
-       bool     Flush();
+       bool     Flush() const;
 
        bool     SetLogSaveThreshold(int64_t lineCount);
 
-       void     PrintBanner(bool bStarted = true);
+       void     PrintBanner(bool bStarted = true) const;
 
        void DisableLogger(int loggerType);
        void DisableAllLoggers();
@@ -178,7 +178,7 @@ namespace dynarithmic
        std::string GetBaseDir(std::string_view path) const;
        std::string GetBaseName(std::string_view path) const;
        void GetModuleName(HINSTANCE hInst);
-       bool WriteOnDemand(std::string_view fmt);
+       bool WriteOnDemand(std::string_view fmt) const;
 
        private:
            bool InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, const LoggingTraits& fTraits = {});

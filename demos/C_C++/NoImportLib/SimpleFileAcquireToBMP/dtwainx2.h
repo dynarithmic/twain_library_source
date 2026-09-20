@@ -30,6 +30,11 @@
 #include <winconst.h>
 #include <dtwaindefs.h>
 #include <dtwain_version.h>
+#ifdef __cplusplus
+    #include <iostream>
+#else
+    #include <stdio.h>
+#endif
 #include <dtwpdft.h>
 #ifndef DTWAIN_NOIMPORTLIB
     #define DTWAIN_NOIMPORTLIB
@@ -2465,16 +2470,6 @@ public:
 #else
 } DYNDTWAIN_API;
 int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE h);
-#endif
-
-#ifdef IGNORE_FUNC_ERRORS
-    #define DTWAINAPI_ASSERT(x) (x)
-#else
-#ifndef _DEBUG
-    #define DTWAINAPI_ASSERT(x) { if (!(x)) return 0; }
-#else
-    #define DTWAINAPI_ASSERT(x) assert(x);
-#endif
 #endif
 #endif
 

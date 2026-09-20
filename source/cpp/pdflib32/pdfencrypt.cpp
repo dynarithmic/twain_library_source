@@ -43,7 +43,6 @@ OF THIRD PARTY RIGHTS.
 #endif
 
 using namespace boost::multiprecision;
-namespace stringutils = dynarithmic::basicstringutils;
 
 using namespace dynarithmic;
 
@@ -667,12 +666,11 @@ void PDFEncryption::SetHashKey(int number, int generation)
 
     m_LocalKey.resize(32);
 
-    std::copy(tempbuf.begin(), tempbuf.begin() + dynarithmic::MD5Hasher::HashBytes, m_LocalKey.begin());
+    std::copy_n(tempbuf.begin(), dynarithmic::MD5Hasher::HashBytes, m_LocalKey.begin());
 
     m_nKeySize = static_cast<int>(m_EncryptionKey.size()) + 5;
     auto maxKeySize = std::max(16U, m_nActualKeyLength);
-    if (m_nKeySize > maxKeySize)
-        m_nKeySize = maxKeySize;
+    m_nKeySize = std::min(m_nKeySize, maxKeySize);
 }
 
 void PDFEncryption::PrepareRC4Key(const UCHARArray& keyParam)

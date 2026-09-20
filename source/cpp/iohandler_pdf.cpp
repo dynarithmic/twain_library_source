@@ -130,15 +130,15 @@ CTL_PDFIOHandler::CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAIN
     m_ImageInfoEx.IsPDF = true;
 }
 
-static char CleanupOCRText1(char ch)
-{
-    if ( !isprint(ch))
-        return ' ';
-    return ch;
-}
-
 namespace
 {
+    char CleanupOCRText1(char ch)
+    {
+        if (!isprint(ch))
+            return ' ';
+        return ch;
+    }
+
     struct OCRTextInfo
     {
         std::vector<LONG> xPos;
@@ -151,7 +151,7 @@ namespace
         std::pair<LONG, LONG> m_ImageDimensions;
         std::pair<double, double> m_PDFScalingFactorForPage;
 
-        void GetCharacterPositionAndHeightInPDF(LONG nChar, PDFPosition& pdfPosition, double& fontHeight, double& fontWidth)
+        void GetCharacterPositionAndHeightInPDF(LONG nChar, PDFPosition& pdfPosition, double& fontHeight, double& fontWidth) const
         {
             double xP = m_RealDimensions.mediabox[2] * xPos[nChar] / m_ImageDimensions.first;  // get PDF x-position of character
             double yP = m_RealDimensions.mediabox[3] * yPos[nChar] / m_ImageDimensions.second; // get PDF y-position of character

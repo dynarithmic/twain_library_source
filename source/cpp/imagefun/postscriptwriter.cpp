@@ -390,7 +390,7 @@ bool PsSessionWriter::WriteLevel2Or3Image(const PreparedPsDibPage& page)
     return WriteAscii85ImageData(page);
 }
 
-bool PsSessionWriter::WriteAscii85FlateImageData(const PreparedPsDibPage& page)
+bool PsSessionWriter::WriteAscii85FlateImageData(const PreparedPsDibPage& page) const
 {
     std::string raw;
     if (!BuildRawImageData(page, raw))
