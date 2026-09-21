@@ -119,7 +119,10 @@ extern "C"
         LOG_FUNC_ENTRY_PARAMS((Source, lpEvent))
         auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
         const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
-        *lpEvent = DeviceEvent.GetEvent() + 1;
+        auto theEvent = DeviceEvent.GetEvent();
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] 
+            { return theEvent == CTL_DeviceEvent::InvalidEvent; }, DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
+        *lpEvent = theEvent;
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpEvent))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
@@ -127,20 +130,34 @@ extern "C"
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPDWORD lpEvent, LPDTWAIN_ARRAY pArray)
     {
+        // Check if event exists
         LOG_FUNC_ENTRY_PARAMS((Source, lpEvent, pArray))
         if (!DTWAIN_GetDeviceEvent(Source, lpEvent))
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
         auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
         auto pHandle = pSource->GetDTWAINHandle();
+
+        // User array pointer cannot be NULL
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
+        // Create an array
+        auto retVal = CreateArrayFromFactory(pHandle, GetDeviceEventArrayType(*lpEvent), 0);
+        // Check for array creation success
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+        
+        // Get the cached device event 
+        DTWAIN_BOOL bRet = TRUE;
         const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
-        DTWAIN_ARRAY arr = {};
+        DTWAIN_ARRAY arr = retVal.second;
+        // Make sure the array we created gets destroyed at the exit of the function
         DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arr);
-        const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pHandle, arr);
+
+        // Get the event data and move it to the user's array
+        bRet = DeviceEvent.GetEventInfoEx(pHandle, arr);
         MoveArray(pHandle, pArray, &arr);
-        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpEvent))
+
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpEvent, *pArray))
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
     }
