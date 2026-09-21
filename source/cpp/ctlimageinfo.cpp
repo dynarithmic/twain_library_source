@@ -123,7 +123,7 @@ extern "C"
 
         if (Compression)
             *Compression = pInfo->Compression;
-        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution, Width, Length, NumSamples, BitsPerSample?*BitsPerSample:nullptr, BitsPerPixel, Planar, PixelType, Compression))
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
