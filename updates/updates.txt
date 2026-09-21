@@ -24,6 +24,9 @@ DTWAIN Version changes
   The TWAIN specification does not allow setting the default TWAIN Source for DSM versions less than 2.x, thus 
   issuing this call will result in an error.
 
+- The DTWAIN_GetDeviceEvent() and DTWAIN_GetDeviceEventEx() functions will now return 9999 for an unknown device
+  event.  
+
 - Fix issue with DTWAIN_GetAcquireArea() possibly not returning the values used for the area of acquisition.
 
 - Added function DTWAIN_GetImageLayoutInfo() that returns the document number, frame number, and page number 

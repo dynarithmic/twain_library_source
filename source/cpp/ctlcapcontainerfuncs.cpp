@@ -184,6 +184,7 @@ extern "C"
             }
         }
         MoveArray(pHandle, pArray, &pDTWAINArray);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*pArray))
         LOG_FUNC_EXIT_NONAME_PARAMS(0xFFFFFFFF)
         CATCH_BLOCK_LOG_PARAMS(0)
     }

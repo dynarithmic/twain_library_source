@@ -698,5 +698,34 @@ namespace dynarithmic
         }
         return 1.0;
     }
+
+    constexpr bool DeviceEventHasInfo(TW_UINT16 devEvent)
+    {
+        switch(devEvent)
+        {
+            case TWDE_CHECKBATTERY:
+            case TWDE_CHECKPOWERSUPPLY:
+            case TWDE_CHECKRESOLUTION:
+            case TWDE_CHECKFLASH:
+            case TWDE_CHECKAUTOMATICCAPTURE:
+                return true;
+        }
+        return false;
+    }
+
+    constexpr int GetDeviceEventArrayType(TW_UINT16 devEvent)
+    {
+        switch (devEvent)
+        {
+            case TWDE_CHECKBATTERY:
+            case TWDE_CHECKPOWERSUPPLY:
+            case TWDE_CHECKFLASH:
+            case TWDE_CHECKAUTOMATICCAPTURE:
+                return DTWAIN_ARRAYLONG;
+            case TWDE_CHECKRESOLUTION:
+                return DTWAIN_ARRAYFLOAT;
+        }
+        return DTWAIN_ARRAYLONG;
+    }
 }
 #endif
