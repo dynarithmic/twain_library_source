@@ -186,6 +186,7 @@ extern "C"
         auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !FloatArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
         const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<TW_UINT16>(lGetType));
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*FloatArray))
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK_LOG_PARAMS(false)
     }

@@ -84,6 +84,7 @@ extern "C"
             DTWAIN_ARRAY ThisArray = CreateArrayFromContainer<std::vector<LONG>>(pHandle, vVect);
             MoveArray(pHandle, Array, &ThisArray);
         }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*Array))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -149,10 +150,12 @@ extern "C"
                 }
             }
             MoveArray(pHandle, Array, &ThisArray);
+            LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*Array))
             LOG_FUNC_EXIT_NONAME_PARAMS(true)
         }
         else
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_EXTIMAGEINFO_RETRIEVAL, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*Array))
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
         CATCH_BLOCK(false)
     }
@@ -304,6 +307,7 @@ extern "C"
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return !Data; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
         auto retValue = GetExtImageInfoDataInternal(pTheSource, nWhich, Data);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*Data))
         LOG_FUNC_EXIT_NONAME_PARAMS(retValue.first)
         CATCH_BLOCK(false)
     }
