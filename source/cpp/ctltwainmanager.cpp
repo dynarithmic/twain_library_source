@@ -130,11 +130,18 @@ CTL_TwainAppMgrPtr CTL_TwainAppMgr::Create(CTL_TwainDLLHandle* pHandle,
 
     s_ThisInstance = hThisInstance;
     s_nLastError = 0;
-    try { s_pGlobalAppMgr.reset(new CTL_TwainAppMgr( pHandle, lpszDLLName, hInstance, hThisInstance ));}
+    try 
+    { 
+        s_pGlobalAppMgr.reset(new CTL_TwainAppMgr( pHandle, lpszDLLName, hInstance, hThisInstance ));
+    }
     catch(...)
-    { return CTL_TwainAppMgrPtr(); }
+    { 
+        return {};
+    }
     if ( !s_pGlobalAppMgr->LoadSourceManager(lpszDLLName) )
-    { s_pGlobalAppMgr.reset(); }
+    { 
+        s_pGlobalAppMgr.reset(); 
+    }
     return s_pGlobalAppMgr;
 }
 
