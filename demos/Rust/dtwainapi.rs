@@ -587,6 +587,7 @@ type DtwaingetjpegxrvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut 
 type DtwaingetlanguageFunc = unsafe extern "C" fn() -> i32;
 type DtwaingetlastcapenumindicesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
 type DtwaingetlasterrorFunc = unsafe extern "C" fn() -> i32;
+type DtwaingetlasttwainerrorFunc = unsafe extern "C" fn(*mut u32,*mut u32) -> i32;
 type DtwaingetlibrarypathFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
 type DtwaingetlibrarypathaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
 type DtwaingetlibrarypathwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
@@ -1762,6 +1763,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetLanguageFunc: Symbol<'a, DtwaingetlanguageFunc>,
     DTWAIN_GetLastCapEnumIndicesFunc: Symbol<'a, DtwaingetlastcapenumindicesFunc>,
     DTWAIN_GetLastErrorFunc: Symbol<'a, DtwaingetlasterrorFunc>,
+    DTWAIN_GetLastTwainErrorFunc: Symbol<'a, DtwaingetlasttwainerrorFunc>,
     DTWAIN_GetLibraryPathFunc: Symbol<'a, DtwaingetlibrarypathFunc>,
     DTWAIN_GetLibraryPathAFunc: Symbol<'a, DtwaingetlibrarypathaFunc>,
     DTWAIN_GetLibraryPathWFunc: Symbol<'a, DtwaingetlibrarypathwFunc>,
@@ -2732,6 +2734,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_TN_INVALID_TWAINDSM2_BITMAP: i32 = 1058;
     pub const DTWAIN_TN_IMAGE_RESAMPLE_FAILURE: i32 = 1059;
     pub const DTWAIN_TN_DEVICEEVENT: i32 = 1100;
+    pub const DTWAIN_TN_DEVICEEVENTFAILED: i32 = 1101;
     pub const DTWAIN_TN_TWAINPAGECANCELLED: i32 = 1105;
     pub const DTWAIN_TN_TWAINPAGEFAILED: i32 = 1106;
     pub const DTWAIN_TN_APPUPDATEDDIB: i32 = 1107;
@@ -4619,6 +4622,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetLanguage: Symbol<DtwaingetlanguageFunc> = unsafe { library.get(b"DTWAIN_GetLanguage")? };
         let DTWAIN_GetLastCapEnumIndices: Symbol<DtwaingetlastcapenumindicesFunc> = unsafe { library.get(b"DTWAIN_GetLastCapEnumIndices")? };
         let DTWAIN_GetLastError: Symbol<DtwaingetlasterrorFunc> = unsafe { library.get(b"DTWAIN_GetLastError")? };
+        let DTWAIN_GetLastTwainError: Symbol<DtwaingetlasttwainerrorFunc> = unsafe { library.get(b"DTWAIN_GetLastTwainError")? };
         let DTWAIN_GetLibraryPath: Symbol<DtwaingetlibrarypathFunc> = unsafe { library.get(b"DTWAIN_GetLibraryPath")? };
         let DTWAIN_GetLibraryPathA: Symbol<DtwaingetlibrarypathaFunc> = unsafe { library.get(b"DTWAIN_GetLibraryPathA")? };
         let DTWAIN_GetLibraryPathW: Symbol<DtwaingetlibrarypathwFunc> = unsafe { library.get(b"DTWAIN_GetLibraryPathW")? };
@@ -5793,6 +5797,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetLanguageFunc: DTWAIN_GetLanguage,
             DTWAIN_GetLastCapEnumIndicesFunc: DTWAIN_GetLastCapEnumIndices,
             DTWAIN_GetLastErrorFunc: DTWAIN_GetLastError,
+            DTWAIN_GetLastTwainErrorFunc: DTWAIN_GetLastTwainError,
             DTWAIN_GetLibraryPathFunc: DTWAIN_GetLibraryPath,
             DTWAIN_GetLibraryPathAFunc: DTWAIN_GetLibraryPathA,
             DTWAIN_GetLibraryPathWFunc: DTWAIN_GetLibraryPathW,
@@ -8588,6 +8593,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetLastError(&self) -> i32 {
         unsafe { return (self.DTWAIN_GetLastErrorFunc)();  }
+    }
+
+    pub fn DTWAIN_GetLastTwainError(&self, rcError: *mut u32, ccError: *mut u32) -> i32 {
+        unsafe { return (self.DTWAIN_GetLastTwainErrorFunc)(rcError, ccError);  }
     }
 
     pub fn DTWAIN_GetLibraryPath(&self, lpszVer: *mut u16, nLength: i32) -> i32 {

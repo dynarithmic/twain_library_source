@@ -600,6 +600,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_TN_INVALID_TWAINDSM2_BITMAP = 1058;
     public static const int DTWAIN_TN_IMAGE_RESAMPLE_FAILURE = 1059;
     public static const int DTWAIN_TN_DEVICEEVENT = 1100;
+    public static const int DTWAIN_TN_DEVICEEVENTFAILED = 1101;
     public static const int DTWAIN_TN_TWAINPAGECANCELLED = 1105;
     public static const int DTWAIN_TN_TWAINPAGEFAILED = 1106;
     public static const int DTWAIN_TN_APPUPDATEDDIB = 1107;
@@ -2482,6 +2483,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function() DTWAIN_GetLanguage;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPLONG) DTWAIN_GetLastCapEnumIndices;
     extern(Windows) LONG function() DTWAIN_GetLastError;
+    extern(Windows) DTWAIN_BOOL function(LPDWORD, LPDWORD) DTWAIN_GetLastTwainError;
     extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetLibraryPath;
     extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetLibraryPathA;
     extern(Windows) LONG function(LPWSTR, LONG) DTWAIN_GetLibraryPathW;
@@ -3650,6 +3652,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetLanguage, "DTWAIN_GetLanguage");
         bindFunction(cast(void**)&DTWAIN_GetLastCapEnumIndices, "DTWAIN_GetLastCapEnumIndices");
         bindFunction(cast(void**)&DTWAIN_GetLastError, "DTWAIN_GetLastError");
+        bindFunction(cast(void**)&DTWAIN_GetLastTwainError, "DTWAIN_GetLastTwainError");
         bindFunction(cast(void**)&DTWAIN_GetLibraryPath, "DTWAIN_GetLibraryPath");
         bindFunction(cast(void**)&DTWAIN_GetLibraryPathA, "DTWAIN_GetLibraryPathA");
         bindFunction(cast(void**)&DTWAIN_GetLibraryPathW, "DTWAIN_GetLibraryPathW");

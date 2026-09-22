@@ -598,6 +598,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_TN_INVALID_TWAINDSM2_BITMAP As Integer = 1058
         Public Const DTWAIN_TN_IMAGE_RESAMPLE_FAILURE As Integer = 1059
         Public Const DTWAIN_TN_DEVICEEVENT As Integer = 1100
+        Public Const DTWAIN_TN_DEVICEEVENTFAILED As Integer = 1101
         Public Const DTWAIN_TN_TWAINPAGECANCELLED As Integer = 1105
         Public Const DTWAIN_TN_TWAINPAGEFAILED As Integer = 1106
         Public Const DTWAIN_TN_APPUPDATEDDIB As Integer = 1107
@@ -3230,6 +3231,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetLastErrorDelegate() As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetLastTwainErrorDelegate(ByRef rcError As UInteger, ByRef ccError As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetLibraryPathDelegate(<MarshalAs(UnmanagedType.LPTStr)> lpszVer As StringBuilder, nLength As Integer) As Integer
@@ -6239,6 +6243,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetLastError()
         End Function
         
+        Public Function DTWAIN_GetLastTwainError(ByRef rcError As UInteger, ByRef ccError As UInteger) As Integer
+        Return api.DTWAIN_GetLastTwainError(rcError, ccError)
+        End Function
+        
         Public Function DTWAIN_GetLibraryPath(<MarshalAs(UnmanagedType.LPTStr)> lpszVer As StringBuilder, nLength As Integer) As Integer
         Return api.DTWAIN_GetLibraryPath(lpszVer, nLength)
         End Function
@@ -8405,6 +8413,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetLanguage As DTWAIN_GetLanguageDelegate
             Public DTWAIN_GetLastCapEnumIndices As DTWAIN_GetLastCapEnumIndicesDelegate
             Public DTWAIN_GetLastError As DTWAIN_GetLastErrorDelegate
+            Public DTWAIN_GetLastTwainError As DTWAIN_GetLastTwainErrorDelegate
             Public DTWAIN_GetLibraryPath As DTWAIN_GetLibraryPathDelegate
             Public DTWAIN_GetLightPath As DTWAIN_GetLightPathDelegate
             Public DTWAIN_GetLightPathEx As DTWAIN_GetLightPathExDelegate
