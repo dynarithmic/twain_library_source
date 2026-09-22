@@ -74,6 +74,7 @@
 #define IDS_LOGMSG_LASTERROR                (IDS_LOGMSG_START + 23)
 #define IDS_LOGMSG_END                      (4999)
 
+#define IDS_TWAINCONDITIONCODE_START  1100
 #define IDS_ErrCCLowMemory          TWAIN_ERR_LOW_MEMORY
 #define IDS_ErrCCFalseAlarm         TWAIN_ERR_FALSE_ALARM
 #define IDS_ErrCCBummer             TWAIN_ERR_BUMMER

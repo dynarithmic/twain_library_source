@@ -173,7 +173,7 @@ extern "C"
             case DTWAIN_GETDE_EVENT:
             {
                 const auto p = static_cast<LPDWORD>(pValue);
-                *p = DeviceEvent.GetEvent() + 1;
+                *p = DeviceEvent.GetEvent();
             }
             break;
 
