@@ -52,6 +52,8 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_GetVersion(LPLONG lpMajor, LPLONG lpMino
 /* DTWAIN Error message handling */
 LONG           DLLENTRY_DEF      DTWAIN_GetLastError(VOID_PROTOTYPE);
 LONG           DLLENTRY_DEF      DTWAIN_SetLastError(LONG nError);
+DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_GetLastTwainError(LPDWORD rcError, LPDWORD ccError);
+
 
 /* Modal / Modeless TWAIN message operation */
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_SetTwainMode(LONG lAcquireMode);

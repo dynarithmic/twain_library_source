@@ -43,6 +43,21 @@ extern "C"
         CATCH_BLOCK(DTWAIN_ERR_BAD_HANDLE)
     }
 
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetLastTwainError(LPDWORD rcError, LPDWORD ccError)
+    {
+        LOG_FUNC_ENTRY_PARAMS((rcError, ccError))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto pH = pHandle;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&]{ return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, FALSE, FUNC_MACRO);
+        if ( rcError )
+            *rcError = CTL_TwainAppMgr::GetLastTwainError();
+        if ( ccError )
+            *ccError = CTL_TwainAppMgr::GetLastConditionCodeError();
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((rcError, ccError))
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK(false)
+    }
+
     LONG DLLENTRY_DEF DTWAIN_SetLastError(LONG nError)
     {
         LOG_FUNC_ENTRY_PARAMS((nError))

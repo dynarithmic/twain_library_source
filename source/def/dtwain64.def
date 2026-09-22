@@ -1180,3 +1180,4 @@ DTWAIN_GetPendingXferCount                        @1176
 DTWAIN_SetSaveFileType                            @1177
 DTWAIN_GetSaveFileType                            @1178
 DTWAIN_GetImageLayoutInfo                         @1179
+DTWAIN_GetLastTwainError                          @1180
