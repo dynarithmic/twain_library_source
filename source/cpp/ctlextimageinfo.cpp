@@ -212,17 +212,6 @@ extern "C"
         CATCH_BLOCK_LOG_PARAMS(false)
     }
 
-    /* !!DEPRECATED as of version 5.6.2 !!
-       This function actually initiates the querying of the ext image information.  This function
-       will query the TWAIN Source.  If your TWAIN Source has bugs, this will be where any problem
-       will exist */
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfo(DTWAIN_SOURCE Source)
-    {
-        LOG_FUNC_ENTRY_PARAMS((Source))
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        CATCH_BLOCK(false)
-    }
-
     /* This returns the information pertaining to a certain item in the list.  The application
        will call this for each information retrieved from the Source.  This function does not
        return the actual data, only the information as to the number of items, data type, etc.
