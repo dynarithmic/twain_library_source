@@ -427,6 +427,7 @@ Class DTWAINAPI
     Public Const DTWAIN_TN_INVALID_TWAINDSM2_BITMAP As Integer = 1058
     Public Const DTWAIN_TN_IMAGE_RESAMPLE_FAILURE As Integer = 1059
     Public Const DTWAIN_TN_DEVICEEVENT As Integer = 1100
+    Public Const DTWAIN_TN_DEVICEEVENTFAILED As Integer = 1101
     Public Const DTWAIN_TN_TWAINPAGECANCELLED As Integer = 1105
     Public Const DTWAIN_TN_TWAINPAGEFAILED As Integer = 1106
     Public Const DTWAIN_TN_APPUPDATEDDIB As Integer = 1107
@@ -2207,6 +2208,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetLanguage Lib "dtwain32.dll" () As Integer
     Public Declare Function DTWAIN_GetLastCapEnumIndices Lib "dtwain32.dll" (Source As System.IntPtr, ByRef pCurrentIndex As Integer, ByRef pDefaultIndex As Integer) As Integer
     Public Declare Function DTWAIN_GetLastError Lib "dtwain32.dll" () As Integer
+    Public Declare Function DTWAIN_GetLastTwainError Lib "dtwain32.dll" (ByRef rcError As UInteger, ByRef ccError As UInteger) As Integer
     Public Declare Ansi Function DTWAIN_GetLibraryPath Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszVer As StringBuilder, nLength As Integer) As Integer
     Public Declare Function DTWAIN_GetLightPath Lib "dtwain32.dll" (Source As System.IntPtr, ByRef lpLightPath As Integer) As Integer
     Public Declare Function DTWAIN_GetLightPathEx Lib "dtwain32.dll" (Source As System.IntPtr) As Integer

@@ -483,6 +483,7 @@ module TwainAPI =
     let public DTWAIN_TN_INVALID_TWAINDSM2_BITMAP = 1058
     let public DTWAIN_TN_IMAGE_RESAMPLE_FAILURE = 1059
     let public DTWAIN_TN_DEVICEEVENT = 1100
+    let public DTWAIN_TN_DEVICEEVENTFAILED = 1101
     let public DTWAIN_TN_TWAINPAGECANCELLED = 1105
     let public DTWAIN_TN_TWAINPAGEFAILED = 1106
     let public DTWAIN_TN_APPUPDATEDDIB = 1107
@@ -3168,6 +3169,9 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetLastErrorDelegate = delegate of unit -> LONG
 
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetLastTwainErrorDelegate = delegate of DWORD byref * DWORD byref -> DTWAIN_BOOL
+
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetLibraryPathDelegate = delegate of System.Text.StringBuilder * LONG -> LONG
 
@@ -4886,6 +4890,7 @@ module TwainAPI =
     let private GetLanguage = lazy (DynamicDll.Bind "DTWAIN_GetLanguage" : DTWAIN_GetLanguageDelegate)
     let private GetLastCapEnumIndices = lazy (DynamicDll.Bind "DTWAIN_GetLastCapEnumIndices" : DTWAIN_GetLastCapEnumIndicesDelegate)
     let private GetLastError = lazy (DynamicDll.Bind "DTWAIN_GetLastError" : DTWAIN_GetLastErrorDelegate)
+    let private GetLastTwainError = lazy (DynamicDll.Bind "DTWAIN_GetLastTwainError" : DTWAIN_GetLastTwainErrorDelegate)
     let private GetLibraryPath = lazy (DynamicDll.Bind "DTWAIN_GetLibraryPath" : DTWAIN_GetLibraryPathDelegate)
     let private GetLightPath = lazy (DynamicDll.Bind "DTWAIN_GetLightPath" : DTWAIN_GetLightPathDelegate)
     let private GetLightPathEx = lazy (DynamicDll.Bind "DTWAIN_GetLightPathEx" : DTWAIN_GetLightPathExDelegate)
@@ -7040,6 +7045,10 @@ module TwainAPI =
     let DTWAIN_GetLastError() : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetLastError.Value.Invoke()
+
+    let DTWAIN_GetLastTwainError (rcerror: DWORD byref) (ccerror: DWORD byref) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetLastTwainError.Value.Invoke(&rcerror, &ccerror)
 
     let DTWAIN_GetLibraryPath (lpszver: System.Text.StringBuilder) (nlength: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

@@ -616,6 +616,7 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetLanguage();
         DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
         LONG DTWAIN_GetLastError();
+        DTWAIN_BOOL DTWAIN_GetLastTwainError(LPDWORD rcError, LPDWORD ccError);
         LONG DTWAIN_GetLibraryPath(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathA(LPSTR lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathW(LPWSTR lpszVer, LONG nLength);
@@ -1846,6 +1847,7 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetLanguage();
         DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
         LONG DTWAIN_GetLastError();
+        DTWAIN_BOOL DTWAIN_GetLastTwainError(LPDWORD rcError, LPDWORD ccError);
         LONG DTWAIN_GetLibraryPath(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathA(LPSTR lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathW(LPWSTR lpszVer, LONG nLength);
@@ -3076,6 +3078,7 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetLanguage();
         DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
         LONG DTWAIN_GetLastError();
+        DTWAIN_BOOL DTWAIN_GetLastTwainError(LPDWORD rcError, LPDWORD ccError);
         LONG DTWAIN_GetLibraryPath(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathA(LPSTR lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathW(LPWSTR lpszVer, LONG nLength);
@@ -4306,6 +4309,7 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetLanguage();
         DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
         LONG DTWAIN_GetLastError();
+        DTWAIN_BOOL DTWAIN_GetLastTwainError(LPDWORD rcError, LPDWORD ccError);
         LONG DTWAIN_GetLibraryPath(DTWAIN_CHARPTRTYPE lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathA(LPSTR lpszVer, LONG nLength);
         LONG DTWAIN_GetLibraryPathW(LPWSTR lpszVer, LONG nLength);

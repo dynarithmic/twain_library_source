@@ -675,6 +675,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetLanguage
    attr_reader :DTWAIN_GetLastCapEnumIndices
    attr_reader :DTWAIN_GetLastError
+   attr_reader :DTWAIN_GetLastTwainError
    attr_reader :DTWAIN_GetLibraryPath
    attr_reader :DTWAIN_GetLibraryPathA
    attr_reader :DTWAIN_GetLibraryPathW
@@ -1642,6 +1643,7 @@ class DTWAINAPI
    DTWAIN_TN_INVALID_TWAINDSM2_BITMAP = 1058
    DTWAIN_TN_IMAGE_RESAMPLE_FAILURE = 1059
    DTWAIN_TN_DEVICEEVENT = 1100
+   DTWAIN_TN_DEVICEEVENTFAILED = 1101
    DTWAIN_TN_TWAINPAGECANCELLED = 1105
    DTWAIN_TN_TWAINPAGEFAILED = 1106
    DTWAIN_TN_APPUPDATEDDIB = 1107
@@ -3568,6 +3570,7 @@ class DTWAINAPI
        @DTWAIN_GetLanguage = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLanguage'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetLastCapEnumIndices = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLastCapEnumIndices'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetLastError = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLastError'],[],Fiddle::TYPE_LONG)
+       @DTWAIN_GetLastTwainError = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLastTwainError'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetLibraryPath = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLibraryPath'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetLibraryPathA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLibraryPathA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetLibraryPathW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLibraryPathW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)

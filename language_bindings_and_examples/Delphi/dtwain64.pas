@@ -523,6 +523,7 @@ const
   DTWAIN_TN_INVALID_TWAINDSM2_BITMAP = 1058;
   DTWAIN_TN_IMAGE_RESAMPLE_FAILURE = 1059;
   DTWAIN_TN_DEVICEEVENT = 1100;
+  DTWAIN_TN_DEVICEEVENTFAILED = 1101;
   DTWAIN_TN_TWAINPAGECANCELLED = 1105;
   DTWAIN_TN_TWAINPAGEFAILED = 1106;
   DTWAIN_TN_APPUPDATEDDIB = 1107;
@@ -2410,6 +2411,7 @@ function DTWAIN_GetJpegXRValues(Source:DTWAIN_SOURCE; pQuality:LPLONG; Progressi
 function DTWAIN_GetLanguage : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetLanguage';
 function DTWAIN_GetLastCapEnumIndices(Source:DTWAIN_SOURCE; pCurrentIndex:LPLONG; pDefaultIndex:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetLastCapEnumIndices';
 function DTWAIN_GetLastError : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetLastError';
+function DTWAIN_GetLastTwainError(rcError:LPDWORD; ccError:LPDWORD) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetLastTwainError';
 function DTWAIN_GetLibraryPath(lpszVer:LPTSTR; nLength:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetLibraryPath';
 function DTWAIN_GetLibraryPathA(lpszVer:LPSTR; nLength:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetLibraryPathA';
 function DTWAIN_GetLibraryPathW(lpszVer:LPWSTR; nLength:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetLibraryPathW';

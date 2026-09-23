@@ -588,6 +588,7 @@
     D_GETLANGUAGEFUNC                             DYNDTWAIN_API::DTWAIN_GetLanguage = nullptr;
     D_GETLASTCAPENUMINDICESFUNC                   DYNDTWAIN_API::DTWAIN_GetLastCapEnumIndices = nullptr;
     D_GETLASTERRORFUNC                            DYNDTWAIN_API::DTWAIN_GetLastError = nullptr;
+    D_GETLASTTWAINERRORFUNC                       DYNDTWAIN_API::DTWAIN_GetLastTwainError = nullptr;
     D_GETLIBRARYPATHFUNC                          DYNDTWAIN_API::DTWAIN_GetLibraryPath = nullptr;
     D_GETLIBRARYPATHAFUNC                         DYNDTWAIN_API::DTWAIN_GetLibraryPathA = nullptr;
     D_GETLIBRARYPATHWFUNC                         DYNDTWAIN_API::DTWAIN_GetLibraryPathW = nullptr;
@@ -1843,6 +1844,7 @@ int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetLanguage, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLastCapEnumIndices, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLastError, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetLastTwainError, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLibraryPath, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLibraryPathA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLibraryPathW, hModule);

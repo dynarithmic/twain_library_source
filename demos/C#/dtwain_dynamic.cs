@@ -498,6 +498,7 @@
         public const int DTWAIN_TN_INVALID_TWAINDSM2_BITMAP = 1058;
         public const int DTWAIN_TN_IMAGE_RESAMPLE_FAILURE = 1059;
         public const int DTWAIN_TN_DEVICEEVENT = 1100;
+        public const int DTWAIN_TN_DEVICEEVENTFAILED = 1101;
         public const int DTWAIN_TN_TWAINPAGECANCELLED = 1105;
         public const int DTWAIN_TN_TWAINPAGEFAILED = 1106;
         public const int DTWAIN_TN_APPUPDATEDDIB = 1107;
@@ -2396,6 +2397,7 @@
         public delegate int DTWAIN_GetLanguageDelegate();
         public delegate int DTWAIN_GetLastCapEnumIndicesDelegate(DTWAIN_SOURCE Source, ref int pCurrentIndex, ref int pDefaultIndex);
         public delegate int DTWAIN_GetLastErrorDelegate();
+        public delegate int DTWAIN_GetLastTwainErrorDelegate(ref DWORD rcError, ref DWORD ccError);
         public delegate int DTWAIN_GetLibraryPathDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszVer, int nLength);
         public delegate int DTWAIN_GetLibraryPathDelegate_overload(System.IntPtr lpszVer, int nLength);
         public delegate int DTWAIN_GetLightPathDelegate(DTWAIN_SOURCE Source, ref int lpLightPath);
@@ -4258,6 +4260,9 @@
 
         [DTWAINNativeFunction("DTWAIN_GetLastError")]
         private readonly DTWAIN_GetLastErrorDelegate  _DTWAIN_GetLastError;
+
+        [DTWAINNativeFunction("DTWAIN_GetLastTwainError")]
+        private readonly DTWAIN_GetLastTwainErrorDelegate  _DTWAIN_GetLastTwainError;
 
         [DTWAINNativeFunction("DTWAIN_GetLibraryPath")]
         private readonly DTWAIN_GetLibraryPathDelegate  _DTWAIN_GetLibraryPath;
@@ -7062,6 +7067,9 @@
 
         public  int DTWAIN_GetLastError()
         => _DTWAIN_GetLastError();
+
+        public  int DTWAIN_GetLastTwainError(ref DWORD rcError, ref DWORD ccError)
+        => _DTWAIN_GetLastTwainError(ref rcError, ref ccError);
 
         public  int DTWAIN_GetLibraryPath([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszVer, int nLength)
         => _DTWAIN_GetLibraryPath(lpszVer, nLength);

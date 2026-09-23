@@ -355,6 +355,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_TN_INVALID_TWAINDSM2_BITMAP = 1058
    dtwain_constants.DTWAIN_TN_IMAGE_RESAMPLE_FAILURE = 1059
    dtwain_constants.DTWAIN_TN_DEVICEEVENT = 1100
+   dtwain_constants.DTWAIN_TN_DEVICEEVENTFAILED = 1101
    dtwain_constants.DTWAIN_TN_TWAINPAGECANCELLED = 1105
    dtwain_constants.DTWAIN_TN_TWAINPAGEFAILED = 1106
    dtwain_constants.DTWAIN_TN_APPUPDATEDDIB = 1107
