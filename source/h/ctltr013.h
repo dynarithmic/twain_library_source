@@ -54,8 +54,7 @@ namespace dynarithmic
         TW_UINT16  sCap,
         TW_UINT16 TwainType,
         const std::vector<T>& rArray)
-        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray), m_nAggSize(rArray.size())
-    { }
+        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray), m_nAggSize(rArray.size()) {}
 
     template <typename T>
     TW_UINT16 CTL_CapabilitySetEnumTriplet<T>::GetContainerTypeSize()
@@ -79,7 +78,7 @@ namespace dynarithmic
     bool CTL_CapabilitySetEnumTriplet<T>::Encode(const std::vector<T>& rArray, void* pMemBlock)
     {
         // Get a TW_ENUMERATION structure
-        pTW_ENUMERATION pArray = static_cast<pTW_ENUMERATION>(pMemBlock);
+        auto pArray = static_cast<pTW_ENUMERATION>(pMemBlock);
 
         // Set the # of elements
         pArray->NumItems = static_cast<TW_UINT32>(m_nAggSize);

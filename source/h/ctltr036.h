@@ -31,9 +31,7 @@ namespace dynarithmic
     class CTL_CapabilityLabelHelpTriplet : public CTL_CapabilityGetOneValTriplet
     {
         public:
-            CTL_CapabilityLabelHelpTriplet(CTL_ITwainSession *pSession,
-                                           TW_UINT16 gCap,
-                                           TW_UINT16 TwainType=0xFFFF) :
+            CTL_CapabilityLabelHelpTriplet(CTL_ITwainSession *pSession,  TW_UINT16 gCap, TW_UINT16 TwainType=0xFFFF) :
             CTL_CapabilityGetOneValTriplet(pSession, nullptr, msgType, gCap, TwainType)
             {
                 TW_CAPABILITY* pCap = GetCapabilityBuffer();

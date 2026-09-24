@@ -32,8 +32,7 @@ namespace dynarithmic
     class CTL_EntryPointTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_EntryPointTriplet(CTL_ITwainSession* pSession) :
-                CTL_TwainTriplet(), m_EntryPoint{}, m_bTripletFound(false)
+            CTL_EntryPointTriplet(CTL_ITwainSession* pSession) : m_bTripletFound(false)
             {
                 m_EntryPoint.Size = sizeof(TW_ENTRYPOINT);
                 InitGeneric(pSession, nullptr, DG_CONTROL, DAT_ENTRYPOINT, msg, &m_EntryPoint);

@@ -69,13 +69,13 @@ namespace dynarithmic
                                      TW_UINT16 TwainType,
                                      const std::vector<T> & rArray);
 
-            TW_UINT16                Execute() override;
+            TW_UINT16 Execute() override;
 
         protected:
             virtual bool Encode( const std::vector<T>& /*rArray*/, void * /*pMemBlock*/) { return false; }
 
         private:
-            std::vector<T>              m_Array;
+            std::vector<T> m_Array;
     };
 
     template <typename T>

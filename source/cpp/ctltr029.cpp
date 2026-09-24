@@ -29,8 +29,8 @@ using namespace dynarithmic;
 
 CTL_ExtImageInfoTriplet::CTL_ExtImageInfoTriplet(CTL_ITwainSession *pSession,
                                                  CTL_ITwainSource* pSource,
-                                                 int nInfo)
-                                               :  CTL_TwainTriplet(), m_pExtImageInfo{},m_memHandle{}, m_nNumInfo{}, m_bRetrievedInfo{}
+                                                 int nInfo) : m_pExtImageInfo{},m_memHandle{}, 
+                                                              m_nNumInfo{}, m_bRetrievedInfo{}
 {
     InitInfo(pSession, pSource, nInfo);
 }

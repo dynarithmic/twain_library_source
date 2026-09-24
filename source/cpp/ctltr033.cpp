@@ -21,7 +21,7 @@
 #include "ctltr033.h"
 
 using namespace dynarithmic;
-CTL_TwainDirectTriplet::CTL_TwainDirectTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_TwainDirect{}
+CTL_TwainDirectTriplet::CTL_TwainDirectTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource) : m_TwainDirect{}
 {
     InitGeneric(pSession, pSource, DG_CONTROL, DAT_TWAINDIRECT, MSG_SETTASK, &m_TwainDirect);
 }

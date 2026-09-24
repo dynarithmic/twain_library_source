@@ -27,9 +27,7 @@ namespace dynarithmic
     class CTL_ImageInfoTriplet : public CTL_ImageTriplet
     {
         public:
-            CTL_ImageInfoTriplet(CTL_ITwainSession *pSession,
-                                 CTL_ITwainSource *pSource);
-
+            CTL_ImageInfoTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource *pSource);
             TW_IMAGEINFO*   GetImageInfoBuffer();
 
         private:

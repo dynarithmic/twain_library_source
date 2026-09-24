@@ -77,7 +77,7 @@ namespace dynarithmic
     bool CTL_CapabilitySetArrayTriplet<T>::Encode(const std::vector<T>& rArray, void* pMemBlock)
     {
         // Get a TW_RANGE structure
-        pTW_ARRAY pArray = static_cast<pTW_ARRAY>(pMemBlock);
+        auto pArray = static_cast<pTW_ARRAY>(pMemBlock);
 
         // Set the # of elements
         pArray->NumItems = static_cast<TW_UINT32>(m_nAggSize);

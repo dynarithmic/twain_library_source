@@ -24,8 +24,7 @@
 using namespace dynarithmic;
 CTL_ImagePendingTriplet::CTL_ImagePendingTriplet(CTL_ITwainSession *pSession,
                                                  CTL_ITwainSource* pSource,
-                                                 TW_UINT16 nMsg)
-    : CTL_TwainTriplet(), m_nMsg(nMsg), m_PendingXfers{}
+                                                 TW_UINT16 nMsg) : m_nMsg(nMsg), m_PendingXfers{}
 {
     InitGeneric(pSession, pSource, DG_CONTROL, DAT_PENDINGXFERS, m_nMsg, &m_PendingXfers);
 }

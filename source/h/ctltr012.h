@@ -49,8 +49,7 @@ namespace dynarithmic
                                                                     TW_UINT16  sCap,
                                                                     TW_UINT16 TwainType,
                                                                     const std::vector<T>& rArray)
-        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray)
-    {}
+        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray) {}
 
 
     template <typename T>
@@ -78,7 +77,7 @@ namespace dynarithmic
         T Data1, Data2, Data3;
 
         // Get a TW_RANGE structure
-        const pTW_RANGE pVal = static_cast<pTW_RANGE>(pMemBlock);
+        const auto pVal = static_cast<pTW_RANGE>(pMemBlock);
         if (rArray.size() >= 3)
         {
             Data1 = rArray[0]; // Min value

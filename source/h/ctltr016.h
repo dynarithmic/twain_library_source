@@ -31,8 +31,7 @@ namespace dynarithmic
     class CTL_ImageTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_ImageTriplet(CTL_ITwainSession *pSession,
-                             CTL_ITwainSource *pSource);
+            CTL_ImageTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource *pSource);
             bool QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_TwainDibArray& pArray, size_t nWhich);
     };
 }

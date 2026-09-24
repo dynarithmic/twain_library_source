@@ -52,8 +52,7 @@ namespace dynarithmic
         TW_UINT16    sCap,
         TW_UINT16 TwainType,
         const std::vector<T>& rArray)
-        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray)
-    {}
+        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray) {}
 
 
     template <typename T>
@@ -82,7 +81,7 @@ namespace dynarithmic
         T Data;
 
         // Get a TW_ONEVALUE structure
-        const pTW_ONEVALUE pVal = static_cast<pTW_ONEVALUE>(pMemBlock);
+        const auto pVal = static_cast<pTW_ONEVALUE>(pMemBlock);
 
         // Get the TWTY_xxx type
         pVal->ItemType = CTL_CapabilitySetTripletBase::GetTwainType();
