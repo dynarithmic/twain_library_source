@@ -2182,7 +2182,6 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetErrorCallback64 Lib "dtwain32ud.dll" () As DTwainErrorProc64
     Public Declare Unicode Function DTWAIN_GetErrorString Lib "dtwain32ud.dll" (lError As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Unicode Function DTWAIN_GetExtCapFromName Lib "dtwain32ud.dll" (szName As String) As Integer
-    Public Declare Function DTWAIN_GetExtImageInfo Lib "dtwain32ud.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetExtImageInfoData Lib "dtwain32ud.dll" (Source As System.IntPtr, nWhich As Integer, ByRef Data As System.IntPtr) As Integer
     Public Declare Function DTWAIN_GetExtImageInfoDataEx Lib "dtwain32ud.dll" (Source As System.IntPtr, nWhich As Integer) As System.IntPtr
     Public Declare Function DTWAIN_GetExtImageInfoItem Lib "dtwain32ud.dll" (Source As System.IntPtr, nWhich As Integer, ByRef InfoID As Integer, ByRef NumItems As Integer, ByRef Type As Integer) As Integer

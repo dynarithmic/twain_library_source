@@ -3152,9 +3152,6 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetExtCapFromNameDelegate(szName As String) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_GetExtImageInfoDelegate(Source As System.IntPtr) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetExtImageInfoDataDelegate(Source As System.IntPtr, nWhich As Integer, ByRef Data As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -6135,10 +6132,6 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetExtCapFromName(szName)
         End Function
         
-        Public Function DTWAIN_GetExtImageInfo(Source As System.IntPtr) As Integer
-        Return api.DTWAIN_GetExtImageInfo(Source)
-        End Function
-        
         Public Function DTWAIN_GetExtImageInfoData(Source As System.IntPtr, nWhich As Integer, ByRef Data As System.IntPtr) As Integer
         Return api.DTWAIN_GetExtImageInfoData(Source, nWhich, Data)
         End Function
@@ -8386,7 +8379,6 @@ Namespace Dynarithmic
             Public DTWAIN_GetErrorCallback64 As DTWAIN_GetErrorCallback64Delegate
             Public DTWAIN_GetErrorString As DTWAIN_GetErrorStringDelegate
             Public DTWAIN_GetExtCapFromName As DTWAIN_GetExtCapFromNameDelegate
-            Public DTWAIN_GetExtImageInfo As DTWAIN_GetExtImageInfoDelegate
             Public DTWAIN_GetExtImageInfoData As DTWAIN_GetExtImageInfoDataDelegate
             Public DTWAIN_GetExtImageInfoDataEx As DTWAIN_GetExtImageInfoDataExDelegate
             Public DTWAIN_GetExtImageInfoItem As DTWAIN_GetExtImageInfoItemDelegate

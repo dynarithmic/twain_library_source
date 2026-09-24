@@ -2444,7 +2444,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(DTWAIN_CCHARPTRTYPE) DTWAIN_GetExtCapFromName;
     extern(Windows) LONG function(LPCSTR) DTWAIN_GetExtCapFromNameA;
     extern(Windows) LONG function(LPCWSTR) DTWAIN_GetExtCapFromNameW;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_GetExtImageInfo;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LPDTWAIN_ARRAY) DTWAIN_GetExtImageInfoData;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, LONG) DTWAIN_GetExtImageInfoDataEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LPLONG, LPLONG, LPLONG) DTWAIN_GetExtImageInfoItem;
@@ -3613,7 +3612,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetExtCapFromName, "DTWAIN_GetExtCapFromName");
         bindFunction(cast(void**)&DTWAIN_GetExtCapFromNameA, "DTWAIN_GetExtCapFromNameA");
         bindFunction(cast(void**)&DTWAIN_GetExtCapFromNameW, "DTWAIN_GetExtCapFromNameW");
-        bindFunction(cast(void**)&DTWAIN_GetExtImageInfo, "DTWAIN_GetExtImageInfo");
         bindFunction(cast(void**)&DTWAIN_GetExtImageInfoData, "DTWAIN_GetExtImageInfoData");
         bindFunction(cast(void**)&DTWAIN_GetExtImageInfoDataEx, "DTWAIN_GetExtImageInfoDataEx");
         bindFunction(cast(void**)&DTWAIN_GetExtImageInfoItem, "DTWAIN_GetExtImageInfoItem");

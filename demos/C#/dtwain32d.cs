@@ -3101,9 +3101,6 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetExtCapFromName([MarshalAs(UnmanagedType.LPStr)] string szName);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetExtImageInfo(DTWAIN_SOURCE Source);
-
-        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, int nWhich, ref DTWAIN_ARRAY Data);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]

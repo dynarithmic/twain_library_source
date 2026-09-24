@@ -2364,7 +2364,6 @@
         public delegate int DTWAIN_GetErrorStringDelegate(int lError, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetErrorStringDelegate_overload(int lError, System.IntPtr lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetExtCapFromNameDelegate([MarshalAs(UnmanagedType.LPTStr)] string szName);
-        public delegate int DTWAIN_GetExtImageInfoDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_GetExtImageInfoDataDelegate(DTWAIN_SOURCE Source, int nWhich, ref DTWAIN_ARRAY Data);
         public delegate DTWAIN_ARRAY DTWAIN_GetExtImageInfoDataExDelegate(DTWAIN_SOURCE Source, int nWhich);
         public delegate int DTWAIN_GetExtImageInfoItemDelegate(DTWAIN_SOURCE Source, int nWhich, ref int InfoID, ref int NumItems, ref int Type);
@@ -4161,9 +4160,6 @@
 
         [DTWAINNativeFunction("DTWAIN_GetExtCapFromName")]
         private readonly DTWAIN_GetExtCapFromNameDelegate  _DTWAIN_GetExtCapFromName;
-
-        [DTWAINNativeFunction("DTWAIN_GetExtImageInfo")]
-        private readonly DTWAIN_GetExtImageInfoDelegate  _DTWAIN_GetExtImageInfo;
 
         [DTWAINNativeFunction("DTWAIN_GetExtImageInfoData")]
         private readonly DTWAIN_GetExtImageInfoDataDelegate  _DTWAIN_GetExtImageInfoData;
@@ -6968,9 +6964,6 @@
 
         public  int DTWAIN_GetExtCapFromName([MarshalAs(UnmanagedType.LPTStr)] string szName)
         => _DTWAIN_GetExtCapFromName(szName);
-
-        public  int DTWAIN_GetExtImageInfo(DTWAIN_SOURCE Source)
-        => _DTWAIN_GetExtImageInfo(Source);
 
         public  int DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, int nWhich, ref DTWAIN_ARRAY Data)
         => _DTWAIN_GetExtImageInfoData(Source, nWhich, ref Data);

@@ -25,6 +25,44 @@
 
 use std::ffi::{c_void, c_char};
 use libloading::{Library, Symbol};
+use std::path::{Path, PathBuf};
+
+/// Open a DTWAIN DLL by an explicit path or search the current directory and PATH.
+/// Keep the returned Library alive for as long as the DTwainAPI created from it.
+pub fn load_dtwain_library<P: AsRef<Path>>(dllname: P) -> Result<Library, Box<dyn std::error::Error>> {
+    let dllname = dllname.as_ref();
+    let dllpath = if dllname.is_file() {
+        std::fs::canonicalize(dllname)?
+    } else if dllname.file_name() != Some(dllname.as_os_str()) {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!("DTWAIN DLL not found: {}", dllname.display()),
+        ).into());
+    } else {
+        let mut found: Option<PathBuf> = None;
+        if let Some(search_path) = std::env::var_os("PATH") {
+            for dir in std::env::split_paths(&search_path) {
+                if dir.as_os_str().is_empty() {
+                    continue;
+                }
+                let candidate = dir.join(dllname);
+                if candidate.is_file() {
+                    found = Some(std::fs::canonicalize(candidate)?);
+                    break;
+                }
+            }
+        }
+        found.ok_or_else(|| std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!("DTWAIN DLL not found in current directory or PATH: {}", dllname.display()),
+        ))?
+    };
+
+    // Loading a library runs its initialization code; callers choose a trusted DLL.
+    unsafe { Library::new(&dllpath) }.map_err(|e| {
+        format!("Unable to load DTWAIN DLL {}: {}", dllpath.display(), e).into()
+    })
+}
 
 #[cfg(target_pointer_width = "64")]
 type Dtwaincallbacktype = i64;
@@ -548,7 +586,6 @@ type DtwaingeterrorstringwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
 type DtwaingetextcapfromnameFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingetextcapfromnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
 type DtwaingetextcapfromnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwaingetextimageinfoFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwaingetextimageinfodataFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
 type DtwaingetextimageinfodataexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
 type DtwaingetextimageinfoitemFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,*mut i32,*mut i32) -> i32;
@@ -1724,7 +1761,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetExtCapFromNameFunc: Symbol<'a, DtwaingetextcapfromnameFunc>,
     DTWAIN_GetExtCapFromNameAFunc: Symbol<'a, DtwaingetextcapfromnameaFunc>,
     DTWAIN_GetExtCapFromNameWFunc: Symbol<'a, DtwaingetextcapfromnamewFunc>,
-    DTWAIN_GetExtImageInfoFunc: Symbol<'a, DtwaingetextimageinfoFunc>,
     DTWAIN_GetExtImageInfoDataFunc: Symbol<'a, DtwaingetextimageinfodataFunc>,
     DTWAIN_GetExtImageInfoDataExFunc: Symbol<'a, DtwaingetextimageinfodataexFunc>,
     DTWAIN_GetExtImageInfoItemFunc: Symbol<'a, DtwaingetextimageinfoitemFunc>,
@@ -4583,7 +4619,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetExtCapFromName: Symbol<DtwaingetextcapfromnameFunc> = unsafe { library.get(b"DTWAIN_GetExtCapFromName")? };
         let DTWAIN_GetExtCapFromNameA: Symbol<DtwaingetextcapfromnameaFunc> = unsafe { library.get(b"DTWAIN_GetExtCapFromNameA")? };
         let DTWAIN_GetExtCapFromNameW: Symbol<DtwaingetextcapfromnamewFunc> = unsafe { library.get(b"DTWAIN_GetExtCapFromNameW")? };
-        let DTWAIN_GetExtImageInfo: Symbol<DtwaingetextimageinfoFunc> = unsafe { library.get(b"DTWAIN_GetExtImageInfo")? };
         let DTWAIN_GetExtImageInfoData: Symbol<DtwaingetextimageinfodataFunc> = unsafe { library.get(b"DTWAIN_GetExtImageInfoData")? };
         let DTWAIN_GetExtImageInfoDataEx: Symbol<DtwaingetextimageinfodataexFunc> = unsafe { library.get(b"DTWAIN_GetExtImageInfoDataEx")? };
         let DTWAIN_GetExtImageInfoItem: Symbol<DtwaingetextimageinfoitemFunc> = unsafe { library.get(b"DTWAIN_GetExtImageInfoItem")? };
@@ -5758,7 +5793,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetExtCapFromNameFunc: DTWAIN_GetExtCapFromName,
             DTWAIN_GetExtCapFromNameAFunc: DTWAIN_GetExtCapFromNameA,
             DTWAIN_GetExtCapFromNameWFunc: DTWAIN_GetExtCapFromNameW,
-            DTWAIN_GetExtImageInfoFunc: DTWAIN_GetExtImageInfo,
             DTWAIN_GetExtImageInfoDataFunc: DTWAIN_GetExtImageInfoData,
             DTWAIN_GetExtImageInfoDataExFunc: DTWAIN_GetExtImageInfoDataEx,
             DTWAIN_GetExtImageInfoItemFunc: DTWAIN_GetExtImageInfoItem,
@@ -8437,10 +8471,6 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetExtCapFromNameW(&self, szName: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_GetExtCapFromNameWFunc)(szName);  }
-    }
-
-    pub fn DTWAIN_GetExtImageInfo(&self, Source: *mut c_void) -> i32 {
-        unsafe { return (self.DTWAIN_GetExtImageInfoFunc)(Source);  }
     }
 
     pub fn DTWAIN_GetExtImageInfoData(&self, Source: *mut c_void, nWhich: i32, Data: *mut *mut c_void) -> i32 {

@@ -2372,7 +2372,6 @@ function DTWAIN_GetErrorStringW(lError:LONG; lpszBuffer:LPWSTR; nLength:LONG) : 
 function DTWAIN_GetExtCapFromName(szName:LPCTSTR) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetExtCapFromName';
 function DTWAIN_GetExtCapFromNameA(szName:LPCSTR) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetExtCapFromNameA';
 function DTWAIN_GetExtCapFromNameW(szName:LPCWSTR) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetExtCapFromNameW';
-function DTWAIN_GetExtImageInfo(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetExtImageInfo';
 function DTWAIN_GetExtImageInfoData(Source:DTWAIN_SOURCE; nWhich:LONG; Data:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetExtImageInfoData';
 function DTWAIN_GetExtImageInfoDataEx(Source:DTWAIN_SOURCE; nWhich:LONG) : DTWAIN_ARRAY; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetExtImageInfoDataEx';
 function DTWAIN_GetExtImageInfoItem(Source:DTWAIN_SOURCE; nWhich:LONG; InfoID:LPLONG; NumItems:LPLONG; Type_:LPLONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetExtImageInfoItem';

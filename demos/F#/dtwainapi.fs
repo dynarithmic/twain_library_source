@@ -3089,9 +3089,6 @@ module TwainAPI =
     type DTWAIN_GetExtCapFromNameDelegate = delegate of string -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_GetExtImageInfoDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetExtImageInfoDataDelegate = delegate of DTWAIN_SOURCE * LONG * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4863,7 +4860,6 @@ module TwainAPI =
     let private GetErrorCallback64 = lazy (DynamicDll.Bind "DTWAIN_GetErrorCallback64" : DTWAIN_GetErrorCallback64Delegate)
     let private GetErrorString = lazy (DynamicDll.Bind "DTWAIN_GetErrorString" : DTWAIN_GetErrorStringDelegate)
     let private GetExtCapFromName = lazy (DynamicDll.Bind "DTWAIN_GetExtCapFromName" : DTWAIN_GetExtCapFromNameDelegate)
-    let private GetExtImageInfo = lazy (DynamicDll.Bind "DTWAIN_GetExtImageInfo" : DTWAIN_GetExtImageInfoDelegate)
     let private GetExtImageInfoData = lazy (DynamicDll.Bind "DTWAIN_GetExtImageInfoData" : DTWAIN_GetExtImageInfoDataDelegate)
     let private GetExtImageInfoDataEx = lazy (DynamicDll.Bind "DTWAIN_GetExtImageInfoDataEx" : DTWAIN_GetExtImageInfoDataExDelegate)
     let private GetExtImageInfoItem = lazy (DynamicDll.Bind "DTWAIN_GetExtImageInfoItem" : DTWAIN_GetExtImageInfoItemDelegate)
@@ -6937,10 +6933,6 @@ module TwainAPI =
     let DTWAIN_GetExtCapFromName (szname: string) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetExtCapFromName.Value.Invoke(szname)
-
-    let DTWAIN_GetExtImageInfo (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetExtImageInfo.Value.Invoke(source)
 
     let DTWAIN_GetExtImageInfoData (source: DTWAIN_SOURCE) (nwhich: LONG) (data: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

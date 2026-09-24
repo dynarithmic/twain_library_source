@@ -549,7 +549,6 @@
     D_GETEXTCAPFROMNAMEFUNC                       DYNDTWAIN_API::DTWAIN_GetExtCapFromName = nullptr;
     D_GETEXTCAPFROMNAMEAFUNC                      DYNDTWAIN_API::DTWAIN_GetExtCapFromNameA = nullptr;
     D_GETEXTCAPFROMNAMEWFUNC                      DYNDTWAIN_API::DTWAIN_GetExtCapFromNameW = nullptr;
-    D_GETEXTIMAGEINFOFUNC                         DYNDTWAIN_API::DTWAIN_GetExtImageInfo = nullptr;
     D_GETEXTIMAGEINFODATAFUNC                     DYNDTWAIN_API::DTWAIN_GetExtImageInfoData = nullptr;
     D_GETEXTIMAGEINFODATAEXFUNC                   DYNDTWAIN_API::DTWAIN_GetExtImageInfoDataEx = nullptr;
     D_GETEXTIMAGEINFOITEMFUNC                     DYNDTWAIN_API::DTWAIN_GetExtImageInfoItem = nullptr;
@@ -1805,7 +1804,6 @@ int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetExtCapFromName, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtCapFromNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtCapFromNameW, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_GetExtImageInfo, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtImageInfoData, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtImageInfoDataEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtImageInfoItem, hModule);

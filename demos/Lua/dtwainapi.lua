@@ -577,7 +577,6 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetExtCapFromName(DTWAIN_CCHARPTRTYPE szName);
         LONG DTWAIN_GetExtCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetExtCapFromNameW(LPCWSTR szName);
-        DTWAIN_BOOL DTWAIN_GetExtImageInfo(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data);
         DTWAIN_ARRAY DTWAIN_GetExtImageInfoDataEx(DTWAIN_SOURCE Source, LONG nWhich);
         DTWAIN_BOOL DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source, LONG nWhich, LPLONG InfoID, LPLONG NumItems, LPLONG Type);
@@ -1808,7 +1807,6 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetExtCapFromName(DTWAIN_CCHARPTRTYPE szName);
         LONG DTWAIN_GetExtCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetExtCapFromNameW(LPCWSTR szName);
-        DTWAIN_BOOL DTWAIN_GetExtImageInfo(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data);
         DTWAIN_ARRAY DTWAIN_GetExtImageInfoDataEx(DTWAIN_SOURCE Source, LONG nWhich);
         DTWAIN_BOOL DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source, LONG nWhich, LPLONG InfoID, LPLONG NumItems, LPLONG Type);
@@ -3039,7 +3037,6 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetExtCapFromName(DTWAIN_CCHARPTRTYPE szName);
         LONG DTWAIN_GetExtCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetExtCapFromNameW(LPCWSTR szName);
-        DTWAIN_BOOL DTWAIN_GetExtImageInfo(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data);
         DTWAIN_ARRAY DTWAIN_GetExtImageInfoDataEx(DTWAIN_SOURCE Source, LONG nWhich);
         DTWAIN_BOOL DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source, LONG nWhich, LPLONG InfoID, LPLONG NumItems, LPLONG Type);
@@ -4270,7 +4267,6 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetExtCapFromName(DTWAIN_CCHARPTRTYPE szName);
         LONG DTWAIN_GetExtCapFromNameA(LPCSTR szName);
         LONG DTWAIN_GetExtCapFromNameW(LPCWSTR szName);
-        DTWAIN_BOOL DTWAIN_GetExtImageInfo(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data);
         DTWAIN_ARRAY DTWAIN_GetExtImageInfoDataEx(DTWAIN_SOURCE Source, LONG nWhich);
         DTWAIN_BOOL DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source, LONG nWhich, LPLONG InfoID, LPLONG NumItems, LPLONG Type);
