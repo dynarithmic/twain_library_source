@@ -4955,6 +4955,37 @@ function containsValue(tbl, valueToFind)
   return false -- Value not found
 end
 
+local function resolve_dtwaindll_path(dllname)
+  local function exists(path)
+    local file = io.open(path, "rb")
+    if file then
+      file:close()
+      return true
+    end
+    return false
+  end
+
+  -- Preserve an explicit path; never substitute another DLL with the same name.
+  if dllname:find("[\\/]") then
+    return exists(dllname) and dllname or nil
+  end
+
+  if exists(dllname) then
+    return ".\\" .. dllname
+  end
+
+  for dir in (os.getenv("PATH") or ""):gmatch("[^;]+") do
+    dir = dir:match("^%s*(.-)%s*$"):gsub('^"(.*)"$', '%1')
+    if dir ~= "" then
+      local candidate = dir .. (dir:match("[\\/]$") and "" or "\\") .. dllname
+      if exists(candidate) then
+        return candidate
+      end
+    end
+  end
+  return nil
+end
+
 function load_dtwaindll(DLLToLoad)
   local ffi = require("ffi")
 
@@ -4968,7 +4999,7 @@ function load_dtwaindll(DLLToLoad)
 
   -- get the name of the DTWAIN DLL that will be loaded
   local directory2, filename2, extension2 = split_filename(DLLToLoad)
-  filename_lower = string.lower(filename2)
+  local filename_lower = string.lower(filename2)
 
   -- determine if the DLL is valid
   local good_file = false
@@ -4992,23 +5023,25 @@ function load_dtwaindll(DLLToLoad)
   -- determine if DLL is actually ANSI or Unicode
   local isAnsi = containsValue(ansiToUse, filename_lower)
 
-  -- load the function defs depending on the bitness and whether the DLL is ANSI or Unicode
-  local mylib = {}
-  if ptr_size == 4 then
-    if isAnsi then
-       mylib = load32bitAnsi(DLLToLoad)
-    else
-       mylib = load32bitUnicode(DLLToLoad)
-    end
-  else
-    if isAnsi then
-       mylib = load64bitAnsi(DLLToLoad)
-    else
-       mylib = load64bitUnicode(DLLToLoad)
-    end
+  local dllpath = resolve_dtwaindll_path(DLLToLoad)
+  if not dllpath then
+    print("Unable to locate DTWAIN DLL: " .. DLLToLoad)
+    return nil
   end
-  if mylib == nil then
-    print(DLLToLoad .. " failed to load")
+
+  -- load the function defs depending on the bitness and whether the DLL is ANSI or Unicode
+  local loader
+  if ptr_size == 4 then
+    loader = isAnsi and load32bitAnsi or load32bitUnicode
+  else
+    loader = isAnsi and load64bitAnsi or load64bitUnicode
+  end
+
+  local ok, mylib = pcall(loader, dllpath)
+  if not ok then
+    print("Unable to load DTWAIN DLL: " .. dllpath)
+    print(mylib)
+    return nil
   end
   return mylib
 end
