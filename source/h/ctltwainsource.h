@@ -578,7 +578,7 @@ namespace dynarithmic
         CapGetInfo& GetCapGetInfoRef() { return m_CapGetInfo; }
         CapGetInfo GetCapGetInfo() const { return m_CapGetInfo; }
 
-        ExtendedImageInformation* GetExtendedImageInfo() { return m_pExtendedImageInformation.get(); }
+        ExtendedImageInformation* GetExtendedImageInfo() const { return m_pExtendedImageInformation.get(); }
         void        SetFeederWaitTime(int waitTime) { m_nFeederWaitTime = waitTime; }
         int         GetFeederWaitTime() const noexcept { return m_nFeederWaitTime; }
         int         GetFeederWaitTimeOption() const noexcept { return m_nFeederWaitTimeOption; }

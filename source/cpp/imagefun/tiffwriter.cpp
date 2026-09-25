@@ -490,7 +490,7 @@ bool TiffSessionWriter::SetCompressionTags(const PageTagInfo& tagInfo) const
     {
         TIFFSetField(tif_, TIFFTAG_JPEGQUALITY, currentPageSettings_.jpegQuality);
 
-        uint32_t rowsperstrip = static_cast<uint32_t>(-1);
+        auto rowsperstrip = static_cast<uint32_t>(-1);
         rowsperstrip = TIFFDefaultStripSize(tif_, rowsperstrip);
 
         const uint32_t rem = rowsperstrip % 8;

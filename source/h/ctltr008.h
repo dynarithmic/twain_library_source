@@ -32,11 +32,7 @@ namespace dynarithmic
                                          TW_UINT16   gType,
                                          TW_UINT16      gCap,
                                          TW_UINT16 TwainDataType)
-                : CTL_CapabilityGetTriplet(pSession,
-                    pSource,
-                    gType,
-                    gCap,
-                    TwainDataType) {}
+                : CTL_CapabilityGetTriplet(pSession,  pSource, gType, gCap, TwainDataType) {}
 
             bool GetValue(void* pData, size_t nWhere) override
             {

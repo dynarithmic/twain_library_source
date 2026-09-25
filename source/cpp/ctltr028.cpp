@@ -25,8 +25,7 @@ using namespace dynarithmic;
 /////////////////////////////////////////////////////////////////////////
 CTL_FileSystemTriplet::CTL_FileSystemTriplet(CTL_ITwainSession *pSession,
                                          CTL_ITwainSource* pSource,
-                                         TW_UINT16 nMsg)
-                                         : CTL_TwainTriplet(), m_FileSystem()
+                                         TW_UINT16 nMsg) : m_FileSystem()
 {
     InitGeneric(pSession, pSource, DG_CONTROL, DAT_FILESYSTEM, nMsg, &m_FileSystem);
 }

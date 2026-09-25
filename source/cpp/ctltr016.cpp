@@ -24,8 +24,7 @@
 
 using namespace dynarithmic;
 
-CTL_ImageTriplet::CTL_ImageTriplet(CTL_ITwainSession *pSession,
-                                   CTL_ITwainSource* pSource) :  CTL_TwainTriplet()
+CTL_ImageTriplet::CTL_ImageTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource)
 {
     SetSessionPtr(pSession);
     SetSourcePtr(pSource);

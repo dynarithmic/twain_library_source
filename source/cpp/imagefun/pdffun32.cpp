@@ -75,14 +75,14 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         m_MultiPageStruct.pUserData = pPDFInfo;
 
         // Open the file, return if there is an error
-        auto pDocument = pPDFInfo->m_Interface->DTWLIB_PDFGetNewDocument();
+        auto pDocument = PDFInterface::DTWLIB_PDFGetNewDocument();
 
-        if ( !pDocument || !pPDFInfo->m_Interface->DTWLIB_PDFOpenNewFile(pDocument, m_sFileName.c_str()) )
+        if ( !pDocument || !PDFInterface::DTWLIB_PDFOpenNewFile(pDocument, m_sFileName.c_str()) )
         {
             pPDFInfo->IsFileOpened = false;
             pPDFInfo->IsPDFStarted = false;
             if ( pDocument )
-                pPDFInfo->m_Interface->DTWLIB_PDFReleaseDocument(pDocument);
+                PDFInterface::DTWLIB_PDFReleaseDocument(pDocument);
             pPDFInfo.reset();
             return DTWAIN_ERR_FILEWRITE;
         }
@@ -91,24 +91,24 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         pPDFInfo->nCurrentPage  = 1;
         m_MultiPageStruct.pUserData = pPDFInfo;
         pPDFInfo->sFileName     = m_sFileName;
-        pPDFInfo->m_Interface->DTWLIB_PDFSetCompression(pDocument, false);
-        pPDFInfo->m_Interface->DTWLIB_PDFSetNoCompression(pDocument, false);
+        PDFInterface::DTWLIB_PDFSetCompression(pDocument, false);
+        PDFInterface::DTWLIB_PDFSetNoCompression(pDocument, false);
 
         // Set the ASCII Hex compression
-        pPDFInfo->m_Interface->DTWLIB_PDFSetASCIICompression(pDocument, pPDFInfo->ImageInfoEx.PDFUseASCIICompression);
+        PDFInterface::DTWLIB_PDFSetASCIICompression(pDocument, pPDFInfo->ImageInfoEx.PDFUseASCIICompression);
 
         // turn on other compression flags in the PDF object
         if ( pPDFInfo->ImageInfoEx.PDFUseCompression )
-            pPDFInfo->m_Interface->DTWLIB_PDFSetCompression(pDocument, true);   // Use Flate compression
+            PDFInterface::DTWLIB_PDFSetCompression(pDocument, true);   // Use Flate compression
         else
-            pPDFInfo->m_Interface->DTWLIB_PDFSetNoCompression(pDocument, true); // Use no compression
+            PDFInterface::DTWLIB_PDFSetNoCompression(pDocument, true); // Use no compression
 
-        pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_AUTHOR, m_sAuthor.c_str());
-        pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_PRODUCER, m_sProducer.c_str());
-        pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_TITLE, m_sTitle.c_str());
-        pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_KEYWORDS, m_sKeywords.c_str());
-        pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_SUBJECT, m_sSubject.c_str());
-        pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_CREATOR, m_sCreator.c_str());
+        PDFInterface::DTWLIB_PDFSetNameField(pDocument, PDF_AUTHOR, m_sAuthor.c_str());
+        PDFInterface::DTWLIB_PDFSetNameField(pDocument, PDF_PRODUCER, m_sProducer.c_str());
+        PDFInterface::DTWLIB_PDFSetNameField(pDocument, PDF_TITLE, m_sTitle.c_str());
+        PDFInterface::DTWLIB_PDFSetNameField(pDocument, PDF_KEYWORDS, m_sKeywords.c_str());
+        PDFInterface::DTWLIB_PDFSetNameField(pDocument, PDF_SUBJECT, m_sSubject.c_str());
+        PDFInterface::DTWLIB_PDFSetNameField(pDocument, PDF_CREATOR, m_sCreator.c_str());
 
         // Set the PDF standard to 1.3, 1.6, or 2.0 depending on encryption setting
         int major_version = 1;
@@ -122,15 +122,15 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
             minor_version = 0;
         }
 
-        if ( !pPDFInfo->m_Interface->DTWLIB_PDFStartCreation(pDocument, major_version, minor_version) )
+        if ( !PDFInterface::DTWLIB_PDFStartCreation(pDocument, major_version, minor_version) )
         {
             pPDFInfo->IsPDFStarted = false;
-            pPDFInfo->m_Interface->DTWLIB_PDFReleaseDocument (pDocument);
+            PDFInterface::DTWLIB_PDFReleaseDocument (pDocument);
             pPDFInfo.reset();
             return DTWAIN_ERR_FILEWRITE;
         }
 
-        pPDFInfo->m_Interface->DTWLIB_PDFSetPolarity(pDocument, imageinfo.nPDFPolarity);
+        PDFInterface::DTWLIB_PDFSetPolarity(pDocument, imageinfo.nPDFPolarity);
         // Test the encryption here
         if ( pPDFInfo->ImageInfoEx.bIsPDFEncrypted)
         {
@@ -139,13 +139,13 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
             if (imageinfo.bIsAES256Encrypted)
                 imageinfo.nPDFKeyLength = 32;
 
-            pPDFInfo->m_Interface->DTWLIB_PDFSetEncryption(pDocument,
-                                                            imageinfo.PDFOwnerPassword.c_str(),
-                                                            imageinfo.PDFUserPassword.c_str(),
-                                                            imageinfo.PDFPermissions,
-                                                            imageinfo.bUseStrongEncryption?TRUE:false,
-                                                            (imageinfo.bIsAESEncrypted || imageinfo.bIsAES256Encrypted)?TRUE:FALSE,
-                                                            imageinfo.nPDFKeyLength);
+            PDFInterface::DTWLIB_PDFSetEncryption(pDocument,
+                          imageinfo.PDFOwnerPassword.c_str(),
+                           imageinfo.PDFUserPassword.c_str(),
+                                     imageinfo.PDFPermissions,
+                                     imageinfo.bUseStrongEncryption?TRUE:false,
+                                     (imageinfo.bIsAESEncrypted || imageinfo.bIsAES256Encrypted)?TRUE:FALSE,
+                                     imageinfo.nPDFKeyLength);
         }
 
         pPDFInfo->IsPDFStarted = true;
@@ -160,10 +160,10 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         try
         {
             if ( pPDFInfo->IsPDFStarted )
-                pPDFInfo->m_Interface->DTWLIB_PDFEndCreation(pPDFInfo->pPDFdoc);
+                PDFInterface::DTWLIB_PDFEndCreation(pPDFInfo->pPDFdoc);
             if ( pPDFInfo->pPDFdoc )
             {
-                pPDFInfo->m_Interface->DTWLIB_PDFReleaseDocument(pPDFInfo->pPDFdoc);
+                PDFInterface::DTWLIB_PDFReleaseDocument(pPDFInfo->pPDFdoc);
             }
 
             retval = 0;
@@ -176,10 +176,10 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         catch(...)
         {
             if ( pPDFInfo->IsPDFStarted )
-                pPDFInfo->m_Interface->DTWLIB_PDFEndCreation(pPDFInfo->pPDFdoc);
+                PDFInterface::DTWLIB_PDFEndCreation(pPDFInfo->pPDFdoc);
             if ( pPDFInfo->pPDFdoc )
             {
-                pPDFInfo->m_Interface->DTWLIB_PDFReleaseDocument(pPDFInfo->pPDFdoc);
+                PDFInterface::DTWLIB_PDFReleaseDocument(pPDFInfo->pPDFdoc);
                 pPDFInfo.reset();
             }
             return DTWAIN_ERR_FILEWRITE;
@@ -208,13 +208,13 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
     // Set the thumbnail if used
     if ( pPDFInfo->ImageInfoEx.PDFUseThumbnail )
     {
-        pPDFInfo->m_Interface->DTWLIB_PDFSetThumbnailFile(pPDFInfo->pPDFdoc, m_sThumbnailFile.c_str());
+        PDFInterface::DTWLIB_PDFSetThumbnailFile(pPDFInfo->pPDFdoc, m_sThumbnailFile.c_str());
     }
 
-    pPDFInfo->m_Interface->DTWLIB_PDFSetImageType(pPDFInfo->pPDFdoc, m_nImageType);
+    PDFInterface::DTWLIB_PDFSetImageType(pPDFInfo->pPDFdoc, m_nImageType);
     if ( m_nImageType == 0 )
     {
-        pPDFInfo->m_Interface->DTWLIB_PDFSetDPI(pPDFInfo->pPDFdoc, pPDFInfo->ImageInfoEx.ResolutionX);
+        PDFInterface::DTWLIB_PDFSetDPI(pPDFInfo->pPDFdoc, pPDFInfo->ImageInfoEx.ResolutionX);
     }
 
     // Set any other text to write (searchable text is included in this)
@@ -229,16 +229,16 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
             const auto it2 = iter->second.second.end();
             while (it != it2 )
             {
-                pPDFInfo->m_Interface->DTWLIB_PDFAddPageText(pPDFInfo->pPDFdoc, *it);
+                PDFInterface::DTWLIB_PDFAddPageText(pPDFInfo->pPDFdoc, *it);
                 ++it;
             }
         }
     }
 
-    if (!pPDFInfo->m_Interface->DTWLIB_PDFWritePage(pPDFInfo->pPDFdoc, path))
+    if (!PDFInterface::DTWLIB_PDFWritePage(pPDFInfo->pPDFdoc, path))
     {
         fileutils::delete_file(path);
-        pPDFInfo->m_Interface->DTWLIB_PDFReleaseDocument(pPDFInfo->pPDFdoc);
+        PDFInterface::DTWLIB_PDFReleaseDocument(pPDFInfo->pPDFdoc);
         pPDFInfo.reset();
         return DTWAIN_ERR_FILEWRITE;
     }
@@ -249,8 +249,8 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
 
     if ( m_MultiPageStruct.Stage == 0)
     {
-        pPDFInfo->m_Interface->DTWLIB_PDFEndCreation(pPDFInfo->pPDFdoc);
-        pPDFInfo->m_Interface->DTWLIB_PDFReleaseDocument(pPDFInfo->pPDFdoc);
+        PDFInterface::DTWLIB_PDFEndCreation(pPDFInfo->pPDFdoc);
+        PDFInterface::DTWLIB_PDFReleaseDocument(pPDFInfo->pPDFdoc);
         RemoveAllImageFiles(pPDFInfo.get());
         pPDFInfo.reset();
     }
@@ -272,7 +272,7 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
          rotation = DTWAIN_PDF_PORTRAIT;
 
     // Set the rotation
-    pPDFInfo->m_Interface->DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_ORIENTATION, rotation);
+    PDFInterface::DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_ORIENTATION, rotation);
 
     // Check if normal paper size is specified
     if ( !(pPDFInfo->ImageInfoEx.PDFPageSize == DTWAIN_PDF_CUSTOMSIZE) &&
@@ -280,7 +280,7 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
          !(pPDFInfo->ImageInfoEx.PDFPageSize == DTWAIN_PDF_PIXELSPERMETERSIZE))
     {
         // One of the default page sized (A4, USLETTER, etc.)
-        pPDFInfo->m_Interface->DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, pPDFInfo->ImageInfoEx.PDFPageSize);
+        PDFInterface::DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, pPDFInfo->ImageInfoEx.PDFPageSize);
     }
     else
     if ( pPDFInfo->ImageInfoEx.PDFPageSize == DTWAIN_PDF_CUSTOMSIZE )
@@ -289,12 +289,12 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
         std::ostringstream sBuf;
         sBuf << "[0 0 " << static_cast<int>(pPDFInfo->ImageInfoEx.PDFCustomSize[0]) << " " << static_cast<int>(pPDFInfo->ImageInfoEx.PDFCustomSize[1]) << "]";
         sDimensions = sBuf.str();
-        pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, sDimensions.c_str());
+        PDFInterface::DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, sDimensions.c_str());
     }
     else
     if ( pPDFInfo->ImageInfoEx.PDFPageSize == DTWAIN_PDF_VARIABLEPAGESIZE )
     {
-        pPDFInfo->m_Interface->DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, -1);
+        PDFInterface::DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, -1);
     }
     else
     {
@@ -319,7 +319,7 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
         std::ostringstream sBuf;
         sBuf << "[0 0 " << widthInPoints << " " << heightInPoints << "]";
         sDimensions = sBuf.str();
-        pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, sDimensions.c_str());
+        PDFInterface::DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, sDimensions.c_str());
 
         if ( CTL_StaticData::GetLogFilterFlags() )
         {
@@ -333,28 +333,28 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
     // Best fit overrides all scale types
     if ( pPDFInfo->ImageInfoEx.PDFScaleType == DTWAIN_PDF_FITPAGE )
     {
-        pPDFInfo->m_Interface->DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_SCALETYPE, DTWAIN_PDF_FITPAGE);
+        PDFInterface::DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_SCALETYPE, DTWAIN_PDF_FITPAGE);
     }
     else
     if ( pPDFInfo->ImageInfoEx.PDFScaleType == DTWAIN_PDF_NOSCALING )
     {
-        pPDFInfo->m_Interface->DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_SCALETYPE, DTWAIN_PDF_NOSCALING);
+        PDFInterface::DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_SCALETYPE, DTWAIN_PDF_NOSCALING);
     }
     else
     if ( pPDFInfo->ImageInfoEx.PDFScaleType == DTWAIN_PDF_CUSTOMSCALE )
     {
-        pPDFInfo->m_Interface->DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_SCALETYPE, DTWAIN_PDF_CUSTOMSCALE);
-        pPDFInfo->m_Interface->DTWLIB_PDFSetScaling(pPDFInfo->pPDFdoc,pPDFInfo->ImageInfoEx.PDFCustomScale[0],
+        PDFInterface::DTWLIB_PDFSetLongField(pPDFInfo->pPDFdoc, PDF_SCALETYPE, DTWAIN_PDF_CUSTOMSCALE);
+        PDFInterface::DTWLIB_PDFSetScaling(pPDFInfo->pPDFdoc,pPDFInfo->ImageInfoEx.PDFCustomScale[0],
                                       pPDFInfo->ImageInfoEx.PDFCustomScale[1]);
 
     }
 
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_AUTHOR,   std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFAuthor) + ")").c_str());
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_PRODUCER, std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFProducer) + ")").c_str());
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_KEYWORDS, std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFKeywords) + ")").c_str());
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_TITLE,    std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFTitle) + ")").c_str());
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_SUBJECT,  std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFSubject) + ")").c_str());
-    pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_CREATOR,  std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFCreator) + ")").c_str());
+    PDFInterface::DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_AUTHOR,   std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFAuthor) + ")").c_str());
+    PDFInterface::DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_PRODUCER, std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFProducer) + ")").c_str());
+    PDFInterface::DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_KEYWORDS, std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFKeywords) + ")").c_str());
+    PDFInterface::DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_TITLE,    std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFTitle) + ")").c_str());
+    PDFInterface::DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_SUBJECT,  std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFSubject) + ")").c_str());
+    PDFInterface::DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_CREATOR,  std::string("(" + stringconversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFCreator) + ")").c_str());
     return 0;
 }
 

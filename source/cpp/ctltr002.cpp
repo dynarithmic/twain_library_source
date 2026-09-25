@@ -294,31 +294,41 @@ void CTL_ProcessEventTriplet::DeviceEvent()
     auto* pSource = GetSourcePtr();
     auto pSession = pSource->GetTwainSession();
     CTL_DeviceEventTriplet DevTrip(pSession, pSource);
-    DevTrip.Execute();
-    if ( DevTrip.IsSuccessful() )
+    auto retCode = DevTrip.Execute();
+
+    // 
+    int message = DTWAIN_TN_DEVICEEVENT;
+    if (!DevTrip.IsSuccessful())
     {
-        pSource->SetDeviceEvent( DevTrip.GetDeviceEvent() );
-        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_DEVICEEVENT,reinterpret_cast<LPARAM>(pSource));
+        // Set the next device event to a failed one
+        message = DTWAIN_TN_DEVICEEVENTFAILED;
+        pSource->SetDeviceEvent({});
+    }
+    else
+    {
+        // Set the last device event
+        pSource->SetDeviceEvent(DevTrip.GetDeviceEvent());
+    }
+    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, message ,reinterpret_cast<LPARAM>(pSource));
 
-        const auto pHandle = pSource->GetDTWAINHandle();
-        // if there is a callback, call it now with the error notifications
-        if ( pHandle->m_pCallbackFn )
-        {
-            const UINT uMsg = CTL_StaticData::GetRegisteredMessage();
-            LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
-            #ifdef _WIN64
-                (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
-            #else
-                (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG>(pSource));
-            #endif
-        }
+    const auto pHandle = pSource->GetDTWAINHandle();
+    // if there is a callback, call it now with the error notifications
+    if ( pHandle->m_pCallbackFn )
+    {
+        const UINT uMsg = CTL_StaticData::GetRegisteredMessage();
+        LogDTWAINMessage(nullptr, uMsg, message, 0, true);
+        #ifdef _WIN64
+            (*pHandle->m_pCallbackFn)(message, 0, reinterpret_cast<LONG_PTR>(pSource));
+        #else
+            (*pHandle->m_pCallbackFn)(message, 0, reinterpret_cast<LONG>(pSource));
+        #endif
+    }
 
-        // if there is a 64-bit callback, call it now with the error notifications
-        if ( pHandle->m_pCallbackFn64 )
-        {
-            const UINT uMsg = CTL_StaticData::GetRegisteredMessage();
-            LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
-            (*pHandle->m_pCallbackFn64)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
-        }
+    // if there is a 64-bit callback, call it now with the error notifications
+    if ( pHandle->m_pCallbackFn64 )
+    {
+        const UINT uMsg = CTL_StaticData::GetRegisteredMessage();
+        LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
+        (*pHandle->m_pCallbackFn64)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
     }
 }

@@ -116,7 +116,7 @@ namespace dynarithmic
             static uint32_t BitsPerComponent(const PreparedPsDibPage& page);
             const char* DecodeArray(const PreparedPsDibPage& page) const;
             bool WriteLevel1Image(const PreparedPsDibPage& page);
-            bool WriteLevel2Or3Image(const PreparedPsDibPage& page);
+            bool WriteLevel2Or3Image(const PreparedPsDibPage& page) const;
             static const uint8_t* SourceRow(const PreparedPsDibPage& page, uint32_t y);
             bool WriteHexByte(uint8_t v);
             bool EndHexData();

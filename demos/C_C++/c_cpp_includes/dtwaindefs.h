@@ -466,6 +466,7 @@
 
 /* Device event for TWAIN 1.8 Sources */
 #define  DTWAIN_TN_DEVICEEVENT                    1100
+#define  DTWAIN_TN_DEVICEEVENTFAILED              1101
 
 /* Sent if TWAIN driver sends cancel code during acquisition */
 #define DTWAIN_TN_TWAINPAGECANCELLED       1105

@@ -290,6 +290,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     /* Allow DTWAIN messages to be sent directly to our Window proc */
     DTWAIN_StartTwainSession(g_hWnd, NULL);
+
+    char szTest[100];
+    DTWAIN_GetResourceStringA(DTWAIN_ERR_TWAINDSM_NOT_FOUND, szTest, 100);
     // DTWAIN_SetTwainMode(DTWAIN_MODELESS);
     DTWAIN_EnableMsgNotify(TRUE);
 
@@ -1618,6 +1621,12 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
             pdf_page_count = 1;
         break;
 
+        case DTWAIN_TN_TRANSFERREADY:
+        {
+            DTWAIN_ARRAY arr;
+            DTWAIN_GetImageInfo(g_CurrentSource, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+        }
+        break;
         case DTWAIN_TN_TRANSFERDONE:
         {
             BOOL showBarCodes = GetToggleMenuState(IDM_SHOW_BARCODEINFO) && IsMenuItemEnabled(IDM_SHOW_BARCODEINFO);
@@ -1626,6 +1635,13 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
         }
         break;
 
+        case DTWAIN_TN_DEVICEEVENT:
+        {
+            DTWAIN_ARRAY arr;
+            LONG theEvent;
+            DTWAIN_GetDeviceEventEx(g_CurrentSource, &theEvent, &arr);
+        }
+        break;
         /* See if we want to keep the DIB */
         case DTWAIN_TN_QUERYPAGEDISCARD:
         {

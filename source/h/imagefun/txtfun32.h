@@ -47,7 +47,7 @@ namespace dynarithmic
     class CTextImageHandler : public CDibInterface
     {
         public:
-            CTextImageHandler(DTWAINImageInfoEx &ImageInfoEx, OCREngine* pEngine, LONG inputFormat,
+            CTextImageHandler(const DTWAINImageInfoEx &ImageInfoEx, OCREngine* pEngine, LONG inputFormat,
                                 CTL_TwainDib* pDib) :
                                      m_bWriteOk(true),
                                      m_ImageInfoEx(ImageInfoEx),
