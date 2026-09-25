@@ -1574,6 +1574,7 @@ DTWAIN DLL are not displayed */
 #define DTWAIN_TWAINDSM_LEGACY                  1
 #define DTWAIN_TWAINDSM_VERSION2                2
 #define DTWAIN_TWAINDSM_LATESTVERSION           4
+#define DTWAIN_TWAINDSM_VERSION2FALLBACK        8
 
 /* Windows TWAIN DSM search logic constants */
 #define DTWAIN_TWAINDSMSEARCH_NOTFOUND         (-1)

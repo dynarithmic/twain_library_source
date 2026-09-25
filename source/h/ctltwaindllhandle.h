@@ -97,6 +97,7 @@ namespace dynarithmic
                 CTL_StringType szProduct;
                 CTL_StringType DSMName;
                 int nSessionType;
+                bool m_bFallbackDSMToLegacy;
                 tagSessionStruct() : nMajorNum(1),
                                      nMinorNum(0),
                                      nLanguage(TWLG_USA),
@@ -110,7 +111,8 @@ namespace dynarithmic
                                      nSessionType(DTWAIN_TWAINDSM_VERSION2)
                                      #else
                                      DSMName(TWAINDLLVERSION_1),
-                                     nSessionType(DTWAIN_TWAINDSM_LEGACY)
+                                     nSessionType(DTWAIN_TWAINDSM_LEGACY),
+                                     m_bFallbackDSMToLegacy(false)
                                      #endif
                                     {}
             };
