@@ -336,7 +336,7 @@ const char* PsSessionWriter::DecodeArray(const PreparedPsDibPage& page) const
     return "[0 1 0 1 0 1]";
 }
 
-bool PsSessionWriter::WriteLevel2Or3Image(const PreparedPsDibPage& page)
+bool PsSessionWriter::WriteLevel2Or3Image(const PreparedPsDibPage& page) const
 {
     const char* colorSpace =
         (page.pixelFlavor == PsPixelFlavor::Bgr24 ||
