@@ -32,7 +32,7 @@ namespace dynarithmic
     {
         public:
             CTL_ImageLayoutTripletImpl(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource,
-                                       const CTL_RealArray* rArray = nullptr) : m_ImageLayout{}
+                                       const CTL_RealArray* rArray = nullptr)
             {
                 InitGeneric(pSession, pSource, DG_IMAGE, DAT_IMAGELAYOUT, GetSetType, &m_ImageLayout);
 
@@ -41,16 +41,16 @@ namespace dynarithmic
                     TW_IMAGELAYOUT* pLayout = GetImageLayout();
                     if (GetSetType != MSG_RESET && rArray && rArray->size() >= 4)
                     {
-                        pLayout->Frame.Left = FloatToFix32(static_cast<float>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_LEFT]));
-                        pLayout->Frame.Top = FloatToFix32(static_cast<float>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_TOP]));
-                        pLayout->Frame.Right = FloatToFix32(static_cast<float>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_RIGHT]));
-                        pLayout->Frame.Bottom = FloatToFix32(static_cast<float>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_BOTTOM]));
+                        pLayout->Frame.Left = FloatToFix32(static_cast<float>((*rArray)[LAYOUT_LEFT]));
+                        pLayout->Frame.Top = FloatToFix32(static_cast<float>((*rArray)[LAYOUT_TOP]));
+                        pLayout->Frame.Right = FloatToFix32(static_cast<float>((*rArray)[LAYOUT_RIGHT]));
+                        pLayout->Frame.Bottom = FloatToFix32(static_cast<float>((*rArray)[LAYOUT_BOTTOM]));
                     }
-                    if (rArray->size() >= CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS)
+                    if (rArray && (rArray->size() >= LAYOUT_NUMCOMPONENTS))
                     {
-                        pLayout->DocumentNumber = static_cast<TW_UINT32>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_DOCUMENTNUMBER]);
-                        pLayout->PageNumber = static_cast<TW_UINT32>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_PAGENUMBER]);
-                        pLayout->FrameNumber = static_cast<TW_UINT32>((*rArray)[CTL_EnumLayoutComponents::LAYOUT_FRAMENUMBER]);
+                        pLayout->DocumentNumber = static_cast<TW_UINT32>((*rArray)[LAYOUT_DOCUMENTNUMBER]);
+                        pLayout->PageNumber = static_cast<TW_UINT32>((*rArray)[LAYOUT_PAGENUMBER]);
+                        pLayout->FrameNumber = static_cast<TW_UINT32>((*rArray)[LAYOUT_FRAMENUMBER]);
                     }
                     else
                     {

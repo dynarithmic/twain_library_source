@@ -30,8 +30,7 @@ namespace dynarithmic
     class CTL_ConditionCodeTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_ConditionCodeTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource/* = nullptr*/) :
-                CTL_TwainTriplet(), m_Status{}
+            CTL_ConditionCodeTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource/* = nullptr*/) : m_Status{}
             {
                 InitGeneric(pSession, pSource, DG_CONTROL, DAT_STATUS, MSG_GET, &m_Status);
             }

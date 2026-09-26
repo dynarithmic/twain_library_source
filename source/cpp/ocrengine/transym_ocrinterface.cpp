@@ -26,7 +26,6 @@
 #include "versioninfo.h"
 #include "ctlfileutils.h"
 #include "errorcheck.h"
-#include "ctliface.h"
 
 #ifdef VERSINFO_STANDALONE
 using namespace VersionInformation;
@@ -58,17 +57,20 @@ TOCRSDK::TOCRSDK()
 {
 }
 
-static CTL_StringType GetTOCRDLLName()
+namespace
 {
-    // Load the resources
-    auto *customProfile = CTL_StaticData::GetINIInterface();
-    const char* defName = "Transym";
-    if ( customProfile )
-        defName = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_OCRLIBRARY_KEY).data(), defName);
-    auto val = stringconversion::Convert_AnsiPtr_To_Native(defName);
-    if (val.empty())
-        val = _T("TOCRDLL.DLL");
-    return val;
+    CTL_StringType GetTOCRDLLName()
+    {
+        // Load the resources
+        auto* customProfile = CTL_StaticData::GetINIInterface();
+        const char* defName = "Transym";
+        if (customProfile)
+            defName = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_OCRLIBRARY_KEY).data(), defName);
+        auto val = stringconversion::Convert_AnsiPtr_To_Native(defName);
+        if (val.empty())
+            val = _T("TOCRDLL.DLL");
+        return val;
+    }
 }
 
 HMODULE TOCRSDK::InitTOCR()
@@ -82,25 +84,25 @@ HMODULE TOCRSDK::InitTOCR()
         return nullptr;
     }
 
-    TOCRInitialise       =  (TOCRINITIALIZEFUNC      )GetProcAddress(m_hMod, "TOCRInitialise");
-    TOCRShutdown         =  (TOCRSHUTDOWNFUNC        )GetProcAddress(m_hMod, "TOCRShutdown");
-    TOCRGetErrorMode     =  (TOCRGETERRORMODEFUNC    )GetProcAddress(m_hMod, "TOCRGetErrorMode");
-    TOCRSetErrorMode     =  (TOCRSETERRORMODEFUNC    )GetProcAddress(m_hMod, "TOCRSetErrorMode");
-    TOCRDoJob            =  (TOCRDOJOBFUNC           )GetProcAddress(m_hMod, "TOCRDoJob");
-    TOCRWaitForJob       =  (TOCRWAITFORJOBFUNC      )GetProcAddress(m_hMod, "TOCRWaitForJob");
-    TOCRWaitForAnyJob    =  (TOCRWAITFORANYJOBFUNC   )GetProcAddress(m_hMod, "TOCRWaitForAnyJob");
-    TOCRGetJobDBInfo     =  (TOCRGETJOBDBINFOFUNC    )GetProcAddress(m_hMod, "TOCRGetJobDBInfo");
-    TOCRGetJobStatus     =  (TOCRGETJOBSTATUSFUNC    )GetProcAddress(m_hMod, "TOCRGetJobStatus");
-    TOCRGetJobStatusEx   =  (TOCRGETJOBSTATUSEXFUNC  )GetProcAddress(m_hMod, "TOCRGetJobStatusEx");
-    TOCRGetJobStatusMsg  =  (TOCRGETJOBSTATUSMSGFUNC )GetProcAddress(m_hMod, "TOCRGetJobStatusMsg");
-    TOCRGetNumPages      =  (TOCRGETNUMPAGESFUNC     )GetProcAddress(m_hMod, "TOCRGetNumPages");
-    TOCRGetJobResults    =  (TOCRGETJOBRESULTSFUNC   )GetProcAddress(m_hMod, "TOCRGetJobResults");
-    TOCRGetJobResultsEx  =  (TOCRGETJOBRESULTSEXFUNC )GetProcAddress(m_hMod, "TOCRGetJobResultsEx");
-    TOCRGetLicenceInfo   =  (TOCRGETLICENCEINFOFUNC  )GetProcAddress(m_hMod, "TOCRGetLicenceInfo");
-    TOCRConvertTIFFtoDIB =  (TOCRCONVERTTIFFTODIBFUNC)GetProcAddress(m_hMod, "TOCRConvertTIFFtoDIB");
-    TOCRRotateMonoBitmap =  (TOCRROTATEMONOBITMAPFUNC)GetProcAddress(m_hMod, "TOCRRotateMonoBitmap");
-    TOCRConvertFormat    =  (TOCRCONVERTFORMATFUNC   )GetProcAddress(m_hMod, "TOCRConvertFormat");
-    TOCRGetLicenceInfoEx =  (TOCRGETLICENCEINFOEXFUNC)GetProcAddress(m_hMod, "TOCRGetLicenceInfoEx");
+    TOCRInitialise       =  reinterpret_cast<TOCRINITIALIZEFUNC>(GetProcAddress(m_hMod, "TOCRInitialise"));
+    TOCRShutdown         =  reinterpret_cast<TOCRSHUTDOWNFUNC>(GetProcAddress(m_hMod, "TOCRShutdown"));
+    TOCRGetErrorMode     =  reinterpret_cast<TOCRGETERRORMODEFUNC>(GetProcAddress(m_hMod, "TOCRGetErrorMode"));
+    TOCRSetErrorMode     =  reinterpret_cast<TOCRSETERRORMODEFUNC>(GetProcAddress(m_hMod, "TOCRSetErrorMode"));
+    TOCRDoJob            =  reinterpret_cast<TOCRDOJOBFUNC>(GetProcAddress(m_hMod, "TOCRDoJob"));
+    TOCRWaitForJob       =  reinterpret_cast<TOCRWAITFORJOBFUNC>(GetProcAddress(m_hMod, "TOCRWaitForJob"));
+    TOCRWaitForAnyJob    =  reinterpret_cast<TOCRWAITFORANYJOBFUNC>(GetProcAddress(m_hMod, "TOCRWaitForAnyJob"));
+    TOCRGetJobDBInfo     =  reinterpret_cast<TOCRGETJOBDBINFOFUNC>(GetProcAddress(m_hMod, "TOCRGetJobDBInfo"));
+    TOCRGetJobStatus     =  reinterpret_cast<TOCRGETJOBSTATUSFUNC>(GetProcAddress(m_hMod, "TOCRGetJobStatus"));
+    TOCRGetJobStatusEx   =  reinterpret_cast<TOCRGETJOBSTATUSEXFUNC>(GetProcAddress(m_hMod, "TOCRGetJobStatusEx"));
+    TOCRGetJobStatusMsg  =  reinterpret_cast<TOCRGETJOBSTATUSMSGFUNC>(GetProcAddress(m_hMod, "TOCRGetJobStatusMsg"));
+    TOCRGetNumPages      =  reinterpret_cast<TOCRGETNUMPAGESFUNC>(GetProcAddress(m_hMod, "TOCRGetNumPages"));
+    TOCRGetJobResults    =  reinterpret_cast<TOCRGETJOBRESULTSFUNC>(GetProcAddress(m_hMod, "TOCRGetJobResults"));
+    TOCRGetJobResultsEx  =  reinterpret_cast<TOCRGETJOBRESULTSEXFUNC>(GetProcAddress(m_hMod, "TOCRGetJobResultsEx"));
+    TOCRGetLicenceInfo   =  reinterpret_cast<TOCRGETLICENCEINFOFUNC>(GetProcAddress(m_hMod, "TOCRGetLicenceInfo"));
+    TOCRConvertTIFFtoDIB =  reinterpret_cast<TOCRCONVERTTIFFTODIBFUNC>(GetProcAddress(m_hMod, "TOCRConvertTIFFtoDIB"));
+    TOCRRotateMonoBitmap =  reinterpret_cast<TOCRROTATEMONOBITMAPFUNC>(GetProcAddress(m_hMod, "TOCRRotateMonoBitmap"));
+    TOCRConvertFormat    =  reinterpret_cast<TOCRCONVERTFORMATFUNC>(GetProcAddress(m_hMod, "TOCRConvertFormat"));
+    TOCRGetLicenceInfoEx =  reinterpret_cast<TOCRGETLICENCEINFOEXFUNC>(GetProcAddress(m_hMod, "TOCRGetLicenceInfoEx"));
 
     if (!TOCRInitialise ||
         !TOCRShutdown       ||

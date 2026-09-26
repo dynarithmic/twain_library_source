@@ -35,73 +35,78 @@
 
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static constexpr TiffCompression TranslateCompression(int nCompression)
+
+namespace 
 {
-    switch (nCompression)
+    constexpr TiffCompression TranslateCompression(int nCompression)
     {
-        case COMPRESSION_NONE: return TiffCompression::None;
-        case COMPRESSION_CCITTFAX3: return TiffCompression::Group3;
-        case COMPRESSION_CCITTFAX4: return TiffCompression::Group4;
-        case COMPRESSION_LZW: return TiffCompression::Lzw;
-        case COMPRESSION_ADOBE_DEFLATE: return TiffCompression::Flate;
-        case COMPRESSION_PACKBITS: return TiffCompression::PackBits;
-        case COMPRESSION_JPEG:     return TiffCompression::Jpeg;
+        switch (nCompression)
+        {
+            case COMPRESSION_NONE: return TiffCompression::None;
+            case COMPRESSION_CCITTFAX3: return TiffCompression::Group3;
+            case COMPRESSION_CCITTFAX4: return TiffCompression::Group4;
+            case COMPRESSION_LZW: return TiffCompression::Lzw;
+            case COMPRESSION_ADOBE_DEFLATE: return TiffCompression::Flate;
+            case COMPRESSION_PACKBITS: return TiffCompression::PackBits;
+            case COMPRESSION_JPEG:     return TiffCompression::Jpeg;
+        }
+        return TiffCompression::None;
     }
-    return TiffCompression::None;
+
+    constexpr std::pair<int, int> ProcessCompressionType(int nFormat)
+    {
+        switch (nFormat)
+        {
+            case CTL_TwainDib::TiffFormatLZW:
+            case CTL_TwainDib::TiffFormatLZWMULTI:
+            case CTL_TwainDib::BigTiffFormatLZW:
+            case CTL_TwainDib::BigTiffFormatLZWMULTI:
+                return { true, COMPRESSION_LZW };
+
+            case CTL_TwainDib::TiffFormatNONE:
+            case CTL_TwainDib::TiffFormatNONEMULTI:
+            case CTL_TwainDib::BigTiffFormatNONE:
+            case CTL_TwainDib::BigTiffFormatNONEMULTI:
+                return { true, COMPRESSION_NONE };
+
+            case CTL_TwainDib::TiffFormatGROUP3:
+            case CTL_TwainDib::TiffFormatGROUP3MULTI:
+            case CTL_TwainDib::BigTiffFormatGROUP3:
+            case CTL_TwainDib::BigTiffFormatGROUP3MULTI:
+                return { true, COMPRESSION_CCITTFAX3 };
+
+            case CTL_TwainDib::TiffFormatGROUP4:
+            case CTL_TwainDib::TiffFormatGROUP4MULTI:
+            case CTL_TwainDib::BigTiffFormatGROUP4:
+            case CTL_TwainDib::BigTiffFormatGROUP4MULTI:
+                return { true, COMPRESSION_CCITTFAX4 };
+
+            case CTL_TwainDib::TiffFormatPACKBITS:
+            case CTL_TwainDib::TiffFormatPACKBITSMULTI:
+            case CTL_TwainDib::BigTiffFormatPACKBITS:
+            case CTL_TwainDib::BigTiffFormatPACKBITSMULTI:
+                return { true, COMPRESSION_PACKBITS };
+
+            case CTL_TwainDib::TiffFormatDEFLATE:
+            case CTL_TwainDib::TiffFormatDEFLATEMULTI:
+            case CTL_TwainDib::BigTiffFormatDEFLATE:
+            case CTL_TwainDib::BigTiffFormatDEFLATEMULTI:
+                return { true, COMPRESSION_ADOBE_DEFLATE };
+
+            case CTL_TwainDib::TiffFormatJPEG:
+            case CTL_TwainDib::TiffFormatJPEGMULTI:
+            case CTL_TwainDib::BigTiffFormatJPEG:
+            case CTL_TwainDib::BigTiffFormatJPEGMULTI:
+                return { true, COMPRESSION_JPEG };
+
+            case CTL_TwainDib::TiffFormatPIXARLOG:
+            case CTL_TwainDib::TiffFormatPIXARLOGMULTI:
+                return { true, COMPRESSION_PIXARLOG };
+        }
+        return { false, DTWAIN_ERR_INVALID_BITDEPTH };
+    }
 }
 
-static constexpr std::pair<int, int> ProcessCompressionType(int nFormat)
-{
-    switch (nFormat)
-    {
-        case CTL_TwainDib::TiffFormatLZW:
-        case CTL_TwainDib::TiffFormatLZWMULTI:
-        case CTL_TwainDib::BigTiffFormatLZW:
-        case CTL_TwainDib::BigTiffFormatLZWMULTI:
-            return { true, COMPRESSION_LZW };
-
-        case CTL_TwainDib::TiffFormatNONE:
-        case CTL_TwainDib::TiffFormatNONEMULTI:
-        case CTL_TwainDib::BigTiffFormatNONE:
-        case CTL_TwainDib::BigTiffFormatNONEMULTI:
-            return { true, COMPRESSION_NONE };
-
-        case CTL_TwainDib::TiffFormatGROUP3:
-        case CTL_TwainDib::TiffFormatGROUP3MULTI:
-        case CTL_TwainDib::BigTiffFormatGROUP3:
-        case CTL_TwainDib::BigTiffFormatGROUP3MULTI:
-            return { true, COMPRESSION_CCITTFAX3 };
-
-        case CTL_TwainDib::TiffFormatGROUP4:
-        case CTL_TwainDib::TiffFormatGROUP4MULTI:
-        case CTL_TwainDib::BigTiffFormatGROUP4:
-        case CTL_TwainDib::BigTiffFormatGROUP4MULTI:
-            return { true, COMPRESSION_CCITTFAX4 };
-
-        case CTL_TwainDib::TiffFormatPACKBITS:
-        case CTL_TwainDib::TiffFormatPACKBITSMULTI:
-        case CTL_TwainDib::BigTiffFormatPACKBITS:
-        case CTL_TwainDib::BigTiffFormatPACKBITSMULTI:
-            return { true, COMPRESSION_PACKBITS };
-
-        case CTL_TwainDib::TiffFormatDEFLATE:
-        case CTL_TwainDib::TiffFormatDEFLATEMULTI:
-        case CTL_TwainDib::BigTiffFormatDEFLATE:
-        case CTL_TwainDib::BigTiffFormatDEFLATEMULTI:
-            return { true, COMPRESSION_ADOBE_DEFLATE };
-
-        case CTL_TwainDib::TiffFormatJPEG:
-        case CTL_TwainDib::TiffFormatJPEGMULTI:
-        case CTL_TwainDib::BigTiffFormatJPEG:
-        case CTL_TwainDib::BigTiffFormatJPEGMULTI:
-            return { true, COMPRESSION_JPEG };
-
-        case CTL_TwainDib::TiffFormatPIXARLOG:
-        case CTL_TwainDib::TiffFormatPIXARLOGMULTI:
-            return { true, COMPRESSION_PIXARLOG };
-    }
-    return { false, DTWAIN_ERR_INVALID_BITDEPTH };
-}
 
 int CTL_TiffIOHandler::WriteOneTiffPage(LPCTSTR path, HANDLE bitmap, const DibMultiPageStruct* multiPageStruct)
 {

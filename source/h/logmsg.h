@@ -148,7 +148,7 @@ namespace dynarithmic
        void DisableAllLoggers();
 
        std::string GetAppName() const {return m_csAppName;}
-       void OutputDebugStringFull(std::string_view s);
+       void OutputDebugStringFull(std::string_view s) const;
        std::string GetDebugStringFull(std::string_view s);
        void SetDLLHandle(CTL_TwainDLLHandle* pHandle);
        int GetCurrentIndentLevel() const { return m_nCurrentIndentLevel; }
@@ -175,8 +175,8 @@ namespace dynarithmic
 
        /////////////////////////////////////////////////////////////////////////////
        // string utils
-       std::string GetBaseDir(std::string_view path) const;
-       std::string GetBaseName(std::string_view path) const;
+       static std::string GetBaseDir(std::string_view path);
+       static std::string GetBaseName(std::string_view path);
        void GetModuleName(HINSTANCE hInst);
        bool WriteOnDemand(std::string_view fmt) const;
 

@@ -76,7 +76,7 @@ namespace dynarithmic
         private:
             static int To01mm(double pixels, double dpi);
             bool WriteEmf(const PreparedMetafileDibPage& page) const;
-            bool WriteWmfViaEmf(const PreparedMetafileDibPage& page);
+            bool WriteWmfViaEmf(const PreparedMetafileDibPage& page) const;
             static bool WritePlaceableWmfFile(const std::wstring& filename, const PreparedMetafileDibPage& page,
                                               const std::vector<BYTE>& wmfBits);
             static HENHMETAFILE CreateRasterEmfInMemory(const PreparedMetafileDibPage& page);
