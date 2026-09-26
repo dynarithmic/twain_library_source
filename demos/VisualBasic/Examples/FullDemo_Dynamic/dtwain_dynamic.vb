@@ -1469,6 +1469,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_TWAINDSM_LEGACY As Integer = 1
         Public Const DTWAIN_TWAINDSM_VERSION2 As Integer = 2
         Public Const DTWAIN_TWAINDSM_LATESTVERSION As Integer = 4
+        Public Const DTWAIN_TWAINDSM_VERSION2FALLBACK As Integer = 8
         Public Const DTWAIN_TWAINDSMSEARCH_NOTFOUND As Integer = (-1)
         Public Const DTWAIN_TWAINDSMSEARCH_WSO As Integer = 0
         Public Const DTWAIN_TWAINDSMSEARCH_WOS As Integer = 1

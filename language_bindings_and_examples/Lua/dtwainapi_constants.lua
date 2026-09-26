@@ -1225,6 +1225,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_TWAINDSM_LEGACY = 1
    dtwain_constants.DTWAIN_TWAINDSM_VERSION2 = 2
    dtwain_constants.DTWAIN_TWAINDSM_LATESTVERSION = 4
+   dtwain_constants.DTWAIN_TWAINDSM_VERSION2FALLBACK = 8
    dtwain_constants.DTWAIN_TWAINDSMSEARCH_NOTFOUND = (-1)
    dtwain_constants.DTWAIN_TWAINDSMSEARCH_WSO = 0
    dtwain_constants.DTWAIN_TWAINDSMSEARCH_WOS = 1
