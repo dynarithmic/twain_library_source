@@ -83,7 +83,7 @@ std::string OCREngine::GetCachedText() const { return m_OCRCache.sOCRText; }
 
 void OCREngine::AddCharacterInfo(LONG nPage, const OCRCharacterInfo& cInfo)
 {
-    OCRCharacterInfoMap::iterator itMap = m_OCRCharMap.find(nPage);
+    auto itMap = m_OCRCharMap.find(nPage);
     if ( itMap == m_OCRCharMap.end() )
         itMap = m_OCRCharMap.insert(make_pair(nPage, std::vector<OCRCharacterInfo>())).first;
     itMap->second.push_back(cInfo);
@@ -257,7 +257,7 @@ int OCREngine::GetCurrentPageNumber() const { return m_nCurrentPage; }
 
 std::vector<OCRCharacterInfo>& OCREngine::GetCharacterInfo(LONG nPage, int& status)
 {
-    const OCRCharacterInfoMap::iterator it = m_OCRCharMap.find(nPage);
+    const auto it = m_OCRCharMap.find(nPage);
     status = -1;
     if ( it != m_OCRCharMap.end())
     {
@@ -274,7 +274,7 @@ void OCREngine::SetPageTextMap(LONG nPage, const std::string& sData)
 
 std::string OCREngine::GetOCRText(LONG nPage)
 {
-    const OCRPageTextMap::iterator it = m_OCRPageTextMap.find(nPage);
+    const auto it = m_OCRPageTextMap.find(nPage);
     if ( it != m_OCRPageTextMap.end())
         return it->second;
     return {};

@@ -1352,6 +1352,7 @@ namespace Dynarithmic
         public const int DTWAIN_TWAINDSM_LEGACY = 1;
         public const int DTWAIN_TWAINDSM_VERSION2 = 2;
         public const int DTWAIN_TWAINDSM_LATESTVERSION = 4;
+        public const int DTWAIN_TWAINDSM_VERSION2FALLBACK = 8;
         public const int DTWAIN_TWAINDSMSEARCH_NOTFOUND = (-1);
         public const int DTWAIN_TWAINDSMSEARCH_WSO = 0;
         public const int DTWAIN_TWAINDSMSEARCH_WOS = 1;

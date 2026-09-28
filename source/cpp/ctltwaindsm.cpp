@@ -58,16 +58,19 @@ extern "C"
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return sessionEnabled; }, 
                                                   DTWAIN_ERR_ACTIVE_TWAINSESSION, false, FUNC_MACRO);
         #ifndef _WIN64
+        pHandle->m_SessionStruct.m_bFallbackDSMToLegacy = false;
         if ( DSMType == DTWAIN_TWAINDSM_LEGACY || DSMType == DTWAIN_TWAINDSM_LATESTVERSION)
         {
             pHandle->m_SessionStruct.nSessionType = DSMType;
             pHandle->m_SessionStruct.DSMName = TWAINDLLVERSION_1;
         }
         else
-        if ( DSMType == DTWAIN_TWAINDSM_VERSION2)
+        if ( DSMType == DTWAIN_TWAINDSM_VERSION2 || DSMType == DTWAIN_TWAINDSM_VERSION2FALLBACK)
         {
             pHandle->m_SessionStruct.nSessionType = DTWAIN_TWAINDSM_VERSION2;
             pHandle->m_SessionStruct.DSMName = TWAINDLLVERSION_2;
+            if (DSMType == DTWAIN_TWAINDSM_VERSION2FALLBACK)
+                pHandle->m_SessionStruct.m_bFallbackDSMToLegacy = true;
         }
         #else
         pHandle->m_SessionStruct.nSessionType = DTWAIN_TWAINDSM_VERSION2;

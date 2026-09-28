@@ -149,6 +149,7 @@ namespace dynarithmic
         CTL_StringType           s_ApplicationName;
         SupportedBitDepthsMap    s_supportedBitDepths;
         std::queue<MSG>          s_TwainV2MessageQueue;
+        std::pair<bool, bool>    s_EmbeddedResourceStatus = { false, false };
         CTL_StaticDataStruct();
     };
 
@@ -172,6 +173,9 @@ namespace dynarithmic
         static CTL_FileSaveMap& GetFileSaveMap() { return Get().s_FileSaveMap; }
         static CTL_CompressionMap& GetCompressionMap() { return Get().s_CompressionMap; }
         static bool ResourcesLoaded() { return Get().s_ResourcesInitialized; }
+        static std::pair<bool, bool>& GetEmbeddedResourceStatus() { return Get().s_EmbeddedResourceStatus; }
+        static bool IsTwainInfoEmbedded() { return Get().s_EmbeddedResourceStatus.first; }
+        static bool IsLanguageResourceEmbedded() { return Get().s_EmbeddedResourceStatus.second; }
         static void Reset() 
         { 
             CTL_StaticDataStruct tempStruct; 
@@ -182,6 +186,7 @@ namespace dynarithmic
             tempStruct.s_StartupDSMSearchOrder = static_struct.s_StartupDSMSearchOrder;
             tempStruct.s_StartupDSMSearchOrderDir = static_struct.s_StartupDSMSearchOrderDir;
             tempStruct.s_SavedSelectSourcePos = static_struct.s_SavedSelectSourcePos;
+            tempStruct.s_EmbeddedResourceStatus = { false, false };
             static_struct = tempStruct;
         }
         static auto& GetLogFilterFlags() { return Get().s_logFilterFlags; }

@@ -38,7 +38,11 @@ namespace
         if (!writer.Open(filename, options))
             return false;
 
-        if (!writer.SetPageInfo(JxrSessionWriter::MakePreparedJxrPage(lockedPage.GetView()).value()))
+        auto pageInfo = JxrSessionWriter::MakePreparedJxrPage(lockedPage.GetView());
+        if (!pageInfo.has_value())
+            return false;
+
+        if (!writer.SetPageInfo(pageInfo.value()))
             return false;
 
         if (!writer.WriteCurrentPage())

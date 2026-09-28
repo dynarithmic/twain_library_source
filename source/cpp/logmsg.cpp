@@ -381,7 +381,7 @@ bool CLogSystem::Flush() const
 }
 /////////////////////////////////////////////////////////////////////////////
 
-std::string CLogSystem::GetBaseName(std::string_view path) const
+std::string CLogSystem::GetBaseName(std::string_view path)
 {
     StringArray rArray;
     filenameutils::SplitPath(path, rArray);
@@ -390,14 +390,14 @@ std::string CLogSystem::GetBaseName(std::string_view path) const
 
 /////////////////////////////////////////////////////////////////////////////
 
-std::string CLogSystem::GetBaseDir(std::string_view path) const
+std::string CLogSystem::GetBaseDir(std::string_view path)
 {
     StringArray rArray;
     filenameutils::SplitPath(path, rArray);
     return rArray[filenameutils::DIRECTORY_POS];
 }
 
-void CLogSystem::OutputDebugStringFull(std::string_view s)
+void CLogSystem::OutputDebugStringFull(std::string_view s) const
 {
     for (const auto& m : app_logger_map)
         m.second->trace(s);

@@ -33,8 +33,7 @@ func main() {
     api_func.DTWAIN_EnableMsgNotify(1)
 
     // Select a source
-    twain_source := api_func.DTWAIN_SelectSource2A(nil, "Test title", 0, 0,
-        dtwainapi.DTWAIN_DLG_CENTER_CURRENT_MONITOR|dtwainapi.DTWAIN_DLG_SORTNAMES|dtwainapi.DTWAIN_DLG_HIGHLIGHTFIRST)
+    twain_source := api_func.DTWAIN_SelectSource()
     if twain_source == dtwainapi.DTWAIN_SOURCE(nil) {
         fmt.Println("Source was not selected")
     } else {

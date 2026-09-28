@@ -2347,37 +2347,65 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
     }
     else
     {
-        // load the default TWAIN_32.DLL or TWAINDSM.DLL using the
-        // normal process of finding these DLL's
-        const auto& tempStr = m_strTwainDSMPath;
-        m_strTwainDSMPath = GetTwainDirFullName(m_strTwainDSMPath.c_str(), &m_nTwainDSMFoundPath, true, &m_hLibModule);
-        if ( m_strTwainDSMPath.empty() )
-        {
-            m_strTwainDSMPath = tempStr;
-            m_strTwainDSMPath = GetTwainDirFullNameEx(m_strTwainDSMPath.c_str(), &m_nTwainDSMFoundPath, true, &m_hLibModule);
-            if ( m_strTwainDSMPath.empty())
-            {
-                const CTL_StringType dllName = _T(" : ") + tempStr;
-                DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, stringconversion::Convert_Native_To_Ansi(dllName, dllName.length()), false, true)
-            }
-        }
-        m_strTwainDSMVersionInfo = GetVersionInfo(m_hLibModule.native(), 0);
-        CTL_StringStreamType strm;
-        strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session...\n");
-        strm << _T("Version information for \"") << m_strTwainDSMPath << _T("\":\n") << GetVersionInfo(m_hLibModule.native(), 4);
-        LogToDebugMonitor(strm.str());
-        if (CTL_StaticData::GetLogFilterFlags() != 0)
-            DTWAIN_LogMessageA(stringconversion::Convert_Native_To_Ansi(strm.str()).c_str());
+        auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        int numAttempts = 1;
+        if (pHandle->m_SessionStruct.m_bFallbackDSMToLegacy)
+            numAttempts = 2;
 
-        // Load the entry point for these DLL's
-        LoadDSM();
+        for (int curAttempt = 1; curAttempt <= numAttempts; ++curAttempt)
+        {
+            // load the default TWAIN_32.DLL or TWAINDSM.DLL using the
+            // normal process of finding these DLL's
+            const auto& tempStr = m_strTwainDSMPath;
+            m_strTwainDSMPath = GetTwainDirFullName(m_strTwainDSMPath.c_str(), &m_nTwainDSMFoundPath, true, &m_hLibModule);
+            if (m_strTwainDSMPath.empty())
+            {
+                m_strTwainDSMPath = tempStr;
+                m_strTwainDSMPath = GetTwainDirFullNameEx(m_strTwainDSMPath.c_str(), &m_nTwainDSMFoundPath, true, &m_hLibModule);
+                if (m_strTwainDSMPath.empty())
+                {
+                    // See if we should report the error
+                    if (numAttempts == curAttempt) 
+                    {
+                        const CTL_StringType dllName = _T(" : ") + tempStr;
+                        DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, stringconversion::Convert_Native_To_Ansi(dllName, dllName.length()), false, true)
+                    }
+                    else
+                    {
+                        // Fallback to legacy DSM and see if this works
+                        CTL_StringStreamType strm;
+                        strm << _T("TWAIN DSM Version 2.x was not found.  Falling back to legacy (TWAIN_32.DLL)...\n");
+                        LogToDebugMonitor(strm.str());
+                        if (CTL_StaticData::GetLogFilterFlags() != 0)
+                            DTWAIN_LogMessageA(stringconversion::Convert_Native_To_Ansi(strm.str()).c_str());
+                        DTWAIN_SetTwainDSM(DTWAIN_TWAINDSM_LEGACY);
+                        // Set the fallback to legacy flag and try again loading the legacy TWAIN_32.DLL
+                        pHandle->m_SessionStruct.m_bFallbackDSMToLegacy = true;
+                        m_strTwainDSMPath = TWAINDLLVERSION_1;
+                        continue;
+                    }
+                }
+            }
+            m_strTwainDSMVersionInfo = GetVersionInfo(m_hLibModule.native(), 0);
+            CTL_StringStreamType strm;
+            strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session...\n");
+            strm << _T("Version information for \"") << m_strTwainDSMPath << _T("\":\n") << GetVersionInfo(m_hLibModule.native(), 4);
+            LogToDebugMonitor(strm.str());
+            if (CTL_StaticData::GetLogFilterFlags() != 0)
+                DTWAIN_LogMessageA(stringconversion::Convert_Native_To_Ansi(strm.str()).c_str());
+
+            // Load the entry point for these DLL's
+            LoadDSM();
+            if (pHandle->m_lLastError == DTWAIN_NO_ERROR)
+                return true;
+        }
     }
-    return true;
+    return false;
 }
 
 bool CTL_TwainAppMgr::LoadDSM()
 {
-    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     m_lpDSMEntry = dtwain_library_loader<DSMENTRYPROC>::get_func_ptr(m_hLibModule.native(), "DSM_Entry");
     if ( !m_lpDSMEntry )
         DTWAIN_ERROR_CONDITION(IDS_ErrTwainDLLInvalid,false, true)
