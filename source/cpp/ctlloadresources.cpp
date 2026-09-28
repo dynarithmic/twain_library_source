@@ -668,6 +668,7 @@ namespace dynarithmic
         LOG_FUNC_ENTRY_PARAMS(())
 
         auto iniInterface = CTL_StaticData::GetINIInterface();
+        auto& resourceStatus = CTL_StaticData::GetEmbeddedResourceStatus();
 
         bool bUseExternalResource =
             iniInterface->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
@@ -681,12 +682,14 @@ namespace dynarithmic
                 std::istringstream strm(resTest);
                 auto retVal = ReadResources(strm, resTest, retValue);
                 CTL_StaticData::GetResourceVersion() = stringconversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
+                resourceStatus.first = retVal; // use embedded resources
                 return retVal;
             }
             return false;
         }
         else
         {
+            resourceStatus.first = false; // Not using embedded resources
             CTL_TWAINDecoderStruct ErrorStruct;
             TW_UINT32 dg;
             TW_UINT16 dat, msg;
@@ -854,6 +857,10 @@ namespace dynarithmic
         auto& info = CTL_StaticData::GetGeneralResourceInfo();
         info.sResourceName = _T("english");
         info.bIsFromRC = true;
+
+        // Regenerate version information
+        CTL_StaticData::GetVersionString().clear();
+        GetVersionString();
         return true;
     }
 

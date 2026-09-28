@@ -90,13 +90,21 @@ namespace dynarithmic
 
         auto appName = CTL_StaticData::GetApplicationName();
         CTL_StringType& sOut = verString;
+        auto embeddedResource = CTL_StaticData::IsTwainInfoEmbedded();
         sOut += _T("Dynarithmic TWAIN Library, Version ");
         sOut += _T(DTWAIN_VERINFO_FILEVERSION);
         sOut += _T(' ') + s + _T('\n');
         sOut += _T("Shared Library path : ") + GetDTWAINDLLPath();
-        sOut += _T("\nUsing Resource file (twaininfo.txt) version: ");
-        sOut += _T(DTWAIN_TEXTRESOURCE_FILEVERSION);
-        sOut += _T("\nResource file path: ") + CTL_StaticData::GetResourcePath();
+        if (!embeddedResource)
+        {
+            sOut += _T("\nUsing Resource file (twaininfo.txt) version: ");
+            sOut += _T(DTWAIN_TEXTRESOURCE_FILEVERSION);
+            sOut += _T("\nResource file path: ") + CTL_StaticData::GetResourcePath();
+        }
+        else
+        {
+            sOut += _T("\nUsing embedded TWAIN constants and information");
+        }
         sOut += _T("\nText Resource Language: ") + CTL_StaticData::GetGeneralResourceInfo().sResourceName;
         if (CTL_StaticData::GetGeneralResourceInfo().bIsFromRC)
             sOut += _T(" (Text resources are directly from DTWAIN DLL and not from a text resource file)");
