@@ -18,6 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include <algorithm>
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
@@ -624,8 +625,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
 {
     // Get the current page number
     int nCurImage = GetPendingImageNum() - GetBlankPageCount();
-    if ( nCurImage < 0 )
-        nCurImage = 0;
+    nCurImage = std::max(nCurImage, 0);
 
     if ( GetCurrentJobControl() != TWJC_NONE &&
         IsFileTypeMultiPage(m_AcquireFileStatus.GetAcquireFileFormat()) &&
@@ -1090,26 +1090,29 @@ void CTL_ITwainSource::ProcessMultipageFile()
     }
 }
 
-template <typename T>
-static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
+namespace
 {
-    const auto pHandle = pSource->GetDTWAINHandle();
-    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, nCap, static_cast<LONG>(dataArray.size())).second;
-    if (theArray)
+    template <typename T>
+    DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
+    {
+        const auto pHandle = pSource->GetDTWAINHandle();
+        const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, nCap, static_cast<LONG>(dataArray.size())).second;
+        if (theArray)
+        {
+            auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
+            std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny)
+                { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny); });
+        }
+        return theArray;
+    }
+
+    template <typename T>
+    bool PopulateCache(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray, std::vector<anytype_>& dataArray)
     {
         auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
-        std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny)
-                       { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny); });
+        std::transform(vVector.begin(), vVector.end(), std::back_inserter(dataArray), [](typename T::value_type value) { return value; });
+        return true;
     }
-    return theArray;
-}
-
-template <typename T>
-static bool PopulateCache(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray, std::vector<anytype_>& dataArray)
-{
-    auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
-    std::transform(vVector.begin(), vVector.end(), std::back_inserter(dataArray), [](typename T::value_type value){ return value;});
-    return true;
 }
 
 CTL_ITwainSession* CTL_ITwainSource::GetTwainSession() const
