@@ -51,17 +51,17 @@ namespace dynarithmic
     {
         static UINT GetWindowsDirectory(LPSTR lpBuffer, UINT uSize)
         {
-            return GetWindowsDirectoryA(&lpBuffer[0], uSize);
+            return ::GetWindowsDirectoryA(&lpBuffer[0], uSize);
         }
 
         static UINT GetSystemDirectory(LPSTR lpBuffer, UINT uSize)
         {
-            return GetSystemDirectoryA(&lpBuffer[0], uSize);
+            return ::GetSystemDirectoryA(&lpBuffer[0], uSize);
         }
 
         static DWORD GetModuleFileName(HMODULE hModule, LPSTR lpBuffer, DWORD nSize)
         {
-            return GetModuleFileNameA(hModule, &lpBuffer[0], nSize);
+            return ::GetModuleFileNameA(hModule, &lpBuffer[0], nSize);
         }
     };
 
