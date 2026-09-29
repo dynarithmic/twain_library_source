@@ -21,7 +21,7 @@
 #include "pnmwriter.h"
 using namespace dynarithmic;
 
-std::optional<PreparedPnmDibPage> PnmSessionWriter::MakePreparedPnmDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedPnmDibPage> PnmSessionWriter::MakePreparedPnmDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;

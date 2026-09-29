@@ -295,7 +295,7 @@ namespace
                     try
                     {
                         uint32_t valueToUse = std::stoi(iter2->pItem);
-                        autoclose_map.insert({ iter->pItem, (valueToUse != 0)?true:false });
+                        autoclose_map.insert({ iter->pItem, (valueToUse != 0) });
                     }
                     catch (const std::invalid_argument& /*ex*/)
                     {

@@ -228,7 +228,7 @@ namespace
         else
         {
             bOk = SetMultiCapValues<DataType, ConvertFrom, ConverterFn>
-                (DLLHandle, Source, pArray, eType, static_cast<UINT>(lCap), static_cast<TW_UINT16>(lSetType), static_cast<UINT>(lContainerType), true, static_cast<TW_UINT16>(TwainTypeValue)) ? true : false;
+                (DLLHandle, Source, pArray, eType, static_cast<UINT>(lCap), static_cast<TW_UINT16>(lSetType), static_cast<UINT>(lContainerType), true, static_cast<TW_UINT16>(TwainTypeValue));
 
         }
         return bOk;

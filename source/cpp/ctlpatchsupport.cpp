@@ -33,10 +33,10 @@ namespace
     // This file processes both patch codes and bar code caps, since currently the capabilities
     // described by the TWAIN specification as of TWAIN 2.5 have identical names (except for the 
     // BAR and PATCH differences in the name).
-    bool IsCapInList(CTL_ITwainSource* pSource, const std::array<LONG, 7>& capList)
+    bool IsCapInList(const CTL_ITwainSource* pSource, const std::array<LONG, 7>& capList)
     {
         const auto iter = std::find_if(std::begin(capList), std::end(capList), [&](LONG val)
-            { return pSource->IsCapInSupportedList(static_cast<TW_UINT16>(val)) ? true : false; });
+            { return pSource->IsCapInSupportedList(static_cast<TW_UINT16>(val)); });
         const bool bRet = iter != std::end(capList);
         return bRet;
     }

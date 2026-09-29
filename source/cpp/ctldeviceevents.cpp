@@ -77,7 +77,7 @@ extern "C"
                 }
             }
         }
-        const bool bRet = SetCapValuesEx2_Internal(pSource, CAP_DEVICEEVENT, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array)?true:false;
+        const bool bRet = SetCapValuesEx2_Internal(pSource, CAP_DEVICEEVENT, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array);
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
@@ -95,7 +95,7 @@ extern "C"
             DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
         const bool bRet = GetCapValuesEx2_Internal(pSource, CAP_DEVICEEVENT, DTWAIN_CAPGETCURRENT, 
-                                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+                                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
         if (!bRet)
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 

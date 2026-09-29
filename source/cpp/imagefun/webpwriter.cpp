@@ -43,7 +43,7 @@ namespace
     }
 }
 
-std::optional<PreparedWebPDibPage> WebPSessionWriter::MakePreparedWebPDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedWebPDibPage> WebPSessionWriter::MakePreparedWebPDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;

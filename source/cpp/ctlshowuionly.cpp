@@ -53,7 +53,7 @@ extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 
     // Open the source (if source is closed)
     bool bCloseSource = false;
-    const bool bIsSourceOpen = CTL_TwainAppMgr::IsSourceOpen(pSource) ? true : false;
+    const bool bIsSourceOpen = CTL_TwainAppMgr::IsSourceOpen(pSource);
 
     if (!bIsSourceOpen && pHandle->m_lAcquireMode == DTWAIN_MODAL)
     {

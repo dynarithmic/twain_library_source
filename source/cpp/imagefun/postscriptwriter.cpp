@@ -85,7 +85,7 @@ namespace
     }
 }
 
-std::optional<PreparedPsDibPage> PsSessionWriter::MakePreparedPsDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedPsDibPage> PsSessionWriter::MakePreparedPsDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;
@@ -397,11 +397,11 @@ bool PsSessionWriter::WriteAscii85FlateImageData(const PreparedPsDibPage& page) 
         return false;
 
     std::string flate;
-    if (dynarithmic::FlateEncode(std::string_view(raw.data(), raw.size()), flate) != Z_OK)
+    if (FlateEncode(std::string_view(raw.data(), raw.size()), flate) != Z_OK)
         return false;
 
     std::string encoded;
-    if (dynarithmic::ASCII85Encode(std::string_view(flate.data(), flate.size()), encoded) != 1)
+    if (ASCII85Encode(std::string_view(flate.data(), flate.size()), encoded) != 1)
         return false;
 
     if (!encoded.empty())
@@ -774,7 +774,7 @@ bool PsSessionWriter::WriteAscii85ImageData(const PreparedPsDibPage& page) const
         return false;
 
     std::string encoded;
-    if (!dynarithmic::ASCII85Encode(std::string_view(raw.data(), raw.size()), encoded) != 0)
+    if (!ASCII85Encode(std::string_view(raw.data(), raw.size()), encoded) != 0)
         return false;
 
     if (!encoded.empty())
@@ -802,7 +802,7 @@ bool PsSessionWriter::WriteAscii85RunLengthImageData(const PreparedPsDibPage& pa
     PsRunLengthEncode(std::string_view(raw.data(), raw.size()), rle);
 
     std::string encoded;
-    if (!dynarithmic::ASCII85Encode(std::string_view(rle.data(), rle.size()), encoded) != 0)
+    if (!ASCII85Encode(std::string_view(rle.data(), rle.size()), encoded) != 0)
         return false;
 
     if (!encoded.empty())

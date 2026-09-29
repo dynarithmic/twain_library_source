@@ -33,7 +33,7 @@ namespace
 {
     DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource)
     {
-        LOG_FUNC_ENTRY_PARAMS(())
+        LOG_FUNC_ENTRY_PARAMS((pHandle, pSource))
 
         if (pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE && pSource->IsAcquireAttempt())
         {
@@ -43,7 +43,7 @@ namespace
         else
             DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return pSource->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
-        bool bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, pSource) ? true : false;
+        bool bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, pSource);
         LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
         CATCH_BLOCK(false)
     }

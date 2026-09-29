@@ -92,7 +92,7 @@ namespace dynarithmic
             bool WriteCurrentPage();
             void Close();
             bool IsOpen() const noexcept;
-            static std::optional<PreparedGifDibPage> MakePreparedGifPage(const dynarithmic::DibPageView& view);
+            static std::optional<PreparedGifDibPage> MakePreparedGifPage(const DibPageView& view);
 
         private:
             static int gif_write_callback(GifFileType* gif, const GifByteType* data, int length);

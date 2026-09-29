@@ -140,7 +140,7 @@ namespace
 
         bool operator()()
         {
-            return SetSupport<CapDataType>(theSource, &theValue, theCap, setType ? true : false);
+            return SetSupport<CapDataType>(theSource, &theValue, theCap, setType);
         }
     };
 
@@ -306,7 +306,7 @@ namespace
         if (DTWAIN_GetCapDataType(reinterpret_cast<DTWAIN_SOURCE>(pSource), lCap) != TWTY_FIX32)
             return { false, DTWAIN_ERR_BAD_CAPTYPE };
         DTWAIN_ARRAY Array = nullptr;
-        bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+        bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
         if (!bRet)
             return { false, pHandle->m_lLastError };
 

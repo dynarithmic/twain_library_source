@@ -110,7 +110,7 @@ namespace
             case 4:
             case 8:
             {
-                const uint8_t idx = dynarithmic::dib::GetIndexedPixel(row, x, srcBpp);
+                const uint8_t idx = GetIndexedPixel(row, x, srcBpp);
 
                 if (srcPal && idx < srcPalEntries)
                     return GrayFromRGBQUAD(srcPal[idx]);
@@ -219,7 +219,7 @@ namespace
         return static_cast<uint16_t>(v + 0.5);
     }
 
-    const uint8_t* LogicalSrcRow(const dynarithmic::dib::LockedDib& dib, uint32_t logicalY)
+    const uint8_t* LogicalSrcRow(const LockedDib& dib, uint32_t logicalY)
     {
         const uint32_t height = dib.Height();
         const uint32_t physicalY =
@@ -230,7 +230,7 @@ namespace
         return dib.Bits() + static_cast<size_t>(physicalY) * dib.StrideBytes();
     }
 
-    uint8_t* LogicalDstRow(dynarithmic::dib::LockedDib& dib, uint32_t logicalY)
+    uint8_t* LogicalDstRow(LockedDib& dib, uint32_t logicalY)
     {
         const uint32_t height = dib.Height();
         const uint32_t physicalY =
@@ -241,7 +241,7 @@ namespace
         return dib.Bits() + static_cast<size_t>(physicalY) * dib.StrideBytes();
     }
 
-    uint8_t SampleBicubic8(const dynarithmic::dib::LockedDib& src, double srcX, double srcY)
+    uint8_t SampleBicubic8(const LockedDib& src, double srcX, double srcY)
     {
         const int width = static_cast<int>(src.Width());
         const int height = static_cast<int>(src.Height());
@@ -276,7 +276,7 @@ namespace
         return ClampU8(sum);
     }
 
-    uint16_t SampleBicubic16(const dynarithmic::dib::LockedDib& src, double srcX, double srcY)
+    uint16_t SampleBicubic16(const LockedDib& src, double srcX, double srcY)
     {
         const int width = static_cast<int>(src.Width());
         const int height = static_cast<int>(src.Height());
@@ -312,19 +312,19 @@ namespace
         return ClampU16(sum);
     }
 
-    const uint8_t* LogicalRow(const dynarithmic::dib::LockedDib& d, uint32_t y)
+    const uint8_t* LogicalRow(const LockedDib& d, uint32_t y)
     {
         const uint32_t physicalY = d.BottomUp() ? (d.Height() - 1 - y) : y;
         return d.Bits() + static_cast<size_t>(physicalY) * d.StrideBytes();
     }
 
-    uint8_t* LogicalRow(dynarithmic::dib::LockedDib& d, uint32_t y)
+    uint8_t* LogicalRow(LockedDib& d, uint32_t y)
     {
         const uint32_t physicalY = d.BottomUp() ? (d.Height() - 1 - y) : y;
         return d.Bits() + static_cast<size_t>(physicalY) * d.StrideBytes();
     }
 
-    void CopyOnePixel(const dynarithmic::dib::LockedDib& src, uint32_t sx, uint32_t sy, dynarithmic::dib::LockedDib& dst, 
+    void CopyOnePixel(const LockedDib& src, uint32_t sx, uint32_t sy, LockedDib& dst, 
                              uint32_t dx, uint32_t dy)
     {
         const uint16_t bpp = src.BitsPerPixel();
@@ -351,7 +351,7 @@ namespace
         }
     }
 
-    void FillDibWhite(dynarithmic::dib::LockedDib& d)
+    void FillDibWhite(LockedDib& d)
     {
         const uint16_t bpp = d.BitsPerPixel();
 
@@ -404,7 +404,7 @@ namespace
     }
 
 
-    HANDLE RotateRightAngle(const dynarithmic::dib::LockedDib& src, int angle)
+    HANDLE RotateRightAngle(const LockedDib& src, int angle)
     {
         const uint32_t sw = src.Width();
         const uint32_t sh = src.Height();
@@ -419,10 +419,10 @@ namespace
         if (!hDst)
             return nullptr;
 
-        dynarithmic::dib::LockedDib dst(hDst);
+        LockedDib dst(hDst);
         if (!dst.IsValid())
         {
-            ::GlobalFree(hDst);
+            GlobalFree(hDst);
             return nullptr;
         }
 
@@ -461,8 +461,8 @@ namespace
         return hDst;
     }
 
-    void SampleNearestToDst(const dynarithmic::dib::LockedDib& src, double sx, double sy,
-                                dynarithmic::dib::LockedDib& dst, uint32_t dx, uint32_t dy)
+    void SampleNearestToDst(const LockedDib& src, double sx, double sy,
+                                LockedDib& dst, uint32_t dx, uint32_t dy)
     {
         const uint32_t ix = static_cast<uint32_t>(
             std::clamp<int>(static_cast<int>(std::floor(sx + 0.5)),
@@ -478,8 +478,8 @@ namespace
     }
 
 
-    void SampleBicubicToDst(const dynarithmic::dib::LockedDib& src, double sx, double sy,
-                                dynarithmic::dib::LockedDib& dst, uint32_t dx, uint32_t dy)
+    void SampleBicubicToDst(const LockedDib& src, double sx, double sy,
+                                LockedDib& dst, uint32_t dx, uint32_t dy)
     {
         const uint16_t bpp = src.BitsPerPixel();
         const int w = static_cast<int>(src.Width());
@@ -580,7 +580,7 @@ namespace
             p[3] = ClampU8(weight ? acc[3] / weight : acc[3]);
     }
 
-    HANDLE RotateArbitrary(const dynarithmic::dib::LockedDib& src, float angleDeg)
+    HANDLE RotateArbitrary(const LockedDib& src, float angleDeg)
     {
         const uint32_t sw = src.Width();
         const uint32_t sh = src.Height();
@@ -624,10 +624,10 @@ namespace
         if (!hDst)
             return nullptr;
 
-        dynarithmic::dib::LockedDib dst(hDst);
+        LockedDib dst(hDst);
         if (!dst.IsValid())
         {
-            ::GlobalFree(hDst);
+            GlobalFree(hDst);
             return nullptr;
         }
 
@@ -836,7 +836,7 @@ HANDLE dynarithmic::dib::IncreaseDibBpp(HANDLE hDib, uint16_t dstBpp)
     LockedDib dstDib(hDst);
     if (!dstDib.IsValid())
     {
-        ::GlobalFree(hDst);
+        GlobalFree(hDst);
         return nullptr;
     }
 
@@ -1020,7 +1020,7 @@ HANDLE dynarithmic::dib::DecreaseDibBpp(HANDLE hDib, uint16_t dstBpp)
     LockedDib dstDib(hDst);
     if (!dstDib.IsValid())
     {
-        ::GlobalFree(hDst);
+        GlobalFree(hDst);
         return nullptr;
     }
 
@@ -1101,33 +1101,33 @@ HGLOBAL dynarithmic::dib::CloneDibHandle(HANDLE hDib)
     if (!hDib)
         return nullptr;
 
-    const SIZE_T size = ::GlobalSize(hDib);
+    const SIZE_T size = GlobalSize(hDib);
     if (size == 0)
         return nullptr;
 
-    void* src = ::GlobalLock(hDib);
+    void* src = GlobalLock(hDib);
     if (!src)
         return nullptr;
 
-    HGLOBAL hNew = ::GlobalAlloc(GHND, size);
+    HGLOBAL hNew = GlobalAlloc(GHND, size);
     if (!hNew)
     {
-        ::GlobalUnlock(hDib);
+        GlobalUnlock(hDib);
         return nullptr;
     }
 
-    void* dst = ::GlobalLock(hNew);
+    void* dst = GlobalLock(hNew);
     if (!dst)
     {
-        ::GlobalFree(hNew);
-        ::GlobalUnlock(hDib);
+        GlobalFree(hNew);
+        GlobalUnlock(hDib);
         return nullptr;
     }
 
     std::memcpy(dst, src, size);
 
-    ::GlobalUnlock(hNew);
-    ::GlobalUnlock(hDib);
+    GlobalUnlock(hNew);
+    GlobalUnlock(hDib);
 
     return hNew;
 }
@@ -1147,14 +1147,14 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
     LockedDib dib(hNew);
     if (!dib.IsValid())
     {
-        ::GlobalFree(hNew);
+        GlobalFree(hNew);
         return nullptr;
     }
 
     BITMAPINFOHEADER* bih = dib.HeaderMutable();
     if (!bih || bih->biCompression != BI_RGB)
     {
-        ::GlobalFree(hNew);
+        GlobalFree(hNew);
         return nullptr;
     }
 
@@ -1231,7 +1231,7 @@ HANDLE dynarithmic::dib::NegateDib(HANDLE hDib)
         }
 
         default:
-            ::GlobalFree(hNew);
+            GlobalFree(hNew);
             return nullptr;
     }
     return hNew;
@@ -1290,7 +1290,7 @@ HANDLE dynarithmic::dib::CropDib(HANDLE hDib, int left, int top, int right, int 
     LockedDib dstDib(hDst);
     if (!dstDib.IsValid())
     {
-        ::GlobalFree(hDst);
+        GlobalFree(hDst);
         return nullptr;
     }
 
@@ -1387,7 +1387,7 @@ namespace
         double a = 255;
     };
 
-    BgraD SampleBicubic24Or32(const dynarithmic::dib::LockedDib& src, double srcX, double srcY, uint16_t bpp)
+    BgraD SampleBicubic24Or32(const LockedDib& src, double srcX, double srcY, uint16_t bpp)
     {
         const int width = static_cast<int>(src.Width());
         const int height = static_cast<int>(src.Height());
@@ -1486,7 +1486,7 @@ HANDLE dynarithmic::dib::ResizeDib(HANDLE hDib, int32_t newx, int32_t newy)
     LockedDib dst(hDst);
     if (!dst.IsValid())
     {
-        ::GlobalFree(hDst);
+        GlobalFree(hDst);
         return nullptr;
     }
 
@@ -1611,7 +1611,7 @@ HANDLE dynarithmic::dib::Rotate(HANDLE src, float angle)
     if (!src)
         return nullptr;
 
-    dynarithmic::dib::LockedDib s(src);
+    LockedDib s(src);
     if (!s.IsValid())
         return nullptr;
 
@@ -1644,7 +1644,7 @@ HANDLE dynarithmic::dib::Rotate(HANDLE src, float angle)
     };
 
     if (nearAngle(normAngle, 0.0f) || nearAngle(normAngle, 360.0f))
-        return dynarithmic::dib::CloneDibHandle(src);
+        return CloneDibHandle(src);
 
     if (nearAngle(normAngle, 90.0f))
         return RotateRightAngle(s, 90);

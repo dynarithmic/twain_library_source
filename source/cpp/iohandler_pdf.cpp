@@ -205,7 +205,7 @@ namespace
         DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARYWIDTH, &tInfo.yDim[0], bufSize);
 
         // Get the original bitmap info translated into PDF units
-        const LPBITMAPINFOHEADER pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hBitmap));
+        const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hBitmap));
         DTWAINGlobalHandle_RAII dibHandle(hBitmap);
 
         const double xInches = static_cast<double>(pbi->biXPelsPerMeter) / 39.37;

@@ -31,7 +31,7 @@ namespace dynarithmic
         inline bool GetLocalTime(std::time_t value, std::tm& result)
         {
 #ifdef _WIN32
-            return ::localtime_s(&result, &value) == 0;
+            return localtime_s(&result, &value) == 0;
 #else
             return ::localtime_r(&value, &result) != nullptr;
 #endif

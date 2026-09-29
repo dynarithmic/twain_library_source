@@ -87,11 +87,11 @@ bool PcxSessionWriter::Open(const std::wstring& filename, const PcxSessionOption
         // DCX directory:
         // magic + 1024 DWORD offsets (offset[0..1022] pages, zero terminator)
         pageOffsets_.clear();
-        if (!dynarithmic::pcx::write_u32_le(file_, 0x3ADE68B1u))
+        if (!pcx::write_u32_le(file_, 0x3ADE68B1u))
             return false;
         for (int i = 0; i < 1024; ++i)
         {
-            if (!dynarithmic::pcx::write_u32_le(file_, 0))
+            if (!pcx::write_u32_le(file_, 0))
                 return false;
         }
     }
@@ -165,12 +165,12 @@ bool PcxSessionWriter::PatchDcxDirectory() const
 
     for (size_t i = 0; i < pageOffsets_.size(); ++i)
     {
-        if (!dynarithmic::pcx::write_u32_le(file_, pageOffsets_[i]))
+        if (!pcx::write_u32_le(file_, pageOffsets_[i]))
             return false;
     }
 
     // terminating zero
-    if (!dynarithmic::pcx::write_u32_le(file_, 0))
+    if (!pcx::write_u32_le(file_, 0))
         return false;
 
     return true;
@@ -178,7 +178,7 @@ bool PcxSessionWriter::PatchDcxDirectory() const
 
 bool PcxSessionWriter::WriteOnePcx(const PreparedPcxDibPage& page)
 {
-    dynarithmic::pcx::PcxHeader hdr{};
+    pcx::PcxHeader hdr{};
     hdr.manufacturer = 0x0A;
     hdr.version = 5;
     hdr.encoding = 1;
@@ -198,7 +198,7 @@ bool PcxSessionWriter::WriteOnePcx(const PreparedPcxDibPage& page)
         case PcxPixelFlavor::BW1:
             hdr.bitsPerPixel = 1;
             hdr.colorPlanes = 1;
-            hdr.bytesPerLine = dynarithmic::pcx::even_pad(
+            hdr.bytesPerLine = pcx::even_pad(
                 static_cast<uint16_t>((page.width + 7u) / 8u));
             FillMonoPalette(hdr, page);
             break;
@@ -206,14 +206,14 @@ bool PcxSessionWriter::WriteOnePcx(const PreparedPcxDibPage& page)
         case PcxPixelFlavor::Indexed8:
             hdr.bitsPerPixel = 8;
             hdr.colorPlanes = 1;
-            hdr.bytesPerLine = dynarithmic::pcx::even_pad(
+            hdr.bytesPerLine = pcx::even_pad(
                 static_cast<uint16_t>(page.width));
             break;
 
         case PcxPixelFlavor::Bgr24:
             hdr.bitsPerPixel = 8;
             hdr.colorPlanes = 3;
-            hdr.bytesPerLine = dynarithmic::pcx::even_pad(
+            hdr.bytesPerLine = pcx::even_pad(
                 static_cast<uint16_t>(page.width));
             break;
     }
@@ -244,7 +244,7 @@ bool PcxSessionWriter::WriteOnePcx(const PreparedPcxDibPage& page)
     return true;
 }
 
-void PcxSessionWriter::FillMonoPalette(dynarithmic::pcx::PcxHeader& hdr, const PreparedPcxDibPage& page)
+void PcxSessionWriter::FillMonoPalette(pcx::PcxHeader& hdr, const PreparedPcxDibPage& page)
 {
     // Prefer DIB mono palette if present; otherwise default to black/white.
     RGBQUAD c0{ 0,0,0,0 };
@@ -281,7 +281,7 @@ bool PcxSessionWriter::Write1Bpp(const PreparedPcxDibPage& page, uint16_t bytesP
         std::memcpy(rowBuffer_.data(), src, srcPacked);
 
         planeBuffer_.clear();
-        dynarithmic::pcx::encode_rle_row(rowBuffer_.data(), bytesPerLine, planeBuffer_);
+        pcx::encode_rle_row(rowBuffer_.data(), bytesPerLine, planeBuffer_);
 
         if (std::fwrite(planeBuffer_.data(), 1, planeBuffer_.size(), file_) != planeBuffer_.size())
             return false;
@@ -304,7 +304,7 @@ bool PcxSessionWriter::Write8Bpp(const PreparedPcxDibPage& page, uint16_t bytesP
         std::memcpy(rowBuffer_.data(), src, page.width);
 
         planeBuffer_.clear();
-        dynarithmic::pcx::encode_rle_row(rowBuffer_.data(), bytesPerLine, planeBuffer_);
+        pcx::encode_rle_row(rowBuffer_.data(), bytesPerLine, planeBuffer_);
 
         if (std::fwrite(planeBuffer_.data(), 1, planeBuffer_.size(), file_) != planeBuffer_.size())
             return false;
@@ -338,7 +338,7 @@ bool PcxSessionWriter::Write24Bpp(const PreparedPcxDibPage& page, uint16_t bytes
             }
 
             planeBuffer_.clear();
-            dynarithmic::pcx::encode_rle_row(rowBuffer_.data(), bytesPerLine, planeBuffer_);
+            pcx::encode_rle_row(rowBuffer_.data(), bytesPerLine, planeBuffer_);
 
             if (std::fwrite(planeBuffer_.data(), 1, planeBuffer_.size(), file_) != planeBuffer_.size())
                 return false;

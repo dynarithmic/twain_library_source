@@ -386,12 +386,12 @@ int TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, b
     if (pSource->IsUsePeekMessage())
     {
         // Use the PeekMessage() version of the message loop
-        watchdog_triggered = ::ContinueLoopTraits<::ContinueLoopTraitsPeek>::InvokeLoop(this, pSource, isUIOnly);
+        watchdog_triggered = ContinueLoopTraits<ContinueLoopTraitsPeek>::InvokeLoop(this, pSource, isUIOnly);
     }
     else
     {
         // Use the GetMessage() version of the message loop
-        watchdog_triggered = ::ContinueLoopTraits<::ContinueLoopTraitsGet>::InvokeLoop(this, pSource, isUIOnly);
+        watchdog_triggered = ContinueLoopTraits<ContinueLoopTraitsGet>::InvokeLoop(this, pSource, isUIOnly);
     }
 
     if (watchdog_triggered)

@@ -36,14 +36,14 @@ inline HGLOBAL Create8bppGrayDib(uint32_t width, uint32_t height, bool bottomUp,
     const uint32_t imageSize = stride * height;
     const size_t totalSize = sizeof(BITMAPINFOHEADER) + paletteCount * sizeof(RGBQUAD) +imageSize;
 
-    HGLOBAL hDib = ::GlobalAlloc(GHND, totalSize);
+    HGLOBAL hDib = GlobalAlloc(GHND, totalSize);
     if (!hDib)
         return nullptr;
 
-    void* p = ::GlobalLock(hDib);
+    void* p = GlobalLock(hDib);
     if (!p)
     {
-        ::GlobalFree(hDib);
+        GlobalFree(hDib);
         return nullptr;
     }
 
@@ -71,7 +71,7 @@ inline HGLOBAL Create8bppGrayDib(uint32_t width, uint32_t height, bool bottomUp,
         pal[i].rgbReserved = 0;
     }
 
-    ::GlobalUnlock(hDib);
+    GlobalUnlock(hDib);
     return hDib;
 }
 
@@ -92,7 +92,7 @@ inline HGLOBAL Convert24bppDibTo8bppGray(HANDLE hSrcDib)
     dynarithmic::dib::LockedDib dst(hDst);
     if (!dst.IsValid())
     {
-        ::GlobalFree(hDst);
+        GlobalFree(hDst);
         return nullptr;
     }
 

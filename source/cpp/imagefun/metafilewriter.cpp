@@ -52,7 +52,7 @@ namespace
     }
 }
 
-std::optional<PreparedMetafileDibPage> MetafileSessionWriter::MakePreparedMetafileDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedMetafileDibPage> MetafileSessionWriter::MakePreparedMetafileDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;

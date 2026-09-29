@@ -22,7 +22,7 @@
 
 using namespace dynarithmic;
 
-std::optional<PreparedBmpRle8Page> BmpRle8Writer::MakePreparedBmpRle8Page(const dynarithmic::DibPageView& view)
+std::optional<PreparedBmpRle8Page> BmpRle8Writer::MakePreparedBmpRle8Page(const DibPageView& view)
 {
     if (view.bitsPerPixel != 8 || !view.palette || view.paletteEntries == 0)
         return std::nullopt;

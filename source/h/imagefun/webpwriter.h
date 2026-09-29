@@ -97,7 +97,7 @@ namespace dynarithmic
             bool WriteCurrentPage();
             void Close();
             bool IsOpen() const noexcept;
-            static std::optional<PreparedWebPDibPage> MakePreparedWebPDibPage(const dynarithmic::DibPageView& view);
+            static std::optional<PreparedWebPDibPage> MakePreparedWebPDibPage(const DibPageView& view);
 
         private:
             static bool ValidatePage(const PreparedWebPDibPage& page);

@@ -141,11 +141,11 @@ extern "C"
         if ( nStrings == 1 )
         {
             // First try one value
-            bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString)?true:false;
+            bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString);
             if ( !bRet )
             // Try enumerations
                 bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
-                                 DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString)?true:false;
+                                 DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString);
             if ( bRet )
             {
                 if ( pNumStrings )
@@ -156,7 +156,7 @@ extern "C"
         {
             // Try enumerations
             bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
-                             DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString)?true:false;
+                             DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString);
             if ( bRet )
             {
                 if ( pNumStrings )
@@ -166,7 +166,7 @@ extern "C"
             {
             //  try one value
                 bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSET,
-                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString)?true:false;
+                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString);
                 if ( bRet )
                 {
                     if ( pNumStrings )

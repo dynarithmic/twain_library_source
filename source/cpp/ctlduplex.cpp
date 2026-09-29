@@ -39,7 +39,7 @@ namespace
         DTWAIN_ARRAY Array = nullptr;
         const auto pHandle = pSource->GetDTWAINHandle();
         const DTWAIN_BOOL bRet2 = GetCapValuesEx2_Internal(pSource, CAP_DUPLEX, DTWAIN_CAPGET,
-            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
         DTWAINArrayLowLevelPtr_RAII arr(pHandle, &Array);
         if (bRet2 && Array)
         {

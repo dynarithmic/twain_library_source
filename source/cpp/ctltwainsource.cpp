@@ -377,7 +377,7 @@ bool CTL_ITwainSource::IsCapabilityCached(TW_UINT16 nCap) const
 
 void CTL_ITwainSource::SetCapCached(TW_UINT16 nCapability, bool bSet)
 {
-    const CachedCapMap::iterator found = m_aCapCache.find(static_cast<TW_UINT16>(nCapability));
+    const auto found = m_aCapCache.find(static_cast<TW_UINT16>(nCapability));
     const TW_UINT16 nVal = nCapability;
     bool bCached = false;
     if (found != m_aCapCache.end())
@@ -546,8 +546,7 @@ CTL_TwainDibPtr CTL_ITwainSource::GetDibObject(int nWhich /*=0*/) const
         CTL_TwainDibPtr pDib = m_DibArray->GetAt(nWhich);
         return pDib;
     }
-    else
-        return CTL_TwainDibPtr();
+    return {};
 }
 
 
@@ -857,7 +856,7 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
         SetPDFValue(PDFUSERPASSKEY, strUserPassword);
         SetPDFValue(PDFOWNERPASSKEY, strOwnerPassword);
         SetPDFValue(PDFPERMISSIONSKEY, Permissions);
-        m_ImageInfoEx.bUseStrongEncryption = bUseStrongEncryption?true:false;
+        m_ImageInfoEx.bUseStrongEncryption = bUseStrongEncryption;
         m_ImageInfoEx.nPDFKeyLength = bUseStrongEncryption?16:5; // This will be multiplied by 8
         m_ImageInfoEx.bIsPDFEncrypted = true;
     }
@@ -868,17 +867,20 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
     }
 }
 
-static void ClearPDFTextInternal(CTL_TEXTELEMENTMAP::iterator it, PDFTextElement* pElement)
+namespace
 {
-    // See if text element is in set
-    auto& theSet = it->second.first;
-    if (theSet.count(pElement))
+    void ClearPDFTextInternal(CTL_TEXTELEMENTMAP::iterator it, PDFTextElement* pElement)
     {
-        auto& theList = it->second.second;
-        theList.erase(std::remove(theList.begin(), theList.end(), pElement), theList.end());
+        // See if text element is in set
+        auto& theSet = it->second.first;
+        if (theSet.count(pElement))
+        {
+            auto& theList = it->second.second;
+            theList.erase(std::remove(theList.begin(), theList.end(), pElement), theList.end());
+        }
+        theSet.erase(pElement);
+        pElement->vptrTwainSource.erase(it->first);
     }
-    theSet.erase(pElement);
-    pElement->vptrTwainSource.erase(it->first);
 }
 
 void CTL_ITwainSource::ClearPDFTextElements()
@@ -1012,7 +1014,6 @@ void CTL_ITwainSource::AddDuplexFileData(CTL_StringType fName,
 
 sDuplexFileData CTL_ITwainSource::GetDuplexFileData( int nPage, int nWhich ) const
 {
-    sDuplexFileData junk;
     const std::vector<sDuplexFileData> *pData;
     if ( nWhich == 0 )
         pData = &m_DuplexFileData.first;
@@ -1021,7 +1022,7 @@ sDuplexFileData CTL_ITwainSource::GetDuplexFileData( int nPage, int nWhich ) con
 
     if ( nPage < static_cast<int>(pData->size()) )
         return pData->at(nPage);
-    return junk;
+    return {};
 }
 
 void CTL_ITwainSource::RemoveDuplexFileData()

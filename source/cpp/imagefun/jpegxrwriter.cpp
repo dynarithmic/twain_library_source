@@ -159,12 +159,10 @@ bool JxrSessionWriter::WriteCurrentPage()
     else
     {
         float q = options_.quality;
-        if (q < 0.0f) q = 0.0f;
-        if (q > 1.0f) q = 1.0f;
+        q = std::clamp(q, 0.0f, 1.0f);
 
         float qp = (1.0f - q) * 63.0f + 0.5f;
-        if (qp < 0.0f) qp = 0.0f;
-        if (qp > 63.0f) qp = 63.0f;
+        qp = std::clamp(qp, 0.0f, 63.0f);
 
         codecParam.uiDefaultQPIndex = static_cast<U8>(qp);
     }
@@ -172,9 +170,7 @@ bool JxrSessionWriter::WriteCurrentPage()
     // --------------------------------------------------------
     // Set image size
     // --------------------------------------------------------
-    if (encoder->SetSize(encoder.get(),
-        currentPage_.width,
-        currentPage_.height) != WMP_errSuccess)
+    if (encoder->SetSize(encoder.get(), currentPage_.width, currentPage_.height) != WMP_errSuccess)
     {
         return false;
     }
@@ -204,16 +200,9 @@ bool JxrSessionWriter::WriteCurrentPage()
 
     for (uint32_t y = 0; y < currentPage_.height; ++y)
     {
-        const uint32_t srcY =
-            currentPage_.bottomUp
-            ? (currentPage_.height - 1 - y)
-            : y;
-
-        const uint8_t* src =
-            currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
-
-        uint8_t* dst =
-            imageBuffer_.data() + y * stride;
+        const uint32_t srcY = currentPage_.bottomUp ? (currentPage_.height - 1 - y) : y;
+        const uint8_t* src = currentPage_.bits + static_cast<size_t>(srcY) * currentPage_.strideBytes;
+        uint8_t* dst = imageBuffer_.data() + y * stride;
 
         PrepareRow(src, dst, stride);
     }
@@ -221,10 +210,7 @@ bool JxrSessionWriter::WriteCurrentPage()
     // --------------------------------------------------------
     // Write all rows in one call, matching plugin behavior
     // --------------------------------------------------------
-    if (encoder->WritePixels(encoder.get(),
-        currentPage_.height,
-        imageBuffer_.data(),
-        stride) != WMP_errSuccess)
+    if (encoder->WritePixels(encoder.get(), currentPage_.height,imageBuffer_.data(),stride) != WMP_errSuccess)
     {
         return false;
     }

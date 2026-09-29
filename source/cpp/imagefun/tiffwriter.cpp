@@ -569,7 +569,7 @@ bool TiffSessionWriter::WritePixels(const PageTagInfo& tagInfo)
     return true;
 }
 
-std::optional<PreparedTiffDibPage> TiffSessionWriter::MakePreparedTiffDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedTiffDibPage> TiffSessionWriter::MakePreparedTiffDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;

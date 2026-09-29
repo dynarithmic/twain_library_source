@@ -137,7 +137,7 @@ namespace
 
         // Set here
         vFeeder[0] = bValue;
-        bReturn = SetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPSETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aValues) ? true : false;
+        bReturn = SetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPSETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aValues);
         if (bReturn)
             (pSource->*Func)(bValue);
         else

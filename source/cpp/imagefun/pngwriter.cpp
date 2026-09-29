@@ -52,7 +52,7 @@ std::optional<PreparedPngDibPage> PngSessionWriter::MakePreparedPngDibPage(const
     {
         case 8:
             if (page.palette && page.paletteEntries > 0 &&
-                !dynarithmic::dib::is_identity_grayscale_palette(page.palette, page.paletteEntries))
+                !dib::is_identity_grayscale_palette(page.palette, page.paletteEntries))
                 page.pixelFlavor = PngPixelFlavor::Palette8;
             else
                 page.pixelFlavor = PngPixelFlavor::Gray8;
