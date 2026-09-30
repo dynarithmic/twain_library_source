@@ -294,7 +294,7 @@ namespace dynarithmic
         bool         IsOpenAfterAcquire() const { return m_bOpenAfterAcquire; }
 
         // Controls whether to reopen the source if it has been closed
-        bool         IsReopenAfterAcquire() const { return !m_bOpenAfterAcquire ? true : false; }
+        bool         IsReopenAfterAcquire() const { return !m_bOpenAfterAcquire; }
         int          GetMaxAcquisitions() const { return m_nMaxAcquisitions; }
         void         SetMaxAcquisitions(int nMax) { m_nMaxAcquisitions = nMax; }
         int          GetUIMaxAcquisitions() const { return m_nUIMaxAcquisitions; }

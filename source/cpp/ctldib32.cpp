@@ -614,7 +614,7 @@ bool CTL_TwainDib::IsGrayScale() const
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if (hDib)
-        return CDibInterface::IsGrayScale(hDib, GetDepth())?true:false;
+        return CDibInterface::IsGrayScale(hDib, GetDepth());
     return false;
 }
 

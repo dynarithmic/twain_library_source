@@ -151,7 +151,7 @@ void CTL_TwainAppMgr::Destroy()
     {
         s_pGlobalAppMgr->DestroyAllTwainSessions();
         /* Use for this APP only */
-        CTL_TwainAppMgr::UnloadSourceManager();
+        UnloadSourceManager();
     }
     s_pGlobalAppMgr.reset();
 }
@@ -299,7 +299,7 @@ const CTL_ITwainSource* CTL_TwainAppMgr::SelectSourceDlg(  CTL_ITwainSession *pS
 
         case TWRC_FAILURE:
         {
-            auto ccode = CTL_TwainAppMgr::GetLastConditionCodeError();
+            auto ccode = GetLastConditionCodeError();
             SendTwainMsgToWindow(pSession, nullptr, DTWAIN_SelectSourceFailed, ccode);
             return nullptr;
         }
@@ -464,14 +464,14 @@ namespace
     template <typename LayoutTriplet>
     void GetLayoutComponents(LayoutTriplet* LayoutTrip, CTL_RealArray& rArray)
     {
-        rArray.resize(CTL_EnumLayoutComponents::LAYOUT_NUMCOMPONENTS);
-        rArray[CTL_EnumLayoutComponents::LAYOUT_LEFT] = LayoutTrip->GetLeft();
-        rArray[CTL_EnumLayoutComponents::LAYOUT_TOP] = LayoutTrip->GetTop();
-        rArray[CTL_EnumLayoutComponents::LAYOUT_RIGHT] = LayoutTrip->GetRight();
-        rArray[CTL_EnumLayoutComponents::LAYOUT_BOTTOM] = LayoutTrip->GetBottom();
-        rArray[CTL_EnumLayoutComponents::LAYOUT_DOCUMENTNUMBER] = LayoutTrip->GetDocumentNumber();
-        rArray[CTL_EnumLayoutComponents::LAYOUT_FRAMENUMBER] = LayoutTrip->GetFrameNumber();
-        rArray[CTL_EnumLayoutComponents::LAYOUT_PAGENUMBER] = LayoutTrip->GetPageNumber();
+        rArray.resize(LAYOUT_NUMCOMPONENTS);
+        rArray[LAYOUT_LEFT] = LayoutTrip->GetLeft();
+        rArray[LAYOUT_TOP] = LayoutTrip->GetTop();
+        rArray[LAYOUT_RIGHT] = LayoutTrip->GetRight();
+        rArray[LAYOUT_BOTTOM] = LayoutTrip->GetBottom();
+        rArray[LAYOUT_DOCUMENTNUMBER] = LayoutTrip->GetDocumentNumber();
+        rArray[LAYOUT_FRAMENUMBER] = LayoutTrip->GetFrameNumber();
+        rArray[LAYOUT_PAGENUMBER] = LayoutTrip->GetPageNumber();
     }
 }
 
@@ -517,7 +517,7 @@ bool CTL_TwainAppMgr::SetImageLayoutSize(const CTL_ITwainSource* pSource,
     const auto pSession = pTempSource->GetTwainSession();
 
     std::unique_ptr<CTL_TwainTriplet> layOutTriplet;
-    if (::IsMSGResetType(SetType))
+    if (IsMSGResetType(SetType))
         layOutTriplet = std::make_unique<CTL_ResetImageLayoutTriplet>(pSession, pTempSource, nullptr);
     else
         layOutTriplet = std::make_unique<CTL_SetImageLayoutTriplet>(pSession, pTempSource, &rArray);
@@ -551,7 +551,7 @@ bool CTL_TwainAppMgr::CloseSource(CTL_ITwainSession* pSession,
         return false;
     const auto iter = FindSession(pSession);
     if ( iter != s_pGlobalAppMgr->m_arrTwainSession.end() )
-        return pSession->CloseSource( pSource, bForce )?true:false;
+        return pSession->CloseSource( pSource, bForce );
     return true;
 }
 
@@ -818,7 +818,7 @@ bool CTL_TwainAppMgr::SetFeederEnableMode( CTL_ITwainSource *pSource, bool bMode
     if ( !s_pGlobalAppMgr )
         return false;
 
-    if ( !s_pGlobalAppMgr->IsSourceOpen( pSource ))
+    if ( !IsSourceOpen( pSource ))
         return false;
 
     pSource->SetFeederEnableMode(bMode);
@@ -1371,7 +1371,7 @@ int CTL_TwainAppMgr::StartTransfer( CTL_ITwainSession * /*pSession*/,
             if ( nAcquireType == TWAINAcquireType_File ) // The TWAIN source is solely responsible for the file handling
             {
                 // Send notification that file save was successful
-                CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                SendTwainMsgToWindow(pSource->GetTwainSession(),
                     nullptr, DTWAIN_TN_FILEPAGESAVEOK, reinterpret_cast<LPARAM>(pSource));
             }
         }
@@ -1540,11 +1540,11 @@ LPSTR CTL_TwainAppMgr::GetErrorString(int nError, LPSTR lpszBuffer, int nSize)
 void CTL_TwainAppMgr::SetAndLogError(int nError, std::string_view extraInfo, bool bMustReportGeneralError)
 {
     int nActualError = std::abs(nError);
-    CTL_TwainAppMgr::SetError(nActualError, extraInfo.data(), bMustReportGeneralError);
+    SetError(nActualError, extraInfo.data(), bMustReportGeneralError);
     if (CTL_StaticData::GetLogFilterFlags() != 0)
     {
         char szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
-        CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
+        GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
         LogWriterUtils::WriteLogInfoIndentedA(szBuf);
     }
 }
@@ -1578,7 +1578,7 @@ bool CTL_TwainAppMgr::IsCapabilitySupported(const CTL_ITwainSource *pSource, TW_
     if (!IsValidTwainSession(pSession))
         return false;
 
-    if (!s_pGlobalAppMgr->IsSourceOpen(pSource))
+    if (!IsSourceOpen(pSource))
         return false;
 
     std::unique_ptr<CTL_CapabilityGetTriplet> pTrip;
@@ -1935,7 +1935,7 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
     if (!IsValidTwainSession(pSession))
         return { nullptr, nullptr, 0 };
 
-    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
+    if (!IsSourceOpen(pSource))
         return { nullptr, nullptr, 0 };
 
     CTL_CapabilityQueryTriplet QT(pSession, pTempSource, static_cast<TW_UINT16>(nCap));
@@ -2196,7 +2196,7 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     if (pHandle && pHandle->GetTwainSession())
     {
-        auto appMgr = CTL_TwainAppMgr::GetInstance();
+        auto appMgr = GetInstance();
         auto appMgrPtr = appMgr.get();
         if (appMgrPtr)
         {
@@ -2208,7 +2208,7 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
         #endif
             auto isSame = stringutils::CompareNoCase(lowerName, strTwainDLLName.c_str());
             if (isSame)
-                return { true, CTL_TwainAppMgr::GetDSMPath() };
+                return { true, GetDSMPath() };
         }
         else
             return { false, {} };
@@ -2427,7 +2427,7 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
     {
         // Get the capabilities using TWAIN
         CTL_TwainCapArray rArray;
-        CTL_TwainAppMgr::GetCapabilities(pSource, rArray);
+        GetCapabilities(pSource, rArray);
 
         // Report TWAIN compliance issue if retrieving capabilities returns no values
         bool logErrors = (CTL_StaticData::GetLogFilterFlags());

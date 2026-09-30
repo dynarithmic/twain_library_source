@@ -21,7 +21,7 @@
 #include "wbmpwriter.h"
 using namespace dynarithmic;
 
-std::optional<PreparedWbmpDibPage> WbmpSessionWriter::MakePreparedWbmpDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedWbmpDibPage> WbmpSessionWriter::MakePreparedWbmpDibPage(const DibPageView& view)
 {
 
     if (view.bitsPerPixel != 1)

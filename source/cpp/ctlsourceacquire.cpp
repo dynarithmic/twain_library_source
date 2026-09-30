@@ -60,7 +60,7 @@ namespace
         const auto& vValues = pDLLHandle->m_ArrayFactory->underlying_container_t<void*>(aDibs);
 
         bool bRet = false;
-        bRet = !vValues.empty() ? true: false;
+        bRet = !vValues.empty();
         if (opts.getStatus() == DTWAIN_TN_ACQUIRESTARTED && !vValues.empty())
             bRet = true;
 
@@ -563,7 +563,7 @@ namespace dynarithmic
             setSource(pSource->GetDTWAINSource()).
             setPixelType(PixelType).
             setMaxPages(nMaxPages).
-            setShowUI(bShowUI ? true : false).
+            setShowUI(bShowUI).
             setRemainOpen(true).
             setAcquireType(acquireType).
             setTransferMode(nTransferMode).

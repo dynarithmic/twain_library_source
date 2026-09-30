@@ -60,14 +60,14 @@ namespace dynarithmic
                 nLengthW = len;
             int nLengthA = static_cast<int>(nLengthW * 4);
             m_sz.resize(nLengthA);
-            bool bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), m_sz.data(), nLengthA, nullptr, nullptr) ? true : false;
+            bool bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), m_sz.data(), nLengthA, nullptr, nullptr);
             if (bFailed)
             {
                 if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
                 {
                     nLengthA = WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), nullptr, 0, nullptr, nullptr);
                     m_sz.resize(nLengthA);
-                    bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), m_sz.data(), nLengthA, nullptr, nullptr) ? true : false;
+                    bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), m_sz.data(), nLengthA, nullptr, nullptr);
                 }
             }
         }
@@ -106,14 +106,14 @@ namespace dynarithmic
                     nLengthA = len;
                 int nLengthW = static_cast<int>(nLengthA);
                 m_sz.resize(nLengthW);
-                bool bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), m_sz.data(), nLengthW) ? true : false;
+                bool bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), m_sz.data(), nLengthW);
                 if (bFailed)
                 {
                     if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
                     {
                         nLengthW = MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), nullptr, 0);
                         m_sz.resize(nLengthW);
-                        bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), m_sz.data(), nLengthW) ? true : false;
+                        bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), m_sz.data(), nLengthW);
                     }
                 }
             }

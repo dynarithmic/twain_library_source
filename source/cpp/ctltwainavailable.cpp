@@ -150,7 +150,7 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
     {
-        LOG_FUNC_ENTRY_PARAMS(())
+        LOG_FUNC_ENTRY_PARAMS((directories, nMaxLen))
         LONG maxCharsCopied = 0;
         CheckTwainAvailability(directories, nMaxLen, &maxCharsCopied);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
@@ -171,7 +171,7 @@ extern "C"
     // Test which version of TWAIN is available.
     LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen)
     {
-        LOG_FUNC_ENTRY_PARAMS(())
+        LOG_FUNC_ENTRY_PARAMS((directories, nMaxLen))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         auto availability = GetTwainAvailablityInternal();
 

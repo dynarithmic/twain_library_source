@@ -25,7 +25,7 @@ using namespace dynarithmic;
  // GIF writer
  // Single-image writer for DTWAIN-style first/last-page workflow
  // ============================================================
-std::optional<PreparedGifDibPage> GifSessionWriter::MakePreparedGifPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedGifDibPage> GifSessionWriter::MakePreparedGifPage(const DibPageView& view)
 {
     if (view.bitsPerPixel != 8 || !view.bits)
         return std::nullopt;
@@ -41,7 +41,7 @@ std::optional<PreparedGifDibPage> GifSessionWriter::MakePreparedGifPage(const dy
     page.paletteEntries = view.paletteEntries;
 
     if (view.palette && view.paletteEntries > 0 &&
-        dynarithmic::dib::is_grayscale_palette(view.palette, view.paletteEntries))
+        dib::is_grayscale_palette(view.palette, view.paletteEntries))
     {
         page.pixelFlavor = GifPixelFlavor::Gray8;
     }

@@ -26,7 +26,7 @@ unsigned int dynarithmic::crc32_aux(const unsigned char* buf, unsigned int len)
 {
     if (!buf)
         return 0;
-    boost::crc_32_type  result;
+    crc_32_type  result;
     result.process_bytes(buf, len);
     return result.checksum();
 }

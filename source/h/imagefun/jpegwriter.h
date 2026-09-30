@@ -91,7 +91,7 @@ namespace dynarithmic
             bool WriteCurrentPage();
             void Close();
             bool IsOpen() const noexcept;
-            static std::optional<PreparedJpegDibPage> MakePreparedJpegPage(const dynarithmic::DibPageView& view);
+            static std::optional<PreparedJpegDibPage> MakePreparedJpegPage(const DibPageView& view);
 
         private:
             static bool ValidatePage(const PreparedJpegDibPage& page);

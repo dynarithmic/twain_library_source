@@ -24,7 +24,7 @@
 
 using namespace dynarithmic;
 
-std::optional<PreparedTgaDibPage> TgaSessionWriter::MakePreparedTgaDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedTgaDibPage> TgaSessionWriter::MakePreparedTgaDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;

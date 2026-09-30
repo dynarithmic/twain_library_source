@@ -177,7 +177,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source, Quality))
         auto [pHandle, pSource] = VerifyHandles(Source);
-        Quality = (std::max<LONG>)(1, (std::min<LONG>)(100, Quality));
+        Quality = std::clamp(Quality, 1L, 100L); 
         pSource->SetPDFValue(PDFJPEGQUALITYKEY, Quality);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
@@ -187,11 +187,14 @@ extern "C"
 using SetPDFFn = DTWAIN_BOOL(DLLENTRY_DEF *)(DTWAIN_SOURCE, LONG, DTWAIN_FLOAT, DTWAIN_FLOAT);
 using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
 
-static DTWAIN_BOOL SetPDFStringFunc(DTWAIN_SOURCE Source, LONG value, LPCTSTR val1, LPCTSTR val2, SetPDFFn fn)
+namespace
 {
-    const DTWAIN_FLOAT value1 = CharTraits<CharType>::ToDouble(val1);
-    const DTWAIN_FLOAT value2 = CharTraits<CharType>::ToDouble(val2);
-    return fn(Source, value, value1, value2);
+    DTWAIN_BOOL SetPDFStringFunc(DTWAIN_SOURCE Source, LONG value, LPCTSTR val1, LPCTSTR val2, SetPDFFn fn)
+    {
+        const DTWAIN_FLOAT value1 = CharTraits<CharType>::ToDouble(val1);
+        const DTWAIN_FLOAT value2 = CharTraits<CharType>::ToDouble(val2);
+        return fn(Source, value, value1, value2);
+    }
 }
 
 extern "C"
@@ -704,8 +707,9 @@ extern "C"
                 pPtr->renderMode = val1;
             break;
 
-            case DTWAIN_PDFTEXTELEMENT_TRANSFORMORDER:
-                pPtr->textTransform = (std::max<LONG>)(0, (std::min<LONG>)(val1, DTWAIN_PDFTEXTTRANFORM_LAST));
+        case DTWAIN_PDFTEXTELEMENT_TRANSFORMORDER:
+                pPtr->textTransform = std::clamp(pPtr->textTransform, 0U, 
+                                                 static_cast<unsigned int>(DTWAIN_PDFTEXTTRANFORM_LAST));
             break;
 
             default:

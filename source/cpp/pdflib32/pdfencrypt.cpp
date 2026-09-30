@@ -285,7 +285,7 @@ void PDFEncryption::CreateAESV3Info(std::string_view userPassword, std::string_v
                                     int permissions)
 {
     // Generate file encryption key
-    m_EncryptionKey = dynarithmic::CreateRandomDigits(32);
+    m_EncryptionKey = CreateRandomDigits(32);
 
     // Compute U and UE values
     ComputeUserKeyAESV3(userPassword);
@@ -343,7 +343,7 @@ void PDFEncryption::ComputePermsKey(int permissions)
     PermBlock[13] = 0;
     PermBlock[14] = 0;
     PermBlock[15] = 0;
-    auto randomData = dynarithmic::CreateRandomDigits(4);
+    auto randomData = CreateRandomDigits(4);
     std::copy_n(randomData.begin(), 4, PermBlock + 12);
 
     PDFEncryptionAES aes;
@@ -372,8 +372,8 @@ void PDFEncryption::ComputeUserOrOwnerKeyAESV3(std::string_view pswd, // Passwor
     // Generate Salts
 
     // step a)
-    auto vSalt = dynarithmic::CreateRandomDigits(8);
-    auto kSalt = dynarithmic::CreateRandomDigits(8); 
+    auto vSalt = CreateRandomDigits(8);
+    auto kSalt = CreateRandomDigits(8); 
     auto vSaltString = dynarithmic::StringFromUChars<std::string>(vSalt.data(), 8);
     auto kSaltString = dynarithmic::StringFromUChars<std::string>(kSalt.data(), 8);
 
@@ -417,9 +417,9 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string_view pswd,
     // PDF 2.0 Algorithm 2.B
     // step a) -- Create the K value with the SHA hash of the data, salt,
     // and userKey value (which will be empty if creating the user key).
-    PDFEncryption::UCHARArray outValue;
+    UCHARArray outValue;
     std::string hasherKey = pswd.data() + salt + uValue;
-    auto K = dynarithmic::SHA2Hash(hasherKey, dynarithmic::SHA2HashType::SHA256);
+    auto K = SHA2Hash(hasherKey, SHA2HashType::SHA256);
 
     std::string E;
     PDFEncryptionAES aesEncryptor;
@@ -465,15 +465,15 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string_view pswd,
         // step d) -- Choose the SHA hash algorithm, based on the remainder
         if (remainder == 0)
         {
-            K = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA256);
+            K = SHA2Hash(E, SHA2HashType::SHA256);
         }
         else if (remainder == 1)
         {
-            K = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA384);
+            K = SHA2Hash(E, SHA2HashType::SHA384);
         }
         else
         {
-            K = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA512);
+            K = SHA2Hash(E, SHA2HashType::SHA512);
         }
     }
 
@@ -513,7 +513,7 @@ void PDFEncryption::SetupGlobalEncryptionKey(std::string_view documentID,
 
     // This version of the MD5 checksum mimics the PDF reference
     // create a new hashing object
-    dynarithmic::MD5Hasher md5;
+    MD5Hasher md5;
     md5.Add(userPad.data(), userPad.size());
     md5.Add(ownerKeyParam.data(), ownerKeyParam.size());
     md5.Add(ext.data(), 4);
@@ -529,11 +529,11 @@ void PDFEncryption::SetupGlobalEncryptionKey(std::string_view documentID,
         for (int k = 0; k < 50; ++k)
         {
             md5.Reset();
-            md5.Add(testbuf.data(), dynarithmic::MD5Hasher::HashBytes);
+            md5.Add(testbuf.data(), MD5Hasher::HashBytes);
             testbuf = md5.GetHash();
         }
     }
-    auto minToCopy = std::min(static_cast<size_t>(dynarithmic::MD5Hasher::HashBytes), m_EncryptionKey.size());
+    auto minToCopy = std::min(static_cast<size_t>(MD5Hasher::HashBytes), m_EncryptionKey.size());
     std::copy(testbuf.begin(), testbuf.begin() + minToCopy, m_EncryptionKey.begin());
 }
 
@@ -545,7 +545,7 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeOwnerKey(const UCHARArray& userP
     UCHARArray ownerKeyValue(m_nMaxPasswordLength);
     UCHARArray digest(16);
 
-    dynarithmic::MD5Hasher md5;
+    MD5Hasher md5;
     md5.Add(ownerPad.data(), ownerPad.size());
     digest = md5.GetHash();
 
@@ -554,7 +554,7 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeOwnerKey(const UCHARArray& userP
         for (int k = 0; k < 50; ++k)
         {
             md5.Reset();
-            md5.Add(digest.data(), dynarithmic::MD5Hasher::HashBytes);
+            md5.Add(digest.data(), MD5Hasher::HashBytes);
             digest = md5.GetHash();
         }
 
@@ -581,7 +581,7 @@ void PDFEncryption::SetupUserKey()
     if (m_EncryptionKey.size() >= 16)
     {
         UCHARArray digest(32);
-        dynarithmic::MD5Hasher md5;
+        MD5Hasher md5;
         md5.Add(&pad[0], sizeof pad);
 
         // step 3
@@ -660,13 +660,13 @@ void PDFEncryption::SetHashKey(int number, int generation)
     const std::string sTemp = m.str();
 
     const UCHARArray tempArr = StringToByteArray(sTemp);
-    dynarithmic::MD5Hasher md5;
+    MD5Hasher md5;
     md5.Add(tempArr.data(), tempArr.size());
     auto tempbuf = md5.GetHash();
 
     m_LocalKey.resize(32);
 
-    std::copy_n(tempbuf.begin(), dynarithmic::MD5Hasher::HashBytes, m_LocalKey.begin());
+    std::copy_n(tempbuf.begin(), MD5Hasher::HashBytes, m_LocalKey.begin());
 
     m_nKeySize = static_cast<int>(m_EncryptionKey.size()) + 5;
     auto maxKeySize = std::max(16U, m_nActualKeyLength);
@@ -762,7 +762,7 @@ void PDFEncryptionAES::PrepareKey()
 {
     PrepareRC4Key(m_LocalKey, 0, m_nKeySize);
     IVGenerator iv;
-    PDFEncryption::UCHARArray arr = iv.getIV(AES_BLOCK_SIZE);
+    UCHARArray arr = iv.getIV(AES_BLOCK_SIZE);
     memcpy(m_ivValue, &arr[0], AES_BLOCK_SIZE);
 }
 
@@ -778,7 +778,7 @@ void PDFEncryptionAES::PrepareKey(const unsigned char* key, size_t keySize)
     m_LocalKey.clear();
     std::copy_n(key, keySize, std::back_inserter(m_LocalKey));
     IVGenerator iv;
-    PDFEncryption::UCHARArray arr = iv.getIV(AES_BLOCK_SIZE);
+    UCHARArray arr = iv.getIV(AES_BLOCK_SIZE);
     memcpy(m_ivValue, &arr[0], AES_BLOCK_SIZE);
 }
 
@@ -830,7 +830,7 @@ void PDFEncryptionAES::EncryptInternal(std::string_view dataIn, std::string& dat
     {
         // we need to add padding bytes (PKCS#7)
         extraPadding = true;
-        auto nearest16 = dynarithmic::RoundUpToNearest(dataIn.size(), 16U);
+        auto nearest16 = RoundUpToNearest(dataIn.size(), 16U);
         if (dataIn.size() % 16 == 0)
         {
             paddingByte = 0x10;
@@ -848,7 +848,7 @@ void PDFEncryptionAES::EncryptInternal(std::string_view dataIn, std::string& dat
         origDataAsUChars.insert(origDataAsUChars.end(), paddingToAdd, paddingToAdd + paddingByte);
     }
 
-    dynarithmic::AES aes(keyLength); // The lower-level AES encryption instance
+    AES aes(keyLength); // The lower-level AES encryption instance
     std::vector<unsigned char> vEncryptedData;
 
     if (aesMode == AESMode::AES_ECB)

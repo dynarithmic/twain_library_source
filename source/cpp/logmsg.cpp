@@ -53,7 +53,7 @@ namespace dynarithmic
         const auto currentDateTimeTimeT = std::chrono::system_clock::to_time_t(currentDateTime);
         std::tm currentDateTimeLocalTime = {};
         #ifdef _MSC_VER
-        ::localtime_s(&currentDateTimeLocalTime, &currentDateTimeTimeT);
+        localtime_s(&currentDateTimeLocalTime, &currentDateTimeTimeT);
         #else
         ::localtime_r(&currentDateTimeLocalTime, &currentDateTimeTimeT);
         #endif
@@ -196,7 +196,7 @@ namespace dynarithmic
 
     StdCout_Logger::~StdCout_Logger()
     {
-        ::FreeConsole();
+        FreeConsole();
     }
 }
 

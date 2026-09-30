@@ -448,7 +448,7 @@ namespace dynarithmic
     constexpr TW_FIX32 FloatToFix32(float fnum) noexcept
     {
         TW_FIX32 fix32_value{};
-        const bool sign = fnum < 0 ? true : false;
+        const bool sign = fnum < 0;
         auto value = static_cast<TW_INT32>(fnum * 65536.0 + (sign ? -0.5 : 0.5));
         fix32_value.Whole = static_cast<TW_INT16>(value >> 16);
         fix32_value.Frac = static_cast<TW_UINT16>(value & 0x0000ffffL);

@@ -168,7 +168,7 @@ namespace
             if (!bAlwaysHighlightFirst)
             {
                 // Turn off default open temporarily
-                openSourceSaver sourceSaver(selectTraits.pHandle->m_bOpenSourceOnSelect ? true : false);
+                openSourceSaver sourceSaver(selectTraits.pHandle->m_bOpenSourceOnSelect);
                 selectTraits.pHandle->m_bOpenSourceOnSelect = false;
 
                 // Select the default source

@@ -64,7 +64,7 @@ namespace
     std::string LoadResourceFromRC(unsigned resNum)
     {
         char szBuffer[DTWAIN_USERRES_MAXSIZE + 1];
-        if (::LoadStringA(CTL_StaticData::GetDLLInstanceHandle(), resNum, szBuffer, DTWAIN_USERRES_MAXSIZE))
+        if (LoadStringA(CTL_StaticData::GetDLLInstanceHandle(), resNum, szBuffer, DTWAIN_USERRES_MAXSIZE))
             return szBuffer;
         return {};
     }
@@ -639,12 +639,12 @@ namespace dynarithmic
         if (!hRes)
             return {};
 
-        HGLOBAL hData = ::LoadResource(hModule, hRes);
+        HGLOBAL hData = LoadResource(hModule, hRes);
         if (!hData)
             return {};
 
-        const DWORD size = ::SizeofResource(hModule, hRes);
-        const void* pData = ::LockResource(hData);
+        const DWORD size = SizeofResource(hModule, hRes);
+        const void* pData = LockResource(hData);
         if (!pData || size == 0)
             return {};
         const char* first = static_cast<const char*>(pData);

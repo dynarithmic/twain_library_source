@@ -175,7 +175,7 @@ int CTL_TiffIOHandler::WriteOneTiffPage(LPCTSTR path, HANDLE bitmap, const DibMu
         }
     }
 
-    tiffPageSettings.invertImage = (m_ImageInfoEx.PhotoMetric == PHOTOMETRIC_MINISWHITE) ? true : false;
+    tiffPageSettings.invertImage = (m_ImageInfoEx.PhotoMetric == PHOTOMETRIC_MINISWHITE);
 
     // Set the JPEG quality
     tiffPageSettings.jpegQuality = m_ImageInfoEx.nJpegQuality;

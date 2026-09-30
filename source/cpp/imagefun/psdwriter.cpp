@@ -22,7 +22,7 @@
 
 using namespace dynarithmic;
 
-std::optional<PreparedPsdDibPage> PsdSessionWriter::MakePreparedPsdDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedPsdDibPage> PsdSessionWriter::MakePreparedPsdDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;
@@ -135,26 +135,26 @@ bool PsdSessionWriter::WriteHeader() const
     if (std::fwrite(sig, 1, 4, file_) != 4)
         return false;
 
-    if (!dynarithmic::psd::write_u16_be(file_, 1))
+    if (!psd::write_u16_be(file_, 1))
         return false;
 
     const uint8_t reserved[6] = { 0, 0, 0, 0, 0, 0 };
     if (std::fwrite(reserved, 1, 6, file_) != 6)
         return false;
 
-    if (!dynarithmic::psd::write_u16_be(file_, 3))
+    if (!psd::write_u16_be(file_, 3))
         return false;
 
-    if (!dynarithmic::psd::write_u32_be(file_, currentPage_.height))
+    if (!psd::write_u32_be(file_, currentPage_.height))
         return false;
 
-    if (!dynarithmic::psd::write_u32_be(file_, currentPage_.width))
+    if (!psd::write_u32_be(file_, currentPage_.width))
         return false;
 
-    if (!dynarithmic::psd::write_u16_be(file_, 8))
+    if (!psd::write_u16_be(file_, 8))
         return false;
 
-    if (!dynarithmic::psd::write_u16_be(file_, 3))
+    if (!psd::write_u16_be(file_, 3))
         return false;
 
     return true;
@@ -162,13 +162,13 @@ bool PsdSessionWriter::WriteHeader() const
 
 bool PsdSessionWriter::WriteColorModeDataSection() const
 {
-    return dynarithmic::psd::write_u32_be(file_, 0);
+    return psd::write_u32_be(file_, 0);
 }
 
 bool PsdSessionWriter::WriteImageResourcesSection()
 {
     if (options_.comment.empty())
-        return dynarithmic::psd::write_u32_be(file_, 0);
+        return psd::write_u32_be(file_, 0);
 
     std::vector<uint8_t> resources;
 
@@ -224,7 +224,7 @@ bool PsdSessionWriter::WriteImageResourcesSection()
 
     append_resource(1008, "Caption", captionData);
 
-    if (!dynarithmic::psd::write_u32_be(file_,
+    if (!psd::write_u32_be(file_,
         resources.size()))
     {
         return false;
@@ -240,7 +240,7 @@ bool PsdSessionWriter::WriteImageResourcesSection()
 
 bool PsdSessionWriter::WriteLayerAndMaskSection() const
 {
-    return dynarithmic::psd::write_u32_be(file_, 0);
+    return psd::write_u32_be(file_, 0);
 }
 
 bool PsdSessionWriter::WriteImageDataSection()
@@ -252,7 +252,7 @@ bool PsdSessionWriter::WriteImageDataSection()
 
 bool PsdSessionWriter::WriteImageDataSectionRaw()
 {
-    if (!dynarithmic::psd::write_u16_be(file_, 0))
+    if (!psd::write_u16_be(file_, 0))
         return false;
 
     channelRow_.resize(currentPage_.width);
@@ -269,7 +269,7 @@ bool PsdSessionWriter::WriteImageDataSectionRaw()
 
 bool PsdSessionWriter::WriteImageDataSectionRle()
 {
-    if (!dynarithmic::psd::write_u16_be(file_, 1))
+    if (!psd::write_u16_be(file_, 1))
         return false;
 
     channelRow_.resize(currentPage_.width);
@@ -290,7 +290,7 @@ bool PsdSessionWriter::WriteImageDataSectionRle()
     // PSD stores one 16-bit big-endian byte count per row per channel.
     for (uint16_t len : rleLengths_)
     {
-        if (!dynarithmic::psd::write_u16_be(file_, len))
+        if (!psd::write_u16_be(file_, len))
             return false;
     }
 

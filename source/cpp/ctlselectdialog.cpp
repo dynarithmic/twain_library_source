@@ -130,7 +130,7 @@ namespace
     }
 
     // Determine if the selected source name is actually a mapped name
-    CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelectedSourceName)
+    CTL_StringType GetPossibleMappedName(CustomPlacement CS, const TCHAR* szSelectedSourceName)
     {
         if (CS.mapNames.empty())
             return szSelectedSourceName;
@@ -227,7 +227,7 @@ namespace dynarithmic
                                                     reinterpret_cast<DLGPROC>(DisplayTwainDlgProc), reinterpret_cast<LPARAM>(&selectStruct));
         if (bRet == -1)
         {
-            CTL_TwainAppMgr::SetError(DTWAIN_ERR_WIN32_ERROR, LogWin32Error(::GetLastError()), false);
+            CTL_TwainAppMgr::SetError(DTWAIN_ERR_WIN32_ERROR, LogWin32Error(GetLastError()), false);
             return {};
         }
 
@@ -301,7 +301,7 @@ namespace dynarithmic
                 lstSources = GetDlgItem(hWnd, IDC_LSTSOURCES);
 
                 // Set the title
-                ::SetWindowTextW(hWnd, pS->CS.sTitle.c_str());
+                SetWindowTextW(hWnd, pS->CS.sTitle.c_str());
 
                 // Fill the list box with the sources
                 auto vValues = pS->getNameListFunc(*pS);
@@ -423,8 +423,8 @@ namespace dynarithmic
                 // Display the window as topmost if topmost flag is on
                 if (pS->CS.nOptions & DTWAIN_DLG_TOPMOSTWINDOW)
                 {
-                    ::SetForegroundWindow(hWnd);
-                    ::SetWindowPos(hWnd,       // handle to window
+                    SetForegroundWindow(hWnd);
+                    SetWindowPos(hWnd,       // handle to window
                         HWND_TOPMOST,  // placement-order handle
                         0,     // horizontal position
                         0,      // vertical position

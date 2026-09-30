@@ -29,7 +29,7 @@
 
 using namespace dynarithmic;
 
-std::optional<PreparedJpegDibPage> JpegSessionWriter::MakePreparedJpegPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedJpegDibPage> JpegSessionWriter::MakePreparedJpegPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;
@@ -52,7 +52,7 @@ std::optional<PreparedJpegDibPage> JpegSessionWriter::MakePreparedJpegPage(const
 
             // If an 8-bpp palette exists, require it to be grayscale.
             if (pal && palEntries > 0 &&
-                !dynarithmic::dib::is_grayscale_palette(pal, palEntries))
+                !dib::is_grayscale_palette(pal, palEntries))
             {
                 return std::nullopt;
             }
