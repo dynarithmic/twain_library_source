@@ -19,7 +19,6 @@ DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRING
 OF THIRD PARTY RIGHTS.
 */
 #include <windows.h>
-#include "date/date.h"
 #include <ctime>
 #include <cstdio>
 #include <sstream>
@@ -40,7 +39,6 @@ OF THIRD PARTY RIGHTS.
 #include "ctliface.h"
 
 using namespace dynarithmic;
-using namespace date;
 
 /////////////////////////////////////////////////////////////////////////////
 std::mutex CLogSystem::s_logMutex;
