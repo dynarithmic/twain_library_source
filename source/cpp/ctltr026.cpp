@@ -61,7 +61,7 @@ bool CTL_CapabilityQueryTriplet::EnumCapValues( void *pCapData )
     if (bRetVal)
     {
         // dereference to a TW_ENUMERATION structure
-        pTW_ONEVALUE pValOne = static_cast<pTW_ONEVALUE>(pCapData);
+        auto pValOne = static_cast<pTW_ONEVALUE>(pCapData);
         m_lCapSupport = pValOne->Item;
     }
     return bRetVal;

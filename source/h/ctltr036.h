@@ -62,7 +62,7 @@ namespace dynarithmic
                 if (bRetVal)
                 {
                     // dereference to a TW_ONEVALUE structure
-                    pTW_ONEVALUE pValOne = static_cast<pTW_ONEVALUE>(pCapData);
+                    auto pValOne = static_cast<pTW_ONEVALUE>(pCapData);
                     HANDLE hStr = (HANDLE)(uintptr_t)pValOne->Item;
 
                     // Get the string 

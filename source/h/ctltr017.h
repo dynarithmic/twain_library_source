@@ -22,16 +22,25 @@
 #define CTLTR017_H
 
 #include "ctltr016.h"
+
 namespace dynarithmic
 {
     class CTL_ImageInfoTriplet : public CTL_ImageTriplet
     {
         public:
-            CTL_ImageInfoTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource *pSource);
-            TW_IMAGEINFO*   GetImageInfoBuffer();
+            CTL_ImageInfoTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource *pSource) : 
+                                CTL_ImageTriplet(pSession, pSource) 
+            {
+                InitGeneric(pSession, pSource, DG_IMAGE, DAT_IMAGEINFO, MSG_GET, &m_ImageInfo);
+            }
+
+            TW_IMAGEINFO*  GetImageInfoBuffer()
+            {
+                return &m_ImageInfo;
+            }
 
         private:
-            TW_IMAGEINFO          m_ImageInfo;
+            TW_IMAGEINFO          m_ImageInfo {};
     };
 }
 #endif

@@ -706,16 +706,12 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctltr009.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr010.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr016.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr017.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr018.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr019.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr023.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr026.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr028.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr029.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr031.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr032.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr033.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr034.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltripletbase.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainappinfo.cpp
