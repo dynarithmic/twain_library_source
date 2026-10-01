@@ -29,7 +29,11 @@ namespace dynarithmic
     class CTL_TwainDirectTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_TwainDirectTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource);
+            CTL_TwainDirectTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource) : m_TwainDirect{}
+            {
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_TWAINDIRECT, MSG_SETTASK, &m_TwainDirect);
+            }
+
             const TW_TWAINDIRECT& getTwainDirect() const { return m_TwainDirect; }
 
         private:

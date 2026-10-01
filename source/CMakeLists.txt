@@ -706,16 +706,12 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctltr009.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr010.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr016.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr017.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr018.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr019.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr023.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr026.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr028.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr029.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr031.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr032.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr033.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr034.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltripletbase.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainappinfo.cpp
@@ -1263,10 +1259,6 @@ set(SIMPLEINI_SOURCES
   ${PROJECT_SOURCE_DIR}/simpleini/SimpleIni.h
   )
 
-set(DATEMASTER_SOURCES
-  ${PROJECT_SOURCE_DIR}/date-master/include/date/date.h
-  )
-
 set(NLOHMANN_SOURCES
   ${PROJECT_SOURCE_DIR}/nlohmann/json.hpp
   ${PROJECT_SOURCE_DIR}/nlohmann/json_fwd.hpp
@@ -1409,7 +1401,6 @@ add_library(dtwain SHARED
     ${ZLIB_SOURCES}
     ${MINIZ_SOURCES}
     ${SIMPLEINI_SOURCES}
-    ${DATEMASTER_SOURCES}
     ${NLOHMANN_SOURCES}
     ${WILDCARD_SOURCES}
 
@@ -1697,7 +1688,6 @@ source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${LIBWEBP_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${ZLIB_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${MINIZ_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${SIMPLEINI_SOURCES})
-source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${DATEMASTER_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${NLOHMANN_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${WILDCARD_SOURCES})
 

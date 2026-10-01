@@ -29,7 +29,11 @@ namespace dynarithmic
     class CTL_DSMMetricsTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_DSMMetricsTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource);
+            CTL_DSMMetricsTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource) : m_DSMMetrics{}
+            {
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_METRICS, MSG_GET, &m_DSMMetrics);
+            }
+
             const TW_METRICS& getMetrics() const { return m_DSMMetrics; }
 
         private:

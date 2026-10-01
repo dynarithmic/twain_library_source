@@ -29,7 +29,11 @@ namespace dynarithmic
     class CTL_DSMCallbackTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_DSMCallbackTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, TW_UINT16 msg);
+            CTL_DSMCallbackTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, TW_UINT16 msg)
+            {
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_CALLBACK, msg, &m_TWCallback);
+            }
+
             void setDSMEntryProc(DSMENTRYPROC proc)
             {
                 m_DSMEntryProc = proc;
@@ -40,8 +44,8 @@ namespace dynarithmic
             TW_CALLBACK getCallback() const { return m_TWCallback; }
 
         private:
-            DSMENTRYPROC m_DSMEntryProc;
-            TW_CALLBACK m_TWCallback;
+            DSMENTRYPROC m_DSMEntryProc {};
+            TW_CALLBACK m_TWCallback {};
     };
 
     class CTL_DSMCallbackTripletRegister : public CTL_DSMCallbackTriplet
