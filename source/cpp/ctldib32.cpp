@@ -419,7 +419,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
 }
 
 
-int CTL_TwainDib::WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int nFormat, int &nStatus,
+int CTL_TwainDib::WriteNextPageDibMulti(const CTL_ImageIOHandlerPtr& pImgHandler, int nFormat, int &nStatus,
                                         const DTWAINImageInfoEx& ImageInfo)
 {
     nStatus = DTWAIN_ERR_BADPARAM;
@@ -454,7 +454,7 @@ int CTL_TwainDib::WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int 
 }
 
 
-int CTL_TwainDib::WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus, bool bSaveFile/*=true*/)
+int CTL_TwainDib::WriteLastPageDibMulti(const CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus, bool bSaveFile/*=true*/)
 {
     nStatus = DTWAIN_ERR_BADPARAM;
     if (pImgHandler)
@@ -755,7 +755,7 @@ HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
     return returnHandle;
 }
 
-bool CTL_TwainDib::FlipBitMap(bool /*bRGB*/)
+bool CTL_TwainDib::FlipBitMap(bool /*bRGB*/) const
 {
     int                     pixels;
     long                    items;
@@ -778,12 +778,12 @@ bool CTL_TwainDib::FlipBitMap(bool /*bRGB*/)
         HANDLE temp = ImageMemoryHandler::GlobalAlloc(GHND, SizeImage);
         if (temp)
         {
-            HUGEPTR_CHAR tempptr = static_cast<unsigned char*>(ImageMemoryHandler::GlobalLock(temp));
+            auto tempptr = static_cast<unsigned char*>(ImageMemoryHandler::GlobalLock(temp));
 
             // make sure we unlock and free
             DTWAINGlobalHandleUnlockFree_RAII memHandler(temp);
 
-            HUGEPTR_CHAR tempptrsave = tempptr;
+            auto tempptrsave = tempptr;
 
             // calculate offset to start of the bitmap data
             DWORD offset = sizeof(BITMAPINFOHEADER);
@@ -804,7 +804,7 @@ bool CTL_TwainDib::FlipBitMap(bool /*bRGB*/)
             }
 
             // Copy temp over hBM
-            HUGEPTR_CHAR pbuffer = reinterpret_cast<unsigned char*>(pdib);
+            auto pbuffer = reinterpret_cast<unsigned char*>(pdib);
              pbuffer += sizeof(BITMAPINFOHEADER);
             pbuffer += pdib->bmiHeader.biClrUsed * sizeof(RGBQUAD);
 
@@ -893,7 +893,7 @@ CTL_TwainDibArray::~CTL_TwainDibArray()
     RemoveAllDibs();
 }
 
-bool CTL_TwainDibArray::RemoveDib( CTL_TwainDibPtr pDib )
+bool CTL_TwainDibArray::RemoveDib(const CTL_TwainDibPtr& pDib )
 {
     const auto it = find(m_TwainDibArray.begin(), m_TwainDibArray.end(), pDib);
     if ( it != m_TwainDibArray.end() )
@@ -952,7 +952,7 @@ void CTL_TwainDibArray::RemoveAllDibs()
     m_TwainDibArray.clear();
 }
 
-bool CTL_TwainDibArray::DeleteDibMemory(CTL_TwainDibPtr Dib)
+bool CTL_TwainDibArray::DeleteDibMemory(const CTL_TwainDibPtr& Dib)
 {
     auto it = find(m_TwainDibArray.begin(), m_TwainDibArray.end(), Dib);
     if ( it != m_TwainDibArray.end() )

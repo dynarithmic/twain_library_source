@@ -462,7 +462,7 @@ namespace dynarithmic
             if ( it1 != pHandle->m_mapDTWAINArrayToTwainType.end() )
             {
                 // Search the array for the Twain Type
-                const std::vector<LONG>::iterator it2 =
+                const auto it2 =
                     std::find(it1->second.begin(), it1->second.end(), nDataType);
                 if ( it2 != it1->second.end())
                     bFoundType = true;

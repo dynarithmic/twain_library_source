@@ -44,7 +44,7 @@ namespace
 
 namespace dynarithmic
 {
-    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize)
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(const CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize)
     {
         if (nInitialSize < 0)
             return { DTWAIN_ERR_INVALID_PARAM, nullptr };
@@ -83,7 +83,7 @@ namespace dynarithmic
         return { DTWAIN_ERR_BAD_ARRAY, nullptr };
     }
 
-    std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize)
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(const CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize)
     {
         const LONG lType = GetCapArrayType(pSource, lCapType);
         if (lType == DTWAIN_FAILURE1)
@@ -91,7 +91,7 @@ namespace dynarithmic
         return CreateArrayFromFactory(pHandle, lType, lSize);
     }
 
-    DTWAIN_ARRAY CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source)
+    DTWAIN_ARRAY CreateArrayCopyFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source)
     {
         const LONG lType = CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(Source));
         DTWAIN_ARRAY Dest = CreateArrayFromFactory(pHandle, lType, 0).second;
@@ -161,7 +161,7 @@ namespace dynarithmic
         return VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_frame(Left, Top, Right, Bottom));
     }
 
-    void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame)
+    void DestroyFrameFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame)
     {
         pHandle->m_ArrayFactory->destroy(Frame);
     }
@@ -205,7 +205,7 @@ namespace dynarithmic
         return true;
     }
 
-    void SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib)
+    void SetAcquiredImage(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib)
     {
         const int nDibs = GetNumAcquiredImages(pHandle, aAcq, nWhichAcq );
         if (nWhichDib >= nDibs)

@@ -48,7 +48,7 @@ namespace dynarithmic
             TW_UINT32  GetTimeBeforeFirstCapture() const; /* Automatic Capture            */
             TW_UINT32  GetTimeBetweenCaptures() const;    /* Automatic Capture            */
 
-            bool       GetEventInfoEx(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Array) const;
+            bool       GetEventInfoEx(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Array) const;
 
         private:
             TW_DEVICEEVENT  m_DeviceEvent {};
