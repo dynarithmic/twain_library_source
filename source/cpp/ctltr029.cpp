@@ -220,7 +220,7 @@ CTL_ExtImageInfoTriplet::~CTL_ExtImageInfoTriplet()
     }
 }
 
-std::pair<bool, int32_t> CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pItemSize/*=NULL*/) const
+std::pair<bool, int32_t> CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pItemSize/*=nullptr*/) const
 {
     auto sessionHandle = GetSourcePtr()->GetDTWAINHandle();
     if (!sessionHandle)

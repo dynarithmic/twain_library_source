@@ -144,7 +144,7 @@ TW_UINT16 CTL_CapabilityGetRangeTriplet::GetDataType()
 
 bool CTL_CapabilityGetRangeTriplet::GetValue(void *pData, size_t nWhichVal)
 {
-    if ( nWhichVal >= m_nNumRangeItems )
+    if ( nWhichVal >= m_nNumRangeItems || !pData )
         return false;
     const int nDataType = GetDataType();
     if ( nDataType == TWTY_FIX32 )
