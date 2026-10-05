@@ -693,7 +693,7 @@ void CTL_TwainAppMgr::EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSo
     }
 }
 
-bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip/*=NULL*/)
+bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip/*=nullptr*/)
 {
     const auto pTempSource = pSource;
     const auto pSession = pTempSource->GetTwainSession();
@@ -2051,7 +2051,7 @@ std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
     return "Unknown capability.  " + std::to_string(Cap);
 }
 
-int CTL_TwainAppMgr::GetDataTypeFromCap( TW_UINT16 Cap, CTL_ITwainSource *pSource/*=NULL*/ )
+int CTL_TwainAppMgr::GetDataTypeFromCap( TW_UINT16 Cap, CTL_ITwainSource *pSource/*=nullptr*/ )
 {
     const auto nThisCap = Cap;
     if (nThisCap >= CAP_CUSTOMBASE)

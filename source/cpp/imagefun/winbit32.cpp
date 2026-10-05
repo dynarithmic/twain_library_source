@@ -183,7 +183,7 @@ HANDLE CDibInterface::NormalizeDib(HANDLE hDib, bool bReturnCopy /* = false */ )
     return hNewDib;
 }
 
-HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=NULL*/)
+HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=nullptr*/)
 {
     height = abs(height);
 

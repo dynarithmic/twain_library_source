@@ -112,7 +112,7 @@ void CTL_ImageMemXferTriplet::InitXferBuffer()
     {
         m_ImageMemXferBuffer.Memory.Flags = TWMF_DSOWNS;
         m_ImageMemXferBuffer.Memory.Length = TWON_DONTCARE32;
-        m_ImageMemXferBuffer.Memory.TheMem = NULL;
+        m_ImageMemXferBuffer.Memory.TheMem = nullptr;
     }
 
     if ( m_nCompression != TWCP_NONE )

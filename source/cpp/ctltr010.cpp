@@ -95,6 +95,9 @@ TW_UINT16 CTL_CapabilitySetTripletBase::PostEncode(TW_UINT16 rc)
 
 void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData)
 {
+    if (!pData)
+        return;
+
     // Do Fix32 special case
     if ( IsTwainFix32Type(pVal->ItemType))
     {
@@ -143,9 +146,12 @@ void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
                                                    size_t nItemSize,
                                                    void *pData)
 {
+    if (!pData)
+        return;
+
     if ( IsTwainFix32Type(pArray->ItemType))
     {
-        // floats are stored as doubles in CTL
+        // floats are stored as double
         const float fnum = static_cast<float>(*static_cast<double*>(pData));
         TW_FIX32 ffix32 = FloatToFix32( fnum );
         memcpy(&pArray->ItemList[valuePos], &ffix32, sizeof(TW_FIX32));
@@ -168,6 +174,8 @@ void CTL_CapabilitySetTripletBase::EncodeRange(pTW_RANGE pVal,
                                                void *pData2,
                                                void *pData3) const
 {
+    if (!pData1 || !pData2 || !pData3)
+        return;
     pVal->ItemType = GetTwainType();
     const size_t nItemSize = GetTwainItemSize( pVal->ItemType );
 
@@ -199,6 +207,9 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
                                                     size_t valuePos,
                                                     void *pData)
 {
+    if (!pData)
+        return;
+
     // Get size of datatype
     const TW_UINT16 nItemSize = GetTwainItemSize( pArray->ItemType );
     if ( IsTwainFix32Type(pArray->ItemType))

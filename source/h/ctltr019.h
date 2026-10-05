@@ -29,10 +29,21 @@ namespace dynarithmic
         public:
             CTL_ImagePendingTriplet(CTL_ITwainSession *pSession,
                                     CTL_ITwainSource *pSource,
-                                    TW_UINT16 nMsg = MSG_ENDXFER);
-            bool Reset( TW_UINT16 nMsg );
+                                    TW_UINT16 nMsg = MSG_ENDXFER) : m_nMsg(nMsg), m_PendingXfers{}
+            {
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_PENDINGXFERS, m_nMsg, &m_PendingXfers);
+            }
 
-            TW_PENDINGXFERS* GetPendingXferBuffer();
+            bool Reset( TW_UINT16 nMsg )
+            {
+                return InitGeneric(GetSessionPtr(), GetSourcePtr(), DG_CONTROL,
+                               DAT_PENDINGXFERS, nMsg, &m_PendingXfers, { false, false });
+            }
+
+            TW_PENDINGXFERS* GetPendingXferBuffer()
+            {
+                return &m_PendingXfers;
+            }
 
         private:
             TW_UINT16       m_nMsg;

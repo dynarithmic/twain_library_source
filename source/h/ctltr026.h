@@ -31,8 +31,23 @@ namespace dynarithmic
             CTL_CapabilityQueryTriplet(CTL_ITwainSession *pSession,
                                        CTL_ITwainSource *pSource,
                                        TW_UINT16 gCap,
-                                       TW_UINT16 TwainType=0xFFFF);
-            TW_UINT16       Execute() override;
+                                       TW_UINT16 TwainType=0xFFFF) :
+                       CTL_CapabilityGetOneValTriplet(pSession, pSource, MSG_QUERYSUPPORT, gCap, TwainType)
+            {
+                TW_CAPABILITY *pCap = GetCapabilityBuffer();
+                pCap->Cap = gCap;
+                pCap->ConType = TWON_ONEVALUE;
+                pCap->hContainer = nullptr;
+                m_lCapSupport = 0;
+            }
+
+            TW_UINT16  Execute() override
+            {
+                const TW_UINT16 rc = CTL_CapabilityGetOneValTriplet::Execute();
+                if ( rc == TWRC_SUCCESS )
+                    GetValue(nullptr);
+                return rc;
+            }
 
             bool            IsGet() const
                             { return m_lCapSupport & TWQC_GET?true:false; }
@@ -58,8 +73,23 @@ namespace dynarithmic
             UINT            GetSupport() const { return static_cast<UINT>(m_lCapSupport); }
 
         protected:
-            bool    GetValue( void *pData, size_t nWhere=0 ) override;
-            bool    EnumCapValues( void *pCapData ) override;
+            bool    GetValue( void *pData, size_t nWhere=0 ) override
+            {
+                return true;
+            }
+
+            bool    EnumCapValues( void *pCapData ) override
+            {
+                const bool bRetVal = CTL_CapabilityGetOneValTriplet::EnumCapValues(pCapData);
+
+                if (bRetVal)
+                {
+                    // dereference to a TW_ENUMERATION structure
+                    auto pValOne = static_cast<pTW_ONEVALUE>(pCapData);
+                    m_lCapSupport = pValOne->Item;
+                }
+                return bRetVal;
+            }
 
         private:
             TW_UINT32   m_lCapSupport;
