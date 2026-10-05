@@ -51,7 +51,7 @@ bool CTextImageHandler::CloseOutputFile()
     return true;
 }
 
-int CTextImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo/*=NULL*/)
+int CTextImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo/*=nullptr*/)
 {
     return WriteImage(ptrHandler, 0, 0, 0, 0, 0, nullptr, const_cast<LPTSTR>(path)); 
 }
