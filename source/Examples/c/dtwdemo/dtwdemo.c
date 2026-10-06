@@ -290,9 +290,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     /* Allow DTWAIN messages to be sent directly to our Window proc */
     DTWAIN_StartTwainSession(g_hWnd, NULL);
-
-    char szTest[100];
-    DTWAIN_GetResourceStringA(DTWAIN_ERR_TWAINDSM_NOT_FOUND, szTest, 100);
     // DTWAIN_SetTwainMode(DTWAIN_MODELESS);
     DTWAIN_EnableMsgNotify(TRUE);
 
