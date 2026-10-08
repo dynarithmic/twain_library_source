@@ -39,12 +39,12 @@ namespace
 
 namespace
 {
-    LONG GetNumAcquiredImages(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhich);
+    LONG GetNumAcquiredImages(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhich);
 }
 
 namespace dynarithmic
 {
-    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize)
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(const CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize)
     {
         if (nInitialSize < 0)
             return { DTWAIN_ERR_INVALID_PARAM, nullptr };
@@ -83,7 +83,7 @@ namespace dynarithmic
         return { DTWAIN_ERR_BAD_ARRAY, nullptr };
     }
 
-    std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize)
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(const CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize)
     {
         const LONG lType = GetCapArrayType(pSource, lCapType);
         if (lType == DTWAIN_FAILURE1)
@@ -91,7 +91,7 @@ namespace dynarithmic
         return CreateArrayFromFactory(pHandle, lType, lSize);
     }
 
-    DTWAIN_ARRAY CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source)
+    DTWAIN_ARRAY CreateArrayCopyFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source)
     {
         const LONG lType = CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(Source));
         DTWAIN_ARRAY Dest = CreateArrayFromFactory(pHandle, lType, 0).second;
@@ -100,7 +100,7 @@ namespace dynarithmic
         return Dest;
     }
 
-    void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
+    void DestroyArrayFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
     {
         pHandle->m_ArrayFactory->destroy(pArray);
     }
@@ -161,12 +161,12 @@ namespace dynarithmic
         return VOID_TO_DTWAIN_ARRAY(pHandle->m_ArrayFactory->create_frame(Left, Top, Right, Bottom));
     }
 
-    void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame)
+    void DestroyFrameFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame)
     {
         pHandle->m_ArrayFactory->destroy(Frame);
     }
 
-    bool TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil)
+    bool TWFRAMEToDTWAINFRAME(const TW_FRAME& pTwain, DTWAIN_FRAME pDdtwil)
     {
         double ValOut[4];
         TW_FIX32 ValIn[4];
@@ -205,7 +205,7 @@ namespace dynarithmic
         return true;
     }
 
-    void SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib)
+    void SetAcquiredImage(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib)
     {
         const int nDibs = GetNumAcquiredImages(pHandle, aAcq, nWhichAcq );
         if (nWhichDib >= nDibs)
@@ -221,7 +221,7 @@ using CharType = CTL_StringType::value_type;
 
 namespace
 {
-    std::string CreateIndexErrorMsg(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY arr, LONG invalidIndex)
+    std::string CreateIndexErrorMsg(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY arr, LONG invalidIndex)
     {
         return "Index " + std::to_string(invalidIndex) + " >= size (" + std::to_string(pHandle->m_ArrayFactory->size(arr)) + ")";
     }
@@ -263,7 +263,7 @@ namespace
             return retVal;
         }
 
-        ArrayReturn CheckImpl(CTL_TwainDLLHandle* pHandle) const
+        ArrayReturn CheckImpl(const CTL_TwainDLLHandle* pHandle) const
         {
             const auto& factory = pHandle->m_ArrayFactory;
 
@@ -522,7 +522,7 @@ namespace
             CATCH_BLOCK(0)
     }
 
-    LONG IsValidAcqArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
+    LONG IsValidAcqArray(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
     {
         LOG_FUNC_ENTRY_PARAMS((pArray))
         // Check if array is a valid type for ranges
@@ -673,7 +673,7 @@ namespace
         return Dest;
     }
 
-    LONG ArrayFindInternal(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, LPVOID pVariant, DTWAIN_FLOAT Tolerance, bool UseTolerance = false)
+    LONG ArrayFindInternal(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, LPVOID pVariant, DTWAIN_FLOAT Tolerance, bool UseTolerance = false)
     {
         const auto& factory = pHandle->m_ArrayFactory;
 
@@ -769,14 +769,6 @@ namespace
 
 extern "C"
 {
-    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayInit()
-    {
-        LOG_FUNC_ENTRY_PARAMS(())
-        LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
-        CATCH_BLOCK(nullptr)
-    }
-
-
     DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreate( LONG nEnumType, LONG nInitialSize )
     {
         static_assert(sizeof(DWORD) == sizeof(LONG), "Error -- DWORD must have the same size as LONG");
@@ -2114,12 +2106,12 @@ extern "C"
         auto enumType = pHandle->m_ArrayFactory->tag_type(pArray);
         if (enumType == CTL_ArrayFactory::arrayTag::LongType)
             GenericRangeGetter<LONG>(pHandle, pArray, 
-                reinterpret_cast<LONG*>(pVariantLow), reinterpret_cast<LONG*>(pVariantUp), 
-                reinterpret_cast<LONG*>(pVariantStep), reinterpret_cast<LONG*>(pDefault), reinterpret_cast<LONG*>(pCurrent));
+                static_cast<LONG*>(pVariantLow), static_cast<LONG*>(pVariantUp), 
+                static_cast<LONG*>(pVariantStep), static_cast<LONG*>(pDefault), static_cast<LONG*>(pCurrent));
         else
             GenericRangeGetter<double>(pHandle, pArray,
-                reinterpret_cast<double*>(pVariantLow), reinterpret_cast<double*>(pVariantUp),
-                reinterpret_cast<double*>(pVariantStep), reinterpret_cast<double*>(pDefault), reinterpret_cast<double*>(pCurrent));
+                static_cast<double*>(pVariantLow), static_cast<double*>(pVariantUp),
+                static_cast<double*>(pVariantStep), static_cast<double*>(pDefault), static_cast<double*>(pCurrent));
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -2976,7 +2968,7 @@ namespace
         return VOID_TO_DTWAIN_ARRAY(aDouble);
     }
 
-    LONG GetNumAcquiredImages(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhich)
+    LONG GetNumAcquiredImages(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhich)
     {
         LONG lError;
         if ((lError = IsValidAcqArray(pHandle, aAcq)) < 0)

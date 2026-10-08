@@ -74,6 +74,7 @@
 #define IDS_LOGMSG_LASTERROR                (IDS_LOGMSG_START + 23)
 #define IDS_LOGMSG_END                      (4999)
 
+#define IDS_TWAINCONDITIONCODE_START  1100
 #define IDS_ErrCCLowMemory          TWAIN_ERR_LOW_MEMORY
 #define IDS_ErrCCFalseAlarm         TWAIN_ERR_FALSE_ALARM
 #define IDS_ErrCCBummer             TWAIN_ERR_BUMMER
@@ -248,4 +249,9 @@
 #define IDS_DTWAIN_VERSIONSTRING_SUBBUILD1  11002
 #define IDS_DTWAIN_VERSIONSTRING_SUBBUILD2  11003
 
+// Embedded TWAIN resources
+#define IDR_TWAININFO                       12000
+#define IDR_DTWAININI_64                    12001
+#define IDR_DTWAININI_32                    12002
+#define IDR_DTWAINRESOURCESTRINGS           12003
 #endif

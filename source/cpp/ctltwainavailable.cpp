@@ -19,6 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 
+#include <algorithm>
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include <ctlstringutilsx.h>
@@ -132,12 +133,8 @@ namespace
         if (maxCharsCopied)
             *maxCharsCopied = retVal;
         basicstringutils::Tokenize(dirsToUse, _T("|"), arr);
-        for (auto& s : arr)
-        {
-            if (s != s_NullEntry)
-                return true;
-        }
-        return false;
+        return std::any_of(arr.begin(), arr.end(), 
+                        [&](const auto& s) { return s != s_NullEntry; });
     }
 }
 
@@ -153,7 +150,7 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
     {
-        LOG_FUNC_ENTRY_PARAMS(())
+        LOG_FUNC_ENTRY_PARAMS((directories, nMaxLen))
         LONG maxCharsCopied = 0;
         CheckTwainAvailability(directories, nMaxLen, &maxCharsCopied);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
@@ -174,7 +171,7 @@ extern "C"
     // Test which version of TWAIN is available.
     LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen)
     {
-        LOG_FUNC_ENTRY_PARAMS(())
+        LOG_FUNC_ENTRY_PARAMS((directories, nMaxLen))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         auto availability = GetTwainAvailablityInternal();
 

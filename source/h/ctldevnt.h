@@ -31,7 +31,8 @@ namespace dynarithmic
     class CTL_DeviceEvent
     {
         public:
-            CTL_DeviceEvent() = default;
+            static constexpr TW_UINT32 InvalidEvent = 9999;
+            CTL_DeviceEvent() { m_DeviceEvent.Event = InvalidEvent; }
             operator pTW_DEVICEEVENT() { return &m_DeviceEvent; }
 
             TW_UINT32  GetEvent() const;                  /* One of the TWDE_xxxx values. */
@@ -47,7 +48,7 @@ namespace dynarithmic
             TW_UINT32  GetTimeBeforeFirstCapture() const; /* Automatic Capture            */
             TW_UINT32  GetTimeBetweenCaptures() const;    /* Automatic Capture            */
 
-            bool       GetEventInfoEx(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Array) const;
+            bool       GetEventInfoEx(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Array) const;
 
         private:
             TW_DEVICEEVENT  m_DeviceEvent {};

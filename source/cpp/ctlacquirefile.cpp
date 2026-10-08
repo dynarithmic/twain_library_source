@@ -78,23 +78,6 @@ namespace
         return bRetval;
     }
 
-    bool IsSupportedFileType(DTWAIN_SOURCE Source, LONG lFileType, LONG lFileFlags)
-    {
-        bool bFileGood = true;
-        // Check if the file format is valid
-        auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
-        if (availableFileTypes.find(lFileType) == availableFileTypes.end())
-        {
-            // Not a universal file type, so see if this is a type supported
-            // by the Source's file transfer
-            if (lFileFlags & DTWAIN_USESOURCEMODE)
-                bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType) ? true : false;
-            else
-                bFileGood = false;
-        }
-        return bFileGood;
-    }
-
     template <typename T>
     std::vector<T> FileListToVector(SourceAcquireOptions& opts)
     {
@@ -265,10 +248,27 @@ namespace dynarithmic
         CATCH_BLOCK(DTWAIN_FAILURE1)
     }
 
+    bool IsSupportedFileType(DTWAIN_SOURCE Source, LONG lFileType, LONG lFileFlags)
+    {
+        bool bFileGood = true;
+        // Check if the file format is valid
+        auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
+        if (availableFileTypes.find(lFileType) == availableFileTypes.end())
+        {
+            // Not a universal file type, so see if this is a type supported
+            // by the Source's file transfer
+            if (lFileFlags & DTWAIN_USESOURCEMODE)
+                bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType) ? true : false;
+            else
+                bFileGood = false;
+        }
+        return bFileGood;
+    }
+
     bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
     {
         LOG_FUNC_ENTRY_PARAMS((opts))
-        auto *pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
 
         DumpArrayContents(opts.getFileList(), 0, false, false);
         #ifdef _UNICODE

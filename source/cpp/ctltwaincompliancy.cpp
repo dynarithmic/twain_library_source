@@ -34,7 +34,7 @@ namespace
     {
         LONG origValue;
         CTL_ITwainSource* m_pSourceRAII;
-        ResetPixelType(CTL_ITwainSource* pSource, LONG oValue) : m_pSourceRAII(pSource), origValue(oValue) {}
+        ResetPixelType(CTL_ITwainSource* pSource, LONG oValue) : origValue(oValue), m_pSourceRAII(pSource) {}
         ~ResetPixelType()
         {
             try

@@ -22,7 +22,7 @@
 #include <utility>
 #include "imagexferfilewriter.h"
 #include "logwriterutils.h"
-#include "ctltr026.h"
+#include "ctltr018.h"
 #include "ctltwainmanager.h"
 #include "ctlfilesave.h"
 #include "ctldib32ex.h"
@@ -341,8 +341,10 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
         while ( currentside < 2 )
         {
             // front side
-            if ( currentside == 0 || (currentside == 0 && m_pSource->IsMultiPageModeContinuous()))
-                DupData = m_pSource->GetDuplexFileData( nCurPage[0], nWhichSide[0] );
+            if (currentside == 0)
+            {
+                DupData = m_pSource->GetDuplexFileData(nCurPage[0], nWhichSide[0]);
+            }
             else
             if ( bNotManualDuplex )
             {
@@ -554,7 +556,7 @@ void ImageXferFileWriter::ManualDuplexCleanUp(CTL_StringViewType strFile/* = ""*
     CTL_TwainDib Dib;
     int nStatus;
     // Clean up by officially closing out the multi-page processing
-    Dib.WriteLastPageDibMulti(m_pSource->GetImageHandlerPtr(), nStatus);
+    CTL_TwainDib::WriteLastPageDibMulti(m_pSource->GetImageHandlerPtr(), nStatus);
 
     if ( nStatus != 0 )
         SendFileAcquireError(m_pSource, m_pSession, nStatus, DTWAIN_TN_FILESAVEERROR,

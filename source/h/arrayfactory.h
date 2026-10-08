@@ -433,12 +433,7 @@ namespace dynarithmic
         template <typename T, typename U>
         arrayTag* generic_single_creator(U tagType)
         {
-            auto sp = std::make_shared<T>();
-            sp->setTag(tagType);
-            m_tagMap.insert({ sp.get(), {tagType,sp} });
-            auto& v = underlying_container<T>(sp.get());
-            v.resize(1);
-            return sp.get();
+            return generic_array_creator<T, U>(tagType, 1);
         }
 
     private:

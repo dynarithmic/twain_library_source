@@ -32,7 +32,7 @@ namespace dynarithmic::dib
         void operator()(HGLOBAL h) const noexcept
         {
             if (h)
-                ::GlobalFree(h);
+                GlobalFree(h);
         }
     };
 
@@ -169,7 +169,7 @@ namespace dynarithmic::dib
             if (!hDib_)
                 return;
 
-            locked_ = ::GlobalLock(hDib_);
+            locked_ = GlobalLock(hDib_);
             if (!locked_)
                 return;
 
@@ -186,7 +186,7 @@ namespace dynarithmic::dib
         ~LockedDib()
         {
             if (locked_)
-                ::GlobalUnlock(hDib_);
+                GlobalUnlock(hDib_);
         }
 
         LockedDib(const LockedDib&) = delete;
@@ -209,7 +209,7 @@ namespace dynarithmic::dib
             if (this != &other)
             {
                 if (locked_)
-                    ::GlobalUnlock(hDib_);
+                    GlobalUnlock(hDib_);
 
                 hDib_ = other.hDib_;
                 locked_ = other.locked_;

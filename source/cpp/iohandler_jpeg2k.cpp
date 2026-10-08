@@ -23,33 +23,42 @@
 #include "ctldib32ex.h"
 #include "ctlstringconversion.h"
 
+#ifdef _MSC_VER
+    #define STRINGER_2_(x) #x
+    #define STRINGER_(x) STRINGER_2_(x)
+    #pragma message ("Using LibOpenJPEG version " STRINGER_(OPJ_VERSION_MAJOR) "." STRINGER_(OPJ_VERSION_MINOR) "." STRINGER_(OPJ_VERSION_BUILD))
+#endif
+
 using namespace dynarithmic;
 
 // ============================================================
 // Example HANDLE-based helper
 // ============================================================
 
-static bool WriteOneDibHandleToJpeg2000(const std::wstring& filename, const Jpeg2000SessionOptions& options, HANDLE hDib)
+namespace
 {
-    LockedDibPage lockedPage(hDib);
-    if (!lockedPage.IsValid())
-        return false;
+    bool WriteOneDibHandleToJpeg2000(const std::wstring& filename, const Jpeg2000SessionOptions& options, HANDLE hDib)
+    {
+        LockedDibPage lockedPage(hDib);
+        if (!lockedPage.IsValid())
+            return false;
 
-    Jpeg2000SessionWriter writer;
-    if (!writer.Open(filename, options))
-        return false;
+        Jpeg2000SessionWriter writer;
+        if (!writer.Open(filename, options))
+            return false;
 
-    auto pageInfo = Jpeg2000SessionWriter::MakePreparedJpeg2000Page(lockedPage.GetView());
-    if (!pageInfo.has_value())
-        return false;
-    if (!writer.SetPageInfo(pageInfo.value()))
-        return false;
+        auto pageInfo = Jpeg2000SessionWriter::MakePreparedJpeg2000Page(lockedPage.GetView());
+        if (!pageInfo.has_value())
+            return false;
+        if (!writer.SetPageInfo(pageInfo.value()))
+            return false;
 
-    if (!writer.WriteCurrentPage())
-        return false;
+        if (!writer.WriteCurrentPage())
+            return false;
 
-    writer.Close();
-    return true;
+        writer.Close();
+        return true;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

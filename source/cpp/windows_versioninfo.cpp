@@ -5,6 +5,17 @@
 #include "dtwinverex.h"
 #include "ctlstaticdata.h"
 
+namespace
+{
+    std::wstring MakeVersionString(DWORD ms, DWORD ls)
+    {
+        return std::to_wstring(HIWORD(ms)) + L"." +
+            std::to_wstring(LOWORD(ms)) + L"." +
+            std::to_wstring(HIWORD(ls)) + L"." +
+            std::to_wstring(LOWORD(ls));
+    }
+}
+
 namespace dynarithmic
 {
     CTL_StringType GetVersionInfo()
@@ -19,14 +30,6 @@ namespace dynarithmic
         CTL_StringStreamType strm;
         vInfo.printit(strm, indent, crlf.data());
         return strm.str();
-    }
-
-    std::wstring MakeVersionString(DWORD ms, DWORD ls)
-    {
-        return std::to_wstring(HIWORD(ms)) + L"." +
-            std::to_wstring(LOWORD(ms)) + L"." +
-            std::to_wstring(HIWORD(ls)) + L"." +
-            std::to_wstring(LOWORD(ls));
     }
 
     bool GetDLLVersionNumbersSmall(HMODULE hModule, VersionNumbersSmall& out)

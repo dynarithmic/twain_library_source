@@ -23,6 +23,10 @@
 #include "ctldib32ex.h"
 #include "ctlstringconversion.h"
 
+#ifdef _MSC_VER
+    #pragma message ("Using LibPNG version " PNG_LIBPNG_VER_STRING)
+#endif
+
 using namespace dynarithmic;
 
 int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )

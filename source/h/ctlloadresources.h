@@ -35,7 +35,7 @@
 
 namespace dynarithmic
 {
-    typedef BASIC_MAPTYPE_<std::string, bool> CTL_ResourceRegistryMap;
+    using CTL_ResourceRegistryMap = BASIC_MAPTYPE_<std::string, bool>;
 
     bool LoadLanguageResourceA(const char* lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear);
     bool LoadLanguageResourceA(const char* lpszName, bool bClear);
@@ -46,6 +46,7 @@ namespace dynarithmic
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize);
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize);
     std::string GetErrorString_Internal(int nError);
+    std::string GetResourceString_Internal(int nResNumber);
 
     struct ResourceLoadingInfo
     {
@@ -68,7 +69,8 @@ namespace dynarithmic
         ResourceLoadingInfo() : errorValue{} { errorValue[2] = true; }
     };
 
-    bool LoadTwainResources(ResourceLoadingInfo& ret);
+    bool LoadTwainResources(HMODULE hDLL, ResourceLoadingInfo& ret);
+    std::string LoadEmbeddedTwainInfo(HMODULE hModule, int resID);
     void UnloadStringResources();
     void UnloadErrorResources();
     std::vector<std::string> GetLangResourceNames();

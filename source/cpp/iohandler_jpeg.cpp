@@ -22,31 +22,41 @@
 #include "jpegwriter.h"
 #include "ctldib32ex.h"
 #include "ctlstringconversion.h"
+#include "jversion.h"
+
+#ifdef _MSC_VER
+    #define STRINGER_2_(x) #x
+    #define STRINGER_(x) STRINGER_2_(x)
+    #pragma message ("Using LibJPEG version " JVERSION)
+#endif
 
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static bool WriteOneDibHandleToJpeg(const std::wstring& filename,const JpegSessionOptions& options, HANDLE hDib)
+namespace
 {
-    LockedDibPage lockedPage(hDib);
-    if (!lockedPage.IsValid())
-        return false;
+    bool WriteOneDibHandleToJpeg(const std::wstring& filename, const JpegSessionOptions& options, HANDLE hDib)
+    {
+        LockedDibPage lockedPage(hDib);
+        if (!lockedPage.IsValid())
+            return false;
 
-    JpegSessionWriter writer;
-    if (!writer.Open(filename, options))
-        return false;
+        JpegSessionWriter writer;
+        if (!writer.Open(filename, options))
+            return false;
 
-    auto preparedPage = JpegSessionWriter::MakePreparedJpegPage(lockedPage.GetView());
-    if (!preparedPage.has_value())
-        return false;
+        auto preparedPage = JpegSessionWriter::MakePreparedJpegPage(lockedPage.GetView());
+        if (!preparedPage.has_value())
+            return false;
 
-    if (!writer.SetPageInfo(preparedPage.value()))
-        return false;
+        if (!writer.SetPageInfo(preparedPage.value()))
+            return false;
 
-    if (!writer.WriteCurrentPage())
-        return false;
+        if (!writer.WriteCurrentPage())
+            return false;
 
-    writer.Close();
-    return true;
+        writer.Close();
+        return true;
+    }
 }
 
 int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)

@@ -448,7 +448,7 @@ namespace dynarithmic
     constexpr TW_FIX32 FloatToFix32(float fnum) noexcept
     {
         TW_FIX32 fix32_value{};
-        const bool sign = fnum < 0 ? true : false;
+        const bool sign = fnum < 0;
         auto value = static_cast<TW_INT32>(fnum * 65536.0 + (sign ? -0.5 : 0.5));
         fix32_value.Whole = static_cast<TW_INT16>(value >> 16);
         fix32_value.Frac = static_cast<TW_UINT16>(value & 0x0000ffffL);
@@ -634,6 +634,20 @@ namespace dynarithmic
         return containerType;
     }
 
+    template <typename T>
+    constexpr TW_UINT16 GetTWAINContainerFromType()
+    {
+        if constexpr (std::is_same_v<T, TW_ONEVALUE>)
+            return TWON_ONEVALUE;
+        if constexpr (std::is_same_v<T, TW_ENUMERATION>)
+            return TWON_ENUMERATION;
+        if constexpr (std::is_same_v<T, TW_RANGE>)
+            return TWON_RANGE;
+        if constexpr (std::is_same_v<T, TW_ARRAY>)
+            return TWON_ARRAY;
+        return TWON_ONEVALUE;
+    }
+
     constexpr bool IsValidContainerType(TW_UINT16 containerType, bool testDTWAINType = true)
     {
         switch (containerType)
@@ -683,6 +697,35 @@ namespace dynarithmic
                 return 2.54;
         }
         return 1.0;
+    }
+
+    constexpr bool DeviceEventHasInfo(TW_UINT16 devEvent)
+    {
+        switch(devEvent)
+        {
+            case TWDE_CHECKBATTERY:
+            case TWDE_CHECKPOWERSUPPLY:
+            case TWDE_CHECKRESOLUTION:
+            case TWDE_CHECKFLASH:
+            case TWDE_CHECKAUTOMATICCAPTURE:
+                return true;
+        }
+        return false;
+    }
+
+    constexpr int GetDeviceEventArrayType(TW_UINT16 devEvent)
+    {
+        switch (devEvent)
+        {
+            case TWDE_CHECKBATTERY:
+            case TWDE_CHECKPOWERSUPPLY:
+            case TWDE_CHECKFLASH:
+            case TWDE_CHECKAUTOMATICCAPTURE:
+                return DTWAIN_ARRAYLONG;
+            case TWDE_CHECKRESOLUTION:
+                return DTWAIN_ARRAYFLOAT;
+        }
+        return DTWAIN_ARRAYLONG;
     }
 }
 #endif

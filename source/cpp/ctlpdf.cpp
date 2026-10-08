@@ -20,7 +20,7 @@
  */
 #include <algorithm>
 #include "cppfunc.h"
-#include "dtwainc.h"
+#include "dtwtype.h"
 #include "dtwainx.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
@@ -126,7 +126,8 @@ extern "C"
         // Even though the Permissions parameter is an unsigned 32-bit value from the user, 
         // this will be "converted" to a 32-bit signed integer internally, which is what the PDF 
         // specification requires.
-        pSource->SetPDFEncryption(bUseEncryption?true:false, user, owner, Permissions, UseStrongEncryption?true:false);
+        pSource->SetPDFEncryption(bUseEncryption?true:false, user, owner, 
+                                    static_cast<LONG>(Permissions), UseStrongEncryption?true:false);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
@@ -176,21 +177,24 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source, Quality))
         auto [pHandle, pSource] = VerifyHandles(Source);
-        Quality = (std::max<LONG>)(1, (std::min<LONG>)(100, Quality));
+        Quality = std::clamp(Quality, 1L, 100L); 
         pSource->SetPDFValue(PDFJPEGQUALITYKEY, Quality);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
 }
 
-typedef DTWAIN_BOOL (DLLENTRY_DEF *SetPDFFn)(DTWAIN_SOURCE, LONG, DTWAIN_FLOAT, DTWAIN_FLOAT);
+using SetPDFFn = DTWAIN_BOOL(DLLENTRY_DEF *)(DTWAIN_SOURCE, LONG, DTWAIN_FLOAT, DTWAIN_FLOAT);
 using CharType = std::remove_cv_t<std::remove_pointer_t<LPCTSTR>>;
 
-static DTWAIN_BOOL SetPDFStringFunc(DTWAIN_SOURCE Source, LONG value, LPCTSTR val1, LPCTSTR val2, SetPDFFn fn)
+namespace
 {
-    const DTWAIN_FLOAT value1 = CharTraits<CharType>::ToDouble(val1);
-    const DTWAIN_FLOAT value2 = CharTraits<CharType>::ToDouble(val2);
-    return fn(Source, value, value1, value2);
+    DTWAIN_BOOL SetPDFStringFunc(DTWAIN_SOURCE Source, LONG value, LPCTSTR val1, LPCTSTR val2, SetPDFFn fn)
+    {
+        const DTWAIN_FLOAT value1 = CharTraits<CharType>::ToDouble(val1);
+        const DTWAIN_FLOAT value2 = CharTraits<CharType>::ToDouble(val2);
+        return fn(Source, value, value1, value2);
+    }
 }
 
 extern "C"
@@ -425,13 +429,18 @@ namespace
         if (Flags & DTWAIN_PDFTEXT_NOABSPOSITION)
             element.stockPosition = Flags & 0x000FFF00;
 
-        if (!pTextElement)
+        auto copyElement = Flags & DTWAIN_PDFTEXT_COPYTEXTELEMENT;
+        if (!pTextElement || (pTextElement && copyElement))
         {
             auto pPtr = std::make_shared<PDFTextElement>();
 
             auto& guidMap = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal())->GetGUIDMap(GUID_PDFTEXTELEMENTS);
             guidMap.Insert(GenerateUUIDv4Impl<std::string>(), pPtr.get());
-
+            if (copyElement && pTextElement)
+            {
+                Flags |= DTWAIN_PDFTEXT_CURRENTPAGE;
+                element = *pTextElement;
+            }
             *pPtr = element;
             // Add to the global list
             auto& globalTextElementList = CTL_StaticData::GetPDFTextElementList();
@@ -443,7 +452,7 @@ namespace
 
             // Set the "has already been displayed" to false
             pPtr->hasBeenDisplayed = false;
-            pPtr->displayFlags = Flags;
+            pPtr->displayFlags = static_cast<int>(Flags);
             return pPtr;
         }
         else
@@ -451,7 +460,7 @@ namespace
             pTextElement->hasBeenDisplayed = false;
             if (pSource)
                 pSource->SetPDFValue(PDFTEXTELEMENTKEY, pTextElement);
-            pTextElement->displayFlags = Flags;
+            pTextElement->displayFlags = static_cast<int>(Flags);
         }
         return pTextElement;
     }
@@ -518,41 +527,6 @@ extern "C"
         auto retVal = DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, val1,
                                         colorRGB, renderMode, val2, val3, val4, val5, Flags);
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-        CATCH_BLOCK_LOG_PARAMS(false)
-    }
-
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source,
-                                                 LPCTSTR szText, 
-                                                 LONG xPos, 
-                                                 LONG yPos,
-                                                 LPCTSTR fontName, 
-                                                 DTWAIN_FLOAT fontSize, 
-                                                 LONG colorRGB,
-                                                 LONG renderMode, 
-                                                 DTWAIN_FLOAT scaling,
-                                                 DTWAIN_FLOAT charSpacing, 
-                                                 DTWAIN_FLOAT wordSpacing,
-                                                 DTWAIN_FLOAT strokeWidth, 
-                                                 DTWAIN_FLOAT rotationAngle,
-                                                 DTWAIN_FLOAT skewAngleX,
-                                                 DTWAIN_FLOAT skewAngleY,
-                                                 DTWAIN_FLOAT scalingX,
-                                                  DTWAIN_FLOAT scalingY,
-                                                 LONG transformType)
-    {
-        LOG_FUNC_ENTRY_PARAMS((Source, szText, xPos, yPos, fontName, fontSize, colorRGB,
-                               renderMode, scaling, charSpacing, wordSpacing, strokeWidth, 
-                               rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType))
-        auto [pHandle, pSource] = VerifyHandles(Source);
-        auto ptrText = GenericAddPDFText(pSource, szText, xPos, yPos, fontName, fontSize, colorRGB,
-                                     renderMode, scaling, charSpacing, wordSpacing, strokeWidth, DTWAIN_PDFTEXT_CURRENTPAGE);
-        ptrText->rotationAngle = rotationAngle;
-        ptrText->skewAngleX = skewAngleX;
-        ptrText->skewAngleY = skewAngleY;
-        ptrText->scalingX = scalingX;
-        ptrText->scalingY = scalingY;
-        ptrText->textTransform = transformType;
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
 
@@ -733,8 +707,9 @@ extern "C"
                 pPtr->renderMode = val1;
             break;
 
-            case DTWAIN_PDFTEXTELEMENT_TRANSFORMORDER:
-                pPtr->textTransform = (std::max<LONG>)(0, (std::min<LONG>)(val1, DTWAIN_PDFTEXTTRANFORM_LAST));
+        case DTWAIN_PDFTEXTELEMENT_TRANSFORMORDER:
+                pPtr->textTransform = std::clamp(pPtr->textTransform, 0U, 
+                                                 static_cast<unsigned int>(DTWAIN_PDFTEXTTRANFORM_LAST));
             break;
 
             default:

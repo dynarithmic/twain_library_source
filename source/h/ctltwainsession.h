@@ -52,7 +52,8 @@ namespace dynarithmic
         static CTL_ITwainSession*  Create(CTL_TwainDLLHandle *pHandle, LPCTSTR pAppName, HWND* hAppWnd);
 
         static void Destroy( CTL_ITwainSessionPtr& pSession );
-
+        static HWND CreateTwainWindow(CTL_TwainDLLHandle* /*pHandle*/, HINSTANCE hInstance/*=nullptr*/, HWND hWndParent);
+        
         CTL_ITwainSession(CTL_TwainDLLHandle* pHandle, LPCTSTR pszAppName, HWND* hAppWnd );
 
         HWND*               GetWindowHandlePtr() const { return const_cast<HWND*>(&m_AppWnd); }
@@ -79,7 +80,7 @@ namespace dynarithmic
         bool                IsAllSourcesRetrieved() const { return m_bAllSourcesRetrieved; }
         void                DestroyOneSource(CTL_ITwainSource *pSource);
         void                DestroyAllSources();
-        CTL_TwainDLLHandle* GetTwainDLLHandle() { return m_pTwainDLLHandle; }
+        CTL_TwainDLLHandle* GetTwainDLLHandle() const { return m_pTwainDLLHandle; }
         void                SetTwainDLLHandle(CTL_TwainDLLHandle* pHandle) { m_pTwainDLLHandle = pHandle; }
         const CTL_TwainSourceSet& GetTwainSources();
         const CTL_TwainSourceSet& GetCurrentTwainSources() const { return m_arrTwainSource; }
@@ -89,7 +90,7 @@ namespace dynarithmic
         virtual ~CTL_ITwainSession();
 
     protected:
-        CTL_ITwainSource* IsSourceSelected( LPCTSTR pPsourceName);
+        CTL_ITwainSource* IsSourceSelected( LPCTSTR pSourceName);
 
         static HWND     CreateTwainWindow();
         bool            IsTwainWindowActive() const;
@@ -110,6 +111,6 @@ namespace dynarithmic
         bool        m_bTwainMessageFlag;
 };
 
-typedef std::vector< CTL_ITwainSessionPtr > CTL_TwainSessionArray;
+using CTL_TwainSessionArray = std::vector< CTL_ITwainSessionPtr >;
 }
 #endif

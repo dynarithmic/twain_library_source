@@ -53,7 +53,7 @@ namespace
             bool* m_pLeaveLoaded = nullptr;
             boost::dll::shared_library* m_pSharedLibrary = nullptr;
             libLoadRAII(boost::dll::shared_library* pSharedLibrary, bool* pLeaveLoaded) :
-                m_pSharedLibrary(pSharedLibrary), m_pLeaveLoaded(pLeaveLoaded) {}
+                m_pLeaveLoaded(pLeaveLoaded), m_pSharedLibrary(pSharedLibrary) {}
             void LeaveLoaded(bool bSet) { *m_pLeaveLoaded = bSet; }
             ~libLoadRAII()
             {

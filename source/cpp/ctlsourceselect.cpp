@@ -32,12 +32,13 @@
 #endif
 #include <dtwainx.h>
 #include <ctlthreadutils.h>
+#include "dtwtype.h"
 
 using namespace dynarithmic;
 using namespace boost::logic;
 namespace stringutils = basicstringutils;
 
-typedef DTWAIN_SOURCE(*SourceFn)(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions&);
+using SourceFn = DTWAIN_SOURCE(*)(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions&);
 static constexpr std::array<std::pair<int, SourceFn>, 4> SourcefnMap = { {{SELECTSOURCE, DTWAIN_LLSelectSource},
                                                         {SELECTDEFAULTSOURCE, DTWAIN_LLSelectDefaultSource},
                                                         {SELECTSOURCEBYNAME, DTWAIN_LLSelectSourceByName},
@@ -53,22 +54,15 @@ namespace
         ~openSourceSaver() { DTWAIN_OpenSourcesOnSelect(m_bSaved); }
     };
 
-    bool SetDefaultSource_Internal(CTL_ITwainSource* pSource, const SourceSelectionOptions& opts)
+    std::pair<bool, int> SetDefaultSource_Internal(CTL_ITwainSource* pSource, const SourceSelectionOptions& opts)
     {
-        bool bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
-        // Load the resources
-        auto* customProfile = CTL_StaticData::GetINIInterface();
+        if (pSource->GetDTWAINHandle()->m_SessionStruct.nSessionType != DTWAIN_TWAINDSM_VERSION2)
+            return { false, DTWAIN_ERR_DSMVERSION_NOTSUPPORTED };
 
-        // see if the default source is saved to the INI file
-        if (opts.setINIToDefault && customProfile && pSource->GetDTWAINHandle()->m_OnSourceOpenProperties.m_bSaveDefaultToINI)
-        {
-            // Set the dtwain*.ini file to the default source
-            customProfile->SetValue(
-                CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
-                CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_DEFAULT_ITEM).data(),
-                pSource->GetProductNameA().c_str());
-        }
-        return bRet;
+        bool bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
+        if (bRet)
+            return { true, DTWAIN_NO_ERROR };
+        return { false, DTWAIN_ERR_TWAIN };
     }
 
     LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOptions& opts)
@@ -111,7 +105,7 @@ namespace
             if (retVal != DTWAIN_NO_ERROR)
             {
                 if ( opts.nWhich == SELECTSOURCEBYNAME )
-                    CTL_TwainAppMgr::SetError(retVal, stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct).c_str(), false);
+                    CTL_TwainAppMgr::SetError(retVal, stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct), false);
                 return nullptr;
             }
             iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, CTL_TwainAppMgr::IsSourceOpen(pSource));
@@ -122,7 +116,8 @@ namespace
         }
 
         if ( !Source && opts.nWhich == SELECTSOURCEBYNAME )
-            CTL_TwainAppMgr::SetError(pHandle->m_lLastError, stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct).c_str(), false);
+            CTL_TwainAppMgr::SetError(pHandle->m_lLastError,
+                                      stringconversion::Convert_NativePtr_To_Ansi(opts.szProduct), false);
         return Source;
     }
 
@@ -155,7 +150,7 @@ namespace
         return {};
     }
 
-    std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
+    std::vector<TCHAR> GetDefaultName(const SelectStruct& selectTraits)
     {
         bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
         bool bAlwaysHighlightFirst = selectTraits.CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST;
@@ -173,7 +168,7 @@ namespace
             if (!bAlwaysHighlightFirst)
             {
                 // Turn off default open temporarily
-                openSourceSaver sourceSaver(selectTraits.pHandle->m_bOpenSourceOnSelect ? true : false);
+                openSourceSaver sourceSaver(selectTraits.pHandle->m_bOpenSourceOnSelect);
                 selectTraits.pHandle->m_bOpenSourceOnSelect = false;
 
                 // Select the default source
@@ -197,7 +192,7 @@ namespace
         return DefName;
     }
 
-    std::vector<CTL_StringType> GetNameList(SelectStruct& pS)
+    std::vector<CTL_StringType> GetNameList(const SelectStruct& pS)
     {
         std::vector<CTL_StringType> vSourceNames;
         // Fill the list box with the sources
@@ -227,7 +222,7 @@ namespace dynarithmic
         // Select a source from the source dialog
         const CTL_ITwainSource *pSource = CTL_TwainAppMgr::SelectSourceDlg( pHandle->m_pTwainSession );
         // Check if a source was selected
-        LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_SOURCE)pSource)
+        LOG_FUNC_EXIT_NONAME_PARAMS(reinterpret_cast<DTWAIN_SOURCE>(const_cast<CTL_ITwainSource*>(pSource)))
         CATCH_BLOCK(nullptr)
     }
 
@@ -446,16 +441,16 @@ extern "C"
         CATCH_BLOCK_LOG_PARAMS(FALSE)
     }
 
-
-
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
     {
         LOG_FUNC_ENTRY_PARAMS((Source))
         auto [pHandle, pSource] = VerifyHandles(Source);
         SourceSelectionOptions sOpts(0,0);
         sOpts.setINIToDefault = pHandle->m_OnSourceOpenProperties.m_bSaveDefaultToINI;
-        bool bRet = SetDefaultSource_Internal(pSource, sOpts);
-        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        auto bRet = SetDefaultSource_Internal(pSource, sOpts);
+        DTWAIN_Check_Error_Condition_NoThrow_Ex(pHandle, [&] 
+            { return !bRet.first; }, bRet.second, false, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet.first)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
 }

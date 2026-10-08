@@ -72,15 +72,18 @@ namespace dynarithmic
                                    TWAINFileFormat_TIFFPIXARLOG              = DTWAIN_TIFFPIXARLOG,
                                    TWAINFileFormat_TIFFPIXARLOGMULTI         = DTWAIN_TIFFPIXARLOGMULTI,
                                    TWAINFileFormat_TIFFNONEMULTI             = DTWAIN_TIFFNONEMULTI,
-                                   TWAINFileFormat_TIFFGROUP3MULTI           = DTWAIN_TIFFG3MULTI, TWAINFileFormat_TIFFGROUP4MULTI
-                                   = DTWAIN_TIFFG4MULTI, TWAINFileFormat_TIFFPACKBITSMULTI         = DTWAIN_TIFFPACKBITSMULTI,
+                                   TWAINFileFormat_TIFFGROUP3MULTI           = DTWAIN_TIFFG3MULTI, 
+                                   TWAINFileFormat_TIFFGROUP4MULTI           = DTWAIN_TIFFG4MULTI, 
+                                   TWAINFileFormat_TIFFPACKBITSMULTI         = DTWAIN_TIFFPACKBITSMULTI,
                                    TWAINFileFormat_TIFFDEFLATEMULTI          = DTWAIN_TIFFDEFLATEMULTI,
-                                   TWAINFileFormat_TIFFJPEGMULTI             = DTWAIN_TIFFJPEGMULTI, TWAINFileFormat_TIFFLZWMULTI
-                                   = DTWAIN_TIFFLZWMULTI, TWAINFileFormat_POSTSCRIPT1               = DTWAIN_POSTSCRIPT1,
-                                   TWAINFileFormat_POSTSCRIPT1MULTI          = DTWAIN_POSTSCRIPT1MULTI, TWAINFileFormat_POSTSCRIPT2
-                                   = DTWAIN_POSTSCRIPT2, TWAINFileFormat_POSTSCRIPT2MULTI          = DTWAIN_POSTSCRIPT2MULTI,
-                                   TWAINFileFormat_POSTSCRIPT3               = DTWAIN_POSTSCRIPT3, TWAINFileFormat_POSTSCRIPT3MULTI
-                                   = DTWAIN_POSTSCRIPT3MULTI,
+                                   TWAINFileFormat_TIFFJPEGMULTI             = DTWAIN_TIFFJPEGMULTI, 
+                                   TWAINFileFormat_TIFFLZWMULTI              = DTWAIN_TIFFLZWMULTI, 
+                                   TWAINFileFormat_POSTSCRIPT1               = DTWAIN_POSTSCRIPT1,
+                                   TWAINFileFormat_POSTSCRIPT1MULTI          = DTWAIN_POSTSCRIPT1MULTI, 
+                                   TWAINFileFormat_POSTSCRIPT2               = DTWAIN_POSTSCRIPT2, 
+                                   TWAINFileFormat_POSTSCRIPT2MULTI          = DTWAIN_POSTSCRIPT2MULTI,
+                                   TWAINFileFormat_POSTSCRIPT3               = DTWAIN_POSTSCRIPT3, 
+                                   TWAINFileFormat_POSTSCRIPT3MULTI          = DTWAIN_POSTSCRIPT3MULTI,
                                    TWAINFileFormat_TEXT                      = DTWAIN_TEXT,
                                    TWAINFileFormat_TEXTMULTI                 = DTWAIN_TEXTMULTI,
                                    TWAINFileFormat_WEBP                      = DTWAIN_WEBP,
@@ -179,6 +182,17 @@ namespace dynarithmic
             TwainRange_STEP,
             TwainRange_DEFAULT,
             TwainRange_CURRENT
+    };
+
+    enum CTL_EnumLayoutComponents {
+        LAYOUT_LEFT,
+        LAYOUT_TOP,
+        LAYOUT_RIGHT,
+        LAYOUT_BOTTOM,
+        LAYOUT_DOCUMENTNUMBER,
+        LAYOUT_FRAMENUMBER,
+        LAYOUT_PAGENUMBER,
+        LAYOUT_NUMCOMPONENTS
     };
 }
 #endif

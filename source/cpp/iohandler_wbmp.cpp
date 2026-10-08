@@ -26,28 +26,31 @@
 
 using namespace dynarithmic;
 
-static bool WriteOneDibHandleToWbmp(const std::wstring& filename, const WbmpSessionOptions& options, HANDLE hDib)
+namespace
 {
-    LockedDibPage lockedPage(hDib);
-    if (!lockedPage.IsValid())
-        return false;
+    bool WriteOneDibHandleToWbmp(const std::wstring& filename, const WbmpSessionOptions& options, HANDLE hDib)
+    {
+        LockedDibPage lockedPage(hDib);
+        if (!lockedPage.IsValid())
+            return false;
 
-    WbmpSessionWriter writer;
-    if (!writer.Open(filename, options))
-        return false;
+        WbmpSessionWriter writer;
+        if (!writer.Open(filename, options))
+            return false;
 
-    auto pageInfo = WbmpSessionWriter::MakePreparedWbmpDibPage(lockedPage.GetView());
-    if (!pageInfo.has_value())
-        return false;
+        auto pageInfo = WbmpSessionWriter::MakePreparedWbmpDibPage(lockedPage.GetView());
+        if (!pageInfo.has_value())
+            return false;
 
-    if (!writer.SetPageInfo(pageInfo.value()))
-        return false;
+        if (!writer.SetPageInfo(pageInfo.value()))
+            return false;
 
-    if (!writer.WriteCurrentPage())
-        return false;
+        if (!writer.WriteCurrentPage())
+            return false;
 
-    writer.Close();
-    return true;
+        writer.Close();
+        return true;
+    }
 }
 
 int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )

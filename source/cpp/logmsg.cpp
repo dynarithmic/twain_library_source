@@ -19,7 +19,6 @@ DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRING
 OF THIRD PARTY RIGHTS.
 */
 #include <windows.h>
-#include "date/date.h"
 #include <ctime>
 #include <cstdio>
 #include <sstream>
@@ -40,7 +39,6 @@ OF THIRD PARTY RIGHTS.
 #include "ctliface.h"
 
 using namespace dynarithmic;
-using namespace date;
 
 /////////////////////////////////////////////////////////////////////////////
 std::mutex CLogSystem::s_logMutex;
@@ -53,7 +51,7 @@ namespace dynarithmic
         const auto currentDateTimeTimeT = std::chrono::system_clock::to_time_t(currentDateTime);
         std::tm currentDateTimeLocalTime = {};
         #ifdef _MSC_VER
-        ::localtime_s(&currentDateTimeLocalTime, &currentDateTimeTimeT);
+        localtime_s(&currentDateTimeLocalTime, &currentDateTimeTimeT);
         #else
         ::localtime_r(&currentDateTimeLocalTime, &currentDateTimeTimeT);
         #endif
@@ -196,7 +194,7 @@ namespace dynarithmic
 
     StdCout_Logger::~StdCout_Logger()
     {
-        ::FreeConsole();
+        FreeConsole();
     }
 }
 
@@ -340,7 +338,7 @@ void CLogSystem::SetDLLHandle(CTL_TwainDLLHandle* pHandle)
     m_pDLLHandle = pHandle;
 }
 
-void CLogSystem::PrintBanner(bool bStarted)
+void CLogSystem::PrintBanner(bool bStarted) const
 {
     std::string LogMsg;
     if (bStarted)
@@ -358,7 +356,7 @@ void CLogSystem::Enable(bool bEnable)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-bool CLogSystem::StatusOutFast(LPCSTR fmt)
+bool CLogSystem::StatusOutFast(LPCSTR fmt) const
 {
     if (!m_bEnable)
         return true;
@@ -367,21 +365,21 @@ bool CLogSystem::StatusOutFast(LPCSTR fmt)
     return true;
 }
 
-bool CLogSystem::WriteOnDemand(std::string_view fmt)
+bool CLogSystem::WriteOnDemand(std::string_view fmt) const
 {
-    std::lock_guard<std::mutex> g(s_logMutex);
+    std::scoped_lock g(s_logMutex);
     for (const auto& m : app_logger_map)
         m.second->trace(fmt);
     return true;
 }
 
-bool CLogSystem::Flush()
+bool CLogSystem::Flush() const
 {
     return WriteOnDemand("");
 }
 /////////////////////////////////////////////////////////////////////////////
 
-std::string CLogSystem::GetBaseName(std::string_view path) const
+std::string CLogSystem::GetBaseName(std::string_view path)
 {
     StringArray rArray;
     filenameutils::SplitPath(path, rArray);
@@ -390,14 +388,14 @@ std::string CLogSystem::GetBaseName(std::string_view path) const
 
 /////////////////////////////////////////////////////////////////////////////
 
-std::string CLogSystem::GetBaseDir(std::string_view path) const
+std::string CLogSystem::GetBaseDir(std::string_view path)
 {
     StringArray rArray;
     filenameutils::SplitPath(path, rArray);
     return rArray[filenameutils::DIRECTORY_POS];
 }
 
-void CLogSystem::OutputDebugStringFull(std::string_view s)
+void CLogSystem::OutputDebugStringFull(std::string_view s) const
 {
     for (const auto& m : app_logger_map)
         m.second->trace(s);

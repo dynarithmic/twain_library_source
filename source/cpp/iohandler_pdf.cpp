@@ -58,9 +58,9 @@ namespace
         }
     };
 
-    typedef std::pair<double, double> PDFPosition;
+    using PDFPosition = std::pair<double, double>;
 
-    typedef std::vector<PDFTextElement> PDFStringToTextElement;
+    using PDFStringToTextElement = std::vector<PDFTextElement>;
 
     struct AllPDFDimensions
     {
@@ -130,15 +130,15 @@ CTL_PDFIOHandler::CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAIN
     m_ImageInfoEx.IsPDF = true;
 }
 
-static char CleanupOCRText1(char ch)
-{
-    if ( !isprint(ch))
-        return ' ';
-    return ch;
-}
-
 namespace
 {
+    char CleanupOCRText1(char ch)
+    {
+        if (!isprint(ch))
+            return ' ';
+        return ch;
+    }
+
     struct OCRTextInfo
     {
         std::vector<LONG> xPos;
@@ -151,7 +151,7 @@ namespace
         std::pair<LONG, LONG> m_ImageDimensions;
         std::pair<double, double> m_PDFScalingFactorForPage;
 
-        void GetCharacterPositionAndHeightInPDF(LONG nChar, PDFPosition& pdfPosition, double& fontHeight, double& fontWidth)
+        void GetCharacterPositionAndHeightInPDF(LONG nChar, PDFPosition& pdfPosition, double& fontHeight, double& fontWidth) const
         {
             double xP = m_RealDimensions.mediabox[2] * xPos[nChar] / m_ImageDimensions.first;  // get PDF x-position of character
             double yP = m_RealDimensions.mediabox[3] * yPos[nChar] / m_ImageDimensions.second; // get PDF y-position of character
@@ -205,7 +205,7 @@ namespace
         DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARYWIDTH, &tInfo.yDim[0], bufSize);
 
         // Get the original bitmap info translated into PDF units
-        const LPBITMAPINFOHEADER pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hBitmap));
+        const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hBitmap));
         DTWAINGlobalHandle_RAII dibHandle(hBitmap);
 
         const double xInches = static_cast<double>(pbi->biXPelsPerMeter) / 39.37;
@@ -219,11 +219,11 @@ namespace
 
         // test scaling of normal PDF page
         AllPDFDimensions pdfdims;
-        auto it = generic_array_finder_if(pdfdims.m_mediamap, [&](const auto& pr) { return pr.first == imageInfoEx.PDFPageSize; });
+        auto it = generic_array_finder_if(AllPDFDimensions::m_mediamap, [&](const auto& pr) { return pr.first == imageInfoEx.PDFPageSize; });
         if (it.first)
         {
             double d1, d2, d3, d4;
-            pdfdims.m_mediamap[it.second].second.GetDimensions(d1, d2, d3, d4);
+            AllPDFDimensions::m_mediamap[it.second].second.GetDimensions(d1, d2, d3, d4);
             tInfo.m_ScaledDimensions.SetDimensions(d1, d2, d3, d4);
         }
         else

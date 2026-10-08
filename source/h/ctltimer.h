@@ -36,8 +36,8 @@ namespace dynarithmic
             }
 
         private:
-            typedef std::chrono::high_resolution_clock clock_;
-            typedef std::chrono::duration<double, std::ratio<1>> second_;
+            using clock_ = std::chrono::high_resolution_clock;
+            using second_ = std::chrono::duration<double, std::ratio<1>>;
             std::chrono::time_point<clock_> beg_;
     };
 }

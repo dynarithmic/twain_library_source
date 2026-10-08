@@ -21,41 +21,32 @@
 #ifndef CTLTR034_H
 #define CTLTR034_H
 
-#include "ctltr010.h"
+#include "ctltr018.h"
+
 namespace dynarithmic
 {
-    class CTL_DeviceEventTriplet : public CTL_TwainTriplet
+    class CTL_ImageMemFileXferTriplet : public CTL_ImageXferTriplet
     {
         public:
-            CTL_DeviceEventTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource)
-            {
-                InitGeneric(pSession, pSource, DG_CONTROL, DAT_DEVICEEVENT, MSG_GET, &m_DeviceEvent);
-                m_bPassed = false;
-            }
+            CTL_ImageMemFileXferTriplet(CTL_ITwainSession *pSession,
+                                        CTL_ITwainSource* pSource,
+                                        TW_UINT32 numBytes,
+                                        bool bHandleMemory = false);
 
-            TW_UINT16 Execute() override
-            {
-                m_bPassed = false;
-                const TW_UINT16 rc = CTL_TwainTriplet::Execute();
-                if (rc != TWRC_SUCCESS)
-                    return rc;
-                m_bPassed = true;
-                return rc;
-            }
+            TW_UINT16           Execute() override;
+            ~CTL_ImageMemFileXferTriplet() override;
+            CTL_ImageMemFileXferTriplet(const CTL_ImageMemFileXferTriplet&) = delete;
+            CTL_ImageMemFileXferTriplet& operator=(const CTL_ImageMemFileXferTriplet&) = delete;
 
-            CTL_DeviceEvent GetDeviceEvent() const
-            {
-                return m_DeviceEvent;
-            }
-
-            bool IsSuccessful() const
-            {
-                return m_bPassed;
-            }
-    
-    private:
-            CTL_DeviceEvent     m_DeviceEvent;
-            bool                m_bPassed;
+        protected:
+            void InitXferBuffer();
+            TW_IMAGEMEMXFER& GetMemXferBuffer() { return m_ImageMemXferBuffer; }
+        private:
+            TW_IMAGEMEMXFER m_ImageMemXferBuffer;
+            TW_UINT32 m_nCompressPos;
+            HANDLE hLocalHandle;
     };
 }
 #endif
+
+

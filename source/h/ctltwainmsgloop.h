@@ -83,8 +83,6 @@ namespace dynarithmic
     class TwainMessageLoopV2 : public TwainMessageLoopWindowsImpl
     {
     public:
-        static std::queue<MSG> s_MessageQueue;
-
         static TW_UINT16 TW_CALLINGSTYLE TwainVersion2MsgProc(
             pTW_IDENTITY pOrigin,
             pTW_IDENTITY pDest,
@@ -95,13 +93,8 @@ namespace dynarithmic
         );
 
         TwainMessageLoopV2(CTL_TwainDLLHandle* pHandle) : TwainMessageLoopWindowsImpl(pHandle) {}
-        void PrepareLoop() override
-        {
-            // remove elements from the queue
-            std::queue<MSG> empty;
-            std::swap(s_MessageQueue, empty);
-        }
-
+        void PrepareLoop() override;
+        
         bool IsSourceOpen(CTL_ITwainSource* pSource) override;
         bool CanEnterDispatch(MSG* pMsg) override { return !DTWAIN_IsTwainMsg(pMsg); }
     };

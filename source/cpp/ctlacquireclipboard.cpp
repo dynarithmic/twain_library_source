@@ -24,6 +24,7 @@
 #include "acquisitionarray.h"
 #include "ctldtwainhandle.h"
 #include "ctltwainlogging.h"
+#include "dtwainx.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -65,7 +66,7 @@ extern "C" DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE So
     DTWAIN_ARRAY aDibs = DTWAIN_CreateAcquisitionArray();
     if (!aDibs)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-    AcquisitionArrayRAII raii(aDibs, true);
+    AcquisitionArrayRAII raii(pHandle, aDibs, true);
 
     int actualAcquireMode = ACQUIREBUFFEREDEX;
     if (nTransferMode == DTWAIN_USENATIVE)

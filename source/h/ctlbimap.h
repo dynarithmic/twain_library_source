@@ -21,7 +21,7 @@
 #ifndef CTLBIMAP_H
 #define CTLBIMAP_H
 
-#include <map>
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -98,8 +98,8 @@ namespace dynarithmic
         const auto& GetRightToLeftMap() const { return right_to_left; }
         const auto& GetLeftToRightMap() const { return left_to_right; }
     private:
-        std::map<Left, Right> left_to_right;
-        std::map<Right, Left> right_to_left;
+        BASIC_MAPTYPE_<Left, Right> left_to_right;
+        BASIC_MAPTYPE_<Right, Left> right_to_left;
     };
 }
 #endif

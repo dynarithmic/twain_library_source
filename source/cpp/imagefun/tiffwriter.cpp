@@ -30,6 +30,10 @@
 #include "tiffwriter.h"
 #include "dtwaindefs.h"
 
+#ifdef _MSC_VER
+    #pragma message ("Using LibTiff version " TIFFLIB_VERSION_STR_MAJ_MIN_MIC)
+#endif
+
 using namespace dynarithmic;
 
 namespace
@@ -486,7 +490,7 @@ bool TiffSessionWriter::SetCompressionTags(const PageTagInfo& tagInfo) const
     {
         TIFFSetField(tif_, TIFFTAG_JPEGQUALITY, currentPageSettings_.jpegQuality);
 
-        uint32_t rowsperstrip = static_cast<uint32_t>(-1);
+        auto rowsperstrip = static_cast<uint32_t>(-1);
         rowsperstrip = TIFFDefaultStripSize(tif_, rowsperstrip);
 
         const uint32_t rem = rowsperstrip % 8;
@@ -565,7 +569,7 @@ bool TiffSessionWriter::WritePixels(const PageTagInfo& tagInfo)
     return true;
 }
 
-std::optional<PreparedTiffDibPage> TiffSessionWriter::MakePreparedTiffDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedTiffDibPage> TiffSessionWriter::MakePreparedTiffDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;
@@ -596,7 +600,7 @@ std::optional<PreparedTiffDibPage> TiffSessionWriter::MakePreparedTiffDibPage(co
 }
 
 std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename, const TiffSessionOptions& sessionOptions, const PreparedTiffDibPage& page,
-        TiffPageSettings settings)
+        const TiffPageSettings& settings)
 {
     if (writer_)
         return { false, DTWAIN_ERR_FILEWRITE };
@@ -612,7 +616,7 @@ std::pair<bool, int> DTWAINTiffOutput::OnFirstPage(const std::wstring& filename,
     return write_page(page, settings);
 }
 
-std::pair<bool, int> DTWAINTiffOutput::OnNextPage(const PreparedTiffDibPage& page, TiffPageSettings settings)
+std::pair<bool, int> DTWAINTiffOutput::OnNextPage(const PreparedTiffDibPage& page, const TiffPageSettings& settings)
 {
     if (!writer_)
         return { false, DTWAIN_ERR_FILEWRITE };

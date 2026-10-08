@@ -42,7 +42,7 @@ namespace dynarithmic
                 // Get the parameters
                 const HWND ThisWnd = GetParent(hWnd);
                 const OPENFILENAME* pofs = reinterpret_cast<OPENFILENAME*>(lParam);
-                CustomPlacement* pCS = reinterpret_cast<CustomPlacement*>(pofs->lCustData);
+                auto pCS = reinterpret_cast<CustomPlacement*>(pofs->lCustData);
                 if (pCS->nOptions & DTWAIN_DLG_CENTER_SCREEN)
                     CenterWindow(ThisWnd, nullptr);
                 else
@@ -59,8 +59,7 @@ namespace dynarithmic
     void RegisterTwainWindowClass()
     {
         CTL_StaticData::GetRegisteredMessage() = ::RegisterWindowMessage(REGISTERED_DTWAIN_MSG);
-        WNDCLASS wndclass;
-        memset(&wndclass, 0, sizeof(WNDCLASS));
+        WNDCLASS wndclass = {};
     #ifdef DTWAIN_LIB
         wndclass.style = 0;
     #else
@@ -135,28 +134,28 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
 {
     switch (fdwReason)
     {
-    case DLL_PROCESS_ATTACH:
-    case DLL_THREAD_ATTACH:
-    {
-        if (fdwReason == DLL_PROCESS_ATTACH)
+        case DLL_PROCESS_ATTACH:
+        case DLL_THREAD_ATTACH:
         {
-            CTL_StaticData::GetLogFilterFlags() = 0;
+            if (fdwReason == DLL_PROCESS_ATTACH)
+            {
+                CTL_StaticData::GetLogFilterFlags() = 0;
+            }
+            CTL_StaticData::SetDLLInstanceHandle(hinstDll);
         }
-        CTL_StaticData::SetDLLInstanceHandle(hinstDll);
-    }
-    return TRUE;
+        return TRUE;
 
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH:
+        case DLL_THREAD_DETACH:
+        case DLL_PROCESS_DETACH:
 
-#ifndef DTWAIN_RETAIL
+    #ifndef DTWAIN_RETAIL
         if (fdwReason == DLL_PROCESS_DETACH)
         {
             DTWAINScopedLogController sLogContoller(0);
             if (GetDTWAINHandle_Internal())
                 DTWAIN_SysDestroy();
         }
-#endif
+    #endif
         return TRUE;
     }
     return TRUE;

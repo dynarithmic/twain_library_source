@@ -1029,7 +1029,7 @@ void InfoObject::ComposeObject()
     }
     else
     {
-        typedef std::pair<std::string, std::string> EncryptedDataPair;
+        using EncryptedDataPair = std::pair<std::string, std::string>;
         std::vector< EncryptedDataPair > AllEncryptedData( 7 );
         AllEncryptedData[0].first = m_sCreator.substr(1, m_sCreator.length() - 2);
         AllEncryptedData[1].first = m_sProducer.substr(1, m_sProducer.length() - 2);
@@ -1138,7 +1138,7 @@ void EncryptionObject::ComposeObject()
         char szLengthBuf[100] = {};
         if (m_bAESEncrypted)
             sprintf(szLengthBuf, " /Length 128");
-        sprintf(szBuf, "/Filter /Standard%s\n", szLengthBuf);;
+        sprintf(szBuf, "/Filter /Standard%s\n", szLengthBuf);
         AppendContents(szBuf);
 
         // Now for the owner and user passwords
@@ -1237,8 +1237,8 @@ void ContentsObject::PreComposeObject()
 
 void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
 {
-    typedef std::pair<int, double> FontPairKey;
-    typedef std::unordered_map<FontPairKey, std::vector<PDFTextElement*>, boost::hash<FontPairKey>> FontToElementMap;
+    using FontPairKey = std::pair<int, double>;
+    using FontToElementMap = BASIC_UNORDERED_MAPTYPE_<FontPairKey, std::vector<PDFTextElement*>, boost::hash<FontPairKey>>;
 
     FontToElementMap fontToElementMap;
 

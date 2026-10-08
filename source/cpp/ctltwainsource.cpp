@@ -18,6 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include <algorithm>
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
@@ -29,7 +30,7 @@
 #include "ctltr001.h"
 #include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
-#include "ctltr038.h"
+#include "ctltr029.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
 #include "tiff.h"
@@ -152,7 +153,6 @@ bool CTL_ITwainSource::IsActive() const
 CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProduct, CTL_TwainDLLHandle* pHandle)
     :
     m_pUserPtr(nullptr),
-    CapCacheInfo(),
     m_bDSMVersion2(false),
     m_bXferReadySent(false),
     m_bIsOpened(false),
@@ -258,8 +258,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_TwainCompliancy(this),
     m_bImageInfoRetrieved(false),
     m_bExtendedImageInfoSupported(false),
-    m_bSupportedCustomCapsRetrieved(false),
     m_bSupportedExtImageInfo(false),
+    m_bSupportedCustomCapsRetrieved(false),
     m_nFeederWaitTime(0),
     m_nFeederWaitTimeOption(DTWAIN_FEEDER_TERMINATE)
 {
@@ -377,7 +377,7 @@ bool CTL_ITwainSource::IsCapabilityCached(TW_UINT16 nCap) const
 
 void CTL_ITwainSource::SetCapCached(TW_UINT16 nCapability, bool bSet)
 {
-    const CachedCapMap::iterator found = m_aCapCache.find(static_cast<TW_UINT16>(nCapability));
+    const auto found = m_aCapCache.find(static_cast<TW_UINT16>(nCapability));
     const TW_UINT16 nVal = nCapability;
     bool bCached = false;
     if (found != m_aCapCache.end())
@@ -386,8 +386,11 @@ void CTL_ITwainSource::SetCapCached(TW_UINT16 nCapability, bool bSet)
     if (bSet && !bCached)
         m_aCapCache[nVal] = true;   // Add to cache
     else
-    if (!bSet && bCached)
-        m_aCapCache.erase(found); // Delete from cache
+    if ( found != m_aCapCache.end())
+    {
+        if (!bSet && bCached)
+            m_aCapCache.erase(found); // Delete from cache
+    }
 }
 
 int CTL_ITwainSource::IsCapSupportedFromCache(TW_UINT16 nCap)
@@ -543,8 +546,7 @@ CTL_TwainDibPtr CTL_ITwainSource::GetDibObject(int nWhich /*=0*/) const
         CTL_TwainDibPtr pDib = m_DibArray->GetAt(nWhich);
         return pDib;
     }
-    else
-        return CTL_TwainDibPtr();
+    return {};
 }
 
 
@@ -622,8 +624,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
 {
     // Get the current page number
     int nCurImage = GetPendingImageNum() - GetBlankPageCount();
-    if ( nCurImage < 0 )
-        nCurImage = 0;
+    nCurImage = std::max(nCurImage, 0);
 
     if ( GetCurrentJobControl() != TWJC_NONE &&
         IsFileTypeMultiPage(m_AcquireFileStatus.GetAcquireFileFormat()) &&
@@ -855,7 +856,7 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
         SetPDFValue(PDFUSERPASSKEY, strUserPassword);
         SetPDFValue(PDFOWNERPASSKEY, strOwnerPassword);
         SetPDFValue(PDFPERMISSIONSKEY, Permissions);
-        m_ImageInfoEx.bUseStrongEncryption = bUseStrongEncryption?true:false;
+        m_ImageInfoEx.bUseStrongEncryption = bUseStrongEncryption;
         m_ImageInfoEx.nPDFKeyLength = bUseStrongEncryption?16:5; // This will be multiplied by 8
         m_ImageInfoEx.bIsPDFEncrypted = true;
     }
@@ -866,17 +867,20 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
     }
 }
 
-static void ClearPDFTextInternal(CTL_TEXTELEMENTMAP::iterator it, PDFTextElement* pElement)
+namespace
 {
-    // See if text element is in set
-    auto& theSet = it->second.first;
-    if (theSet.count(pElement))
+    void ClearPDFTextInternal(CTL_TEXTELEMENTMAP::iterator it, PDFTextElement* pElement)
     {
-        auto& theList = it->second.second;
-        theList.erase(std::remove(theList.begin(), theList.end(), pElement), theList.end());
+        // See if text element is in set
+        auto& theSet = it->second.first;
+        if (theSet.count(pElement))
+        {
+            auto& theList = it->second.second;
+            theList.erase(std::remove(theList.begin(), theList.end(), pElement), theList.end());
+        }
+        theSet.erase(pElement);
+        pElement->vptrTwainSource.erase(it->first);
     }
-    theSet.erase(pElement);
-    pElement->vptrTwainSource.erase(it->first);
 }
 
 void CTL_ITwainSource::ClearPDFTextElements()
@@ -1010,7 +1014,6 @@ void CTL_ITwainSource::AddDuplexFileData(CTL_StringType fName,
 
 sDuplexFileData CTL_ITwainSource::GetDuplexFileData( int nPage, int nWhich ) const
 {
-    sDuplexFileData junk;
     const std::vector<sDuplexFileData> *pData;
     if ( nWhich == 0 )
         pData = &m_DuplexFileData.first;
@@ -1019,7 +1022,7 @@ sDuplexFileData CTL_ITwainSource::GetDuplexFileData( int nPage, int nWhich ) con
 
     if ( nPage < static_cast<int>(pData->size()) )
         return pData->at(nPage);
-    return junk;
+    return {};
 }
 
 void CTL_ITwainSource::RemoveDuplexFileData()
@@ -1088,26 +1091,29 @@ void CTL_ITwainSource::ProcessMultipageFile()
     }
 }
 
-template <typename T>
-static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
+namespace
 {
-    const auto pHandle = pSource->GetDTWAINHandle();
-    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, nCap, static_cast<LONG>(dataArray.size())).second;
-    if (theArray)
+    template <typename T>
+    DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
+    {
+        const auto pHandle = pSource->GetDTWAINHandle();
+        const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, nCap, static_cast<LONG>(dataArray.size())).second;
+        if (theArray)
+        {
+            auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
+            std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny)
+                { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny); });
+        }
+        return theArray;
+    }
+
+    template <typename T>
+    bool PopulateCache(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray, std::vector<anytype_>& dataArray)
     {
         auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
-        std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny)
-                       { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny); });
+        std::transform(vVector.begin(), vVector.end(), std::back_inserter(dataArray), [](typename T::value_type value) { return value; });
+        return true;
     }
-    return theArray;
-}
-
-template <typename T>
-static bool PopulateCache(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray, std::vector<anytype_>& dataArray)
-{
-    auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
-    std::transform(vVector.begin(), vVector.end(), std::back_inserter(dataArray), [](typename T::value_type value){ return value;});
-    return true;
 }
 
 CTL_ITwainSession* CTL_ITwainSource::GetTwainSession() const

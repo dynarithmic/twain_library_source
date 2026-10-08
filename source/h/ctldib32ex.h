@@ -39,7 +39,7 @@ namespace dynarithmic
     struct DTWAINImageInfoEx;
     class CTL_ImageIOHandler;
 
-    typedef std::shared_ptr<CTL_ImageIOHandler> CTL_ImageIOHandlerPtr;
+    using CTL_ImageIOHandlerPtr = std::shared_ptr<CTL_ImageIOHandler>;
     ///////////////////////////////////////////////////////////////////////////////
     class CTL_HBitmap
     {
@@ -167,7 +167,7 @@ namespace dynarithmic
             bool        IsGrayScale() const;
             BlankDIBInfo IsBlankDIB(double threshold) const;
             void        Delete();
-            bool        FlipBitMap(bool bRGB=false);
+            bool        FlipBitMap(bool bRGB=false) const;
 
             // Auto deletion flag
             CTL_TwainDib&  SetAutoDelete(bool bSet=true) {m_bAutoDelete = bSet; return *this; }
@@ -182,8 +182,8 @@ namespace dynarithmic
             // Write a multi-page DIB file
             CTL_ImageIOHandlerPtr WriteFirstPageDibMulti(DTWAINImageInfoEx& ImageInfo, LPCTSTR szFile, int nFormat,
                                                         bool bOpenFile, int fhFile, int &nStatus);
-            int WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int nFormat, int &nStatus, const DTWAINImageInfoEx& ImageInfo);
-            static int WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus, bool bSaveFile=true);
+            int WriteNextPageDibMulti(const CTL_ImageIOHandlerPtr& pImgHandler, int nFormat, int &nStatus, const DTWAINImageInfoEx& ImageInfo);
+            static int WriteLastPageDibMulti(const CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus, bool bSaveFile=true);
 
             // Crop a DIB
             int CropDib(const FloatRect& ActualRect, const FloatRect& RequestedRect,
@@ -232,7 +232,7 @@ namespace dynarithmic
             bool        m_bIsValid;
     };
 
-    typedef std::shared_ptr<CTL_TwainDib> CTL_TwainDibPtr;
+    using CTL_TwainDibPtr = std::shared_ptr<CTL_TwainDib>;
 
     class CTL_TwainDibArray
     {
@@ -246,12 +246,12 @@ namespace dynarithmic
             CTL_TwainDibPtr CreateDib(const CTL_TwainDib& rDib);
 
             // Dib page deletion
-            bool          RemoveDib( CTL_TwainDibPtr pDib);
+            bool          RemoveDib(const CTL_TwainDibPtr& pDib);
             bool          RemoveDib( size_t nWhere );
             bool          RemoveDib( HANDLE hDib );
 
             // Dib memory deletion
-            bool          DeleteDibMemory(CTL_TwainDibPtr Dib);
+            bool          DeleteDibMemory(const CTL_TwainDibPtr& Dib);
             bool          DeleteDibMemory(size_t nWhere ) const;
             bool          DeleteDibMemory(HANDLE hDib );
 

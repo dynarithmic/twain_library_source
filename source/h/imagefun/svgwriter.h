@@ -63,8 +63,8 @@ namespace dynarithmic
 
         private:
             static bool ValidatePage(const PreparedSvgDibPage& page);
-            static bool SaveDIBAsSVGEx(const BITMAPINFOHEADER& bih, const uint8_t* bits, const std::string filename, bool isSVGZ,
-                                       std::string& comment);
+            static bool SaveDIBAsSVGEx(const BITMAPINFOHEADER& bih, const uint8_t* bits, const std::string& filename, bool isSVGZ,
+                                       const std::string& comment);
             PreparedSvgDibPage currentPage_{};
             std::wstring filename_;
             SvgSessionOptions options_{};

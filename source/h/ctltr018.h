@@ -20,75 +20,112 @@
  */
 #ifndef CTLTR018_H
 #define CTLTR018_H
-#include <vector>
+
+#include <string>
+#include "blankpage.h"
 #include "ctltr016.h"
+#include "ctltr019.h"
+#include "ctldib32ex.h"
 namespace dynarithmic
 {
-    template <typename T>
-    class CTL_CapabilitySetRangeTriplet : public CTL_CapabilitySetTriplet<T>
+    struct DTWAINImageInfoEx;
+    class CTL_ImageIOHandler;
+    class ImageXferFileWriter;
+
+    class CTL_ImageXferTriplet : public CTL_ImageTriplet
     {
         public:
-            CTL_CapabilitySetRangeTriplet(CTL_ITwainSession *pSession,
-                                           CTL_ITwainSource* pSource,
-                                           TW_UINT16 sType,
-                                           TW_UINT16  sCap,
-                                           TW_UINT16 TwainType,
-                                           const std::vector<T>& rArray);
+            CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
+                                 CTL_ITwainSource *pSource,
+                                 TW_UINT16 nType);
+
+            HANDLE          GetDibHandle() const;
+
+            TW_UINT16       Execute() override;
+            bool            IsScanPending() const;
+            int             GetTotalScannedPages() const;
+            int             GetTransferType() const;
+            int             PromptAndSaveImage(size_t nImageNum);
+            static CTL_TwainFileFormatEnum GetFileTypeFromCompression(int nCompression);
+            int             GetAcquireFailAction() const { return m_nFailAction; }
+            void            SetAcquireFailAction(int nAction) { m_nFailAction = nAction; }
+            static void     ResolveImageResolution(CTL_ITwainSource *pSource,  DTWAINImageInfoEx* ImageInfo);
+            std::pair<bool, CTL_ImagePendingTriplet> ResetTransfer(TW_UINT16 Msg = MSG_RESET);
 
         protected:
-            TW_UINT16   GetContainerTypeSize() override;
-            size_t      GetAggregateSize() override;
-            TW_UINT16   GetContainerType() override;
-            bool        Encode(const std::vector<T>& rArray, void *pMemBlock) override;
+            struct AbortTraits
+            {
+                bool m_bForceClose = false;
+                bool m_bStopFeeder = false;
+            };
+
+            std::pair<bool, bool> AbortTransfer(AbortTraits bForceClose = {false, false}, int error = 0);
+            std::string     GetPageFileName(const std::string& strBase, int nCurImage ) const;
+            bool            IsPendingXfersDone() const { return m_bPendingXfersDone; }
+            void            SetPendingXfersDone(bool bSet) { m_bPendingXfersDone = bSet; }
+            TW_PENDINGXFERS& GetLocalPendingXferInfo() { return m_PendingXfers; }
+            void            SetLastPendingInfoCode(TW_UINT16 code) { m_lastPendingXferCode = code; }
+            TW_UINT16       GetLastPendingInfoCode() const { return m_lastPendingXferCode; }
+            bool            CancelAcquisition();
+            TW_UINT16       GetPendingCount();
+            bool            FailAcquisition();
+            void            StopAcquisitions(int errfile);
+            bool            StopFeeder();
+            bool            IsJobControlPending(TW_PENDINGXFERS *pPending) const;
+            TW_UINT16       GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UINT16 nMsg=MSG_ENDXFER);
+            CTL_ImageIOHandler *GetImageHandler() const { return m_pImgHandler; }
+            CTL_ImageIOHandler *m_pImgHandler;
+            static bool CropDib(CTL_ITwainSession* pSession,
+                                const CTL_ITwainSource* pSource,
+                                const CTL_TwainDibPtr& CurDib);
+            static bool ResampleDib(CTL_ITwainSession* pSession,
+                                    const CTL_ITwainSource* pSource,
+                                    const CTL_TwainDibPtr& CurDib);
+
+            static bool NegateDib(CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource, const CTL_TwainDibPtr& CurDib);
+            static      BlankDIBInfo IsPageBlank(CTL_ITwainSession* pSession,
+                                    const CTL_ITwainSource* pSource,
+                                    bool resampled,
+                                    const CTL_TwainDibPtr& CurDib);
+
+            void SetBufferedTransfer(bool bSet);
+            bool IsBufferedTransfer() const ;
+
+            int ProcessBlankPage(CTL_ITwainSession* pSession,
+                                 CTL_ITwainSource* pSource,
+                                 const CTL_TwainDibPtr& CurDib,
+                                 bool resampled,
+                                 LONG message_to_send1,
+                                 LONG message_to_send2,
+                                 LONG option_to_test) const;
+
+            void SaveJobPages(const ImageXferFileWriter& FileWriter);
+            bool ModifyAcquiredDib();
+            bool QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, size_t nWhich);
+            bool ResampleAcquiredDib();
+            bool EndTwainUI() const { return m_bEndTwainUI; }
+            void SetEndTwainUI(bool bSet = true) { m_bEndTwainUI = bSet; }
+            HANDLE ProcessUserUpdatingDIB(size_t nLastDib, int notification);
+
+        protected:
+            HANDLE          m_hDataHandle;
+            int             m_nTotalPagesSaved;
+            bool            m_bJobControlPageRecorded;
+            bool            m_bJobMarkerNeedsToBeWritten;
+
+        private:
+            bool            m_bScanPending;
+            int             m_nTotalPages;
+            int             m_nTransferType;
+            int             m_nFailAction;
+            bool            m_bPendingXfersDone;
+            TW_PENDINGXFERS m_PendingXfers;
+            TW_UINT16       m_lastPendingXferCode;
+            HANDLE          m_hDataHandleFromDevice;
+            bool            m_IsBuffered;
+            bool            m_bEndTwainUI;
     };
-
-    template <typename T>
-    CTL_CapabilitySetRangeTriplet<T>::CTL_CapabilitySetRangeTriplet(CTL_ITwainSession* pSession,
-                                                                    CTL_ITwainSource* pSource,
-                                                                    TW_UINT16 sType,
-                                                                    TW_UINT16  sCap,
-                                                                    TW_UINT16 TwainType,
-                                                                    const std::vector<T>& rArray)
-        : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray)
-    {}
-
-
-    template <typename T>
-    TW_UINT16 CTL_CapabilitySetRangeTriplet<T>::GetContainerTypeSize()
-    {
-        return sizeof(TW_RANGE);
-    }
-
-    template <typename T>
-    size_t CTL_CapabilitySetRangeTriplet<T>::GetAggregateSize()
-    {
-        return 0;
-    }
-
-    template <typename T>
-    TW_UINT16 CTL_CapabilitySetRangeTriplet<T>::GetContainerType()
-    {
-        return TWON_RANGE;
-    }
-
-
-    template <typename T>
-    bool CTL_CapabilitySetRangeTriplet<T>::Encode(const std::vector<T>& rArray, void* pMemBlock)
-    {
-        T Data1, Data2, Data3;
-
-        // Get a TW_RANGE structure
-        const pTW_RANGE pVal = static_cast<pTW_RANGE>(pMemBlock);
-        if (rArray.size() >= 3)
-        {
-            Data1 = rArray[0]; // Min value
-            Data2 = rArray[1]; // Max value
-            Data3 = rArray[2]; // Step value
-            CTL_CapabilitySetTripletBase::EncodeRange(pVal, &Data1, &Data2, &Data3);
-            pVal->DefaultValue = TWON_DONTCARE32;
-            return true;
-        }
-        return false;
-    }
 }
 #endif
+
+

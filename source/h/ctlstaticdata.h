@@ -27,6 +27,7 @@
 #include <mutex>
 #include <map>
 #include <vector>
+#include <queue>
 #include <tchar.h>
 #include "ctlstringdefs.h"
 #include "ctlmapdefs.h"
@@ -36,6 +37,7 @@
 #include "pdffont_basic.h"
 #include "ctlfilesavedefs.h"
 #include "dtwaindefs.h"
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -49,10 +51,10 @@ namespace dynarithmic
     {
         std::string m_sImageType;
         std::vector<uint16_t> m_vNoSamples;
-        std::map<uint16_t, uint16_t> m_mapFromTo;
+        BASIC_MAPTYPE_<uint16_t, uint16_t> m_mapFromTo;
     };
 
-    using ImageResamplerMap = std::map<int, ImageResamplerData>;
+    using ImageResamplerMap = BASIC_MAPTYPE_<int, ImageResamplerData>;
 
     struct CTL_StaticDataStruct
     {
@@ -82,6 +84,7 @@ namespace dynarithmic
                INI_TESTGET_ITEM,
                INI_AUTOCLOSEUI_KEY,
                INI_PARSEDELIMS_ITEM,
+               INI_USEEXTERNALRC_ITEM,
                LASTINIENTRY };
 
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
@@ -96,15 +99,13 @@ namespace dynarithmic
         bool                         s_bThrowExceptions = false;
         HINSTANCE                    s_DLLInstance = nullptr;
         uint32_t                     s_logFilterFlags = 0;
-        UINT_PTR                     s_nTimeoutID = 0;
-        UINT                         s_nTimeoutMilliseconds = 0;
         bool                         s_ResourcesInitialized = false;
         bool                         s_bTimerIDSet = false;
         CTL_StringType               s_FileParseDelimiters;
         CTL_UINT16ToInfoMap          s_IntToTwainInfoMap;
         CTL_StringToConstantMap      s_MapStringToConstant;
         CTL_TwainIDToStringMap     s_MapExtendedImageInfo;
-        CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
+        CTL_StringToMapLongToStringMap s_AllLanguageResourcesMap;
         CTL_GeneralResourceInfo         s_ResourceInfo;
         CTL_PDFMediaMap          s_PDFMediaMap;
         CTL_TwainConstantsMap s_TwainConstantsMap;
@@ -146,7 +147,9 @@ namespace dynarithmic
         SourceSheetcountMap      s_SourceSheetcountList;
         SourceToUIAutocloseMap   s_SourceToAutocloseMap;
         CTL_StringType           s_ApplicationName;
-
+        SupportedBitDepthsMap    s_supportedBitDepths;
+        std::queue<MSG>          s_TwainV2MessageQueue;
+        std::pair<bool, bool>    s_EmbeddedResourceStatus = { false, false };
         CTL_StaticDataStruct();
     };
 
@@ -154,102 +157,104 @@ namespace dynarithmic
     {
         static std::mutex               s_mutexInitDestroy;
         static std::unique_ptr<CSimpleIniA>    s_iniInterface;
-        static CTL_StaticDataStruct s_StaticData;
-        static UINT_PTR GetTimeoutID() { return s_StaticData.s_nTimeoutID; }
-        static void SetTimeoutID(UINT_PTR val) { s_StaticData.s_nTimeoutID = val; }
-        static UINT GetTimeoutValue() { return s_StaticData.s_nTimeoutMilliseconds; }
-        static void SetTimeoutValue(UINT value) { s_StaticData.s_nTimeoutMilliseconds = value; }
-        static CTL_ThreadMap& GetThreadMap() { return s_StaticData.s_ThreadMap; }
-        static HFONT& GetDialogFont() { return s_StaticData.s_DialogFont; }
-        static CLogSystem& GetLogger() { return s_StaticData.s_appLog; }
-        static LONG& GetRegisteredMessage() { return s_StaticData.s_nRegisteredDTWAINMsg; }
-        static bool IsResamplingDone() { return s_StaticData.s_bDoResampling;  }
-        static void SetResamplingDone(bool bSet) { s_StaticData.s_bDoResampling = bSet; }
-        static CTL_StringType& GetVersionString() { return s_StaticData.s_VersionString; }
-        static bool IsINIFileLoaded() { return s_StaticData.s_bINIFileLoaded; }
-        static void SetINIFileLoaded(bool bSet) { s_StaticData.s_bINIFileLoaded = bSet; }
-        static CTL_StringType& GetLanguageResourcePath() { return s_StaticData.s_strLangResourcePath; }
-        static CTL_ErrorToExtraInfoMap& GetExtraErrorInfoMap() { return s_StaticData.s_mapExtraErrorInfo; }
-        static CTL_MapThreadToDLLHandle& GetThreadToDLLHandleMap() { return s_StaticData.s_mapThreadToDLLHandle; }
-        static CTL_FileSaveMap& GetFileSaveMap() { return s_StaticData.s_FileSaveMap; }
-        static CTL_CompressionMap& GetCompressionMap() { return s_StaticData.s_CompressionMap; }
-        static bool ResourcesLoaded() { return s_StaticData.s_ResourcesInitialized; }
+        static CTL_StaticDataStruct& Get();
+        static CTL_ThreadMap& GetThreadMap() { return Get().s_ThreadMap; }
+        static HFONT& GetDialogFont() { return Get().s_DialogFont; }
+        static CLogSystem& GetLogger() { return Get().s_appLog; }
+        static LONG& GetRegisteredMessage() { return Get().s_nRegisteredDTWAINMsg; }
+        static bool IsResamplingDone() { return Get().s_bDoResampling;  }
+        static void SetResamplingDone(bool bSet) { Get().s_bDoResampling = bSet; }
+        static CTL_StringType& GetVersionString() { return Get().s_VersionString; }
+        static bool IsINIFileLoaded() { return Get().s_bINIFileLoaded; }
+        static void SetINIFileLoaded(bool bSet) { Get().s_bINIFileLoaded = bSet; }
+        static CTL_StringType& GetLanguageResourcePath() { return Get().s_strLangResourcePath; }
+        static CTL_ErrorToExtraInfoMap& GetExtraErrorInfoMap() { return Get().s_mapExtraErrorInfo; }
+        static CTL_MapThreadToDLLHandle& GetThreadToDLLHandleMap() { return Get().s_mapThreadToDLLHandle; }
+        static CTL_FileSaveMap& GetFileSaveMap() { return Get().s_FileSaveMap; }
+        static CTL_CompressionMap& GetCompressionMap() { return Get().s_CompressionMap; }
+        static bool ResourcesLoaded() { return Get().s_ResourcesInitialized; }
+        static std::pair<bool, bool>& GetEmbeddedResourceStatus() { return Get().s_EmbeddedResourceStatus; }
+        static bool IsTwainInfoEmbedded() { return Get().s_EmbeddedResourceStatus.first; }
+        static bool IsLanguageResourceEmbedded() { return Get().s_EmbeddedResourceStatus.second; }
         static void Reset() 
         { 
             CTL_StaticDataStruct tempStruct; 
-            tempStruct.s_DLLPath = s_StaticData.s_DLLPath;
-            tempStruct.s_DLLParentPath = s_StaticData.s_DLLParentPath;
-            tempStruct.s_DLLInstance = s_StaticData.s_DLLInstance;
-            tempStruct.s_StartupDSMSearchOrder = s_StaticData.s_StartupDSMSearchOrder;
-            tempStruct.s_StartupDSMSearchOrderDir = s_StaticData.s_StartupDSMSearchOrderDir;
-            tempStruct.s_SavedSelectSourcePos = s_StaticData.s_SavedSelectSourcePos;
-            s_StaticData = tempStruct;
+            auto& static_struct = Get();
+            tempStruct.s_DLLPath = static_struct.s_DLLPath;
+            tempStruct.s_DLLParentPath = static_struct.s_DLLParentPath;
+            tempStruct.s_DLLInstance = static_struct.s_DLLInstance;
+            tempStruct.s_StartupDSMSearchOrder = static_struct.s_StartupDSMSearchOrder;
+            tempStruct.s_StartupDSMSearchOrderDir = static_struct.s_StartupDSMSearchOrderDir;
+            tempStruct.s_SavedSelectSourcePos = static_struct.s_SavedSelectSourcePos;
+            tempStruct.s_EmbeddedResourceStatus = { false, false };
+            static_struct = tempStruct;
         }
-        static auto& GetLogFilterFlags() { return s_StaticData.s_logFilterFlags; }
-        static bool IsThrowExceptions() { return s_StaticData.s_bThrowExceptions; }
-        static void SetThrowExceptions(bool bSet) { s_StaticData.s_bThrowExceptions = bSet; }
-        static CTL_UINT16ToInfoMap& GetIntToTwainInfoMap() { return s_StaticData.s_IntToTwainInfoMap; }
-        static int32_t GetExtImageInfoOffset() { return s_StaticData.s_nExtImageInfoOffset; }
-        static void SetExtImageInfoOffset(int32_t offset) { s_StaticData.s_nExtImageInfoOffset = offset; }
-        static CTL_StringToConstantMap& GetStringToConstantMap() { return s_StaticData.s_MapStringToConstant; }
-        static CTL_TwainIDToStringMap& GetExtendedImageInfoMap() { return s_StaticData.s_MapExtendedImageInfo; }
-        static int GetResourceLoadError() { return s_StaticData.s_nLoadingError; }
-        static void SetResourceLoadError(int errNum) { s_StaticData.s_nLoadingError = errNum; }
+        static auto& GetLogFilterFlags() { return Get().s_logFilterFlags; }
+        static bool IsThrowExceptions() { return Get().s_bThrowExceptions; }
+        static void SetThrowExceptions(bool bSet) { Get().s_bThrowExceptions = bSet; }
+        static CTL_UINT16ToInfoMap& GetIntToTwainInfoMap() { return Get().s_IntToTwainInfoMap; }
+        static int32_t GetExtImageInfoOffset() { return Get().s_nExtImageInfoOffset; }
+        static void SetExtImageInfoOffset(int32_t offset) { Get().s_nExtImageInfoOffset = offset; }
+        static CTL_StringToConstantMap& GetStringToConstantMap() { return Get().s_MapStringToConstant; }
+        static CTL_TwainIDToStringMap& GetExtendedImageInfoMap() { return Get().s_MapExtendedImageInfo; }
+        static int GetResourceLoadError() { return Get().s_nLoadingError; }
+        static void SetResourceLoadError(int errNum) { Get().s_nLoadingError = errNum; }
         static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }
-        static CTL_PairToStringMap& GetResourceCache() { return s_StaticData.s_ResourceCache; }
-        static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_StaticData.s_AllLoadedResourcesMap; }
+        static CTL_PairToStringMap& GetResourceCache() { return Get().s_ResourceCache; }
+        static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return Get().s_AllLanguageResourcesMap; }
         static CTL_LongToStringMap* GetLanguageResource(std::string_view sLang);
-        static std::string&         GetCurrentLanguageResourceKey() { return s_StaticData.s_CurrentResourceKey; }
-        static void SetCurrentLanguageResourceKey(const std::string& sLang) { s_StaticData.s_CurrentResourceKey = sLang; }
+        static std::string&         GetCurrentLanguageResourceKey() { return Get().s_CurrentResourceKey; }
+        static void SetCurrentLanguageResourceKey(const std::string& sLang) { Get().s_CurrentResourceKey = sLang; }
         static CTL_LongToStringMap* GetCurrentLanguageResource();
-        static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_StaticData.s_ResourceInfo; }
-        static CTL_PDFMediaMap& GetPDFMediaMap() { return s_StaticData.s_PDFMediaMap; }
-        static CTL_TwainConstantsMap& GetTwainConstantsMap() { return s_StaticData.s_TwainConstantsMap; }
-        static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_StaticData.s_TwainConstantsMap[nWhich]; }
-        static bool IsCheckHandles() { return s_StaticData.s_bCheckHandles; }
-        static void SetCheckHandles(bool bSet) { s_StaticData.s_bCheckHandles = bSet; }
+        static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return Get().s_ResourceInfo; }
+        static CTL_PDFMediaMap& GetPDFMediaMap() { return Get().s_PDFMediaMap; }
+        static CTL_TwainConstantsMap& GetTwainConstantsMap() { return Get().s_TwainConstantsMap; }
+        static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return Get().s_TwainConstantsMap[nWhich]; }
+        static bool IsCheckHandles() { return Get().s_bCheckHandles; }
+        static void SetCheckHandles(bool bSet) { Get().s_bCheckHandles = bSet; }
         static std::pair<bool, TwainConstantType> GetIDFromTwainName(std::string_view sName);
         static constexpr int GetDGResourceID() { return 8890; }
         static constexpr int GetDATResourceID() { return 8891; }
         static constexpr int GetMSGResourceID() { return 8892; }
-        static CTL_StringType& GetResourcePath() { return s_StaticData.s_strResourcePath; }
-        static CTL_StringType& GetDLLPath() { return s_StaticData.s_DLLPath; }
-        static CTL_StringType& GetINIPath() { return s_StaticData.s_sINIPath; }
-        static CTL_StringType& GetStartupDSMSearchOrder() { return s_StaticData.s_StartupDSMSearchOrder; }
-        static CTL_StringType& GetStartupDSMSearchOrderDir() { return s_StaticData.s_StartupDSMSearchOrderDir; }
-        static bool IsUsingMultipleThreads() { return s_StaticData.s_multipleThreads; }
-        static void SetUseMultipleThreads(bool bSet) { s_StaticData.s_multipleThreads = bSet; }
-        static CTL_LongToStringMap& GetErrorCodes() { return s_StaticData.s_ErrorCodes; }
-        static CTL_GeneralCapInfo& GetGeneralCapInfo() { return s_StaticData.s_mapGeneralCapInfo; }
-        static HINSTANCE GetDLLInstanceHandle() { return s_StaticData.s_DLLInstance; }
-        static CTL_GeneralErrorInfo& GetGeneralErrorInfoMap() { return s_StaticData.s_mapGeneralErrorInfo; }
-        static void SetDLLInstanceHandle(HINSTANCE h) { s_StaticData.s_DLLInstance = h; }
-        static ImageResamplerMap& GetImageResamplerMap() { return s_StaticData.s_ImageResamplerMap; }
-        static SourceStatusMap& GetSourceStatusMap() { return s_StaticData.s_SourceStatusMap;  }
-        static CTL_StringType& GetResourceVersion() { return s_StaticData.s_ResourceVersion; }
+        static CTL_StringType& GetResourcePath() { return Get().s_strResourcePath; }
+        static CTL_StringType& GetDLLPath() { return Get().s_DLLPath; }
+        static CTL_StringType& GetINIPath() { return Get().s_sINIPath; }
+        static CTL_StringType& GetStartupDSMSearchOrder() { return Get().s_StartupDSMSearchOrder; }
+        static CTL_StringType& GetStartupDSMSearchOrderDir() { return Get().s_StartupDSMSearchOrderDir; }
+        static bool IsUsingMultipleThreads() { return Get().s_multipleThreads; }
+        static void SetUseMultipleThreads(bool bSet) { Get().s_multipleThreads = bSet; }
+        static CTL_LongToStringMap& GetErrorCodes() { return Get().s_ErrorCodes; }
+        static CTL_GeneralCapInfo& GetGeneralCapInfo() { return Get().s_mapGeneralCapInfo; }
+        static HINSTANCE GetDLLInstanceHandle() { return Get().s_DLLInstance; }
+        static CTL_GeneralErrorInfo& GetGeneralErrorInfoMap() { return Get().s_mapGeneralErrorInfo; }
+        static void SetDLLInstanceHandle(HINSTANCE h) { Get().s_DLLInstance = h; }
+        static ImageResamplerMap& GetImageResamplerMap() { return Get().s_ImageResamplerMap; }
+        static SourceStatusMap& GetSourceStatusMap() { return Get().s_SourceStatusMap;  }
+        static CTL_StringType& GetResourceVersion() { return Get().s_ResourceVersion; }
         static std::pair<bool, CTL_StringType> GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant);
         static std::pair<bool, std::string> GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant);
         static std::pair<bool, std::wstring> GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
-        static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
-        static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
-        static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
-        static std::string& GetAppTitleHTML() { return s_StaticData.s_AppTitleHTML; }
-        static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
-        static auto& GetPDFTextElementList() { return s_StaticData.s_PDFTextElementList; }
-        static auto& GetLogFileSaveThreshold() { return s_StaticData.s_logFileSaveThreshold; }
-        static bool& IsTestForGetMessage() { return s_StaticData.s_bTestGetMessage; }
-        static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_StaticData.s_SourceToXferReadyMap; }
-        static SourceToXferReadyList& GetSourceToXferReadyList() { return s_StaticData.s_SourceToXferReadyList; }
-        static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_StaticData.s_SourceFlatbedOnlyList; }
-        static SourceGetMessageList& GetSourceGetMessageList() { return s_StaticData.s_SourceGetMessageList; }
-        static SourcePaperDetectableMap& GetSourcePaperDetectionMap() { return s_StaticData.s_SourcePaperDetectableMap; }
-        static SourceSheetcountMap& GetSourceSheetcountMap() { return s_StaticData.s_SourceSheetcountList; }
-        static SourceToUIAutocloseMap& GetSourceToUIAutocloseMap() { return s_StaticData.s_SourceToAutocloseMap; }
-        static CTL_StringType& GetFileParseDelimiters() { return s_StaticData.s_FileParseDelimiters; }
-        static CTL_StringType& GetApplicationName() { return s_StaticData.s_ApplicationName;  }
-        static CTL_StringType& GetDLLParentPath() { return s_StaticData.s_DLLParentPath; }
-        static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_StaticData.s_AvailableFileFormatsMap; }
-
+        static auto& GetAppWindowsToDisable() { return Get().s_appWindowsToDisable; }
+        static constexpr std::string_view GetINIKey(int nWhich) { return Get().s_aINIKeys[nWhich].second; }
+        static std::string& GetAppTitle() { return Get().s_AppTitle; }
+        static std::string& GetAppTitleHTML() { return Get().s_AppTitleHTML; }
+        static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return Get().s_SavedSelectSourcePos; }
+        static auto& GetPDFTextElementList() { return Get().s_PDFTextElementList; }
+        static auto& GetLogFileSaveThreshold() { return Get().s_logFileSaveThreshold; }
+        static bool& IsTestForGetMessage() { return Get().s_bTestGetMessage; }
+        static SourceToXferReadyMap& GetSourceToXferReadyMap() { return Get().s_SourceToXferReadyMap; }
+        static SourceToXferReadyList& GetSourceToXferReadyList() { return Get().s_SourceToXferReadyList; }
+        static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return Get().s_SourceFlatbedOnlyList; }
+        static SourceGetMessageList& GetSourceGetMessageList() { return Get().s_SourceGetMessageList; }
+        static SourcePaperDetectableMap& GetSourcePaperDetectionMap() { return Get().s_SourcePaperDetectableMap; }
+        static SourceSheetcountMap& GetSourceSheetcountMap() { return Get().s_SourceSheetcountList; }
+        static SourceToUIAutocloseMap& GetSourceToUIAutocloseMap() { return Get().s_SourceToAutocloseMap; }
+        static CTL_StringType& GetFileParseDelimiters() { return Get().s_FileParseDelimiters; }
+        static CTL_StringType& GetApplicationName() { return Get().s_ApplicationName;  }
+        static CTL_StringType& GetDLLParentPath() { return Get().s_DLLParentPath; }
+        static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return Get().s_AvailableFileFormatsMap; }
+        static SupportedBitDepthsMap& GetSupportedBPPMap() { return Get().s_supportedBitDepths; }
+        static auto& GetTwainV2MessageQueue() { return Get().s_TwainV2MessageQueue; }
     };
 }
 #endif

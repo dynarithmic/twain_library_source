@@ -130,7 +130,7 @@ namespace
     }
 
     // Determine if the selected source name is actually a mapped name
-    CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelectedSourceName)
+    CTL_StringType GetPossibleMappedName(CustomPlacement CS, const TCHAR* szSelectedSourceName)
     {
         if (CS.mapNames.empty())
             return szSelectedSourceName;
@@ -227,7 +227,7 @@ namespace dynarithmic
                                                     reinterpret_cast<DLGPROC>(DisplayTwainDlgProc), reinterpret_cast<LPARAM>(&selectStruct));
         if (bRet == -1)
         {
-            CTL_TwainAppMgr::SetError(DTWAIN_ERR_WIN32_ERROR, LogWin32Error(::GetLastError()).c_str(), false);
+            CTL_TwainAppMgr::SetError(DTWAIN_ERR_WIN32_ERROR, LogWin32Error(GetLastError()), false);
             return {};
         }
 
@@ -262,10 +262,11 @@ namespace dynarithmic
             case WM_INITDIALOG:
             {
                 DTWAINDeviceContextRelease_RAII contextRAII;
-                if (CTL_StaticData::GetDialogFont())
+                HFONT dlgFont = CTL_StaticData::GetDialogFont();
+                if (dlgFont)
                 {
-                    SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_StaticData::GetDialogFont()), 0);
-                    EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_StaticData::GetDialogFont()));
+                    SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(dlgFont), 0);
+                    EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(dlgFont));
                 }
 
                 HWND lstSources;
@@ -300,7 +301,7 @@ namespace dynarithmic
                 lstSources = GetDlgItem(hWnd, IDC_LSTSOURCES);
 
                 // Set the title
-                ::SetWindowTextW(hWnd, pS->CS.sTitle.c_str());
+                SetWindowTextW(hWnd, pS->CS.sTitle.c_str());
 
                 // Fill the list box with the sources
                 auto vValues = pS->getNameListFunc(*pS);
@@ -422,8 +423,8 @@ namespace dynarithmic
                 // Display the window as topmost if topmost flag is on
                 if (pS->CS.nOptions & DTWAIN_DLG_TOPMOSTWINDOW)
                 {
-                    ::SetForegroundWindow(hWnd);
-                    ::SetWindowPos(hWnd,       // handle to window
+                    SetForegroundWindow(hWnd);
+                    SetWindowPos(hWnd,       // handle to window
                         HWND_TOPMOST,  // placement-order handle
                         0,     // horizontal position
                         0,      // vertical position

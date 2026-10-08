@@ -52,7 +52,7 @@ namespace
     }
 }
 
-std::optional<PreparedMetafileDibPage> MetafileSessionWriter::MakePreparedMetafileDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedMetafileDibPage> MetafileSessionWriter::MakePreparedMetafileDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;
@@ -189,7 +189,7 @@ bool MetafileSessionWriter::WriteEmf(const PreparedMetafileDibPage& page) const
     return ret != GDI_ERROR;
 }
 
-bool MetafileSessionWriter::WriteWmfViaEmf(const PreparedMetafileDibPage& page)
+bool MetafileSessionWriter::WriteWmfViaEmf(const PreparedMetafileDibPage& page) const
 {
     HENHMETAFILE hemf = CreateRasterEmfInMemory(page);
     if (!hemf)

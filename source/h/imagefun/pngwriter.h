@@ -100,7 +100,7 @@ namespace dynarithmic
             std::pair<bool,int> WriteCurrentPage();
             void Close();
             bool IsOpen() const noexcept;
-            static std::optional<PreparedPngDibPage> MakePreparedPngDibPage(const dynarithmic::DibPageView& view);
+            static std::optional<PreparedPngDibPage> MakePreparedPngDibPage(const DibPageView& view);
 
         private:
             bool ValidateCurrentPage() const;

@@ -103,6 +103,7 @@ extern "C"
                     std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoMap::value_type& CapInfo)
                                     { vCaps.push_back(std::get<0>(CapInfo)); });
                     MoveArray(pHandle, Array, &ThisArray); 
+                    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*Array))
                     LOG_FUNC_EXIT_NONAME_PARAMS(true)
                 }
             }
@@ -124,8 +125,12 @@ extern "C"
             const bool bFound = !vCaps.empty();
             MoveArray(pHandle, Array, &ThisArray);
             if (bFound)
+            {
+                LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*Array))
                 LOG_FUNC_EXIT_NONAME_PARAMS(true)
+            }
         }
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*Array))
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
@@ -228,6 +233,7 @@ extern "C"
                                            retVal, false, FUNC_MACRO);
 
         // Everything is ok
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*Array))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
@@ -247,6 +253,7 @@ extern "C"
                                           retVal, false, FUNC_MACRO);
 
         // Everything is ok.
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((*Array))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }

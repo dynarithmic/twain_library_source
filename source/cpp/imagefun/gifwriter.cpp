@@ -25,7 +25,7 @@ using namespace dynarithmic;
  // GIF writer
  // Single-image writer for DTWAIN-style first/last-page workflow
  // ============================================================
-std::optional<PreparedGifDibPage> GifSessionWriter::MakePreparedGifPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedGifDibPage> GifSessionWriter::MakePreparedGifPage(const DibPageView& view)
 {
     if (view.bitsPerPixel != 8 || !view.bits)
         return std::nullopt;
@@ -41,7 +41,7 @@ std::optional<PreparedGifDibPage> GifSessionWriter::MakePreparedGifPage(const dy
     page.paletteEntries = view.paletteEntries;
 
     if (view.palette && view.paletteEntries > 0 &&
-        dynarithmic::dib::is_grayscale_palette(view.palette, view.paletteEntries))
+        dib::is_grayscale_palette(view.palette, view.paletteEntries))
     {
         page.pixelFlavor = GifPixelFlavor::Gray8;
     }
@@ -184,15 +184,18 @@ int GifSessionWriter::gif_write_callback(GifFileType* gif, const GifByteType* da
     return static_cast<int>(std::fwrite(data, 1, static_cast<size_t>(length), file));
 }
 
-static void append_metadata_line(std::string& out,const char* key, const std::string& value)
+namespace
 {
-    if (value.empty())
-        return;
+    void append_metadata_line(std::string& out, const char* key, const std::string& value)
+    {
+        if (value.empty())
+            return;
 
-    out += key;
-    out += ": ";
-    out += value;
-    out += "\n";
+        out += key;
+        out += ": ";
+        out += value;
+        out += "\n";
+    }
 }
 
 std::string GifSessionWriter::build_comment_text() const
@@ -210,7 +213,7 @@ std::string GifSessionWriter::build_comment_text() const
     return text;
 }
 
-bool GifSessionWriter::write_comment_extensions()
+bool GifSessionWriter::write_comment_extensions() const
 {
     const std::string text = build_comment_text();
     if (text.empty())

@@ -62,7 +62,7 @@ namespace dynarithmic
     static const constexpr char* EnterString = "==>>";
     static const constexpr char* ExitString = "<<==";
 
-    std::string CTL_LogFunctionCallA(int32_t logFlags, const char* pFuncName, int nWhich, const char* pOptionalString/* = NULL*/)
+    std::string CTL_LogFunctionCallA(uint32_t logFlags, const char* pFuncName, int nWhich, const char* pOptionalString/* = NULL*/)
     {
         if (!(CTL_StaticData::GetLogFilterFlags() & logFlags))
             return {};

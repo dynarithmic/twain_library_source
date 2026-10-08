@@ -22,11 +22,15 @@
 #include "ctlencodeutils.h"
 #include "zlib.h"
 
+#ifdef _MSC_VER
+    #pragma message ("Using ZLib version " ZLIB_VERSION)
+#endif
+
 using namespace dynarithmic;
 
 namespace
 {
-    static void PsRunLengthEncode(std::string_view input, std::string& output)
+    void PsRunLengthEncode(std::string_view input, std::string& output)
     {
         output.clear();
 
@@ -81,7 +85,7 @@ namespace
     }
 }
 
-std::optional<PreparedPsDibPage> PsSessionWriter::MakePreparedPsDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedPsDibPage> PsSessionWriter::MakePreparedPsDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;
@@ -332,7 +336,7 @@ const char* PsSessionWriter::DecodeArray(const PreparedPsDibPage& page) const
     return "[0 1 0 1 0 1]";
 }
 
-bool PsSessionWriter::WriteLevel2Or3Image(const PreparedPsDibPage& page)
+bool PsSessionWriter::WriteLevel2Or3Image(const PreparedPsDibPage& page) const
 {
     const char* colorSpace =
         (page.pixelFlavor == PsPixelFlavor::Bgr24 ||
@@ -386,18 +390,18 @@ bool PsSessionWriter::WriteLevel2Or3Image(const PreparedPsDibPage& page)
     return WriteAscii85ImageData(page);
 }
 
-bool PsSessionWriter::WriteAscii85FlateImageData(const PreparedPsDibPage& page)
+bool PsSessionWriter::WriteAscii85FlateImageData(const PreparedPsDibPage& page) const
 {
     std::string raw;
     if (!BuildRawImageData(page, raw))
         return false;
 
     std::string flate;
-    if (dynarithmic::FlateEncode(std::string_view(raw.data(), raw.size()), flate) != Z_OK)
+    if (FlateEncode(std::string_view(raw.data(), raw.size()), flate) != Z_OK)
         return false;
 
     std::string encoded;
-    if (dynarithmic::ASCII85Encode(std::string_view(flate.data(), flate.size()), encoded) != 1)
+    if (ASCII85Encode(std::string_view(flate.data(), flate.size()), encoded) != 1)
         return false;
 
     if (!encoded.empty())
@@ -770,7 +774,7 @@ bool PsSessionWriter::WriteAscii85ImageData(const PreparedPsDibPage& page) const
         return false;
 
     std::string encoded;
-    if (!dynarithmic::ASCII85Encode(std::string_view(raw.data(), raw.size()), encoded) != 0)
+    if (!ASCII85Encode(std::string_view(raw.data(), raw.size()), encoded) != 0)
         return false;
 
     if (!encoded.empty())
@@ -798,7 +802,7 @@ bool PsSessionWriter::WriteAscii85RunLengthImageData(const PreparedPsDibPage& pa
     PsRunLengthEncode(std::string_view(raw.data(), raw.size()), rle);
 
     std::string encoded;
-    if (!dynarithmic::ASCII85Encode(std::string_view(rle.data(), rle.size()), encoded) != 0)
+    if (!ASCII85Encode(std::string_view(rle.data(), rle.size()), encoded) != 0)
         return false;
 
     if (!encoded.empty())

@@ -23,6 +23,7 @@
 #include "ctldib32ex.h"
 #include "ctlglobalhandletraits.h"
 #include "winbit32.h"
+#include "dtwainx.h"
 
 using namespace dynarithmic;
 

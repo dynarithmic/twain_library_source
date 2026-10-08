@@ -40,30 +40,30 @@ namespace dynarithmic
     class PDFInterface
     {
         public:
-            PdfDocumentPtr DTWLIB_PDFGetNewDocument();
-            bool DTWLIB_PDFOpenNewFile(PdfDocumentPtr pDoc, LPCTSTR szFile);
-            void DTWLIB_PDFSetCompression(PdfDocumentPtr pDoc, bool bCompress);
-            void DTWLIB_PDFSetNameField(PdfDocumentPtr pDoc, int32_t nWhich, const char* szName);
-            bool DTWLIB_PDFStartCreation(PdfDocumentPtr pDoc, int majorv, int minorv);
-            bool DTWLIB_PDFEndCreation(PdfDocumentPtr pDoc);
-            void DTWLIB_PDFSetImageType(PdfDocumentPtr pDoc, int32_t iType);
-            void DTWLIB_PDFSetLongField(PdfDocumentPtr pDoc, int32_t nWhich, int32_t nValue);
-            bool DTWLIB_PDFWritePage(PdfDocumentPtr pDoc, LPCTSTR szPath);
-            void DTWLIB_PDFSetScaling(PdfDocumentPtr pDoc, double xscale, double yscale);
-            void DTWLIB_PDFReleaseDocument(PdfDocumentPtr pDoc);
-            void DTWLIB_PDFSetThumbnailFile(PdfDocumentPtr pDoc, LPCTSTR szPath);
-            void DTWLIB_PDFSetDPI(PdfDocumentPtr pDoc, int32_t dpi);
-            void DTWLIB_PDFSetEncryption(PdfDocumentPtr pDoc, LPCTSTR szOwnerPass,
-                                         LPCTSTR szUserPass, int32_t Permissions,
-                                         bool bUseStrongEncrypt,
-                                         bool bUseAESEncryption,
-                                         uint32_t nKeyLength);
+            static PdfDocumentPtr DTWLIB_PDFGetNewDocument();
+            static bool DTWLIB_PDFOpenNewFile(const PdfDocumentPtr& pDoc, LPCTSTR szFile);
+            static void DTWLIB_PDFSetCompression(const PdfDocumentPtr& pDoc, bool bCompress);
+            static void DTWLIB_PDFSetNameField(const PdfDocumentPtr& pDoc, int32_t nWhich, const char* szName);
+            static bool DTWLIB_PDFStartCreation(const PdfDocumentPtr& pDoc, int majorv, int minorv);
+            static bool DTWLIB_PDFEndCreation(const PdfDocumentPtr& pDoc);
+            static void DTWLIB_PDFSetImageType(const PdfDocumentPtr& pDoc, int32_t iType);
+            static void DTWLIB_PDFSetLongField(const PdfDocumentPtr& pDoc, int32_t nWhich, int32_t nValue);
+            static bool DTWLIB_PDFWritePage(const PdfDocumentPtr& pDoc, LPCTSTR szPath);
+            static void DTWLIB_PDFSetScaling(const PdfDocumentPtr& pDoc, double xscale, double yscale);
+            static void DTWLIB_PDFReleaseDocument(PdfDocumentPtr pDoc);
+            static void DTWLIB_PDFSetThumbnailFile(const PdfDocumentPtr& pDoc, LPCTSTR szPath);
+            static void DTWLIB_PDFSetDPI(const PdfDocumentPtr& pDoc, int32_t dpi);
+            static void DTWLIB_PDFSetEncryption(const PdfDocumentPtr& pDoc, LPCTSTR szOwnerPass,
+                                                LPCTSTR szUserPass, int32_t Permissions,
+                                                bool bUseStrongEncrypt,
+                                                bool bUseAESEncryption,
+                                                uint32_t nKeyLength);
 
-            void DTWLIB_PDFSetASCIICompression(PdfDocumentPtr pDoc, bool bCompression);
-            void DTWLIB_PDFSetNoCompression(PdfDocumentPtr pDoc, bool bCompression);
-            void DTWLIB_PDFSetSearchableText(PdfDocumentPtr pDoc, const char* text);
-            void DTWLIB_PDFAddPageText(PdfDocumentPtr pDoc, PDFTextElement* pElement);
-            void DTWLIB_PDFSetPolarity(PdfDocumentPtr pDoc, int32_t Polarity);
+            static void DTWLIB_PDFSetASCIICompression(const PdfDocumentPtr& pDoc, bool bCompression);
+            static void DTWLIB_PDFSetNoCompression(const PdfDocumentPtr& pDoc, bool bCompression);
+            static void DTWLIB_PDFSetSearchableText(const PdfDocumentPtr& pDoc, const char* text);
+            static void DTWLIB_PDFAddPageText(const PdfDocumentPtr& pDoc, PDFTextElement* pElement);
+            static void DTWLIB_PDFSetPolarity(const PdfDocumentPtr& pDoc, int32_t Polarity);
     };
 
     struct PDFINFO : DibMultiPageData

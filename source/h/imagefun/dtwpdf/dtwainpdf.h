@@ -39,12 +39,12 @@
 #include "ctlmapdefs.h"
 namespace dynarithmic
 {
-    typedef CTL_PDFMediaMap MediaBoxMap;
-    typedef std::map< unsigned int, PDFFont> FontRefToFontInfoMap;
-    typedef std::map< std::string, PDFFont> FontNameToFontInfoMap;
-    typedef std::map< unsigned int, PDFFont> FontNumberToFontInfoMap;
-    typedef std::set< std::string > StringSet;
-    typedef std::vector< std::string > StringVector;
+    using MediaBoxMap = CTL_PDFMediaMap;
+    using FontRefToFontInfoMap = BASIC_MAPTYPE_< unsigned int, PDFFont>;
+    using FontNameToFontInfoMap = BASIC_MAPTYPE_< std::string, PDFFont>;
+    using FontNumberToFontInfoMap = BASIC_MAPTYPE_< unsigned int, PDFFont>;
+    using StringSet = std::set< std::string >;
+    using StringVector = std::vector< std::string >;
 
     class PdfDocument;
     using PdfDocumentPtr = std::shared_ptr<PdfDocument>;
@@ -65,7 +65,7 @@ namespace dynarithmic
             virtual ~PDFObject() { }
             void SetByteOffset(unsigned long byteoffset) { m_byteOffset = byteoffset; }
             void SetASCIIHexCompression(bool bSet) { m_bASCIIHexCompression = bSet; }
-            bool IsASCIICompressed() { return m_bASCIIHexCompression; }
+            bool IsASCIICompressed() const { return m_bASCIIHexCompression; }
             void AssignParent(PdfDocument *pDoc) {m_pParentDoc = pDoc; }
             PdfDocument* GetParent() const { return m_pParentDoc; }
             void SetEncrypted(bool bEncrypted=true) { m_bIsEncrypted = bEncrypted; }
@@ -143,8 +143,8 @@ namespace dynarithmic
             double m_yscale;
     };
 
-    typedef std::map<unsigned long, unsigned long> CRCMapToObj;
-    typedef std::map<unsigned long, unsigned long> CRCMapToPage;
+    using CRCMapToObj = BASIC_MAPTYPE_<unsigned long, unsigned long>;
+    using CRCMapToPage = BASIC_MAPTYPE_<unsigned long, unsigned long>;
 
     class ImageObject : public PDFObject
     {
@@ -261,9 +261,7 @@ namespace dynarithmic
         public:
             PageObject() { }
             PageObject(int objnum) : PDFObject(objnum),
-                                     m_smediabox("[0 0 612 792]"),
-                                     m_orientation(DTWAIN_PDF_PORTRAIT),
-                                     m_bThumbnailImage(false)
+                                     m_smediabox("[0 0 612 792]")
             { }
             void SetMediaBox(std::string_view mediabox) { m_smediabox = mediabox;}
             void SetResourceObjectNum(int nNum) { m_resObjNum = nNum; }
@@ -293,7 +291,7 @@ namespace dynarithmic
             ContentsObject* theContents = nullptr;
             int m_resObjNum = 0;
             unsigned long m_nImageNum = 0;
-            int m_orientation = 0;
+            int m_orientation = DTWAIN_PDF_PORTRAIT;
             bool m_bDuplicateImage = false;
             bool m_bDuplicateThumbImage = false;
             bool m_bThumbnailImage = false;

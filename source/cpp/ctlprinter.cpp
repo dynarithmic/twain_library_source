@@ -141,11 +141,11 @@ extern "C"
         if ( nStrings == 1 )
         {
             // First try one value
-            bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString)?true:false;
+            bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString);
             if ( !bRet )
             // Try enumerations
                 bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
-                                 DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString)?true:false;
+                                 DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString);
             if ( bRet )
             {
                 if ( pNumStrings )
@@ -156,7 +156,7 @@ extern "C"
         {
             // Try enumerations
             bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
-                             DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString)?true:false;
+                             DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString);
             if ( bRet )
             {
                 if ( pNumStrings )
@@ -166,7 +166,7 @@ extern "C"
             {
             //  try one value
                 bRet = SetCapValuesEx2_Internal(pSource, CAP_PRINTERSTRING, DTWAIN_CAPSET,
-                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString)?true:false;
+                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString);
                 if ( bRet )
                 {
                     if ( pNumStrings )
@@ -183,17 +183,4 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
     }
-}
-
-DTWAIN_ARRAY GetPrinterMode(DTWAIN_SOURCE Source, LONG GetType)
-{
-    if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTERMODE) )
-        return nullptr;
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
-    DTWAIN_ARRAY Array = nullptr;
-    const DTWAIN_BOOL bRet = GetCapValuesEx2_Internal(pSource, CAP_PRINTERMODE, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
-    if ( bRet )
-        return Array;
-    DTWAIN_ArrayDestroy(Array);
-    return nullptr;
 }

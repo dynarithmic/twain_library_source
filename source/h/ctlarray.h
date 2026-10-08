@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <iterator>
 #include "dtwtype.h"
 #include "twain.h"
 #include "dtwaindefs.h"
@@ -40,8 +41,8 @@ namespace dynarithmic
     void ArrayCopyWideToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
     void ArrayCopyAnsiToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
     std::shared_ptr<CTL_ArrayFactory>& GetArrayFactoryFromHandle(CTL_TwainDLLHandle* pHandle);
-    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
-    void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(const CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
+    void DestroyArrayFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
 
     template <typename Container, typename DTWAINArrayType>
     static void CopyContainer(CTL_TwainDLLHandle* pHandle, const Container& theContainer, DTWAIN_ARRAY theArray)
@@ -132,6 +133,9 @@ namespace dynarithmic
         bool m_bDestroy;
         DTWAINArrayLowLevel_RAII_Impl() : m_pHandle{}, m_Array{}, m_bDestroy(true) {}
         DTWAINArrayLowLevel_RAII_Impl(CTL_TwainDLLHandle* pHandle, ArrayType a) : m_pHandle(pHandle), m_Array(a), m_bDestroy(true) {}
+        DTWAINArrayLowLevel_RAII_Impl(const DTWAINArrayLowLevel_RAII_Impl&) = delete;
+        DTWAINArrayLowLevel_RAII_Impl& operator=(const DTWAINArrayLowLevel_RAII_Impl&) = delete;
+
         void SetDestroy(bool bSet) { m_bDestroy = bSet; }
         void SetArray(ArrayType arr) { m_Array = arr; }
         void SetHandle(CTL_TwainDLLHandle* pHandle) { m_pHandle = pHandle; }
@@ -161,15 +165,15 @@ namespace dynarithmic
     using DTWAINArrayLowLevelPtr_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY*>;
     using DTWAINArrayPtr_RAII = DTWAINArrayLowLevelPtr_RAII;
 
-    void SetAcquiredImage(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib);
-    void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame);
-    std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
-    DTWAIN_ARRAY CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source);
+    void SetAcquiredImage(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aAcq, LONG nWhichAcq, LONG nWhichDib, HANDLE theDib);
+    void DestroyFrameFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame);
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(const CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
+    DTWAIN_ARRAY CreateArrayCopyFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source);
     DTWAIN_FRAME CreateFrameArray(const CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
     void SetArrayValueFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
     bool MoveArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
     LONG DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
     bool DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain);
-    bool TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil);
+    bool TWFRAMEToDTWAINFRAME(const TW_FRAME& pTwain, DTWAIN_FRAME pDdtwil);
 }
 #endif

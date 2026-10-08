@@ -45,6 +45,17 @@ option(DTWAIN_BUILD_CPP_DEMOS
        OFF)
 
 mark_as_advanced(DTWAIN_BUILD_CPP_DEMOS)
+
+option(DTWAIN_USE_CPP20
+       "Use C++20 instead of C++17 (Visual Studio 2022/2026 only)"
+       OFF)
+
+mark_as_advanced(DTWAIN_USE_CPP20)
+
+if(DTWAIN_USE_CPP20 AND NOT MSVC_TOOLSET_VERSION MATCHES "^(143|145)$")
+    message(FATAL_ERROR
+        "DTWAIN_USE_CPP20 is supported only with Visual Studio 2022 or Visual Studio 2026.")
+endif()
 # -----------------------------------------------------------------------------
 # Boost setup
 # -----------------------------------------------------------------------------
@@ -387,6 +398,9 @@ set(DTWAIN_RESOURCE_FILES
 set(DTWAIN_MISCELLANEOUS_FILES
     ${PROJECT_SOURCE_DIR}/rc/twainresourcestrings_english.rc2
     ${PROJECT_SOURCE_DIR}/rc/resource_verinfo.rc2
+    ${PROJECT_SOURCE_DIR}/rc/dtwain32_ini.rc2
+    ${PROJECT_SOURCE_DIR}/rc/dtwain64_ini.rc2
+    ${PROJECT_SOURCE_DIR}/rc/twaininfo.rc2
 )
 
 set(MAIN_HEADERS 
@@ -407,13 +421,10 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlcapcollect.h
         ${PROJECT_SOURCE_DIR}/h/ctlcapcontainerfuncs.h
         ${PROJECT_SOURCE_DIR}/h/ctlclosesource.h
-        ${PROJECT_SOURCE_DIR}/h/ctlcntry.h
         ${PROJECT_SOURCE_DIR}/h/ctlconstexprfind.h
         ${PROJECT_SOURCE_DIR}/h/ctlconstexprutils.h
-        ${PROJECT_SOURCE_DIR}/h/ctldefsource.h
         ${PROJECT_SOURCE_DIR}/h/ctldevicecontext.h
         ${PROJECT_SOURCE_DIR}/h/ctldevnt.h
-        ${PROJECT_SOURCE_DIR}/h/ctldib.h
         ${PROJECT_SOURCE_DIR}/h/ctldib32.h
         ${PROJECT_SOURCE_DIR}/h/ctldib32ex.h
         ${PROJECT_SOURCE_DIR}/h/ctldtwainhandle.h
@@ -450,10 +461,15 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlthreadutils.h
         ${PROJECT_SOURCE_DIR}/h/ctltimer.h
         ${PROJECT_SOURCE_DIR}/h/ctltimeutils.h
-        ${PROJECT_SOURCE_DIR}/h/ctl10tuple.h
         ${PROJECT_SOURCE_DIR}/h/ctlgetsetcapsinternal.h
         ${PROJECT_SOURCE_DIR}/h/ctltr000.h
         ${PROJECT_SOURCE_DIR}/h/ctltr001.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr002.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr003.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr004.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr005.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr006.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr007.h
         ${PROJECT_SOURCE_DIR}/h/ctltr008.h
         ${PROJECT_SOURCE_DIR}/h/ctltr009.h
         ${PROJECT_SOURCE_DIR}/h/ctltr010.h
@@ -468,6 +484,8 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltr019.h
         ${PROJECT_SOURCE_DIR}/h/ctltr020.h
         ${PROJECT_SOURCE_DIR}/h/ctltr021.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr022.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr023.h
         ${PROJECT_SOURCE_DIR}/h/ctltr024.h
         ${PROJECT_SOURCE_DIR}/h/ctltr025.h
         ${PROJECT_SOURCE_DIR}/h/ctltr026.h
@@ -477,18 +495,10 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctltr030.h
         ${PROJECT_SOURCE_DIR}/h/ctltr031.h
         ${PROJECT_SOURCE_DIR}/h/ctltr032.h
+        ${PROJECT_SOURCE_DIR}/h/ctltr033.h
         ${PROJECT_SOURCE_DIR}/h/ctltr034.h
         ${PROJECT_SOURCE_DIR}/h/ctltr035.h
         ${PROJECT_SOURCE_DIR}/h/ctltr036.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr037.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr038.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr039.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr040.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr041.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr042.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr043.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr044.h
-        ${PROJECT_SOURCE_DIR}/h/ctltr045.h
         ${PROJECT_SOURCE_DIR}/h/ctltripletbase.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaincompliancy.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaindecoder.h
@@ -636,7 +646,6 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlerrorcallback.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlextimageinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlfeed.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctlfileappend.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlfilesave.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlfiletypes.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlfileutils.cpp
@@ -667,6 +676,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlprinter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlresourcestring.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsavefilename.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlsavefiletype.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlselectdialog.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsetgetcaps.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlshowuionly.cpp
@@ -683,30 +693,24 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourcescale.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsourceselect.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsrceoj.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctlstaticdata.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlstringutilsx.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlsupport.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltempdir.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctlthreadutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltiff.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltimeout.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltimeutils.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr008.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr002.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr004.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr005.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr009.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr010.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr011.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr015.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltr016.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr024.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr025.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr026.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr027.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr031.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr035.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr037.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr038.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr040.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr041.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr042.cpp
-  ${PROJECT_SOURCE_DIR}/cpp/ctltr043.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr018.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr023.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr028.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr029.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ctltr034.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltripletbase.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainappinfo.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ctltwainavailable.cpp
@@ -1253,16 +1257,16 @@ set(SIMPLEINI_SOURCES
   ${PROJECT_SOURCE_DIR}/simpleini/SimpleIni.h
   )
 
-set(DATEMASTER_SOURCES
-  ${PROJECT_SOURCE_DIR}/date-master/include/date/date.h
+set(NLOHMANN_SOURCES
+  ${PROJECT_SOURCE_DIR}/nlohmann/json.hpp
+  ${PROJECT_SOURCE_DIR}/nlohmann/json_fwd.hpp
   )
 
+set(WILDCARD_SOURCES
+  ${PROJECT_SOURCE_DIR}/wildcards/wildcards.hpp
+  )
 
 set(TEXT_RESOURCE_FILES
-  ${PROJECT_SOURCE_DIR}/text_resources/dtwain32.ini
-  ${PROJECT_SOURCE_DIR}/text_resources/dtwain64.ini
-  ${PROJECT_SOURCE_DIR}/text_resources/twaininfo.txt
-  ${PROJECT_SOURCE_DIR}/text_resources/twainlanguage.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_cantonese.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_dutch.txt
   ${PROJECT_SOURCE_DIR}/text_resources/twainresourcestrings_english.txt
@@ -1395,7 +1399,9 @@ add_library(dtwain SHARED
     ${ZLIB_SOURCES}
     ${MINIZ_SOURCES}
     ${SIMPLEINI_SOURCES}
-    ${DATEMASTER_SOURCES}
+    ${NLOHMANN_SOURCES}
+    ${WILDCARD_SOURCES}
+
 )
 
 target_link_libraries(dtwain PRIVATE
@@ -1586,7 +1592,11 @@ if(MSVC)
 )
 endif()
 
-target_compile_features(dtwain PRIVATE cxx_std_17)
+if(DTWAIN_USE_CPP20)
+    target_compile_features(dtwain PRIVATE cxx_std_20)
+else()
+    target_compile_features(dtwain PRIVATE cxx_std_17)
+endif()
 
 target_include_directories(dtwain PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -1622,7 +1632,6 @@ set_target_properties(dtwain PROPERTIES
     OUTPUT_NAME "dtwain"
 )
 
-target_compile_features(dtwain PRIVATE cxx_std_17)
 
 target_compile_definitions(dtwain PRIVATE
     $<$<BOOL:${DTWAIN_BUILD_UNICODE}>:UNICODE>
@@ -1677,7 +1686,8 @@ source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${LIBWEBP_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${ZLIB_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${MINIZ_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${SIMPLEINI_SOURCES})
-source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${DATEMASTER_SOURCES})
+source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${NLOHMANN_SOURCES})
+source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${WILDCARD_SOURCES})
 
 if(MSVC)
     if(DTWAIN_USE_DYNAMIC_CRT)

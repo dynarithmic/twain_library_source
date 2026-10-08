@@ -21,110 +21,33 @@
 #ifndef CTLTR028_H
 #define CTLTR028_H
 
-#include <unordered_map>
-#include <algorithm>
-#include "ctltripletbase.h"
-#include "ctlgetsetcapsinternal.h"
-#include "ctlstringutils.h"
-
+#include "ctlstringdefs.h"
+#include "ctltr004.h"
 namespace dynarithmic
 {
-    template <TW_UINT16 GetSetType>
-    class CTL_SetupFileXferTripletImpl : public CTL_TwainTriplet
+    class CTL_FileSystemTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_SetupFileXferTripletImpl(CTL_ITwainSession* pSession,
-                CTL_ITwainSource* pSource,
-                CTL_TwainFileFormatEnum FileFormat,
-                CTL_StringType strFileName
-            ) : m_SetupFileXfer()
-            {
-                SetSessionPtr(pSession);
-                SetSourcePtr(pSource);
-                basicstringutils::SafeStrcpy(m_SetupFileXfer.FileName,
-                    stringconversion::Convert_Native_To_Ansi(strFileName).c_str(),
-                    sizeof m_SetupFileXfer.FileName - 1);
-
-                m_SetupFileXfer.Format = static_cast<TW_UINT16>(FileFormat);
-
-                InitGeneric(pSession, pSource, DG_CONTROL, DAT_SETUPFILEXFER, GetSetType, &m_SetupFileXfer);
-
-                // Set the capability map if this is a set type
-                const bool bIsSet = IsMessageSetType();
-                if (bIsSet)
-                {
-                    m_capMap[ICAP_JPEGPIXELTYPE] = TWPT_BW;
-                    m_capMap[ICAP_JPEGQUALITY] = TWJQ_MEDIUM;
-                    m_capMap[ICAP_COMPRESSION] = TWCP_NONE;
-                    m_capMap[ICAP_JPEGSUBSAMPLING] = TWCP_NONE;
-                }
-            }
-            typedef std::unordered_map<TW_UINT16, LONG> FileXferCapMap;
-
-            struct CapGetter
-            {
-                CTL_ITwainSource* m_pSource;
-                CapGetter(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
-                void operator()(FileXferCapMap::value_type& v) const
-                {
-                    CTL_TwainAppMgr::GetOneTwainCapValue(m_pSource, &v.second, v.first, MSG_GETCURRENT,
-                                                         static_cast<TW_UINT16>(CTL_TwainAppMgr::GetGeneralCapInfo(v.first).m_nDataType));
-                }
-            };
-
-            struct CapSetter
-            {
-                CTL_ITwainSource* m_pSource;
-                CapSetter(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
-                void operator()(const FileXferCapMap::value_type& v) const
-                {
-                    SetOneCapValue(m_pSource, v.first, MSG_SET, v.second, static_cast<TW_UINT16>(CTL_TwainAppMgr::GetGeneralCapInfo(v.first).m_nDataType));
-                }
-            };
-
-            TW_UINT16 Execute() override
-            {
-                const bool bIsSet = IsMessageSetType();
-
-                if (bIsSet)
-                {
-                    // Get the current cap values for each cap we need to know about before setting the file transfer
-                    const CapGetter cg(GetSourcePtr());
-                    std::for_each(m_capMap.begin(), m_capMap.end(), cg);
-                }
-
-                // set up the file xfer
-                const TW_UINT16 rc = CTL_TwainTriplet::Execute();
-
-                // if successful we now set the trailing capabilities we need for file xfer
-                if (rc == TWRC_SUCCESS && bIsSet)
-                {
-                    const CapSetter cs(GetSourcePtr());
-                    std::for_each(m_capMap.begin(), m_capMap.end(), cs);
-                }
-                return rc;
-            }
-
-            CTL_StringType GetFileName() const { return stringconversion::Convert_AnsiPtr_To_Native(m_SetupFileXfer.FileName); }
-            CTL_TwainFileFormatEnum  GetFileFormat() const { return static_cast<CTL_TwainFileFormatEnum>(m_SetupFileXfer.Format); }
+            CTL_FileSystemTriplet(CTL_ITwainSession *pSession,
+                                   CTL_ITwainSource* pSource,
+                                   TW_UINT16 nMsg=MSG_CHANGEDIRECTORY);
+            TW_UINT16 ChangeDirectory(const CTL_StringType& sDir);
+            TW_UINT16 CopyFile(const CTL_StringType& sInput, const CTL_StringType& sOutput);
+            TW_UINT16 CreateDirectory(const CTL_StringType& sDir);
+            TW_UINT16 DeleteFile(const CTL_StringType& sDir, bool bRecursive);
+            TW_UINT16 FormatMedia(const CTL_StringType& sDir);
+            TW_UINT16 GetFirstFile();
+            TW_UINT16 GetClose();
+            TW_UINT16 GetInfo(const CTL_StringType& sDir);
+            TW_UINT16 GetNextFile(TW_MEMREF Context);
+            TW_UINT16 Rename(const CTL_StringType& sInput, const CTL_StringType& sOutput);
+            TW_UINT16 SelectAutoCaptureDirectory(const CTL_StringType& sDir);
+            const TW_FILESYSTEM& GetTWFileSystem() const;
 
         private:
-            FileXferCapMap          m_capMap;
-            TW_SETUPFILEXFER        m_SetupFileXfer;
-    };
-
-    using CTL_GetSetupFileXferTriplet = CTL_SetupFileXferTripletImpl<MSG_GET>;
-    using CTL_GetDefaultSetupFileXferTriplet = CTL_SetupFileXferTripletImpl<MSG_GETDEFAULT>;
-    using CTL_SetSetupFileXferTriplet = CTL_SetupFileXferTripletImpl<MSG_SET>;
-    using CTL_ResetSetupFileXferTriplet = CTL_SetupFileXferTripletImpl<MSG_RESET>;
-
-    class CTL_AudioFileXferTriplet : public CTL_TwainTriplet
-    {
-        public:
-            CTL_AudioFileXferTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : CTL_TwainTriplet()
-            {
-                InitGeneric(pSession, pSource, DG_CONTROL, DAT_AUDIOFILEXFER, MSG_GET, nullptr);
-            }
+            TW_FILESYSTEM  m_FileSystem;
+            TW_UINT16 ChangeDirectoryHelper(const CTL_StringType& sDir, TW_UINT16 Msg);
+            TW_UINT16 ExecuteIt(TW_UINT16 Msg);
     };
 }
 #endif

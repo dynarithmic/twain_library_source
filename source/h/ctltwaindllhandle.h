@@ -45,6 +45,7 @@
 #include "ocrinterface.h"
 #include "ctlinternalconstants.h"
 #include "ctlstaticdata.h"
+#include "mapdefs.h"
 
 namespace dynarithmic
 {
@@ -58,7 +59,7 @@ namespace dynarithmic
     class CTL_TwainDLLHandle
     {
         using OCRInterfaceContainer = std::vector<OCREnginePtr>;
-        using OCRProductNameToEngineMap = std::unordered_map<std::string, OCREnginePtr>;
+        using OCRProductNameToEngineMap = BASIC_UNORDERED_MAPTYPE_<std::string, OCREnginePtr>;
         using CTL_TwainDLLHandlePtr = std::shared_ptr<CTL_TwainDLLHandle>;
 
         public:
@@ -96,6 +97,7 @@ namespace dynarithmic
                 CTL_StringType szProduct;
                 CTL_StringType DSMName;
                 int nSessionType;
+                bool m_bFallbackDSMToLegacy;
                 tagSessionStruct() : nMajorNum(1),
                                      nMinorNum(0),
                                      nLanguage(TWLG_USA),
@@ -109,7 +111,8 @@ namespace dynarithmic
                                      nSessionType(DTWAIN_TWAINDSM_VERSION2)
                                      #else
                                      DSMName(TWAINDLLVERSION_1),
-                                     nSessionType(DTWAIN_TWAINDSM_LEGACY)
+                                     nSessionType(DTWAIN_TWAINDSM_LEGACY),
+                                     m_bFallbackDSMToLegacy(false)
                                      #endif
                                     {}
             };

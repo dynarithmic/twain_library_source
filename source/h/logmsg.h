@@ -27,6 +27,7 @@
 #include <fstream>
 #include <mutex>
 #include "ctlstringdefs.h"
+#include "mapdefs.h"
 
 /////////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
@@ -61,7 +62,7 @@ namespace dynarithmic
             void trace(std::string_view msg) override;
             static BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType);
             StdCout_Logger(const LoggingTraits& lTraits);
-            ~StdCout_Logger();
+            ~StdCout_Logger() override;
     };
 
     class DebugMonitor_Logger final : public CBaseLogger
@@ -83,7 +84,7 @@ namespace dynarithmic
 
         public:
             File_Logger(const LPCSTR filename, const LoggingTraits& fTraits);
-            ~File_Logger();
+            ~File_Logger() override;
             bool isFileCreated() const { return m_bFileCreated; }
             std::string getFileName() const { return m_fileName; }
             int64_t getAutoSaveThreshold() const { return m_autoSaveThreshold; }
@@ -105,7 +106,7 @@ namespace dynarithmic
         enum {FILE_LOGGING, DEBUG_WINDOW_LOGGING, CONSOLE_LOGGING, CALLBACK_LOGGING};
 
        /////////////////////////////////////////////////////////////////////////////
-        std::unordered_map<int, std::shared_ptr<CBaseLogger>> app_logger_map;
+        BASIC_UNORDERED_MAPTYPE_<int, std::shared_ptr<CBaseLogger>> app_logger_map;
         CLogSystem();
        ~CLogSystem() = default;
 
@@ -118,7 +119,7 @@ namespace dynarithmic
 
        /////////////////////////////////////////////////////////////////////////////
        // output text, just like TRACE or printf
-       bool     StatusOutFast(LPCSTR fmt);
+       bool     StatusOutFast(LPCSTR fmt) const;
 
 
        /////////////////////////////////////////////////////////////////////////////
@@ -137,17 +138,17 @@ namespace dynarithmic
        // override the default app name, which is the name the EXE (minus the ".exe")
        void     SetAppName(LPCSTR pName) {m_csAppName = pName;}
 
-       bool     Flush();
+       bool     Flush() const;
 
        bool     SetLogSaveThreshold(int64_t lineCount);
 
-       void     PrintBanner(bool bStarted = true);
+       void     PrintBanner(bool bStarted = true) const;
 
        void DisableLogger(int loggerType);
        void DisableAllLoggers();
 
        std::string GetAppName() const {return m_csAppName;}
-       void OutputDebugStringFull(std::string_view s);
+       void OutputDebugStringFull(std::string_view s) const;
        std::string GetDebugStringFull(std::string_view s);
        void SetDLLHandle(CTL_TwainDLLHandle* pHandle);
        int GetCurrentIndentLevel() const { return m_nCurrentIndentLevel; }
@@ -174,10 +175,10 @@ namespace dynarithmic
 
        /////////////////////////////////////////////////////////////////////////////
        // string utils
-       std::string GetBaseDir(std::string_view path) const;
-       std::string GetBaseName(std::string_view path) const;
+       static std::string GetBaseDir(std::string_view path);
+       static std::string GetBaseName(std::string_view path);
        void GetModuleName(HINSTANCE hInst);
-       bool WriteOnDemand(std::string_view fmt);
+       bool WriteOnDemand(std::string_view fmt) const;
 
        private:
            bool InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, const LoggingTraits& fTraits = {});

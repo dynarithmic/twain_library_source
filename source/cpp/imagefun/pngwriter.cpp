@@ -29,6 +29,7 @@
 #ifdef _MSC_VER
     #pragma warning (disable : 4786)
     #pragma warning (disable : 4611)
+    #pragma message ("Using LibPNG version " PNG_LIBPNG_VER_STRING)
 #endif
 
 using namespace dynarithmic;
@@ -51,7 +52,7 @@ std::optional<PreparedPngDibPage> PngSessionWriter::MakePreparedPngDibPage(const
     {
         case 8:
             if (page.palette && page.paletteEntries > 0 &&
-                !dynarithmic::dib::is_identity_grayscale_palette(page.palette, page.paletteEntries))
+                !dib::is_identity_grayscale_palette(page.palette, page.paletteEntries))
                 page.pixelFlavor = PngPixelFlavor::Palette8;
             else
                 page.pixelFlavor = PngPixelFlavor::Gray8;
@@ -142,18 +143,20 @@ std::pair<bool, int> PngSessionWriter::WriteCurrentPage()
     return { true, DTWAIN_NO_ERROR };
 }
 
-
-static void push_text_chunk(std::vector<png_text>& chunks,const char* key,const std::string& value)
+namespace
 {
-    if (value.empty())
-        return;
+    void push_text_chunk(std::vector<png_text>& chunks, const char* key, const std::string& value)
+    {
+        if (value.empty())
+            return;
 
-    png_text t{};
-    t.compression = PNG_TEXT_COMPRESSION_NONE;
-    t.key = const_cast<png_charp>(key);
-    t.text = const_cast<png_charp>(value.c_str());
-    t.text_length = value.size();
-    chunks.push_back(t);
+        png_text t{};
+        t.compression = PNG_TEXT_COMPRESSION_NONE;
+        t.key = const_cast<png_charp>(key);
+        t.text = const_cast<png_charp>(value.c_str());
+        t.text_length = value.size();
+        chunks.push_back(t);
+    }
 }
 
 void PngSessionWriter::prepare_text_chunks()

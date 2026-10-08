@@ -106,17 +106,17 @@ namespace dynarithmic
         SourceAcquireOptions& setIsUIIOnly(bool bSet) { bIsUIOnly = bSet; return *this; }
         SourceAcquireOptions& setUseClipboard(bool bSet) { bUseClipboard = bSet; return *this; }
         LONG getStatus() const { return return_status; }
-        DTWAIN_SOURCE getSource() { return Source; }
-        DTWAIN_HANDLE getHandle() { return DLLHandle; }
+        DTWAIN_SOURCE getSource() const { return Source; }
+        DTWAIN_HANDLE getHandle() const { return DLLHandle; }
         LONG getPixelType() const { return nPixelType; }
         bool getDiscardDibs() const { return bDiscardDibs; }
         bool getRemainOpen() const { return bRemainOpen; }
         LONG getAcquireType() const { return nOrigAcquireType; }
         bool getIsUIOnly() const { return bIsUIOnly; }
-        DTWAIN_ARRAY getUserArray() { return UserArray; }
+        DTWAIN_ARRAY getUserArray() const { return UserArray; }
         bool getShowUI() const { return bShowUI; }
         LONG getMaxPages() const { return nMaxPages; }
-        DTWAIN_ARRAY getFileList() { return FileList; }
+        DTWAIN_ARRAY getFileList() const { return FileList; }
         LONG getFileFlags() const { return lFileFlags; }
         LONG getFileType() const { return lFileType; }
         LPCTSTR getFileName() const { return lpszFile; }

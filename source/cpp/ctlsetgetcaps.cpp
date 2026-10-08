@@ -228,7 +228,7 @@ namespace
         else
         {
             bOk = SetMultiCapValues<DataType, ConvertFrom, ConverterFn>
-                (DLLHandle, Source, pArray, eType, static_cast<UINT>(lCap), static_cast<TW_UINT16>(lSetType), static_cast<UINT>(lContainerType), true, static_cast<TW_UINT16>(TwainTypeValue)) ? true : false;
+                (DLLHandle, Source, pArray, eType, static_cast<UINT>(lCap), static_cast<TW_UINT16>(lSetType), static_cast<UINT>(lContainerType), true, static_cast<TW_UINT16>(TwainTypeValue));
 
         }
         return bOk;
@@ -462,7 +462,7 @@ namespace dynarithmic
             if ( it1 != pHandle->m_mapDTWAINArrayToTwainType.end() )
             {
                 // Search the array for the Twain Type
-                const std::vector<LONG>::iterator it2 =
+                const auto it2 =
                     std::find(it1->second.begin(), it1->second.end(), nDataType);
                 if ( it2 != it1->second.end())
                     bFoundType = true;
@@ -648,6 +648,23 @@ extern "C"
         else
             bRet = SetCapValuesEx2_Internal(pSource, lCap, lSetType, lContainerType, nDataType, pArray);
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, pCurrentIndex, pDefaultIndex))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        DTWAIN_BOOL bRet = FALSE;
+        auto& capGetInfo = pSource->GetCapGetInfoRef();
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return capGetInfo.ContainerType != TWON_ENUMERATION;} , 
+                DTWAIN_ERR_TWENUMERATOR_NOTUSED, false, FUNC_MACRO, false);
+        if (pCurrentIndex)
+            *pCurrentIndex = capGetInfo.CurrentIndex;
+        if (pDefaultIndex)
+            *pDefaultIndex = capGetInfo.DefaultIndex;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pCurrentIndex, pDefaultIndex))
+        LOG_FUNC_EXIT_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
 }

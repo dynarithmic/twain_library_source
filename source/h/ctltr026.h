@@ -21,111 +21,78 @@
 #ifndef CTLTR026_H
 #define CTLTR026_H
 
-#include <string>
-#include "blankpage.h"
-#include "ctltr024.h"
-#include "ctltr027.h"
-#include "ctldib32ex.h"
+#include "ctltr007.h"
+
 namespace dynarithmic
 {
-    struct DTWAINImageInfoEx;
-    class CTL_ImageIOHandler;
-    class ImageXferFileWriter;
-
-    class CTL_ImageXferTriplet : public CTL_ImageTriplet
+    class CTL_CapabilityQueryTriplet : public CTL_CapabilityGetOneValTriplet
     {
         public:
-            CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
-                                 CTL_ITwainSource *pSource,
-                                 TW_UINT16 nType);
-
-            HANDLE          GetDibHandle() const;
-
-            TW_UINT16       Execute() override;
-            bool            IsScanPending() const;
-            int             GetTotalScannedPages() const;
-            int             GetTransferType() const;
-            int             PromptAndSaveImage(size_t nImageNum);
-            static CTL_TwainFileFormatEnum GetFileTypeFromCompression(int nCompression);
-            int             GetAcquireFailAction() const { return m_nFailAction; }
-            void            SetAcquireFailAction(int nAction) { m_nFailAction = nAction; }
-            static void     ResolveImageResolution(CTL_ITwainSource *pSource,  DTWAINImageInfoEx* ImageInfo);
-            std::pair<bool, CTL_ImagePendingTriplet> ResetTransfer(TW_UINT16 Msg = MSG_RESET);
-
-        protected:
-            struct AbortTraits
+            CTL_CapabilityQueryTriplet(CTL_ITwainSession *pSession,
+                                       CTL_ITwainSource *pSource,
+                                       TW_UINT16 gCap,
+                                       TW_UINT16 TwainType=0xFFFF) :
+                       CTL_CapabilityGetOneValTriplet(pSession, pSource, MSG_QUERYSUPPORT, gCap, TwainType)
             {
-                bool m_bForceClose = false;
-                bool m_bStopFeeder = false;
-            };
+                TW_CAPABILITY *pCap = GetCapabilityBuffer();
+                pCap->Cap = gCap;
+                pCap->ConType = TWON_ONEVALUE;
+                pCap->hContainer = nullptr;
+                m_lCapSupport = 0;
+            }
 
-            std::pair<bool, bool> AbortTransfer(AbortTraits bForceClose = {false, false}, int error = 0);
-            std::string     GetPageFileName(const std::string& strBase, int nCurImage ) const;
-            bool            IsPendingXfersDone() const { return m_bPendingXfersDone; }
-            void            SetPendingXfersDone(bool bSet) { m_bPendingXfersDone = bSet; }
-            TW_PENDINGXFERS& GetLocalPendingXferInfo() { return m_PendingXfers; }
-            void            SetLastPendingInfoCode(TW_UINT16 code) { m_lastPendingXferCode = code; }
-            TW_UINT16       GetLastPendingInfoCode() const { return m_lastPendingXferCode; }
-            bool            CancelAcquisition();
-            TW_UINT16       GetPendingCount();
-            bool            FailAcquisition();
-            void            StopAcquisitions(int errfile);
-            bool            StopFeeder();
-            bool            IsJobControlPending(TW_PENDINGXFERS *pPending) const;
-            TW_UINT16       GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UINT16 nMsg=MSG_ENDXFER);
-            CTL_ImageIOHandler *GetImageHandler() const { return m_pImgHandler; }
-            CTL_ImageIOHandler *m_pImgHandler;
-            static bool CropDib(CTL_ITwainSession* pSession,
-                                const CTL_ITwainSource* pSource,
-                                const CTL_TwainDibPtr& CurDib);
-            static bool ResampleDib(CTL_ITwainSession* pSession,
-                                    const CTL_ITwainSource* pSource,
-                                    const CTL_TwainDibPtr& CurDib);
+            TW_UINT16  Execute() override
+            {
+                const TW_UINT16 rc = CTL_CapabilityGetOneValTriplet::Execute();
+                if ( rc == TWRC_SUCCESS )
+                    GetValue(nullptr);
+                return rc;
+            }
 
-            static bool NegateDib(CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource, const CTL_TwainDibPtr& CurDib);
-            static      BlankDIBInfo IsPageBlank(CTL_ITwainSession* pSession,
-                                    const CTL_ITwainSource* pSource,
-                                    bool resampled,
-                                    const CTL_TwainDibPtr& CurDib);
+            bool            IsGet() const
+                            { return m_lCapSupport & TWQC_GET?true:false; }
 
-            void SetBufferedTransfer(bool bSet);
-            bool IsBufferedTransfer() const ;
+            bool            IsGetDefault() const
+                            { return m_lCapSupport & TWQC_GETDEFAULT?true:false; }
 
-            int ProcessBlankPage(CTL_ITwainSession* pSession,
-                                 CTL_ITwainSource* pSource,
-                                 const CTL_TwainDibPtr& CurDib,
-                                 bool resampled,
-                                 LONG message_to_send1,
-                                 LONG message_to_send2,
-                                 LONG option_to_test) const;
+            bool            IsGetCurrent() const
+                            { return m_lCapSupport & TWQC_GETCURRENT ? true : false; }
 
-            void SaveJobPages(const ImageXferFileWriter& FileWriter);
-            bool ModifyAcquiredDib();
-            bool QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, size_t nWhich);
-            bool ResampleAcquiredDib();
-            bool EndTwainUI() const { return m_bEndTwainUI; }
-            void SetEndTwainUI(bool bSet = true) { m_bEndTwainUI = bSet; }
-            HANDLE ProcessUserUpdatingDIB(size_t nLastDib, int notification);
+            bool            IsSet() const
+                            { return m_lCapSupport & TWQC_SET?true:false; }
+
+            bool            IsReset() const
+                            { return m_lCapSupport & TWQC_RESET?true:false; }
+
+            bool            IsSetConstraint() const
+                            { return m_lCapSupport & TWQC_SETCONSTRAINT ? true : false;}
+
+            bool            IsAnySupport() const
+                            { return m_lCapSupport?true:false; }
+
+            UINT            GetSupport() const { return static_cast<UINT>(m_lCapSupport); }
 
         protected:
-            HANDLE          m_hDataHandle;
-            int             m_nTotalPagesSaved;
-            bool            m_bJobControlPageRecorded;
-            bool            m_bJobMarkerNeedsToBeWritten;
+            bool    GetValue( void *pData, size_t nWhere=0 ) override
+            {
+                return true;
+            }
+
+            bool    EnumCapValues( void *pCapData ) override
+            {
+                const bool bRetVal = CTL_CapabilityGetOneValTriplet::EnumCapValues(pCapData);
+
+                if (bRetVal)
+                {
+                    // dereference to a TW_ENUMERATION structure
+                    auto pValOne = static_cast<pTW_ONEVALUE>(pCapData);
+                    m_lCapSupport = pValOne->Item;
+                }
+                return bRetVal;
+            }
 
         private:
-            bool            m_bScanPending;
-            int             m_nTotalPages;
-            int             m_nTransferType;
-            int             m_nFailAction;
-            bool            m_bPendingXfersDone;
-            TW_PENDINGXFERS m_PendingXfers;
-            TW_UINT16       m_lastPendingXferCode;
-            HANDLE          m_hDataHandleFromDevice;
-            bool            m_IsBuffered;
-            bool            m_bEndTwainUI;
+            TW_UINT32   m_lCapSupport;
     };
 }
 #endif
-
-

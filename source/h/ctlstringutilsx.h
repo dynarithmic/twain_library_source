@@ -27,6 +27,7 @@
 #include <array>
 
 #include "ctlconstexprfind.h"
+#include "ctlstringutils.h"
 
 namespace dynarithmic
 {

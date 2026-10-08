@@ -29,7 +29,7 @@ namespace dynarithmic
     {
         public:
             CTL_PngIOHandler() { SetSaveArgs(); }
-            CTL_PngIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib), m_ImageInfoEx(ImageInfoEx)
+            CTL_PngIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib), m_ImageInfoEx(ImageInfoEx)
             {
                 SetSaveArgs();
             }

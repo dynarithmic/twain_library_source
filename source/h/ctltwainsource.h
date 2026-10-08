@@ -27,7 +27,7 @@
 #include <map>
 
 #include "ctlarray.h"
-#include "ctldib.h"
+#include "ctldib32.h"
 #include "ctlenum.h"
 #include "dtwtype.h"
 #include "ctldevnt.h"
@@ -52,10 +52,10 @@ namespace dynarithmic
         ~SourceCloserRAII();
     };
 
-    typedef BASIC_MAPTYPE_<TW_UINT16, short int> CapToStateMap;
-    typedef std::set<TW_UINT16> CapList;
-    typedef std::vector<TW_UINT16> JobControlList;
-    typedef std::vector<TW_INFO> TWINFOVector;
+    using CapToStateMap = BASIC_MAPTYPE_<TW_UINT16, short int>;
+    using CapList = std::set<TW_UINT16>;
+    using JobControlList = std::vector<TW_UINT16>;
+    using TWINFOVector = std::vector<TW_INFO>;
 
     class CTL_TwainDLLHandle;
     class CTL_ITwainSource;
@@ -71,10 +71,10 @@ namespace dynarithmic
     using CTL_ITwainSessionPtr = std::unique_ptr<CTL_ITwainSession>;
 
     class CTL_TwainDib;
-    typedef std::shared_ptr<CTL_TwainDib> CTL_TwainDibPtr;
+    using CTL_TwainDibPtr = std::shared_ptr<CTL_TwainDib>;
 
     class CTL_ImageIOHandler;
-    typedef std::shared_ptr<CTL_ImageIOHandler> CTL_ImageIOHandlerPtr;
+    using CTL_ImageIOHandlerPtr = std::shared_ptr<CTL_ImageIOHandler>;
 
     enum SourceState {SOURCE_STATE_CLOSED=3,
                       SOURCE_STATE_OPENED=4,
@@ -93,12 +93,11 @@ namespace dynarithmic
         sDuplexFileData() : nBytes(0), bIsJobControlPage(false), m_pSource{} {}
     };
 
-    typedef  std::pair<
+    using DuplexData = std::pair<
              std::vector<sDuplexFileData>,
-             std::vector<sDuplexFileData> > DuplexData;
+             std::vector<sDuplexFileData>>;
 
-    #define COMPRESSIONMAP_TYPE std::map
-    using SourceCompressionMap = COMPRESSIONMAP_TYPE<int, COMPRESSIONMAP_TYPE<int, std::vector<LONG>>>;
+    using SourceCompressionMap = BASIC_MAPTYPE_<int, BASIC_MAPTYPE_<int, std::vector<LONG>>>;
 
     struct AcquireFileStatus
     {
@@ -128,6 +127,28 @@ namespace dynarithmic
             void  SetAcquireFileFormat(CTL_TwainFileFormatEnum file_format) { m_nFileFormat = file_format; }
     };
 
+    struct CapGetInfo
+    {
+        LONG Capability = 0;
+        LONG GetType = 0;
+        LONG ContainerType = 0;
+        LONG DataType = 0;
+        TW_UINT32 NumItems = 0;
+
+        // TW_ENUMERATION
+        LONG CurrentIndex = 0;
+        LONG DefaultIndex = 0;
+        bool HasEnumInfo = false;
+
+        // TW_RANGE
+        double MinValue = 0;
+        double MaxValue = 0;
+        double StepSize = 0;
+        double DefaultValue = 0;
+        double CurrentValue = 0;
+        bool HasRangeInfo = false;
+    };
+
     class CTL_ITwainSource
     {
         struct container_values
@@ -136,7 +157,7 @@ namespace dynarithmic
             std::vector<anytype_> m_data;
         };
 
-        typedef BASIC_MAPTYPE_<TW_UINT16, container_values> CapToValuesMap;
+        using CapToValuesMap = BASIC_MAPTYPE_<TW_UINT16, container_values>;
         CapToValuesMap m_capToValuesMap_G;
         CapToValuesMap m_capToValuesMap_GD;
         SourceCompressionMap m_CompressionMap;
@@ -177,15 +198,15 @@ namespace dynarithmic
         TW_UINT16    GetProtocolMajor() const { return m_SourceId.get_protocol_major(); }
         TW_UINT16    GetProtocolMinor() const { return m_SourceId.get_protocol_minor(); }
         TW_UINT32    GetSupportedGroups() const { return m_SourceId.get_supported_groups(); }
-#ifdef UNICODE
+        #ifdef _UNICODE
         CTL_StringType GetManufacturer() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_manufacturer()); }
         CTL_StringType GetProductFamily() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_product_family()); }
         CTL_StringType GetProductName() const { return stringconversion::Convert_Ansi_To_Native(m_SourceId.get_product_name()); }
-#else
+        #else
         CTL_StringType GetManufacturer() const { return m_SourceId.get_manufacturer(); }
         CTL_StringType GetProductFamily() const { return m_SourceId.get_product_family(); }
         CTL_StringType GetProductName() const { return m_SourceId.get_product_name(); }
-#endif
+        #endif
         std::string GetManufacturerA() const { return m_SourceId.get_manufacturer(); }
         std::string GetProductFamilyA() const { return m_SourceId.get_product_family(); }
         std::string GetProductNameA() const { return m_SourceId.get_product_name(); }
@@ -273,7 +294,7 @@ namespace dynarithmic
         bool         IsOpenAfterAcquire() const { return m_bOpenAfterAcquire; }
 
         // Controls whether to reopen the source if it has been closed
-        bool         IsReopenAfterAcquire() const { return !m_bOpenAfterAcquire ? true : false; }
+        bool         IsReopenAfterAcquire() const { return !m_bOpenAfterAcquire; }
         int          GetMaxAcquisitions() const { return m_nMaxAcquisitions; }
         void         SetMaxAcquisitions(int nMax) { m_nMaxAcquisitions = nMax; }
         int          GetUIMaxAcquisitions() const { return m_nUIMaxAcquisitions; }
@@ -554,7 +575,10 @@ namespace dynarithmic
         bool        IsUseAutocloseUI() const { return m_bAutocloseUI; }
         AcquireFileStatus& GetAcquireFileStatusRef() { return m_AcquireFileStatus; }
         AcquireFileStatus GetAcquireFileStatus() const { return m_AcquireFileStatus; }
-        ExtendedImageInformation* GetExtendedImageInfo() { return m_pExtendedImageInformation.get(); }
+        CapGetInfo& GetCapGetInfoRef() { return m_CapGetInfo; }
+        CapGetInfo GetCapGetInfo() const { return m_CapGetInfo; }
+
+        ExtendedImageInformation* GetExtendedImageInfo() const { return m_pExtendedImageInformation.get(); }
         void        SetFeederWaitTime(int waitTime) { m_nFeederWaitTime = waitTime; }
         int         GetFeederWaitTime() const noexcept { return m_nFeederWaitTime; }
         int         GetFeederWaitTimeOption() const noexcept { return m_nFeederWaitTimeOption; }
@@ -576,27 +600,8 @@ namespace dynarithmic
         void SetDibHandleProc(HANDLE hDib, size_t nWhich, bool bCreatePalette) const;
 
     private:
-
-        struct tagCapCacheInfo {
-                double Contrast;
-                double Brightness;
-                double XResolution;
-                double YResolution;
-                double XNativeResolution;
-                int    PixelFlavor;
-                int    BitDepth;
-                int    PixelType;
-                unsigned int UseContrast:1;
-                unsigned int UseBrightness:1;
-                unsigned int UseXResolution:1;
-                unsigned int UseYResolution:1;
-                unsigned int UsePixelFlavor:1;
-                unsigned int UseXNativeResolution:1;
-                unsigned int UseBitDepth:1;
-                unsigned int UsePixelType:1;
-            } CapCacheInfo;
-
         AcquireFileStatus m_AcquireFileStatus;
+        CapGetInfo m_CapGetInfo;
         bool            m_bDSMVersion2;
         bool            m_bXferReadySent;
         bool            m_bIsOpened;
@@ -704,14 +709,10 @@ namespace dynarithmic
         SourceAcquireOptions m_acquireOptions;
         HANDLE m_UpdatedDIB = nullptr;
 
-        struct tagCapCachInfo {
-            TW_UINT16 nCap;
-            bool      m_bSupported;
-        };
-        typedef BASIC_MAPTYPE_<TW_UINT16, bool> CachedCapMap;
+        using CachedCapMap = BASIC_MAPTYPE_<TW_UINT16, bool>;
 
         public:
-            typedef BASIC_MAPTYPE_<int, std::set<int> > CachedPixelTypeMap;
+            using CachedPixelTypeMap = BASIC_MAPTYPE_<int, std::set<int> >;
             void        AddPixelTypeAndBitDepth(int PixelType, int BitDepth);
             CachedPixelTypeMap::iterator FindPixelType(int PixelType);
             bool IsBitDepthSupported(int PixelType, int BitDepth);

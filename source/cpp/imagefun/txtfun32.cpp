@@ -51,7 +51,7 @@ bool CTextImageHandler::CloseOutputFile()
     return true;
 }
 
-int CTextImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo/*=NULL*/)
+int CTextImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo/*=nullptr*/)
 {
     return WriteImage(ptrHandler, 0, 0, 0, 0, 0, nullptr, const_cast<LPTSTR>(path)); 
 }
@@ -128,12 +128,12 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         // OK, now convert DIB to the correct file type -- only do this if the input format
         // is not DIB
         if ( m_InputFormat == DTWAIN_BMP)
-            m_pTextPageInfo->m_pOrigHandler.reset(new CTL_BmpIOHandler(m_pDib, m_ImageInfoEx));
+            m_pTextPageInfo->m_pOrigHandler = std::make_shared<CTL_BmpIOHandler>(m_pDib, m_ImageInfoEx);
         else
         if ( IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(m_InputFormat)))
         {
             m_ImageInfoEx.IsOCRTempImage = true;
-            m_pTextPageInfo->m_pOrigHandler.reset(new CTL_TiffIOHandler(m_pDib, m_InputFormat, m_ImageInfoEx));
+            m_pTextPageInfo->m_pOrigHandler = std::make_shared<CTL_TiffIOHandler>(m_pDib, m_InputFormat, m_ImageInfoEx);
         }
         m_pTextPageInfo->szTempFile = szTempPath;
 
@@ -185,14 +185,14 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
     return 0; 
 }
 
-int CTextImageHandler::WriteTempFile()
+int CTextImageHandler::WriteTempFile() const
 {
     m_pTextPageInfo->m_pOrigHandler->SetDib(m_pDib);
     const int retval = m_pTextPageInfo->m_pOrigHandler->WriteBitmap(m_pTextPageInfo->szTempFile.c_str(), true, 0);
     return retval;
 }
 
-int CTextImageHandler::SaveOCR()
+int CTextImageHandler::SaveOCR() const
 {
     // Now OCR the file and save to the text file specified by user
     const LONG bRet = m_pOCREngine->StartOCR(m_pTextPageInfo->szTempFile);

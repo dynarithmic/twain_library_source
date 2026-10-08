@@ -28,9 +28,9 @@ namespace dynarithmic
     template <typename T, int enumType = 0>
     struct CTL_EnumeratorNode
     {
-        typedef std::vector<T>  container_base_type;
-        typedef container_base_type* container_pointer_type;
-        typedef typename container_base_type::iterator container_iterator_type;
+        using container_base_type = std::vector<T>;
+        using container_pointer_type = container_base_type*;
+        using container_iterator_type = typename container_base_type::iterator;
         int m_EnumType;
         container_base_type m_Array;
         CTL_EnumeratorNode(int nSize) : m_EnumType(enumType), m_Array(nSize) {}

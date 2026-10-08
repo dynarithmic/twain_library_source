@@ -26,11 +26,12 @@
 #include "versioninfo.h"
 #include "ctlfileutils.h"
 #include "errorcheck.h"
-#include "ctliface.h"
 
 #ifdef VERSINFO_STANDALONE
 using namespace VersionInformation;
 #endif
+
+using namespace dynarithmic;
 
 TOCRSDK::TOCRSDK()
         : TOCRInitialise(nullptr),
@@ -56,17 +57,20 @@ TOCRSDK::TOCRSDK()
 {
 }
 
-static CTL_StringType GetTOCRDLLName()
+namespace
 {
-    // Load the resources
-    auto *customProfile = CTL_StaticData::GetINIInterface();
-    const char* defName = "Transym";
-    if ( customProfile )
-        defName = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_OCRLIBRARY_KEY).data(), defName);
-    auto val = stringconversion::Convert_AnsiPtr_To_Native(defName);
-    if (val.empty())
-        val = _T("TOCRDLL.DLL");
-    return val;
+    CTL_StringType GetTOCRDLLName()
+    {
+        // Load the resources
+        auto* customProfile = CTL_StaticData::GetINIInterface();
+        const char* defName = "Transym";
+        if (customProfile)
+            defName = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_OCRLIBRARY_KEY).data(), defName);
+        auto val = stringconversion::Convert_AnsiPtr_To_Native(defName);
+        if (val.empty())
+            val = _T("TOCRDLL.DLL");
+        return val;
+    }
 }
 
 HMODULE TOCRSDK::InitTOCR()
@@ -80,25 +84,25 @@ HMODULE TOCRSDK::InitTOCR()
         return nullptr;
     }
 
-    TOCRInitialise       =  (TOCRINITIALIZEFUNC      )GetProcAddress(m_hMod, "TOCRInitialise");
-    TOCRShutdown         =  (TOCRSHUTDOWNFUNC        )GetProcAddress(m_hMod, "TOCRShutdown");
-    TOCRGetErrorMode     =  (TOCRGETERRORMODEFUNC    )GetProcAddress(m_hMod, "TOCRGetErrorMode");
-    TOCRSetErrorMode     =  (TOCRSETERRORMODEFUNC    )GetProcAddress(m_hMod, "TOCRSetErrorMode");
-    TOCRDoJob            =  (TOCRDOJOBFUNC           )GetProcAddress(m_hMod, "TOCRDoJob");
-    TOCRWaitForJob       =  (TOCRWAITFORJOBFUNC      )GetProcAddress(m_hMod, "TOCRWaitForJob");
-    TOCRWaitForAnyJob    =  (TOCRWAITFORANYJOBFUNC   )GetProcAddress(m_hMod, "TOCRWaitForAnyJob");
-    TOCRGetJobDBInfo     =  (TOCRGETJOBDBINFOFUNC    )GetProcAddress(m_hMod, "TOCRGetJobDBInfo");
-    TOCRGetJobStatus     =  (TOCRGETJOBSTATUSFUNC    )GetProcAddress(m_hMod, "TOCRGetJobStatus");
-    TOCRGetJobStatusEx   =  (TOCRGETJOBSTATUSEXFUNC  )GetProcAddress(m_hMod, "TOCRGetJobStatusEx");
-    TOCRGetJobStatusMsg  =  (TOCRGETJOBSTATUSMSGFUNC )GetProcAddress(m_hMod, "TOCRGetJobStatusMsg");
-    TOCRGetNumPages      =  (TOCRGETNUMPAGESFUNC     )GetProcAddress(m_hMod, "TOCRGetNumPages");
-    TOCRGetJobResults    =  (TOCRGETJOBRESULTSFUNC   )GetProcAddress(m_hMod, "TOCRGetJobResults");
-    TOCRGetJobResultsEx  =  (TOCRGETJOBRESULTSEXFUNC )GetProcAddress(m_hMod, "TOCRGetJobResultsEx");
-    TOCRGetLicenceInfo   =  (TOCRGETLICENCEINFOFUNC  )GetProcAddress(m_hMod, "TOCRGetLicenceInfo");
-    TOCRConvertTIFFtoDIB =  (TOCRCONVERTTIFFTODIBFUNC)GetProcAddress(m_hMod, "TOCRConvertTIFFtoDIB");
-    TOCRRotateMonoBitmap =  (TOCRROTATEMONOBITMAPFUNC)GetProcAddress(m_hMod, "TOCRRotateMonoBitmap");
-    TOCRConvertFormat    =  (TOCRCONVERTFORMATFUNC   )GetProcAddress(m_hMod, "TOCRConvertFormat");
-    TOCRGetLicenceInfoEx =  (TOCRGETLICENCEINFOEXFUNC)GetProcAddress(m_hMod, "TOCRGetLicenceInfoEx");
+    TOCRInitialise       =  reinterpret_cast<TOCRINITIALIZEFUNC>(GetProcAddress(m_hMod, "TOCRInitialise"));
+    TOCRShutdown         =  reinterpret_cast<TOCRSHUTDOWNFUNC>(GetProcAddress(m_hMod, "TOCRShutdown"));
+    TOCRGetErrorMode     =  reinterpret_cast<TOCRGETERRORMODEFUNC>(GetProcAddress(m_hMod, "TOCRGetErrorMode"));
+    TOCRSetErrorMode     =  reinterpret_cast<TOCRSETERRORMODEFUNC>(GetProcAddress(m_hMod, "TOCRSetErrorMode"));
+    TOCRDoJob            =  reinterpret_cast<TOCRDOJOBFUNC>(GetProcAddress(m_hMod, "TOCRDoJob"));
+    TOCRWaitForJob       =  reinterpret_cast<TOCRWAITFORJOBFUNC>(GetProcAddress(m_hMod, "TOCRWaitForJob"));
+    TOCRWaitForAnyJob    =  reinterpret_cast<TOCRWAITFORANYJOBFUNC>(GetProcAddress(m_hMod, "TOCRWaitForAnyJob"));
+    TOCRGetJobDBInfo     =  reinterpret_cast<TOCRGETJOBDBINFOFUNC>(GetProcAddress(m_hMod, "TOCRGetJobDBInfo"));
+    TOCRGetJobStatus     =  reinterpret_cast<TOCRGETJOBSTATUSFUNC>(GetProcAddress(m_hMod, "TOCRGetJobStatus"));
+    TOCRGetJobStatusEx   =  reinterpret_cast<TOCRGETJOBSTATUSEXFUNC>(GetProcAddress(m_hMod, "TOCRGetJobStatusEx"));
+    TOCRGetJobStatusMsg  =  reinterpret_cast<TOCRGETJOBSTATUSMSGFUNC>(GetProcAddress(m_hMod, "TOCRGetJobStatusMsg"));
+    TOCRGetNumPages      =  reinterpret_cast<TOCRGETNUMPAGESFUNC>(GetProcAddress(m_hMod, "TOCRGetNumPages"));
+    TOCRGetJobResults    =  reinterpret_cast<TOCRGETJOBRESULTSFUNC>(GetProcAddress(m_hMod, "TOCRGetJobResults"));
+    TOCRGetJobResultsEx  =  reinterpret_cast<TOCRGETJOBRESULTSEXFUNC>(GetProcAddress(m_hMod, "TOCRGetJobResultsEx"));
+    TOCRGetLicenceInfo   =  reinterpret_cast<TOCRGETLICENCEINFOFUNC>(GetProcAddress(m_hMod, "TOCRGetLicenceInfo"));
+    TOCRConvertTIFFtoDIB =  reinterpret_cast<TOCRCONVERTTIFFTODIBFUNC>(GetProcAddress(m_hMod, "TOCRConvertTIFFtoDIB"));
+    TOCRRotateMonoBitmap =  reinterpret_cast<TOCRROTATEMONOBITMAPFUNC>(GetProcAddress(m_hMod, "TOCRRotateMonoBitmap"));
+    TOCRConvertFormat    =  reinterpret_cast<TOCRCONVERTFORMATFUNC>(GetProcAddress(m_hMod, "TOCRConvertFormat"));
+    TOCRGetLicenceInfoEx =  reinterpret_cast<TOCRGETLICENCEINFOEXFUNC>(GetProcAddress(m_hMod, "TOCRGetLicenceInfoEx"));
 
     if (!TOCRInitialise ||
         !TOCRShutdown       ||
@@ -135,7 +139,7 @@ TOCRSDK::~TOCRSDK()
 
 #define INIT_TOCR_ERROR_CODE(x) m_ErrorCode[x] = #x;
 ///////////////////////////////////////////////////////////////////
-TransymOCR::TransymOCR(CTL_TwainDLLHandle* DLLHandle) : OCREngine(DLLHandle), m_JobHandle{}, m_JobInfo{}, m_nJobRetrieveType{}, m_JobResults{}
+TransymOCR::TransymOCR(CTL_TwainDLLHandle* DLLHandle) : OCREngine(DLLHandle), m_JobInfo{}, m_nJobRetrieveType{}, m_JobHandle{}, m_JobResults{}
 {
     INIT_TOCR_ERROR_CODE(TOCRERR_ILLEGALJOBNO)
     INIT_TOCR_ERROR_CODE(TOCRERR_FAILLOCKDB)
@@ -482,7 +486,7 @@ void TransymOCR::SetAvailableCaps()
             { DTWAIN_OCRCV_REMOVECONTROLCHARS, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", nullptr, false }
         };
 
-        const int numCaps = sizeof capsLongInfo / sizeof capsLongInfo[0];
+        constexpr int numCaps = sizeof capsLongInfo / sizeof capsLongInfo[0];
 
         std::vector<LONG> fArray;
         for (int i = 0; i < numCaps; ++i )

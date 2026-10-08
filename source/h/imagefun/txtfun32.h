@@ -47,13 +47,13 @@ namespace dynarithmic
     class CTextImageHandler : public CDibInterface
     {
         public:
-            CTextImageHandler(DTWAINImageInfoEx &ImageInfoEx, OCREngine* pEngine, LONG inputFormat,
+            CTextImageHandler(const DTWAINImageInfoEx &ImageInfoEx, OCREngine* pEngine, LONG inputFormat,
                                 CTL_TwainDib* pDib) :
+                                     m_bWriteOk(true),
                                      m_ImageInfoEx(ImageInfoEx),
                                      m_pOCREngine(pEngine),
                                      m_InputFormat(inputFormat),
-                                     m_pDib(pDib),
-                                     m_bWriteOk(true) {}
+                                     m_pDib(pDib) {}
             // Virtual interface
             int     WriteGraphicFile(CTL_ImageIOHandler *pHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo = nullptr)  override;
             int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht,
@@ -67,8 +67,8 @@ namespace dynarithmic
             bool OpenOutputFile(LPCTSTR pFileName) override;
             bool CloseOutputFile() override;
             void DestroyAllObjects() override;
-            int WriteTempFile();
-            int SaveOCR();
+            int WriteTempFile() const;
+            int SaveOCR() const;
 
         private:
             bool m_bWriteOk;

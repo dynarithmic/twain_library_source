@@ -26,15 +26,15 @@
 #include <algorithm>
 #include <memory>
 #include "arrayfactory.h"
+#include "ctltr006.h"
+#include "ctltr007.h"
+#include "ctltr008.h"
+#include "ctltr009.h"
+#include "ctltr010.h"
+#include "ctltr011.h"
 #include "ctltr012.h"
 #include "ctltr013.h"
 #include "ctltr014.h"
-#include "ctltr015.h"
-#include "ctltr016.h"
-#include "ctltr017.h"
-#include "ctltr018.h"
-#include "ctltr019.h"
-#include "ctltr020.h"
 #include "ctltwaindllhandle.h"
 #include "ctlstringconversion.h"
 #define USE_NORMALSTRINGS  1
@@ -186,14 +186,6 @@ namespace dynarithmic
                              UINT      nContainerTypes,
                              TW_UINT16  nDataType,
                              std::vector<T> &rArray
-                            );
-    template <typename T>
-    bool SetCapabilityValues( const CTL_ITwainSource *pSource,
-                             TW_UINT16  nCap,
-                             TW_UINT16 SetType,
-                             UINT      nContainerTypes,
-                             TW_UINT16  nDataType,
-                             std::vector<T> &rArray
                             )
     {
         auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
@@ -267,16 +259,6 @@ namespace dynarithmic
                         BOOL bUseStrings,
                         AssignType *pAssign,
                         TW_UINT16 TwainDataType
-                        );
-
-    template <class TwainType, class AssignType>
-    std::pair<bool, int> GetOneCapValue( DTWAIN_HANDLE DLLHandle,
-                        DTWAIN_SOURCE Source,
-                        TW_UINT16 nCap,
-                        TW_UINT16 GetType,
-                        BOOL bUseStrings,
-                        AssignType *pAssign,
-                        TW_UINT16 TwainDataType
                         )
     {
         CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
@@ -314,7 +296,7 @@ namespace dynarithmic
     template <typename T>
     bool SetOneCapValue( DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT16 nCap, TW_UINT16 SetType, T dValue,TW_UINT16 nDataType)
     {
-        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
+        auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
         if ( !p )
             return false;
         return SetOneCapValue(p, nCap, SetType, dValue, nDataType);
@@ -363,8 +345,8 @@ namespace dynarithmic
                                     )
         {
             UNUSED_PARAM(TT);
-            CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
-            CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle*>(DLLHandle);
+            auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
+            auto pHandle = static_cast<CTL_TwainDLLHandle*>(DLLHandle);
 
             if ( !p )
                 return false;
@@ -521,8 +503,8 @@ namespace dynarithmic
                           TW_UINT16 OriginalTwainType
                           )
     {
-        CTL_ITwainSource* p = reinterpret_cast<CTL_ITwainSource*>(Source);
-        CTL_TwainDLLHandle*  pHandle = static_cast<CTL_TwainDLLHandle*>(DLLHandle);
+        auto p = reinterpret_cast<CTL_ITwainSource*>(Source);
+        auto pHandle = static_cast<CTL_TwainDLLHandle*>(DLLHandle);
 
         if ( !p )
             return false;

@@ -40,86 +40,88 @@ using namespace dynarithmic;
 
 
 // Lower level routines
-static FloatRect Normalize(const dib::LockedDib& hDib, const FloatRect& ActualRect, const FloatRect& RequestedRect,
-                           int sourceunit, int destunit, int dpi)
+namespace
 {
-    static constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
-                                                                      {DTWAIN_TWIPS, 1440.0},
-                                                                      {DTWAIN_POINTS, 72.0},
-                                                                      {DTWAIN_PICAS, 6.0},
-                                                                      {DTWAIN_CENTIMETERS, 2.54}} };
-    const UINT32 width = hDib.Width();
-
-    // Set up a return rect
-    FloatRect fRect = RequestedRect;
-
-    // Check dimensions
-    if (fabs(ActualRect.right - ActualRect.left) < 1.0)
-        return fRect;
-
-    const UINT32 pitch = hDib.Pitch(); 
-    if (pitch == 0)
-        return fRect;
-
-    const auto iterSourceUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == sourceunit; });
-    const auto iterDestUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == destunit; });
-
-    // If not found return the original rect
-    if (!iterSourceUnit.first || !iterDestUnit.first)
-        return fRect;
-
-    auto actualSourceUnit = Measurement[iterSourceUnit.second].second;
-    auto actualDestUnit = Measurement[iterDestUnit.second].second;
-
-    // Convert Actual rect to pixels
-    double PixelsPerInch = dpi;
-    switch (sourceunit)
+    FloatRect Normalize(const dib::LockedDib& hDib, const FloatRect& ActualRect, const FloatRect& RequestedRect,
+                    int sourceunit, int destunit, int dpi)
     {
-        case DTWAIN_PIXELS:
-            break;
+        constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
+                                                                          {DTWAIN_TWIPS, 1440.0},
+                                                                          {DTWAIN_POINTS, 72.0},
+                                                                          {DTWAIN_PICAS, 6.0},
+                                                                          {DTWAIN_CENTIMETERS, 2.54}} };
+        const UINT32 width = hDib.Width();
 
-        case DTWAIN_INCHES:
-        case DTWAIN_TWIPS:
-        case DTWAIN_CENTIMETERS:
-        case DTWAIN_POINTS:
-        case DTWAIN_PICAS:
+        // Set up a return rect
+        FloatRect fRect = RequestedRect;
+
+        // Check dimensions
+        if (fabs(ActualRect.right - ActualRect.left) < 1.0)
+            return fRect;
+
+        const UINT32 pitch = hDib.Pitch();
+        if (pitch == 0)
+            return fRect;
+
+        const auto iterSourceUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == sourceunit; });
+        const auto iterDestUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == destunit; });
+
+        // If not found return the original rect
+        if (!iterSourceUnit.first || !iterDestUnit.first)
+            return fRect;
+
+        auto actualSourceUnit = Measurement[iterSourceUnit.second].second;
+        auto actualDestUnit = Measurement[iterDestUnit.second].second;
+
+        // Convert Actual rect to pixels
+        double PixelsPerInch = dpi;
+        switch (sourceunit)
         {
-            const double NumInches = (ActualRect.right - ActualRect.left) / actualSourceUnit;
-            PixelsPerInch = static_cast<double>(width) / NumInches;
-        }
-        break;
-    }
+            case DTWAIN_PIXELS:
+                break;
 
-    switch (destunit)
-    {
-        case DTWAIN_PIXELS:
+            case DTWAIN_INCHES:
+            case DTWAIN_TWIPS:
+            case DTWAIN_CENTIMETERS:
+            case DTWAIN_POINTS:
+            case DTWAIN_PICAS:
+            {
+                const double NumInches = (ActualRect.right - ActualRect.left) / actualSourceUnit;
+                PixelsPerInch = static_cast<double>(width) / NumInches;
+            }
             break;
-
-        case DTWAIN_INCHES:
-        case DTWAIN_TWIPS:
-        case DTWAIN_CENTIMETERS:
-        case DTWAIN_POINTS:
-        case DTWAIN_PICAS:
-        {
-            if (sourceunit == DTWAIN_PIXELS)
-            {
-                fRect.left = RequestedRect.left / PixelsPerInch;
-                fRect.right = RequestedRect.right / PixelsPerInch;
-                fRect.top = RequestedRect.top / PixelsPerInch;
-                fRect.bottom = RequestedRect.bottom / PixelsPerInch;
-            }
-            else
-            {
-                fRect.left = RequestedRect.left / actualDestUnit * PixelsPerInch;
-                fRect.right = RequestedRect.right / actualDestUnit * PixelsPerInch;
-                fRect.top = RequestedRect.top / actualDestUnit * PixelsPerInch;
-                fRect.bottom = RequestedRect.bottom / actualDestUnit * PixelsPerInch;
-            }
         }
-        break;
-    }
-    return fRect;
 
+        switch (destunit)
+        {
+            case DTWAIN_PIXELS:
+                break;
+
+            case DTWAIN_INCHES:
+            case DTWAIN_TWIPS:
+            case DTWAIN_CENTIMETERS:
+            case DTWAIN_POINTS:
+            case DTWAIN_PICAS:
+            {
+                if (sourceunit == DTWAIN_PIXELS)
+                {
+                    fRect.left = RequestedRect.left / PixelsPerInch;
+                    fRect.right = RequestedRect.right / PixelsPerInch;
+                    fRect.top = RequestedRect.top / PixelsPerInch;
+                    fRect.bottom = RequestedRect.bottom / PixelsPerInch;
+                }
+                else
+                {
+                    fRect.left = RequestedRect.left / actualDestUnit * PixelsPerInch;
+                    fRect.right = RequestedRect.right / actualDestUnit * PixelsPerInch;
+                    fRect.top = RequestedRect.top / actualDestUnit * PixelsPerInch;
+                    fRect.bottom = RequestedRect.bottom / actualDestUnit * PixelsPerInch;
+                }
+            }
+            break;
+        }
+        return fRect;
+    }
 }
 
 CDibInterface::CDibInterface() : m_lasterror(0) {}
@@ -181,7 +183,7 @@ HANDLE CDibInterface::NormalizeDib(HANDLE hDib, bool bReturnCopy /* = false */ )
     return hNewDib;
 }
 
-HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=NULL*/)
+HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=nullptr*/)
 {
     height = abs(height);
 
@@ -286,7 +288,7 @@ HANDLE CDibInterface::DecreaseBpp(HANDLE hDib, long newbpp)
 HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const FloatRect& RequestedRect, int sourceunit,
                               int destunit, int dpi, bool bConvertActual, int& retval)
 {
-    retval = IS_ERR_OK;
+    retval = 0;
 
     dib::LockedDib dibHandle(handle);
 
@@ -320,7 +322,7 @@ HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const 
 
     if (startx == endx || starty == endy)
     {
-        retval = IS_ERR_BADPARAM;
+        retval = DTWAIN_ERR_INVALID_PARAM;
         return nullptr;
     }
 

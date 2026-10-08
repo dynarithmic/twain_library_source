@@ -42,6 +42,7 @@ LONG          g_FileType;
 TCHAR         g_FileName[256];
 int           g_LogType;
 TCHAR         g_LogFileName[MAX_PATH];
+LRESULT       g_StampPages;
 
 void SelectTheSource(int nWhich);
 void EnableSourceItems(BOOL bEnable);
@@ -268,20 +269,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     /* Initialize DTWAIN */
     while (1)
     {
-        /* Try initialization, but do not show error
-           message box if there is a failure */
-        if (DTWAIN_SysInitializeNoBlocking())
-            break; 
-
-        /* Retry initialization with alternate path */
-        DTWAIN_SetResourcePathA(ALTERNATE_RESOURCE_PATH);
-
-        /* Try initialization again using the alternate path */
         if (DTWAIN_SysInitialize())
-            break;
-
-        /* Reset the resource path to the default (which is the DTWAIN DLL's path) */
-        DTWAIN_SetResourcePathA("");
+            break; 
 
         /* Failed, so either the user exits the program, or copies the 
            proper text resource files to a folder (on the path or to the 
@@ -293,6 +282,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         else
             return 0;
     }
+
     LONG major, minor, versiontype, patch;
     DTWAIN_GetVersionEx(&major, &minor, &versiontype, &patch);
 
@@ -308,7 +298,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     /* Call function to determine the DTWAIN version */
     DTWAIN_GetVersion(&nMajorVer, &nMinorVer, &nDTwainType);
-
 
     /* Create a PDF text element for usage when acquiring to a PDF file */
     g_PDFTextElement = DTWAIN_CreatePDFTextElement();
@@ -558,11 +547,24 @@ void LoadLanguage(int message)
 
 void LoadLanguageStrings(LPCTSTR szLang)
 {
-    BOOL bRet = DTWAIN_LoadCustomStringResources(szLang);
-    if (!bRet)
-        MessageBox(NULL, _T("Could not load language resource"), _T("Language Resource Error"), MB_ICONSTOP);
-    else
-        MessageBox(g_hWnd, _T("Custom resource loaded.  Select a Source or choose Logging to see the new language being used"), _T("Success"), MB_OK);
+    const char* szPath[] = { "", ALTERNATE_RESOURCE_PATH };
+    int i;
+    for (i = 0; i < 2; ++i)
+    {
+        DTWAIN_SetResourcePathA(szPath[i]);
+        BOOL bRet = DTWAIN_LoadCustomStringResources(szLang);
+        if (bRet)
+        {
+            MessageBox(g_hWnd, _T("Custom resource loaded.  Select a Source or choose Logging to see the new language being used"), _T("Success"), MB_OK);
+            break;
+        }
+        else
+        if (i == 1)
+        {
+            MessageBox(NULL, _T("Could not load language resource"), _T("Language Resource Error"), MB_ICONSTOP);
+            break;
+        }
+    }
 }
 
 void ToggleCheckedItem(UINT resId)
@@ -613,7 +615,9 @@ void SelectTheSource(int nWhich)
     switch (nWhich)
     {
         case IDM_SELECT_SOURCE:
-            tempSource = DTWAIN_SelectSource2(NULL, NULL,0,0, DTWAIN_DLG_CENTER_CURRENT_MONITOR| DTWAIN_DLG_SORTNAMES);
+            tempSource = DTWAIN_SelectSource2(NULL, NULL,0,0, 
+                DTWAIN_DLG_CENTER_CURRENT_MONITOR | DTWAIN_DLG_SORTNAMES 
+                | DTWAIN_DLG_TOPMOSTWINDOW | DTWAIN_DLG_HIGHLIGHTFIRST);
         break;
 
         case IDM_SELECT_DEFAULT_SOURCE:
@@ -732,19 +736,24 @@ void GenericAcquire(LONG nWhichOne)
                                 &ErrStatus /* Error Status */
                             );
     }
-    EnableSourceItems(TRUE);
+
     if (!bRet)
     {
         LONG lastError = DTWAIN_GetLastError();
         char szError[1024];
         if (ErrStatus == DTWAIN_TN_ACQUIRECANCELED)
-            MessageBox(NULL, _T("Acquisition cancelled without acquiring any images"), _T("Information"), MB_ICONSTOP);
+        {
+            TCHAR szErrorW[1024];
+            DTWAIN_GetResourceString(DTWAIN_ERR_ACQUISITION_CANCELED, szErrorW, 1023);
+            MessageBox(NULL, szErrorW, _T("Information"), MB_ICONSTOP);
+        }
         else
         {
             DTWAIN_GetErrorStringA(lastError, szError, 1023);
             MessageBoxA(NULL, szError, "TWAIN Error", MB_ICONSTOP);
         }
         DTWAIN_DestroyAcquisitionArray(g_AcquireArray, FALSE);
+        EnableSourceItems(TRUE);
         return;
     }
 
@@ -753,10 +762,12 @@ void GenericAcquire(LONG nWhichOne)
     {
         MessageBox(g_hWnd, _T("No Images Acquired"), _T(""), MB_ICONSTOP);
         DTWAIN_DestroyAcquisitionArray(g_AcquireArray, FALSE);
+        EnableSourceItems(TRUE);
         return;
     }
     RetrieveAndDisplayDibs(g_hInstance, g_AcquireArray, IDD_dlgDib, g_hWnd);
     DTWAIN_DestroyAcquisitionArray( g_AcquireArray, TRUE );
+    EnableSourceItems(TRUE);
 }
 
 void AcquireNative()
@@ -1223,6 +1234,8 @@ LRESULT CALLBACK PDFSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
                 case IDOK:
                 {
                     int i;
+                    HWND hStamp = GetDlgItem(hDlg, IDC_chkStampPageNumbers);
+                    g_StampPages = SendMessage(hStamp, BM_GETCHECK, 0, 0);
                     for (i = 0; i < numIDs; ++i)
                         GetWindowTextA(allWindowItems[i], pPDFInfo[i], 255);
                     EndDialog(hDlg, LOWORD(wParam));
@@ -1632,7 +1645,7 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
         /* If this is a PDF file, this code will put a page stamp on this page */
         case DTWAIN_TN_FILEPAGESAVING:
         {
-            if (g_FileType == DTWAIN_PDFMULTI)
+            if (g_FileType == DTWAIN_PDFMULTI && g_StampPages)
             {
                 /* Set the text to "Page x*, where x is the current page count */
                 TCHAR text[100];

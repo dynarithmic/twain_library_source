@@ -61,19 +61,20 @@ namespace dynarithmic
         DTWAINScopedLogControllerEx& operator=(DTWAINScopedLogControllerEx&) = delete;
     };
 
-    typedef DTWAINScopedLogControllerEx<LogTraitsOff> DTWAINScopedLogControllerExclude;
-    typedef DTWAINScopedLogControllerEx<LogTraitsOn>  DTWAINScopedLogControllerInclude;
+    using DTWAINScopedLogControllerExclude = DTWAINScopedLogControllerEx<LogTraitsOff>;
+    using DTWAINScopedLogControllerInclude = DTWAINScopedLogControllerEx<LogTraitsOn>;
 
-    bool AnyLoggerExists(CTL_TwainDLLHandle* pHandle);
+    bool AnyLoggerExists(const CTL_TwainDLLHandle* pHandle);
     void WriteUserDefinedLogMsg(CTL_TwainDLLHandle* pHandle, LPCTSTR sz);
     void WriteUserDefinedLogMsgA(CTL_TwainDLLHandle* pHandle, LPCSTR sz);
     void WriteUserDefinedLogMsgW(CTL_TwainDLLHandle* pHandle, LPCWSTR sz);
-    bool UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle);
+    bool UserDefinedLoggerExists(const CTL_TwainDLLHandle* pHandle);
     std::string LogWin32Error(DWORD lastError);
     void LogToDebugMonitorA(std::string sMsg);
     void LogToDebugMonitorW(std::wstring sMsg);
     void LogToDebugMonitor(CTL_StringType sMsg);
     void LogDTWAINMessage(HWND, UINT, WPARAM, LPARAM, bool bCallback=false);
+    void LogDTWAININISettings();
 
     struct LoggingTraits;
     std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const LoggingTraits& fTraits = {});

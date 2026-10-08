@@ -37,7 +37,7 @@ extern "C"
         CATCH_BLOCK_LOG_PARAMS(false)
     }
 
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetManualDuplexCount(DTWAIN_SOURCE Source, LONG *pSide1, LONG *pSide2)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetManualDuplexCount(DTWAIN_SOURCE Source, LPLONG pSide1, LPLONG pSide2)
     {
         LOG_FUNC_ENTRY_PARAMS((Source, pSide1, pSide2))
         auto [pHandle, pSource] = VerifyHandles(Source);
@@ -45,6 +45,7 @@ extern "C"
             *pSide1 = static_cast<LONG>(pSource->GetNumDuplexFiles(0));
         if (pSide2)
             *pSide2 = static_cast<LONG>(pSource->GetNumDuplexFiles(1));
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pSide1, pSide2))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }

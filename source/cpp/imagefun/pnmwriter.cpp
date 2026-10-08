@@ -21,7 +21,7 @@
 #include "pnmwriter.h"
 using namespace dynarithmic;
 
-std::optional<PreparedPnmDibPage> PnmSessionWriter::MakePreparedPnmDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedPnmDibPage> PnmSessionWriter::MakePreparedPnmDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;
@@ -184,7 +184,7 @@ uint32_t PnmSessionWriter::MaxValue() const
     }
 }
 
-bool PnmSessionWriter::WriteHeader()
+bool PnmSessionWriter::WriteHeader() const
 {
     if (std::fprintf(file_, "%s\n", Magic()) < 0)
         return false;

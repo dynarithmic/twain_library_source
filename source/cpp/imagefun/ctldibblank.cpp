@@ -123,14 +123,14 @@ namespace
         ctx.height = static_cast<int>(std::abs(bih->biHeight));
         ctx.topDown = (bih->biHeight < 0);
         ctx.bpp = bih->biBitCount;
-        ctx.stride = dynarithmic::dib::effective_width(ctx.width, static_cast<uint16_t>(ctx.bpp)); 
+        ctx.stride = dib::effective_width(ctx.width, static_cast<uint16_t>(ctx.bpp)); 
         ctx.bytesPerPixel = (ctx.bpp >= 8) ? (ctx.bpp / 8) : 0;
-        ctx.palette = dynarithmic::dib::palette_ptr(bih); 
-        ctx.bits = dynarithmic::dib::bits_ptr(bih); 
+        ctx.palette = dib::palette_ptr(bih); 
+        ctx.bits = dib::bits_ptr(bih); 
 
         if (ctx.bpp == 16 && bih->biCompression == BI_BITFIELDS)
         {
-            const DWORD* masks = reinterpret_cast<const DWORD*>(dynarithmic::dib::bits_ptr(bih)); 
+            const DWORD* masks = reinterpret_cast<const DWORD*>(dib::bits_ptr(bih)); 
             ctx.useBitfields16 = true;
             ctx.redMask = masks[0];
             ctx.greenMask = masks[1];
@@ -595,7 +595,7 @@ BlankDIBInfo CDibInterface::IsBlankDIBEx(HANDLE hDib, double threshold)
 
     if (threshold < 0.0 || threshold > 100.0)
         return { false, {-1, -1} };
-    dynarithmic::dib::LockedDib dibHandle(hDib);
+    dib::LockedDib dibHandle(hDib);
     if ( !dibHandle.IsValid())
         return { false, {-1, -1} };
 

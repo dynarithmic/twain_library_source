@@ -29,7 +29,7 @@
 
 using namespace dynarithmic;
 
-std::optional<PreparedIcoDibPage> IcoSessionWriter::MakePreparedIcoDibPage(const dynarithmic::DibPageView& view)
+std::optional<PreparedIcoDibPage> IcoSessionWriter::MakePreparedIcoDibPage(const DibPageView& view)
 {
     if (!view.bits)
         return std::nullopt;
@@ -55,7 +55,7 @@ std::optional<PreparedIcoDibPage> IcoSessionWriter::MakePreparedIcoDibPage(const
 
         case 8:
             if (page.palette && page.paletteEntries > 0 &&
-                dynarithmic::dib::is_grayscale_palette(page.palette, page.paletteEntries))
+                dib::is_grayscale_palette(page.palette, page.paletteEntries))
             {
                 page.pixelFlavor = IcoPixelFlavor::Gray8;
             }
@@ -212,7 +212,7 @@ bool IcoMemoryPngEncoder::build_png_ready_image(const PreparedIcoDibPage& page, 
         case IcoPixelFlavor::BW1:
         {
             out.flavor = PngReadyFlavor::Palette1;
-            out.strideBytes = dynarithmic::dib::calc_stride_bytes(page.width, 1);
+            out.strideBytes = dib::calc_stride_bytes(page.width, 1);
             out.palette.resize(2);
             if (page.palette && page.paletteEntries >= 2)
             {
@@ -414,7 +414,7 @@ bool IcoSessionWriter::WriteCurrentPage()
     if (options_.mode == IcoMode::VistaPng)
     {
         IcoMemoryPngEncoder encoder;
-        if (!encoder.Encode(currentPage_, imageData_))
+        if (!IcoMemoryPngEncoder::Encode(currentPage_, imageData_))
             return false;
     }
     else
@@ -466,7 +466,7 @@ bool IcoSessionWriter::build_classic_icon_image()
         return false;
 
     const uint32_t xorStride = currentPage_.strideBytes;
-    const uint32_t andStride = dynarithmic::dib::calc_stride_bytes(currentPage_.width, 1);
+    const uint32_t andStride = dib::calc_stride_bytes(currentPage_.width, 1);
     const uint32_t andSize = andStride * currentPage_.height;
 
     BITMAPINFOHEADER bih{};

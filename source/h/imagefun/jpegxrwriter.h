@@ -180,7 +180,7 @@ namespace dynarithmic
         private:
             static bool ValidatePage(const PreparedJxrDibPage& page);
             uint32_t EffectiveRowBytes() const;
-            void PrepareRow(const uint8_t* src, uint8_t* dst, uint32_t rowBytes) const;
+            static void PrepareRow(const uint8_t* src, uint8_t* dst, uint32_t rowBytes);
 
         private:
             std::wstring filename_;

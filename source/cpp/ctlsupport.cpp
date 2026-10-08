@@ -50,7 +50,7 @@ namespace dynarithmic
 
     bool EnumSupported(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG Cap)
     {
-        const bool bRet = GetCapValuesEx2_Internal(reinterpret_cast<CTL_ITwainSource*>(Source), Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray) ? true : false;
+        const bool bRet = GetCapValuesEx2_Internal(reinterpret_cast<CTL_ITwainSource*>(Source), Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray);
         return bRet;
     }
 

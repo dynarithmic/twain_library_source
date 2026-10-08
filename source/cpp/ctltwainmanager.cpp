@@ -39,18 +39,18 @@
 #include "ctldib32ex.h"
 #include "ctltr000.h"
 #include "ctltr001.h"
-#include "ctltr007.h"
-#include "ctltr008.h"
+#include "ctltr002.h"
+#include "ctltr003.h"
+#include "ctltr015.h"
+#include "ctltr017.h"
+#include "ctltr018.h"
+#include "ctltr020.h"
 #include "ctltr021.h"
-#include "ctltr025.h"
-#include "ctltr026.h"
-#include "ctltr028.h"
-#include "ctltr029.h"
+#include "ctltr022.h"
+#include "ctltr023.h"
+#include "ctltr024.h"
 #include "ctltr030.h"
-#include "ctltr031.h"
-#include "ctltr032.h"
-#include "ctltr039.h"
-#include "ctltr043.h"
+#include "ctltr034.h"
 #include "ctlguidimpl.h"
 #include "ctlstringutilsx.h"
 #include "ctlcapcollect.h"
@@ -130,11 +130,18 @@ CTL_TwainAppMgrPtr CTL_TwainAppMgr::Create(CTL_TwainDLLHandle* pHandle,
 
     s_ThisInstance = hThisInstance;
     s_nLastError = 0;
-    try { s_pGlobalAppMgr.reset(new CTL_TwainAppMgr( pHandle, lpszDLLName, hInstance, hThisInstance ));}
+    try 
+    { 
+        s_pGlobalAppMgr.reset(new CTL_TwainAppMgr( pHandle, lpszDLLName, hInstance, hThisInstance ));
+    }
     catch(...)
-    { return CTL_TwainAppMgrPtr(); }
+    { 
+        return {};
+    }
     if ( !s_pGlobalAppMgr->LoadSourceManager(lpszDLLName) )
-    { s_pGlobalAppMgr.reset(); }
+    { 
+        s_pGlobalAppMgr.reset(); 
+    }
     return s_pGlobalAppMgr;
 }
 
@@ -144,7 +151,7 @@ void CTL_TwainAppMgr::Destroy()
     {
         s_pGlobalAppMgr->DestroyAllTwainSessions();
         /* Use for this APP only */
-        CTL_TwainAppMgr::UnloadSourceManager();
+        UnloadSourceManager();
     }
     s_pGlobalAppMgr.reset();
 }
@@ -292,7 +299,7 @@ const CTL_ITwainSource* CTL_TwainAppMgr::SelectSourceDlg(  CTL_ITwainSession *pS
 
         case TWRC_FAILURE:
         {
-            auto ccode = CTL_TwainAppMgr::GetLastConditionCodeError();
+            auto ccode = GetLastConditionCodeError();
             SendTwainMsgToWindow(pSession, nullptr, DTWAIN_SelectSourceFailed, ccode);
             return nullptr;
         }
@@ -457,10 +464,14 @@ namespace
     template <typename LayoutTriplet>
     void GetLayoutComponents(LayoutTriplet* LayoutTrip, CTL_RealArray& rArray)
     {
-        rArray.push_back(LayoutTrip->GetLeft());
-        rArray.push_back(LayoutTrip->GetTop());
-        rArray.push_back(LayoutTrip->GetRight());
-        rArray.push_back(LayoutTrip->GetBottom());
+        rArray.resize(LAYOUT_NUMCOMPONENTS);
+        rArray[LAYOUT_LEFT] = LayoutTrip->GetLeft();
+        rArray[LAYOUT_TOP] = LayoutTrip->GetTop();
+        rArray[LAYOUT_RIGHT] = LayoutTrip->GetRight();
+        rArray[LAYOUT_BOTTOM] = LayoutTrip->GetBottom();
+        rArray[LAYOUT_DOCUMENTNUMBER] = LayoutTrip->GetDocumentNumber();
+        rArray[LAYOUT_FRAMENUMBER] = LayoutTrip->GetFrameNumber();
+        rArray[LAYOUT_PAGENUMBER] = LayoutTrip->GetPageNumber();
     }
 }
 
@@ -474,6 +485,9 @@ bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_Re
     if (GetType == MSG_GET)
         layOutTriplet = std::make_unique<CTL_GetImageLayoutTriplet>(pSession, pTempSource);
     else
+    if ( GetType == MSG_GETCURRENT)
+        layOutTriplet = std::make_unique<CTL_GetCurrentImageLayoutTriplet>(pSession, pTempSource);
+    else
         layOutTriplet = std::make_unique<CTL_GetDefaultImageLayoutTriplet>(pSession, pTempSource);
 
     const TW_UINT16 rc = layOutTriplet->Execute();
@@ -481,6 +495,9 @@ bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_Re
     {
         if ( GetType == MSG_GET )
             GetLayoutComponents(static_cast<CTL_GetImageLayoutTriplet*>(layOutTriplet.get()), rArray);
+        else
+        if ( GetType == MSG_GETCURRENT)    
+            GetLayoutComponents(static_cast<CTL_GetCurrentImageLayoutTriplet*>(layOutTriplet.get()), rArray);
         else
             GetLayoutComponents(static_cast<CTL_GetDefaultImageLayoutTriplet*>(layOutTriplet.get()), rArray);
         return true;
@@ -500,7 +517,7 @@ bool CTL_TwainAppMgr::SetImageLayoutSize(const CTL_ITwainSource* pSource,
     const auto pSession = pTempSource->GetTwainSession();
 
     std::unique_ptr<CTL_TwainTriplet> layOutTriplet;
-    if (::IsMSGResetType(SetType))
+    if (IsMSGResetType(SetType))
         layOutTriplet = std::make_unique<CTL_ResetImageLayoutTriplet>(pSession, pTempSource, nullptr);
     else
         layOutTriplet = std::make_unique<CTL_SetImageLayoutTriplet>(pSession, pTempSource, &rArray);
@@ -534,7 +551,7 @@ bool CTL_TwainAppMgr::CloseSource(CTL_ITwainSession* pSession,
         return false;
     const auto iter = FindSession(pSession);
     if ( iter != s_pGlobalAppMgr->m_arrTwainSession.end() )
-        return pSession->CloseSource( pSource, bForce )?true:false;
+        return pSession->CloseSource( pSource, bForce );
     return true;
 }
 
@@ -676,7 +693,7 @@ void CTL_TwainAppMgr::EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSo
     }
 }
 
-bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip/*=NULL*/)
+bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip/*=nullptr*/)
 {
     const auto pTempSource = pSource;
     const auto pSession = pTempSource->GetTwainSession();
@@ -801,7 +818,7 @@ bool CTL_TwainAppMgr::SetFeederEnableMode( CTL_ITwainSource *pSource, bool bMode
     if ( !s_pGlobalAppMgr )
         return false;
 
-    if ( !s_pGlobalAppMgr->IsSourceOpen( pSource ))
+    if ( !IsSourceOpen( pSource ))
         return false;
 
     pSource->SetFeederEnableMode(bMode);
@@ -1354,7 +1371,7 @@ int CTL_TwainAppMgr::StartTransfer( CTL_ITwainSession * /*pSession*/,
             if ( nAcquireType == TWAINAcquireType_File ) // The TWAIN source is solely responsible for the file handling
             {
                 // Send notification that file save was successful
-                CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                SendTwainMsgToWindow(pSource->GetTwainSession(),
                     nullptr, DTWAIN_TN_FILEPAGESAVEOK, reinterpret_cast<LPARAM>(pSource));
             }
         }
@@ -1523,11 +1540,11 @@ LPSTR CTL_TwainAppMgr::GetErrorString(int nError, LPSTR lpszBuffer, int nSize)
 void CTL_TwainAppMgr::SetAndLogError(int nError, std::string_view extraInfo, bool bMustReportGeneralError)
 {
     int nActualError = std::abs(nError);
-    CTL_TwainAppMgr::SetError(nActualError, extraInfo.data(), bMustReportGeneralError);
+    SetError(nActualError, extraInfo.data(), bMustReportGeneralError);
     if (CTL_StaticData::GetLogFilterFlags() != 0)
     {
         char szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
-        CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
+        GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
         LogWriterUtils::WriteLogInfoIndentedA(szBuf);
     }
 }
@@ -1561,7 +1578,7 @@ bool CTL_TwainAppMgr::IsCapabilitySupported(const CTL_ITwainSource *pSource, TW_
     if (!IsValidTwainSession(pSession))
         return false;
 
-    if (!s_pGlobalAppMgr->IsSourceOpen(pSource))
+    if (!IsSourceOpen(pSource))
         return false;
 
     std::unique_ptr<CTL_CapabilityGetTriplet> pTrip;
@@ -1918,7 +1935,7 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
     if (!IsValidTwainSession(pSession))
         return { nullptr, nullptr, 0 };
 
-    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
+    if (!IsSourceOpen(pSource))
         return { nullptr, nullptr, 0 };
 
     CTL_CapabilityQueryTriplet QT(pSession, pTempSource, static_cast<TW_UINT16>(nCap));
@@ -2034,7 +2051,7 @@ std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
     return "Unknown capability.  " + std::to_string(Cap);
 }
 
-int CTL_TwainAppMgr::GetDataTypeFromCap( TW_UINT16 Cap, CTL_ITwainSource *pSource/*=NULL*/ )
+int CTL_TwainAppMgr::GetDataTypeFromCap( TW_UINT16 Cap, CTL_ITwainSource *pSource/*=nullptr*/ )
 {
     const auto nThisCap = Cap;
     if (nThisCap >= CAP_CUSTOMBASE)
@@ -2179,7 +2196,7 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     if (pHandle && pHandle->GetTwainSession())
     {
-        auto appMgr = CTL_TwainAppMgr::GetInstance();
+        auto appMgr = GetInstance();
         auto appMgrPtr = appMgr.get();
         if (appMgrPtr)
         {
@@ -2191,7 +2208,7 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
         #endif
             auto isSame = stringutils::CompareNoCase(lowerName, strTwainDLLName.c_str());
             if (isSame)
-                return { true, appMgrPtr->GetDSMPath() };
+                return { true, GetDSMPath() };
         }
         else
             return { false, {} };
@@ -2330,37 +2347,65 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
     }
     else
     {
-        // load the default TWAIN_32.DLL or TWAINDSM.DLL using the
-        // normal process of finding these DLL's
-        const auto& tempStr = m_strTwainDSMPath;
-        m_strTwainDSMPath = GetTwainDirFullName(m_strTwainDSMPath.c_str(), &m_nTwainDSMFoundPath, true, &m_hLibModule);
-        if ( m_strTwainDSMPath.empty() )
-        {
-            m_strTwainDSMPath = tempStr;
-            m_strTwainDSMPath = GetTwainDirFullNameEx(m_strTwainDSMPath.c_str(), &m_nTwainDSMFoundPath, true, &m_hLibModule);
-            if ( m_strTwainDSMPath.empty())
-            {
-                const CTL_StringType dllName = _T(" : ") + tempStr;
-                DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, stringconversion::Convert_Native_To_Ansi(dllName, dllName.length()), false, true)
-            }
-        }
-        m_strTwainDSMVersionInfo = GetVersionInfo(m_hLibModule.native(), 0);
-        CTL_StringStreamType strm;
-        strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session...\n");
-        strm << _T("Version information for \"") << m_strTwainDSMPath << _T("\":\n") << GetVersionInfo(m_hLibModule.native(), 4);
-        LogToDebugMonitor(strm.str());
-        if (CTL_StaticData::GetLogFilterFlags() != 0)
-            DTWAIN_LogMessageA(stringconversion::Convert_Native_To_Ansi(strm.str()).c_str());
+        auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        int numAttempts = 1;
+        if (pHandle->m_SessionStruct.m_bFallbackDSMToLegacy)
+            numAttempts = 2;
 
-        // Load the entry point for these DLL's
-        LoadDSM();
+        for (int curAttempt = 1; curAttempt <= numAttempts; ++curAttempt)
+        {
+            // load the default TWAIN_32.DLL or TWAINDSM.DLL using the
+            // normal process of finding these DLL's
+            const auto& tempStr = m_strTwainDSMPath;
+            m_strTwainDSMPath = GetTwainDirFullName(m_strTwainDSMPath.c_str(), &m_nTwainDSMFoundPath, true, &m_hLibModule);
+            if (m_strTwainDSMPath.empty())
+            {
+                m_strTwainDSMPath = tempStr;
+                m_strTwainDSMPath = GetTwainDirFullNameEx(m_strTwainDSMPath.c_str(), &m_nTwainDSMFoundPath, true, &m_hLibModule);
+                if (m_strTwainDSMPath.empty())
+                {
+                    // See if we should report the error
+                    if (numAttempts == curAttempt) 
+                    {
+                        const CTL_StringType dllName = _T(" : ") + tempStr;
+                        DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, stringconversion::Convert_Native_To_Ansi(dllName, dllName.length()), false, true)
+                    }
+                    else
+                    {
+                        // Fallback to legacy DSM and see if this works
+                        CTL_StringStreamType strm;
+                        strm << _T("TWAIN DSM Version 2.x was not found.  Falling back to legacy (TWAIN_32.DLL)...\n");
+                        LogToDebugMonitor(strm.str());
+                        if (CTL_StaticData::GetLogFilterFlags() != 0)
+                            DTWAIN_LogMessageA(stringconversion::Convert_Native_To_Ansi(strm.str()).c_str());
+                        DTWAIN_SetTwainDSM(DTWAIN_TWAINDSM_LEGACY);
+                        // Set the fallback to legacy flag and try again loading the legacy TWAIN_32.DLL
+                        pHandle->m_SessionStruct.m_bFallbackDSMToLegacy = true;
+                        m_strTwainDSMPath = TWAINDLLVERSION_1;
+                        continue;
+                    }
+                }
+            }
+            m_strTwainDSMVersionInfo = GetVersionInfo(m_hLibModule.native(), 0);
+            CTL_StringStreamType strm;
+            strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session...\n");
+            strm << _T("Version information for \"") << m_strTwainDSMPath << _T("\":\n") << GetVersionInfo(m_hLibModule.native(), 4);
+            LogToDebugMonitor(strm.str());
+            if (CTL_StaticData::GetLogFilterFlags() != 0)
+                DTWAIN_LogMessageA(stringconversion::Convert_Native_To_Ansi(strm.str()).c_str());
+
+            // Load the entry point for these DLL's
+            LoadDSM();
+            if (pHandle->m_lLastError == DTWAIN_NO_ERROR)
+                return true;
+        }
     }
-    return true;
+    return false;
 }
 
 bool CTL_TwainAppMgr::LoadDSM()
 {
-    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     m_lpDSMEntry = dtwain_library_loader<DSMENTRYPROC>::get_func_ptr(m_hLibModule.native(), "DSM_Entry");
     if ( !m_lpDSMEntry )
         DTWAIN_ERROR_CONDITION(IDS_ErrTwainDLLInvalid,false, true)
@@ -2382,7 +2427,7 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
     {
         // Get the capabilities using TWAIN
         CTL_TwainCapArray rArray;
-        CTL_TwainAppMgr::GetCapabilities(pSource, rArray);
+        GetCapabilities(pSource, rArray);
 
         // Report TWAIN compliance issue if retrieving capabilities returns no values
         bool logErrors = (CTL_StaticData::GetLogFilterFlags());
@@ -2577,7 +2622,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         {
             std::string sz;
             std::ostringstream strm;
-            sz = decoder.GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
+            sz = CTL_TWAINDecoderStruct::GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
             sTwainLogString = decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
             strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4",
                 { GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT),
@@ -2646,19 +2691,6 @@ bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, CTL_ITwainS
             return false;
     }
     return true;
-}
-
-VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
-{
-#if 0
-#ifdef _WIN32
-    KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
-
-    LogWriterUtils::WriteLogInfoIndentedA("The last TWAIN triplet was not completed due to time out");
-    SetError(DTWAIN_ERR_TIMEOUT, "", false);
-    throw DTWAINException(DTWAIN_ERR_TIMEOUT);
-#endif
-#endif
 }
 
 CTL_StringType CTL_TwainAppMgr::GetDSMPath()

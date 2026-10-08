@@ -46,18 +46,18 @@ namespace dynarithmic
         }
     };
 
-    typedef BASIC_MAPTYPE_<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
-    typedef BASIC_MAPTYPE_<LONG, int> CTL_LongToIntMap;
-    typedef BASIC_MAPTYPE_<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
-    typedef BASIC_MAPTYPE_<CTL_StringType, int> CTL_StringToIntMap;
-    typedef BASIC_MAPTYPE_<LONG, HMODULE> CTL_LongToHMODULEMap;
-    typedef BASIC_MAPTYPE_<TW_UINT16 , CTL_CapInfo> CTL_EnumCapToInfoMap;
-    typedef BASIC_MAPTYPE_<LONG, CTL_StringType> CTL_StringToLongMap;
-    typedef BASIC_MAPTYPE_<LONG, std::string> CTL_LongToStringMap;
-    typedef BASIC_MAPTYPE_<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
-    typedef BASIC_MAPTYPE_<LONG, std::vector<LONG>> CTL_LongToVectorLongMap;
+    using CTL_MapThreadToDLLHandle = BASIC_MAPTYPE_<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>>;
+    using CTL_LongToIntMap = BASIC_MAPTYPE_<LONG, int>;
+    using CTL_StringToSourcePtrMap = BASIC_MAPTYPE_<CTL_StringType, CTL_ITwainSource*>;
+    using CTL_StringToIntMap = BASIC_MAPTYPE_<CTL_StringType, int>;
+    using CTL_LongToHMODULEMap = BASIC_MAPTYPE_<LONG, HMODULE>;
+    using CTL_EnumCapToInfoMap = BASIC_MAPTYPE_<TW_UINT16 , CTL_CapInfo>;
+    using CTL_StringToLongMap = BASIC_MAPTYPE_<LONG, CTL_StringType>;
+    using CTL_LongToStringMap = BASIC_MAPTYPE_<LONG, std::string>;
+    using CTL_StringToMapLongToStringMap = BASIC_MAPTYPE_<std::string, CTL_LongToStringMap>;
+    using CTL_LongToVectorLongMap = BASIC_MAPTYPE_<LONG, std::vector<LONG>>;
 
-    typedef std::vector<CTL_MapThreadToDLLHandle> CTL_HookInfoArray;
+    using CTL_HookInfoArray = std::vector<CTL_MapThreadToDLLHandle>;
 
     using SourceStatusMap = BASIC_MAPTYPE_<std::string, SourceStatus>;
     using CTL_PDFMediaMap = BASIC_MAPTYPE_<int, std::pair<std::string, std::string>>;
@@ -76,6 +76,7 @@ namespace dynarithmic
     using SourceGetMessageList = std::unordered_set<std::string>;
     using SourceSheetcountMap = std::vector<std::pair<std::string, std::string>>;
     using SourcePaperDetectableMap = BASIC_MAPTYPE_<std::string, bool>;
-    using CTL_PairToStringMap = std::unordered_map<std::pair<int, std::string>, std::string, CacheKeyHash>;
+    using CTL_PairToStringMap = BASIC_UNORDERED_MAPTYPE_<std::pair<int, std::string>, std::string, CacheKeyHash>;
+    using SupportedBitDepthsMap = BASIC_MAPTYPE_<LONG, std::vector<uint16_t>>;
 }
 #endif

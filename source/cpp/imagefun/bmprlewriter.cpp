@@ -22,7 +22,7 @@
 
 using namespace dynarithmic;
 
-std::optional<PreparedBmpRle8Page> BmpRle8Writer::MakePreparedBmpRle8Page(const dynarithmic::DibPageView& view)
+std::optional<PreparedBmpRle8Page> BmpRle8Writer::MakePreparedBmpRle8Page(const DibPageView& view)
 {
     if (view.bitsPerPixel != 8 || !view.palette || view.paletteEntries == 0)
         return std::nullopt;
@@ -135,7 +135,7 @@ void BmpRle8Writer::emit_word(uint8_t a, uint8_t b)
 // - literal buffer flushes at 254 bytes
 int BmpRle8Writer::RLEEncodeLineLikeFreeImage(uint8_t* target, const uint8_t* source, int size)
 {
-    uint8_t buffer[256];
+    uint8_t buffer[256]{};
     int buffer_size = 0;
     int target_pos = 0;
 

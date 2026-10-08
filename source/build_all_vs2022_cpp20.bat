@@ -1,0 +1,23 @@
+call build_VS2022_x32_crt_ansi_cpp20.bat
+if errorlevel 1 exit /b 1
+
+call build_VS2022_x32_crt_unicode_cpp20.bat
+if errorlevel 1 exit /b 1
+
+call build_VS2022_x32_nocrt_ansi_cpp20.bat
+if errorlevel 1 exit /b 1
+
+call build_VS2022_x32_nocrt_unicode_cpp20.bat
+if errorlevel 1 exit /b 1
+
+call build_VS2022_x64_crt_ansi_cpp20.bat
+if errorlevel 1 exit /b 1
+
+call build_VS2022_x64_crt_unicode_cpp20.bat
+if errorlevel 1 exit /b 1
+
+call build_VS2022_x64_nocrt_ansi_cpp20.bat
+if errorlevel 1 exit /b 1
+
+call build_VS2022_x64_nocrt_unicode_cpp20.bat
+if errorlevel 1 exit /b 1

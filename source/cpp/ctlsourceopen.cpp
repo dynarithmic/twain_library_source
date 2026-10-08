@@ -72,7 +72,7 @@ namespace
 
         StringStreamA strm;
         std::string sBitDepths;
-        LONG oldflags = CTL_StaticData::GetLogFilterFlags();
+        auto oldflags = CTL_StaticData::GetLogFilterFlags();
         for (auto& mapPr : pixelBitDepthMap)
         {
             strm.str("");
@@ -91,12 +91,12 @@ namespace
             LogWriterUtils::WriteMultiLineInfoIndentedA(sBitDepths, "\n");
     }
 
-    void DetermineIfSpecialXfer(CTL_ITwainSource* p)
+    void DetermineIfSpecialXfer(const CTL_ITwainSource* pSource)
     {
         using wildcards::match;
         auto& xfer_map = CTL_StaticData::GetSourceToXferReadyMap();
         auto& xfer_list = CTL_StaticData::GetSourceToXferReadyList();
-        std::string sourceName = p->GetProductNameA();
+        std::string sourceName = pSource->GetProductNameA();
         auto iter = xfer_map.find(sourceName);
 
         // Already in map
@@ -119,11 +119,11 @@ namespace
         }
     }
 
-    void DetermineIfPaperDetectable(CTL_ITwainSource* p)
+    void DetermineIfPaperDetectable(CTL_ITwainSource* pSource)
     {
         using wildcards::match;
         auto& paperdetectable_map = CTL_StaticData::GetSourcePaperDetectionMap();
-        std::string sourceName = p->GetProductNameA();
+        std::string sourceName = pSource->GetProductNameA();
 
         // Search map for a matching name
         auto iterSearch = paperdetectable_map.begin();
@@ -132,18 +132,18 @@ namespace
             bool matches = match(sourceName, iterSearch->first);
             if (matches)
             {
-                p->SetFeederSensitive(iterSearch->second);
+                pSource->SetFeederSensitive(iterSearch->second);
                 return;
             }
             ++iterSearch;
         }
     }
 
-    void DetermineSheetcountDefs(CTL_ITwainSource* p)
+    void DetermineSheetcountDefs(CTL_ITwainSource* pSource)
     {
         using wildcards::match;
         auto& sheetcount_map = CTL_StaticData::GetSourceSheetcountMap();
-        std::string sourceName = p->GetProductNameA();
+        std::string sourceName = pSource->GetProductNameA();
 
         // Search map for a matching name
         auto iterSearch = sheetcount_map.begin();
@@ -153,12 +153,12 @@ namespace
             if (matches)
             {
                 bool usesSheets = (iterSearch->second == "SHEETS");
-                p->SetUseSheetCountAsSheets(usesSheets);
+                pSource->SetUseSheetCountAsSheets(usesSheets);
                 return;
             }
             ++iterSearch;
         }
-        p->SetUseSheetCountAsSheets(true);
+        pSource->SetUseSheetCountAsSheets(true);
     }
 
     void DetermineIfGetMessage(CTL_ITwainSource* pSource)

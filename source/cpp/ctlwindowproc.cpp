@@ -25,6 +25,7 @@
 #include "ctlsourcedibs.h"
 #include "ctltwainlogging.h"
 #include "windowsinit_impl.h"
+#include "ctltwaindllhandle.h"
 
 using namespace dynarithmic;
 
@@ -96,7 +97,7 @@ namespace
         return lResult;
     }
 
-    LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle* pHandle, HWND hWnd, UINT uMsg,
+    LRESULT ExecuteDTWAINCallbacks(const CTL_TwainDLLHandle* pHandle, HWND hWnd, UINT uMsg,
         WPARAM wParam, LPARAM lParam, bool bPassMsg, bool bCallDefProcs)
     {
         LRESULT lResult = 0;
@@ -342,7 +343,7 @@ namespace dynarithmic
         LPARAM lParam)
     {
         bool bPassMsg = false;
-        auto pHandle = FindHandle(hWnd, FALSE);
+        auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         if (!pHandle)
         {
             return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -539,6 +540,7 @@ namespace dynarithmic
             case DTWAIN_TN_QUERYACQUIREPAGES:
             case DTWAIN_TN_QUERYUPDATEDIBORIG:
             case DTWAIN_TN_QUERYUPDATEDIBRESAMPLED:
+            case DTWAIN_TN_PENDINGXFERSRETRIEVED:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))
@@ -723,7 +725,7 @@ namespace dynarithmic
             break;
             }
             // Send message to other notification windows
-            pHandle->NotifyWindows(uMsg, wParam, lParam);
+            CTL_TwainDLLHandle::NotifyWindows(uMsg, wParam, lParam);
 
             // Do not let window process this message again
             if (!bPassMsg)

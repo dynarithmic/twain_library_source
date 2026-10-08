@@ -183,6 +183,7 @@
 #define IDC_edOwnerPassword                 8036  
 #define IDC_txtUserPassword                 8037  
 #define IDC_txtOwnerPassword                8038  
+#define IDC_chkStampPageNumbers             8039
 
 #define IDD_dlgEnterBlankThreshold     9000
 #define IDC_edBlankThresholdPct        9001

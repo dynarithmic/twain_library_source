@@ -52,7 +52,7 @@ TW_UINT32  CTL_DeviceEvent::GetTimeBeforeFirstCapture() const { return m_DeviceE
 TW_UINT32  CTL_DeviceEvent::GetTimeBetweenCaptures() const { return    m_DeviceEvent.TimeBetweenCaptures;   }
 
 
-bool CTL_DeviceEvent::GetEventInfoEx(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Array)  const
+bool CTL_DeviceEvent::GetEventInfoEx(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Array)  const
 {
     auto& factory = pHandle->m_ArrayFactory;
     factory->clear(Array);

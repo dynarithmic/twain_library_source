@@ -29,6 +29,7 @@ namespace dynarithmic
     bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType);
     DTWAIN_ACQUIRE  LLAcquireImage(SourceAcquireOptions& opts);
     bool TileModeOn(DTWAIN_SOURCE Source);
+    bool IsSupportedFileType(DTWAIN_SOURCE Source, LONG lFileType, LONG lFileFlags);
 }
 #endif
 

@@ -35,15 +35,16 @@ namespace dynarithmic
         m_pSession(nullptr)
     {}
 
+    
     CTL_TwainTriplet::CTL_TwainTriplet(pTW_IDENTITY pOrigin,
-        pTW_IDENTITY pDest,
-        TW_UINT32    nDG,
-        TW_UINT16    nDAT,
-        TW_UINT16    nMSG,
-        TW_MEMREF    pData) : m_bInit(false),
-        m_bAlive(false),
-        m_pSource(nullptr),
-        m_pSession(nullptr)
+                                       pTW_IDENTITY pDest,
+                                       TW_UINT32    nDG,
+                                       TW_UINT16    nDAT,
+                                       TW_UINT16    nMSG,
+                                       TW_MEMREF    pData) : m_bInit(false),
+                                                             m_bAlive(false),
+                                                             m_pSource(nullptr),
+                                                             m_pSession(nullptr)
     {
         Init(pOrigin, pDest, nDG, nDAT, nMSG, pData);
     }
@@ -77,8 +78,8 @@ namespace dynarithmic
     }
 
 
-    void CTL_TwainTriplet::Init(const pTW_IDENTITY pOrigin, const pTW_IDENTITY pDest, TW_UINT32 nDG, 
-                                TW_UINT16 nDAT, TW_UINT16 nMSG,TW_MEMREF pData)
+    void CTL_TwainTriplet::Init(const pTW_IDENTITY pOrigin, const pTW_IDENTITY pDest, TW_UINT32 nDG, TW_UINT16 nDAT,
+                                TW_UINT16 nMSG, TW_MEMREF pData)
     {
         m_TwainTripletArg = { pOrigin, pDest, {nDG, nDAT, nMSG}, pData };
         m_bInit = true;

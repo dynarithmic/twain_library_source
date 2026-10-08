@@ -23,6 +23,8 @@
 #define SWAPWORDS(X) ( ((X)<<16) | ((X)>>16) )
 
 #include <iomanip>
+#include <algorithm>
+
 template <typename charTraits>
 VersionInfoImpl<charTraits>::VersionInfoImpl(HMODULE hMod )
 {

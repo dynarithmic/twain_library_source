@@ -21,18 +21,20 @@
 #ifndef ACQUISITIONARRAY_H
 #define ACQUISITIONARRAY_H
 
-#include "dtwainx.h"
+#include "dtwtype.h"
 
-struct AcquisitionArrayRAII
+namespace dynarithmic
 {
-    DTWAIN_ARRAY acqArray = nullptr;
-    bool bDestroy = true;
-    bool bDestroyDibs = true;
-    AcquisitionArrayRAII(DTWAIN_ARRAY arr, BOOL destroyDibs) : acqArray(arr), bDestroyDibs(destroyDibs) {}
-    ~AcquisitionArrayRAII()
+    class CTL_TwainDLLHandle;
+    struct AcquisitionArrayRAII
     {
-        if (bDestroy)
-            DTWAIN_DestroyAcquisitionArray(acqArray, bDestroyDibs);
-    }
-};
+        DTWAIN_ARRAY acqArray = nullptr;
+        bool bDestroy = true;
+        bool bDestroyDibs = true;
+        CTL_TwainDLLHandle* m_pHandle = nullptr;
+        AcquisitionArrayRAII(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY arr, bool destroyDibs) : 
+            m_pHandle(pHandle), acqArray(arr), bDestroyDibs(destroyDibs) {}
+        ~AcquisitionArrayRAII();
+    };
+}
 #endif

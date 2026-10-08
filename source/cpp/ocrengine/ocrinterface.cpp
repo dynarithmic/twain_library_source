@@ -30,16 +30,27 @@
 #ifdef _MSC_VER
 #pragma warning (disable:4505)
 #endif
-// OCR routines
-static bool OCREngineExists(CTL_TwainDLLHandle* pHandle, OCREngine* pEngine);
-static bool OCRIsActive(const OCREngine* pEngine);
-static LONG GetOCRTextSupport(OCREngine* pEngine, LONG fileType, LONG pixelType, LONG bitDepth);
-static std::vector<CTL_StringType> GetNameList(SelectStruct& selectTraits);
 
-static BOOL CALLBACK ChildEnumFontProc(HWND hWnd, LPARAM lParam)
+using namespace dynarithmic;
+
+namespace
 {
-    SendMessage(hWnd, WM_SETFONT, static_cast<WPARAM>(lParam), 0);
-    return TRUE;
+    // OCR routines
+    bool OCREngineExists(CTL_TwainDLLHandle* pHandle, OCREngine* pEngine)
+    {
+        auto iter = std::find_if(pHandle->m_OCRInterfaceArray.begin(),
+            pHandle->m_OCRInterfaceArray.end(),
+            [&](auto& curEngine) { return curEngine.get() == pEngine; });
+
+        return iter != pHandle->m_OCRInterfaceArray.end();
+    }
+
+    bool OCRIsActive(const OCREngine* pEngine)
+    {
+        return pEngine->IsActivated();
+    }
+
+    LONG GetOCRTextSupport(OCREngine* pEngine, LONG fileType, LONG pixelType, LONG bitDepth);
 }
 
 namespace dynarithmic
@@ -544,52 +555,55 @@ extern "C"
     }
 }
 
-LONG GetOCRTextSupport(OCREngine* pEngine, LONG fileType, LONG pixelType, LONG bitDepth)
+namespace
 {
-    // Get file type support
-    OCREngine::OCRLongArrayValues vals;
-    bool bOK = pEngine->GetCapValues(DTWAIN_OCRCV_IMAGEFILEFORMAT, DTWAIN_CAPGET, vals);
-    if (!bOK)
-        return DTWAIN_ERR_OCR_INVALIDFILETYPE;
-    if (vals.empty())
-        return DTWAIN_ERR_OCR_INVALIDFILETYPE;
-    auto it = std::find(vals.begin(), vals.end(), fileType);
-    if (it == vals.end())
-        return DTWAIN_ERR_OCR_INVALIDFILETYPE;
-
-    // File type exists, so see if pixel type exists
-    bOK = pEngine->GetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPGET, vals);
-    if (!bOK)
-        return DTWAIN_ERR_OCR_INVALIDPIXELTYPE;
-    if (vals.empty())
-        return DTWAIN_ERR_OCR_INVALIDPIXELTYPE;
-    it = std::find(vals.begin(), vals.end(), pixelType);
-    if (it == vals.end())
-        return DTWAIN_ERR_OCR_INVALIDPIXELTYPE;
-
-    // Now select the pixel type, but remember the last one to reset it.
-    pEngine->GetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPGETCURRENT, vals);
-    const LONG lastPixelType = vals[0];
-    vals[0] = pixelType;
-    pEngine->SetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPSET, vals);
-
-    // Get the bit depths for this type
-    bOK = pEngine->GetCapValues(DTWAIN_OCRCV_BITDEPTH, DTWAIN_CAPGET, vals);
-    LONG retVal = 0;
-    if (!bOK || vals.empty())
-        retVal = DTWAIN_ERR_OCR_INVALIDBITDEPTH;
-    if (retVal == 0)
+    LONG GetOCRTextSupport(OCREngine* pEngine, LONG fileType, LONG pixelType, LONG bitDepth)
     {
-        const OCREngine::OCRLongArrayValues::iterator it2 = std::find(vals.begin(), vals.end(), bitDepth);
-        if (it2 == vals.end())
-            retVal = DTWAIN_ERR_OCR_INVALIDBITDEPTH;
-    }
+        // Get file type support
+        OCREngine::OCRLongArrayValues vals;
+        bool bOK = pEngine->GetCapValues(DTWAIN_OCRCV_IMAGEFILEFORMAT, DTWAIN_CAPGET, vals);
+        if (!bOK)
+            return DTWAIN_ERR_OCR_INVALIDFILETYPE;
+        if (vals.empty())
+            return DTWAIN_ERR_OCR_INVALIDFILETYPE;
+        auto it = std::find(vals.begin(), vals.end(), fileType);
+        if (it == vals.end())
+            return DTWAIN_ERR_OCR_INVALIDFILETYPE;
 
-    // reset pixel type
-    vals.resize(1);
-    vals[0] = lastPixelType;
-    pEngine->SetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPSET, vals);
-    return retVal;
+        // File type exists, so see if pixel type exists
+        bOK = pEngine->GetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPGET, vals);
+        if (!bOK)
+            return DTWAIN_ERR_OCR_INVALIDPIXELTYPE;
+        if (vals.empty())
+            return DTWAIN_ERR_OCR_INVALIDPIXELTYPE;
+        it = std::find(vals.begin(), vals.end(), pixelType);
+        if (it == vals.end())
+            return DTWAIN_ERR_OCR_INVALIDPIXELTYPE;
+
+        // Now select the pixel type, but remember the last one to reset it.
+        pEngine->GetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPGETCURRENT, vals);
+        const LONG lastPixelType = vals[0];
+        vals[0] = pixelType;
+        pEngine->SetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPSET, vals);
+
+        // Get the bit depths for this type
+        bOK = pEngine->GetCapValues(DTWAIN_OCRCV_BITDEPTH, DTWAIN_CAPGET, vals);
+        LONG retVal = 0;
+        if (!bOK || vals.empty())
+            retVal = DTWAIN_ERR_OCR_INVALIDBITDEPTH;
+        if (retVal == 0)
+        {
+            const OCREngine::OCRLongArrayValues::iterator it2 = std::find(vals.begin(), vals.end(), bitDepth);
+            if (it2 == vals.end())
+                retVal = DTWAIN_ERR_OCR_INVALIDBITDEPTH;
+        }
+
+        // reset pixel type
+        vals.resize(1);
+        vals[0] = lastPixelType;
+        pEngine->SetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPSET, vals);
+        return retVal;
+    }
 }
 
 extern "C"
@@ -637,20 +651,6 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
-}
-
-bool OCREngineExists(CTL_TwainDLLHandle* pHandle, OCREngine* pEngine)
-{
-    auto iter = std::find_if(pHandle->m_OCRInterfaceArray.begin(),
-                             pHandle->m_OCRInterfaceArray.end(),
-                            [&](auto& curEngine) { return curEngine.get() == pEngine; });
-
-    return iter != pHandle->m_OCRInterfaceArray.end();
-}
-
-bool OCRIsActive(const OCREngine* pEngine)
-{
-    return pEngine->IsActivated();
 }
 
 extern "C"
@@ -762,15 +762,3 @@ extern "C"
         CATCH_BLOCK(-1)
     }
 }
-
-static bool NewOCRJob(const OCREngine *pEngine, LPCSTR szFileName)
-{
-    std::string s1 = pEngine->GetCachedFile();
-    std::string s2 = szFileName;
-    s1 = basicstringutils::TrimAll(s1);
-    s1 = basicstringutils::MakeLowerCase(s1);
-    s2 = basicstringutils::TrimAll(s2);
-    s2 = basicstringutils::MakeLowerCase(s2);
-    return s1 != s2;
-}
-

@@ -29,9 +29,8 @@ namespace dynarithmic
     class CTL_TiffIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_TiffIOHandler(int nFormat, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(), m_nFormat(nFormat),
-                m_ImageInfoEx(ImageInfoEx) {}
-            CTL_TiffIOHandler(CTL_TwainDib* pDib, int nFormat, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
+            CTL_TiffIOHandler(int nFormat, DTWAINImageInfoEx& ImageInfoEx) : m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
+            CTL_TiffIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler(pDib),
                 m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
             ~CTL_TiffIOHandler() = default;
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct) override;

@@ -41,13 +41,13 @@
 #endif
 namespace stringutils = dynarithmic::basicstringutils;
 
-typedef DTWAIN_BOOL (DLLENTRY_DEF *SetByStringFn)(DTWAIN_SOURCE, DTWAIN_FLOAT);
-typedef DTWAIN_BOOL (DLLENTRY_DEF *SetByStringFn2)(DTWAIN_SOURCE, DTWAIN_FLOAT, DTWAIN_BOOL);
-typedef DTWAIN_BOOL (DLLENTRY_DEF *GetByStringFn)(DTWAIN_SOURCE, LPDTWAIN_FLOAT);
-typedef DTWAIN_BOOL (*CapSetterByStringFn)(DTWAIN_SOURCE, LPCTSTR, SetByStringFn);
-typedef bool (*SetDoubleCapFn)(DTWAIN_SOURCE, LONG, double);
-typedef bool (*GetDoubleCapFn)(DTWAIN_SOURCE, LONG, double *);
-typedef LONG (*GetCapValuesFn)(DTWAIN_SOURCE, LPDTWAIN_ARRAY, LONG, DTWAIN_BOOL);
+using SetByStringFn = DTWAIN_BOOL(DLLENTRY_DEF *)(DTWAIN_SOURCE, DTWAIN_FLOAT);
+using SetByStringFn2 = DTWAIN_BOOL(DLLENTRY_DEF *)(DTWAIN_SOURCE, DTWAIN_FLOAT, DTWAIN_BOOL);
+using GetByStringFn = DTWAIN_BOOL(DLLENTRY_DEF *)(DTWAIN_SOURCE, LPDTWAIN_FLOAT);
+using CapSetterByStringFn = DTWAIN_BOOL(*)(DTWAIN_SOURCE, LPCTSTR, SetByStringFn);
+using SetDoubleCapFn = bool(*)(DTWAIN_SOURCE, LONG, double);
+using GetDoubleCapFn = bool(*)(DTWAIN_SOURCE, LONG, double *);
+using GetCapValuesFn = LONG(*)(DTWAIN_SOURCE, LPDTWAIN_ARRAY, LONG, DTWAIN_BOOL);
 
 using namespace dynarithmic;
 
@@ -140,7 +140,7 @@ namespace
 
         bool operator()()
         {
-            return SetSupport<CapDataType>(theSource, &theValue, theCap, setType ? true : false);
+            return SetSupport<CapDataType>(theSource, &theValue, theCap, setType);
         }
     };
 
@@ -306,7 +306,7 @@ namespace
         if (DTWAIN_GetCapDataType(reinterpret_cast<DTWAIN_SOURCE>(pSource), lCap) != TWTY_FIX32)
             return { false, DTWAIN_ERR_BAD_CAPTYPE };
         DTWAIN_ARRAY Array = nullptr;
-        bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+        bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
         if (!bRet)
             return { false, pHandle->m_lLastError };
 

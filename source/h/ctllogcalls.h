@@ -25,6 +25,6 @@ namespace dynarithmic
 {
     uint32_t& GetLogFilterFlags();
     std::string CTL_LogFunctionCallHelper(const char* pFuncName, int nWhich, const char* pOptionalString = nullptr);
-    std::string CTL_LogFunctionCallA(int32_t logFlags, const char *pFuncName, int nWhich, const char* pOptionalString = nullptr);
+    std::string CTL_LogFunctionCallA(uint32_t logFlags, const char *pFuncName, int nWhich, const char* pOptionalString = nullptr);
 }
 #endif

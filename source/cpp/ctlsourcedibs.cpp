@@ -23,6 +23,8 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsourcedibs.h"
+
+#include "acquisitionarray.h"
 #include "ctldtwainhandle.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -74,7 +76,7 @@ namespace dynarithmic
     DTWAIN_BOOL DTWAIN_GetAllSourceDibsInternal(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray)
     {
         LOG_FUNC_ENTRY_PARAMS((Source, pArray))
-        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
         const auto pHandle = pSource->GetDTWAINHandle();
         const auto& factory = pHandle->m_ArrayFactory;
 
@@ -117,6 +119,12 @@ namespace dynarithmic
         std::for_each(vImagesArray.begin(), vImagesArray.end(), acqDestroyer);
 
         return { true, DTWAIN_NO_ERROR };
+    }
+
+    AcquisitionArrayRAII::~AcquisitionArrayRAII()
+    {
+        if (bDestroy)
+            DestroyAcquisitionArray(m_pHandle, acqArray, bDestroyDibs);
     }
 }
 
@@ -192,8 +200,6 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second)
         CATCH_BLOCK(nullptr)
     }
-
-
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAIN_BOOL bDestroyDibs)
     {

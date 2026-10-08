@@ -41,15 +41,14 @@ namespace dynarithmic
         // Check if this source has had capabilities negotiated and tested
         int nWhere;
 
-        CTL_CapInfoMapPtr pArray;
         bool bNewArray = false;
 
         // get the array of cap info for this source
-        pArray = GetCapInfoArray(pHandle, pSource);
+        CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, pSource);
         if (!pArray)
         {
             // create a new one
-            pArray.reset(new CTL_CapInfoMap);
+            pArray = std::make_shared<CTL_CapInfoMap>();
             bNewArray = true;
         }
 
@@ -107,19 +106,9 @@ namespace dynarithmic
         return true;
     }
 
-    DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource* p, CTL_TwainDLLHandle* pHandle, TW_UINT16 nCapToCache)
+    DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource* pSource, CTL_TwainDLLHandle* pHandle, TW_UINT16 nCapToCache)
     {
         CTL_EnumeratorNode<LONG>::container_base_type vCaps(1, nCapToCache);
-        return DTWAIN_CacheCapabilityInfo(p, pHandle, &vCaps);
+        return DTWAIN_CacheCapabilityInfo(pSource, pHandle, &vCaps);
     }
 }
-
-using namespace dynarithmic;
-
-extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetQueryCapSupport(DTWAIN_BOOL bSet)
-{
-    LOG_FUNC_ENTRY_PARAMS((bSet))
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-

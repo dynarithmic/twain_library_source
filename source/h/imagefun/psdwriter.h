@@ -102,7 +102,7 @@ namespace dynarithmic
             bool WriteCurrentPage();
             void Close();
             bool IsOpen() const noexcept;
-            static std::optional<PreparedPsdDibPage> MakePreparedPsdDibPage(const dynarithmic::DibPageView& view);
+            static std::optional<PreparedPsdDibPage> MakePreparedPsdDibPage(const DibPageView& view);
 
         private:
             static bool ValidatePage(const PreparedPsdDibPage& page);

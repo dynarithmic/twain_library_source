@@ -167,73 +167,6 @@ namespace dynarithmic
         FIC_RGBALPHA   = 4,             // RGB color model with alpha channel
     };
 
-
-    enum {
-        IS_ERR_TRIALVERSION = -1,   // LIB was not initialized with a registered key
-        IS_ERR_OK = 0,              // no err
-        IS_ERR_MEM = 1,             // out of memory
-        IS_ERR_FILEOPEN,            // error on file open
-        IS_ERR_FILEREAD,            // error on file read
-        IS_ERR_FILEWRITE,           // error on file write
-        IS_ERR_BADPARAM = 5,        // bad user param
-        IS_ERR_INVALIDBMP,          // bad BMP file
-        IS_ERR_BMPRLE,              // some RLE variations are not supported
-        IS_ERR_RESERVED1,           // reserved value
-        IS_ERR_INVALIDJPG,          // bad JPG file
-        IS_ERR_DC = 10,             // error with device context
-        IS_ERR_DIB,                 // problem with a GetDIBits call
-        IS_ERR_RESERVED2,           // reserved value
-        IS_ERR_NORESOURCE,          // resource not found
-        IS_ERR_CALLBACKCANCEL,      // callback returned FALSE - operation aborted
-        IS_ERR_INVALIDPNG = 15,     // bad PNG file
-        IS_ERR_PNGCREATE,           // internal PNG lib behavior - contact smaller animals s.w.
-        IS_ERR_INTERNAL,            // misc unexpected behavior error - contact smaller animals s.w.
-        IS_ERR_FONT,                // trouble creating a font object
-        IS_ERR_INTTIFF,             // misc internal TIFF error
-        IS_ERR_INVALIDTIFF = 20,    // invalid TIFF file
-        IS_ERR_NOTIFFLZW,           // this will not read TIFF-LZW images (note, unused error message)
-        IS_ERR_INVALIDPCX,          // invalid PCX image
-        IS_ERR_CREATEBMP,           // a call to the fn CreateCompatibleBitmap failed
-        IS_ERR_NOLINES,             // end of an image while using single-line de/compression
-        IS_ERR_GETDIB = 25,         // error during a call to GetDIBits
-        IS_ERR_NODEVOP,             // device does not support an operation required by this function
-        IS_ERR_INVALIDWMF,          // invalid windows metafile
-        IS_ERR_DEPTHMISMATCH,       // the file was not of the requested bit-depth
-        IS_ERR_BITBLT,              // a call to BitBlt failed.
-        IS_ERR_BUFTOOSMALL = 30,    // output buffer is too small for this operation
-        IS_ERR_TOOMANYCOLORS,       // not enough room in the output palette to store the colors from this image
-        IS_ERR_INVALIDTGA,          // Invalid TGA File
-        IS_ERR_NOTGATHUMBNAIL,      // No TGA Thumbnail in the file
-        IS_ERR_RESERVED3,           // reserved value
-        IS_ERR_CREATEDIB = 35,      // a call to the fn CreateDIBitmap failed
-        IS_ERR_NOLZW,               // LZW de/compression is not permitted
-        IS_ERR_SELECTOBJ,           // a call to SelectObject has failed (DC does not support this operation?)
-        IS_ERR_BADMANAGER,          // the HISSRC or HISDEST object passed into the function does appear to be valid
-        IS_ERR_OBSOLETE,            // the function is obsolete
-        IS_ERR_CREATEDIBSECTION=40, // a call to CreateDIBSection failed
-        IS_ERR_SETWINMETAFILEBITS,  // a call to SetWinMetaFileBits failed (95/98 only)
-        IS_ERR_GETWINMETAFILEBITS,  // a call to GetEnhMetaFileBits or GetWinMetaFileBits failed
-        IS_ERR_PAXPWD,              // apparently invalid PAX password
-        IS_ERR_INVALIDPAX,          // invalid PAX file
-        IS_ERR_NOSUPPORT = 45,      // this function is not supported in this build (see DLL build options)
-        IS_ERR_INVALIDPSD,          // invalid PSD (Photoshop) file
-        IS_ERR_PSDNOTSUPPORTED,     // this Photoshop sub-format is not supported
-        IS_ERR_DECRYPT,             // decryption error - possible bad password for encrypted files
-        IS_ERR_ENCRYPT,             // encryption failed
-        IS_ERR_COMPRESSION = 50,    // compression failed
-        IS_ERR_DECOMPRESSION,       // decompression error - possible bad password for encrypted files
-        IS_ERR_INVALIDTLA,          // invalid TLA file. may indicate incorrect password
-        IS_ERR_INVALIDWBMP,         // invalid or unsupported WBMP (Wireless Bitmap) image.
-        IS_ERR_NOTIFFTAG,           // ImgSource does not support reading this TIFF tag
-        IS_ERR_NOLOCALSTORAGE = 55, // ImgSource was not able to allocate thread-local storage. this is a severe low-memory condition.
-        IS_ERR_INVALIDEXIF,         // invalid EXIF format
-        IS_ERR_NOEXIFSTRING,        // no EXIF string was found with the given ID
-    };
-
-    typedef void (*CONVERSION8_FUNC)(BYTE *target, BYTE *source, int width_in_pixels);
-    typedef void (*CONVERSION16_FUNC)(BYTE *target, BYTE *source, int width_in_pixels, RGBQUAD *pPal);
-    typedef void (*CONVERSION24_FUNC)(BYTE *target, BYTE *source, int width_in_pixels, RGBQUAD *pPal);
-
     #define RGB_RED         0
     #define RGB_GREEN       1
     #define RGB_BLUE        2
@@ -254,7 +187,7 @@ namespace dynarithmic
             virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, void * /*pUserInfo*/ = nullptr) = 0;
             static HANDLE CreateDIB(int width, int height, int bpp, LPSTR palette= nullptr);
 
-            LONG    GetLastError() { return m_lasterror; }
+            LONG    GetLastError() const { return m_lasterror; }
             static bool    IsGrayScale(HANDLE hDib, int bpp);
             static bool    IsBlankDIB(HANDLE hDib, double threshold=0.99);
             static BlankDIBInfo IsBlankDIBEx(HANDLE hDib, double threshold = 99.0);

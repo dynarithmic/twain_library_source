@@ -69,7 +69,7 @@ namespace dynarithmic
             bool SetPageInfo(const PreparedBmpRle8Page& page);
             bool WriteCurrentPage();
             void Close();
-            static std::optional<PreparedBmpRle8Page> MakePreparedBmpRle8Page(const dynarithmic::DibPageView& view);
+            static std::optional<PreparedBmpRle8Page> MakePreparedBmpRle8Page(const DibPageView& view);
 
         private:
             static bool ValidatePage(const PreparedBmpRle8Page& page);
