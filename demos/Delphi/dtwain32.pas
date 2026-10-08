@@ -47,7 +47,7 @@ type
   LPCTSTR = PAnsiChar;
   LPTSTR = PAnsiChar;
   DTWAIN_TSTRING = AnsiString;
-  DTWAIN_PCHAR   = PAnsiChar;
+  DTWAIN_TCHARPTR = PAnsiChar;
   
   LPVOID = Pointer;
   DTWAIN_CALLBACK_PROC = Pointer;
