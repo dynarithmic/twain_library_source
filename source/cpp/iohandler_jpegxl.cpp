@@ -1,0 +1,103 @@
+/*
+This file is part of the Dynarithmic TWAIN Library (DTWAIN).
+Copyright (c) 2002-2026 Dynarithmic Software.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+OF THIRD PARTY RIGHTS.
+*/
+
+#include <windows.h>
+#include <delayimp.h>
+#include "iohandler_jpegxl.h"
+#include "ctldib32ex.h"
+#include "ctlstringconversion.h"
+
+using namespace dynarithmic;
+
+namespace
+{
+    int DelayLoadExceptionFilter(EXCEPTION_POINTERS* exceptionInfo, CTL_JPegXLIOHandler::JxlLoadError* error)
+    {
+        const DWORD code = exceptionInfo->ExceptionRecord->ExceptionCode;
+
+        if (code != VcppException(ERROR_SEVERITY_ERROR,
+                                  ERROR_MOD_NOT_FOUND) &&
+            code != VcppException(ERROR_SEVERITY_ERROR,
+                                  ERROR_PROC_NOT_FOUND))
+        {
+            return EXCEPTION_CONTINUE_SEARCH;
+        }
+
+        error->exceptionCode = code;
+
+        const auto* record = exceptionInfo->ExceptionRecord;
+
+        if (record->NumberParameters >= 1)
+        {
+            auto* delayInfo = reinterpret_cast<const DelayLoadInfo*>(record->ExceptionInformation[0]);
+
+            if (delayInfo)
+                error->windowsError = delayInfo->dwLastError;
+        }
+
+        return EXCEPTION_EXECUTE_HANDLER;
+    }
+
+    bool TryLoadJxlImports(CTL_JPegXLIOHandler::JxlLoadError& error)
+    {
+        error = {};
+
+        __try
+        {
+            __HrLoadAllImportsForDll("jxl.dll");
+            __HrLoadAllImportsForDll("jxl_threads.dll");
+
+            return true;
+        }
+        __except (DelayLoadExceptionFilter(GetExceptionInformation(), &error))
+        {
+            return false;
+        }
+    }
+}
+
+void CTL_JPegXLIOHandler::InitializeJXLSupport()
+{
+    m_bJxlAvailable = TryLoadJxlImports(jxlError);
+}
+
+int CTL_JPegXLIOHandler::WriteBitmap(LPCTSTR szFile, bool, int, DibMultiPageStruct*) 
+{
+    if (!m_bJxlAvailable)
+        return DTWAIN_ERR_JXL_NOTAVAILABLE;
+
+    if (!m_pDib || !szFile) 
+        return DTWAIN_ERR_FILEWRITE;
+
+    LockedDibPage locked(m_pDib->GetHandle());
+    if (!locked.IsValid()) 
+        return DTWAIN_ERR_FILEWRITE;
+
+    const auto page = JxlSessionWriter::MakePreparedJxlPage(locked.GetView());
+    if (!page) 
+        return DTWAIN_ERR_FILEWRITE;
+    const std::wstring filename = stringconversion::Convert_NativePtr_To_Wide(szFile);
+    JxlSessionWriter writer;
+    if (!writer.Open(filename, options_) || !writer.SetPageInfo(*page) || !writer.WriteCurrentPage()) 
+        return DTWAIN_ERR_FILEWRITE;
+    writer.Close();
+    return DTWAIN_NO_ERROR;
+}

@@ -24,6 +24,8 @@
 #include "ctlstaticdata.h"
 #include "ctltwaindllhandle.h"
 #include "ctlarray.h"
+#include "errorcheck.h"
+#include "iohandler_jpegxl.h"
 using namespace dynarithmic;
 
 namespace
@@ -120,5 +122,35 @@ extern "C"
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 1))
         CATCH_BLOCK(nullptr)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFileTypeSupported(LONG fileType)
+    {
+        LOG_FUNC_ENTRY_PARAMS((fileType))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        BOOL bRet = FALSE;
+        LONG nError = DTWAIN_NO_ERROR;
+        switch (fileType)
+        {
+            case DTWAIN_JPEGXL:
+            {
+                CTL_JPegXLIOHandler ioHandler{};
+                bRet = ioHandler.IsJxlAvailable();
+                if (!bRet)
+                    nError = DTWAIN_ERR_JXL_NOTAVAILABLE;
+            }
+            break;
+            default:
+            {
+                auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
+                auto iter = availableFileTypes.find(fileType);
+                bRet = (iter != availableFileTypes.end());
+                if (!bRet)
+                    nError = DTWAIN_ERR_FILE_FORMAT;
+            }
+        }
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return nError != DTWAIN_NO_ERROR; }, nError, FALSE, FUNC_MACRO);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(FALSE)
     }
 }

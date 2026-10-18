@@ -119,6 +119,7 @@ namespace dynarithmic
                                    TWAINFileFormat_JPEGXR = DTWAIN_JPEGXR,
                                    TWAINFileFormat_SVG    = DTWAIN_SVG,
                                    TWAINFileFormat_SVGZ = DTWAIN_SVGZ,
+                                   TWAINFileFormat_JPEGXL = DTWAIN_JPEGXL,
                                    TWAINFileFormat_RAW = 9999
                                 };
 
