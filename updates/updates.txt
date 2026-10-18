@@ -1,5 +1,53 @@
 DTWAIN Version changes
 
+5.10.1
+
+- New: JPEG XL (JXL) Image Format Support
+
+  DTWAIN now supports saving scanned images in the JPEG XL (JXL) image format using the DTWAIN_JPEGXL file type.
+
+  JPEG XL support is available in both 32-bit and 64-bit DTWAIN and uses the JPEG XL libraries supplied separately from DTWAIN.
+
+  **Requirements:**
+  - The appropriate 32-bit or 64-bit JPEG XL DLLs and their dependencies must be available to the application.
+  - The Microsoft Visual C++ Redistributable required by the JPEG XL libraries must be installed.
+  - JPEG XL libraries are loaded on demand and are not required for other DTWAIN image formats.
+
+  If the JPEG XL components are unavailable or cannot be loaded, DTWAIN returns DTWAIN_ERR_JXL_UNAVAILABLE if attempting to
+  save to a JPEG-XL file using DTWAIN_AcquireFile() or similar functions.  Note:  Applications can correct missing JPEG XL 
+  dependencies and retry without restarting the DTWAIN application.
+
+- New API: DTWAIN_IsFileTypeAvailable()
+
+  The new DTWAIN_IsFileTypeAvailable() function determines whether a specified DTWAIN image file format is currently available for saving.
+
+      DTWAIN_BOOL DTWAIN_IsFileTypeAvailable(LONG FileType);
+
+   The function accepts an existing DTWAIN file-type constant and returns `TRUE` if the format is available, or `FALSE` otherwise.
+
+   **Requirements:**
+   - `DTWAIN_SysInitialize()` must have been called successfully.
+   - No TWAIN session needs to be started.
+   - No TWAIN Source needs to be selected or opened.
+
+       For example:
+
+       if (DTWAIN_IsFileTypeAvailable(DTWAIN_JPEGXL))
+       {
+          // JPEG XL output is available.
+       }
+
+    The function can be called repeatedly to detect changes in format availability during application execution.
+
+    Applications can also call this function during acquisition notifications, such as `DTWAIN_TN_QUERYDISCARDPAGE`, to check JPEG XL availability before saving an acquired image.
+
+- Returning 0 from DTWAIN_TN_FILEPAGESAVING notification when acquiring to image files will now stop the file page being saved.
+
+- Upgraded following internal image related libraries:
+
+      libpng --> 1.6.59
+
+
 5.10.0
 
 - The main twain resource files, twaininfo.txt, dtwain32.ini, and dtwain64.ini are now
