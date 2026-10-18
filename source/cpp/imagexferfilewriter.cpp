@@ -157,7 +157,12 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
 {
     DTWAINImageInfoEx ImageInfo;
 
-    CTL_TwainAppMgr::SendTwainMsgToWindow(m_pSession, nullptr, DTWAIN_TN_FILEPAGESAVING, reinterpret_cast<LPARAM>(m_pSource));
+    auto bRet = CTL_TwainAppMgr::SendTwainMsgToWindow(m_pSession, nullptr, DTWAIN_TN_FILEPAGESAVING, reinterpret_cast<LPARAM>(m_pSource));
+    if ( bRet == 0 )
+    {
+        CTL_TwainAppMgr::SendTwainMsgToWindow(m_pSession, nullptr, DTWAIN_TN_FILEPAGESAVEERROR, reinterpret_cast<LPARAM>(m_pSource));
+        return DTWAIN_ERR_FILEWRITE;
+    }
     auto& acquireFileStatus = m_pSource->GetAcquireFileStatusRef();
 
     // Get any relevant Extra Image information
