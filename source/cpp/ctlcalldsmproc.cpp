@@ -22,6 +22,7 @@
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "ctldtwainhandle.h"
+#include "dtwainx.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -84,6 +85,18 @@ extern "C"
                                                            pData);
         LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
         CATCH_BLOCK(DTWAIN_FAILURE1)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCurrentTwainTripletEx(TWAIN_IDENTITY pAppID, TWAIN_IDENTITY pSourceID,
+                                                           LPLONG lpDG, LPLONG lpDAT, LPLONG lpMsg, LPLONG64 lpMemRef)
+    {
+        LOG_FUNC_ENTRY_PARAMS((pAppID, pSourceID, lpDAT, lpDG, lpMsg, lpMemRef))
+        auto bRet = DTWAIN_GetCurrentTwainTriplet(static_cast<TW_IDENTITY*>(pAppID),
+                                                            static_cast<TW_IDENTITY*>(pSourceID),
+                                                            lpDG, lpDAT, lpMsg, lpMemRef);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDG, lpDAT, lpMsg, lpMemRef))
+        LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+        CATCH_BLOCK(FALSE)
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCurrentTwainTriplet(TW_IDENTITY* pAppID, TW_IDENTITY* pSourceID,
