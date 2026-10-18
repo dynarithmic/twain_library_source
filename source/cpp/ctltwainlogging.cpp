@@ -157,9 +157,11 @@ namespace dynarithmic
     std::string LogWin32Error(DWORD lastError)
     {
         LPSTR lpMsgBuf = nullptr;
+        std::string sError;
 
-        FormatMessageA(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+        DWORD len = FormatMessageA(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+                   FORMAT_MESSAGE_IGNORE_INSERTS,
             nullptr,
             lastError,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -168,10 +170,17 @@ namespace dynarithmic
             nullptr
         );
 
+        if ( len == 0 || !lpMsgBuf )
+        {
+            DWORD lastRetrieveError = GetLastError();
+            sError = "Cannot retrieve Windows error description: Error(" + std::to_string(lastRetrieveError) + ")";
+            return sError;
+        }
+
         LogMsg_RAII raiiFree(lpMsgBuf);
 
         // Display the string.
-        std::string sError = lpMsgBuf;
+        sError = lpMsgBuf;
         while (!sError.empty())
         {
             if (std::iscntrl(sError.back()))
