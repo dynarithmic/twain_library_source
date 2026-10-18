@@ -1180,3 +1180,5 @@ DTWAIN_SetSaveFileType                            @1176
 DTWAIN_GetSaveFileType                            @1177  
 DTWAIN_GetImageLayoutInfo                         @1178  
 DTWAIN_GetLastTwainError                          @1179  
+DTWAIN_GetCurrentTwainTripletEx                   @1180
+DTWAIN_IsFileTypeSupported                        @1181
