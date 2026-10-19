@@ -548,6 +548,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/imagefun/imagefilewriterbase.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/jpeg2kwriter.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/jpegwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/jpegxlloader.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/jpegxlwriter.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/jpegxrwriter.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/metafilewriter.h
@@ -744,6 +745,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/imagefilewriterbase.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpeg2kwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpegwriter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpegxlloader.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpegxrwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpegxlwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/metafilewriter.cpp
@@ -1411,42 +1413,6 @@ add_library(dtwain SHARED
 target_link_libraries(dtwain PRIVATE
     dtwain_libpng
 )
-
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(JXL_LIBRARY_DIR ${PROJECT_SOURCE_DIR}/libjxl/x64/lib)
-else()
-    set(JXL_LIBRARY_DIR ${PROJECT_SOURCE_DIR}/libjxl/x32/lib)
-endif()
-
-target_link_directories(dtwain PRIVATE
-    "${JXL_LIBRARY_DIR}"
-)
-
-target_link_libraries(dtwain PRIVATE
-    jxl
-    jxl_threads
-    delayimp
-)
-
-if(MSVC)
-    target_link_options(dtwain PRIVATE
-        "/DELAYLOAD:jxl.dll"
-        "/DELAYLOAD:jxl_threads.dll"
-    )
-endif()
-if(MSVC)
-    target_link_libraries(dtwain PRIVATE
-        jxl.lib
-        jxl_threads.lib
-        delayimp.lib
-    )
-
-    target_link_options(dtwain PRIVATE
-        "/DELAYLOAD:jxl.dll"
-        "/DELAYLOAD:jxl_threads.dll"
-    )
-endif()
-
 
 #
 # Build output name:

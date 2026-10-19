@@ -19,19 +19,17 @@ DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRING
 OF THIRD PARTY RIGHTS.
 */
 
-#include "jpegxlwriter.h"
+#include <limits>
+#include <vector>
 #include <jxl/encode.h>
 #include <jxl/color_encoding.h>
 #include <jxl/thread_parallel_runner.h>
-#include <limits>
-#include <vector>
+#include "jpegxlwriter.h"
+#include "ctlstaticdata.h"
 namespace dynarithmic 
 {
     namespace 
     {
-        struct EncoderDeleter { void operator()(JxlEncoder* p) const { JxlEncoderDestroy(p); } };
-        struct RunnerDeleter { void operator()(void* p) const { JxlThreadParallelRunnerDestroy(p); } };
-
         bool MakePixels(const DibPageView& v, std::vector<uint8_t>& dst, uint32_t& channels, uint32_t& depth) 
         {
             if (!v.bits || !v.width || !v.height || !v.bih || v.bih->biCompression != BI_RGB) 
@@ -148,51 +146,78 @@ namespace dynarithmic
 
     bool JxlSessionWriter::WriteCurrentPage() 
     {
+        auto& jxlLoader = CTL_StaticData::GetJPEGXLLoader();
+        if (!jxlLoader.IsLoaded())
+            return false;
+
         if (!file_ || !hasPage_) 
             return false;
+
+        const auto& jxl = jxlLoader.GetFunctions();
+
         std::vector<uint8_t> pixels;
         uint32_t channels = 0, depth = 0;
         if (!MakePixels(page_.view, pixels, channels, depth)) 
             return false;
-        std::unique_ptr<JxlEncoder, EncoderDeleter> enc(JxlEncoderCreate(nullptr));
-        if (!enc) 
+        auto encoderDeleter = [&jxl](JxlEncoder* p)
+        {
+            if (p)
+                jxl.EncoderDestroy(p);
+        };
+
+        auto runnerDeleter = [&jxl](void* p)
+        {
+            if (p)
+                jxl.ThreadParallelRunnerDestroy(p);
+        };
+
+        std::unique_ptr<JxlEncoder, decltype(encoderDeleter)> enc(jxl.EncoderCreate(nullptr),encoderDeleter);
+
+        if (!enc)
             return false;
-        std::unique_ptr<void, RunnerDeleter> runner(JxlThreadParallelRunnerCreate(nullptr, options_.numThreads > 0 ? size_t(options_.numThreads) : JxlThreadParallelRunnerDefaultNumWorkerThreads()));
-        if (!runner || JxlEncoderSetParallelRunner(enc.get(), JxlThreadParallelRunner, runner.get()) != JXL_ENC_SUCCESS) 
+
+        const size_t threadCount = options_.numThreads > 0 ? static_cast<size_t>(options_.numThreads) : jxl.ThreadParallelRunnerDefaultNumWorkerThreads();
+
+        std::unique_ptr<void, decltype(runnerDeleter)> runner(jxl.ThreadParallelRunnerCreate(nullptr, threadCount),runnerDeleter);
+
+        if (!runner || jxl.EncoderSetParallelRunner(enc.get(),jxl.ThreadParallelRunner,runner.get()) != JXL_ENC_SUCCESS)
+        {
             return false;
+        }
+
         JxlBasicInfo info;
-        JxlEncoderInitBasicInfo(&info);
+        jxl.EncoderInitBasicInfo(&info);
         info.xsize = page_.view.width; 
         info.ysize = page_.view.height;
         info.bits_per_sample = depth; 
         info.exponent_bits_per_sample = 0;
         info.num_color_channels = channels;
         info.uses_original_profile = options_.lossless ? JXL_TRUE : JXL_FALSE;
-        if (JxlEncoderSetBasicInfo(enc.get(), &info) != JXL_ENC_SUCCESS) 
+        if (jxl.EncoderSetBasicInfo(enc.get(), &info) != JXL_ENC_SUCCESS) 
             return false;
         JxlColorEncoding color;
-        JxlColorEncodingSetToSRGB(&color, channels == 1 ? JXL_TRUE : JXL_FALSE);
-        if (JxlEncoderSetColorEncoding(enc.get(), &color) != JXL_ENC_SUCCESS) 
+        jxl.ColorEncodingSetToSRGB(&color, channels == 1 ? JXL_TRUE : JXL_FALSE);
+        if (jxl.EncoderSetColorEncoding(enc.get(), &color) != JXL_ENC_SUCCESS) 
             return false;
-        auto* frame = JxlEncoderFrameSettingsCreate(enc.get(), nullptr);
+        auto* frame = jxl.EncoderFrameSettingsCreate(enc.get(), nullptr);
         if (!frame) 
             return false;
-        if (JxlEncoderSetFrameLossless(frame, options_.lossless ? JXL_TRUE : JXL_FALSE) != JXL_ENC_SUCCESS) 
+        if (jxl.EncoderSetFrameLossless(frame, options_.lossless ? JXL_TRUE : JXL_FALSE) != JXL_ENC_SUCCESS) 
             return false;
-        if (JxlEncoderSetFrameDistance(frame, options_.lossless ? 0.0f : options_.distance) != JXL_ENC_SUCCESS) 
+        if (jxl.EncoderSetFrameDistance(frame, options_.lossless ? 0.0f : options_.distance) != JXL_ENC_SUCCESS) 
             return false;
-        if (JxlEncoderFrameSettingsSetOption(frame, JXL_ENC_FRAME_SETTING_EFFORT, options_.effort) != JXL_ENC_SUCCESS) 
+        if (jxl.EncoderFrameSettingsSetOption(frame, JXL_ENC_FRAME_SETTING_EFFORT, options_.effort) != JXL_ENC_SUCCESS) 
             return false;
         JxlPixelFormat fmt{channels, depth == 16 ? JXL_TYPE_UINT16 : JXL_TYPE_UINT8, JXL_NATIVE_ENDIAN, 0};
-        if (JxlEncoderAddImageFrame(frame, &fmt, pixels.data(), pixels.size()) != JXL_ENC_SUCCESS) 
+        if (jxl.EncoderAddImageFrame(frame, &fmt, pixels.data(), pixels.size()) != JXL_ENC_SUCCESS) 
             return false;
-        JxlEncoderCloseInput(enc.get());
+        jxl.EncoderCloseInput(enc.get());
         std::vector<uint8_t> out(65536);
         for (;;) 
         {
             uint8_t* next = out.data();
             size_t avail = out.size();
-            auto status = JxlEncoderProcessOutput(enc.get(), &next, &avail);
+            auto status = jxl.EncoderProcessOutput(enc.get(), &next, &avail);
             const size_t produced = size_t(next - out.data());
             if (produced && std::fwrite(out.data(), 1, produced, file_) != produced) 
                 return false;

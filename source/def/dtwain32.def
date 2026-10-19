@@ -1182,3 +1182,9 @@ DTWAIN_GetImageLayoutInfo                         @1178
 DTWAIN_GetLastTwainError                          @1179  
 DTWAIN_GetCurrentTwainTripletEx                   @1180  
 DTWAIN_IsFileTypeSupported                        @1181
+DTWAIN_GetJXLLibraryPath                          @1182
+DTWAIN_GetJXLLibraryPathA                         @1183
+DTWAIN_GetJXLLibraryPathW                         @1184 
+DTWAIN_SetJXLLibraryPath                          @1185
+DTWAIN_SetJXLLibraryPathA                         @1186
+DTWAIN_SetJXLLibraryPathW                         @1187

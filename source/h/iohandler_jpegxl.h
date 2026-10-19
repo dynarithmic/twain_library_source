@@ -23,6 +23,7 @@ OF THIRD PARTY RIGHTS.
 #define IOHANDLERJPEGXL_H
 #include "ctldib32.h"
 #include "jpegxlwriter.h"
+#include "jpegxlloader.h"
 
 namespace dynarithmic 
 {

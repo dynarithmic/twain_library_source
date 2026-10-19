@@ -3285,4 +3285,44 @@ extern "C"
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
     #endif
     }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJXLLibraryPathA(LPCSTR szFilePath)
+    {
+#ifdef _UNICODE
+        return DTWAIN_SetJXLLibraryPath(stringconversion::Convert_AnsiPtr_To_Native(szFilePath).c_str());
+#else
+        return DTWAIN_SetJXLLibraryPath(szFilePath);
+#endif
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJXLLibraryPathW(LPCWSTR szFilePath)
+    {
+#ifdef _UNICODE
+        return DTWAIN_SetJXLLibraryPath(szFilePath);
+#else
+        return DTWAIN_SetJXLLibraryPath(stringconversion::Convert_WidePtr_To_Native(szFilePath).c_str());
+#endif
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetJXLLibraryPathA(LPSTR lpszOut, LONG nMaxLen)
+    {
+    #ifdef _UNICODE
+        std::wstring arg((std::max)(nMaxLen, 0L), 0);
+        LONG retVal = DTWAIN_GetJXLLibraryPath(lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        return null_terminator_copier(get_view(arg), lpszOut, retVal);
+    #else
+        return DTWAIN_GetJXLLibraryPath(lpszOut, nMaxLen);
+    #endif
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetJXLLibraryPathW(LPWSTR lpszOut, LONG nMaxLen)
+    {
+    #ifdef _UNICODE
+        return DTWAIN_GetJXLLibraryPath(lpszOut, nMaxLen);
+    #else
+        std::string arg((std::max)(nMaxLen, 0L), 0);
+        LONG retVal = DTWAIN_GetJXLLibraryPath(lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        return null_terminator_copier(get_view(arg), lpszOut, retVal);
+    #endif
+    }
 }

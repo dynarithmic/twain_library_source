@@ -23,60 +23,24 @@ OF THIRD PARTY RIGHTS.
 #include <delayimp.h>
 #include "iohandler_jpegxl.h"
 #include "ctldib32ex.h"
+#include "ctlstaticdata.h"
 #include "ctlstringconversion.h"
+#include "ctltwainlogging.h"
 
 using namespace dynarithmic;
 
-namespace
-{
-    int DelayLoadExceptionFilter(EXCEPTION_POINTERS* exceptionInfo, CTL_JPegXLIOHandler::JxlLoadError* error)
-    {
-        const DWORD code = exceptionInfo->ExceptionRecord->ExceptionCode;
-
-        if (code != VcppException(ERROR_SEVERITY_ERROR,
-                                  ERROR_MOD_NOT_FOUND) &&
-            code != VcppException(ERROR_SEVERITY_ERROR,
-                                  ERROR_PROC_NOT_FOUND))
-        {
-            return EXCEPTION_CONTINUE_SEARCH;
-        }
-
-        error->exceptionCode = code;
-
-        const auto* record = exceptionInfo->ExceptionRecord;
-
-        if (record->NumberParameters >= 1)
-        {
-            auto* delayInfo = reinterpret_cast<const DelayLoadInfo*>(record->ExceptionInformation[0]);
-
-            if (delayInfo)
-                error->windowsError = delayInfo->dwLastError;
-        }
-
-        return EXCEPTION_EXECUTE_HANDLER;
-    }
-
-    bool TryLoadJxlImports(CTL_JPegXLIOHandler::JxlLoadError& error)
-    {
-        error = {};
-
-        __try
-        {
-            __HrLoadAllImportsForDll("jxl.dll");
-            __HrLoadAllImportsForDll("jxl_threads.dll");
-
-            return true;
-        }
-        __except (DelayLoadExceptionFilter(GetExceptionInformation(), &error))
-        {
-            return false;
-        }
-    }
-}
-
 void CTL_JPegXLIOHandler::InitializeJXLSupport()
 {
-    m_bJxlAvailable = TryLoadJxlImports(jxlError);
+    auto jxlPath = stringconversion::Convert_Native_To_Wide(CTL_StaticData::GetJPEGXLPath());
+    auto jxlLoadVal = CTL_StaticData::GetJPEGXLLoader().Load(jxlPath); 
+    if ( !jxlLoadVal.first )
+    {
+        jxlError.windowsError = jxlLoadVal.second;
+        m_bJxlAvailable = false;
+        LogWin32Error(jxlError.windowsError);
+        return;
+    }
+    m_bJxlAvailable = jxlLoadVal.first;
 }
 
 int CTL_JPegXLIOHandler::WriteBitmap(LPCTSTR szFile, bool, int, DibMultiPageStruct*) 
@@ -96,6 +60,7 @@ int CTL_JPegXLIOHandler::WriteBitmap(LPCTSTR szFile, bool, int, DibMultiPageStru
         return DTWAIN_ERR_FILEWRITE;
     const std::wstring filename = stringconversion::Convert_NativePtr_To_Wide(szFile);
     JxlSessionWriter writer;
+
     if (!writer.Open(filename, options_) || !writer.SetPageInfo(*page) || !writer.WriteCurrentPage()) 
         return DTWAIN_ERR_FILEWRITE;
     writer.Close();
