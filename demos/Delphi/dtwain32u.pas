@@ -354,6 +354,7 @@ const
   DTWAIN_JPEGXR = 12000;
   DTWAIN_SVG = 13000;
   DTWAIN_SVGZ = 13001;
+  DTWAIN_JPEGXL = 14000;
   DTWAIN_INCHES = 0;
   DTWAIN_CENTIMETERS = 1;
   DTWAIN_PICAS = 2;
@@ -937,6 +938,9 @@ const
   DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091);
   DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092);
   DTWAIN_ERR_TWENUMERATOR_NOTUSED = (-1093);
+  DTWAIN_ERR_JXL_NOTAVAILABLE = (-1094);
+  DTWAIN_ERR_JXL_ALREADYLOADED = (-1095);
+  DTWAIN_ERR_INVALID_PATH = (-1096);
   TWAIN_ERR_LOW_MEMORY = (-1100);
   TWAIN_ERR_FALSE_ALARM = (-1101);
   TWAIN_ERR_BUMMER = (-1102);
@@ -2351,6 +2355,7 @@ function DTWAIN_GetCurrentFileNameW(Source:DTWAIN_SOURCE; szName:LPWSTR; MaxLen:
 function DTWAIN_GetCurrentPageNum(Source:DTWAIN_SOURCE) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCurrentPageNum';
 function DTWAIN_GetCurrentRetryCount(Source:DTWAIN_SOURCE) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCurrentRetryCount';
 function DTWAIN_GetCurrentTwainTriplet(pAppID:pTW_IDENTITY; pSourceID:pTW_IDENTITY; lpDG:LPLONG; lpDAT:LPLONG; lpMsg:LPLONG; lpMemRef:LPLONG64) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCurrentTwainTriplet';
+function DTWAIN_GetCurrentTwainTripletEx(pAppID:TWAIN_IDENTITY; pSourceID:TWAIN_IDENTITY; lpDG:LPLONG; lpDAT:LPLONG; lpMsg:LPLONG; lpMemRef:LPLONG64) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCurrentTwainTripletEx';
 function DTWAIN_GetCustomDSData(Source:DTWAIN_SOURCE; Data:LPBYTE; dSize:DWORD; pActualSize:LPDWORD; nFlags:LONG) : NativeInt; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetCustomDSData';
 function DTWAIN_GetDSMFullName(DSMType:LONG; szDLLName:LPTSTR; nMaxLen:LONG; pWhichSearch:LPLONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMFullName';
 function DTWAIN_GetDSMFullNameA(DSMType:LONG; szDLLName:LPSTR; nMaxLen:LONG; pWhichSearch:LPLONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMFullNameA';
@@ -2412,6 +2417,9 @@ function DTWAIN_GetImageInfoString(Source:DTWAIN_SOURCE; lpXResolution:LPTSTR; l
 function DTWAIN_GetImageInfoStringA(Source:DTWAIN_SOURCE; lpXResolution:LPSTR; lpYResolution:LPSTR; lpWidth:LPLONG; lpLength:LPLONG; lpNumSamples:LPLONG; lpBitsPerSample:LPDTWAIN_ARRAY; lpBitsPerPixel:LPLONG; lpPlanar:LPLONG; lpPixelType:LPLONG; lpCompression:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetImageInfoStringA';
 function DTWAIN_GetImageInfoStringW(Source:DTWAIN_SOURCE; lpXResolution:LPWSTR; lpYResolution:LPWSTR; lpWidth:LPLONG; lpLength:LPLONG; lpNumSamples:LPLONG; lpBitsPerSample:LPDTWAIN_ARRAY; lpBitsPerPixel:LPLONG; lpPlanar:LPLONG; lpPixelType:LPLONG; lpCompression:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetImageInfoStringW';
 function DTWAIN_GetImageLayoutInfo(Source:DTWAIN_SOURCE; lGetType:LONG; DocumentNumber:LPLONG; PageNumber:LPLONG; FrameNumber:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetImageLayoutInfo';
+function DTWAIN_GetJXLLibraryPath(lpszOut:LPTSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetJXLLibraryPath';
+function DTWAIN_GetJXLLibraryPathA(lpszOut:LPSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetJXLLibraryPathA';
+function DTWAIN_GetJXLLibraryPathW(lpszOut:LPWSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetJXLLibraryPathW';
 function DTWAIN_GetJobControl(Source:DTWAIN_SOURCE; pJobControl:LPLONG; bCurrent:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetJobControl';
 function DTWAIN_GetJobControlEx(Source:DTWAIN_SOURCE; bGetCurrent:BOOL) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetJobControlEx';
 function DTWAIN_GetJpegValues(Source:DTWAIN_SOURCE; pQuality:LPLONG; Progressive:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetJpegValues';
@@ -2643,6 +2651,7 @@ function DTWAIN_IsFeederLoaded(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 
 function DTWAIN_IsFeederSensitive(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsFeederSensitive';
 function DTWAIN_IsFeederSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsFeederSupported';
 function DTWAIN_IsFileSystemSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsFileSystemSupported';
+function DTWAIN_IsFileTypeSupported(fileType:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsFileTypeSupported';
 function DTWAIN_IsFileXferSupported(Source:DTWAIN_SOURCE; lFileType:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsFileXferSupported';
 function DTWAIN_IsGetMessageLoopDetectionOn : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsGetMessageLoopDetectionOn';
 function DTWAIN_IsGetMessageLoopEnabled(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_IsGetMessageLoopEnabled';
@@ -2905,6 +2914,9 @@ function DTWAIN_SetHighlight(Source:DTWAIN_SOURCE; Highlight:DTWAIN_FLOAT) : BOO
 function DTWAIN_SetHighlightString(Source:DTWAIN_SOURCE; Highlight:LPCTSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetHighlightString';
 function DTWAIN_SetHighlightStringA(Source:DTWAIN_SOURCE; Highlight:LPCSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetHighlightStringA';
 function DTWAIN_SetHighlightStringW(Source:DTWAIN_SOURCE; Highlight:LPCWSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetHighlightStringW';
+function DTWAIN_SetJXLLibraryPath(sFilePath:LPCTSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetJXLLibraryPath';
+function DTWAIN_SetJXLLibraryPathA(szFilePath:LPCSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetJXLLibraryPathA';
+function DTWAIN_SetJXLLibraryPathW(sFilePath:LPCWSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetJXLLibraryPathW';
 function DTWAIN_SetJobControl(Source:DTWAIN_SOURCE; JobControl:LONG; bSetCurrent:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetJobControl';
 function DTWAIN_SetJpegValues(Source:DTWAIN_SOURCE; Quality:LONG; Progressive:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetJpegValues';
 function DTWAIN_SetJpegXRValues(Source:DTWAIN_SOURCE; Quality:LONG; Progressive:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetJpegXRValues';

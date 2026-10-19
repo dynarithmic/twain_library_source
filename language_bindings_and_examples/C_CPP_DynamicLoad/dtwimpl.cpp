@@ -519,6 +519,7 @@
     D_GETCURRENTPAGENUMFUNC                       DYNDTWAIN_API::DTWAIN_GetCurrentPageNum = nullptr;
     D_GETCURRENTRETRYCOUNTFUNC                    DYNDTWAIN_API::DTWAIN_GetCurrentRetryCount = nullptr;
     D_GETCURRENTTWAINTRIPLETFUNC                  DYNDTWAIN_API::DTWAIN_GetCurrentTwainTriplet = nullptr;
+    D_GETCURRENTTWAINTRIPLETEXFUNC                DYNDTWAIN_API::DTWAIN_GetCurrentTwainTripletEx = nullptr;
     D_GETCUSTOMDSDATAFUNC                         DYNDTWAIN_API::DTWAIN_GetCustomDSData = nullptr;
     D_GETDSMFULLNAMEFUNC                          DYNDTWAIN_API::DTWAIN_GetDSMFullName = nullptr;
     D_GETDSMFULLNAMEAFUNC                         DYNDTWAIN_API::DTWAIN_GetDSMFullNameA = nullptr;
@@ -580,6 +581,9 @@
     D_GETIMAGEINFOSTRINGAFUNC                     DYNDTWAIN_API::DTWAIN_GetImageInfoStringA = nullptr;
     D_GETIMAGEINFOSTRINGWFUNC                     DYNDTWAIN_API::DTWAIN_GetImageInfoStringW = nullptr;
     D_GETIMAGELAYOUTINFOFUNC                      DYNDTWAIN_API::DTWAIN_GetImageLayoutInfo = nullptr;
+    D_GETJXLLIBRARYPATHFUNC                       DYNDTWAIN_API::DTWAIN_GetJXLLibraryPath = nullptr;
+    D_GETJXLLIBRARYPATHAFUNC                      DYNDTWAIN_API::DTWAIN_GetJXLLibraryPathA = nullptr;
+    D_GETJXLLIBRARYPATHWFUNC                      DYNDTWAIN_API::DTWAIN_GetJXLLibraryPathW = nullptr;
     D_GETJOBCONTROLFUNC                           DYNDTWAIN_API::DTWAIN_GetJobControl = nullptr;
     D_GETJOBCONTROLEXFUNC                         DYNDTWAIN_API::DTWAIN_GetJobControlEx = nullptr;
     D_GETJPEGVALUESFUNC                           DYNDTWAIN_API::DTWAIN_GetJpegValues = nullptr;
@@ -811,6 +815,7 @@
     D_ISFEEDERSENSITIVEFUNC                       DYNDTWAIN_API::DTWAIN_IsFeederSensitive = nullptr;
     D_ISFEEDERSUPPORTEDFUNC                       DYNDTWAIN_API::DTWAIN_IsFeederSupported = nullptr;
     D_ISFILESYSTEMSUPPORTEDFUNC                   DYNDTWAIN_API::DTWAIN_IsFileSystemSupported = nullptr;
+    D_ISFILETYPESUPPORTEDFUNC                     DYNDTWAIN_API::DTWAIN_IsFileTypeSupported = nullptr;
     D_ISFILEXFERSUPPORTEDFUNC                     DYNDTWAIN_API::DTWAIN_IsFileXferSupported = nullptr;
     D_ISGETMESSAGELOOPDETECTIONONFUNC             DYNDTWAIN_API::DTWAIN_IsGetMessageLoopDetectionOn = nullptr;
     D_ISGETMESSAGELOOPENABLEDFUNC                 DYNDTWAIN_API::DTWAIN_IsGetMessageLoopEnabled = nullptr;
@@ -1073,6 +1078,9 @@
     D_SETHIGHLIGHTSTRINGFUNC                      DYNDTWAIN_API::DTWAIN_SetHighlightString = nullptr;
     D_SETHIGHLIGHTSTRINGAFUNC                     DYNDTWAIN_API::DTWAIN_SetHighlightStringA = nullptr;
     D_SETHIGHLIGHTSTRINGWFUNC                     DYNDTWAIN_API::DTWAIN_SetHighlightStringW = nullptr;
+    D_SETJXLLIBRARYPATHFUNC                       DYNDTWAIN_API::DTWAIN_SetJXLLibraryPath = nullptr;
+    D_SETJXLLIBRARYPATHAFUNC                      DYNDTWAIN_API::DTWAIN_SetJXLLibraryPathA = nullptr;
+    D_SETJXLLIBRARYPATHWFUNC                      DYNDTWAIN_API::DTWAIN_SetJXLLibraryPathW = nullptr;
     D_SETJOBCONTROLFUNC                           DYNDTWAIN_API::DTWAIN_SetJobControl = nullptr;
     D_SETJPEGVALUESFUNC                           DYNDTWAIN_API::DTWAIN_SetJpegValues = nullptr;
     D_SETJPEGXRVALUESFUNC                         DYNDTWAIN_API::DTWAIN_SetJpegXRValues = nullptr;
@@ -1779,6 +1787,7 @@ int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetCurrentPageNum, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetCurrentRetryCount, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetCurrentTwainTriplet, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_GetCurrentTwainTripletEx, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetCustomDSData, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetDSMFullName, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetDSMFullNameA, hModule)
@@ -1840,6 +1849,9 @@ int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetImageInfoStringA, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetImageInfoStringW, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetImageLayoutInfo, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_GetJXLLibraryPath, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_GetJXLLibraryPathA, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_GetJXLLibraryPathW, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetJobControl, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetJobControlEx, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetJpegValues, hModule)
@@ -2071,6 +2083,7 @@ int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsFeederSensitive, hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsFeederSupported, hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsFileSystemSupported, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_IsFileTypeSupported, hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsFileXferSupported, hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsGetMessageLoopDetectionOn, hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsGetMessageLoopEnabled, hModule)
@@ -2333,6 +2346,9 @@ int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetHighlightString, hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetHighlightStringA, hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetHighlightStringW, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_SetJXLLibraryPath, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_SetJXLLibraryPathA, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_SetJXLLibraryPathW, hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetJobControl, hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetJpegValues, hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetJpegXRValues, hModule)

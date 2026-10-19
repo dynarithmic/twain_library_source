@@ -216,6 +216,7 @@ DTWAIN_BIGTIFFJPEGMULTI = 11016
 DTWAIN_JPEGXR = 12000
 DTWAIN_SVG = 13000
 DTWAIN_SVGZ = 13001
+DTWAIN_JPEGXL = 14000
 DTWAIN_INCHES = 0
 DTWAIN_CENTIMETERS = 1
 DTWAIN_PICAS = 2
@@ -799,6 +800,9 @@ DTWAIN_ERR_DTWAINDLL_VERSION = (-1090)
 DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091)
 DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092)
 DTWAIN_ERR_TWENUMERATOR_NOTUSED = (-1093)
+DTWAIN_ERR_JXL_NOTAVAILABLE = (-1094)
+DTWAIN_ERR_JXL_ALREADYLOADED = (-1095)
+DTWAIN_ERR_INVALID_PATH = (-1096)
 TWAIN_ERR_LOW_MEMORY = (-1100)
 TWAIN_ERR_FALSE_ALARM = (-1101)
 TWAIN_ERR_BUMMER = (-1102)
@@ -2310,6 +2314,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetCurrentPageNum.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentRetryCount.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentTwainTriplet.restype = ct.c_long
+     theDLL.DTWAIN_GetCurrentTwainTripletEx.restype = ct.c_long
      theDLL.DTWAIN_GetCustomDSData.restype = ct.c_void_p
      theDLL.DTWAIN_GetDSMFullName.restype = ct.c_long
      theDLL.DTWAIN_GetDSMFullNameA.restype = ct.c_long
@@ -2371,6 +2376,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetImageInfoStringA.restype = ct.c_long
      theDLL.DTWAIN_GetImageInfoStringW.restype = ct.c_long
      theDLL.DTWAIN_GetImageLayoutInfo.restype = ct.c_long
+     theDLL.DTWAIN_GetJXLLibraryPath.restype = ct.c_long
+     theDLL.DTWAIN_GetJXLLibraryPathA.restype = ct.c_long
+     theDLL.DTWAIN_GetJXLLibraryPathW.restype = ct.c_long
      theDLL.DTWAIN_GetJobControl.restype = ct.c_long
      theDLL.DTWAIN_GetJobControlEx.restype = ct.c_long
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
@@ -2601,6 +2609,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_IsFeederSensitive.restype = ct.c_long
      theDLL.DTWAIN_IsFeederSupported.restype = ct.c_long
      theDLL.DTWAIN_IsFileSystemSupported.restype = ct.c_long
+     theDLL.DTWAIN_IsFileTypeSupported.restype = ct.c_long
      theDLL.DTWAIN_IsFileXferSupported.restype = ct.c_long
      theDLL.DTWAIN_IsGetMessageLoopDetectionOn.restype = ct.c_long
      theDLL.DTWAIN_IsGetMessageLoopEnabled.restype = ct.c_long
@@ -2862,6 +2871,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetHighlightString.restype = ct.c_long
      theDLL.DTWAIN_SetHighlightStringA.restype = ct.c_long
      theDLL.DTWAIN_SetHighlightStringW.restype = ct.c_long
+     theDLL.DTWAIN_SetJXLLibraryPath.restype = ct.c_long
+     theDLL.DTWAIN_SetJXLLibraryPathA.restype = ct.c_long
+     theDLL.DTWAIN_SetJXLLibraryPathW.restype = ct.c_long
      theDLL.DTWAIN_SetJobControl.restype = ct.c_long
      theDLL.DTWAIN_SetJpegValues.restype = ct.c_long
      theDLL.DTWAIN_SetJpegXRValues.restype = ct.c_long
@@ -3472,6 +3484,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetCurrentPageNum.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetCurrentRetryCount.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetCurrentTwainTriplet.argtypes = [ct.POINTER(TW_IDENTITY), ct.POINTER(TW_IDENTITY), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_int64)]
+     theDLL.DTWAIN_GetCurrentTwainTripletEx.argtypes = [ct.c_void_p, ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_int64)]
      theDLL.DTWAIN_GetCustomDSData.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ubyte), ct.c_ulong, ct.POINTER(ct.c_ulong), ct.c_long]
      theDLL.DTWAIN_GetDSMFullName.argtypes = [ct.c_long, ct.c_wchar_p, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetDSMFullNameA.argtypes = [ct.c_long, ct.c_char_p, ct.c_long, ct.POINTER(ct.c_long)]
@@ -3528,6 +3541,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetImageInfoStringA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_char_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_void_p), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetImageInfoStringW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_wchar_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_void_p), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetImageLayoutInfo.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetJXLLibraryPath.argtypes = [ct.c_wchar_p, ct.c_long]
+     theDLL.DTWAIN_GetJXLLibraryPathA.argtypes = [ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetJXLLibraryPathW.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetJobControl.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_GetJobControlEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_GetJpegValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
@@ -3746,6 +3762,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_IsFeederSensitive.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsFeederSupported.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsFileSystemSupported.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_IsFileTypeSupported.argtypes = [ct.c_long]
      theDLL.DTWAIN_IsFileXferSupported.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_IsGetMessageLoopEnabled.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsIAFieldALastPageSupported.argtypes = [ct.c_void_p]
@@ -3996,6 +4013,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetHighlightString.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_SetHighlightStringA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetHighlightStringW.argtypes = [ct.c_void_p, ct.c_wchar_p]
+     theDLL.DTWAIN_SetJXLLibraryPath.argtypes = [ct.c_wchar_p]
+     theDLL.DTWAIN_SetJXLLibraryPathA.argtypes = [ct.c_char_p]
+     theDLL.DTWAIN_SetJXLLibraryPathW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_SetJobControl.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegXRValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
@@ -4630,6 +4650,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetCurrentPageNum.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentRetryCount.restype = ct.c_long
      theDLL.DTWAIN_GetCurrentTwainTriplet.restype = ct.c_long
+     theDLL.DTWAIN_GetCurrentTwainTripletEx.restype = ct.c_long
      theDLL.DTWAIN_GetCustomDSData.restype = ct.c_void_p
      theDLL.DTWAIN_GetDSMFullName.restype = ct.c_long
      theDLL.DTWAIN_GetDSMFullNameA.restype = ct.c_long
@@ -4691,6 +4712,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetImageInfoStringA.restype = ct.c_long
      theDLL.DTWAIN_GetImageInfoStringW.restype = ct.c_long
      theDLL.DTWAIN_GetImageLayoutInfo.restype = ct.c_long
+     theDLL.DTWAIN_GetJXLLibraryPath.restype = ct.c_long
+     theDLL.DTWAIN_GetJXLLibraryPathA.restype = ct.c_long
+     theDLL.DTWAIN_GetJXLLibraryPathW.restype = ct.c_long
      theDLL.DTWAIN_GetJobControl.restype = ct.c_long
      theDLL.DTWAIN_GetJobControlEx.restype = ct.c_long
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
@@ -4921,6 +4945,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_IsFeederSensitive.restype = ct.c_long
      theDLL.DTWAIN_IsFeederSupported.restype = ct.c_long
      theDLL.DTWAIN_IsFileSystemSupported.restype = ct.c_long
+     theDLL.DTWAIN_IsFileTypeSupported.restype = ct.c_long
      theDLL.DTWAIN_IsFileXferSupported.restype = ct.c_long
      theDLL.DTWAIN_IsGetMessageLoopDetectionOn.restype = ct.c_long
      theDLL.DTWAIN_IsGetMessageLoopEnabled.restype = ct.c_long
@@ -5182,6 +5207,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetHighlightString.restype = ct.c_long
      theDLL.DTWAIN_SetHighlightStringA.restype = ct.c_long
      theDLL.DTWAIN_SetHighlightStringW.restype = ct.c_long
+     theDLL.DTWAIN_SetJXLLibraryPath.restype = ct.c_long
+     theDLL.DTWAIN_SetJXLLibraryPathA.restype = ct.c_long
+     theDLL.DTWAIN_SetJXLLibraryPathW.restype = ct.c_long
      theDLL.DTWAIN_SetJobControl.restype = ct.c_long
      theDLL.DTWAIN_SetJpegValues.restype = ct.c_long
      theDLL.DTWAIN_SetJpegXRValues.restype = ct.c_long
@@ -5792,6 +5820,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetCurrentPageNum.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetCurrentRetryCount.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_GetCurrentTwainTriplet.argtypes = [ct.POINTER(TW_IDENTITY), ct.POINTER(TW_IDENTITY), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_int64)]
+     theDLL.DTWAIN_GetCurrentTwainTripletEx.argtypes = [ct.c_void_p, ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_int64)]
      theDLL.DTWAIN_GetCustomDSData.argtypes = [ct.c_void_p, ct.POINTER(ct.c_ubyte), ct.c_ulong, ct.POINTER(ct.c_ulong), ct.c_long]
      theDLL.DTWAIN_GetDSMFullName.argtypes = [ct.c_long, ct.c_char_p, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetDSMFullNameA.argtypes = [ct.c_long, ct.c_char_p, ct.c_long, ct.POINTER(ct.c_long)]
@@ -5848,6 +5877,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetImageInfoStringA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_char_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_void_p), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetImageInfoStringW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_wchar_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_void_p), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetImageLayoutInfo.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetJXLLibraryPath.argtypes = [ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetJXLLibraryPathA.argtypes = [ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetJXLLibraryPathW.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetJobControl.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_GetJobControlEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_GetJpegValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
@@ -6066,6 +6098,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_IsFeederSensitive.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsFeederSupported.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsFileSystemSupported.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_IsFileTypeSupported.argtypes = [ct.c_long]
      theDLL.DTWAIN_IsFileXferSupported.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_IsGetMessageLoopEnabled.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_IsIAFieldALastPageSupported.argtypes = [ct.c_void_p]
@@ -6316,6 +6349,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetHighlightString.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetHighlightStringA.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetHighlightStringW.argtypes = [ct.c_void_p, ct.c_wchar_p]
+     theDLL.DTWAIN_SetJXLLibraryPath.argtypes = [ct.c_char_p]
+     theDLL.DTWAIN_SetJXLLibraryPathA.argtypes = [ct.c_char_p]
+     theDLL.DTWAIN_SetJXLLibraryPathW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_SetJobControl.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegXRValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]

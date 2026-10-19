@@ -180,6 +180,7 @@ const int DTWAIN_BIGTIFFJPEGMULTI = 11016;
 const int DTWAIN_JPEGXR = 12000;
 const int DTWAIN_SVG = 13000;
 const int DTWAIN_SVGZ = 13001;
+const int DTWAIN_JPEGXL = 14000;
 const int DTWAIN_INCHES = 0;
 const int DTWAIN_CENTIMETERS = 1;
 const int DTWAIN_PICAS = 2;
@@ -763,6 +764,9 @@ const int DTWAIN_ERR_DTWAINDLL_VERSION = (-1090);
 const int DTWAIN_ERR_ACTIVE_TWAINSESSION = (-1091);
 const int DTWAIN_ERR_DSMVERSION_NOTSUPPORTED = (-1092);
 const int DTWAIN_ERR_TWENUMERATOR_NOTUSED = (-1093);
+const int DTWAIN_ERR_JXL_NOTAVAILABLE = (-1094);
+const int DTWAIN_ERR_JXL_ALREADYLOADED = (-1095);
+const int DTWAIN_ERR_INVALID_PATH = (-1096);
 const int TWAIN_ERR_LOW_MEMORY = (-1100);
 const int TWAIN_ERR_FALSE_ALARM = (-1101);
 const int TWAIN_ERR_BUMMER = (-1102);
@@ -2861,6 +2865,9 @@ typedef _GetCurrentPageNumDart = int Function(DTWAIN_SOURCE);
 typedef _GetCurrentRetryCountNative = LONG Function(DTWAIN_SOURCE);
 typedef _GetCurrentRetryCountDart = int Function(DTWAIN_SOURCE);
 
+typedef _GetCurrentTwainTripletExNative = DTWAIN_BOOL Function(TWAIN_IDENTITY,TWAIN_IDENTITY,LPLONG,LPLONG,LPLONG,LPLONG64);
+typedef _GetCurrentTwainTripletExDart = int Function(TWAIN_IDENTITY, TWAIN_IDENTITY, LPLONG, LPLONG, LPLONG, LPLONG64);
+
 typedef _GetCustomDSDataNative = HANDLE Function(DTWAIN_SOURCE,LPBYTE,DWORD,LPDWORD,LONG);
 typedef _GetCustomDSDataDart = HANDLE Function(DTWAIN_SOURCE, LPBYTE, int, LPDWORD, int);
 
@@ -2971,6 +2978,9 @@ typedef _GetImageInfoStringDart = int Function(DTWAIN_SOURCE, Pointer<Utf16>, Po
 
 typedef _GetImageLayoutInfoNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LONG,LPLONG,LPLONG,LPLONG);
 typedef _GetImageLayoutInfoDart = int Function(DTWAIN_SOURCE, int, LPLONG, LPLONG, LPLONG);
+
+typedef _GetJXLLibraryPathNative = LONG Function(DTWAIN_CHARPTRTYPE,LONG);
+typedef _GetJXLLibraryPathDart = int Function(Pointer<Utf16>, int);
 
 typedef _GetJobControlNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LPLONG,DTWAIN_BOOL);
 typedef _GetJobControlDart = int Function(DTWAIN_SOURCE, LPLONG, int);
@@ -3427,6 +3437,9 @@ typedef _IsFeederSupportedDart = int Function(DTWAIN_SOURCE);
 
 typedef _IsFileSystemSupportedNative = DTWAIN_BOOL Function(DTWAIN_SOURCE);
 typedef _IsFileSystemSupportedDart = int Function(DTWAIN_SOURCE);
+
+typedef _IsFileTypeSupportedNative = DTWAIN_BOOL Function(LONG);
+typedef _IsFileTypeSupportedDart = int Function(int);
 
 typedef _IsFileXferSupportedNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LONG);
 typedef _IsFileXferSupportedDart = int Function(DTWAIN_SOURCE, int);
@@ -3988,6 +4001,9 @@ typedef _SetHighlightDart = int Function(DTWAIN_SOURCE, double);
 
 typedef _SetHighlightStringNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,DTWAIN_CCHARPTRTYPE);
 typedef _SetHighlightStringDart = int Function(DTWAIN_SOURCE, DTWAIN_CCHARPTRTYPE);
+
+typedef _SetJXLLibraryPathNative = DTWAIN_BOOL Function(DTWAIN_CCHARPTRTYPE);
+typedef _SetJXLLibraryPathDart = int Function(DTWAIN_CCHARPTRTYPE);
 
 typedef _SetJobControlNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LONG,DTWAIN_BOOL);
 typedef _SetJobControlDart = int Function(DTWAIN_SOURCE, int, int);
@@ -4649,6 +4665,7 @@ class DTWAIN {
   late final _GetCurrentFileNameDart _getCurrentFileName;
   late final _GetCurrentPageNumDart _getCurrentPageNum;
   late final _GetCurrentRetryCountDart _getCurrentRetryCount;
+  late final _GetCurrentTwainTripletExDart _getCurrentTwainTripletEx;
   late final _GetCustomDSDataDart _getCustomDSData;
   late final _GetDSMFullNameDart _getDSMFullName;
   late final _GetDSMSearchOrderDart _getDSMSearchOrder;
@@ -4686,6 +4703,7 @@ class DTWAIN {
   late final _GetImageInfoDart _getImageInfo;
   late final _GetImageInfoStringDart _getImageInfoString;
   late final _GetImageLayoutInfoDart _getImageLayoutInfo;
+  late final _GetJXLLibraryPathDart _getJXLLibraryPath;
   late final _GetJobControlDart _getJobControl;
   late final _GetJobControlExDart _getJobControlEx;
   late final _GetJpegValuesDart _getJpegValues;
@@ -4838,6 +4856,7 @@ class DTWAIN {
   late final _IsFeederSensitiveDart _isFeederSensitive;
   late final _IsFeederSupportedDart _isFeederSupported;
   late final _IsFileSystemSupportedDart _isFileSystemSupported;
+  late final _IsFileTypeSupportedDart _isFileTypeSupported;
   late final _IsFileXferSupportedDart _isFileXferSupported;
   late final _IsGetMessageLoopDetectionOnDart _isGetMessageLoopDetectionOn;
   late final _IsGetMessageLoopEnabledDart _isGetMessageLoopEnabled;
@@ -5025,6 +5044,7 @@ class DTWAIN {
   late final _SetHalftoneDart _setHalftone;
   late final _SetHighlightDart _setHighlight;
   late final _SetHighlightStringDart _setHighlightString;
+  late final _SetJXLLibraryPathDart _setJXLLibraryPath;
   late final _SetJobControlDart _setJobControl;
   late final _SetJpegValuesDart _setJpegValues;
   late final _SetJpegXRValuesDart _setJpegXRValues;
@@ -5515,6 +5535,7 @@ class DTWAIN {
   _getCurrentFileName = _dll.lookupFunction<_GetCurrentFileNameNative, _GetCurrentFileNameDart>('DTWAIN_GetCurrentFileName');
   _getCurrentPageNum = _dll.lookupFunction<_GetCurrentPageNumNative, _GetCurrentPageNumDart>('DTWAIN_GetCurrentPageNum');
   _getCurrentRetryCount = _dll.lookupFunction<_GetCurrentRetryCountNative, _GetCurrentRetryCountDart>('DTWAIN_GetCurrentRetryCount');
+  _getCurrentTwainTripletEx = _dll.lookupFunction<_GetCurrentTwainTripletExNative, _GetCurrentTwainTripletExDart>('DTWAIN_GetCurrentTwainTripletEx');
   _getCustomDSData = _dll.lookupFunction<_GetCustomDSDataNative, _GetCustomDSDataDart>('DTWAIN_GetCustomDSData');
   _getDSMFullName = _dll.lookupFunction<_GetDSMFullNameNative, _GetDSMFullNameDart>('DTWAIN_GetDSMFullName');
   _getDSMSearchOrder = _dll.lookupFunction<_GetDSMSearchOrderNative, _GetDSMSearchOrderDart>('DTWAIN_GetDSMSearchOrder');
@@ -5552,6 +5573,7 @@ class DTWAIN {
   _getImageInfo = _dll.lookupFunction<_GetImageInfoNative, _GetImageInfoDart>('DTWAIN_GetImageInfo');
   _getImageInfoString = _dll.lookupFunction<_GetImageInfoStringNative, _GetImageInfoStringDart>('DTWAIN_GetImageInfoString');
   _getImageLayoutInfo = _dll.lookupFunction<_GetImageLayoutInfoNative, _GetImageLayoutInfoDart>('DTWAIN_GetImageLayoutInfo');
+  _getJXLLibraryPath = _dll.lookupFunction<_GetJXLLibraryPathNative, _GetJXLLibraryPathDart>('DTWAIN_GetJXLLibraryPath');
   _getJobControl = _dll.lookupFunction<_GetJobControlNative, _GetJobControlDart>('DTWAIN_GetJobControl');
   _getJobControlEx = _dll.lookupFunction<_GetJobControlExNative, _GetJobControlExDart>('DTWAIN_GetJobControlEx');
   _getJpegValues = _dll.lookupFunction<_GetJpegValuesNative, _GetJpegValuesDart>('DTWAIN_GetJpegValues');
@@ -5704,6 +5726,7 @@ class DTWAIN {
   _isFeederSensitive = _dll.lookupFunction<_IsFeederSensitiveNative, _IsFeederSensitiveDart>('DTWAIN_IsFeederSensitive');
   _isFeederSupported = _dll.lookupFunction<_IsFeederSupportedNative, _IsFeederSupportedDart>('DTWAIN_IsFeederSupported');
   _isFileSystemSupported = _dll.lookupFunction<_IsFileSystemSupportedNative, _IsFileSystemSupportedDart>('DTWAIN_IsFileSystemSupported');
+  _isFileTypeSupported = _dll.lookupFunction<_IsFileTypeSupportedNative, _IsFileTypeSupportedDart>('DTWAIN_IsFileTypeSupported');
   _isFileXferSupported = _dll.lookupFunction<_IsFileXferSupportedNative, _IsFileXferSupportedDart>('DTWAIN_IsFileXferSupported');
   _isGetMessageLoopDetectionOn = _dll.lookupFunction<_IsGetMessageLoopDetectionOnNative, _IsGetMessageLoopDetectionOnDart>('DTWAIN_IsGetMessageLoopDetectionOn');
   _isGetMessageLoopEnabled = _dll.lookupFunction<_IsGetMessageLoopEnabledNative, _IsGetMessageLoopEnabledDart>('DTWAIN_IsGetMessageLoopEnabled');
@@ -5891,6 +5914,7 @@ class DTWAIN {
   _setHalftone = _dll.lookupFunction<_SetHalftoneNative, _SetHalftoneDart>('DTWAIN_SetHalftone');
   _setHighlight = _dll.lookupFunction<_SetHighlightNative, _SetHighlightDart>('DTWAIN_SetHighlight');
   _setHighlightString = _dll.lookupFunction<_SetHighlightStringNative, _SetHighlightStringDart>('DTWAIN_SetHighlightString');
+  _setJXLLibraryPath = _dll.lookupFunction<_SetJXLLibraryPathNative, _SetJXLLibraryPathDart>('DTWAIN_SetJXLLibraryPath');
   _setJobControl = _dll.lookupFunction<_SetJobControlNative, _SetJobControlDart>('DTWAIN_SetJobControl');
   _setJpegValues = _dll.lookupFunction<_SetJpegValuesNative, _SetJpegValuesDart>('DTWAIN_SetJpegValues');
   _setJpegXRValues = _dll.lookupFunction<_SetJpegXRValuesNative, _SetJpegXRValuesDart>('DTWAIN_SetJpegXRValues');
@@ -8059,6 +8083,11 @@ class DTWAIN {
     return _getCurrentRetryCount(Source);  
   }  
   
+  int getCurrentTwainTripletEx(TWAIN_IDENTITY pAppID, TWAIN_IDENTITY pSourceID, LPLONG lpDG, LPLONG lpDAT, LPLONG lpMsg, LPLONG64 lpMemRef)  
+  {  
+    return _getCurrentTwainTripletEx(pAppID, pSourceID, lpDG, lpDAT, lpMsg, lpMemRef);  
+  }  
+  
   HANDLE getCustomDSData(DTWAIN_SOURCE Source, LPBYTE Data, int dSize, LPDWORD pActualSize, int nFlags)  
   {  
     return _getCustomDSData(Source, Data, dSize, pActualSize, nFlags);  
@@ -8249,6 +8278,11 @@ class DTWAIN {
   int getImageLayoutInfo(DTWAIN_SOURCE Source, int lGetType, LPLONG DocumentNumber, LPLONG PageNumber, LPLONG FrameNumber)  
   {  
     return _getImageLayoutInfo(Source, lGetType, DocumentNumber, PageNumber, FrameNumber);  
+  }  
+  
+  int getJXLLibraryPath(Pointer<Utf16> lpszOut, int nSize)  
+  {  
+    return _getJXLLibraryPath(lpszOut, nSize);  
   }  
   
   int getJobControl(DTWAIN_SOURCE Source, LPLONG pJobControl, int bCurrent)  
@@ -9023,6 +9057,11 @@ class DTWAIN {
   int isFileSystemSupported(DTWAIN_SOURCE Source)  
   {  
     return _isFileSystemSupported(Source);  
+  }  
+  
+  int isFileTypeSupported(int fileType)  
+  {  
+    return _isFileTypeSupported(fileType);  
   }  
   
   int isFileXferSupported(DTWAIN_SOURCE Source, int lFileType)  
@@ -10245,6 +10284,18 @@ class DTWAIN {
     } finally {  
         if (HighlightPtr != nullptr) {  
           calloc.free(HighlightPtr);  
+        }  
+    }  
+  }  
+  
+  int setJXLLibraryPath(String? sFilePath)  
+  {  
+    final Pointer<Utf16> sFilePathPtr = sFilePath == null ? nullptr : sFilePath.toNativeUtf16();  
+    try {  
+      return _setJXLLibraryPath(sFilePathPtr);  
+    } finally {  
+        if (sFilePathPtr != nullptr) {  
+          calloc.free(sFilePathPtr);  
         }  
     }  
   }  

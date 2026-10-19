@@ -109,7 +109,7 @@ void main() {
 
     final acquired = dtwain.acquireFile(
       source,
-      'testd.bmp',
+      'testdart.bmp',
       DTWAIN_BMP,
       DTWAIN_USELONGNAME,
       DTWAIN_PT_DEFAULT,

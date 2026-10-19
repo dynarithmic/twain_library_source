@@ -421,6 +421,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_JPEGXR As Integer = 12000
         Public Const DTWAIN_SVG As Integer = 13000
         Public Const DTWAIN_SVGZ As Integer = 13001
+        Public Const DTWAIN_JPEGXL As Integer = 14000
         Public Const DTWAIN_INCHES As Integer = 0
         Public Const DTWAIN_CENTIMETERS As Integer = 1
         Public Const DTWAIN_PICAS As Integer = 2
@@ -1004,6 +1005,9 @@ Namespace Dynarithmic
         Public Const DTWAIN_ERR_ACTIVE_TWAINSESSION As Integer = (-1091)
         Public Const DTWAIN_ERR_DSMVERSION_NOTSUPPORTED As Integer = (-1092)
         Public Const DTWAIN_ERR_TWENUMERATOR_NOTUSED As Integer = (-1093)
+        Public Const DTWAIN_ERR_JXL_NOTAVAILABLE As Integer = (-1094)
+        Public Const DTWAIN_ERR_JXL_ALREADYLOADED As Integer = (-1095)
+        Public Const DTWAIN_ERR_INVALID_PATH As Integer = (-1096)
         Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
         Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
         Public Const TWAIN_ERR_BUMMER As Integer = (-1102)
@@ -3093,6 +3097,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetCurrentTwainTripletDelegate(ByRef pAppID As TW_IDENTITY, ByRef pSourceID As TW_IDENTITY, ByRef lpDG As Integer, ByRef lpDAT As Integer, ByRef lpMsg As Integer, ByRef lpMemRef As System.Int64) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetCurrentTwainTripletExDelegate(pAppID As System.IntPtr, pSourceID As System.IntPtr, ByRef lpDG As Integer, ByRef lpDAT As Integer, ByRef lpMsg As Integer, ByRef lpMemRef As System.Int64) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetCustomDSDataDelegate(Source As System.IntPtr, Data As Byte(), dSize As UInteger, ByRef pActualSize As UInteger, nFlags As Integer) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
@@ -3208,6 +3215,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetImageLayoutInfoDelegate(Source As System.IntPtr, lGetType As Integer, ByRef DocumentNumber As Integer, ByRef PageNumber As Integer, ByRef FrameNumber As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Private Delegate Function DTWAIN_GetJXLLibraryPathDelegate(<MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetJobControlDelegate(Source As System.IntPtr, ByRef pJobControl As Integer, bCurrent As Integer) As Integer
@@ -3667,6 +3677,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_IsFileSystemSupportedDelegate(Source As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_IsFileTypeSupportedDelegate(fileType As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_IsFileXferSupportedDelegate(Source As System.IntPtr, lFileType As Integer) As Integer
@@ -4243,6 +4256,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_SetHighlightStringDelegate(Source As System.IntPtr, Highlight As String) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Private Delegate Function DTWAIN_SetJXLLibraryPathDelegate(sFilePath As String) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetJobControlDelegate(Source As System.IntPtr, JobControl As Integer, bSetCurrent As Integer) As Integer
@@ -6053,6 +6069,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetCurrentTwainTriplet(pAppID, pSourceID, lpDG, lpDAT, lpMsg, lpMemRef)
         End Function
         
+        Public Function DTWAIN_GetCurrentTwainTripletEx(pAppID As System.IntPtr, pSourceID As System.IntPtr, ByRef lpDG As Integer, ByRef lpDAT As Integer, ByRef lpMsg As Integer, ByRef lpMemRef As System.Int64) As Integer
+        Return api.DTWAIN_GetCurrentTwainTripletEx(pAppID, pSourceID, lpDG, lpDAT, lpMsg, lpMemRef)
+        End Function
+        
         Public Function DTWAIN_GetCustomDSData(Source As System.IntPtr, Data As Byte(), dSize As UInteger, ByRef pActualSize As UInteger, nFlags As Integer) As System.IntPtr
         Return api.DTWAIN_GetCustomDSData(Source, Data, dSize, pActualSize, nFlags)
         End Function
@@ -6207,6 +6227,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_GetImageLayoutInfo(Source As System.IntPtr, lGetType As Integer, ByRef DocumentNumber As Integer, ByRef PageNumber As Integer, ByRef FrameNumber As Integer) As Integer
         Return api.DTWAIN_GetImageLayoutInfo(Source, lGetType, DocumentNumber, PageNumber, FrameNumber)
+        End Function
+        
+        Public Function DTWAIN_GetJXLLibraryPath(<MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
+        Return api.DTWAIN_GetJXLLibraryPath(lpszOut, nSize)
         End Function
         
         Public Function DTWAIN_GetJobControl(Source As System.IntPtr, ByRef pJobControl As Integer, bCurrent As Integer) As Integer
@@ -6819,6 +6843,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_IsFileSystemSupported(Source As System.IntPtr) As Integer
         Return api.DTWAIN_IsFileSystemSupported(Source)
+        End Function
+        
+        Public Function DTWAIN_IsFileTypeSupported(fileType As Integer) As Integer
+        Return api.DTWAIN_IsFileTypeSupported(fileType)
         End Function
         
         Public Function DTWAIN_IsFileXferSupported(Source As System.IntPtr, lFileType As Integer) As Integer
@@ -7587,6 +7615,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_SetHighlightString(Source As System.IntPtr, Highlight As String) As Integer
         Return api.DTWAIN_SetHighlightString(Source, Highlight)
+        End Function
+        
+        Public Function DTWAIN_SetJXLLibraryPath(sFilePath As String) As Integer
+        Return api.DTWAIN_SetJXLLibraryPath(sFilePath)
         End Function
         
         Public Function DTWAIN_SetJobControl(Source As System.IntPtr, JobControl As Integer, bSetCurrent As Integer) As Integer
@@ -8360,6 +8392,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetCurrentPageNum As DTWAIN_GetCurrentPageNumDelegate
             Public DTWAIN_GetCurrentRetryCount As DTWAIN_GetCurrentRetryCountDelegate
             Public DTWAIN_GetCurrentTwainTriplet As DTWAIN_GetCurrentTwainTripletDelegate
+            Public DTWAIN_GetCurrentTwainTripletEx As DTWAIN_GetCurrentTwainTripletExDelegate
             Public DTWAIN_GetCustomDSData As DTWAIN_GetCustomDSDataDelegate
             Public DTWAIN_GetDSMFullName As DTWAIN_GetDSMFullNameDelegate
             Public DTWAIN_GetDSMSearchOrder As DTWAIN_GetDSMSearchOrderDelegate
@@ -8399,6 +8432,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetImageInfo As DTWAIN_GetImageInfoDelegate
             Public DTWAIN_GetImageInfoString As DTWAIN_GetImageInfoStringDelegate
             Public DTWAIN_GetImageLayoutInfo As DTWAIN_GetImageLayoutInfoDelegate
+            Public DTWAIN_GetJXLLibraryPath As DTWAIN_GetJXLLibraryPathDelegate
             Public DTWAIN_GetJobControl As DTWAIN_GetJobControlDelegate
             Public DTWAIN_GetJobControlEx As DTWAIN_GetJobControlExDelegate
             Public DTWAIN_GetJpegValues As DTWAIN_GetJpegValuesDelegate
@@ -8552,6 +8586,7 @@ Namespace Dynarithmic
             Public DTWAIN_IsFeederSensitive As DTWAIN_IsFeederSensitiveDelegate
             Public DTWAIN_IsFeederSupported As DTWAIN_IsFeederSupportedDelegate
             Public DTWAIN_IsFileSystemSupported As DTWAIN_IsFileSystemSupportedDelegate
+            Public DTWAIN_IsFileTypeSupported As DTWAIN_IsFileTypeSupportedDelegate
             Public DTWAIN_IsFileXferSupported As DTWAIN_IsFileXferSupportedDelegate
             Public DTWAIN_IsGetMessageLoopDetectionOn As DTWAIN_IsGetMessageLoopDetectionOnDelegate
             Public DTWAIN_IsGetMessageLoopEnabled As DTWAIN_IsGetMessageLoopEnabledDelegate
@@ -8744,6 +8779,7 @@ Namespace Dynarithmic
             Public DTWAIN_SetHalftone As DTWAIN_SetHalftoneDelegate
             Public DTWAIN_SetHighlight As DTWAIN_SetHighlightDelegate
             Public DTWAIN_SetHighlightString As DTWAIN_SetHighlightStringDelegate
+            Public DTWAIN_SetJXLLibraryPath As DTWAIN_SetJXLLibraryPathDelegate
             Public DTWAIN_SetJobControl As DTWAIN_SetJobControlDelegate
             Public DTWAIN_SetJpegValues As DTWAIN_SetJpegValuesDelegate
             Public DTWAIN_SetJpegXRValues As DTWAIN_SetJpegXRValuesDelegate
