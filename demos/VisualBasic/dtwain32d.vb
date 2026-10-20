@@ -2210,6 +2210,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetJobControl Lib "dtwain32d.dll" (Source As System.IntPtr, ByRef pJobControl As Integer, bCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetJobControlEx Lib "dtwain32d.dll" (Source As System.IntPtr, bGetCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetJpegValues Lib "dtwain32d.dll" (Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
+    Public Declare Function DTWAIN_GetJpegXLQuality Lib "dtwain32d.dll" (Source As System.IntPtr, ByRef pQuality As Integer) As Integer
     Public Declare Function DTWAIN_GetJpegXRValues Lib "dtwain32d.dll" (Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
     Public Declare Function DTWAIN_GetLanguage Lib "dtwain32d.dll" () As Integer
     Public Declare Function DTWAIN_GetLastCapEnumIndices Lib "dtwain32d.dll" (Source As System.IntPtr, ByRef pCurrentIndex As Integer, ByRef pDefaultIndex As Integer) As Integer
@@ -2556,6 +2557,7 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_SetJXLLibraryPath Lib "dtwain32d.dll" (sFilePath As String) As Integer
     Public Declare Function DTWAIN_SetJobControl Lib "dtwain32d.dll" (Source As System.IntPtr, JobControl As Integer, bSetCurrent As Integer) As Integer
     Public Declare Function DTWAIN_SetJpegValues Lib "dtwain32d.dll" (Source As System.IntPtr, Quality As Integer, Progressive As Integer) As Integer
+    Public Declare Function DTWAIN_SetJpegXLQuality Lib "dtwain32d.dll" (Source As System.IntPtr, Quality As Integer) As Integer
     Public Declare Function DTWAIN_SetJpegXRValues Lib "dtwain32d.dll" (Source As System.IntPtr, Quality As Integer, Progressive As Integer) As Integer
     Public Declare Function DTWAIN_SetLanguage Lib "dtwain32d.dll" (nLanguage As Integer) As Integer
     Public Declare Function DTWAIN_SetLastError Lib "dtwain32d.dll" (nError As Integer) As Integer

@@ -3166,6 +3166,9 @@ module TwainAPI =
     type DTWAIN_GetJpegValuesDelegate = delegate of DTWAIN_SOURCE * int byref * int byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_GetJpegXLQualityDelegate = delegate of DTWAIN_SOURCE * int byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetJpegXRValuesDelegate = delegate of DTWAIN_SOURCE * int byref * int byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4198,6 +4201,9 @@ module TwainAPI =
     type DTWAIN_SetJpegValuesDelegate = delegate of DTWAIN_SOURCE * LONG * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_SetJpegXLQualityDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SetJpegXRValuesDelegate = delegate of DTWAIN_SOURCE * LONG * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4901,6 +4907,7 @@ module TwainAPI =
     let private GetJobControl = lazy (DynamicDll.Bind "DTWAIN_GetJobControl" : DTWAIN_GetJobControlDelegate)
     let private GetJobControlEx = lazy (DynamicDll.Bind "DTWAIN_GetJobControlEx" : DTWAIN_GetJobControlExDelegate)
     let private GetJpegValues = lazy (DynamicDll.Bind "DTWAIN_GetJpegValues" : DTWAIN_GetJpegValuesDelegate)
+    let private GetJpegXLQuality = lazy (DynamicDll.Bind "DTWAIN_GetJpegXLQuality" : DTWAIN_GetJpegXLQualityDelegate)
     let private GetJpegXRValues = lazy (DynamicDll.Bind "DTWAIN_GetJpegXRValues" : DTWAIN_GetJpegXRValuesDelegate)
     let private GetLanguage = lazy (DynamicDll.Bind "DTWAIN_GetLanguage" : DTWAIN_GetLanguageDelegate)
     let private GetLastCapEnumIndices = lazy (DynamicDll.Bind "DTWAIN_GetLastCapEnumIndices" : DTWAIN_GetLastCapEnumIndicesDelegate)
@@ -5245,6 +5252,7 @@ module TwainAPI =
     let private SetJXLLibraryPath = lazy (DynamicDll.Bind "DTWAIN_SetJXLLibraryPath" : DTWAIN_SetJXLLibraryPathDelegate)
     let private SetJobControl = lazy (DynamicDll.Bind "DTWAIN_SetJobControl" : DTWAIN_SetJobControlDelegate)
     let private SetJpegValues = lazy (DynamicDll.Bind "DTWAIN_SetJpegValues" : DTWAIN_SetJpegValuesDelegate)
+    let private SetJpegXLQuality = lazy (DynamicDll.Bind "DTWAIN_SetJpegXLQuality" : DTWAIN_SetJpegXLQualityDelegate)
     let private SetJpegXRValues = lazy (DynamicDll.Bind "DTWAIN_SetJpegXRValues" : DTWAIN_SetJpegXRValuesDelegate)
     let private SetLanguage = lazy (DynamicDll.Bind "DTWAIN_SetLanguage" : DTWAIN_SetLanguageDelegate)
     let private SetLastError = lazy (DynamicDll.Bind "DTWAIN_SetLastError" : DTWAIN_SetLastErrorDelegate)
@@ -7051,6 +7059,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetJpegValues.Value.Invoke(source, &pquality, &progressive)
 
+    let DTWAIN_GetJpegXLQuality (source: DTWAIN_SOURCE) (pquality: int byref) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetJpegXLQuality.Value.Invoke(source, &pquality)
+
     let DTWAIN_GetJpegXRValues (source: DTWAIN_SOURCE) (pquality: int byref) (progressive: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetJpegXRValues.Value.Invoke(source, &pquality, &progressive)
@@ -8426,6 +8438,10 @@ module TwainAPI =
     let DTWAIN_SetJpegValues (source: DTWAIN_SOURCE) (quality: LONG) (progressive: LONG) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         SetJpegValues.Value.Invoke(source, quality, progressive)
+
+    let DTWAIN_SetJpegXLQuality (source: DTWAIN_SOURCE) (quality: LONG) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        SetJpegXLQuality.Value.Invoke(source, quality)
 
     let DTWAIN_SetJpegXRValues (source: DTWAIN_SOURCE) (quality: LONG) (progressive: LONG) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

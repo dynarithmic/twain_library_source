@@ -3200,6 +3200,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, ref int pQuality, ref int Progressive);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_GetJpegXLQuality(DTWAIN_SOURCE Source, ref int pQuality);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetJpegXRValues(DTWAIN_SOURCE Source, ref int pQuality, ref int Progressive);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
@@ -4365,6 +4368,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_SetJpegValues(DTWAIN_SOURCE Source, int Quality, int Progressive);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_SetJpegXLQuality(DTWAIN_SOURCE Source, int Quality);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_SetJpegXRValues(DTWAIN_SOURCE Source, int Quality, int Progressive);

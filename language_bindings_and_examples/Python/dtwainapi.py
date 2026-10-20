@@ -2382,6 +2382,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetJobControl.restype = ct.c_long
      theDLL.DTWAIN_GetJobControlEx.restype = ct.c_long
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
+     theDLL.DTWAIN_GetJpegXLQuality.restype = ct.c_long
      theDLL.DTWAIN_GetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_GetLanguage.restype = ct.c_long
      theDLL.DTWAIN_GetLastCapEnumIndices.restype = ct.c_long
@@ -2876,6 +2877,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetJXLLibraryPathW.restype = ct.c_long
      theDLL.DTWAIN_SetJobControl.restype = ct.c_long
      theDLL.DTWAIN_SetJpegValues.restype = ct.c_long
+     theDLL.DTWAIN_SetJpegXLQuality.restype = ct.c_long
      theDLL.DTWAIN_SetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_SetLanguage.restype = ct.c_long
      theDLL.DTWAIN_SetLastError.restype = ct.c_long
@@ -3547,6 +3549,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetJobControl.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_GetJobControlEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_GetJpegValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetJpegXLQuality.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetJpegXRValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLastCapEnumIndices.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLastTwainError.argtypes = [ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong)]
@@ -4018,6 +4021,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetJXLLibraryPathW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_SetJobControl.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_SetJpegXLQuality.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_SetJpegXRValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetLanguage.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetLastError.argtypes = [ct.c_long]
@@ -4718,6 +4722,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetJobControl.restype = ct.c_long
      theDLL.DTWAIN_GetJobControlEx.restype = ct.c_long
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
+     theDLL.DTWAIN_GetJpegXLQuality.restype = ct.c_long
      theDLL.DTWAIN_GetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_GetLanguage.restype = ct.c_long
      theDLL.DTWAIN_GetLastCapEnumIndices.restype = ct.c_long
@@ -5212,6 +5217,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetJXLLibraryPathW.restype = ct.c_long
      theDLL.DTWAIN_SetJobControl.restype = ct.c_long
      theDLL.DTWAIN_SetJpegValues.restype = ct.c_long
+     theDLL.DTWAIN_SetJpegXLQuality.restype = ct.c_long
      theDLL.DTWAIN_SetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_SetLanguage.restype = ct.c_long
      theDLL.DTWAIN_SetLastError.restype = ct.c_long
@@ -5883,6 +5889,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetJobControl.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_GetJobControlEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_GetJpegValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetJpegXLQuality.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetJpegXRValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLastCapEnumIndices.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLastTwainError.argtypes = [ct.POINTER(ct.c_ulong), ct.POINTER(ct.c_ulong)]
@@ -6354,6 +6361,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetJXLLibraryPathW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_SetJobControl.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_SetJpegXLQuality.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_SetJpegXRValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetLanguage.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetLastError.argtypes = [ct.c_long]

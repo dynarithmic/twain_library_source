@@ -2991,6 +2991,9 @@ typedef _GetJobControlExDart = int Function(DTWAIN_SOURCE, int);
 typedef _GetJpegValuesNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LPLONG,LPLONG);
 typedef _GetJpegValuesDart = int Function(DTWAIN_SOURCE, LPLONG, LPLONG);
 
+typedef _GetJpegXLQualityNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LPLONG);
+typedef _GetJpegXLQualityDart = int Function(DTWAIN_SOURCE, LPLONG);
+
 typedef _GetJpegXRValuesNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LPLONG,LPLONG);
 typedef _GetJpegXRValuesDart = int Function(DTWAIN_SOURCE, LPLONG, LPLONG);
 
@@ -4011,6 +4014,9 @@ typedef _SetJobControlDart = int Function(DTWAIN_SOURCE, int, int);
 typedef _SetJpegValuesNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LONG,LONG);
 typedef _SetJpegValuesDart = int Function(DTWAIN_SOURCE, int, int);
 
+typedef _SetJpegXLQualityNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LONG);
+typedef _SetJpegXLQualityDart = int Function(DTWAIN_SOURCE, int);
+
 typedef _SetJpegXRValuesNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LONG,LONG);
 typedef _SetJpegXRValuesDart = int Function(DTWAIN_SOURCE, int, int);
 
@@ -4707,6 +4713,7 @@ class DTWAIN {
   late final _GetJobControlDart _getJobControl;
   late final _GetJobControlExDart _getJobControlEx;
   late final _GetJpegValuesDart _getJpegValues;
+  late final _GetJpegXLQualityDart _getJpegXLQuality;
   late final _GetJpegXRValuesDart _getJpegXRValues;
   late final _GetLanguageDart _getLanguage;
   late final _GetLastCapEnumIndicesDart _getLastCapEnumIndices;
@@ -5047,6 +5054,7 @@ class DTWAIN {
   late final _SetJXLLibraryPathDart _setJXLLibraryPath;
   late final _SetJobControlDart _setJobControl;
   late final _SetJpegValuesDart _setJpegValues;
+  late final _SetJpegXLQualityDart _setJpegXLQuality;
   late final _SetJpegXRValuesDart _setJpegXRValues;
   late final _SetLanguageDart _setLanguage;
   late final _SetLastErrorDart _setLastError;
@@ -5577,6 +5585,7 @@ class DTWAIN {
   _getJobControl = _dll.lookupFunction<_GetJobControlNative, _GetJobControlDart>('DTWAIN_GetJobControl');
   _getJobControlEx = _dll.lookupFunction<_GetJobControlExNative, _GetJobControlExDart>('DTWAIN_GetJobControlEx');
   _getJpegValues = _dll.lookupFunction<_GetJpegValuesNative, _GetJpegValuesDart>('DTWAIN_GetJpegValues');
+  _getJpegXLQuality = _dll.lookupFunction<_GetJpegXLQualityNative, _GetJpegXLQualityDart>('DTWAIN_GetJpegXLQuality');
   _getJpegXRValues = _dll.lookupFunction<_GetJpegXRValuesNative, _GetJpegXRValuesDart>('DTWAIN_GetJpegXRValues');
   _getLanguage = _dll.lookupFunction<_GetLanguageNative, _GetLanguageDart>('DTWAIN_GetLanguage');
   _getLastCapEnumIndices = _dll.lookupFunction<_GetLastCapEnumIndicesNative, _GetLastCapEnumIndicesDart>('DTWAIN_GetLastCapEnumIndices');
@@ -5917,6 +5926,7 @@ class DTWAIN {
   _setJXLLibraryPath = _dll.lookupFunction<_SetJXLLibraryPathNative, _SetJXLLibraryPathDart>('DTWAIN_SetJXLLibraryPath');
   _setJobControl = _dll.lookupFunction<_SetJobControlNative, _SetJobControlDart>('DTWAIN_SetJobControl');
   _setJpegValues = _dll.lookupFunction<_SetJpegValuesNative, _SetJpegValuesDart>('DTWAIN_SetJpegValues');
+  _setJpegXLQuality = _dll.lookupFunction<_SetJpegXLQualityNative, _SetJpegXLQualityDart>('DTWAIN_SetJpegXLQuality');
   _setJpegXRValues = _dll.lookupFunction<_SetJpegXRValuesNative, _SetJpegXRValuesDart>('DTWAIN_SetJpegXRValues');
   _setLanguage = _dll.lookupFunction<_SetLanguageNative, _SetLanguageDart>('DTWAIN_SetLanguage');
   _setLastError = _dll.lookupFunction<_SetLastErrorNative, _SetLastErrorDart>('DTWAIN_SetLastError');
@@ -8300,6 +8310,11 @@ class DTWAIN {
     return _getJpegValues(Source, pQuality, Progressive);  
   }  
   
+  int getJpegXLQuality(DTWAIN_SOURCE Source, LPLONG pQuality)  
+  {  
+    return _getJpegXLQuality(Source, pQuality);  
+  }  
+  
   int getJpegXRValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive)  
   {  
     return _getJpegXRValues(Source, pQuality, Progressive);  
@@ -10308,6 +10323,11 @@ class DTWAIN {
   int setJpegValues(DTWAIN_SOURCE Source, int Quality, int Progressive)  
   {  
     return _setJpegValues(Source, Quality, Progressive);  
+  }  
+  
+  int setJpegXLQuality(DTWAIN_SOURCE Source, int Quality)  
+  {  
+    return _setJpegXLQuality(Source, Quality);  
   }  
   
   int setJpegXRValues(DTWAIN_SOURCE Source, int Quality, int Progressive)  
