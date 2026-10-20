@@ -615,6 +615,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetJobControl(DTWAIN_SOURCE Source, LPLONG pJobControl, DTWAIN_BOOL bCurrent);
         LONG DTWAIN_GetJobControlEx(DTWAIN_SOURCE Source, DTWAIN_BOOL bGetCurrent);
         DTWAIN_BOOL DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
+        DTWAIN_BOOL DTWAIN_GetJpegXLQuality(DTWAIN_SOURCE Source, LPLONG pQuality);
         DTWAIN_BOOL DTWAIN_GetJpegXRValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         LONG DTWAIN_GetLanguage();
         DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
@@ -1107,6 +1108,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetJXLLibraryPathW(LPCWSTR sFilePath);
         DTWAIN_BOOL DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobControl, DTWAIN_BOOL bSetCurrent);
         DTWAIN_BOOL DTWAIN_SetJpegValues(DTWAIN_SOURCE Source, LONG Quality, LONG Progressive);
+        DTWAIN_BOOL DTWAIN_SetJpegXLQuality(DTWAIN_SOURCE Source, LONG Quality);
         DTWAIN_BOOL DTWAIN_SetJpegXRValues(DTWAIN_SOURCE Source, LONG Quality, LONG Progressive);
         DTWAIN_BOOL DTWAIN_SetLanguage(LONG nLanguage);
         LONG DTWAIN_SetLastError(LONG nError);
@@ -1853,6 +1855,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetJobControl(DTWAIN_SOURCE Source, LPLONG pJobControl, DTWAIN_BOOL bCurrent);
         LONG DTWAIN_GetJobControlEx(DTWAIN_SOURCE Source, DTWAIN_BOOL bGetCurrent);
         DTWAIN_BOOL DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
+        DTWAIN_BOOL DTWAIN_GetJpegXLQuality(DTWAIN_SOURCE Source, LPLONG pQuality);
         DTWAIN_BOOL DTWAIN_GetJpegXRValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         LONG DTWAIN_GetLanguage();
         DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
@@ -2345,6 +2348,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetJXLLibraryPathW(LPCWSTR sFilePath);
         DTWAIN_BOOL DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobControl, DTWAIN_BOOL bSetCurrent);
         DTWAIN_BOOL DTWAIN_SetJpegValues(DTWAIN_SOURCE Source, LONG Quality, LONG Progressive);
+        DTWAIN_BOOL DTWAIN_SetJpegXLQuality(DTWAIN_SOURCE Source, LONG Quality);
         DTWAIN_BOOL DTWAIN_SetJpegXRValues(DTWAIN_SOURCE Source, LONG Quality, LONG Progressive);
         DTWAIN_BOOL DTWAIN_SetLanguage(LONG nLanguage);
         LONG DTWAIN_SetLastError(LONG nError);
@@ -3091,6 +3095,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetJobControl(DTWAIN_SOURCE Source, LPLONG pJobControl, DTWAIN_BOOL bCurrent);
         LONG DTWAIN_GetJobControlEx(DTWAIN_SOURCE Source, DTWAIN_BOOL bGetCurrent);
         DTWAIN_BOOL DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
+        DTWAIN_BOOL DTWAIN_GetJpegXLQuality(DTWAIN_SOURCE Source, LPLONG pQuality);
         DTWAIN_BOOL DTWAIN_GetJpegXRValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         LONG DTWAIN_GetLanguage();
         DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
@@ -3583,6 +3588,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetJXLLibraryPathW(LPCWSTR sFilePath);
         DTWAIN_BOOL DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobControl, DTWAIN_BOOL bSetCurrent);
         DTWAIN_BOOL DTWAIN_SetJpegValues(DTWAIN_SOURCE Source, LONG Quality, LONG Progressive);
+        DTWAIN_BOOL DTWAIN_SetJpegXLQuality(DTWAIN_SOURCE Source, LONG Quality);
         DTWAIN_BOOL DTWAIN_SetJpegXRValues(DTWAIN_SOURCE Source, LONG Quality, LONG Progressive);
         DTWAIN_BOOL DTWAIN_SetLanguage(LONG nLanguage);
         LONG DTWAIN_SetLastError(LONG nError);
@@ -4329,6 +4335,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetJobControl(DTWAIN_SOURCE Source, LPLONG pJobControl, DTWAIN_BOOL bCurrent);
         LONG DTWAIN_GetJobControlEx(DTWAIN_SOURCE Source, DTWAIN_BOOL bGetCurrent);
         DTWAIN_BOOL DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
+        DTWAIN_BOOL DTWAIN_GetJpegXLQuality(DTWAIN_SOURCE Source, LPLONG pQuality);
         DTWAIN_BOOL DTWAIN_GetJpegXRValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive);
         LONG DTWAIN_GetLanguage();
         DTWAIN_BOOL DTWAIN_GetLastCapEnumIndices(DTWAIN_SOURCE Source, LPLONG pCurrentIndex, LPLONG pDefaultIndex);
@@ -4821,6 +4828,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_SetJXLLibraryPathW(LPCWSTR sFilePath);
         DTWAIN_BOOL DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobControl, DTWAIN_BOOL bSetCurrent);
         DTWAIN_BOOL DTWAIN_SetJpegValues(DTWAIN_SOURCE Source, LONG Quality, LONG Progressive);
+        DTWAIN_BOOL DTWAIN_SetJpegXLQuality(DTWAIN_SOURCE Source, LONG Quality);
         DTWAIN_BOOL DTWAIN_SetJpegXRValues(DTWAIN_SOURCE Source, LONG Quality, LONG Progressive);
         DTWAIN_BOOL DTWAIN_SetLanguage(LONG nLanguage);
         LONG DTWAIN_SetLastError(LONG nError);
