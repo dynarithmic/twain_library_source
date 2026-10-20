@@ -18,6 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include <algorithm>
 #include "cppfunc.h"
 #include "dtwainx.h"
 #include "ctldtwainhandle.h"
@@ -32,7 +33,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source, Quality, Progressive))
         auto [pHandle, pSource] = VerifyHandles(Source);
-        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return Quality < 0 || Quality > 100; }, DTWAIN_ERR_INVALID_PARAM, FALSE, FUNC_MACRO);
+        Quality = std::clamp(Quality, 0L, 100L);
         pSource->SetJpegValues(Quality, Progressive?true:false);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
@@ -42,7 +43,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source, Quality, Progressive))
         auto [pHandle, pSource] = VerifyHandles(Source);
-        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return Quality < 0 || Quality > 100; }, DTWAIN_ERR_INVALID_PARAM, FALSE, FUNC_MACRO);
+        Quality = std::clamp(Quality, 0L, 100L);
         pSource->SetJpegXRValues(Quality, Progressive?true:false);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
@@ -52,7 +53,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source, Quality))
         auto [pHandle, pSource] = VerifyHandles(Source);
-        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return Quality < 0 || Quality > 100; }, DTWAIN_ERR_INVALID_PARAM, FALSE, FUNC_MACRO);
+        Quality = std::clamp(Quality, 0L, 100L);
         pSource->SetJpegXLValues(Quality);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
