@@ -41,7 +41,9 @@ namespace dynarithmic
                 InitializeJXLSupport();
             }
 
-            CTL_JPegXLIOHandler(CTL_TwainDib* dib, DTWAINImageInfoEx&) : CTL_ImageIOHandler(dib)
+            CTL_JPegXLIOHandler(CTL_TwainDib* dib, const DTWAINImageInfoEx& ImageInfo) : 
+                            CTL_ImageIOHandler(dib), 
+                            m_ImageInfoEx(ImageInfo)
             {
                 InitializeJXLSupport();
             }
@@ -55,6 +57,7 @@ namespace dynarithmic
             void InitializeJXLSupport();
             JxlSessionOptions options_{};
             bool m_bJxlAvailable{};
+            DTWAINImageInfoEx m_ImageInfoEx;
     };
 }
 #endif

@@ -28,7 +28,16 @@ OF THIRD PARTY RIGHTS.
 
 namespace dynarithmic 
 {
-    struct JxlSessionOptions { bool lossless = true; float distance = 1.0f; int effort = 7; int numThreads = 0; };
+    struct JxlSessionOptions
+    {
+        bool lossless = true; 
+        float distance = 1.0f; 
+        int qualitySetting = 100;
+        int effort = 7; 
+        int numThreads = 0;
+        std::string copyright;
+    };
+
     struct PreparedJxlDibPage { DibPageView view{}; };
 
     class JxlSessionWriter 

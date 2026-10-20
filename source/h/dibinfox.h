@@ -111,6 +111,7 @@ namespace dynarithmic
         bool bProgressiveJpeg;
         LONG nJpegXRQuality;
         bool bProgressiveJpegXR;
+        LONG nJpegXLQuality;
         LONG PDFPageSize;
         bool PDFUseCompression;
         bool PDFUseThumbnail;
@@ -167,6 +168,7 @@ namespace dynarithmic
             nJpegQuality(100),
             bProgressiveJpeg(false),
             nJpegXRQuality(100),
+            nJpegXLQuality(100),
             bProgressiveJpegXR(false),
             PDFPageSize(DTWAIN_PDF_NOSCALING),
             PDFUseCompression(true),

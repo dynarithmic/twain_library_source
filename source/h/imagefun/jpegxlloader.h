@@ -51,6 +51,10 @@ namespace dynarithmic
             decltype(&JxlEncoderAddImageFrame) EncoderAddImageFrame = nullptr;
             decltype(&JxlEncoderCloseInput) EncoderCloseInput = nullptr;
             decltype(&JxlEncoderProcessOutput) EncoderProcessOutput = nullptr;
+            decltype(&JxlEncoderDistanceFromQuality) EncoderDistanceFromQuality = nullptr;
+            decltype(&JxlEncoderUseBoxes) EncoderUseBoxes = nullptr;
+            decltype(&JxlEncoderAddBox) EncoderAddBox = nullptr;
+            decltype(&JxlEncoderCloseBoxes) EncoderCloseBoxes = nullptr;
 
             // jxl_threads.dll
             decltype(&JxlThreadParallelRunnerCreate) ThreadParallelRunnerCreate = nullptr;

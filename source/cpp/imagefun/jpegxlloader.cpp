@@ -64,6 +64,20 @@ JxlDynamicLoader& JxlDynamicLoader::operator=(JxlDynamicLoader&& other) noexcept
 
 std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
 {
+    struct LoadLibraryRAII
+    {
+        JxlDynamicLoader* m_pThis{};
+        bool bUnload = true;
+        LoadLibraryRAII(JxlDynamicLoader* thisLoader) : m_pThis(thisLoader) {}
+        ~LoadLibraryRAII()
+        {
+            if (bUnload && m_pThis)
+            {
+                m_pThis->Unload();
+            }
+        }
+    };
+
     if (m_loaded)
         return { true, 0 };
 
@@ -79,6 +93,7 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
     HMODULE hThreads = nullptr;
     std::wstring jxlPath = L"jxl.dll";
     std::wstring threadsPath = L"jxl_threads.dll";
+    LoadLibraryRAII raii(this);
 
     if (directory.empty())
     {
@@ -117,19 +132,17 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
             return { false, m_lastError };
         }
 
-        hThreads = LoadLibraryExW(
-            threadsPath.c_str(), nullptr, flags);
+        hThreads = LoadLibraryExW(threadsPath.c_str(), nullptr, flags);
     }
+
+    m_jxl = hJxl;
 
     if (!hThreads)
     {
         m_lastError = GetLastError();
-        FreeLibrary(hJxl);
         return { false, m_lastError };
     }
 
-    // Both DLLs loaded successfully.
-    m_jxl = hJxl;
     m_threads = hThreads;
 
     if (CTL_StaticData::GetLogFilterFlags())
@@ -168,7 +181,6 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
         {                                                      \
             m_lastError = ::GetLastError();                    \
             m_failedFunction = exportedName;                  \
-            Unload();                                         \
             return { false, m_lastError };                                     \
         }                                                      \
     } while (false)
@@ -187,6 +199,10 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
     RESOLVE_JXL(m_jxl, EncoderAddImageFrame, "JxlEncoderAddImageFrame");
     RESOLVE_JXL(m_jxl, EncoderCloseInput, "JxlEncoderCloseInput");
     RESOLVE_JXL(m_jxl, EncoderProcessOutput, "JxlEncoderProcessOutput");
+    RESOLVE_JXL(m_jxl, EncoderDistanceFromQuality, "JxlEncoderDistanceFromQuality");
+    RESOLVE_JXL(m_jxl, EncoderUseBoxes, "JxlEncoderUseBoxes");
+    RESOLVE_JXL(m_jxl, EncoderAddBox, "JxlEncoderAddBox");
+    RESOLVE_JXL(m_jxl, EncoderCloseBoxes, "JxlEncoderCloseBoxes");
 
     RESOLVE_JXL(m_threads, ThreadParallelRunnerCreate, "JxlThreadParallelRunnerCreate");
     RESOLVE_JXL(m_threads, ThreadParallelRunnerDestroy, "JxlThreadParallelRunnerDestroy");
@@ -199,7 +215,7 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
     // Publish only a fully resolved table.
     m_functions = f;
     m_loaded = true;
-
+    raii.bUnload = false;
     return { true, 0 };
 }
 

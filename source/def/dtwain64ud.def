@@ -1188,3 +1188,5 @@ DTWAIN_GetJXLLibraryPathW                         @1184
 DTWAIN_SetJXLLibraryPath                          @1185
 DTWAIN_SetJXLLibraryPathA                         @1186
 DTWAIN_SetJXLLibraryPathW                         @1187
+DTWAIN_SetJpegXLQuality                           @1188
+DTWAIN_GetJpegXLQuality                           @1189

@@ -19,10 +19,9 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "dtwainc.h"
 #include "dtwainx.h"
-#include "ctltwainmanager.h"
 #include "ctldtwainhandle.h"
+#include "errorcheck.h"
 
 using namespace dynarithmic;
 
@@ -33,6 +32,7 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source, Quality, Progressive))
         auto [pHandle, pSource] = VerifyHandles(Source);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return Quality < 0 || Quality > 100; }, DTWAIN_ERR_INVALID_PARAM, FALSE, FUNC_MACRO);
         pSource->SetJpegValues(Quality, Progressive?true:false);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
@@ -42,7 +42,18 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source, Quality, Progressive))
         auto [pHandle, pSource] = VerifyHandles(Source);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return Quality < 0 || Quality > 100; }, DTWAIN_ERR_INVALID_PARAM, FALSE, FUNC_MACRO);
         pSource->SetJpegXRValues(Quality, Progressive?true:false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJpegXLQuality(DTWAIN_SOURCE Source, LONG Quality)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, Quality))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return Quality < 0 || Quality > 100; }, DTWAIN_ERR_INVALID_PARAM, FALSE, FUNC_MACRO);
+        pSource->SetJpegXLValues(Quality);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
     }
@@ -52,8 +63,12 @@ extern "C"
         LOG_FUNC_ENTRY_PARAMS((Source, pQuality, Progressive))
         auto [pHandle, pSource] = VerifyHandles(Source);
         bool PrTemp;
-        pSource->GetJpegValues(*pQuality, PrTemp);
-        *Progressive = static_cast<LONG>(PrTemp);
+        LONG tempQuality;
+        pSource->GetJpegValues(tempQuality, PrTemp);
+        if (pQuality)
+            *pQuality = tempQuality;
+        if ( Progressive )
+            *Progressive = static_cast<LONG>(PrTemp);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pQuality, Progressive))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
@@ -64,10 +79,28 @@ extern "C"
         LOG_FUNC_ENTRY_PARAMS((Source, pQuality, Progressive))
         auto [pHandle, pSource] = VerifyHandles(Source);
         bool PrTemp;
-        pSource->GetJpegXRValues(*pQuality, PrTemp);
-        *Progressive = static_cast<LONG>(PrTemp);
+        LONG tempQuality;
+        pSource->GetJpegXRValues(tempQuality, PrTemp);
+        if ( pQuality )
+            *pQuality = tempQuality;
+        if ( Progressive)
+            *Progressive = static_cast<LONG>(PrTemp);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pQuality, Progressive))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetJpegXLQuality(DTWAIN_SOURCE Source, LPLONG pQuality)
+    {
+        LOG_FUNC_ENTRY_PARAMS((Source, pQuality))
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        LONG tempQuality;
+        pSource->GetJpegXLValues(tempQuality);
+        if ( pQuality )
+            *pQuality = tempQuality;
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pQuality))
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+        
     }
 }

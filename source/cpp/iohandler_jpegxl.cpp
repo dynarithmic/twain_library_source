@@ -20,7 +20,6 @@ OF THIRD PARTY RIGHTS.
 */
 
 #include <windows.h>
-#include <delayimp.h>
 #include "iohandler_jpegxl.h"
 #include "ctldib32ex.h"
 #include "ctlstaticdata.h"
@@ -60,6 +59,13 @@ int CTL_JPegXLIOHandler::WriteBitmap(LPCTSTR szFile, bool, int, DibMultiPageStru
         return DTWAIN_ERR_FILEWRITE;
     const std::wstring filename = stringconversion::Convert_NativePtr_To_Wide(szFile);
     JxlSessionWriter writer;
+    if (m_ImageInfoEx.nJpegXLQuality < 100)
+    {
+        options_.lossless = false;
+        options_.qualitySetting = m_ImageInfoEx.nJpegXLQuality;
+    }
+
+    options_.copyright = GetCopyrightString();
 
     if (!writer.Open(filename, options_) || !writer.SetPageInfo(*page) || !writer.WriteCurrentPage()) 
         return DTWAIN_ERR_FILEWRITE;
