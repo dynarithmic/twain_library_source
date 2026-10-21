@@ -213,7 +213,11 @@ bool JxlSessionWriter::WriteCurrentPage()
     if (!enc)
         return false;
 
-    const size_t threadCount = options_.numThreads > 0 ? static_cast<size_t>(options_.numThreads) : jxl.ThreadParallelRunnerDefaultNumWorkerThreads();
+    size_t threadCount = 0;
+    if (options_.numThreads == DTWAIN_DEFAULT)
+        threadCount = jxl.ThreadParallelRunnerDefaultNumWorkerThreads();
+    else
+        threadCount = options_.numThreads;
 
     std::unique_ptr<void, decltype(runnerDeleter)> runner(jxl.ThreadParallelRunnerCreate(nullptr, threadCount),runnerDeleter);
 

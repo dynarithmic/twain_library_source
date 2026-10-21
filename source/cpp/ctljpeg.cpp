@@ -59,6 +59,26 @@ extern "C"
         CATCH_BLOCK_LOG_PARAMS(false)
     }
 
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJpegXLThreadCount(LONG ThreadCount)
+    {
+        LOG_FUNC_ENTRY_PARAMS((ThreadCount))
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (ThreadCount < DTWAIN_DEFAULT)
+            ThreadCount = DTWAIN_DEFAULT;
+        CTL_StaticData::GetJPEGXLNumThreads() = ThreadCount;
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetJpegXLThreadCount()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto threadCount = CTL_StaticData::GetJPEGXLNumThreads();
+        LOG_FUNC_EXIT_NONAME_PARAMS(threadCount)
+        CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE2)
+    }
+
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive)
     {
         LOG_FUNC_ENTRY_PARAMS((Source, pQuality, Progressive))
