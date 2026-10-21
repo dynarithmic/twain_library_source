@@ -346,7 +346,7 @@ namespace dynarithmic
     /////////////// Supported formats for File transfers ////////////////
     constexpr auto EnumTwainFileFormats()
     {
-        constexpr std::array<int, 61> ca = {
+        constexpr std::array<int, 62> ca = {
             TWAINFileFormat_BMP, TWAINFileFormat_BMPRLE, TWAINFileFormat_PCX, TWAINFileFormat_DCX, TWAINFileFormat_TIFFLZW,
             TWAINFileFormat_PDF, TWAINFileFormat_PDFMULTI, TWAINFileFormat_TIFFNONE, TWAINFileFormat_TIFFGROUP3,TWAINFileFormat_TIFFGROUP4,
             TWAINFileFormat_TIFFPACKBITS, TWAINFileFormat_TIFFDEFLATE, TWAINFileFormat_TIFFJPEG, TWAINFileFormat_TIFFNONEMULTI,
@@ -359,7 +359,7 @@ namespace dynarithmic
             TWAINFileFormat_BIGTIFFNONE, TWAINFileFormat_BIGTIFFNONEMULTI, TWAINFileFormat_BIGTIFFPACKBITS, TWAINFileFormat_BIGTIFFPACKBITSMULTI,
             TWAINFileFormat_BIGTIFFDEFLATE, TWAINFileFormat_BIGTIFFDEFLATEMULTI, TWAINFileFormat_BIGTIFFGROUP3, TWAINFileFormat_BIGTIFFGROUP3MULTI,
             TWAINFileFormat_BIGTIFFGROUP4, TWAINFileFormat_BIGTIFFGROUP4MULTI, TWAINFileFormat_BIGTIFFJPEG, TWAINFileFormat_BIGTIFFJPEGMULTI,
-            TWAINFileFormat_JPEGXR, TWAINFileFormat_SVG, TWAINFileFormat_SVGZ};
+            TWAINFileFormat_JPEGXR, TWAINFileFormat_SVG, TWAINFileFormat_SVGZ, TWAINFileFormat_JPEGXL};
         return ca;
     }
 

@@ -221,4 +221,60 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
         CATCH_BLOCK(0)
     }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJXLLibraryPath(LPCTSTR szPath)
+    {
+        LOG_FUNC_ENTRY_PARAMS((szPath))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto& jxlLoader = CTL_StaticData::GetJPEGXLLoader();
+
+        // Reject changes after JPEG XL has been loaded.
+        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return jxlLoader.IsLoaded(); }, DTWAIN_ERR_JXL_ALREADYLOADED, 
+                                                FALSE, FUNC_MACRO);
+
+        auto& jxlPath = CTL_StaticData::GetJPEGXLPath();
+        
+        // Perform the usual DTWAIN initialization checks here.
+        CTL_StringType sPath;
+        if (szPath)
+        {
+            sPath = szPath;
+        }
+
+        std::filesystem::path directory(sPath);
+
+        // An empty path is valid and means default Windows DLL search.
+        if (!directory.empty())
+        {
+            if (!directory.is_absolute())
+            {
+                DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PATH, false, FUNC_MACRO);
+            }
+
+            if (!std::filesystem::is_directory(directory))
+            {
+                DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PATH, false, FUNC_MACRO);
+            }
+        }
+
+        // Save the directory for the JPEG XL loader.
+    #ifdef UNICODE
+        jxlPath = directory.wstring();
+    #else
+        jxlPath = directory.string();
+    #endif
+        LOG_FUNC_EXIT_PARAMS(TRUE)
+        CATCH_BLOCK(FALSE)
+    }
+
+    LONG DLLENTRY_DEF DTWAIN_GetJXLLibraryPath(LPTSTR lpszOut, LONG nMaxLen)
+    {
+        LOG_FUNC_ENTRY_PARAMS((lpszOut, nMaxLen))
+        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        auto ret = CTL_StaticData::GetJPEGXLPath();
+        auto numChars = CopyInfoToCString(ret, lpszOut, nMaxLen);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+        LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+        CATCH_BLOCK(-1)
+    }
 }

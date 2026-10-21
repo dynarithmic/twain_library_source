@@ -40,7 +40,7 @@
 #include "ctlguiddef.h"
 #include "ctltwaindllhandle.h"
 #include "dtwainx.h"
-#include <arrayfactory.h>
+#include "arrayfactory.h"
 #include "ctlfileutils.h"
 #include "ctlguidimpl.h"
 #include "ctlstringdefs.h"

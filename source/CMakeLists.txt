@@ -8,7 +8,7 @@ if(POLICY CMP0167)
     cmake_policy(SET CMP0167 OLD)
 endif()
 
-project (dtwain VERSION 5.9.2 LANGUAGES C CXX)
+project (dtwain VERSION 5.10.1 LANGUAGES C CXX)
 
 option(DTWAIN_BUILD_UNICODE
        "Build DTWAIN as Unicode instead of ANSI"
@@ -548,6 +548,8 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/imagefun/imagefilewriterbase.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/jpeg2kwriter.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/jpegwriter.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/jpegxlloader.h
+        ${PROJECT_SOURCE_DIR}/h/imagefun/jpegxlwriter.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/jpegxrwriter.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/metafilewriter.h
         ${PROJECT_SOURCE_DIR}/h/imagefun/pcxwriter.h
@@ -572,6 +574,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/iohandler_jpeg.h
         ${PROJECT_SOURCE_DIR}/h/iohandler_jpeg2k.h
         ${PROJECT_SOURCE_DIR}/h/iohandler_jpegxr.h
+        ${PROJECT_SOURCE_DIR}/h/iohandler_jpegxl.h  
         ${PROJECT_SOURCE_DIR}/h/iohandler_pbm.h
         ${PROJECT_SOURCE_DIR}/h/iohandler_pcx.h
         ${PROJECT_SOURCE_DIR}/h/iohandler_pdf.h
@@ -742,7 +745,9 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/imagefilewriterbase.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpeg2kwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpegwriter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpegxlloader.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpegxrwriter.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/imagefun/jpegxlwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/metafilewriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/pcxwriter.cpp
   ${PROJECT_SOURCE_DIR}/cpp/imagefun/pdffun32.cpp
@@ -766,6 +771,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpeg.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpeg2k.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpegxr.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/iohandler_jpegxl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_pbm.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_pcx.cpp
   ${PROJECT_SOURCE_DIR}/cpp/iohandler_pdf.cpp
@@ -1615,6 +1621,7 @@ target_include_directories(dtwain PRIVATE
     ${PROJECT_SOURCE_DIR}/LibJXR/image/decode
     ${PROJECT_SOURCE_DIR}/LibJXR/image/encode
     ${PROJECT_SOURCE_DIR}/LibJXR/jxrgluelib
+    ${PROJECT_SOURCE_DIR}/LibJXL/include
     ${PROJECT_SOURCE_DIR}/LibOpenJPEG
     ${PROJECT_SOURCE_DIR}/LibPNG
     ${PROJECT_SOURCE_DIR}/LibTIFF4

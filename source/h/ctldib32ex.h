@@ -146,6 +146,7 @@ namespace dynarithmic
                    JpegXRFormat = DTWAIN_JPEGXR,
                    SVGFormat = DTWAIN_SVG,
                    SVGZFormat = DTWAIN_SVGZ,
+                   JpegXLFormat = DTWAIN_JPEGXL,
                    RawFormat=9999};
 
             // Setting/Getting

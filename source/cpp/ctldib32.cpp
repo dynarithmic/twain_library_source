@@ -36,6 +36,7 @@
 #include "iohandler_jpeg2k.h"
 #include "iohandler_pdf.h"
 #include "iohandler_ps.h"
+#include "iohandler_jpegxl.h"
 #include "iohandler_jpegxr.h"
 #include "iohandler_png.h"
 #include "iohandler_pcx.h"
@@ -51,7 +52,9 @@
 #include "iohandler_svg.h"
 #include "ctlglobalhandletraits.h"
 #include "capconst.h"
+#include "ctltwainlogging.h"
 #include "dtwainx.h"
+#include "logwriterutils.h"
 
 template<typename T1, typename T2, typename T3>
 constexpr auto BOUND(T1 x, T2 min, T3 max) { return ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x))); }
@@ -178,6 +181,19 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         break;
         case JpegXRFormat:
             pHandler = std::make_unique<CTL_JpegXRIOHandler>(this, ImageInfo);
+        break;
+        case JpegXLFormat:
+        {
+            auto pJxlHandler = std::make_unique<CTL_JPegXLIOHandler>(this, ImageInfo);
+            if (!pJxlHandler->IsJxlAvailable())
+            {
+                // Set DTWAIN error indicating that
+                // JPEG XL support is unavailable.
+                LogWin32Error(pJxlHandler->GetJXLLoadError().windowsError);
+                return DTWAIN_ERR_JXL_NOTAVAILABLE;
+            }
+            pHandler = std::move(pJxlHandler);
+        }
         break;
         case Jpeg2000Format:
             ImageInfo.nJpegQuality = 100;

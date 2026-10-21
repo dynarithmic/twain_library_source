@@ -355,39 +355,53 @@ namespace dynarithmic
             }
         }
 
-        void         SetFastCapRetrieval(bool bSet = true) { m_bFastCapRetrieval = bSet; }
-        bool         IsFastCapRetrieval() const { return m_bFastCapRetrieval; }
+        void SetFastCapRetrieval(bool bSet = true) { m_bFastCapRetrieval = bSet; }
+        bool IsFastCapRetrieval() const { return m_bFastCapRetrieval; }
 
-        void         SetJpegValues(LONG nQuality, bool bProgressive) {
+        void SetJpegValues(LONG nQuality, bool bProgressive) 
+        {
             m_ImageInfoEx.nJpegQuality = nQuality;
             m_ImageInfoEx.bProgressiveJpeg = bProgressive;
         }
 
-        void         SetJpegXRValues(LONG nQuality, bool bProgressive) {
+        void SetJpegXRValues(LONG nQuality, bool bProgressive) 
+        {
             m_ImageInfoEx.nJpegXRQuality = nQuality;
             m_ImageInfoEx.bProgressiveJpegXR = bProgressive;
         }
 
-        void         GetJpegValues(LONG& Quality, bool& bProgressive) const {
+        void SetJpegXLValues(LONG nQuality) 
+        {
+            m_ImageInfoEx.nJpegXLQuality = nQuality;
+        }
+
+        void GetJpegValues(LONG& Quality, bool& bProgressive) const 
+        {
             Quality = m_ImageInfoEx.nJpegQuality;
             bProgressive = m_ImageInfoEx.bProgressiveJpeg;
         }
 
-        void         GetJpegXRValues(LONG& Quality, bool& bProgressive) const {
+        void GetJpegXRValues(LONG& Quality, bool& bProgressive) const 
+        {
             Quality = m_ImageInfoEx.nJpegXRQuality;
             bProgressive = m_ImageInfoEx.bProgressiveJpegXR;
         }
 
-        void         SetPDFValue(CTL_StringViewType nWhich, CTL_StringViewType sz);
-        void         SetPDFValue(CTL_StringViewType nWhich, LONG nValue);
-        void         SetPDFValue(CTL_StringViewType s, DTWAIN_FLOAT f1, DTWAIN_FLOAT f2);
-        void         SetPDFValue(CTL_StringViewType nWhich, const PDFTextElementPtr& element);
-        void         SetPDFPageSize(LONG nPageSize, DTWAIN_FLOAT cWidth, DTWAIN_FLOAT cHeight);
-        void         SetPDFEncryption(bool bIsEncrypted,
+        void GetJpegXLValues(LONG& Quality) const 
+        {
+            Quality = m_ImageInfoEx.nJpegXRQuality;
+        }
+
+        void SetPDFValue(CTL_StringViewType nWhich, CTL_StringViewType sz);
+        void SetPDFValue(CTL_StringViewType nWhich, LONG nValue);
+        void SetPDFValue(CTL_StringViewType s, DTWAIN_FLOAT f1, DTWAIN_FLOAT f2);
+        void SetPDFValue(CTL_StringViewType nWhich, const PDFTextElementPtr& element);
+        void SetPDFPageSize(LONG nPageSize, DTWAIN_FLOAT cWidth, DTWAIN_FLOAT cHeight);
+        void SetPDFEncryption(bool bIsEncrypted,
             CTL_StringViewType strOwnerPassword, CTL_StringViewType strUserPassword,
             LONG Permissions, bool bUseStrongEncryption);
 
-        void         SetPhotometric(LONG Setting);
+        void SetPhotometric(LONG Setting);
 
         void         GetImageInfoEx(DTWAINImageInfoEx& ImageInfoEx) const;
         DTWAINImageInfoEx& GetImageInfoExRef() { return m_ImageInfoEx; }
