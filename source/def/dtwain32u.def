@@ -1190,3 +1190,5 @@ DTWAIN_SetJXLLibraryPathA                         @1186
 DTWAIN_SetJXLLibraryPathW                         @1187
 DTWAIN_SetJpegXLQuality                           @1188
 DTWAIN_GetJpegXLQuality                           @1189
+DTWAIN_SetJpegXLThreadCount                       @1190
+DTWAIN_GetJpegXLThreadCount                       @1191

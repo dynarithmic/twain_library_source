@@ -34,7 +34,7 @@ namespace dynarithmic
         float distance = 1.0f; 
         int qualitySetting = 100;
         int effort = 7; 
-        int numThreads = 0;
+        int numThreads = -1;
         std::string copyright;
     };
 

@@ -64,6 +64,7 @@ int CTL_JPegXLIOHandler::WriteBitmap(LPCTSTR szFile, bool, int, DibMultiPageStru
         options_.lossless = false;
         options_.qualitySetting = m_ImageInfoEx.nJpegXLQuality;
     }
+    options_.numThreads = CTL_StaticData::GetJPEGXLNumThreads();
 
     options_.copyright = GetCopyrightString();
 
