@@ -2424,6 +2424,7 @@ function DTWAIN_GetJobControl(Source:DTWAIN_SOURCE; pJobControl:LPLONG; bCurrent
 function DTWAIN_GetJobControlEx(Source:DTWAIN_SOURCE; bGetCurrent:BOOL) : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_GetJobControlEx';
 function DTWAIN_GetJpegValues(Source:DTWAIN_SOURCE; pQuality:LPLONG; Progressive:LPLONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_GetJpegValues';
 function DTWAIN_GetJpegXLQuality(Source:DTWAIN_SOURCE; pQuality:LPLONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_GetJpegXLQuality';
+function DTWAIN_GetJpegXLThreadCount : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_GetJpegXLThreadCount';
 function DTWAIN_GetJpegXRValues(Source:DTWAIN_SOURCE; pQuality:LPLONG; Progressive:LPLONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_GetJpegXRValues';
 function DTWAIN_GetLanguage : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_GetLanguage';
 function DTWAIN_GetLastCapEnumIndices(Source:DTWAIN_SOURCE; pCurrentIndex:LPLONG; pDefaultIndex:LPLONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_GetLastCapEnumIndices';
@@ -2921,6 +2922,7 @@ function DTWAIN_SetJXLLibraryPathW(sFilePath:LPCWSTR) : BOOL; external 'dtwain64
 function DTWAIN_SetJobControl(Source:DTWAIN_SOURCE; JobControl:LONG; bSetCurrent:BOOL) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetJobControl';
 function DTWAIN_SetJpegValues(Source:DTWAIN_SOURCE; Quality:LONG; Progressive:LONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetJpegValues';
 function DTWAIN_SetJpegXLQuality(Source:DTWAIN_SOURCE; Quality:LONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetJpegXLQuality';
+function DTWAIN_SetJpegXLThreadCount(ThreadCount:LONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetJpegXLThreadCount';
 function DTWAIN_SetJpegXRValues(Source:DTWAIN_SOURCE; Quality:LONG; Progressive:LONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetJpegXRValues';
 function DTWAIN_SetLanguage(nLanguage:LONG) : BOOL; external 'dtwain64ud.dll'  name 'DTWAIN_SetLanguage';
 function DTWAIN_SetLastError(nError:LONG) : LONG; external 'dtwain64ud.dll'  name 'DTWAIN_SetLastError';

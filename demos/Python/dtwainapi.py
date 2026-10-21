@@ -2383,6 +2383,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetJobControlEx.restype = ct.c_long
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
      theDLL.DTWAIN_GetJpegXLQuality.restype = ct.c_long
+     theDLL.DTWAIN_GetJpegXLThreadCount.restype = ct.c_long
      theDLL.DTWAIN_GetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_GetLanguage.restype = ct.c_long
      theDLL.DTWAIN_GetLastCapEnumIndices.restype = ct.c_long
@@ -2878,6 +2879,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetJobControl.restype = ct.c_long
      theDLL.DTWAIN_SetJpegValues.restype = ct.c_long
      theDLL.DTWAIN_SetJpegXLQuality.restype = ct.c_long
+     theDLL.DTWAIN_SetJpegXLThreadCount.restype = ct.c_long
      theDLL.DTWAIN_SetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_SetLanguage.restype = ct.c_long
      theDLL.DTWAIN_SetLastError.restype = ct.c_long
@@ -4022,6 +4024,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetJobControl.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegXLQuality.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_SetJpegXLThreadCount.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetJpegXRValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetLanguage.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetLastError.argtypes = [ct.c_long]
@@ -4723,6 +4726,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetJobControlEx.restype = ct.c_long
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
      theDLL.DTWAIN_GetJpegXLQuality.restype = ct.c_long
+     theDLL.DTWAIN_GetJpegXLThreadCount.restype = ct.c_long
      theDLL.DTWAIN_GetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_GetLanguage.restype = ct.c_long
      theDLL.DTWAIN_GetLastCapEnumIndices.restype = ct.c_long
@@ -5218,6 +5222,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetJobControl.restype = ct.c_long
      theDLL.DTWAIN_SetJpegValues.restype = ct.c_long
      theDLL.DTWAIN_SetJpegXLQuality.restype = ct.c_long
+     theDLL.DTWAIN_SetJpegXLThreadCount.restype = ct.c_long
      theDLL.DTWAIN_SetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_SetLanguage.restype = ct.c_long
      theDLL.DTWAIN_SetLastError.restype = ct.c_long
@@ -6362,6 +6367,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetJobControl.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegXLQuality.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_SetJpegXLThreadCount.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetJpegXRValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetLanguage.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetLastError.argtypes = [ct.c_long]

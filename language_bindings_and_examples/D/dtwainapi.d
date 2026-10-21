@@ -2488,6 +2488,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_GetJobControlEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPLONG) DTWAIN_GetJpegValues;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetJpegXLQuality;
+    extern(Windows) LONG function() DTWAIN_GetJpegXLThreadCount;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPLONG) DTWAIN_GetJpegXRValues;
     extern(Windows) LONG function() DTWAIN_GetLanguage;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPLONG) DTWAIN_GetLastCapEnumIndices;
@@ -2978,6 +2979,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, DTWAIN_BOOL) DTWAIN_SetJobControl;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG) DTWAIN_SetJpegValues;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_SetJpegXLQuality;
+    extern(Windows) DTWAIN_BOOL function(LONG) DTWAIN_SetJpegXLThreadCount;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG, LONG) DTWAIN_SetJpegXRValues;
     extern(Windows) DTWAIN_BOOL function(LONG) DTWAIN_SetLanguage;
     extern(Windows) LONG function(LONG) DTWAIN_SetLastError;
@@ -3666,6 +3668,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetJobControlEx, "DTWAIN_GetJobControlEx");
         bindFunction(cast(void**)&DTWAIN_GetJpegValues, "DTWAIN_GetJpegValues");
         bindFunction(cast(void**)&DTWAIN_GetJpegXLQuality, "DTWAIN_GetJpegXLQuality");
+        bindFunction(cast(void**)&DTWAIN_GetJpegXLThreadCount, "DTWAIN_GetJpegXLThreadCount");
         bindFunction(cast(void**)&DTWAIN_GetJpegXRValues, "DTWAIN_GetJpegXRValues");
         bindFunction(cast(void**)&DTWAIN_GetLanguage, "DTWAIN_GetLanguage");
         bindFunction(cast(void**)&DTWAIN_GetLastCapEnumIndices, "DTWAIN_GetLastCapEnumIndices");
@@ -4156,6 +4159,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_SetJobControl, "DTWAIN_SetJobControl");
         bindFunction(cast(void**)&DTWAIN_SetJpegValues, "DTWAIN_SetJpegValues");
         bindFunction(cast(void**)&DTWAIN_SetJpegXLQuality, "DTWAIN_SetJpegXLQuality");
+        bindFunction(cast(void**)&DTWAIN_SetJpegXLThreadCount, "DTWAIN_SetJpegXLThreadCount");
         bindFunction(cast(void**)&DTWAIN_SetJpegXRValues, "DTWAIN_SetJpegXRValues");
         bindFunction(cast(void**)&DTWAIN_SetLanguage, "DTWAIN_SetLanguage");
         bindFunction(cast(void**)&DTWAIN_SetLastError, "DTWAIN_SetLastError");

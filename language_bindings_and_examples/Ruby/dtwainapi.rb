@@ -675,6 +675,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetJobControlEx
    attr_reader :DTWAIN_GetJpegValues
    attr_reader :DTWAIN_GetJpegXLQuality
+   attr_reader :DTWAIN_GetJpegXLThreadCount
    attr_reader :DTWAIN_GetJpegXRValues
    attr_reader :DTWAIN_GetLanguage
    attr_reader :DTWAIN_GetLastCapEnumIndices
@@ -1170,6 +1171,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_SetJobControl
    attr_reader :DTWAIN_SetJpegValues
    attr_reader :DTWAIN_SetJpegXLQuality
+   attr_reader :DTWAIN_SetJpegXLThreadCount
    attr_reader :DTWAIN_SetJpegXRValues
    attr_reader :DTWAIN_SetLanguage
    attr_reader :DTWAIN_SetLastError
@@ -3608,6 +3610,7 @@ class DTWAINAPI
        @DTWAIN_GetJobControlEx = Fiddle::Function::new(dtwain_dll['DTWAIN_GetJobControlEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_LONG)
        @DTWAIN_GetJpegValues = Fiddle::Function::new(dtwain_dll['DTWAIN_GetJpegValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetJpegXLQuality = Fiddle::Function::new(dtwain_dll['DTWAIN_GetJpegXLQuality'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_GetJpegXLThreadCount = Fiddle::Function::new(dtwain_dll['DTWAIN_GetJpegXLThreadCount'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetJpegXRValues = Fiddle::Function::new(dtwain_dll['DTWAIN_GetJpegXRValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetLanguage = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLanguage'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetLastCapEnumIndices = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLastCapEnumIndices'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
@@ -4103,6 +4106,7 @@ class DTWAINAPI
        @DTWAIN_SetJobControl = Fiddle::Function::new(dtwain_dll['DTWAIN_SetJobControl'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_SetJpegValues = Fiddle::Function::new(dtwain_dll['DTWAIN_SetJpegValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetJpegXLQuality = Fiddle::Function::new(dtwain_dll['DTWAIN_SetJpegXLQuality'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
+       @DTWAIN_SetJpegXLThreadCount = Fiddle::Function::new(dtwain_dll['DTWAIN_SetJpegXLThreadCount'],[Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetJpegXRValues = Fiddle::Function::new(dtwain_dll['DTWAIN_SetJpegXRValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetLanguage = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLanguage'],[Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetLastError = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLastError'],[Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)

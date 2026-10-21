@@ -3232,6 +3232,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetJpegXLQualityDelegate(Source As System.IntPtr, ByRef pQuality As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_GetJpegXLThreadCountDelegate() As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetJpegXRValuesDelegate(Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -4271,6 +4274,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetJpegXLQualityDelegate(Source As System.IntPtr, Quality As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_SetJpegXLThreadCountDelegate(ThreadCount As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_SetJpegXRValuesDelegate(Source As System.IntPtr, Quality As Integer, Progressive As Integer) As Integer
@@ -6255,6 +6261,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetJpegXLQuality(Source, pQuality)
         End Function
         
+        Public Function DTWAIN_GetJpegXLThreadCount() As Integer
+        Return api.DTWAIN_GetJpegXLThreadCount()
+        End Function
+        
         Public Function DTWAIN_GetJpegXRValues(Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
         Return api.DTWAIN_GetJpegXRValues(Source, pQuality, Progressive)
         End Function
@@ -7643,6 +7653,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetJpegXLQuality(Source, Quality)
         End Function
         
+        Public Function DTWAIN_SetJpegXLThreadCount(ThreadCount As Integer) As Integer
+        Return api.DTWAIN_SetJpegXLThreadCount(ThreadCount)
+        End Function
+        
         Public Function DTWAIN_SetJpegXRValues(Source As System.IntPtr, Quality As Integer, Progressive As Integer) As Integer
         Return api.DTWAIN_SetJpegXRValues(Source, Quality, Progressive)
         End Function
@@ -8451,6 +8465,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetJobControlEx As DTWAIN_GetJobControlExDelegate
             Public DTWAIN_GetJpegValues As DTWAIN_GetJpegValuesDelegate
             Public DTWAIN_GetJpegXLQuality As DTWAIN_GetJpegXLQualityDelegate
+            Public DTWAIN_GetJpegXLThreadCount As DTWAIN_GetJpegXLThreadCountDelegate
             Public DTWAIN_GetJpegXRValues As DTWAIN_GetJpegXRValuesDelegate
             Public DTWAIN_GetLanguage As DTWAIN_GetLanguageDelegate
             Public DTWAIN_GetLastCapEnumIndices As DTWAIN_GetLastCapEnumIndicesDelegate
@@ -8798,6 +8813,7 @@ Namespace Dynarithmic
             Public DTWAIN_SetJobControl As DTWAIN_SetJobControlDelegate
             Public DTWAIN_SetJpegValues As DTWAIN_SetJpegValuesDelegate
             Public DTWAIN_SetJpegXLQuality As DTWAIN_SetJpegXLQualityDelegate
+            Public DTWAIN_SetJpegXLThreadCount As DTWAIN_SetJpegXLThreadCountDelegate
             Public DTWAIN_SetJpegXRValues As DTWAIN_SetJpegXRValuesDelegate
             Public DTWAIN_SetLanguage As DTWAIN_SetLanguageDelegate
             Public DTWAIN_SetLastError As DTWAIN_SetLastErrorDelegate

@@ -2211,6 +2211,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetJobControlEx Lib "dtwain64d.dll" (Source As System.IntPtr, bGetCurrent As Integer) As Integer
     Public Declare Function DTWAIN_GetJpegValues Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
     Public Declare Function DTWAIN_GetJpegXLQuality Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pQuality As Integer) As Integer
+    Public Declare Function DTWAIN_GetJpegXLThreadCount Lib "dtwain64d.dll" () As Integer
     Public Declare Function DTWAIN_GetJpegXRValues Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
     Public Declare Function DTWAIN_GetLanguage Lib "dtwain64d.dll" () As Integer
     Public Declare Function DTWAIN_GetLastCapEnumIndices Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pCurrentIndex As Integer, ByRef pDefaultIndex As Integer) As Integer
@@ -2558,6 +2559,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_SetJobControl Lib "dtwain64d.dll" (Source As System.IntPtr, JobControl As Integer, bSetCurrent As Integer) As Integer
     Public Declare Function DTWAIN_SetJpegValues Lib "dtwain64d.dll" (Source As System.IntPtr, Quality As Integer, Progressive As Integer) As Integer
     Public Declare Function DTWAIN_SetJpegXLQuality Lib "dtwain64d.dll" (Source As System.IntPtr, Quality As Integer) As Integer
+    Public Declare Function DTWAIN_SetJpegXLThreadCount Lib "dtwain64d.dll" (ThreadCount As Integer) As Integer
     Public Declare Function DTWAIN_SetJpegXRValues Lib "dtwain64d.dll" (Source As System.IntPtr, Quality As Integer, Progressive As Integer) As Integer
     Public Declare Function DTWAIN_SetLanguage Lib "dtwain64d.dll" (nLanguage As Integer) As Integer
     Public Declare Function DTWAIN_SetLastError Lib "dtwain64d.dll" (nError As Integer) As Integer

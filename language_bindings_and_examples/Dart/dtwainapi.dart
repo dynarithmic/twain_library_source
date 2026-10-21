@@ -2994,6 +2994,9 @@ typedef _GetJpegValuesDart = int Function(DTWAIN_SOURCE, LPLONG, LPLONG);
 typedef _GetJpegXLQualityNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LPLONG);
 typedef _GetJpegXLQualityDart = int Function(DTWAIN_SOURCE, LPLONG);
 
+typedef _GetJpegXLThreadCountNative = LONG Function();
+typedef _GetJpegXLThreadCountDart = int Function();
+
 typedef _GetJpegXRValuesNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LPLONG,LPLONG);
 typedef _GetJpegXRValuesDart = int Function(DTWAIN_SOURCE, LPLONG, LPLONG);
 
@@ -4017,6 +4020,9 @@ typedef _SetJpegValuesDart = int Function(DTWAIN_SOURCE, int, int);
 typedef _SetJpegXLQualityNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LONG);
 typedef _SetJpegXLQualityDart = int Function(DTWAIN_SOURCE, int);
 
+typedef _SetJpegXLThreadCountNative = DTWAIN_BOOL Function(LONG);
+typedef _SetJpegXLThreadCountDart = int Function(int);
+
 typedef _SetJpegXRValuesNative = DTWAIN_BOOL Function(DTWAIN_SOURCE,LONG,LONG);
 typedef _SetJpegXRValuesDart = int Function(DTWAIN_SOURCE, int, int);
 
@@ -4714,6 +4720,7 @@ class DTWAIN {
   late final _GetJobControlExDart _getJobControlEx;
   late final _GetJpegValuesDart _getJpegValues;
   late final _GetJpegXLQualityDart _getJpegXLQuality;
+  late final _GetJpegXLThreadCountDart _getJpegXLThreadCount;
   late final _GetJpegXRValuesDart _getJpegXRValues;
   late final _GetLanguageDart _getLanguage;
   late final _GetLastCapEnumIndicesDart _getLastCapEnumIndices;
@@ -5055,6 +5062,7 @@ class DTWAIN {
   late final _SetJobControlDart _setJobControl;
   late final _SetJpegValuesDart _setJpegValues;
   late final _SetJpegXLQualityDart _setJpegXLQuality;
+  late final _SetJpegXLThreadCountDart _setJpegXLThreadCount;
   late final _SetJpegXRValuesDart _setJpegXRValues;
   late final _SetLanguageDart _setLanguage;
   late final _SetLastErrorDart _setLastError;
@@ -5586,6 +5594,7 @@ class DTWAIN {
   _getJobControlEx = _dll.lookupFunction<_GetJobControlExNative, _GetJobControlExDart>('DTWAIN_GetJobControlEx');
   _getJpegValues = _dll.lookupFunction<_GetJpegValuesNative, _GetJpegValuesDart>('DTWAIN_GetJpegValues');
   _getJpegXLQuality = _dll.lookupFunction<_GetJpegXLQualityNative, _GetJpegXLQualityDart>('DTWAIN_GetJpegXLQuality');
+  _getJpegXLThreadCount = _dll.lookupFunction<_GetJpegXLThreadCountNative, _GetJpegXLThreadCountDart>('DTWAIN_GetJpegXLThreadCount');
   _getJpegXRValues = _dll.lookupFunction<_GetJpegXRValuesNative, _GetJpegXRValuesDart>('DTWAIN_GetJpegXRValues');
   _getLanguage = _dll.lookupFunction<_GetLanguageNative, _GetLanguageDart>('DTWAIN_GetLanguage');
   _getLastCapEnumIndices = _dll.lookupFunction<_GetLastCapEnumIndicesNative, _GetLastCapEnumIndicesDart>('DTWAIN_GetLastCapEnumIndices');
@@ -5927,6 +5936,7 @@ class DTWAIN {
   _setJobControl = _dll.lookupFunction<_SetJobControlNative, _SetJobControlDart>('DTWAIN_SetJobControl');
   _setJpegValues = _dll.lookupFunction<_SetJpegValuesNative, _SetJpegValuesDart>('DTWAIN_SetJpegValues');
   _setJpegXLQuality = _dll.lookupFunction<_SetJpegXLQualityNative, _SetJpegXLQualityDart>('DTWAIN_SetJpegXLQuality');
+  _setJpegXLThreadCount = _dll.lookupFunction<_SetJpegXLThreadCountNative, _SetJpegXLThreadCountDart>('DTWAIN_SetJpegXLThreadCount');
   _setJpegXRValues = _dll.lookupFunction<_SetJpegXRValuesNative, _SetJpegXRValuesDart>('DTWAIN_SetJpegXRValues');
   _setLanguage = _dll.lookupFunction<_SetLanguageNative, _SetLanguageDart>('DTWAIN_SetLanguage');
   _setLastError = _dll.lookupFunction<_SetLastErrorNative, _SetLastErrorDart>('DTWAIN_SetLastError');
@@ -8315,6 +8325,11 @@ class DTWAIN {
     return _getJpegXLQuality(Source, pQuality);  
   }  
   
+  int getJpegXLThreadCount()  
+  {  
+    return _getJpegXLThreadCount();  
+  }  
+  
   int getJpegXRValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive)  
   {  
     return _getJpegXRValues(Source, pQuality, Progressive);  
@@ -10328,6 +10343,11 @@ class DTWAIN {
   int setJpegXLQuality(DTWAIN_SOURCE Source, int Quality)  
   {  
     return _setJpegXLQuality(Source, Quality);  
+  }  
+  
+  int setJpegXLThreadCount(int ThreadCount)  
+  {  
+    return _setJpegXLThreadCount(ThreadCount);  
   }  
   
   int setJpegXRValues(DTWAIN_SOURCE Source, int Quality, int Progressive)  

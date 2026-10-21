@@ -588,6 +588,7 @@
     D_GETJOBCONTROLEXFUNC                         DYNDTWAIN_API::DTWAIN_GetJobControlEx = nullptr;
     D_GETJPEGVALUESFUNC                           DYNDTWAIN_API::DTWAIN_GetJpegValues = nullptr;
     D_GETJPEGXLQUALITYFUNC                        DYNDTWAIN_API::DTWAIN_GetJpegXLQuality = nullptr;
+    D_GETJPEGXLTHREADCOUNTFUNC                    DYNDTWAIN_API::DTWAIN_GetJpegXLThreadCount = nullptr;
     D_GETJPEGXRVALUESFUNC                         DYNDTWAIN_API::DTWAIN_GetJpegXRValues = nullptr;
     D_GETLANGUAGEFUNC                             DYNDTWAIN_API::DTWAIN_GetLanguage = nullptr;
     D_GETLASTCAPENUMINDICESFUNC                   DYNDTWAIN_API::DTWAIN_GetLastCapEnumIndices = nullptr;
@@ -1085,6 +1086,7 @@
     D_SETJOBCONTROLFUNC                           DYNDTWAIN_API::DTWAIN_SetJobControl = nullptr;
     D_SETJPEGVALUESFUNC                           DYNDTWAIN_API::DTWAIN_SetJpegValues = nullptr;
     D_SETJPEGXLQUALITYFUNC                        DYNDTWAIN_API::DTWAIN_SetJpegXLQuality = nullptr;
+    D_SETJPEGXLTHREADCOUNTFUNC                    DYNDTWAIN_API::DTWAIN_SetJpegXLThreadCount = nullptr;
     D_SETJPEGXRVALUESFUNC                         DYNDTWAIN_API::DTWAIN_SetJpegXRValues = nullptr;
     D_SETLANGUAGEFUNC                             DYNDTWAIN_API::DTWAIN_SetLanguage = nullptr;
     D_SETLASTERRORFUNC                            DYNDTWAIN_API::DTWAIN_SetLastError = nullptr;
@@ -1858,6 +1860,7 @@ int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetJobControlEx, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetJpegValues, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetJpegXLQuality, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_GetJpegXLThreadCount, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetJpegXRValues, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetLanguage, hModule)
           LOADFUNCTIONIMPL(DTWAIN_GetLastCapEnumIndices, hModule)
@@ -2355,6 +2358,7 @@ int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetJobControl, hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetJpegValues, hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetJpegXLQuality, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_SetJpegXLThreadCount, hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetJpegXRValues, hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetLanguage, hModule)
           LOADFUNCTIONIMPL(DTWAIN_SetLastError, hModule)

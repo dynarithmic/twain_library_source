@@ -586,6 +586,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETJOBCONTROLFUNC)                        
 typedef LONG (DLLENTRY_DEF * D_GETJOBCONTROLEXFUNC)                             (DTWAIN_SOURCE, DTWAIN_BOOL);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETJPEGVALUESFUNC)                        (DTWAIN_SOURCE, LPLONG, LPLONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETJPEGXLQUALITYFUNC)                     (DTWAIN_SOURCE, LPLONG);
+typedef LONG (DLLENTRY_DEF * D_GETJPEGXLTHREADCOUNTFUNC)                        (VOID_PROTOTYPE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETJPEGXRVALUESFUNC)                      (DTWAIN_SOURCE, LPLONG, LPLONG);
 typedef LONG (DLLENTRY_DEF * D_GETLANGUAGEFUNC)                                 (VOID_PROTOTYPE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETLASTCAPENUMINDICESFUNC)                (DTWAIN_SOURCE, LPLONG, LPLONG);
@@ -1083,6 +1084,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETJXLLIBRARYPATHWFUNC)                   
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETJOBCONTROLFUNC)                        (DTWAIN_SOURCE, LONG, DTWAIN_BOOL);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETJPEGVALUESFUNC)                        (DTWAIN_SOURCE, LONG, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETJPEGXLQUALITYFUNC)                     (DTWAIN_SOURCE, LONG);
+typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETJPEGXLTHREADCOUNTFUNC)                 (LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETJPEGXRVALUESFUNC)                      (DTWAIN_SOURCE, LONG, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETLANGUAGEFUNC)                          (LONG);
 typedef LONG (DLLENTRY_DEF * D_SETLASTERRORFUNC)                                (LONG);
@@ -1786,6 +1788,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_GETJOBCONTROLEXFUNC                            DTWAIN_GetJobControlEx;
     STATIC D_GETJPEGVALUESFUNC                              DTWAIN_GetJpegValues;
     STATIC D_GETJPEGXLQUALITYFUNC                           DTWAIN_GetJpegXLQuality;
+    STATIC D_GETJPEGXLTHREADCOUNTFUNC                       DTWAIN_GetJpegXLThreadCount;
     STATIC D_GETJPEGXRVALUESFUNC                            DTWAIN_GetJpegXRValues;
     STATIC D_GETLANGUAGEFUNC                                DTWAIN_GetLanguage;
     STATIC D_GETLASTCAPENUMINDICESFUNC                      DTWAIN_GetLastCapEnumIndices;
@@ -2283,6 +2286,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_SETJOBCONTROLFUNC                              DTWAIN_SetJobControl;
     STATIC D_SETJPEGVALUESFUNC                              DTWAIN_SetJpegValues;
     STATIC D_SETJPEGXLQUALITYFUNC                           DTWAIN_SetJpegXLQuality;
+    STATIC D_SETJPEGXLTHREADCOUNTFUNC                       DTWAIN_SetJpegXLThreadCount;
     STATIC D_SETJPEGXRVALUESFUNC                            DTWAIN_SetJpegXRValues;
     STATIC D_SETLANGUAGEFUNC                                DTWAIN_SetLanguage;
     STATIC D_SETLASTERRORFUNC                               DTWAIN_SetLastError;

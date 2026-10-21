@@ -2401,6 +2401,7 @@
         public delegate int DTWAIN_GetJobControlExDelegate(DTWAIN_SOURCE Source, int bGetCurrent);
         public delegate int DTWAIN_GetJpegValuesDelegate(DTWAIN_SOURCE Source, ref int pQuality, ref int Progressive);
         public delegate int DTWAIN_GetJpegXLQualityDelegate(DTWAIN_SOURCE Source, ref int pQuality);
+        public delegate int DTWAIN_GetJpegXLThreadCountDelegate();
         public delegate int DTWAIN_GetJpegXRValuesDelegate(DTWAIN_SOURCE Source, ref int pQuality, ref int Progressive);
         public delegate int DTWAIN_GetLanguageDelegate();
         public delegate int DTWAIN_GetLastCapEnumIndicesDelegate(DTWAIN_SOURCE Source, ref int pCurrentIndex, ref int pDefaultIndex);
@@ -2791,6 +2792,7 @@
         public delegate int DTWAIN_SetJobControlDelegate(DTWAIN_SOURCE Source, int JobControl, int bSetCurrent);
         public delegate int DTWAIN_SetJpegValuesDelegate(DTWAIN_SOURCE Source, int Quality, int Progressive);
         public delegate int DTWAIN_SetJpegXLQualityDelegate(DTWAIN_SOURCE Source, int Quality);
+        public delegate int DTWAIN_SetJpegXLThreadCountDelegate(int ThreadCount);
         public delegate int DTWAIN_SetJpegXRValuesDelegate(DTWAIN_SOURCE Source, int Quality, int Progressive);
         public delegate int DTWAIN_SetLanguageDelegate(int nLanguage);
         public delegate int DTWAIN_SetLastErrorDelegate(int nError);
@@ -4269,6 +4271,9 @@
         [DTWAINNativeFunction("DTWAIN_GetJpegXLQuality")]
         private readonly DTWAIN_GetJpegXLQualityDelegate  _DTWAIN_GetJpegXLQuality;
 
+        [DTWAINNativeFunction("DTWAIN_GetJpegXLThreadCount")]
+        private readonly DTWAIN_GetJpegXLThreadCountDelegate  _DTWAIN_GetJpegXLThreadCount;
+
         [DTWAINNativeFunction("DTWAIN_GetJpegXRValues")]
         private readonly DTWAIN_GetJpegXRValuesDelegate  _DTWAIN_GetJpegXRValues;
 
@@ -5438,6 +5443,9 @@
 
         [DTWAINNativeFunction("DTWAIN_SetJpegXLQuality")]
         private readonly DTWAIN_SetJpegXLQualityDelegate  _DTWAIN_SetJpegXLQuality;
+
+        [DTWAINNativeFunction("DTWAIN_SetJpegXLThreadCount")]
+        private readonly DTWAIN_SetJpegXLThreadCountDelegate  _DTWAIN_SetJpegXLThreadCount;
 
         [DTWAINNativeFunction("DTWAIN_SetJpegXRValues")]
         private readonly DTWAIN_SetJpegXRValuesDelegate  _DTWAIN_SetJpegXRValues;
@@ -7094,6 +7102,9 @@
         public  int DTWAIN_GetJpegXLQuality(DTWAIN_SOURCE Source, ref int pQuality)
         { return _DTWAIN_GetJpegXLQuality(Source, ref pQuality); }
 
+        public  int DTWAIN_GetJpegXLThreadCount()
+        { return _DTWAIN_GetJpegXLThreadCount(); }
+
         public  int DTWAIN_GetJpegXRValues(DTWAIN_SOURCE Source, ref int pQuality, ref int Progressive)
         { return _DTWAIN_GetJpegXRValues(Source, ref pQuality, ref Progressive); }
 
@@ -8263,6 +8274,9 @@
 
         public  int DTWAIN_SetJpegXLQuality(DTWAIN_SOURCE Source, int Quality)
         { return _DTWAIN_SetJpegXLQuality(Source, Quality); }
+
+        public  int DTWAIN_SetJpegXLThreadCount(int ThreadCount)
+        { return _DTWAIN_SetJpegXLThreadCount(ThreadCount); }
 
         public  int DTWAIN_SetJpegXRValues(DTWAIN_SOURCE Source, int Quality, int Progressive)
         { return _DTWAIN_SetJpegXRValues(Source, Quality, Progressive); }
