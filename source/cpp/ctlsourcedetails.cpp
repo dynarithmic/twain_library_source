@@ -745,7 +745,7 @@ namespace
 
                         // Get the filetype info
                         tempStrm.str("");
-                        static constexpr std::array<std::string_view, 29> fileTypes = {
+                        static constexpr std::array<std::string_view, 30> fileTypes = {
                                                                 "\"bmp (rle compression)\",",
                                                                 "\"bmp\",",
                                                                 "\"dcx\",",
@@ -753,6 +753,7 @@ namespace
                                                                 "\"gif\",",
                                                                 "\"ico\",",
                                                                 "\"jp2 (jpeg-2000)\",",
+                                                                "\"jpeg-xl\",",
                                                                 "\"jpeg-xr\",",
                                                                 "\"jpeg\",",
                                                                 "\"pcx\",",
