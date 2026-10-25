@@ -96,8 +96,8 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
                 {
                     if (CTL_StaticData::GetLogFilterFlags())
                     {
-                        CTL_StringType sJXLNative = L"Could not load JXL exported function " + 
-                            stringconversion::Convert_Ansi_To_Wide(m_functionName);
+                        CTL_StringType sJXLNative = _T("Could not load JXL exported function ") + 
+                            stringconversion::Convert_Ansi_To_Native(m_functionName);
                         LogWriterUtils::WriteLogInfoIndented(sJXLNative);
                     }
                 }
