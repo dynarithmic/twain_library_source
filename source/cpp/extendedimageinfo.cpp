@@ -191,168 +191,167 @@ namespace dynarithmic
         return { true, DTWAIN_NO_ERROR };
     }
 
-/* Returns the data for a specified Extended Image Info type.  Note that this can only be used in State 7 of the source,
-   and after DTWAIN_InitExtImageInfo() has been called*/
-std::pair<bool, int> GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nWhich, LPDTWAIN_ARRAY Data)
-{
-    LONG ItemType = 0;
-    LONG ReturnCode = 0;
-
-    // If the ext image info item does not exist for the source, return an error.
-    DTWAIN_GetExtImageInfoItemEx(reinterpret_cast<DTWAIN_SOURCE>(pSource), nWhich, nullptr, nullptr, &ItemType, &ReturnCode);
-    if (ReturnCode == TWRC_DATANOTAVAILABLE)
-        return { false, DTWAIN_ERR_UNAVAILABLE_EXTINFO };
-    else
-    if (ReturnCode == TWRC_INFONOTSUPPORTED)
-        return { false, DTWAIN_ERR_UNSUPPORTED_EXTINFO };
-
-    // Get the extended image info block containing the cached data.
-    auto* pExtendedImageInfo = pSource->GetExtendedImageInfo();
-    DTWAIN_ARRAY theArray = nullptr;
-
-    // Get the Extended Image Info item.
-    switch (nWhich)
+    /* Returns the data for a specified Extended Image Info type.  Note that this can only be used in State 7 of the source,
+       and after DTWAIN_InitExtImageInfo() has been called*/
+    std::pair<bool, int> GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nWhich, LPDTWAIN_ARRAY Data)
     {
-        case TWEI_BARCODECONFIDENCE:
-        case TWEI_BARCODECOUNT:
-        case TWEI_BARCODEX:
-        case TWEI_BARCODEY:
-        case TWEI_BARCODEROTATION:
-        case TWEI_BARCODETEXT:
-        case TWEI_BARCODETEXTLENGTH:                
-        case TWEI_BARCODETYPE:
-            theArray = pExtendedImageInfo->GetBarcodeInfo(nWhich);
-        break;
+        LONG ItemType = 0;
+        LONG ReturnCode = 0;
 
-        case TWEI_CAMERA:
-        case TWEI_BOOKNAME:
-        case TWEI_CHAPTERNUMBER:
-        case TWEI_DOCUMENTNUMBER:
-        case TWEI_PAGENUMBER:
-        case TWEI_FRAMENUMBER:
-        case TWEI_PIXELFLAVOR:
-        case TWEI_FRAME:
-            theArray = pExtendedImageInfo->GetPageSourceInfo(nWhich);
-        break;
+        // If the ext image info item does not exist for the source, return an error.
+        DTWAIN_GetExtImageInfoItemEx(reinterpret_cast<DTWAIN_SOURCE>(pSource), nWhich, nullptr, nullptr, &ItemType, &ReturnCode);
+        if (ReturnCode == TWRC_DATANOTAVAILABLE)
+            return { false, DTWAIN_ERR_UNAVAILABLE_EXTINFO };
+        else
+        if (ReturnCode == TWRC_INFONOTSUPPORTED)
+            return { false, DTWAIN_ERR_UNSUPPORTED_EXTINFO };
 
-        case TWEI_DESKEWSTATUS:
-        case TWEI_SKEWORIGINALANGLE:
-        case TWEI_SKEWFINALANGLE:
-        case TWEI_SKEWCONFIDENCE:
-        case TWEI_SKEWWINDOWX1:
-        case TWEI_SKEWWINDOWX2:
-        case TWEI_SKEWWINDOWX3:
-        case TWEI_SKEWWINDOWX4:
-        case TWEI_SKEWWINDOWY1:
-        case TWEI_SKEWWINDOWY2:
-        case TWEI_SKEWWINDOWY3:
-        case TWEI_SKEWWINDOWY4:
-            theArray = pExtendedImageInfo->GetSkewInfo(nWhich);
-        break;
+        // Get the extended image info block containing the cached data.
+        auto* pExtendedImageInfo = pSource->GetExtendedImageInfo();
+        DTWAIN_ARRAY theArray = nullptr;
 
-        case TWEI_DESHADECOUNT:
-        case TWEI_DESHADELEFT:
-        case TWEI_DESHADETOP:
-        case TWEI_DESHADEWIDTH:
-        case TWEI_DESHADEHEIGHT:
-        case TWEI_DESHADESIZE:
-        case TWEI_DESHADEBLACKCOUNTOLD:
-        case TWEI_DESHADEBLACKCOUNTNEW:
-        case TWEI_DESHADEBLACKRLMIN:
-        case TWEI_DESHADEBLACKRLMAX:
-        case TWEI_DESHADEWHITECOUNTOLD:
-        case TWEI_DESHADEWHITECOUNTNEW:
-        case TWEI_DESHADEWHITERLMIN:
-        case TWEI_DESHADEWHITERLMAX:
-        case TWEI_DESHADEWHITERLAVE:
-            theArray = pExtendedImageInfo->GetShaderAreaInfo(nWhich);
-        break;
+        // Get the Extended Image Info item.
+        switch (nWhich)
+        {
+            case TWEI_BARCODECONFIDENCE:
+            case TWEI_BARCODECOUNT:
+            case TWEI_BARCODEX:
+            case TWEI_BARCODEY:
+            case TWEI_BARCODEROTATION:
+            case TWEI_BARCODETEXT:
+            case TWEI_BARCODETEXTLENGTH:                
+            case TWEI_BARCODETYPE:
+                theArray = pExtendedImageInfo->GetBarcodeInfo(nWhich);
+            break;
 
-        case TWEI_SPECKLESREMOVED:
-        case TWEI_BLACKSPECKLESREMOVED:
-        case TWEI_WHITESPECKLESREMOVED:
-            theArray = pExtendedImageInfo->GetSpeckleRemovalInfo(nWhich);
-        break;
+            case TWEI_CAMERA:
+            case TWEI_BOOKNAME:
+            case TWEI_CHAPTERNUMBER:
+            case TWEI_DOCUMENTNUMBER:
+            case TWEI_PAGENUMBER:
+            case TWEI_FRAMENUMBER:
+            case TWEI_PIXELFLAVOR:
+            case TWEI_FRAME:
+                theArray = pExtendedImageInfo->GetPageSourceInfo(nWhich);
+            break;
 
-        case TWEI_HORZLINECOUNT:
-        case TWEI_VERTLINECOUNT:
-        case TWEI_HORZLINEXCOORD:
-        case TWEI_HORZLINEYCOORD:
-        case TWEI_HORZLINELENGTH:
-        case TWEI_HORZLINETHICKNESS:
-        case TWEI_VERTLINEXCOORD:
-        case TWEI_VERTLINEYCOORD:
-        case TWEI_VERTLINELENGTH:
-        case TWEI_VERTLINETHICKNESS:
-            theArray = pExtendedImageInfo->GetHorizontalVerticalLineInfo(nWhich);
-        break;
+            case TWEI_DESKEWSTATUS:
+            case TWEI_SKEWORIGINALANGLE:
+            case TWEI_SKEWFINALANGLE:
+            case TWEI_SKEWCONFIDENCE:
+            case TWEI_SKEWWINDOWX1:
+            case TWEI_SKEWWINDOWX2:
+            case TWEI_SKEWWINDOWX3:
+            case TWEI_SKEWWINDOWX4:
+            case TWEI_SKEWWINDOWY1:
+            case TWEI_SKEWWINDOWY2:
+            case TWEI_SKEWWINDOWY3:
+            case TWEI_SKEWWINDOWY4:
+                theArray = pExtendedImageInfo->GetSkewInfo(nWhich);
+            break;
 
-        case TWEI_FORMTEMPLATEMATCH:
-        case TWEI_FORMTEMPLATEPAGEMATCH:
-        case TWEI_FORMHORZDOCOFFSET:
-        case TWEI_FORMVERTDOCOFFSET:
-        case TWEI_FORMCONFIDENCE:
-            theArray = pExtendedImageInfo->GetFillFormsRecognitionInfo(nWhich);
-        break;
+            case TWEI_DESHADECOUNT:
+            case TWEI_DESHADELEFT:
+            case TWEI_DESHADETOP:
+            case TWEI_DESHADEWIDTH:
+            case TWEI_DESHADEHEIGHT:
+            case TWEI_DESHADESIZE:
+            case TWEI_DESHADEBLACKCOUNTOLD:
+            case TWEI_DESHADEBLACKCOUNTNEW:
+            case TWEI_DESHADEBLACKRLMIN:
+            case TWEI_DESHADEBLACKRLMAX:
+            case TWEI_DESHADEWHITECOUNTOLD:
+            case TWEI_DESHADEWHITECOUNTNEW:
+            case TWEI_DESHADEWHITERLMIN:
+            case TWEI_DESHADEWHITERLMAX:
+            case TWEI_DESHADEWHITERLAVE:
+                theArray = pExtendedImageInfo->GetShaderAreaInfo(nWhich);
+            break;
 
-        case TWEI_ICCPROFILE:
-        case TWEI_LASTSEGMENT:
-        case TWEI_SEGMENTNUMBER:
-            theArray = pExtendedImageInfo->GetImageSegmentationInfo(nWhich);
-        break;
+            case TWEI_SPECKLESREMOVED:
+            case TWEI_BLACKSPECKLESREMOVED:
+            case TWEI_WHITESPECKLESREMOVED:
+                theArray = pExtendedImageInfo->GetSpeckleRemovalInfo(nWhich);
+            break;
 
-        case TWEI_ENDORSEDTEXT:
-            theArray = pExtendedImageInfo->GetEndorsedTextInfo(nWhich);
-        break;
+            case TWEI_HORZLINECOUNT:
+            case TWEI_VERTLINECOUNT:
+            case TWEI_HORZLINEXCOORD:
+            case TWEI_HORZLINEYCOORD:
+            case TWEI_HORZLINELENGTH:
+            case TWEI_HORZLINETHICKNESS:
+            case TWEI_VERTLINEXCOORD:
+            case TWEI_VERTLINEYCOORD:
+            case TWEI_VERTLINELENGTH:
+            case TWEI_VERTLINETHICKNESS:
+                theArray = pExtendedImageInfo->GetHorizontalVerticalLineInfo(nWhich);
+            break;
 
-        case TWEI_MAGTYPE:
-            theArray = pExtendedImageInfo->GetExtendedImageInfo20(nWhich);
-        break;
+            case TWEI_FORMTEMPLATEMATCH:
+            case TWEI_FORMTEMPLATEPAGEMATCH:
+            case TWEI_FORMHORZDOCOFFSET:
+            case TWEI_FORMVERTDOCOFFSET:
+            case TWEI_FORMCONFIDENCE:
+                theArray = pExtendedImageInfo->GetFillFormsRecognitionInfo(nWhich);
+            break;
 
-        case TWEI_MAGDATALENGTH:
-        case TWEI_MAGDATA:
-        case TWEI_FILESYSTEMSOURCE:
-        case TWEI_PAGESIDE:
-        case TWEI_IMAGEMERGED:
-            theArray = pExtendedImageInfo->GetExtendedImageInfo21(nWhich);
-        break;
+            case TWEI_ICCPROFILE:
+            case TWEI_LASTSEGMENT:
+            case TWEI_SEGMENTNUMBER:
+                theArray = pExtendedImageInfo->GetImageSegmentationInfo(nWhich);
+            break;
 
-        case TWEI_PAPERCOUNT:
-            theArray = pExtendedImageInfo->GetExtendedImageInfo22(nWhich);
-        break;
+            case TWEI_ENDORSEDTEXT:
+                theArray = pExtendedImageInfo->GetEndorsedTextInfo(nWhich);
+            break;
 
-        case TWEI_PRINTERTEXT:
-            theArray = pExtendedImageInfo->GetExtendedImageInfo23(nWhich);
-        break;
+            case TWEI_MAGTYPE:
+                theArray = pExtendedImageInfo->GetExtendedImageInfo20(nWhich);
+            break;
 
-        case TWEI_TWAINDIRECTMETADATA:
-            theArray = pExtendedImageInfo->GetExtendedImageInfo24(nWhich);
-        break;
+            case TWEI_MAGDATALENGTH:
+            case TWEI_MAGDATA:
+            case TWEI_FILESYSTEMSOURCE:
+            case TWEI_PAGESIDE:
+            case TWEI_IMAGEMERGED:
+                theArray = pExtendedImageInfo->GetExtendedImageInfo21(nWhich);
+            break;
 
-        case TWEI_IAFIELDA_VALUE:
-        case TWEI_IAFIELDB_VALUE:
-        case TWEI_IAFIELDC_VALUE:
-        case TWEI_IAFIELDD_VALUE:
-        case TWEI_IAFIELDE_VALUE:
-        case TWEI_IALEVEL:
-        case TWEI_PRINTER:
-        case TWEI_BARCODETEXT2:
-            theArray = pExtendedImageInfo->GetExtendedImageInfo25(nWhich);
-        break;
+            case TWEI_PAPERCOUNT:
+                theArray = pExtendedImageInfo->GetExtendedImageInfo22(nWhich);
+            break;
 
-        case TWEI_PATCHCODE:
-            theArray = pExtendedImageInfo->GetPatchCodeInfo(nWhich);
-        break;
+            case TWEI_PRINTERTEXT:
+                theArray = pExtendedImageInfo->GetExtendedImageInfo23(nWhich);
+            break;
+
+            case TWEI_TWAINDIRECTMETADATA:
+                theArray = pExtendedImageInfo->GetExtendedImageInfo24(nWhich);
+            break;
+
+            case TWEI_IAFIELDA_VALUE:
+            case TWEI_IAFIELDB_VALUE:
+            case TWEI_IAFIELDC_VALUE:
+            case TWEI_IAFIELDD_VALUE:
+            case TWEI_IAFIELDE_VALUE:
+            case TWEI_IALEVEL:
+            case TWEI_PRINTER:
+            case TWEI_BARCODETEXT2:
+                theArray = pExtendedImageInfo->GetExtendedImageInfo25(nWhich);
+            break;
+
+            case TWEI_PATCHCODE:
+                theArray = pExtendedImageInfo->GetPatchCodeInfo(nWhich);
+            break;
+        }
+
+        if (theArray)
+        {
+            *Data = theArray;
+            return { true, DTWAIN_NO_ERROR };
+        }
+        return { false, DTWAIN_ERR_MEM };
     }
-
-    if (theArray)
-    {
-        *Data = theArray;
-        return { true, DTWAIN_NO_ERROR };
-    }
-    return { false, DTWAIN_ERR_MEM };
-}
-
 }
 
 using namespace dynarithmic;

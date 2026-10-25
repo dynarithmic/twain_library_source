@@ -954,7 +954,7 @@ extern "C"
         {
             CTL_StringArrayType vAllSourcesT;
             std::vector<std::string> vAllSources;
-            stringutils::TokenizeEx((CTL_StringType)szSources, _T("|"), vAllSourcesT, false);
+            stringutils::TokenizeEx(static_cast<CTL_StringType>(szSources), _T("|"), vAllSourcesT, false);
             for (auto& name : vAllSourcesT)
                 vAllSources.push_back(stringconversion::Convert_Native_To_Ansi(name, name.length()));
             auto genDetails = generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor);
