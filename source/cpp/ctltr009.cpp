@@ -54,7 +54,7 @@ bool CTL_CapabilityGetRangeTriplet::EnumCapValues( void *pCapData )
     CTL_TwainTypeArray *pArray = GetTwainTypeArray();
     auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
     // dereference to a TW_RANGE structure
-    const pTW_RANGE pRange = static_cast<pTW_RANGE>(pCapData);
+    const auto pRange = static_cast<pTW_RANGE>(pCapData);
 
     // get item type
     const int nItemType = GetEffectiveItemType(pRange->ItemType);

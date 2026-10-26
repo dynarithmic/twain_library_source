@@ -745,7 +745,7 @@ namespace
 
                         // Get the filetype info
                         tempStrm.str("");
-                        static constexpr std::array<std::string_view, 29> fileTypes = {
+                        static constexpr std::array<std::string_view, 30> fileTypes = {
                                                                 "\"bmp (rle compression)\",",
                                                                 "\"bmp\",",
                                                                 "\"dcx\",",
@@ -753,6 +753,7 @@ namespace
                                                                 "\"gif\",",
                                                                 "\"ico\",",
                                                                 "\"jp2 (jpeg-2000)\",",
+                                                                "\"jpeg-xl\",",
                                                                 "\"jpeg-xr\",",
                                                                 "\"jpeg\",",
                                                                 "\"pcx\",",
@@ -953,7 +954,7 @@ extern "C"
         {
             CTL_StringArrayType vAllSourcesT;
             std::vector<std::string> vAllSources;
-            stringutils::TokenizeEx((CTL_StringType)szSources, _T("|"), vAllSourcesT, false);
+            stringutils::TokenizeEx(static_cast<CTL_StringType>(szSources), _T("|"), vAllSourcesT, false);
             for (auto& name : vAllSourcesT)
                 vAllSources.push_back(stringconversion::Convert_Native_To_Ansi(name, name.length()));
             auto genDetails = generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor);

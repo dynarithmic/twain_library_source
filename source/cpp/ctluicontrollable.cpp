@@ -48,12 +48,12 @@ extern "C" DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
     // Make sure we close this source if the source had to be opened
-    // to test for UI controlability by utilizing RAII class
+    // to test for UI controllability by utilizing RAII class
     SourceCloserRAII so(pSource, !bSourceOpen);
 
     bool bOk = false;
 
-    // Check if capability UICONTROLLABLE is supported
+    // Check if capability CAP_UICONTROLLABLE is supported
     if (pSource->IsCapInSupportedList(CAP_UICONTROLLABLE))
     {
         // Get the capability value

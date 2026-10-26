@@ -42,11 +42,9 @@ For 64-bit:<br>
 
 The development binaries are built from the latest source code found in the [development branch](https://github.com/dynarithmic/twain_library_source/tree/development).  
 
-1) To run DTWAIN using the development libraries will also require you to use the [text resources](https://github.com/dynarithmic/twain_library_source/tree/development/source/txt) found in the development branch, and not the text resources found in the main branch.  
+1) The code found in the [main branch](https://github.com/dynarithmic/twain_library_source/tree/main) reflects the current release version of DTWAIN.<br> If you want to debug the current release version of DTWAIN, the code in the main branch is the code you should retrieve.  
 
-2) The code found in the [main branch](https://github.com/dynarithmic/twain_library_source/tree/main) reflects the current release version of DTWAIN.<br> If you want to debug the current release version of DTWAIN, the code in the main branch is the code you should retrieve.  
-
-3) Please note that whenever new code is pushed to the development branch, new development binaries will also be created.  
+2) Please note that whenever new code is pushed to the development branch, new development binaries will also be created.  
 
 ----
 

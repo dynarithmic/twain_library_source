@@ -71,10 +71,39 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
         LoadLibraryRAII(JxlDynamicLoader* thisLoader) : m_pThis(thisLoader) {}
         ~LoadLibraryRAII()
         {
-            if (bUnload && m_pThis)
+            try
             {
-                m_pThis->Unload();
+                if (bUnload && m_pThis)
+                {
+                    m_pThis->Unload();
+                }
             }
+            catch (...)
+            {}
+        }
+    };
+
+    struct FunctionResolverRAII
+    {
+        std::string m_functionName;
+        bool bDisplayError = true;
+        FunctionResolverRAII() = default;
+        ~FunctionResolverRAII()
+        {
+            try
+            {
+                if (bDisplayError)
+                {
+                    if (CTL_StaticData::GetLogFilterFlags())
+                    {
+                        CTL_StringType sJXLNative = _T("Could not load JXL exported function ") + 
+                            stringconversion::Convert_Ansi_To_Native(m_functionName);
+                        LogWriterUtils::WriteLogInfoIndented(sJXLNative);
+                    }
+                }
+            }
+            catch (...)
+            {}
         }
     };
 
@@ -172,17 +201,19 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
 
     Functions f{};
 
+    FunctionResolverRAII funcResolver;
+
     // Resolve each required function.
     // Preserve the error before unloading modules.
-    #define RESOLVE_JXL(module, member, exportedName)             \
-    do {                                                       \
-        if (!ResolveFunction(                                 \
-                module, exportedName, f.member))              \
-        {                                                      \
-            m_lastError = ::GetLastError();                    \
-            m_failedFunction = exportedName;                  \
-            return { false, m_lastError };                                     \
-        }                                                      \
+    #define RESOLVE_JXL(module, member, exportedName)  \
+    do {   \
+        if (!ResolveFunction(module, exportedName, f.member))  \
+        {   \
+            m_lastError = ::GetLastError();  \
+            m_failedFunction = exportedName; \
+            funcResolver.m_functionName = exportedName; \
+            return { false, m_lastError };   \
+        }                                    \
     } while (false)
 
     RESOLVE_JXL(m_jxl, EncoderCreate, "JxlEncoderCreate");
@@ -216,6 +247,7 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
     m_functions = f;
     m_loaded = true;
     raii.bUnload = false;
+    funcResolver.bDisplayError = false;
     return { true, 0 };
 }
 
