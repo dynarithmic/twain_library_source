@@ -2,6 +2,8 @@ DTWAIN Version changes
 
 5.10.1
 
+- The Dart programming language binding, dtwainapi.dart, has been added to access the DTWAIN API functions from Dart.  
+
 - New: JPEG XL (JXL) Image Format Support
 
   DTWAIN now supports saving scanned images in the JPEG XL (JXL) image format using the DTWAIN_JPEGXL file type.
