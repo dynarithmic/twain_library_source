@@ -55,6 +55,7 @@ namespace dynarithmic
             decltype(&JxlEncoderUseBoxes) EncoderUseBoxes = nullptr;
             decltype(&JxlEncoderAddBox) EncoderAddBox = nullptr;
             decltype(&JxlEncoderCloseBoxes) EncoderCloseBoxes = nullptr;
+            decltype(&JxlEncoderVersion) EncoderVersion = nullptr;
 
             // jxl_threads.dll
             decltype(&JxlThreadParallelRunnerCreate) ThreadParallelRunnerCreate = nullptr;

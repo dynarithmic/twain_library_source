@@ -27,7 +27,6 @@ OF THIRD PARTY RIGHTS.
 #include "ctltwainlogging.h"
 #include "ctlinternalconstants.h"
 #include "ctltwaindllhandle.h"
-#include "windowsinit_impl.h"
 #include "dtwainx.h"
 #include "ctliface.h"
 

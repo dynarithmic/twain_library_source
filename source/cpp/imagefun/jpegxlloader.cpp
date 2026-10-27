@@ -30,6 +30,13 @@
 #include "logwriterutils.h"
 #include "dtwinverex.h"
 
+#ifdef _MSC_VER
+    #pragma warning (disable : 4244)
+    #define STRINGER_2_(x) #x
+    #define STRINGER_(x) STRINGER_2_(x)
+    #pragma message ("Using libjxl version " STRINGER_(JPEGXL_MAJOR_VERSION) "." STRINGER_(JPEGXL_MINOR_VERSION) "." STRINGER_(JPEGXL_PATCH_VERSION))
+#endif
+
 using namespace dynarithmic;
 
 namespace
@@ -234,6 +241,7 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
     RESOLVE_JXL(m_jxl, EncoderUseBoxes, "JxlEncoderUseBoxes");
     RESOLVE_JXL(m_jxl, EncoderAddBox, "JxlEncoderAddBox");
     RESOLVE_JXL(m_jxl, EncoderCloseBoxes, "JxlEncoderCloseBoxes");
+    RESOLVE_JXL(m_jxl, EncoderVersion, "JxlEncoderVersion");
 
     RESOLVE_JXL(m_threads, ThreadParallelRunnerCreate, "JxlThreadParallelRunnerCreate");
     RESOLVE_JXL(m_threads, ThreadParallelRunnerDestroy, "JxlThreadParallelRunnerDestroy");
