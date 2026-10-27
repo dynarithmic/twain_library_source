@@ -6,12 +6,13 @@ DTWAIN Version changes
 
   DTWAIN now supports saving scanned images in the JPEG XL (JXL) image format using the DTWAIN_JPEGXL file type.
 
-  JPEG XL support is available in both 32-bit and 64-bit DTWAIN and uses the JPEG XL libraries supplied separately from DTWAIN.
-
   **Requirements:**
   - The appropriate 32-bit or 64-bit JPEG XL DLLs and their dependencies must be available to the application.
   - The Microsoft Visual C++ Redistributable required by the JPEG XL libraries must be installed.
   - JPEG XL libraries are loaded on demand and are not required for other DTWAIN image formats.
+
+  JPEG XL support is available in both 32-bit and 64-bit DTWAIN and uses the JPEG XL libraries supplied separately from DTWAIN.
+  The jpegxl_libraries.zip file will contain both 32-bit and 64-bit JPEG XL libraries.
 
   If the JPEG XL components are unavailable or cannot be loaded, DTWAIN returns DTWAIN_ERR_JXL_UNAVAILABLE if attempting to
   save to a JPEG-XL file using DTWAIN_AcquireFile() or similar functions.  Note:  Applications can correct missing JPEG XL 
