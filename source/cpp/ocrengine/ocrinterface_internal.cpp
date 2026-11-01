@@ -294,3 +294,14 @@ bool OCREngine::SetPDFFileTypes(OCRPDFInfo::enumPDFColorType nWhich, LONG fileTy
     return true;
 }
 
+int OCREngine::GetInternalOCRFileType(int fileType, OCREngineType engineType)
+{
+    if (fileType != DTWAIN_TEXT && fileType != DTWAIN_TEXTMULTI)
+    {
+        return fileType;
+    }
+
+    constexpr int formatsPerEngine = 2;
+
+    return fileType + static_cast<int>(engineType) * formatsPerEngine;
+}

@@ -21,8 +21,11 @@
 
 #include "resamplefactory.h"
 #include "ctldib32ex.h"
+#include "ctliface.h"
 #include "ctlstaticdata.h"
 #include "logwriterutils.h"
+#include "tesseract_ocrinterface.h"
+#include "ctltwaindllhandle.h"
 
 namespace dynarithmic
 {

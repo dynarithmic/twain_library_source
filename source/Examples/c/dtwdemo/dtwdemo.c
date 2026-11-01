@@ -869,7 +869,9 @@ void AcquireFile(BOOL bUseSource, LONG resourceID, LONG fileType)
         }
         else
         {
-            if ( !DTWAIN_SelectDefaultOCREngine() )
+            if ( !DTWAIN_SelectOCREngine2(NULL, NULL, 0, 0,
+                DTWAIN_DLG_CENTER_CURRENT_MONITOR | DTWAIN_DLG_SORTNAMES
+                | DTWAIN_DLG_TOPMOSTWINDOW | DTWAIN_DLG_HIGHLIGHTFIRST))
             {
                 MessageBox(g_hWnd, _T("OCR engine could not be selected"), _T("OCR engine error"), MB_ICONSTOP);
                 return;

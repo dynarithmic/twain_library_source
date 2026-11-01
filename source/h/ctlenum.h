@@ -22,6 +22,7 @@
 #define CTLENUM_H
 #include "dtwain_filetypes.h"
 #include "dtwaindefs.h"
+#include "ctlinternalconstants.h"
 #include "twain.h"
 
 namespace dynarithmic
@@ -120,6 +121,8 @@ namespace dynarithmic
                                    TWAINFileFormat_SVG    = DTWAIN_SVG,
                                    TWAINFileFormat_SVGZ = DTWAIN_SVGZ,
                                    TWAINFileFormat_JPEGXL = DTWAIN_JPEGXL,
+                                   TWAINFileFormat_TEXTTesseract = DTWAIN_INTERNAL_TESSERACT_TEXT, 
+                                   TWAINFileFormat_TEXTTesseractMULTI = DTWAIN_INTERNAL_TESSERACT_TEXTMULTI,  
                                    TWAINFileFormat_RAW = 9999
                                 };
 

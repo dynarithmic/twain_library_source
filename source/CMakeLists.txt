@@ -8,7 +8,7 @@ if(POLICY CMP0167)
     cmake_policy(SET CMP0167 OLD)
 endif()
 
-project (dtwain VERSION 5.10.1 LANGUAGES C CXX)
+project (dtwain VERSION 5.10.2 LANGUAGES C CXX)
 
 option(DTWAIN_BUILD_UNICODE
        "Build DTWAIN as Unicode instead of ANSI"
@@ -595,6 +595,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/notimpl.h
         ${PROJECT_SOURCE_DIR}/h/ocrengine/ocrinterface.h
         ${PROJECT_SOURCE_DIR}/h/ocrengine/transym_ocrinterface.h
+        ${PROJECT_SOURCE_DIR}/h/ocrengine/tesseract_ocrinterface.h
         ${PROJECT_SOURCE_DIR}/h/pdflib32/pdfencrypt.h
         ${PROJECT_SOURCE_DIR}/h/pdflib32/pdflib32.h
         ${PROJECT_SOURCE_DIR}/h/sourceacquireopts.h
@@ -608,6 +609,8 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlinternalconstants.h
         ${PROJECT_SOURCE_DIR}/h/ctlloggercallback.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaindllhandle.h
+        ${PROJECT_SOURCE_DIR}/h/dtwinver/dtwinver.h
+        ${PROJECT_SOURCE_DIR}/h/dtwinver/dtwinverex.h
 )
 
 set(MAIN_INL
@@ -793,13 +796,14 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrinterface_internal.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ocrengine/ocrselect.cpp
   ${PROJECT_SOURCE_DIR}/cpp/ocrengine/transym_ocrinterface.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/ocrengine/tesseract_ocrinterface.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdfencrypt.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdflib32.cpp
   ${PROJECT_SOURCE_DIR}/cpp/stdafx.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windowsinit_impl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windows_versioninfo.cpp
-  ${PROJECT_SOURCE_DIR}/dtwinver/Dtwinver.cpp
-  ${PROJECT_SOURCE_DIR}/dtwinver/Getwinver.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/dtwinver/Dtwinver.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/dtwinver/Getwinver.cpp
 )
 
 set(LIBGIF_SOURCES
@@ -1612,7 +1616,7 @@ target_include_directories(dtwain PRIVATE
     ${PROJECT_SOURCE_DIR}/cpp
     ${PROJECT_SOURCE_DIR}/c
     ${PROJECT_SOURCE_DIR}/date-master/include
-    ${PROJECT_SOURCE_DIR}/dtwinver
+    ${PROJECT_SOURCE_DIR}/h/dtwinver
     ${PROJECT_SOURCE_DIR}/h/ImageFun/dtwpdf
     ${PROJECT_SOURCE_DIR}/inl
     ${PROJECT_SOURCE_DIR}/LibGIF
@@ -1632,6 +1636,7 @@ target_include_directories(dtwain PRIVATE
     ${PROJECT_SOURCE_DIR}/ZLib
     ${PROJECT_SOURCE_DIR}/miniz
     ${PROJECT_SOURCE_DIR}/simpleini
+    ${PROJECT_SOURCE_DIR}/Tesseract
     ${DTWAIN_BOOST_INCLUDE_DIR}
 )
 
@@ -1680,6 +1685,12 @@ source_group(
     TREE "${PROJECT_SOURCE_DIR}/inl"
     PREFIX "Inline Files"
     FILES ${MAIN_INL}
+)
+
+source_group(
+    TREE "${PROJECT_SOURCE_DIR}/cpp"
+    PREFIX "Source Files"
+    FILES ${MAIN_SOURCES}
 )
 
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${MAIN_INL})

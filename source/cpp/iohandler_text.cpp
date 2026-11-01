@@ -57,7 +57,7 @@ int CTL_TextIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
     int retval;
     if ( !pMultiPageStruct || pMultiPageStruct->Stage != DIB_MULTI_LAST )
-        retval = TextHandler.WriteGraphicFile(this, szFile, hDib);
+        retval = TextHandler.WriteGraphicFile(this, szFile, m_pDib);
     else
         retval = TextHandler.WriteImage(nullptr,nullptr,0,0,0,0, nullptr);
     if ( pMultiPageStruct )

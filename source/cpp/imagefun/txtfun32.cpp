@@ -20,6 +20,7 @@
  */
 #include "txtfun32.h"
 
+#include "ctldib32ex.h"
 #include "ctlfileutils.h"
 #include "winbit32.h"
 #include "iohandler_bmp.h"
@@ -67,122 +68,237 @@ void CTextImageHandler::GetMultiPageStatus(DibMultiPageStruct *pStruct)
     *pStruct = m_MultiPageStruct;
 }
 
-int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImage2*/, UINT32 /*wid*/, UINT32 /*ht*/,
-                                  UINT32 /*bpp*/, UINT32 /*nColors*/, RGBQUAD * /*pPal*/, void * path)
+int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE* /*pImage2*/, UINT32 /*wid*/, UINT32 /*ht*/,
+    UINT32 /*bpp*/, UINT32 /*nColors*/, RGBQUAD* /*pPal*/, void* path)
 {
-    struct DestroyObjectHandler
+    if (m_pOCREngine->GetInputType() == OCRInputType::File)
     {
-        bool doDestroy;
-        CTextImageHandler* m_pThis;
-        std::shared_ptr<CTextPageInfo> m_pTextPageInfo;
-        DestroyObjectHandler(CTextImageHandler* pThis) : doDestroy(true), m_pThis(pThis) {}
-        void setDoDestroy(bool bSet) { doDestroy = bSet; }
-        void setTextPageInfo(const std::shared_ptr<CTextPageInfo>& ptr) { m_pTextPageInfo = ptr; }
-        ~DestroyObjectHandler()
+        struct DestroyObjectHandler
         {
-            if (doDestroy)
+            bool doDestroy;
+            CTextImageHandler* m_pThis;
+            std::shared_ptr<CTextPageInfo> m_pTextPageInfo;
+            DestroyObjectHandler(CTextImageHandler* pThis) : doDestroy(true), m_pThis(pThis) {}
+            void setDoDestroy(bool bSet) { doDestroy = bSet; }
+            void setTextPageInfo(const std::shared_ptr<CTextPageInfo>& ptr) { m_pTextPageInfo = ptr; }
+            ~DestroyObjectHandler()
             {
-                // Always delete the temporary file
-                if (m_pTextPageInfo && !m_pTextPageInfo->szTempFile.empty())
-                    fileutils::delete_file(m_pTextPageInfo->szTempFile.c_str());
-
-                m_pTextPageInfo.reset();
-                try
+                if (doDestroy)
                 {
-                    m_pThis->DestroyAllObjects();
+                    // Always delete the temporary file
+                    if (m_pTextPageInfo && !m_pTextPageInfo->szTempFile.empty())
+                        fileutils::delete_file(m_pTextPageInfo->szTempFile.c_str());
+
+                    m_pTextPageInfo.reset();
+                    try
+                    {
+                        m_pThis->DestroyAllObjects();
+                    }
+                    catch (...) {}
                 }
-                catch (...) {}
+            }
+        };
+
+        DestroyObjectHandler destroyHandler(this);
+
+        // If multi-page, make sure we remember original TIFF handle
+        // First text page
+        if (m_MultiPageStruct.Stage == DIB_MULTI_FIRST || m_MultiPageStruct.Stage == 0)
+        {
+            m_bWriteOk = false;
+            m_pTextPageInfo = std::make_shared<CTextPageInfo>(0);
+
+            // Open the file
+            LPCTSTR fileName = reinterpret_cast<LPCTSTR>(path);
+            std::string fNameStr = stringconversion::Convert_NativePtr_To_Ansi(fileName);
+            auto isOk = OpenOutputFile(fileName);
+            if (!isOk)
+                return DTWAIN_ERR_FILEOPEN;
+
+            destroyHandler.setTextPageInfo(m_pTextPageInfo);
+            m_MultiPageStruct.pUserData = m_pTextPageInfo;
+            m_pTextPageInfo->fh = std::move(m_hFile);
+
+            // This is a temp file
+            CTL_StringType szTempPath = GetDTWAINTempFilePath(m_ImageInfoEx.theSource->GetDTWAINHandle());
+            if (szTempPath.empty())
+                return DTWAIN_ERR_FILEWRITE;
+
+            szTempPath += GetGUID() + _T("OCR");
+
+            LogWriterUtils::WriteLogInfo(GetResourceStringFromMap_Native(IDS_LOGMSG_TEMPIMAGEFILETEXT) + _T(" ") + szTempPath + _T("\n"));
+
+            // OK, now convert DIB to the correct file type -- only do this if the input format
+            // is not DIB
+            if (m_InputFormat == DTWAIN_BMP)
+                m_pTextPageInfo->m_pOrigHandler = std::make_shared<CTL_BmpIOHandler>(m_pDib, m_ImageInfoEx);
+            else
+            if (IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(m_InputFormat)))
+            {
+                m_ImageInfoEx.IsOCRTempImage = true;
+                m_pTextPageInfo->m_pOrigHandler = std::make_shared<CTL_TiffIOHandler>(m_pDib, m_InputFormat, m_ImageInfoEx);
+            }
+            m_pTextPageInfo->szTempFile = szTempPath;
+
+            const int retval = WriteTempFile();
+            if (retval != 0)
+                return retval;
+            m_pOCREngine->ClearCharacterInfoMap(); // clear the character info map.
+            m_pOCREngine->SetCurrentPageNumber(0);
+            SaveOCR();
+            m_bWriteOk = true;
+            if (m_MultiPageStruct.Stage != 0)
+                destroyHandler.setDoDestroy(false);
+            return 0;
+        }
+        else
+        if (m_MultiPageStruct.Stage == DIB_MULTI_NEXT)
+        {
+            // Retrieve handle and write the directory
+            m_pTextPageInfo = std::dynamic_pointer_cast<CTextPageInfo>(m_MultiPageStruct.pUserData);
+
+            // Increment the page
+            m_pTextPageInfo->curPageNum++;
+
+            std::ofstream* ptrStream = m_pTextPageInfo->fh.get();
+
+            // Write the new line at the end of the file
+            char ff = '\x0c';
+            ptrStream->write(&ff, 1);
+
+            // Write the temp file and save the OCR output
+            m_pOCREngine->SetCurrentPageNumber(m_pOCREngine->GetCurrentPageNumber() + 1);
+            WriteTempFile();
+            SaveOCR();
+            destroyHandler.setDoDestroy(false);
+            return 0;
+        }
+        else
+        if (m_MultiPageStruct.Stage == DIB_MULTI_LAST)
+        {
+            m_bWriteOk = true;
+            if (m_MultiPageStruct.pUserData)
+            {
+                m_pTextPageInfo = std::dynamic_pointer_cast<CTextPageInfo>(m_MultiPageStruct.pUserData);
+                destroyHandler.setTextPageInfo(m_pTextPageInfo);
+                szTempFile = m_pTextPageInfo->szTempFile;
+                m_hFile = std::move(m_pTextPageInfo->fh);
             }
         }
-    };
-
-    DestroyObjectHandler destroyHandler(this);
-
-    // If multi-page, make sure we remember original TIFF handle
-    // First text page
-    if ( m_MultiPageStruct.Stage == DIB_MULTI_FIRST || m_MultiPageStruct.Stage == 0 )
+        return 0;
+    }
+    else
     {
-        m_bWriteOk = false;
-        m_pTextPageInfo = std::make_shared<CTextPageInfo>(0);
 
-        // Open the file
-        LPCTSTR fileName = reinterpret_cast<LPCTSTR>(path);
-        std::string fNameStr = stringconversion::Convert_NativePtr_To_Ansi(fileName);
-        auto isOk = OpenOutputFile(fileName);
-        if (!isOk)
-            return DTWAIN_ERR_FILEOPEN;
+        struct DestroyFileHandler
+        {
+            bool doDestroy;
+            CTextImageHandler* m_pThis;
+            std::shared_ptr<CTextPageInfo> m_pTextPageInfo;
+            DestroyFileHandler(CTextImageHandler* pThis) : doDestroy(true), m_pThis(pThis) {}
+            void setDoDestroy(bool bSet) { doDestroy = bSet; }
+            void setTextPageInfo(const std::shared_ptr<CTextPageInfo>& ptr) { m_pTextPageInfo = ptr; }
+            ~DestroyFileHandler()
+            {
+                if (doDestroy)
+                {
+                    // Always delete the temporary file
+                    if (m_pTextPageInfo)
+                        m_pTextPageInfo.reset();
+                }
+            }
+        };
+
+        DestroyFileHandler destroyHandler(this);
+        const auto stage = m_MultiPageStruct.Stage;
+
+        // Last stage: close the output file.
+        // No image recognition is performed.
+        if (stage == DIB_MULTI_LAST)
+        {
+            // Retrieve handle and write the directory
+            m_pTextPageInfo = std::dynamic_pointer_cast<CTextPageInfo>(m_MultiPageStruct.pUserData);
+            destroyHandler.setTextPageInfo(m_pTextPageInfo);
+            if (!m_pTextPageInfo->fh)
+                return DTWAIN_ERR_FILEWRITE;
+            std::ofstream* ptrStream = m_pTextPageInfo->fh.get();
+            if (ptrStream && ptrStream->is_open())
+                ptrStream->close();
+            else
+                return DTWAIN_ERR_FILEWRITE;
+            return DTWAIN_NO_ERROR;
+        }
+
+        const bool bFirstPage = stage == DIB_MULTI_FIRST || stage == 0;
+        const bool bNextPage = stage == DIB_MULTI_NEXT;
+        if (!bFirstPage && !bNextPage)
+            return 0;
+
+        if (!m_pDib || !m_pOCREngine)
+            return 0;
+
+        // Open the output file for the first page.
+        if (bFirstPage)
+        {
+            auto filePath = reinterpret_cast<LPCTSTR>(path);
+            std::wstring filePathW = stringconversion::Convert_NativePtr_To_Wide(filePath);
+
+            m_pTextPageInfo = std::make_shared<CTextPageInfo>(0);
+            m_pTextPageInfo->fh = std::make_unique<std::ofstream>();
+            destroyHandler.setTextPageInfo(m_pTextPageInfo);
+            std::ofstream* outFile = m_pTextPageInfo->fh.get();
+            outFile->open(std::filesystem::path(filePathW),
+                std::ios::out | std::ios::binary | std::ios::trunc);
+
+            if (!outFile->is_open())
+            {
+                m_pTextPageInfo.reset();
+                return DTWAIN_ERR_FILEWRITE;
+            }
+
+            m_MultiPageStruct.pUserData = m_pTextPageInfo;
+        }
+        else
+        {
+            // Retrieve handle and write the directory
+            m_pTextPageInfo = std::dynamic_pointer_cast<CTextPageInfo>(m_MultiPageStruct.pUserData);
+            destroyHandler.setTextPageInfo(m_pTextPageInfo);
+            std::ofstream* ptrStream = m_pTextPageInfo->fh.get();
+            if (!ptrStream->is_open())
+            {
+                return DTWAIN_ERR_FILEWRITE;
+            }
+        }
 
         destroyHandler.setTextPageInfo(m_pTextPageInfo);
-        m_MultiPageStruct.pUserData = m_pTextPageInfo;
-        m_pTextPageInfo->fh = std::move(m_hFile);
+        std::ofstream* ptrStream = m_pTextPageInfo->fh.get();
+        // Perform OCR on the current DIB.
+        const LONG result = m_pOCREngine->StartOCR(m_pDib->GetHandle());
 
-        // This is a temp file
-        CTL_StringType szTempPath = GetDTWAINTempFilePath(m_ImageInfoEx.theSource->GetDTWAINHandle());
-        if ( szTempPath.empty() )
+        if (!m_pOCREngine->IsReturnCodeOk(result))
             return DTWAIN_ERR_FILEWRITE;
 
-        szTempPath += GetGUID() +  _T("OCR");
+        // Get the recognized UTF-8 text.
+        const std::string text = m_pOCREngine->GetOCRText();
 
-        LogWriterUtils::WriteLogInfo(GetResourceStringFromMap_Native(IDS_LOGMSG_TEMPIMAGEFILETEXT) + _T(" ") + szTempPath + _T("\n"));
-
-        // OK, now convert DIB to the correct file type -- only do this if the input format
-        // is not DIB
-        if ( m_InputFormat == DTWAIN_BMP)
-            m_pTextPageInfo->m_pOrigHandler = std::make_shared<CTL_BmpIOHandler>(m_pDib, m_ImageInfoEx);
-        else
-        if ( IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(m_InputFormat)))
+        // Write the current page's text.
+        if (!text.empty())
         {
-            m_ImageInfoEx.IsOCRTempImage = true;
-            m_pTextPageInfo->m_pOrigHandler = std::make_shared<CTL_TiffIOHandler>(m_pDib, m_InputFormat, m_ImageInfoEx);
+            ptrStream->write(text.data(), static_cast<std::streamsize>(text.size()));
+            if (!(*ptrStream))
+                return DTWAIN_ERR_FILEWRITE;
         }
-        m_pTextPageInfo->szTempFile = szTempPath;
 
-        const int retval = WriteTempFile();
-        if ( retval != 0 )
-            return retval;
-        m_pOCREngine->ClearCharacterInfoMap(); // clear the character info map.
-        m_pOCREngine->SetCurrentPageNumber(0);
-        SaveOCR();
-        m_bWriteOk = true;
-        if (m_MultiPageStruct.Stage != 0)
-            destroyHandler.setDoDestroy(false);
-        return 0;
-    }
-    else
-    if ( m_MultiPageStruct.Stage == DIB_MULTI_NEXT )
-    {
-        // Retrieve handle and write the directory
-        m_pTextPageInfo = std::dynamic_pointer_cast<CTextPageInfo>(m_MultiPageStruct.pUserData);
-
-        // Increment the page
-        m_pTextPageInfo->curPageNum++;
-
-        std::ofstream* ptrStream = m_pTextPageInfo->fh.get();
-
-        // Write the new line at the end of the file
-        char ff = '\x0c';
-        ptrStream->write(&ff, 1);
-
-        // Write the temp file and save the OCR output
-        m_pOCREngine->SetCurrentPageNumber(m_pOCREngine->GetCurrentPageNumber() + 1);
-        WriteTempFile();
-        SaveOCR();
+        // Single-page output: close immediately.
+        if (stage == 0)
+        {
+            ptrStream->close();
+            return ptrStream->fail() ? DTWAIN_ERR_FILEWRITE : DTWAIN_NO_ERROR;
+        }
         destroyHandler.setDoDestroy(false);
-        return 0;
     }
-    else
-    if (m_MultiPageStruct.Stage == DIB_MULTI_LAST)
-    {
-        m_bWriteOk = true;
-        if (m_MultiPageStruct.pUserData)
-        {
-            m_pTextPageInfo = std::dynamic_pointer_cast<CTextPageInfo>(m_MultiPageStruct.pUserData); 
-            destroyHandler.setTextPageInfo(m_pTextPageInfo);
-            szTempFile = m_pTextPageInfo->szTempFile;
-            m_hFile = std::move(m_pTextPageInfo->fh);
-        }
-    }
-    return 0; 
+    // Multipage output: keep the stream open.
+    return DTWAIN_NO_ERROR;
 }
 
 int CTextImageHandler::WriteTempFile() const

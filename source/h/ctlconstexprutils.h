@@ -235,6 +235,7 @@ namespace dynarithmic
             FileType == TWAINFileFormat_TIFFPIXARLOGMULTI ||
             FileType == TWAINFileFormat_DCX ||
             FileType == TWAINFileFormat_TEXTMULTI ||
+            FileType == TWAINFileFormat_TEXTTesseractMULTI ||
             FileType == TWAINFileFormat_BIGTIFFLZWMULTI ||
             FileType == TWAINFileFormat_BIGTIFFNONEMULTI ||
             FileType == TWAINFileFormat_BIGTIFFPACKBITSMULTI ||
@@ -366,6 +367,13 @@ namespace dynarithmic
     constexpr bool IsSupportedFileFormat(int nFileFormat) 
     {
         return generic_array_finder(EnumTwainFileFormats(), nFileFormat).first;
+    }
+
+    constexpr bool IsSupportedFileFormatEx(int nFileFormat) 
+    {
+        constexpr std::array<int, 2> ca = { TWAINFileFormat_TEXTTesseract, TWAINFileFormat_TEXTTesseractMULTI };
+        return generic_array_finder(EnumTwainFileFormats(), nFileFormat).first || 
+               generic_array_finder(ca, nFileFormat).first;
     }
 
     constexpr LONG GetArrayTypeFromCapType(TW_UINT16 CapType) noexcept

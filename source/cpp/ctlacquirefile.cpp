@@ -128,6 +128,12 @@ extern "C"
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
 
+        // Adjust lFileType if using OCR 
+        auto pOCR = pHandle->m_pOCRDefaultEngine.get();
+        if ( pOCR )
+            lFileType = OCREngine::GetInternalOCRFileType(lFileType, 
+                                                          pHandle->m_pOCRDefaultEngine.get()->GetOCREngineType());
+        
         DTWAIN_ARRAY tempNames = nullptr;
         DTWAINArrayPtr_RAII tempRAII(pHandle, &tempNames);
         DTWAIN_ARRAY arrayToUse = aFileNames;

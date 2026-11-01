@@ -678,7 +678,7 @@ namespace dynarithmic
 
             nFileType = lFileType;
 
-            if (bUseSourceMode || IsSupportedFileFormat(nFileType))
+            if (bUseSourceMode || IsSupportedFileFormatEx(nFileType))
             {
                 opts.setActualAcquireType(CTL_TwainAppMgr::GetCompatibleFileTransferType(pSource));
                 if (!bUseSourceMode)

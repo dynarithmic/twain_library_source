@@ -162,12 +162,15 @@ void CTL_TwainDib::SetEqual( const CTL_TwainDib &rDib )
 }
 
 int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
-                                  LPCTSTR szFile, int nFormat/*=BmpFormat*/,
+                                  LPCTSTR szFile, int actualFormat/*=BmpFormat*/,
                                   bool bOpenFile/*=TRUE*/, int fhFile/*=0*/)
 {
     std::unique_ptr<CTL_ImageIOHandler> pHandler;
     ImageInfo.IsPDF = false;
-    ImageInfo.IsBigTiff = IsFileTypeBigTiff(static_cast<CTL_TwainFileFormatEnum>(nFormat));
+    ImageInfo.IsBigTiff = IsFileTypeBigTiff(static_cast<CTL_TwainFileFormatEnum>(actualFormat));
+    int nFormat = actualFormat;
+    if (actualFormat >= DTWAIN_INTERNAL_TEXT_FIRST && actualFormat <= DTWAIN_INTERNAL_TEXT_LAST)
+        nFormat = DTWAIN_TEXT;
     switch (nFormat )
     {
         case BmpFormat:
@@ -287,25 +290,35 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         case TextFormatMulti:
         {
             // Get the current OCR engine's input format
-            DTWAIN_ARRAY a = nullptr;
+
             const auto pHandle = ImageInfo.theSource->GetDTWAINHandle();
-            auto& factory = pHandle->m_ArrayFactory;
-            DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
-                                    DTWAIN_CAPGETCURRENT, &a);
-            DTWAINArrayLowLevelPtr_RAII raii(pHandle, &a);
-            if ( a )
+            auto* pOCREngine = pHandle->m_pOCRDefaultEngine.get();
+            if (pOCREngine->GetInputType() == OCRInputType::File)
             {
-                const auto& vValues = factory->underlying_container_t<LONG>(a);
-                if ( !vValues.empty() )
+                DTWAIN_ARRAY a = nullptr;
+                const auto pHandle = ImageInfo.theSource->GetDTWAINHandle();
+                auto& factory = pHandle->m_ArrayFactory;
+                DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
+                    DTWAIN_CAPGETCURRENT, &a);
+                DTWAINArrayLowLevelPtr_RAII raii(pHandle, &a);
+                if (a)
                 {
-                    LONG InputFormat = vValues[0];
-                    pHandler = std::make_unique<CTL_TextIOHandler>(this, InputFormat, ImageInfo, pHandle->m_pOCRDefaultEngine.get());
+                    const auto& vValues = factory->underlying_container_t<LONG>(a);
+                    if (!vValues.empty())
+                    {
+                        LONG InputFormat = vValues[0];
+                        pHandler = std::make_unique<CTL_TextIOHandler>(this, InputFormat, ImageInfo, pHandle->m_pOCRDefaultEngine.get());
+                    }
+                    else
+                        return DTWAIN_ERR_BADPARAM;
                 }
                 else
-                    return DTWAIN_ERR_BADPARAM;
+                    return pHandle->m_lLastError;
             }
             else
-                return pHandle->m_lLastError;
+            {
+                pHandler = std::make_unique<CTL_TextIOHandler>(this, -1, ImageInfo, pOCREngine);
+            }
         }
         break;
 
@@ -320,7 +333,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
     try
     {
         pHandler->SetBaseImageInfo(ImageInfo);
-        bRet = pHandler->WriteBitmapImpl( szFile, nFormat, bOpenFile, fhFile );
+        bRet = pHandler->WriteBitmapImpl( szFile, actualFormat, bOpenFile, fhFile );
     }
     catch(...)
     {
@@ -338,13 +351,17 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
     return bRet;
 }
 
-CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& ImageInfo, LPCTSTR szFile, int nFormat,
+CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& ImageInfo, LPCTSTR szFile, int actualFormat,
                                                           bool bOpenFile, int fhFile, int &nStatus)
 {
     CTL_ImageIOHandlerPtr pHandler;
     ImageInfo.IsPDF = false;
-    ImageInfo.IsBigTiff = IsFileTypeBigTiff(static_cast<CTL_TwainFileFormatEnum>(nFormat));
+    ImageInfo.IsBigTiff = IsFileTypeBigTiff(static_cast<CTL_TwainFileFormatEnum>(actualFormat));
     nStatus = DTWAIN_NO_ERROR;
+    int nFormat = actualFormat;
+    if (actualFormat >= DTWAIN_INTERNAL_TEXT_FIRST && actualFormat <= DTWAIN_INTERNAL_TEXT_LAST)
+        nFormat = TextFormatMulti;
+
     switch (nFormat)
     {
         case TiffFormatNONEMULTI:
@@ -385,22 +402,30 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
             // Get the current OCR engine's input format
             DTWAIN_ARRAY a = nullptr;
             const auto pHandle = ImageInfo.theSource->GetDTWAINHandle();
-            DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
-                                    DTWAIN_CAPGETCURRENT, &a);
-            DTWAINArrayLowLevelPtr_RAII raii(pHandle, &a);
-            if ( a )
+            auto* pOCREngine = pHandle->m_pOCRDefaultEngine.get();
+            if (pOCREngine->GetInputType() == OCRInputType::File)
             {
-                const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(a);
-                if ( !vValues.empty() )
+                DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pOCREngine), DTWAIN_OCRCV_IMAGEFILEFORMAT,
+                    DTWAIN_CAPGETCURRENT, &a);
+                DTWAINArrayLowLevelPtr_RAII raii(pHandle, &a);
+                if (a)
                 {
-                    LONG InputFormat = vValues[0];
-                    pHandler = std::make_shared<CTL_TextIOHandler>(this, InputFormat, ImageInfo, pHandle->m_pOCRDefaultEngine.get());
+                    const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(a);
+                    if (!vValues.empty())
+                    {
+                        LONG InputFormat = vValues[0];
+                        pHandler = std::make_shared<CTL_TextIOHandler>(this, InputFormat, ImageInfo, pOCREngine);
+                    }
                 }
+                else
+                    nStatus = pHandle->m_lLastError;
             }
             else
-                nStatus = pHandle->m_lLastError;
-        break;
+            {
+                pHandler = std::make_shared<CTL_TextIOHandler>(this, -1, ImageInfo, pOCREngine);
+            }
         }
+        break;
     }
     if ( !pHandler )
     {
@@ -417,7 +442,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
 
     try
     {
-        nStatus = pHandler->WriteBitmapImpl( szFile, nFormat, bOpenFile, fhFile, &s );
+        nStatus = pHandler->WriteBitmapImpl( szFile, actualFormat, bOpenFile, fhFile, &s );
     }
     catch(...)
     {

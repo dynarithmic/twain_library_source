@@ -39,11 +39,24 @@
 namespace dynarithmic
 {
     class CTL_TwainDLLHandle;
+
+    enum class OCRInputType
+    {
+        File,
+        DIB
+    };
+
     struct OCRJobOptions
     {
         std::string sFileName;
         UINT nFileType;
         void *pOtherOptions;
+    };
+
+    enum class OCREngineType : int
+    {
+        Transym    = 0,
+        Tesseract  = 1,
     };
 
     struct OCRVersionInfo
@@ -57,11 +70,7 @@ namespace dynarithmic
 
     struct OCRVersionIdentity
     {
-    //    TW_UINT32  Id;              /* Unique number.  In Windows, application hWnd      */
         OCRVersionInfo Version;         /* Identifies the piece of code              */
-    //    TW_UINT16  ProtocolMajor;   /* Application and DS must set to TWON_PROTOCOLMAJOR */
-    //    TW_UINT16  ProtocolMinor;   /* Application and DS must set to TWON_PROTOCOLMINOR */
-    //    TW_UINT32  SupportedGroups; /* Bit field OR combination of DG_ constants */
         std::string Manufacturer;    /* Manufacturer name, e.g. "Hewlett-Packard" */
         std::string ProductFamily;   /* Product family name, e.g. "ScanJet"       */
         std::string ProductName;     /* Product name, e.g. "ScanJet Plus"         */
@@ -249,6 +258,7 @@ namespace dynarithmic
         virtual LONG StartupOCREngine();
         virtual LONG StartOCR();
         virtual LONG StartOCR(CTL_StringType filename);
+        virtual LONG StartOCR(HANDLE hDib) { return 0; };
         virtual LONG GetLastError() const;
         virtual std::string GetErrorString(LONG errCode);
         virtual void SetOkErrorCode();
@@ -263,6 +273,7 @@ namespace dynarithmic
         virtual bool SetOCRVersionIdentity();
         virtual bool ShutdownOCR(int& status);
         virtual int GetNumPagesInFile(CTL_StringType /*szFileName*/, int&) {return 1;}
+        virtual OCRInputType GetInputType() const { return OCRInputType::File; }
         std::string GetManufacturer() const;
         std::string GetProductFamily() const;
         std::string GetProductName() const;
@@ -299,7 +310,9 @@ namespace dynarithmic
         void SetPageTextMap(LONG nPage, const std::string& sData);
         bool IsValidOCRPage(LONG nPage) const;
         CTL_TwainDLLHandle* GetDTWAINHandle() const { return m_pHandle; }
-
+        OCREngineType GetOCREngineType() const { return m_EngineType; }
+        void SetOCREngineType(OCREngineType eType) { m_EngineType = eType; }
+        static int GetInternalOCRFileType(int fileType, OCREngineType engineType);
 
     protected:
         virtual bool ProcessGetCapValues(LONG, LONG, OCRLongArrayValues&);
@@ -318,6 +331,7 @@ namespace dynarithmic
         bool m_bIsActivated;
         LONG m_nLastOCRError;
         CTL_TwainDLLHandle* m_pHandle;
+        OCREngineType m_EngineType = OCREngineType::Transym;
     };
 
     std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandles(DTWAIN_OCRENGINE Engine = nullptr);

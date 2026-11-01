@@ -20,6 +20,7 @@
  */
 #include "ctliface.h"
 #include "transym_ocrinterface.h"
+#include "tesseract_ocrinterface.h"
 #include "errorcheck.h"
 #include "ctlstringdefs.h"
 #include "ctlstringutilsx.h"
@@ -64,6 +65,9 @@ namespace dynarithmic
             pHandle->m_OCRInterfaceArray.push_back(pInterface);
 
         // Add other engines here.
+        const OCREnginePtr pInterface2 = std::make_shared<TesseractOCR>(pHandle);
+        if (pInterface2->IsInitialized())
+            pHandle->m_OCRInterfaceArray.push_back(pInterface2);
 
         // Call virtuals to set up the product names.
         auto it = pHandle->m_OCRInterfaceArray.begin();
@@ -108,6 +112,7 @@ namespace dynarithmic
         throw DTWAINException(DTWAIN_ERR_OCR_INVALIDENGINE);
     }
 }
+
 extern "C"
 {
     HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
@@ -651,10 +656,7 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
-}
 
-extern "C"
-{
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
     {
         LOG_FUNC_ENTRY_PARAMS(())
@@ -721,7 +723,7 @@ extern "C"
             const LONG bRet = pEngine->StartupOCREngine();
             if (bRet != 0)
                 LOG_FUNC_EXIT_NONAME_PARAMS(false)
-                LOG_FUNC_EXIT_NONAME_PARAMS(true)
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
         }
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
