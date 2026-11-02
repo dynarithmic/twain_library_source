@@ -727,5 +727,15 @@ namespace dynarithmic
         }
         return DTWAIN_ARRAYLONG;
     }
+
+    constexpr bool IsValidComponent(int nComponent)
+    {
+        switch (nComponent)
+        {
+            case DTWAIN_COMPONENT_JPEGXL:
+                return true;
+        }
+        return false;
+    }
 }
 #endif

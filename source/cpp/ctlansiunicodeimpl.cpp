@@ -3286,42 +3286,42 @@ extern "C"
     #endif
     }
 
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJXLLibraryPathA(LPCSTR szFilePath)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetComponentPathA(LONG nComponent, LPCSTR szFilePath)
     {
 #ifdef _UNICODE
-        return DTWAIN_SetJXLLibraryPath(stringconversion::Convert_AnsiPtr_To_Native(szFilePath).c_str());
+        return DTWAIN_SetComponentPath(nComponent, stringconversion::Convert_AnsiPtr_To_Native(szFilePath).c_str());
 #else
-        return DTWAIN_SetJXLLibraryPath(szFilePath);
+        return DTWAIN_SetComponentPath(nComponent, szFilePath);
 #endif
     }
 
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJXLLibraryPathW(LPCWSTR szFilePath)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetComponentPathW(LONG nComponent, LPCWSTR szFilePath)
     {
 #ifdef _UNICODE
-        return DTWAIN_SetJXLLibraryPath(szFilePath);
+        return DTWAIN_SetComponentPath(nComponent, szFilePath);
 #else
-        return DTWAIN_SetJXLLibraryPath(stringconversion::Convert_WidePtr_To_Native(szFilePath).c_str());
+        return DTWAIN_SetComponentPath(nComponent, stringconversion::Convert_WidePtr_To_Native(szFilePath).c_str());
 #endif
     }
 
-    LONG DLLENTRY_DEF DTWAIN_GetJXLLibraryPathA(LPSTR lpszOut, LONG nMaxLen)
+    LONG DLLENTRY_DEF DTWAIN_GetComponentPathA(LONG nComponent, LPSTR lpszOut, LONG nMaxLen)
     {
     #ifdef _UNICODE
         std::wstring arg((std::max)(nMaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetJXLLibraryPath(lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetComponentPath(nComponent, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
     #else
-        return DTWAIN_GetJXLLibraryPath(lpszOut, nMaxLen);
+        return DTWAIN_GetComponentPath(nComponent, lpszOut, nMaxLen);
     #endif
     }
 
-    LONG DLLENTRY_DEF DTWAIN_GetJXLLibraryPathW(LPWSTR lpszOut, LONG nMaxLen)
+    LONG DLLENTRY_DEF DTWAIN_GetComponentPathW(LONG nComponent, LPWSTR lpszOut, LONG nMaxLen)
     {
     #ifdef _UNICODE
-        return DTWAIN_GetJXLLibraryPath(lpszOut, nMaxLen);
+        return DTWAIN_GetComponentPath(nComponent, lpszOut, nMaxLen);
     #else
         std::string arg((std::max)(nMaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetJXLLibraryPath(lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
+        LONG retVal = DTWAIN_GetComponentPath(nComponent, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
         return null_terminator_copier(get_view(arg), lpszOut, retVal);
     #endif
     }

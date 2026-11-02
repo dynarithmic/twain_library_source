@@ -222,57 +222,62 @@ extern "C"
         CATCH_BLOCK(0)
     }
 
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJXLLibraryPath(LPCTSTR szPath)
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetComponentPath(LONG nComponent, LPCTSTR szPath)
     {
         LOG_FUNC_ENTRY_PARAMS((szPath))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-        auto& jxlLoader = CTL_StaticData::GetJPEGXLLoader();
-
-        // Reject changes after JPEG XL has been loaded.
-        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return jxlLoader.IsLoaded(); }, DTWAIN_ERR_JXL_ALREADYLOADED, 
-                                                FALSE, FUNC_MACRO);
-
-        auto& jxlPath = CTL_StaticData::GetJPEGXLPath();
-        
-        // Perform the usual DTWAIN initialization checks here.
-        CTL_StringType sPath;
-        if (szPath)
+        if (nComponent == DTWAIN_COMPONENT_JPEGXL)
         {
-            sPath = szPath;
-        }
+            auto& jxlLoader = CTL_StaticData::GetJPEGXLLoader();
 
-        std::filesystem::path directory(sPath);
+            // Reject changes after JPEG XL has been loaded.
+            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return jxlLoader.IsLoaded(); }, DTWAIN_ERR_JXL_ALREADYLOADED,
+                FALSE, FUNC_MACRO);
 
-        // An empty path is valid and means default Windows DLL search.
-        if (!directory.empty())
-        {
-            if (!directory.is_absolute())
+            auto& jxlPath = CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_JPEGXL);
+
+            // Perform the usual DTWAIN initialization checks here.
+            CTL_StringType sPath;
+            if (szPath)
             {
-                DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PATH, false, FUNC_MACRO);
+                sPath = szPath;
             }
 
-            if (!std::filesystem::is_directory(directory))
-            {
-                DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PATH, false, FUNC_MACRO);
-            }
-        }
+            std::filesystem::path directory(sPath);
 
-        // Save the directory for the JPEG XL loader.
-    #ifdef UNICODE
-        jxlPath = directory.wstring();
-    #else
-        jxlPath = directory.string();
-    #endif
+            // An empty path is valid and means default Windows DLL search.
+            if (!directory.empty())
+            {
+                if (!directory.is_absolute())
+                {
+                    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PATH, false, FUNC_MACRO);
+                }
+
+                if (!std::filesystem::is_directory(directory))
+                {
+                    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PATH, false, FUNC_MACRO);
+                }
+            }
+
+            // Save the directory for the JPEG XL loader.
+            #ifdef UNICODE
+            jxlPath = directory.wstring();
+            #else
+            jxlPath = directory.string();
+            #endif
+        }
         LOG_FUNC_EXIT_PARAMS(TRUE)
         CATCH_BLOCK(FALSE)
     }
 
-    LONG DLLENTRY_DEF DTWAIN_GetJXLLibraryPath(LPTSTR lpszOut, LONG nMaxLen)
+    LONG DLLENTRY_DEF DTWAIN_GetComponentPath(LONG nComponent, LPTSTR lpszOut, LONG nMaxLen)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszOut, nMaxLen))
-        VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-        auto ret = CTL_StaticData::GetJPEGXLPath();
-        auto numChars = CopyInfoToCString(ret, lpszOut, nMaxLen);
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        bool bRet = IsValidComponent(nComponent);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_INVALID_PARAM, -1, FUNC_MACRO);
+        auto thePath = CTL_StaticData::GetComponentPath(nComponent);
+        auto numChars = CopyInfoToCString(thePath, lpszOut, nMaxLen);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
         LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
         CATCH_BLOCK(-1)

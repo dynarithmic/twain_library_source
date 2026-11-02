@@ -608,6 +608,8 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlinternalconstants.h
         ${PROJECT_SOURCE_DIR}/h/ctlloggercallback.h
         ${PROJECT_SOURCE_DIR}/h/ctltwaindllhandle.h
+        ${PROJECT_SOURCE_DIR}/h/dtwinver/dtwinver.h
+        ${PROJECT_SOURCE_DIR}/h/dtwinver/dtwinverex.h
 )
 
 set(MAIN_INL
@@ -798,8 +800,8 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/stdafx.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windowsinit_impl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windows_versioninfo.cpp
-  ${PROJECT_SOURCE_DIR}/dtwinver/Dtwinver.cpp
-  ${PROJECT_SOURCE_DIR}/dtwinver/Getwinver.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/dtwinver/Dtwinver.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/dtwinver/Getwinver.cpp
 )
 
 set(LIBGIF_SOURCES
@@ -1612,7 +1614,7 @@ target_include_directories(dtwain PRIVATE
     ${PROJECT_SOURCE_DIR}/cpp
     ${PROJECT_SOURCE_DIR}/c
     ${PROJECT_SOURCE_DIR}/date-master/include
-    ${PROJECT_SOURCE_DIR}/dtwinver
+    ${PROJECT_SOURCE_DIR}/h/dtwinver
     ${PROJECT_SOURCE_DIR}/h/ImageFun/dtwpdf
     ${PROJECT_SOURCE_DIR}/inl
     ${PROJECT_SOURCE_DIR}/LibGIF
@@ -1680,6 +1682,12 @@ source_group(
     TREE "${PROJECT_SOURCE_DIR}/inl"
     PREFIX "Inline Files"
     FILES ${MAIN_INL}
+)
+
+source_group(
+    TREE "${PROJECT_SOURCE_DIR}/cpp"
+    PREFIX "Source Files"
+    FILES ${MAIN_SOURCES}
 )
 
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${MAIN_INL})

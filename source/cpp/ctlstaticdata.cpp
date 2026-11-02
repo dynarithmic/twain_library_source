@@ -32,4 +32,9 @@ namespace dynarithmic
         static CTL_StaticDataStruct static_data;
         return static_data;
     }
+
+    CTL_StringType& CTL_StaticData::GetComponentPath(int nComponent)
+    {
+        return Get().s_mapComponentPaths[nComponent];
+    }
 }
