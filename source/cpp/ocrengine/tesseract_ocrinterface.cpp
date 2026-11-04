@@ -28,6 +28,7 @@
 #include "capconst.h"
 #include "tesseract_ocrinterface.h"
 #include "ctlfileutils.h"
+#include "ctlwindowsimpl.h"
 #include "errorcheck.h"
 
 using namespace dynarithmic;
@@ -196,6 +197,19 @@ namespace
 
         return true;
     }
+
+    std::wstring GetTesseractDLLName()
+    {
+        // Load the resources
+        auto* customProfile = CTL_StaticData::GetINIInterface();
+        const char* defName = "Tesseract";
+        if (customProfile)
+            defName = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_OCRLIBRARY_KEY).data(), defName);
+        auto val = stringconversion::Convert_AnsiPtr_To_Wide(defName);
+        if (val.empty())
+            val = _T("libtesseract-5.dll");
+        return val;
+    }
 }
 
 
@@ -204,10 +218,17 @@ TesseractOCR::TesseractOCR(CTL_TwainDLLHandle* pHandle) : OCREngine(pHandle)
     SetOCREngineType(OCREngineType::Tesseract);
 
     // Load the Tesseract DLL.
-    // Use an explicit path here if DTWAIN has
-    // configured a custom Tesseract directory.
-    m_hTessDLL = LoadLibraryW(L"d:\\Tesseract-OCR-32\\libtesseract-5.dll");
 
+    // Get the configured path
+    auto strPath = CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_TESSERACT);
+    std::wstring sDLLPath = stringconversion::Convert_Native_To_Wide(strPath);
+    sDLLPath = WindowsAPIImplDef::AddBackslashToDirectory(sDLLPath);
+
+    // Get the Tesseract DLL name to load
+    auto sTotalPath = sDLLPath + GetTesseractDLLName();
+
+    m_hTessDLL = LoadLibraryExW(sTotalPath.c_str(), nullptr, 
+        LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
     if (!m_hTessDLL)
         return;
 

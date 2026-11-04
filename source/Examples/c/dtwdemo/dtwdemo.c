@@ -809,6 +809,23 @@ void AcquireFile(BOOL bUseSource, LONG resourceID, LONG fileType)
     else
         FileFlags |= DTWAIN_USENATIVE;
 
+        /* Check if TEXT type is acquired */
+    if ( fileType == DTWAIN_TEXTMULTI )
+    {
+        if (!DTWAIN_InitOCRInterface() )
+        {
+            MessageBox(g_hWnd, _T("Text mode requires OCR engine installed"), _T("No OCR engines detected"), MB_ICONSTOP);
+            return;
+        }
+        if ( !DTWAIN_SelectOCREngine2(NULL, NULL, 0, 0,
+            DTWAIN_DLG_CENTER_CURRENT_MONITOR | DTWAIN_DLG_SORTNAMES
+            | DTWAIN_DLG_TOPMOSTWINDOW | DTWAIN_DLG_HIGHLIGHTFIRST))
+        {
+            MessageBox(g_hWnd, _T("OCR engine was not selected"), _T("OCR engine"), MB_ICONSTOP);
+            return;
+        }
+    }
+
     if (IsAcquirePDF(resourceID))
     {
         memset(&AllPDFInfo, 0, sizeof(PDFInfo));
@@ -857,27 +874,6 @@ void AcquireFile(BOOL bUseSource, LONG resourceID, LONG fileType)
 
     if ( fileType == DTWAIN_PDFMULTI )
         DTWAIN_SetPDFPageSize(g_CurrentSource, DTWAIN_FS_USLETTER, 0, 0);
-
-    /* Check if TEXT type is acquired */
-    if ( fileType == DTWAIN_TEXTMULTI )
-    {
-        /* Initialize the OCR engine if it's available */
-        if (!DTWAIN_InitOCRInterface() )
-        {
-            MessageBox(g_hWnd, _T("Text mode requires OCR engine installed"), _T("No OCR engines detected"), MB_ICONSTOP);
-            return;
-        }
-        else
-        {
-            if ( !DTWAIN_SelectOCREngine2(NULL, NULL, 0, 0,
-                DTWAIN_DLG_CENTER_CURRENT_MONITOR | DTWAIN_DLG_SORTNAMES
-                | DTWAIN_DLG_TOPMOSTWINDOW | DTWAIN_DLG_HIGHLIGHTFIRST))
-            {
-                MessageBox(g_hWnd, _T("OCR engine could not be selected"), _T("OCR engine error"), MB_ICONSTOP);
-                return;
-            }
-        }
-    }
 
     SetUpAcquire();
 

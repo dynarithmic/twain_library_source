@@ -52,30 +52,53 @@ namespace
     }
 
     LONG GetOCRTextSupport(OCREngine* pEngine, LONG fileType, LONG pixelType, LONG bitDepth);
+
+    using OCRFactory = OCREnginePtr (*)(CTL_TwainDLLHandle*);
+
+    struct OCREngineFactory
+    {
+        const char* name;
+        OCRFactory create;
+    };
+
+    template <typename T>
+    OCREnginePtr CreateOCREngine(CTL_TwainDLLHandle* h)
+    {
+        return std::make_shared<T>(h);
+    }
 }
 
 namespace dynarithmic
 {
     void LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
     {
+        bool anyLogFlags = CTL_StaticData::GetLogFilterFlags() != 0;
+
         pHandle->m_OCRProdNameToEngine.clear();
 
-        const OCREnginePtr pInterface = std::make_shared<TransymOCR>(pHandle);
-        if (pInterface->IsInitialized())
-            pHandle->m_OCRInterfaceArray.push_back(pInterface);
+        const std::array<OCREngineFactory, 2> OCRFactories =
+        {{
+            { "Transym OCR",   &CreateOCREngine<TransymOCR> },
+            { "Tesseract OCR", &CreateOCREngine<TesseractOCR> }
+        }};
 
-        // Add other engines here.
-        const OCREnginePtr pInterface2 = std::make_shared<TesseractOCR>(pHandle);
-        if (pInterface2->IsInitialized())
-            pHandle->m_OCRInterfaceArray.push_back(pInterface2);
-
-        // Call virtuals to set up the product names.
-        auto it = pHandle->m_OCRInterfaceArray.begin();
-        while (it != pHandle->m_OCRInterfaceArray.end())
+        for (const auto& factory: OCRFactories)
         {
-            (*it)->SetOCRVersionIdentity();
-            pHandle->m_OCRProdNameToEngine.insert({(*it)->GetProductName(), *it});
-            ++it;
+            auto pInterface = factory.create(pHandle);
+
+            if (pInterface && pInterface->IsInitialized())
+            {
+                pInterface->SetOCRVersionIdentity();
+                pHandle->m_OCRProdNameToEngine.insert({ pInterface->GetProductName(), pInterface });
+                pHandle->m_OCRInterfaceArray.push_back(std::move(pInterface));
+            }
+            else
+            if ( anyLogFlags )
+            {
+                std::string sMsg = "Could not load OCR Engine: ";
+                sMsg += factory.name;
+                LogWriterUtils::WriteLogInfoIndentedA(sMsg);
+            }
         }
 
         // Set first OCR engine to be the default engine

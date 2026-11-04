@@ -226,6 +226,11 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((szPath))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (nComponent == DTWAIN_COMPONENT_TESSERACT)
+        {
+            CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_TESSERACT) = szPath;
+        }
+        else
         if (nComponent == DTWAIN_COMPONENT_JPEGXL)
         {
             auto& jxlLoader = CTL_StaticData::GetJPEGXLLoader();
