@@ -708,7 +708,7 @@ void TestGetCap(HWND hWnd, LONG capValue)
                     }
                 }
 
-                if (szValues[0] == 0)
+                if (szValues[0] == 0 || isRange)
                 {
                     if (nDataType == TWTY_UINT32)
                         sprintf(szValues, rangeFormatU, rangeNameToPrint, (TW_UINT32)lVal);

@@ -151,9 +151,9 @@ namespace dynarithmic
         SupportedBitDepthsMap    s_supportedBitDepths;
         std::queue<MSG>          s_TwainV2MessageQueue;
         std::pair<bool, bool>    s_EmbeddedResourceStatus = { false, false };
-        CTL_StringType           s_JPEGXLComponentPath;
         JxlDynamicLoader         s_JPEGXLDynLoader;
         int                      s_JPEGXLNumThreads = DTWAIN_DEFAULT;
+        BASIC_MAPTYPE_<int, CTL_StringType> s_mapComponentPaths;
         CTL_StaticDataStruct();
     };
 
@@ -258,7 +258,8 @@ namespace dynarithmic
         static CTL_StringType& GetDLLParentPath() { return Get().s_DLLParentPath; }
         static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return Get().s_AvailableFileFormatsMap; }
         static SupportedBitDepthsMap& GetSupportedBPPMap() { return Get().s_supportedBitDepths; }
-        static CTL_StringType& GetJPEGXLPath() { return Get().s_JPEGXLComponentPath; }
+        static CTL_StringType& GetComponentPath(int nComponent);
+        static auto& GetComponentPathMap() { return Get().s_mapComponentPaths; }
         static JxlDynamicLoader& GetJPEGXLLoader() { return Get().s_JPEGXLDynLoader; }
         static int& GetJPEGXLNumThreads() { return Get().s_JPEGXLNumThreads;  }
         static auto& GetTwainV2MessageQueue() { return Get().s_TwainV2MessageQueue; }

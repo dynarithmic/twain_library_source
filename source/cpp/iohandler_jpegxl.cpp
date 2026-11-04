@@ -30,7 +30,7 @@ using namespace dynarithmic;
 
 void CTL_JPegXLIOHandler::InitializeJXLSupport()
 {
-    auto jxlPath = stringconversion::Convert_Native_To_Wide(CTL_StaticData::GetJPEGXLPath());
+    auto jxlPath = stringconversion::Convert_Native_To_Wide(CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_JPEGXL));
     auto jxlLoadVal = CTL_StaticData::GetJPEGXLLoader().Load(jxlPath); 
     if ( !jxlLoadVal.first )
     {
