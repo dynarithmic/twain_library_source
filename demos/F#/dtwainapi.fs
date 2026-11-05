@@ -1834,6 +1834,7 @@ module TwainAPI =
     let public DTWAIN_CHECKDLLVERGREATEREQ = 4
     let public DTWAIN_RESOURCE_COPYRIGHT = 9700
     let public DTWAIN_COMPONENT_JPEGXL = 1
+    let public DTWAIN_COMPONENT_RESOURCES = 2
 
     // Public state exposed after successful Load
     let mutable private IsLoaded = false
