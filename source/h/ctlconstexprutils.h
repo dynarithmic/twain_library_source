@@ -28,7 +28,6 @@
 #include "twain.h"
 #include "ctlenum.h"
 #include "dtwpdft.h"
-#include "dtwain_config.h"
 
 namespace dynarithmic
 {
@@ -733,6 +732,7 @@ namespace dynarithmic
         switch (nComponent)
         {
             case DTWAIN_COMPONENT_JPEGXL:
+            case DTWAIN_COMPONENT_RESOURCES:
                 return true;
         }
         return false;

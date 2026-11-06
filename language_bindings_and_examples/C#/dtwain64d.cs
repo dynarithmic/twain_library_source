@@ -1831,6 +1831,7 @@ namespace Dynarithmic
         public const int DTWAIN_CHECKDLLVERGREATEREQ = 4;
         public const int DTWAIN_RESOURCE_COPYRIGHT = 9700;
         public const int DTWAIN_COMPONENT_JPEGXL = 1;
+        public const int DTWAIN_COMPONENT_RESOURCES = 2;
 
         public const string DTWAIN_LIBRARY = "dtwain64d.dll";
 

@@ -88,6 +88,47 @@ namespace
         #endif
         return CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
     }
+
+    int SetJXLComponent(CTL_TwainDLLHandle* pHandle, LPCTSTR szPath)
+    {
+        auto& jxlLoader = CTL_StaticData::GetJPEGXLLoader();
+
+        // Reject changes after JPEG XL has been loaded.
+        if ( jxlLoader.IsLoaded() )
+            return DTWAIN_ERR_JXL_ALREADYLOADED;
+
+        auto& jxlPath = CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_JPEGXL);
+
+        CTL_StringType sPath;
+        if (szPath)
+        {
+            sPath = szPath;
+        }
+
+        std::filesystem::path directory(sPath);
+
+        // An empty path is valid and means default Windows DLL search.
+        if (!directory.empty())
+        {
+            if (!directory.is_absolute())
+            {
+                return DTWAIN_ERR_INVALID_PATH;
+            }
+
+            if (!std::filesystem::is_directory(directory))
+            {
+                return DTWAIN_ERR_INVALID_PATH;
+            }
+        }
+
+        // Save the directory for the JPEG XL loader.
+        #ifdef UNICODE
+        jxlPath = directory.wstring();
+        #else
+        jxlPath = directory.string();
+        #endif
+        return DTWAIN_NO_ERROR;
+    }
 }
 
 extern "C"
@@ -181,6 +222,7 @@ extern "C"
             CTL_StaticData::GetResourcePath() = ResourcePath;
         else
             CTL_StaticData::GetResourcePath() = _T("");
+        CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_RESOURCES) = CTL_StaticData::GetResourcePath();
         LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
         CATCH_BLOCK(false)
     }
@@ -226,45 +268,22 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((szPath))
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-        if (nComponent == DTWAIN_COMPONENT_JPEGXL)
+        bool bRet = IsValidComponent(nComponent);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_INVALID_PARAM, -1, FUNC_MACRO);
+        switch (nComponent)
         {
-            auto& jxlLoader = CTL_StaticData::GetJPEGXLLoader();
-
-            // Reject changes after JPEG XL has been loaded.
-            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return jxlLoader.IsLoaded(); }, DTWAIN_ERR_JXL_ALREADYLOADED,
-                FALSE, FUNC_MACRO);
-
-            auto& jxlPath = CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_JPEGXL);
-
-            // Perform the usual DTWAIN initialization checks here.
-            CTL_StringType sPath;
-            if (szPath)
+            case DTWAIN_COMPONENT_JPEGXL:
             {
-                sPath = szPath;
+                auto retValue = SetJXLComponent(pHandle, szPath);
+                DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return retValue != DTWAIN_NO_ERROR; }, 
+                                                retValue,FALSE, FUNC_MACRO);
             }
-
-            std::filesystem::path directory(sPath);
-
-            // An empty path is valid and means default Windows DLL search.
-            if (!directory.empty())
+            break;
+            case DTWAIN_COMPONENT_RESOURCES:
             {
-                if (!directory.is_absolute())
-                {
-                    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PATH, false, FUNC_MACRO);
-                }
-
-                if (!std::filesystem::is_directory(directory))
-                {
-                    DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PATH, false, FUNC_MACRO);
-                }
+                DTWAIN_SetResourcePath(szPath);
             }
-
-            // Save the directory for the JPEG XL loader.
-            #ifdef UNICODE
-            jxlPath = directory.wstring();
-            #else
-            jxlPath = directory.string();
-            #endif
+            break;
         }
         LOG_FUNC_EXIT_PARAMS(TRUE)
         CATCH_BLOCK(FALSE)
