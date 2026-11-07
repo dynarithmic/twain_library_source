@@ -26,36 +26,13 @@
 #include "versioninfo.h"
 #include "ctlfileutils.h"
 #include "errorcheck.h"
+#include "sharedlibraryutils.h"
 
 #ifdef VERSINFO_STANDALONE
 using namespace VersionInformation;
 #endif
 
 using namespace dynarithmic;
-
-TOCRSDK::TOCRSDK()
-        : TOCRInitialise(nullptr),
-        TOCRShutdown        (nullptr),
-        TOCRGetErrorMode    (nullptr),
-        TOCRSetErrorMode    (nullptr),
-        TOCRDoJob           (nullptr),
-        TOCRWaitForJob      (nullptr),
-        TOCRWaitForAnyJob   (nullptr),
-        TOCRGetJobDBInfo    (nullptr),
-        TOCRGetJobStatus    (nullptr),
-        TOCRGetJobStatusEx  (nullptr),
-        TOCRGetJobStatusMsg (nullptr),
-        TOCRGetNumPages     (nullptr),
-        TOCRGetJobResults   (nullptr),
-        TOCRGetJobResultsEx (nullptr),
-        TOCRGetLicenceInfo  (nullptr),
-        TOCRConvertTIFFtoDIB(nullptr),
-        TOCRRotateMonoBitmap(nullptr),
-        TOCRConvertFormat   (nullptr),
-        TOCRGetLicenceInfoEx(nullptr),
-        m_hMod (nullptr)
-{
-}
 
 namespace
 {
@@ -73,68 +50,88 @@ namespace
     }
 }
 
-HMODULE TOCRSDK::InitTOCR()
+boost::dll::shared_library TOCRSDK::InitTOCR()
 {
+
+    struct FunctionResolverRAII
+    {
+        std::string m_functionName;
+        bool bDisplayError = true;
+        FunctionResolverRAII() = default;
+        ~FunctionResolverRAII()
+        {
+            try
+            {
+                if (bDisplayError)
+                {
+                    if (CTL_StaticData::GetLogFilterFlags())
+                    {
+                        CTL_StringType sJXLNative = _T("Could not load Transym-TOCR exported function ") + 
+                            stringconversion::Convert_Ansi_To_Native(m_functionName);
+                        LogWriterUtils::WriteLogInfoIndented(sJXLNative);
+                    }
+                }
+            }
+            catch (...)
+            {}
+        }
+    };
+
+
     if ( m_hMod )
         return m_hMod;
-    m_hMod = LoadLibrary(GetTOCRDLLName().c_str());
+     LoadSharedLibrary(m_hMod, stringconversion::Convert_Native_To_Wide(GetTOCRDLLName()));
 
     if ( !m_hMod )
     {
-        return nullptr;
+        return {};
     }
 
-    TOCRInitialise       =  reinterpret_cast<TOCRINITIALIZEFUNC>(GetProcAddress(m_hMod, "TOCRInitialise"));
-    TOCRShutdown         =  reinterpret_cast<TOCRSHUTDOWNFUNC>(GetProcAddress(m_hMod, "TOCRShutdown"));
-    TOCRGetErrorMode     =  reinterpret_cast<TOCRGETERRORMODEFUNC>(GetProcAddress(m_hMod, "TOCRGetErrorMode"));
-    TOCRSetErrorMode     =  reinterpret_cast<TOCRSETERRORMODEFUNC>(GetProcAddress(m_hMod, "TOCRSetErrorMode"));
-    TOCRDoJob            =  reinterpret_cast<TOCRDOJOBFUNC>(GetProcAddress(m_hMod, "TOCRDoJob"));
-    TOCRWaitForJob       =  reinterpret_cast<TOCRWAITFORJOBFUNC>(GetProcAddress(m_hMod, "TOCRWaitForJob"));
-    TOCRWaitForAnyJob    =  reinterpret_cast<TOCRWAITFORANYJOBFUNC>(GetProcAddress(m_hMod, "TOCRWaitForAnyJob"));
-    TOCRGetJobDBInfo     =  reinterpret_cast<TOCRGETJOBDBINFOFUNC>(GetProcAddress(m_hMod, "TOCRGetJobDBInfo"));
-    TOCRGetJobStatus     =  reinterpret_cast<TOCRGETJOBSTATUSFUNC>(GetProcAddress(m_hMod, "TOCRGetJobStatus"));
-    TOCRGetJobStatusEx   =  reinterpret_cast<TOCRGETJOBSTATUSEXFUNC>(GetProcAddress(m_hMod, "TOCRGetJobStatusEx"));
-    TOCRGetJobStatusMsg  =  reinterpret_cast<TOCRGETJOBSTATUSMSGFUNC>(GetProcAddress(m_hMod, "TOCRGetJobStatusMsg"));
-    TOCRGetNumPages      =  reinterpret_cast<TOCRGETNUMPAGESFUNC>(GetProcAddress(m_hMod, "TOCRGetNumPages"));
-    TOCRGetJobResults    =  reinterpret_cast<TOCRGETJOBRESULTSFUNC>(GetProcAddress(m_hMod, "TOCRGetJobResults"));
-    TOCRGetJobResultsEx  =  reinterpret_cast<TOCRGETJOBRESULTSEXFUNC>(GetProcAddress(m_hMod, "TOCRGetJobResultsEx"));
-    TOCRGetLicenceInfo   =  reinterpret_cast<TOCRGETLICENCEINFOFUNC>(GetProcAddress(m_hMod, "TOCRGetLicenceInfo"));
-    TOCRConvertTIFFtoDIB =  reinterpret_cast<TOCRCONVERTTIFFTODIBFUNC>(GetProcAddress(m_hMod, "TOCRConvertTIFFtoDIB"));
-    TOCRRotateMonoBitmap =  reinterpret_cast<TOCRROTATEMONOBITMAPFUNC>(GetProcAddress(m_hMod, "TOCRRotateMonoBitmap"));
-    TOCRConvertFormat    =  reinterpret_cast<TOCRCONVERTFORMATFUNC>(GetProcAddress(m_hMod, "TOCRConvertFormat"));
-    TOCRGetLicenceInfoEx =  reinterpret_cast<TOCRGETLICENCEINFOEXFUNC>(GetProcAddress(m_hMod, "TOCRGetLicenceInfoEx"));
+    FunctionResolverRAII funcResolver;
+    Functions f{};
 
-    if (!TOCRInitialise ||
-        !TOCRShutdown       ||
-        !TOCRGetErrorMode   ||
-        !TOCRSetErrorMode   ||
-        !TOCRDoJob          ||
-        !TOCRWaitForJob     ||
-        !TOCRWaitForAnyJob  ||
-        !TOCRGetJobDBInfo   ||
-        !TOCRGetJobStatus   ||
-        !TOCRGetJobStatusEx ||
-        !TOCRGetJobStatusMsg ||
-        !TOCRGetNumPages     ||
-        !TOCRGetJobResults   ||
-        !TOCRGetJobResultsEx ||
-        !TOCRGetLicenceInfo  ||
-        !TOCRConvertTIFFtoDIB ||
-        !TOCRRotateMonoBitmap ||
-        !TOCRConvertFormat    ||
-        !TOCRGetLicenceInfoEx )
-    {
-        FreeLibrary(m_hMod);
-        m_hMod = nullptr;
-        return nullptr;
-    }
+    // Resolve each required function.
+    // Preserve the error before unloading modules.
+    #define RESOLVE_TOCR(module, member, exportedName)  \
+    do {   \
+        if (!GetSharedLibraryFunction(module, exportedName, f.member).first)  \
+        {   \
+            funcResolver.m_functionName = exportedName; \
+            module.unload(); \
+            return {}; \
+        }                                    \
+    } while (false)
+
+    RESOLVE_TOCR(m_hMod, Initialise, "TOCRInitialise");
+    RESOLVE_TOCR(m_hMod, Shutdown, "TOCRShutdown");
+    RESOLVE_TOCR(m_hMod, GetErrorMode, "TOCRGetErrorMode");
+    RESOLVE_TOCR(m_hMod, SetErrorMode, "TOCRSetErrorMode");
+    RESOLVE_TOCR(m_hMod, DoJob, "TOCRDoJob");
+    RESOLVE_TOCR(m_hMod, WaitForJob, "TOCRWaitForJob");
+    RESOLVE_TOCR(m_hMod, WaitForAnyJob, "TOCRWaitForAnyJob");
+    RESOLVE_TOCR(m_hMod, GetJobDBInfo, "TOCRGetJobDBInfo");
+    RESOLVE_TOCR(m_hMod, GetJobStatus, "TOCRGetJobStatus");
+    RESOLVE_TOCR(m_hMod, GetJobStatusEx, "TOCRGetJobStatusEx");
+    RESOLVE_TOCR(m_hMod, GetJobStatusMsg, "TOCRGetJobStatusMsg");
+    RESOLVE_TOCR(m_hMod, GetNumPages, "TOCRGetNumPages");
+    RESOLVE_TOCR(m_hMod, GetJobResults, "TOCRGetJobResults");
+    RESOLVE_TOCR(m_hMod, GetJobResultsEx, "TOCRGetJobResultsEx");
+    RESOLVE_TOCR(m_hMod, GetLicenseInfo, "TOCRGetLicenceInfo");
+    RESOLVE_TOCR(m_hMod, ConvertTIFFtoDIB, "TOCRConvertTIFFtoDIB");
+    RESOLVE_TOCR(m_hMod, RotateMonoBitmap, "TOCRRotateMonoBitmap");
+    RESOLVE_TOCR(m_hMod, ConvertFormat, "TOCRConvertFormat");
+    RESOLVE_TOCR(m_hMod, GetLicenseInfoEx, "TOCRGetLicenceInfoEx");
+#undef RESOLVE_TOCR
+    m_functions = f;
     return m_hMod;
 }
 
-TOCRSDK::~TOCRSDK()
+TOCRSDK::~TOCRSDK() 
 {
     if (m_hMod)
-        FreeLibrary(m_hMod);
+    {
+        m_hMod.unload();
+    }
 }
 
 #define INIT_TOCR_ERROR_CODE(x) m_ErrorCode[x] = #x;
@@ -379,14 +376,14 @@ TransymOCR::TransymOCR(CTL_TwainDLLHandle* DLLHandle) : OCREngine(DLLHandle), m_
     // Set up available caps
     SetAvailableCaps();
     SetPDFFileTypes(OCRPDFInfo::PDFINFO_BW, DTWAIN_TIFFNONE, DTWAIN_PT_BW, 1);
-    m_hMod = m_SDK.InitTOCR();
-    if ( m_hMod )
+    m_SDK.InitTOCR();
+    if ( m_SDK.m_hMod )
     {
-        const LONG status = m_SDK.TOCRInitialise(&m_JobHandle);
+        const LONG status =  m_SDK.m_functions.Initialise(&m_JobHandle);
         if ( status != TOCR_OK )
         {
-            FreeLibrary(m_hMod);
-            m_hMod = nullptr;
+            m_SDK.m_hMod.unload();
+            m_SDK.m_hMod = {};
         }
         SetActivated(true);
         FileTypeArray fArray;
@@ -399,7 +396,7 @@ TransymOCR::TransymOCR(CTL_TwainDLLHandle* DLLHandle) : OCREngine(DLLHandle), m_
     }
     else
     {
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(DLLHandle, [&] { return !m_hMod; },
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(DLLHandle, [&] { return !m_SDK.m_hMod; },
                     DTWAIN_ERR_OCRLIBRARY_NOTFOUND, false, FUNC_MACRO);
     }
 }
@@ -615,16 +612,16 @@ void TransymOCR::SetAvailableCaps()
 
 TransymOCR::~TransymOCR()
 {
-    if ( m_hMod )
+    if ( m_SDK.m_hMod )
     {
-        FreeLibrary(m_hMod);
-        m_hMod = nullptr;
+        m_SDK.m_hMod.unload();
+        m_SDK.m_hMod = {};
     }
 }
 
 bool TransymOCR::IsInitialized() const
 {
-    return m_hMod?true:false;
+    return m_SDK.m_hMod?true:false;
 }
 
 bool TransymOCR::SetOptions(OCRJobOptions& options)
@@ -636,6 +633,7 @@ bool TransymOCR::SetOptions(OCRJobOptions& options)
 
 LONG TransymOCR::StartOCR(CTL_StringType filename)
 {
+    auto& funcs = m_SDK.m_functions;
     TOCRJOBINFO JobInfo {};
     JobInfo.StructId = 0;
     JobInfo.PageNo = GetCurrentPageNumber();  // This will change
@@ -673,7 +671,7 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
 
     if ( bRet )
     {
-        m_SDK.TOCRSetErrorMode( m_JobHandle, vals[0]);
+        funcs.SetErrorMode( m_JobHandle, vals[0]);
         if ( vals[0] == DTWAIN_OCRERROR_WRITEFILE )
         {
             // Errors will be reported to the file specified by the ERRORREPORTFILE cap
@@ -681,7 +679,7 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
             GetCapValues(DTWAIN_OCRCV_ERRORREPORTFILE, DTWAIN_CAPGETCURRENT, valStr);
 
             // Turn off the TOCR message box if reporting to a file.
-            m_SDK.TOCRSetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);
+            funcs.SetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);
             // Open the file for errors (TO BE DONE)
         }
     }
@@ -726,11 +724,11 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
     ocrOptions.pOtherOptions = &JobInfo;
     SetOptions(ocrOptions);
 
-    LONG status = m_SDK.TOCRDoJob(m_JobHandle, &m_JobInfo);
+    LONG status = funcs.DoJob(m_JobHandle, &m_JobInfo);
     if ( status == TOCR_OK )
     {
         LONG JobStatus;
-        status = m_SDK.TOCRWaitForJob(m_JobHandle, &JobStatus);
+        status = funcs.WaitForJob(m_JobHandle, &JobStatus);
         if ( status == TOCR_OK )
         {
             if ( JobStatus == TOCRJOBSTATUS_DONE )
@@ -744,13 +742,14 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
 
 LONG TransymOCR::ProcessTOCRJob()
 {
+    auto& funcs = m_SDK.m_functions;
     LONG ResultsInf = 0;
     const bool bSaveOCRCharInfo = GetBaseOption(OCROPTION_GETINFO);
 
     OCRCharacterInfo cInfo(this, GetCurrentPageNumber());
 
     // Find out how much space to allocate for results
-    LONG status = m_SDK.TOCRGetJobResults(m_JobHandle, &ResultsInf, nullptr);
+    LONG status = funcs.GetJobResults(m_JobHandle, &ResultsInf, nullptr);
     if ( status == TOCR_OK )
     {
         if ( ResultsInf > 0 )
@@ -760,7 +759,7 @@ LONG TransymOCR::ProcessTOCRJob()
             std::vector<char> theResults(ResultsInf);
 
             // Retrieve the results
-            status = m_SDK.TOCRGetJobResults(m_JobHandle, &ResultsInf,
+            status = funcs.GetJobResults(m_JobHandle, &ResultsInf,
                 reinterpret_cast<TOCRRESULTS*>(theResults.data()));
 
             const TOCRRESULTS* TOCRResults = reinterpret_cast<TOCRRESULTS*>(theResults.data());
@@ -840,48 +839,46 @@ bool TransymOCR::SetOCRVersionIdentity()
 
 std::string TransymOCR::GetOCRVersionInfo()
 {
+    auto& funcs = m_SDK.m_functions;
     static constexpr std::array<std::pair<int, const char*>, 3> LicenseMap = { {
         {TOCRLICENCE_EUROUPGRADE, "Standard License upgraded to European License"},
         {TOCRLICENCE_EURO, "European License"},
         {TOCRLICENCE_STANDARD, "Standard License"}
         } };
 
-    if (m_SDK.TOCRGetLicenceInfoEx)
-    {
-        char LicenseString[30];
-        LONG VolumeLicense;
-        LONG LicenseTime;
-        LONG RemainingTime;
-        LONG TOCRLicenseValue;
-        const LONG retvalue = m_SDK.TOCRGetLicenceInfoEx(m_JobHandle, LicenseString, &VolumeLicense,
-                                                         &LicenseTime, &RemainingTime, &TOCRLicenseValue);
+    char LicenseString[30];
+    LONG VolumeLicense;
+    LONG LicenseTime;
+    LONG RemainingTime;
+    LONG TOCRLicenseValue;
+    const LONG retvalue = funcs.GetLicenseInfoEx(m_JobHandle, LicenseString, &VolumeLicense,
+                                                     &LicenseTime, &RemainingTime, &TOCRLicenseValue);
 
-        if (retvalue == TOCR_OK)
+    if (retvalue == TOCR_OK)
+    {
+        const HMODULE hInst = ::GetModuleHandle(GetTOCRDLLName().c_str());
+        try
         {
-            const HMODULE hInst = ::GetModuleHandle(GetTOCRDLLName().c_str());
-            try
-            {
-                const char* pLicenseFeature = nullptr;
-                auto it = generic_array_finder_if(LicenseMap, [&](const auto& pr) { return pr.first == TOCRLicenseValue; });
-                if (it.first)
-                    pLicenseFeature = LicenseMap[it.second].second;
-                else
-                    pLicenseFeature = "(unavailable)";
-                const VersionInfoA ver(hInst);
-                const std::string sVer = ver.getProductVersion();
-                std::ostringstream strm;
-                strm << "Transym OCR Engine - Version " << sVer <<
-                        "\nLicense String: " << LicenseString <<
-                        "\nVolume: " << VolumeLicense <<
-                        "\nLicense Time: " << LicenseTime <<
-                        "\nRemaining License Time: " << RemainingTime <<
-                        "\nLicense Feature: " << pLicenseFeature;
-                return strm.str();
-            }
-            catch(...)
-            {
-                return {};
-            }
+            const char* pLicenseFeature = nullptr;
+            auto it = generic_array_finder_if(LicenseMap, [&](const auto& pr) { return pr.first == TOCRLicenseValue; });
+            if (it.first)
+                pLicenseFeature = LicenseMap[it.second].second;
+            else
+                pLicenseFeature = "(unavailable)";
+            const VersionInfoA ver(hInst);
+            const std::string sVer = ver.getProductVersion();
+            std::ostringstream strm;
+            strm << "Transym OCR Engine - Version " << sVer <<
+                    "\nLicense String: " << LicenseString <<
+                    "\nVolume: " << VolumeLicense <<
+                    "\nLicense Time: " << LicenseTime <<
+                    "\nRemaining License Time: " << RemainingTime <<
+                    "\nLicense Feature: " << pLicenseFeature;
+            return strm.str();
+        }
+        catch(...)
+        {
+            return {};
         }
     }
     return "TranSym OCR Initialization error!";
@@ -990,6 +987,7 @@ bool TransymOCR::ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRStringArrayV
 
 bool TransymOCR::ProcessSetCapValues(LONG nOCRCap, LONG CapType, const OCRLongArrayValues& vals)
 {
+    auto& funcs = m_SDK.m_functions;
     OCRCapInfo& CapInfo = m_AllCapValues[nOCRCap];
     switch(nOCRCap)
     {
@@ -1072,10 +1070,10 @@ bool TransymOCR::ProcessSetCapValues(LONG nOCRCap, LONG CapType, const OCRLongAr
         case DTWAIN_OCRCV_ERRORREPORTMODE:
         {
             if ( vals[0] != DTWAIN_OCRERROR_WRITEFILE )
-                m_SDK.TOCRSetErrorMode( m_JobHandle, vals[0]);
+                funcs.SetErrorMode( m_JobHandle, vals[0]);
             else
             {
-                m_SDK.TOCRSetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);
+                funcs.SetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);
                 // open the file here??
             }
         }
@@ -1124,9 +1122,10 @@ std::string TransymOCR::GetErrorString(LONG returnCode)
 
 int TransymOCR::GetNumPagesInFile(CTL_StringType szFileName, int& errCode)
 {
+    auto& funcs = m_SDK.m_functions;
     LONG nPages = -1;
     LONG oldErrorMode;
-    LONG bRet = m_SDK.TOCRGetErrorMode(m_JobHandle, &oldErrorMode);
+    LONG bRet = funcs.GetErrorMode(m_JobHandle, &oldErrorMode);
     if ( bRet != TOCR_OK)
     {
         errCode = bRet;
@@ -1134,12 +1133,12 @@ int TransymOCR::GetNumPagesInFile(CTL_StringType szFileName, int& errCode)
     }
 
     // Set the mode to not show the message box
-    m_SDK.TOCRSetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);
+    funcs.SetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);
     const int fExists = fileutils::file_exists(szFileName.c_str());
-    bRet = m_SDK.TOCRGetNumPages(m_JobHandle, (char *)szFileName.c_str(), TOCRJOBTYPE_TIFFFILE, &nPages);
+    bRet = funcs.GetNumPages(m_JobHandle, (char *)szFileName.c_str(), TOCRJOBTYPE_TIFFFILE, &nPages);
 
     // Set the old error mode back
-    m_SDK.TOCRSetErrorMode(m_JobHandle, oldErrorMode);
+    funcs.SetErrorMode(m_JobHandle, oldErrorMode);
 
     // check if current file type is supported file type
     if ( bRet != TOCR_OK )
@@ -1167,7 +1166,7 @@ int TransymOCR::GetNumPagesInFile(CTL_StringType szFileName, int& errCode)
 
 LONG TransymOCR::StartupOCREngine()
 {
-    const LONG status = m_SDK.TOCRInitialise(&m_JobHandle);
+    const LONG status = m_SDK.m_functions.Initialise(&m_JobHandle);
     if ( status == TOCR_OK ) 
         SetActivated(true);
     return status;
@@ -1176,9 +1175,9 @@ LONG TransymOCR::StartupOCREngine()
 bool TransymOCR::ShutdownOCR(int& status)
 {
     status = TOCR_OK;
-    if ( m_hMod )
+    if ( m_SDK.m_hMod )
     {
-        status = m_SDK.TOCRShutdown(m_JobHandle);
+        status = m_SDK.m_functions.Shutdown(m_JobHandle);
         if ( status == TOCR_OK )
         {
             SetActivated(false);

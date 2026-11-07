@@ -23,6 +23,7 @@
 #ifdef _WIN32
 #include "ctlwindowsimpl.h"
 #include "ctlfileutils.h"
+#include "sharedlibraryutils.h"
 
 namespace
 {
@@ -211,7 +212,7 @@ namespace
                     CTL_StringType msg = _T("Testing if file \"") + fNameTotal + _T("\" is a valid Twain DSM...");
                     LogWriterUtils::WriteLogInfo(msg);
                 }
-                lpDSMEntry = dtwain_library_loader<DSMENTRYPROC>::get_func_ptr(libloader.native(), "DSM_Entry");
+                GetSharedLibraryFunction(libloader, "DSM_Entry", lpDSMEntry);
             }
             catch (boost::exception&)
             {

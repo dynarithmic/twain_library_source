@@ -24,11 +24,13 @@
 #include <tchar.h>
 #include <utility>
 
+#include "ctliface.h"
 #include "ctlstaticdata.h"
 #include "ctlstringconversion.h"
 #include "ctlstringdefs.h"
 #include "logwriterutils.h"
 #include "dtwinverex.h"
+#include "sharedlibraryutils.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable : 4244)
@@ -38,16 +40,6 @@
 #endif
 
 using namespace dynarithmic;
-
-namespace
-{
-    template <typename T>
-    bool ResolveFunction(HMODULE module,const char* name,T& function)
-    {
-        function = reinterpret_cast<T>(GetProcAddress(module, name));
-        return function != nullptr;
-    }
-}
 
 JxlDynamicLoader::~JxlDynamicLoader()
 {
@@ -59,8 +51,8 @@ JxlDynamicLoader& JxlDynamicLoader::operator=(JxlDynamicLoader&& other) noexcept
     if (this != &other)
     {
         Unload();
-        m_jxl = std::exchange(other.m_jxl, nullptr);
-        m_threads = std::exchange(other.m_threads, nullptr);
+        m_jxl = std::exchange(other.m_jxl, {});
+        m_threads = std::exchange(other.m_threads, {});
         m_functions = std::exchange(other.m_functions, Functions{});
         m_loaded = std::exchange(other.m_loaded, false);
         m_lastError = std::exchange(other.m_lastError, ERROR_SUCCESS);
@@ -125,23 +117,23 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
 
     namespace fs = std::filesystem;
 
-    HMODULE hJxl = nullptr;
-    HMODULE hThreads = nullptr;
+    boost::dll::shared_library hJxl;
+    boost::dll::shared_library hThreads;
     std::wstring jxlPath = L"jxl.dll";
     std::wstring threadsPath = L"jxl_threads.dll";
     LoadLibraryRAII raii(this);
-
+    int retCodeThreads = 0;
     if (directory.empty())
     {
         // Use standard Windows DLL search behavior.
-        hJxl = LoadLibraryW(L"jxl.dll");
+        auto ret = LoadSharedLibrary<std::error_code>(hJxl, L"jxl.dll");
 
-        if (!hJxl)
+        if (ret != boost::system::errc::success)
         {
-            m_lastError = GetLastError();
+            m_lastError = ret;
             return { false, m_lastError };
         }
-        hThreads = LoadLibraryW(L"jxl_threads.dll");
+        LoadSharedLibrary<std::error_code>(hThreads, L"jxl_threads.dll");
     }
     else
     {
@@ -153,29 +145,30 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
             return { false, m_lastError };
         }
 
-        constexpr DWORD flags =
+        const auto flags =
+        static_cast<boost::dll::load_mode::type>(
             LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR |
-            LOAD_LIBRARY_SEARCH_DEFAULT_DIRS;
+            LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
 
         jxlPath = (base / L"jxl.dll").wstring();
         threadsPath = (base / L"jxl_threads.dll").wstring();
 
-        hJxl = LoadLibraryExW(jxlPath.c_str(), nullptr, flags);
+        auto ret = LoadSharedLibrary<std::error_code>(hJxl, jxlPath, flags);
 
-        if (!hJxl)
+        if (ret != boost::system::errc::success)
         {
-            m_lastError = GetLastError();
+            m_lastError = ret;
             return { false, m_lastError };
         }
 
-        hThreads = LoadLibraryExW(threadsPath.c_str(), nullptr, flags);
+        retCodeThreads = LoadSharedLibrary<std::error_code>(hThreads, threadsPath, flags);
     }
 
     m_jxl = hJxl;
 
     if (!hThreads)
     {
-        m_lastError = GetLastError();
+        m_lastError = retCodeThreads;
         return { false, m_lastError };
     }
 
@@ -187,7 +180,7 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
         CTL_StringType sJXLNative = stringconversion::Convert_Wide_To_Native(sJXLMVersionInfo);
         try
         {
-            sJXLNative += GetVersionInfo(hJxl, 4, _T("\n"));
+//            sJXLNative += GetVersionInfo(hJxl, 4, _T("\n"));
         }
         catch (...)
         {
@@ -197,7 +190,7 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
         sJXLNative += stringconversion::Convert_Wide_To_Native(sJXLMVersionInfo);
         try
         {
-            sJXLNative += GetVersionInfo(hThreads, 4, _T("\n"));
+  //          sJXLNative += GetVersionInfo(hThreads, 4, _T("\n"));
         }
         catch (...)
         {
@@ -214,7 +207,7 @@ std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
     // Preserve the error before unloading modules.
     #define RESOLVE_JXL(module, member, exportedName)  \
     do {   \
-        if (!ResolveFunction(module, exportedName, f.member))  \
+        if (!GetSharedLibraryFunction(module, exportedName, f.member).first)  \
         {   \
             m_lastError = ::GetLastError();  \
             m_failedFunction = exportedName; \
@@ -269,14 +262,14 @@ void JxlDynamicLoader::Unload() noexcept
 
     if (m_threads)
     {
-        FreeLibrary(m_threads);
-        m_threads = nullptr;
+        m_threads.unload();
+        m_threads = {};
     }
 
     if (m_jxl)
     {
-        FreeLibrary(m_jxl);
-        m_jxl = nullptr;
+        m_jxl.unload();
+        m_jxl = {};
     }
 }
 
