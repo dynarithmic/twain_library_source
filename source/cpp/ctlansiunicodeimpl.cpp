@@ -40,6 +40,128 @@ namespace strview = std;
 
 using namespace dynarithmic;
 
+#include <type_traits>
+#include <string>
+#include <vector>
+
+// Internal adapters. These are not exported and do not change the DTWAIN ABI.
+namespace dtwain_aw_detail
+{
+    template <class CharT>
+    class native_input
+    {
+        std::basic_string<TCHAR> storage_;
+        const TCHAR* pointer_ = nullptr;
+    public:
+        explicit native_input(const CharT* value)
+        {
+            if constexpr (std::is_same_v<CharT, TCHAR>)
+                pointer_ = value; // zero-copy native fast path
+            else if (value)
+            {
+                if constexpr (std::is_same_v<CharT, char>)
+                    storage_ = stringconversion::Convert_AnsiPtr_To_Native(value);
+                else
+                    storage_ = stringconversion::Convert_WidePtr_To_Native(value);
+                pointer_ = storage_.c_str();
+            }
+        }
+        native_input(const native_input&) = delete;
+        native_input& operator=(const native_input&) = delete;
+        native_input(native_input&&) = delete;
+        native_input& operator=(native_input&&) = delete;
+        const TCHAR* c_str() const noexcept { return pointer_; }
+    };
+}
+
+namespace
+{
+    // Windows A means the active ANSI code page (CP_ACP), not UTF-8.
+    template <class OutChar>
+    std::basic_string<OutChar> convert_output(const TCHAR* native)
+    {
+        if constexpr (std::is_same_v<OutChar, TCHAR>)
+            return native;
+        else if constexpr (std::is_same_v<OutChar, char>)
+        {
+            const int count = WideCharToMultiByte(CP_ACP, 0, native, -1,
+                                                   nullptr, 0, nullptr, nullptr);
+            if (count <= 0) return {};
+            std::string result(static_cast<size_t>(count), '\0');
+            if (!WideCharToMultiByte(CP_ACP, 0, native, -1,
+                                     result.data(), count, nullptr, nullptr)) return {};
+            result.pop_back(); // strip terminator; caller adds it to required length
+            return result;
+        }
+        else
+        {
+            const int count = MultiByteToWideChar(CP_ACP, 0, native, -1, nullptr, 0);
+            if (count <= 0) return {};
+            std::wstring result(static_cast<size_t>(count), L'\0');
+            if (!MultiByteToWideChar(CP_ACP, 0, native, -1,
+                                     result.data(), count)) return {};
+            result.pop_back();
+            return result;
+        }
+    }
+
+    // MaxLen is measured in destination elements, including the terminator.
+    // The caller is responsible for supplying a buffer of the stated capacity.
+    template <class CharT>
+    void copy_bounded(const std::basic_string<CharT>& value, CharT* output, LONG maxLen)
+    {
+        if (!output || maxLen <= 0)
+            return;
+        const auto count = (std::min)(value.size(), static_cast<size_t>(maxLen - 1));
+        std::char_traits<CharT>::copy(output, value.data(), count);
+        output[count] = CharT{};
+    }
+
+    template <class CharT, class Func>
+    LONG output_with_length(CharT* output, LONG maxLen, Func&& func)
+    {
+        if constexpr (std::is_same_v<CharT, TCHAR>)
+        {
+            // Native character type: forward directly.
+            return func(output, maxLen);
+        }
+        else
+        {
+            // Preserve the caller's length-query operation.
+            if (!output)
+                return func(static_cast<TCHAR*>(nullptr), maxLen);
+
+            // Allocate the intermediate native buffer.
+            const LONG nativeLen = (std::max)(maxLen, 0L);
+
+            std::basic_string<TCHAR> native(static_cast<size_t>(nativeLen), TCHAR{});
+
+            // Exactly one call to the underlying DTWAIN function.
+            const LONG result = func(nativeLen > 0 ? native.data() : nullptr, nativeLen);
+
+            if (result <= 0)
+                return result;
+
+            if (nativeLen == 0)
+                return result;
+
+            // Find the terminator without reading beyond the buffer.
+            const auto end = std::char_traits<TCHAR>::find(native.data(), native.size(), TCHAR{});
+
+            if (!end)
+                return 0;
+
+            native.resize(static_cast<size_t>(end - native.data()));
+
+            const auto converted = convert_output<CharT>(native.c_str());
+
+            copy_bounded(converted, output, maxLen);
+
+            return static_cast<LONG>(converted.size() + 1);
+        }
+    }
+}
+
 namespace
 {
     template <typename StringTypeIn>
@@ -72,129 +194,73 @@ extern "C"
 {
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValuesW(DTWAIN_SOURCE Source, LPCWSTR capName, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL expandIfRange)
     {
-#ifdef _UNICODE
-        return DTWAIN_EnumSourceValues(Source, capName, pArray, expandIfRange);
-#else
-        return DTWAIN_EnumSourceValues(Source, stringconversion::Convert_WidePtr_To_Native(capName).c_str(), pArray, expandIfRange);
-#endif
+        return DTWAIN_EnumSourceValues(Source, dtwain_aw_detail::native_input(capName).c_str(), pArray, expandIfRange);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValuesA(DTWAIN_SOURCE Source, LPCSTR capName, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL expandIfRange)
     {
-#ifdef _UNICODE
-        return DTWAIN_EnumSourceValues(Source, stringconversion::Convert_AnsiPtr_To_Native(capName).c_str(), pArray, expandIfRange);
-#else
-        return DTWAIN_EnumSourceValues(Source, capName, pArray, expandIfRange);
-#endif
+        return DTWAIN_EnumSourceValues(Source, dtwain_aw_detail::native_input(capName).c_str(), pArray, expandIfRange);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireFileA(DTWAIN_SOURCE Source, LPCSTR lpszFile, LONG lFileType, LONG lFileFlags, LONG PixelType, LONG lMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
     {
-#ifdef _UNICODE
-        return DTWAIN_AcquireFile(Source, stringconversion::Convert_AnsiPtr_To_Native(lpszFile).c_str(), lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
-#else
-        return DTWAIN_AcquireFile(Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
-#endif
+        return DTWAIN_AcquireFile(Source, dtwain_aw_detail::native_input(lpszFile).c_str(), lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireFileW(DTWAIN_SOURCE Source, LPCWSTR lpszFile, LONG lFileType, LONG lFileFlags, LONG PixelType, LONG lMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
     {
-#ifdef _UNICODE
-        return DTWAIN_AcquireFile(Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
-#else
-        return DTWAIN_AcquireFile(Source, stringconversion::Convert_WidePtr_To_Native(lpszFile).c_str(), lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
-#endif
+        return DTWAIN_AcquireFile(Source, dtwain_aw_detail::native_input(lpszFile).c_str(), lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFileA(DTWAIN_SOURCE Source, LPCSTR lpszFile, LONG lFileFlags, LONG lMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
     {
-#ifdef _UNICODE
-        return DTWAIN_AcquireAudioFile(Source, stringconversion::Convert_AnsiPtr_To_Native(lpszFile).c_str(), lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
-#else
-        return DTWAIN_AcquireAudioFile(Source, lpszFile, lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
-#endif
+        return DTWAIN_AcquireAudioFile(Source, dtwain_aw_detail::native_input(lpszFile).c_str(), lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFileW(DTWAIN_SOURCE Source, LPCWSTR lpszFile, LONG lFileFlags, LONG lMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
     {
-#ifdef _UNICODE
-        return DTWAIN_AcquireAudioFile(Source, lpszFile, lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
-#else
-        return DTWAIN_AcquireAudioFile(Source, stringconversion::Convert_WidePtr_To_Native(lpszFile).c_str(), lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
-#endif
+        return DTWAIN_AcquireAudioFile(Source, dtwain_aw_detail::native_input(lpszFile).c_str(), lFileFlags, lMaxPages, bShowUI, bCloseSource, pStatus);
     }
 
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags)
     {
-#ifdef _UNICODE
-        return DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
-#else
-        return DTWAIN_AddPDFText(Source, stringconversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos, stringconversion::Convert_WidePtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
-#endif
+        return DTWAIN_AddPDFText(Source, dtwain_aw_detail::native_input(szText).c_str(), xPos, yPos, dtwain_aw_detail::native_input(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags)
     {
-#ifdef _UNICODE
-        return DTWAIN_AddPDFText(Source, stringconversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos, stringconversion::Convert_AnsiPtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
-#else
-        return DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
-#endif
+        return DTWAIN_AddPDFText(Source, dtwain_aw_detail::native_input(szText).c_str(), xPos, yPos, dtwain_aw_detail::native_input(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddStringA(DTWAIN_ARRAY pArray, LPCSTR Val)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayAddString(pArray, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str());
-#else
-        return DTWAIN_ArrayAddString(pArray, Val);
-#endif
+        return DTWAIN_ArrayAddString(pArray, dtwain_aw_detail::native_input(Val).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddStringW(DTWAIN_ARRAY pArray, LPCWSTR Val)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayAddString(pArray, Val);
-#else
-        return DTWAIN_ArrayAddString(pArray, stringconversion::Convert_WidePtr_To_Native(Val).c_str());
-#endif
+        return DTWAIN_ArrayAddString(pArray, dtwain_aw_detail::native_input(Val).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddStringNA(DTWAIN_ARRAY pArray, LPCSTR Val, LONG num)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayAddStringN(pArray, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
-#else
-        return DTWAIN_ArrayAddStringN(pArray, Val, num);
-#endif
+        return DTWAIN_ArrayAddStringN(pArray, dtwain_aw_detail::native_input(Val).c_str(), num);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddStringNW(DTWAIN_ARRAY pArray, LPCWSTR Val, LONG num)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayAddStringN(pArray, Val, num);
-#else
-        return DTWAIN_ArrayAddStringN(pArray, stringconversion::Convert_WidePtr_To_Native(Val).c_str(), num);
-#endif
+        return DTWAIN_ArrayAddStringN(pArray, dtwain_aw_detail::native_input(Val).c_str(), num);
     }
 
     LONG DLLENTRY_DEF DTWAIN_ArrayFindStringA(DTWAIN_ARRAY pArray, LPCSTR pString)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayFindString(pArray, stringconversion::Convert_AnsiPtr_To_Native(pString).c_str());
-#else
-        return DTWAIN_ArrayFindString(pArray, pString);
-#endif
+        return DTWAIN_ArrayFindString(pArray, dtwain_aw_detail::native_input(pString).c_str());
     }
 
     LONG DLLENTRY_DEF DTWAIN_ArrayFindStringW(DTWAIN_ARRAY pArray, LPCWSTR pString)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayFindString(pArray, pString);
-#else
-        return DTWAIN_ArrayFindString(pArray, stringconversion::Convert_WidePtr_To_Native(pString).c_str());
-#endif
+        return DTWAIN_ArrayFindString(pArray, dtwain_aw_detail::native_input(pString).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR pStr)
@@ -221,74 +287,42 @@ extern "C"
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR pVal)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayInsertAtString(pArray, nWhere, stringconversion::Convert_AnsiPtr_To_Native(pVal).c_str());
-#else
-        return DTWAIN_ArrayInsertAtString(pArray, nWhere, pVal);
-#endif
+        return DTWAIN_ArrayInsertAtString(pArray, nWhere, dtwain_aw_detail::native_input(pVal).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR pVal)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayInsertAtString(pArray, nWhere, pVal);
-#else
-        return DTWAIN_ArrayInsertAtString(pArray, nWhere, stringconversion::Convert_WidePtr_To_Native(pVal).c_str());
-#endif
+        return DTWAIN_ArrayInsertAtString(pArray, nWhere, dtwain_aw_detail::native_input(pVal).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtStringNA(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR Val, LONG num)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
-#else
-        return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, Val, num);
-#endif
+        return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, dtwain_aw_detail::native_input(Val).c_str(), num);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtStringNW(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR Val, LONG num)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, Val, num);
-#else
-        return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, stringconversion::Convert_WidePtr_To_Native(Val).c_str(), num);
-#endif
+        return DTWAIN_ArrayInsertAtStringN(pArray, nWhere, dtwain_aw_detail::native_input(Val).c_str(), num);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR pStr)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArraySetAtString(pArray, nWhere, pStr);
-#else
-        return DTWAIN_ArraySetAtString(pArray, nWhere, stringconversion::Convert_WidePtr_To_Native(pStr).c_str());
-#endif
+        return DTWAIN_ArraySetAtString(pArray, nWhere, dtwain_aw_detail::native_input(pStr).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR pStr)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArraySetAtString(pArray, nWhere, stringconversion::Convert_AnsiPtr_To_Native(pStr).c_str());
-#else
-        return DTWAIN_ArraySetAtString(pArray, nWhere, pStr);
-#endif
+        return DTWAIN_ArraySetAtString(pArray, nWhere, dtwain_aw_detail::native_input(pStr).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCRW(DTWAIN_OCRENGINE Engine, LPCWSTR szFileName, LONG nStartPage, LONG nEndPage)
     {
-#ifdef _UNICODE
-        return DTWAIN_ExecuteOCR(Engine, szFileName, nStartPage, nEndPage);
-#else
-        return DTWAIN_ExecuteOCR(Engine, stringconversion::Convert_WidePtr_To_Native(szFileName).c_str(), nStartPage, nEndPage);
-#endif
+        return DTWAIN_ExecuteOCR(Engine, dtwain_aw_detail::native_input(szFileName).c_str(), nStartPage, nEndPage);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCRA(DTWAIN_OCRENGINE Engine, LPCSTR szFileName, LONG nStartPage, LONG nEndPage)
     {
-#ifdef _UNICODE
-        return DTWAIN_ExecuteOCR(Engine, stringconversion::Convert_AnsiPtr_To_Native(szFileName).c_str(), nStartPage, nEndPage);
-#else
-        return DTWAIN_ExecuteOCR(Engine, szFileName, nStartPage, nEndPage);
-#endif
+        return DTWAIN_ExecuteOCR(Engine, dtwain_aw_detail::native_input(szFileName).c_str(), nStartPage, nEndPage);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2StringW(DTWAIN_SOURCE Source, LPWSTR left, LPWSTR top, LPWSTR right, LPWSTR bottom, LPLONG Unit)
@@ -395,20 +429,12 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetCapFromNameA(LPCSTR szName)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetCapFromName(stringconversion::Convert_AnsiPtr_To_Native(szName).c_str());
-#else
-        return DTWAIN_GetCapFromName(szName);
-#endif
+        return DTWAIN_GetCapFromName(dtwain_aw_detail::native_input(szName).c_str());
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetCapFromNameW(LPCWSTR szName)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetCapFromName(szName);
-#else
-        return DTWAIN_GetCapFromName(stringconversion::Convert_WidePtr_To_Native(szName).c_str());
-#endif
+        return DTWAIN_GetCapFromName(dtwain_aw_detail::native_input(szName).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCaptionW(DTWAIN_SOURCE Source, LPWSTR Caption)
@@ -457,46 +483,26 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetCurrentFileNameA(DTWAIN_SOURCE Source, LPSTR szName, LONG MaxLen)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(MaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetCurrentFileName(Source, szName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szName, retVal);
-#else
-        return DTWAIN_GetCurrentFileName(Source, szName, MaxLen);
-#endif
+        return output_with_length(szName, MaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetCurrentFileName(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetCurrentFileNameW(DTWAIN_SOURCE Source, LPWSTR szName, LONG MaxLen)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetCurrentFileName(Source, szName, MaxLen);
-#else
-        std::string arg((std::max)(MaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetCurrentFileName(Source, szName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szName, retVal);
-#endif
+        return output_with_length(szName, MaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetCurrentFileName(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetDSMFullNameW(LONG DSMType, LPWSTR szDLLName, LONG nMaxLen, LPLONG pWhichSearch)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetDSMFullName(DSMType, szDLLName, nMaxLen, pWhichSearch);
-#else
-        std::string arg((std::max)(nMaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetDSMFullName(DSMType, szDLLName ? arg.data() : nullptr, static_cast<LONG>(arg.size()), pWhichSearch);
-        return null_terminator_copier(get_view(arg), szDLLName, retVal);
-#endif
+        return output_with_length(szDLLName, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetDSMFullName(DSMType, nativeOut, nativeCap, pWhichSearch); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetDSMFullNameA(LONG DSMType, LPSTR szDLLName, LONG nMaxLen, LPLONG pWhichSearch)
     {
-#ifdef _UNICODE
-        std::wstring arg(nMaxLen, 0);
-        const LONG retVal = DTWAIN_GetDSMFullName(DSMType, szDLLName ? arg.data() : nullptr, static_cast<LONG>(arg.size()), pWhichSearch);
-        return null_terminator_copier(get_view(arg), szDLLName, retVal);
-#else
-        return DTWAIN_GetDSMFullName(DSMType, szDLLName, nMaxLen, pWhichSearch);
-#endif
+        return output_with_length(szDLLName, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetDSMFullName(DSMType, nativeOut, nativeCap, pWhichSearch); });
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceTimeDateA(DTWAIN_SOURCE Source, LPSTR szTimeDate)
@@ -523,158 +529,87 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetErrorStringA(LONG lError, LPSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetErrorString(lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
-#else
-        return DTWAIN_GetErrorString(lError, lpszBuffer, nLength);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetErrorString(lError, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetErrorStringW(LONG lError, LPWSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetErrorString(lError, lpszBuffer, nLength);
-#else
-        std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetErrorString(lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetErrorString(lError, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetResourceStringA(LONG ResourceID, LPSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetResourceString(ResourceID, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
-#else
-        return DTWAIN_GetResourceString(ResourceID, lpszBuffer, nLength);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetResourceString(ResourceID, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetResourceStringW(LONG ResourceID, LPWSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetResourceString(ResourceID, lpszBuffer, nLength);
-#else
-        std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetResourceString(ResourceID, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetResourceString(ResourceID, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetConditionCodeStringA(LONG lError, LPSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetConditionCodeString(lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
-#else
-        return DTWAIN_GetConditionCodeString(lError, lpszBuffer, nLength);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetConditionCodeString(lError, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetConditionCodeStringW(LONG lError, LPWSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetConditionCodeString(lError, lpszBuffer, nLength);
-#else
-        std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetConditionCodeString(lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetConditionCodeString(lError, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetPaperSizeNameW(LONG paperNumber, LPWSTR outName, LONG nSize)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetPaperSizeName(paperNumber, outName, nSize);
-#else
-        std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetPaperSizeName(paperNumber, outName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), outName, retVal);
-#endif
+        return output_with_length(outName, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetPaperSizeName(paperNumber, nativeOut, nativeCap); });
     }
 
 
     LONG DLLENTRY_DEF DTWAIN_GetPaperSizeNameA(LONG paperNumber, LPSTR outName, LONG nSize)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetPaperSizeName(paperNumber, outName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), outName, retVal);
-#else
-        return DTWAIN_GetPaperSizeName(paperNumber, outName, nSize);
-#endif
+        return output_with_length(outName, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetPaperSizeName(paperNumber, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, lpszOut, nSize);
-#else
-        std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, lpszOut ? arg.data()
-                                                          : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, nativeOut, nativeCap); });
     }
 
 
     LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, lpszOut ? arg.data()
-                                                          : nullptr,
-            static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#else
-        return DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, lpszOut, nSize);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, nativeOut, nativeCap); });
     }
 
 
     LONG DLLENTRY_DEF DTWAIN_GetExtCapFromNameW(LPCWSTR szName)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetExtCapFromName(szName);
-#else
-        return DTWAIN_GetExtCapFromName(stringconversion::Convert_WidePtr_To_Native(szName).c_str());
-#endif
+        return DTWAIN_GetExtCapFromName(dtwain_aw_detail::native_input(szName).c_str());
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetExtCapFromNameA(LPCSTR szName)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetExtCapFromName(stringconversion::Convert_AnsiPtr_To_Native(szName).c_str());
-#else
-        return DTWAIN_GetExtCapFromName(szName);
-#endif
+        return DTWAIN_GetExtCapFromName(dtwain_aw_detail::native_input(szName).c_str());
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetExtNameFromCapW(LONG nValue, LPWSTR szValue, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetExtNameFromCap(nValue, szValue, nLength);
-#else
-        std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetExtNameFromCap(nValue, szValue ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szValue, retVal);
-#endif
+        return output_with_length(szValue, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetExtNameFromCap(nValue, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetExtNameFromCapA(LONG nValue, LPSTR szValue, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetExtNameFromCap(nValue, szValue ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szValue, retVal);
-#else
-        return DTWAIN_GetExtNameFromCap(nValue, szValue, nLength);
-#endif
+        return output_with_length(szValue, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetExtNameFromCap(nValue, nativeOut, nativeCap); });
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetHalftoneA(DTWAIN_SOURCE Source, LPSTR lpHalftone, LONG GetType)
@@ -752,112 +687,62 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetNameFromCapA(LONG nCapValue, LPSTR szValue, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nLength, 0L), 0);
-        const DTWAIN_BOOL retVal = DTWAIN_GetNameFromCap(nCapValue, szValue ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szValue, retVal);
-#else
-        return DTWAIN_GetNameFromCap(nCapValue, szValue, nLength);
-#endif
+        return output_with_length(szValue, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetNameFromCap(nCapValue, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetNameFromCapW(LONG nCapValue, LPWSTR szValue, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetNameFromCap(nCapValue, szValue, nLength);
-#else
-        std::string arg((std::max)(nLength, 0L), 0);
-        DTWAIN_BOOL retVal = DTWAIN_GetNameFromCap(nCapValue, szValue ? arg.data() : nullptr, nLength);
-        return null_terminator_copier(get_view(arg), szValue, retVal);
-#endif
+        return output_with_length(szValue, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetNameFromCap(nCapValue, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetOCRErrorStringW(DTWAIN_OCRENGINE Engine, LONG lError, LPWSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetOCRErrorString(Engine, lError, lpszBuffer, nLength);
-#else
-        std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetOCRErrorString(Engine, lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetOCRErrorString(Engine, lError, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetOCRErrorStringA(DTWAIN_OCRENGINE Engine, LONG lError, LPSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetOCRErrorString(Engine, lError, lpszBuffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
-#else
-        return DTWAIN_GetOCRErrorString(Engine, lError, lpszBuffer, nLength);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetOCRErrorString(Engine, lError, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetOCRManufacturerW(DTWAIN_OCRENGINE Engine, LPWSTR szManufacturer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetOCRManufacturer(Engine, szManufacturer, nLength);
-#else
-        std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetOCRManufacturer(Engine, szManufacturer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szManufacturer, retVal);
-#endif
+        return output_with_length(szManufacturer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetOCRManufacturer(Engine, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetOCRManufacturerA(DTWAIN_OCRENGINE Engine, LPSTR szManufacturer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetOCRManufacturer(Engine, szManufacturer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szManufacturer, retVal);
-#else
-        return DTWAIN_GetOCRManufacturer(Engine, szManufacturer, nLength);
-#endif
+        return output_with_length(szManufacturer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetOCRManufacturer(Engine, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetOCRProductFamilyA(DTWAIN_OCRENGINE Engine, LPSTR szProductFamily, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetOCRProductFamily(Engine, szProductFamily ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szProductFamily, retVal);
-#else
-        return DTWAIN_GetOCRProductFamily(Engine, szProductFamily, nLength);
-#endif
+        return output_with_length(szProductFamily, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetOCRProductFamily(Engine, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetOCRProductFamilyW(DTWAIN_OCRENGINE Engine, LPWSTR szProductFamily, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetOCRProductFamily(Engine, szProductFamily, nLength);
-#else
-        std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetOCRProductFamily(Engine, szProductFamily ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szProductFamily, retVal);
-#endif
+        return output_with_length(szProductFamily, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetOCRProductFamily(Engine, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetOCRProductNameW(DTWAIN_OCRENGINE Engine, LPWSTR szProductName, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetOCRProductName(Engine, szProductName, nLength);
-#else
-        std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetOCRProductName(Engine, szProductName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szProductName, retVal);
-#endif
+        return output_with_length(szProductName, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetOCRProductName(Engine, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetOCRProductNameA(DTWAIN_OCRENGINE Engine, LPSTR szProductName, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetOCRProductName(Engine, szProductName ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), szProductName, retVal);
-#else
-        return DTWAIN_GetOCRProductName(Engine, szProductName, nLength);
-#endif
+        return output_with_length(szProductName, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetOCRProductName(Engine, nativeOut, nativeCap); });
     }
 
     HANDLE DLLENTRY_DEF DTWAIN_GetOCRTextA(DTWAIN_OCRENGINE Engine, LONG nPageNo, LPSTR Data, LONG dSize, LPLONG pActualSize, LONG nFlags)
@@ -884,46 +769,26 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfoA(DTWAIN_OCRENGINE Engine, LPSTR buffer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetOCRVersionInfo(Engine, buffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), buffer, retVal);
-#else
-        return DTWAIN_GetOCRVersionInfo(Engine, buffer, nLength);
-#endif
+        return output_with_length(buffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetOCRVersionInfo(Engine, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfoW(DTWAIN_OCRENGINE Engine, LPWSTR buffer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetOCRVersionInfo(Engine, buffer, nLength);
-#else
-        std::string arg((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetOCRVersionInfo(Engine, buffer ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), buffer, retVal);
-#endif
+        return output_with_length(buffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetOCRVersionInfo(Engine, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG nMaxLen, LONG Flags)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nMaxLen, 0L), 0);
-        const auto retVal = DTWAIN_GetPDFTextElementString(TextElement, szData ? arg.data() : nullptr, static_cast<LONG>(arg.size()), Flags);
-        return null_terminator_copier(get_view(arg), szData, retVal);
-#else
-        return DTWAIN_GetPDFTextElementString(TextElement, szData, nMaxLen, Flags);
-#endif
+        return output_with_length(szData, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetPDFTextElementString(TextElement, nativeOut, nativeCap, Flags); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetPDFTextElementString(TextElement, szData, maxLen, Flags);
-#else
-        std::string arg((std::max)(maxLen, 0L), 0);
-        const auto retVal = DTWAIN_GetPDFTextElementString(TextElement, szData ? arg.data() : nullptr, static_cast<LONG>(arg.size()), Flags);
-        return null_terminator_copier(get_view(arg), szData, retVal);
-#endif
+        return output_with_length(szData, maxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetPDFTextElementString(TextElement, nativeOut, nativeCap, Flags); });
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPrinterSuffixStringA(DTWAIN_SOURCE Source, LPSTR Suffix, LONG nLength)
@@ -994,24 +859,14 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetSaveFileNameW(DTWAIN_SOURCE Source, LPWSTR fName, LONG nMaxLen)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetSaveFileName(Source, fName, nMaxLen);
-#else
-        std::string args((std::max)(nMaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetSaveFileName(Source, fName ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), fName, retVal);
-#endif
+        return output_with_length(fName, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSaveFileName(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSaveFileNameA(DTWAIN_SOURCE Source, LPSTR fName, LONG nMaxLen)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nMaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetSaveFileName(Source, fName ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), fName, retVal);
-#else
-        return DTWAIN_GetSaveFileName(Source, fName, nMaxLen);
-#endif
+        return output_with_length(fName, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSaveFileName(Source, nativeOut, nativeCap); });
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetShadowStringW(DTWAIN_SOURCE Source, LPWSTR Shadow)
@@ -1038,112 +893,62 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceManufacturerA(DTWAIN_SOURCE Source, LPSTR szProduct, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSourceManufacturer(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szProduct, retVal);
-#else
-        return DTWAIN_GetSourceManufacturer(Source, szProduct, nLength);
-#endif
+        return output_with_length(szProduct, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSourceManufacturer(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceManufacturerW(DTWAIN_SOURCE Source, LPWSTR szProduct, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetSourceManufacturer(Source, szProduct, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetSourceManufacturer(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szProduct, retVal);
-#endif
+        return output_with_length(szProduct, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSourceManufacturer(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceProductFamilyW(DTWAIN_SOURCE Source, LPWSTR szProduct, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetSourceProductFamily(Source, szProduct, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetSourceProductFamily(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szProduct, retVal);
-#endif
+        return output_with_length(szProduct, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSourceProductFamily(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceProductFamilyA(DTWAIN_SOURCE Source, LPSTR szProduct, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSourceProductFamily(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szProduct, retVal);
-#else
-        return DTWAIN_GetSourceProductFamily(Source, szProduct, nLength);
-#endif
+        return output_with_length(szProduct, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSourceProductFamily(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceProductNameA(DTWAIN_SOURCE Source, LPSTR szProduct, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSourceProductName(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szProduct, retVal);
-#else
-        return DTWAIN_GetSourceProductName(Source, szProduct, nLength);
-#endif
+        return output_with_length(szProduct, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSourceProductName(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceProductNameW(DTWAIN_SOURCE Source, LPWSTR szProduct, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetSourceProductName(Source, szProduct, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetSourceProductName(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szProduct, retVal);
-#endif
+        return output_with_length(szProduct, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSourceProductName(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfoA(DTWAIN_SOURCE Source, LPSTR szProduct, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSourceVersionInfo(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szProduct, retVal);
-#else
-        return DTWAIN_GetSourceVersionInfo(Source, szProduct, nLength);
-#endif
+        return output_with_length(szProduct, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSourceVersionInfo(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfoW(DTWAIN_SOURCE Source, LPWSTR szProduct, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetSourceVersionInfo(Source, szProduct, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetSourceVersionInfo(Source, szProduct ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szProduct, retVal);
-#endif
+        return output_with_length(szProduct, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSourceVersionInfo(Source, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectoryW(LPWSTR szFilePath, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetTempFileDirectory(szFilePath, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetTempFileDirectory(szFilePath ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szFilePath, retVal);
-#endif
+        return output_with_length(szFilePath, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetTempFileDirectory(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectoryA(LPSTR szFilePath, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetTempFileDirectory(szFilePath ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szFilePath, retVal);
-#else
-        return DTWAIN_GetTempFileDirectory(szFilePath, nLength);
-#endif
+        return output_with_length(szFilePath, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetTempFileDirectory(nativeOut, nativeCap); });
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetThresholdStringA(DTWAIN_SOURCE Source, LPSTR Threshold)
@@ -1192,222 +997,123 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityExA(LPSTR szDirectories, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetTwainAvailabilityEx(szDirectories ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szDirectories, retVal);
-#else
-        return DTWAIN_GetTwainAvailabilityEx(szDirectories, nLength);
-#endif
+        return output_with_length(szDirectories, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetTwainAvailabilityEx(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityExW(LPWSTR szDirectories, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetTwainAvailabilityEx(szDirectories, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetTwainAvailabilityEx(szDirectories ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szDirectories, retVal);
-#endif
+        return output_with_length(szDirectories, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetTwainAvailabilityEx(nativeOut, nativeCap); });
     }
-
 
     LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableExA(LPSTR szDirectories, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_IsTwainAvailableEx(szDirectories ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szDirectories, retVal);
-#else
-        return DTWAIN_IsTwainAvailableEx(szDirectories, nLength);
-#endif
+        return output_with_length(szDirectories, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_IsTwainAvailableEx(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableExW(LPWSTR szDirectories, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_IsTwainAvailableEx(szDirectories, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_IsTwainAvailableEx(szDirectories ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), szDirectories, retVal);
-#endif
+        return output_with_length(szDirectories, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_IsTwainAvailableEx(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetVersionInfoW(LPWSTR lpszVer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetVersionInfo(lpszVer, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetVersionInfo(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszVer, retVal);
-#endif
+        return output_with_length(lpszVer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetVersionInfo(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetVersionInfoA(LPSTR lpszVer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetVersionInfo(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszVer, retVal);
-#else
-        return DTWAIN_GetVersionInfo(lpszVer, nLength);
-#endif
+        return output_with_length(lpszVer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetVersionInfo(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetVersionStringW(LPWSTR lpszVer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetVersionString(lpszVer, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetVersionString(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszVer, retVal);
-#endif
+        return output_with_length(lpszVer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetVersionString(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetLibraryPathA(LPSTR lpszVer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetLibraryPath(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszVer, retVal);
-#else
-        return DTWAIN_GetLibraryPath(lpszVer, nLength);
-#endif
+        return output_with_length(lpszVer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetLibraryPath(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetLibraryPathW(LPWSTR lpszVer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetLibraryPath(lpszVer, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetLibraryPath(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszVer, retVal);
-#endif
+        return output_with_length(lpszVer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetLibraryPath(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetVersionStringA(LPSTR lpszVer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetVersionString(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszVer, retVal);
-#else
-        return DTWAIN_GetVersionString(lpszVer, nLength);
-#endif
+        return output_with_length(lpszVer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetVersionString(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetShortVersionStringW(LPWSTR lpszVer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetShortVersionString(lpszVer, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetShortVersionString(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszVer, retVal);
-#endif
+        return output_with_length(lpszVer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetShortVersionString(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetShortVersionStringA(LPSTR lpszVer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetShortVersionString(lpszVer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszVer, retVal);
-#else
-        return DTWAIN_GetShortVersionString(lpszVer, nLength);
-#endif
+        return output_with_length(lpszVer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetShortVersionString(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainNameA(LPCSTR lpszBuffer)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetConstantFromTwainName(stringconversion::Convert_AnsiPtr_To_Native(lpszBuffer).c_str());
-#else
-        return DTWAIN_GetConstantFromTwainName(lpszBuffer);
-#endif
+        return DTWAIN_GetConstantFromTwainName(dtwain_aw_detail::native_input(lpszBuffer).c_str());
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainNameW(LPCWSTR lpszBuffer)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetConstantFromTwainName(lpszBuffer);
-#else
-        return DTWAIN_GetConstantFromTwainName(stringconversion::Convert_WidePtr_To_Native(lpszBuffer).c_str());
-#endif
+        return DTWAIN_GetConstantFromTwainName(dtwain_aw_detail::native_input(lpszBuffer).c_str());
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfoW(LPWSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetWindowsVersionInfo(lpszBuffer, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetWindowsVersionInfo(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszBuffer, retVal);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetWindowsVersionInfo(nativeOut, nativeCap); });
     }
 
 
     LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfoA(LPSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetWindowsVersionInfo(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszBuffer, retVal);
-#else
-        return DTWAIN_GetWindowsVersionInfo(lpszBuffer, nLength);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetWindowsVersionInfo(nativeOut, nativeCap); });
     }
 
 
     LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPathW(LPWSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetActiveDSMPath(lpszBuffer, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetActiveDSMPath(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszBuffer, retVal);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetActiveDSMPath(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetActiveDSMPath(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszBuffer, retVal);
-#else
-        return DTWAIN_GetActiveDSMPath(lpszBuffer, nLength);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetActiveDSMPath(nativeOut, nativeCap); });
     }
 
 
     LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetActiveDSMVersionInfo(lpszBuffer, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetActiveDSMVersionInfo(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszBuffer, retVal);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetActiveDSMVersionInfo(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfoA(LPSTR lpszBuffer, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetActiveDSMVersionInfo(lpszBuffer ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszBuffer, retVal);
-#else
-        return DTWAIN_GetActiveDSMVersionInfo(lpszBuffer, nLength);
-#endif
+        return output_with_length(lpszBuffer, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetActiveDSMVersionInfo(nativeOut, nativeCap); });
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetXResolutionStringA(DTWAIN_SOURCE Source, LPSTR Resolution)
@@ -1456,92 +1162,52 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_IsDIBBlankStringA(HANDLE hDib, LPCSTR threshold)
     {
-#ifdef _UNICODE
-        return DTWAIN_IsDIBBlankString(hDib, stringconversion::Convert_AnsiPtr_To_Native(threshold).c_str());
-#else
-        return DTWAIN_IsDIBBlankString(hDib, threshold);
-#endif
+        return DTWAIN_IsDIBBlankString(hDib, dtwain_aw_detail::native_input(threshold).c_str());
     }
 
     LONG DLLENTRY_DEF DTWAIN_IsDIBBlankStringW(HANDLE hDib, LPCWSTR threshold)
     {
-#ifdef _UNICODE
-        return DTWAIN_IsDIBBlankString(hDib, threshold);
-#else
-        return DTWAIN_IsDIBBlankString(hDib, stringconversion::Convert_WidePtr_To_Native(threshold).c_str());
-#endif
+        return DTWAIN_IsDIBBlankString(hDib, dtwain_aw_detail::native_input(threshold).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesW(LPCWSTR sLangDLL)
     {
-#ifdef _UNICODE
-        return DTWAIN_LoadCustomStringResources(sLangDLL);
-#else
-        return DTWAIN_LoadCustomStringResources(stringconversion::Convert_WidePtr_To_Native(sLangDLL).c_str());
-#endif
+        return DTWAIN_LoadCustomStringResources(dtwain_aw_detail::native_input(sLangDLL).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesA(LPCSTR sLangDLL)
     {
-#ifdef _UNICODE
-        return DTWAIN_LoadCustomStringResources(stringconversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str());
-#else
-        return DTWAIN_LoadCustomStringResources(sLangDLL);
-#endif
+        return DTWAIN_LoadCustomStringResources(dtwain_aw_detail::native_input(sLangDLL).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesExW(LPCWSTR sLangDLL, DTWAIN_BOOL bClear)
     {
-#ifdef _UNICODE
-        return DTWAIN_LoadCustomStringResourcesEx(sLangDLL, bClear);
-#else
-        return DTWAIN_LoadCustomStringResourcesEx(stringconversion::Convert_WidePtr_To_Native(sLangDLL).c_str(), bClear);
-#endif
+        return DTWAIN_LoadCustomStringResourcesEx(dtwain_aw_detail::native_input(sLangDLL).c_str(), bClear);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesExA(LPCSTR sLangDLL, DTWAIN_BOOL bClear)
     {
-#ifdef _UNICODE
-        return DTWAIN_LoadCustomStringResourcesEx(stringconversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str(), bClear);
-#else
-        return DTWAIN_LoadCustomStringResourcesEx(sLangDLL, bClear);
-#endif
+        return DTWAIN_LoadCustomStringResourcesEx(dtwain_aw_detail::native_input(sLangDLL).c_str(), bClear);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessageW(LPCWSTR message)
     {
-#ifdef _UNICODE
-        return DTWAIN_LogMessage(message);
-#else
-        return DTWAIN_LogMessage(stringconversion::Convert_WidePtr_To_Native(message).c_str());
-#endif
+        return DTWAIN_LogMessage(dtwain_aw_detail::native_input(message).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessageA(LPCSTR message)
     {
-#ifdef _UNICODE
-        return DTWAIN_LogMessage(stringconversion::Convert_AnsiPtr_To_Native(message).c_str());
-#else
-        return DTWAIN_LogMessage(message);
-#endif
+        return DTWAIN_LogMessage(dtwain_aw_detail::native_input(message).c_str());
     }
 
     DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByNameW(LPCWSTR lpszName)
     {
-#ifdef _UNICODE
-        return DTWAIN_SelectOCREngineByName(lpszName);
-#else
-        return DTWAIN_SelectOCREngineByName(stringconversion::Convert_WidePtr_To_Native(lpszName).c_str());
-#endif
+        return DTWAIN_SelectOCREngineByName(dtwain_aw_detail::native_input(lpszName).c_str());
     }
 
     DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByNameA(LPCSTR lpszName)
     {
-#ifdef _UNICODE
-        return DTWAIN_SelectOCREngineByName(stringconversion::Convert_AnsiPtr_To_Native(lpszName).c_str());
-#else
-        return DTWAIN_SelectOCREngineByName(lpszName);
-#endif
+        return DTWAIN_SelectOCREngineByName(dtwain_aw_detail::native_input(lpszName).c_str());
     }
 
     DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2A(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos, LONG nOptions)
@@ -1595,578 +1261,322 @@ extern "C"
 
     DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameW(LPCWSTR lpszName)
     {
-#ifdef _UNICODE
-        return DTWAIN_SelectSourceByName(lpszName);
-#else
-        return DTWAIN_SelectSourceByName(stringconversion::Convert_WidePtr_To_Native(lpszName).c_str());
-#endif
+        return DTWAIN_SelectSourceByName(dtwain_aw_detail::native_input(lpszName).c_str());
     }
 
     DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameA(LPCSTR lpszName)
     {
-#ifdef _UNICODE
-        return DTWAIN_SelectSourceByName(stringconversion::Convert_AnsiPtr_To_Native(lpszName).c_str());
-#else
-        return DTWAIN_SelectSourceByName(lpszName);
-#endif
+        return DTWAIN_SelectSourceByName(dtwain_aw_detail::native_input(lpszName).c_str());
     }
 
     DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameWithOpenW(LPCWSTR lpszName, DTWAIN_BOOL bOpen)
     {
-#ifdef _UNICODE
-        return DTWAIN_SelectSourceByNameWithOpen(lpszName, bOpen);
-#else
-        return DTWAIN_SelectSourceByNameWithOpen(stringconversion::Convert_WidePtr_To_Native(lpszName).c_str(), bOpen);
-#endif
+        return DTWAIN_SelectSourceByNameWithOpen(dtwain_aw_detail::native_input(lpszName).c_str(), bOpen);
     }
 
     DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameWithOpenA(LPCSTR lpszName, DTWAIN_BOOL bOpen)
     {
-#ifdef _UNICODE
-        return DTWAIN_SelectSourceByNameWithOpen(stringconversion::Convert_AnsiPtr_To_Native(lpszName).c_str(), bOpen);
-#else
-        return DTWAIN_SelectSourceByNameWithOpen(lpszName, bOpen);
-#endif
+        return DTWAIN_SelectSourceByNameWithOpen(dtwain_aw_detail::native_input(lpszName).c_str(), bOpen);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2StringW(DTWAIN_SOURCE Source, LPCWSTR left, LPCWSTR top, LPCWSTR right, LPCWSTR bottom, LONG lUnit, LONG Flags)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetAcquireArea2String(Source, left, top, right, bottom, lUnit, Flags);
-#else
-        return DTWAIN_SetAcquireArea2String(Source, stringconversion::Convert_WidePtr_To_Native(left).c_str(), stringconversion::Convert_WidePtr_To_Native(top).c_str(), stringconversion::Convert_WidePtr_To_Native(right).c_str(), stringconversion::Convert_WidePtr_To_Native(bottom).c_str(), lUnit, Flags);
-#endif
+        return DTWAIN_SetAcquireArea2String(Source, dtwain_aw_detail::native_input(left).c_str(), dtwain_aw_detail::native_input(top).c_str(), dtwain_aw_detail::native_input(right).c_str(), dtwain_aw_detail::native_input(bottom).c_str(), lUnit, Flags);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2StringA(DTWAIN_SOURCE Source, LPCSTR left, LPCSTR top, LPCSTR right, LPCSTR bottom, LONG lUnit, LONG Flags)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetAcquireArea2String(Source, stringconversion::Convert_AnsiPtr_To_Native(left).c_str(), stringconversion::Convert_AnsiPtr_To_Native(top).c_str(), stringconversion::Convert_AnsiPtr_To_Native(right).c_str(), stringconversion::Convert_AnsiPtr_To_Native(bottom).c_str(), lUnit, Flags);
-#else
-        return DTWAIN_SetAcquireArea2String(Source, left, top, right, bottom, lUnit, Flags);
-#endif
+        return DTWAIN_SetAcquireArea2String(Source, dtwain_aw_detail::native_input(left).c_str(), dtwain_aw_detail::native_input(top).c_str(), dtwain_aw_detail::native_input(right).c_str(), dtwain_aw_detail::native_input(bottom).c_str(), lUnit, Flags);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleStringA(DTWAIN_SOURCE Source, LPCSTR xscale, LPCSTR yscale)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetAcquireImageScaleString(Source, stringconversion::Convert_AnsiPtr_To_Native(xscale).c_str(), stringconversion::Convert_AnsiPtr_To_Native(yscale).c_str());
-#else
-        return DTWAIN_SetAcquireImageScaleString(Source, xscale, yscale);
-#endif
+        return DTWAIN_SetAcquireImageScaleString(Source, dtwain_aw_detail::native_input(xscale).c_str(), dtwain_aw_detail::native_input(yscale).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleStringW(DTWAIN_SOURCE Source, LPCWSTR xscale, LPCWSTR yscale)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetAcquireImageScaleString(Source, xscale, yscale);
-#else
-        return DTWAIN_SetAcquireImageScaleString(Source, stringconversion::Convert_WidePtr_To_Native(xscale).c_str(), stringconversion::Convert_WidePtr_To_Native(yscale).c_str());
-#endif
+        return DTWAIN_SetAcquireImageScaleString(Source, dtwain_aw_detail::native_input(xscale).c_str(), dtwain_aw_detail::native_input(yscale).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAppInfoW(LPCWSTR szVerStr, LPCWSTR szManu, LPCWSTR szProdFam, LPCWSTR szProdName)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetAppInfo(szVerStr, szManu, szProdFam, szProdName);
-#else
-        return DTWAIN_SetAppInfo(stringconversion::Convert_WidePtr_To_Native(szVerStr).c_str(), stringconversion::Convert_WidePtr_To_Native(szManu).c_str(), stringconversion::Convert_WidePtr_To_Native(szProdFam).c_str(), stringconversion::Convert_WidePtr_To_Native(szProdName).c_str());
-#endif
+        return DTWAIN_SetAppInfo(dtwain_aw_detail::native_input(szVerStr).c_str(), dtwain_aw_detail::native_input(szManu).c_str(), dtwain_aw_detail::native_input(szProdFam).c_str(), dtwain_aw_detail::native_input(szProdName).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAppInfoA(LPCSTR szVerStr, LPCSTR szManu, LPCSTR szProdFam, LPCSTR szProdName)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetAppInfo(stringconversion::Convert_AnsiPtr_To_Native(szVerStr).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szManu).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szProdFam).c_str(), stringconversion::Convert_AnsiPtr_To_Native(szProdName).c_str());
-#else
-        return DTWAIN_SetAppInfo(szVerStr, szManu, szProdFam, szProdName);
-#endif
+        return DTWAIN_SetAppInfo(dtwain_aw_detail::native_input(szVerStr).c_str(), dtwain_aw_detail::native_input(szManu).c_str(), dtwain_aw_detail::native_input(szProdFam).c_str(), dtwain_aw_detail::native_input(szProdName).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAuthorA(DTWAIN_SOURCE Source, LPCSTR szAuthor)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetAuthor(Source, stringconversion::Convert_AnsiPtr_To_Native(szAuthor).c_str());
-#else
-        return DTWAIN_SetAuthor(Source, szAuthor);
-#endif
+        return DTWAIN_SetAuthor(Source, dtwain_aw_detail::native_input(szAuthor).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAuthorW(DTWAIN_SOURCE Source, LPCWSTR szAuthor)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetAuthor(Source, szAuthor);
-#else
-        return DTWAIN_SetAuthor(Source, stringconversion::Convert_WidePtr_To_Native(szAuthor).c_str());
-#endif
+        return DTWAIN_SetAuthor(Source, dtwain_aw_detail::native_input(szAuthor).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionStringA(DTWAIN_SOURCE Source, LPCSTR threshold, LONG autodetect_option, DTWAIN_BOOL bSet)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetBlankPageDetectionString(Source, stringconversion::Convert_AnsiPtr_To_Native(threshold).c_str(), autodetect_option, bSet);
-#else
-        return DTWAIN_SetBlankPageDetectionString(Source, threshold, autodetect_option, bSet);
-#endif
+        return DTWAIN_SetBlankPageDetectionString(Source, dtwain_aw_detail::native_input(threshold).c_str(), autodetect_option, bSet);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionStringW(DTWAIN_SOURCE Source, LPCWSTR threshold, LONG autodetect_option, DTWAIN_BOOL bSet)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetBlankPageDetectionString(Source, threshold, autodetect_option, bSet);
-#else
-        return DTWAIN_SetBlankPageDetectionString(Source, stringconversion::Convert_WidePtr_To_Native(threshold).c_str(), autodetect_option, bSet);
-#endif
+        return DTWAIN_SetBlankPageDetectionString(Source, dtwain_aw_detail::native_input(threshold).c_str(), autodetect_option, bSet);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionExStringA(DTWAIN_SOURCE Source, LPCSTR threshold, LONG autodetect_option, LONG detectOpts, DTWAIN_BOOL bSet)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetBlankPageDetectionExString(Source, stringconversion::Convert_AnsiPtr_To_Native(threshold).c_str(), autodetect_option, detectOpts, bSet);
-#else
-        return DTWAIN_SetBlankPageDetectionExString(Source, threshold, autodetect_option, detectOpts, bSet);
-#endif
+        return DTWAIN_SetBlankPageDetectionExString(Source, dtwain_aw_detail::native_input(threshold).c_str(), autodetect_option, detectOpts, bSet);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionExStringW(DTWAIN_SOURCE Source, LPCWSTR threshold, LONG autodetect_option, LONG detectOpts, DTWAIN_BOOL bSet)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetBlankPageDetectionExString(Source, threshold, autodetect_option, detectOpts, bSet);
-#else
-        return DTWAIN_SetBlankPageDetectionExString(Source, stringconversion::Convert_WidePtr_To_Native(threshold).c_str(), autodetect_option, detectOpts, bSet);
-#endif
+        return DTWAIN_SetBlankPageDetectionExString(Source, dtwain_aw_detail::native_input(threshold).c_str(), autodetect_option, detectOpts, bSet);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBrightnessStringA(DTWAIN_SOURCE Source, LPCSTR Contrast)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetBrightnessString(Source, stringconversion::Convert_AnsiPtr_To_Native(Contrast).c_str());
-#else
-        return DTWAIN_SetBrightnessString(Source, Contrast);
-#endif
+        return DTWAIN_SetBrightnessString(Source, dtwain_aw_detail::native_input(Contrast).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBrightnessStringW(DTWAIN_SOURCE Source, LPCWSTR Contrast)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetBrightnessString(Source, Contrast);
-#else
-        return DTWAIN_SetBrightnessString(Source, stringconversion::Convert_WidePtr_To_Native(Contrast).c_str());
-#endif
+        return DTWAIN_SetBrightnessString(Source, dtwain_aw_detail::native_input(Contrast).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCameraW(DTWAIN_SOURCE Source, LPCWSTR szCamera)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetCamera(Source, szCamera);
-#else
-        return DTWAIN_SetCamera(Source, stringconversion::Convert_WidePtr_To_Native(szCamera).c_str());
-#endif
+        return DTWAIN_SetCamera(Source, dtwain_aw_detail::native_input(szCamera).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCameraA(DTWAIN_SOURCE Source, LPCSTR szCamera)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetCamera(Source, stringconversion::Convert_AnsiPtr_To_Native(szCamera).c_str());
-#else
-        return DTWAIN_SetCamera(Source, szCamera);
-#endif
+        return DTWAIN_SetCamera(Source, dtwain_aw_detail::native_input(szCamera).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCaptionA(DTWAIN_SOURCE Source, LPCSTR Caption)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetCaption(Source, stringconversion::Convert_AnsiPtr_To_Native(Caption).c_str());
-#else
-        return DTWAIN_SetCaption(Source, Caption);
-#endif
+        return DTWAIN_SetCaption(Source, dtwain_aw_detail::native_input(Caption).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCaptionW(DTWAIN_SOURCE Source, LPCWSTR Caption)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetCaption(Source, Caption);
-#else
-        return DTWAIN_SetCaption(Source, stringconversion::Convert_WidePtr_To_Native(Caption).c_str());
-#endif
+        return DTWAIN_SetCaption(Source, dtwain_aw_detail::native_input(Caption).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetContrastStringA(DTWAIN_SOURCE Source, LPCSTR Contrast)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetContrastString(Source, stringconversion::Convert_AnsiPtr_To_Native(Contrast).c_str());
-#else
-        return DTWAIN_SetContrastString(Source, Contrast);
-#endif
+        return DTWAIN_SetContrastString(Source, dtwain_aw_detail::native_input(Contrast).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetContrastStringW(DTWAIN_SOURCE Source, LPCWSTR Contrast)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetContrastString(Source, Contrast);
-#else
-        return DTWAIN_SetContrastString(Source, stringconversion::Convert_WidePtr_To_Native(Contrast).c_str());
-#endif
+        return DTWAIN_SetContrastString(Source, dtwain_aw_detail::native_input(Contrast).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceTimeDateA(DTWAIN_SOURCE Source, LPCSTR szTimeDate)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetDeviceTimeDate(Source, stringconversion::Convert_AnsiPtr_To_Native(szTimeDate).c_str());
-#else
-        return DTWAIN_SetDeviceTimeDate(Source, szTimeDate);
-#endif
+        return DTWAIN_SetDeviceTimeDate(Source, dtwain_aw_detail::native_input(szTimeDate).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceTimeDateW(DTWAIN_SOURCE Source, LPCWSTR szTimeDate)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetDeviceTimeDate(Source, szTimeDate);
-#else
-        return DTWAIN_SetDeviceTimeDate(Source, stringconversion::Convert_WidePtr_To_Native(szTimeDate).c_str());
-#endif
+        return DTWAIN_SetDeviceTimeDate(Source, dtwain_aw_detail::native_input(szTimeDate).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePosW(HWND hWndParent, LPCWSTR szTitle, LONG xPos, LONG yPos, LONG nFlags)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetFileSavePos(hWndParent, szTitle, xPos, yPos, nFlags);
-#else
-        return DTWAIN_SetFileSavePos(hWndParent, stringconversion::Convert_WidePtr_To_Native(szTitle).c_str(), xPos, yPos, nFlags);
-#endif
+        return DTWAIN_SetFileSavePos(hWndParent, dtwain_aw_detail::native_input(szTitle).c_str(), xPos, yPos, nFlags);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePosA(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos, LONG nFlags)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetFileSavePos(hWndParent, stringconversion::Convert_AnsiPtr_To_Native(szTitle).c_str(), xPos, yPos, nFlags);
-#else
-        return DTWAIN_SetFileSavePos(hWndParent, szTitle, xPos, yPos, nFlags);
-#endif
+        return DTWAIN_SetFileSavePos(hWndParent, dtwain_aw_detail::native_input(szTitle).c_str(), xPos, yPos, nFlags);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetHalftoneW(DTWAIN_SOURCE Source, LPCWSTR lpHalftone)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetHalftone(Source, lpHalftone);
-#else
-        return DTWAIN_SetHalftone(Source, stringconversion::Convert_WidePtr_To_Native(lpHalftone).c_str());
-#endif
+        return DTWAIN_SetHalftone(Source, dtwain_aw_detail::native_input(lpHalftone).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetHalftoneA(DTWAIN_SOURCE Source, LPCSTR lpHalftone)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetHalftone(Source, stringconversion::Convert_AnsiPtr_To_Native(lpHalftone).c_str());
-#else
-        return DTWAIN_SetHalftone(Source, lpHalftone);
-#endif
+        return DTWAIN_SetHalftone(Source, dtwain_aw_detail::native_input(lpHalftone).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetHighlightStringA(DTWAIN_SOURCE Source, LPCSTR Highlight)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetHighlightString(Source, stringconversion::Convert_AnsiPtr_To_Native(Highlight).c_str());
-#else
-        return DTWAIN_SetHighlightString(Source, Highlight);
-#endif
+        return DTWAIN_SetHighlightString(Source, dtwain_aw_detail::native_input(Highlight).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetHighlightStringW(DTWAIN_SOURCE Source, LPCWSTR Highlight)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetHighlightString(Source, Highlight);
-#else
-        return DTWAIN_SetHighlightString(Source, stringconversion::Convert_WidePtr_To_Native(Highlight).c_str());
-#endif
+        return DTWAIN_SetHighlightString(Source, dtwain_aw_detail::native_input(Highlight).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFAuthorW(DTWAIN_SOURCE Source, LPCWSTR lpAuthor)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFAuthor(Source, lpAuthor);
-#else
-        return DTWAIN_SetPDFAuthor(Source, stringconversion::Convert_WidePtr_To_Native(lpAuthor).c_str());
-#endif
+        return DTWAIN_SetPDFAuthor(Source, dtwain_aw_detail::native_input(lpAuthor).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFAuthorA(DTWAIN_SOURCE Source, LPCSTR lpAuthor)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFAuthor(Source, stringconversion::Convert_AnsiPtr_To_Native(lpAuthor).c_str());
-#else
-        return DTWAIN_SetPDFAuthor(Source, lpAuthor);
-#endif
+        return DTWAIN_SetPDFAuthor(Source, dtwain_aw_detail::native_input(lpAuthor).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFCreatorW(DTWAIN_SOURCE Source, LPCWSTR lpCreator)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFCreator(Source, lpCreator);
-#else
-        return DTWAIN_SetPDFCreator(Source, stringconversion::Convert_WidePtr_To_Native(lpCreator).c_str());
-#endif
+        return DTWAIN_SetPDFCreator(Source, dtwain_aw_detail::native_input(lpCreator).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFCreatorA(DTWAIN_SOURCE Source, LPCSTR lpCreator)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFCreator(Source, stringconversion::Convert_AnsiPtr_To_Native(lpCreator).c_str());
-#else
-        return DTWAIN_SetPDFCreator(Source, lpCreator);
-#endif
+        return DTWAIN_SetPDFCreator(Source, dtwain_aw_detail::native_input(lpCreator).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionW(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCWSTR lpszUser, LPCWSTR lpszOwner, DWORD Permissions, DTWAIN_BOOL UseStrongEncryption)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFEncryption(Source, bUseEncryption, lpszUser, lpszOwner, Permissions, UseStrongEncryption);
-#else
-        return DTWAIN_SetPDFEncryption(Source, bUseEncryption, stringconversion::Convert_WidePtr_To_Native(lpszUser).c_str(), stringconversion::Convert_WidePtr_To_Native(lpszOwner).c_str(), Permissions, UseStrongEncryption);
-#endif
+        return DTWAIN_SetPDFEncryption(Source, bUseEncryption, dtwain_aw_detail::native_input(lpszUser).c_str(), dtwain_aw_detail::native_input(lpszOwner).c_str(), Permissions, UseStrongEncryption);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionA(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCSTR lpszUser, LPCSTR lpszOwner, DWORD Permissions, DTWAIN_BOOL UseStrongEncryption)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFEncryption(Source, bUseEncryption, stringconversion::Convert_AnsiPtr_To_Native(lpszUser).c_str(), stringconversion::Convert_AnsiPtr_To_Native(lpszOwner).c_str(), Permissions, UseStrongEncryption);
-#else
-        return DTWAIN_SetPDFEncryption(Source, bUseEncryption, lpszUser, lpszOwner, Permissions, UseStrongEncryption);
-#endif
+        return DTWAIN_SetPDFEncryption(Source, bUseEncryption, dtwain_aw_detail::native_input(lpszUser).c_str(), dtwain_aw_detail::native_input(lpszOwner).c_str(), Permissions, UseStrongEncryption);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFKeywordsA(DTWAIN_SOURCE Source, LPCSTR lpKeyWords)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFKeywords(Source, stringconversion::Convert_AnsiPtr_To_Native(lpKeyWords).c_str());
-#else
-        return DTWAIN_SetPDFKeywords(Source, lpKeyWords);
-#endif
+        return DTWAIN_SetPDFKeywords(Source, dtwain_aw_detail::native_input(lpKeyWords).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFKeywordsW(DTWAIN_SOURCE Source, LPCWSTR lpKeyWords)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFKeywords(Source, lpKeyWords);
-#else
-        return DTWAIN_SetPDFKeywords(Source, stringconversion::Convert_WidePtr_To_Native(lpKeyWords).c_str());
-#endif
+        return DTWAIN_SetPDFKeywords(Source, dtwain_aw_detail::native_input(lpKeyWords).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageScaleStringA(DTWAIN_SOURCE Source, LONG nOptions, LPCSTR xScale, LPCSTR yScale)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFPageScaleString(Source, nOptions, stringconversion::Convert_AnsiPtr_To_Native(xScale).c_str(), stringconversion::Convert_AnsiPtr_To_Native(yScale).c_str());
-#else
-        return DTWAIN_SetPDFPageScaleString(Source, nOptions, xScale, yScale);
-#endif
+        return DTWAIN_SetPDFPageScaleString(Source, nOptions, dtwain_aw_detail::native_input(xScale).c_str(), dtwain_aw_detail::native_input(yScale).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageScaleStringW(DTWAIN_SOURCE Source, LONG nOptions, LPCWSTR xScale, LPCWSTR yScale)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFPageScaleString(Source, nOptions, xScale, yScale);
-#else
-        return DTWAIN_SetPDFPageScaleString(Source, nOptions, stringconversion::Convert_WidePtr_To_Native(xScale).c_str(), stringconversion::Convert_WidePtr_To_Native(yScale).c_str());
-#endif
+        return DTWAIN_SetPDFPageScaleString(Source, nOptions, dtwain_aw_detail::native_input(xScale).c_str(), dtwain_aw_detail::native_input(yScale).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageSizeStringA(DTWAIN_SOURCE Source, LONG PageSize, LPCSTR CustomWidth, LPCSTR CustomHeight)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFPageSizeString(Source, PageSize, stringconversion::Convert_AnsiPtr_To_Native(CustomWidth).c_str(), stringconversion::Convert_AnsiPtr_To_Native(CustomHeight).c_str());
-#else
-        return DTWAIN_SetPDFPageSizeString(Source, PageSize, CustomWidth, CustomHeight);
-#endif
+        return DTWAIN_SetPDFPageSizeString(Source, PageSize, dtwain_aw_detail::native_input(CustomWidth).c_str(), dtwain_aw_detail::native_input(CustomHeight).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageSizeStringW(DTWAIN_SOURCE Source, LONG PageSize, LPCWSTR CustomWidth, LPCWSTR CustomHeight)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFPageSizeString(Source, PageSize, CustomWidth, CustomHeight);
-#else
-        return DTWAIN_SetPDFPageSizeString(Source, PageSize, stringconversion::Convert_WidePtr_To_Native(CustomWidth).c_str(), stringconversion::Convert_WidePtr_To_Native(CustomHeight).c_str());
-#endif
+        return DTWAIN_SetPDFPageSizeString(Source, PageSize, dtwain_aw_detail::native_input(CustomWidth).c_str(), dtwain_aw_detail::native_input(CustomHeight).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFProducerW(DTWAIN_SOURCE Source, LPCWSTR lpProducer)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFProducer(Source, lpProducer);
-#else
-        return DTWAIN_SetPDFProducer(Source, stringconversion::Convert_WidePtr_To_Native(lpProducer).c_str());
-#endif
+        return DTWAIN_SetPDFProducer(Source, dtwain_aw_detail::native_input(lpProducer).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFProducerA(DTWAIN_SOURCE Source, LPCSTR lpProducer)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFProducer(Source, stringconversion::Convert_AnsiPtr_To_Native(lpProducer).c_str());
-#else
-        return DTWAIN_SetPDFProducer(Source, lpProducer);
-#endif
+        return DTWAIN_SetPDFProducer(Source, dtwain_aw_detail::native_input(lpProducer).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFSubjectA(DTWAIN_SOURCE Source, LPCSTR lpSubject)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFSubject(Source, stringconversion::Convert_AnsiPtr_To_Native(lpSubject).c_str());
-#else
-        return DTWAIN_SetPDFSubject(Source, lpSubject);
-#endif
+        return DTWAIN_SetPDFSubject(Source, dtwain_aw_detail::native_input(lpSubject).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFSubjectW(DTWAIN_SOURCE Source, LPCWSTR lpSubject)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFSubject(Source, lpSubject);
-#else
-        return DTWAIN_SetPDFSubject(Source, stringconversion::Convert_WidePtr_To_Native(lpSubject).c_str());
-#endif
+        return DTWAIN_SetPDFSubject(Source, dtwain_aw_detail::native_input(lpSubject).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTitleW(DTWAIN_SOURCE Source, LPCWSTR lpTitle)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFTitle(Source, lpTitle);
-#else
-        return DTWAIN_SetPDFTitle(Source, stringconversion::Convert_WidePtr_To_Native(lpTitle).c_str());
-#endif
+        return DTWAIN_SetPDFTitle(Source, dtwain_aw_detail::native_input(lpTitle).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTitleA(DTWAIN_SOURCE Source, LPCSTR lpTitle)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFTitle(Source, stringconversion::Convert_AnsiPtr_To_Native(lpTitle).c_str());
-#else
-        return DTWAIN_SetPDFTitle(Source, lpTitle);
-#endif
+        return DTWAIN_SetPDFTitle(Source, dtwain_aw_detail::native_input(lpTitle).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPostScriptTitleW(DTWAIN_SOURCE Source, LPCWSTR szTitle)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPostScriptTitle(Source, szTitle);
-#else
-        return DTWAIN_SetPostScriptTitle(Source, stringconversion::Convert_WidePtr_To_Native(szTitle).c_str());
-#endif
+        return DTWAIN_SetPostScriptTitle(Source, dtwain_aw_detail::native_input(szTitle).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPostScriptTitleA(DTWAIN_SOURCE Source, LPCSTR szTitle)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPostScriptTitle(Source, stringconversion::Convert_AnsiPtr_To_Native(szTitle).c_str());
-#else
-        return DTWAIN_SetPostScriptTitle(Source, szTitle);
-#endif
+        return DTWAIN_SetPostScriptTitle(Source, dtwain_aw_detail::native_input(szTitle).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterSuffixStringW(DTWAIN_SOURCE Source, LPCWSTR Suffix)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPrinterSuffixString(Source, Suffix);
-#else
-        return DTWAIN_SetPrinterSuffixString(Source, stringconversion::Convert_WidePtr_To_Native(Suffix).c_str());
-#endif
+        return DTWAIN_SetPrinterSuffixString(Source, dtwain_aw_detail::native_input(Suffix).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterSuffixStringA(DTWAIN_SOURCE Source, LPCSTR Suffix)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPrinterSuffixString(Source, stringconversion::Convert_AnsiPtr_To_Native(Suffix).c_str());
-#else
-        return DTWAIN_SetPrinterSuffixString(Source, Suffix);
-#endif
+        return DTWAIN_SetPrinterSuffixString(Source, dtwain_aw_detail::native_input(Suffix).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResolutionStringW(DTWAIN_SOURCE Source, LPCWSTR Resolution)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetResolutionString(Source, Resolution);
-#else
-        return DTWAIN_SetResolutionString(Source, stringconversion::Convert_WidePtr_To_Native(Resolution).c_str());
-#endif
+        return DTWAIN_SetResolutionString(Source, dtwain_aw_detail::native_input(Resolution).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResolutionStringA(DTWAIN_SOURCE Source, LPCSTR Resolution)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetResolutionString(Source, stringconversion::Convert_AnsiPtr_To_Native(Resolution).c_str());
-#else
-        return DTWAIN_SetResolutionString(Source, Resolution);
-#endif
+        return DTWAIN_SetResolutionString(Source, dtwain_aw_detail::native_input(Resolution).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetRotationStringA(DTWAIN_SOURCE Source, LPCSTR Rotation)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetRotationString(Source, stringconversion::Convert_AnsiPtr_To_Native(Rotation).c_str());
-#else
-        return DTWAIN_SetRotationString(Source, Rotation);
-#endif
+        return DTWAIN_SetRotationString(Source, dtwain_aw_detail::native_input(Rotation).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetRotationStringW(DTWAIN_SOURCE Source, LPCWSTR Rotation)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetRotationString(Source, Rotation);
-#else
-        return DTWAIN_SetRotationString(Source, stringconversion::Convert_WidePtr_To_Native(Rotation).c_str());
-#endif
+        return DTWAIN_SetRotationString(Source, dtwain_aw_detail::native_input(Rotation).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetSaveFileNameW(DTWAIN_SOURCE Source, LPCWSTR fName)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetSaveFileName(Source, fName);
-#else
-        return DTWAIN_SetSaveFileName(Source, stringconversion::Convert_WidePtr_To_Native(fName).c_str());
-#endif
+        return DTWAIN_SetSaveFileName(Source, dtwain_aw_detail::native_input(fName).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetSaveFileNameA(DTWAIN_SOURCE Source, LPCSTR fName)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetSaveFileName(Source, stringconversion::Convert_AnsiPtr_To_Native(fName).c_str());
-#else
-        return DTWAIN_SetSaveFileName(Source, fName);
-#endif
+        return DTWAIN_SetSaveFileName(Source, dtwain_aw_detail::native_input(fName).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetShadowStringA(DTWAIN_SOURCE Source, LPCSTR Shadow)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetShadowString(Source, stringconversion::Convert_AnsiPtr_To_Native(Shadow).c_str());
-#else
-        return DTWAIN_SetShadowString(Source, Shadow);
-#endif
+        return DTWAIN_SetShadowString(Source, dtwain_aw_detail::native_input(Shadow).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetShadowStringW(DTWAIN_SOURCE Source, LPCWSTR Shadow)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetShadowString(Source, Shadow);
-#else
-        return DTWAIN_SetShadowString(Source, stringconversion::Convert_WidePtr_To_Native(Shadow).c_str());
-#endif
+        return DTWAIN_SetShadowString(Source, dtwain_aw_detail::native_input(Shadow).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryW(LPCWSTR szFilePath)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetTempFileDirectory(szFilePath);
-#else
-        return DTWAIN_SetTempFileDirectory(stringconversion::Convert_WidePtr_To_Native(szFilePath).c_str());
-#endif
+        return DTWAIN_SetTempFileDirectory(dtwain_aw_detail::native_input(szFilePath).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryA(LPCSTR szFilePath)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetTempFileDirectory(stringconversion::Convert_AnsiPtr_To_Native(szFilePath).c_str());
-#else
-        return DTWAIN_SetTempFileDirectory(szFilePath);
-#endif
+        return DTWAIN_SetTempFileDirectory(dtwain_aw_detail::native_input(szFilePath).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderExW(LPCWSTR szFilePath, LPCWSTR szUserPath)
@@ -2191,146 +1601,82 @@ extern "C"
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePathW(LPCWSTR szFilePath)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetResourcePath(szFilePath);
-#else
-        return DTWAIN_SetResourcePath(stringconversion::Convert_WidePtr_To_Native(szFilePath).c_str());
-#endif
+        return DTWAIN_SetResourcePath(dtwain_aw_detail::native_input(szFilePath).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePathA(LPCSTR szFilePath)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetResourcePath(stringconversion::Convert_AnsiPtr_To_Native(szFilePath).c_str());
-#else
-        return DTWAIN_SetResourcePath(szFilePath);
-#endif
+        return DTWAIN_SetResourcePath(dtwain_aw_detail::native_input(szFilePath).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetThresholdStringA(DTWAIN_SOURCE Source, LPCSTR Threshold, DTWAIN_BOOL bSetBitDepthReduction)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetThresholdString(Source, stringconversion::Convert_AnsiPtr_To_Native(Threshold).c_str(), bSetBitDepthReduction);
-#else
-        return DTWAIN_SetThresholdString(Source, Threshold, bSetBitDepthReduction);
-#endif
+        return DTWAIN_SetThresholdString(Source, dtwain_aw_detail::native_input(Threshold).c_str(), bSetBitDepthReduction);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetThresholdStringW(DTWAIN_SOURCE Source, LPCWSTR Threshold, DTWAIN_BOOL bSetBitDepthReduction)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetThresholdString(Source, Threshold, bSetBitDepthReduction);
-#else
-        return DTWAIN_SetThresholdString(Source, stringconversion::Convert_WidePtr_To_Native(Threshold).c_str(), bSetBitDepthReduction);
-#endif
+        return DTWAIN_SetThresholdString(Source, dtwain_aw_detail::native_input(Threshold).c_str(), bSetBitDepthReduction);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetTwainLog(LogFlags, stringconversion::Convert_AnsiPtr_To_Native(lpszLogFile).c_str());
-#else
-        return DTWAIN_SetTwainLog(LogFlags, lpszLogFile);
-#endif
+        return DTWAIN_SetTwainLog(LogFlags, dtwain_aw_detail::native_input(lpszLogFile).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetTwainLog(LogFlags, lpszLogFile);
-#else
-        return DTWAIN_SetTwainLog(LogFlags, stringconversion::Convert_WidePtr_To_Native(lpszLogFile).c_str());
-#endif
+        return DTWAIN_SetTwainLog(LogFlags, dtwain_aw_detail::native_input(lpszLogFile).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetXResolutionStringW(DTWAIN_SOURCE Source, LPCWSTR Resolution)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetXResolutionString(Source, Resolution);
-#else
-        return DTWAIN_SetXResolutionString(Source, stringconversion::Convert_WidePtr_To_Native(Resolution).c_str());
-#endif
+        return DTWAIN_SetXResolutionString(Source, dtwain_aw_detail::native_input(Resolution).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetXResolutionStringA(DTWAIN_SOURCE Source, LPCSTR Resolution)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetXResolutionString(Source, stringconversion::Convert_AnsiPtr_To_Native(Resolution).c_str());
-#else
-        return DTWAIN_SetXResolutionString(Source, Resolution);
-#endif
+        return DTWAIN_SetXResolutionString(Source, dtwain_aw_detail::native_input(Resolution).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetYResolutionStringW(DTWAIN_SOURCE Source, LPCWSTR Resolution)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetYResolutionString(Source, Resolution);
-#else
-        return DTWAIN_SetYResolutionString(Source, stringconversion::Convert_WidePtr_To_Native(Resolution).c_str());
-#endif
+        return DTWAIN_SetYResolutionString(Source, dtwain_aw_detail::native_input(Resolution).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetYResolutionStringA(DTWAIN_SOURCE Source, LPCSTR Resolution)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetYResolutionString(Source, stringconversion::Convert_AnsiPtr_To_Native(Resolution).c_str());
-#else
-        return DTWAIN_SetYResolutionString(Source, Resolution);
-#endif
+        return DTWAIN_SetYResolutionString(Source, dtwain_aw_detail::native_input(Resolution).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSessionW(HWND hWndMsg, LPCWSTR lpszDLLName)
     {
-#ifdef _UNICODE
-        return DTWAIN_StartTwainSession(hWndMsg, lpszDLLName);
-#else
-        return DTWAIN_StartTwainSession(hWndMsg, stringconversion::Convert_WidePtr_To_Native(lpszDLLName).c_str());
-#endif
+        return DTWAIN_StartTwainSession(hWndMsg, dtwain_aw_detail::native_input(lpszDLLName).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSessionA(HWND hWndMsg, LPCSTR lpszDLLName)
     {
-#ifdef _UNICODE
-        return DTWAIN_StartTwainSession(hWndMsg, stringconversion::Convert_AnsiPtr_To_Native(lpszDLLName).c_str());
-#else
-        return DTWAIN_StartTwainSession(hWndMsg, lpszDLLName);
-#endif
+        return DTWAIN_StartTwainSession(hWndMsg, dtwain_aw_detail::native_input(lpszDLLName).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoubleFeedDetectLengthStringA(DTWAIN_SOURCE Source, LPCSTR szLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetDoubleFeedDetectLengthString(Source, stringconversion::Convert_AnsiPtr_To_Native(szLength).c_str());
-#else
-        return DTWAIN_SetDoubleFeedDetectLengthString(Source, szLength);
-#endif
+        return DTWAIN_SetDoubleFeedDetectLengthString(Source, dtwain_aw_detail::native_input(szLength).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoubleFeedDetectLengthStringW(DTWAIN_SOURCE Source, LPCWSTR szLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetDoubleFeedDetectLengthString(Source, szLength);
-#else
-        return DTWAIN_SetDoubleFeedDetectLengthString(Source, stringconversion::Convert_WidePtr_To_Native(szLength).c_str());
-#endif
+        return DTWAIN_SetDoubleFeedDetectLengthString(Source, dtwain_aw_detail::native_input(szLength).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPCWSTR szString, LONG Flags)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFTextElementString(TextElement, szString, Flags);
-#else
-        return DTWAIN_SetPDFTextElementString(TextElement, stringconversion::Convert_WidePtr_To_Native(szString).c_str(), Flags);
-#endif
+        return DTWAIN_SetPDFTextElementString(TextElement, dtwain_aw_detail::native_input(szString).c_str(), Flags);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPCSTR szString, LONG Flags)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetPDFTextElementString(TextElement, stringconversion::Convert_AnsiPtr_To_Native(szString).c_str(), Flags);
-#else
-        return DTWAIN_SetPDFTextElementString(TextElement, szString, Flags);
-#endif
+        return DTWAIN_SetPDFTextElementString(TextElement, dtwain_aw_detail::native_input(szString).c_str(), Flags);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAllFloatStringW(DTWAIN_RANGE pArray, LPWSTR dLow,
@@ -2407,21 +1753,13 @@ extern "C"
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValueFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPCWSTR dValue)
     {
-#ifdef _UNICODE
-        return DTWAIN_RangeSetValueFloatString(pArray, nWhich, dValue);
-#else
-        return DTWAIN_RangeSetValueFloatString(pArray, nWhich, stringconversion::Convert_WidePtr_To_Native(dValue).c_str());
-#endif
+        return DTWAIN_RangeSetValueFloatString(pArray, nWhich, dtwain_aw_detail::native_input(dValue).c_str());
     }
 
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValueFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue)
     {
-#ifdef _UNICODE
-        return DTWAIN_RangeSetValueFloatString(pArray, nWhich, stringconversion::Convert_AnsiPtr_To_Native(dValue).c_str());
-#else
-        return DTWAIN_RangeSetValueFloatString(pArray, nWhich, dValue);
-#endif
+        return DTWAIN_RangeSetValueFloatString(pArray, nWhich, dtwain_aw_detail::native_input(dValue).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValueFloatStringW(DTWAIN_RANGE pArray, LPCWSTR dIn, LPWSTR dOut, LONG RoundType)
@@ -2518,20 +1856,12 @@ extern "C"
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValueStringW(DTWAIN_FRAME Frame, LONG nWhich, LPCWSTR Value)
     {
-#ifdef _UNICODE
-        return DTWAIN_FrameSetValueString(Frame, nWhich, Value);
-#else
-        return DTWAIN_FrameSetValueString(Frame, nWhich, stringconversion::Convert_WidePtr_To_Native(Value).c_str());
-#endif
+        return DTWAIN_FrameSetValueString(Frame, nWhich, dtwain_aw_detail::native_input(Value).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValueStringA(DTWAIN_FRAME Frame, LONG nWhich, LPCSTR Value)
     {
-#ifdef _UNICODE
-        return DTWAIN_FrameSetValueString(Frame, nWhich, stringconversion::Convert_AnsiPtr_To_Native(Value).c_str());
-#else
-        return DTWAIN_FrameSetValueString(Frame, nWhich, Value);
-#endif
+        return DTWAIN_FrameSetValueString(Frame, nWhich, dtwain_aw_detail::native_input(Value).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllStringW(DTWAIN_FRAME Frame, LPCWSTR Left, LPCWSTR Top, LPCWSTR Right, LPCWSTR Bottom)
@@ -2639,115 +1969,63 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensionsA(LONG nType, LPSTR lpszName, LONG nMaxLen)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nMaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetFileTypeExtensions(nType, lpszName ? arg.data() : nullptr, nMaxLen);
-        return null_terminator_copier(get_view(arg), lpszName, retVal);
-#else
-        return DTWAIN_GetFileTypeExtensions(nType, lpszName, nMaxLen);
-#endif
+        return output_with_length(lpszName, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetFileTypeExtensions(nType, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensionsW(LONG nType, LPWSTR lpszName, LONG nMaxLen)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetFileTypeExtensions(nType, lpszName, nMaxLen);
-#else
-        std::string arg((std::max)(nMaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetFileTypeExtensions(nType, lpszName ? arg.data() : nullptr, nMaxLen);
-        return null_terminator_copier(get_view(arg), lpszName, retVal);
-#endif
+        return output_with_length(lpszName, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetFileTypeExtensions(nType, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetFileTypeNameA(LONG nType, LPSTR lpszName, LONG nMaxLen)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nMaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetFileTypeName(nType, lpszName ? arg.data() : nullptr, nMaxLen);
-        return null_terminator_copier(get_view(arg), lpszName, retVal);
-#else
-        return DTWAIN_GetFileTypeName(nType, lpszName, nMaxLen);
-#endif
+        return output_with_length(lpszName, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetFileTypeName(nType, nativeOut, nativeCap); });
     }
 
 
     LONG DLLENTRY_DEF DTWAIN_GetFileTypeNameW(LONG nType, LPWSTR lpszName, LONG nMaxLen)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetFileTypeName(nType, lpszName, nMaxLen);
-#else
-        std::string arg((std::max)(nMaxLen, 0L), 0);
-        const LONG retVal = DTWAIN_GetFileTypeName(nType, lpszName ? arg.data() : nullptr, nMaxLen);
-        return null_terminator_copier(get_view(arg), lpszName, retVal);
-#endif
+        return output_with_length(lpszName, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetFileTypeName(nType, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSessionDetailsA(LPSTR lpszBuf, LONG nLength, LONG indentFactor, BOOL bRefresh)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSessionDetails(lpszBuf ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
-        return null_terminator_copier(get_view(args), lpszBuf, retVal);
-#else
-        return DTWAIN_GetSessionDetails(lpszBuf, nLength, indentFactor, bRefresh);
-#endif
+        return output_with_length(lpszBuf, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSessionDetails(nativeOut, nativeCap, indentFactor, bRefresh); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSessionDetailsW(LPWSTR lpszBuf, LONG nLength, LONG indentFactor, BOOL bRefresh)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetSessionDetails(lpszBuf, nLength, indentFactor, bRefresh);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        LONG retVal = DTWAIN_GetSessionDetails(lpszBuf ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
-        return null_terminator_copier(get_view(args), lpszBuf, retVal);
-#endif
+        return output_with_length(lpszBuf, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSessionDetails(nativeOut, nativeCap, indentFactor, bRefresh); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsA(LPCSTR lpszSources, LPSTR lpszBuf, LONG nLength, LONG indentFactor, BOOL bRefresh)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSourceDetails(stringconversion::Convert_AnsiPtr_To_Native(lpszSources).c_str(),
-            lpszBuf ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
-        return null_terminator_copier(get_view(args), lpszBuf, retVal);
-#else
-        return DTWAIN_GetSourceDetails(lpszSources, lpszBuf, nLength, indentFactor, bRefresh);
-#endif
+        return output_with_length(lpszBuf, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSourceDetails(dtwain_aw_detail::native_input(lpszSources).c_str(), nativeOut, nativeCap, indentFactor, bRefresh); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsW(LPCWSTR lpszSources, LPWSTR lpszBuf, LONG nLength, LONG indentFactor, BOOL bRefresh)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetSourceDetails(lpszSources, lpszBuf, nLength, indentFactor, bRefresh);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetSourceDetails(basicstringutils::Narrow(lpszSources).c_str(),
-            lpszBuf ? args.data() : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
-        return null_terminator_copier(get_view(args), lpszBuf, retVal);
-#endif
+        return output_with_length(lpszBuf, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetSourceDetails(dtwain_aw_detail::native_input(lpszSources).c_str(), nativeOut, nativeCap, indentFactor, bRefresh); });
     }
 
     LONG  DLLENTRY_DEF DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength)
     {
-#ifdef _UNICODE
-        std::wstring args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetVersionCopyright(lpszApp ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszApp, retVal);
-#else
-        return DTWAIN_GetVersionCopyright(lpszApp, nLength);
-#endif
+        return output_with_length(lpszApp, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetVersionCopyright(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetVersionCopyrightW(LPWSTR lpszApp, LONG nLength)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetVersionCopyright(lpszApp, nLength);
-#else
-        std::string args((std::max)(nLength, 0L), 0);
-        const LONG retVal = DTWAIN_GetVersionCopyright(lpszApp ? args.data() : nullptr, static_cast<LONG>(args.size()));
-        return null_terminator_copier(get_view(args), lpszApp, retVal);
-#endif
+        return output_with_length(lpszApp, nLength,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetVersionCopyright(nativeOut, nativeCap); });
     }
 
     DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2A(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos, LONG nOptions)
@@ -2801,20 +2079,12 @@ extern "C"
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExW(LPCWSTR sLangDLL, DTWAIN_BOOL bClear)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetTempFileDirectoryEx(sLangDLL, bClear);
-#else
-        return DTWAIN_SetTempFileDirectoryEx(stringconversion::Convert_WidePtr_To_Native(sLangDLL).c_str(), bClear);
-#endif
+        return DTWAIN_SetTempFileDirectoryEx(dtwain_aw_detail::native_input(sLangDLL).c_str(), bClear);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExA(LPCSTR sLangDLL, DTWAIN_BOOL bClear)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetTempFileDirectoryEx(stringconversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str(), bClear);
-#else
-        return DTWAIN_SetTempFileDirectoryEx(sLangDLL, bClear);
-#endif
+        return DTWAIN_SetTempFileDirectoryEx(dtwain_aw_detail::native_input(sLangDLL).c_str(), bClear);
     }
 
     LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExA(LPCSTR lpOrigString, LPSTR lpOutString, LONG nSize)
@@ -2904,20 +2174,12 @@ extern "C"
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPCWSTR dValue)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArraySetAtFloatString(pArray, nWhich, dValue);
-#else
-        return DTWAIN_ArraySetAtFloatString(pArray, nWhich, stringconversion::Convert_WidePtr_To_Native(dValue).c_str());
-#endif
+        return DTWAIN_ArraySetAtFloatString(pArray, nWhich, dtwain_aw_detail::native_input(dValue).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArraySetAtFloatString(pArray, nWhich, stringconversion::Convert_AnsiPtr_To_Native(dValue).c_str());
-#else
-        return DTWAIN_ArraySetAtFloatString(pArray, nWhich, dValue);
-#endif
+        return DTWAIN_ArraySetAtFloatString(pArray, nWhich, dtwain_aw_detail::native_input(dValue).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloatStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR dValue)
@@ -2944,38 +2206,22 @@ extern "C"
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPCWSTR dValue)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, dValue);
-#else
-        return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, stringconversion::Convert_WidePtr_To_Native(dValue).c_str());
-#endif
+        return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, dtwain_aw_detail::native_input(dValue).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, stringconversion::Convert_AnsiPtr_To_Native(dValue).c_str());
-#else
-        return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, dValue);
-#endif
+        return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, dtwain_aw_detail::native_input(dValue).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringNW(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR Val, LONG num)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, Val, num);
-#else
-        return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, stringconversion::Convert_WidePtr_To_Native(Val).c_str(), num);
-#endif
+        return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, dtwain_aw_detail::native_input(Val).c_str(), num);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringNA(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR Val, LONG num)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
-#else
-        return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, Val, num);
-#endif
+        return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, dtwain_aw_detail::native_input(Val).c_str(), num);
     }
 
     LONG DLLENTRY_DEF DTWAIN_ArrayFindFloatStringW(DTWAIN_ARRAY pArray, LPCWSTR Val, LPCWSTR Tolerance)
@@ -3000,39 +2246,22 @@ extern "C"
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringW(DTWAIN_ARRAY pArray, LPCWSTR Val)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayAddFloatString(pArray, Val);
-#else
-        return DTWAIN_ArrayAddFloatString(pArray, stringconversion::Convert_WidePtr_To_Native(Val).c_str());
-#endif
+        return DTWAIN_ArrayAddFloatString(pArray, dtwain_aw_detail::native_input(Val).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringA(DTWAIN_ARRAY pArray, LPCSTR Val)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayAddFloatString(pArray, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str());
-#else
-        return DTWAIN_ArrayAddFloatString(pArray, Val);
-#endif
+        return DTWAIN_ArrayAddFloatString(pArray, dtwain_aw_detail::native_input(Val).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringNW(DTWAIN_ARRAY pArray, LPCWSTR Val, LONG num)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayAddFloatStringN(pArray, Val, num);
-#else
-        return DTWAIN_ArrayAddFloatStringN(pArray, stringconversion::Convert_WidePtr_To_Native(Val).c_str(), num);
-#endif
-
+        return DTWAIN_ArrayAddFloatStringN(pArray, dtwain_aw_detail::native_input(Val).c_str(), num);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringNA(DTWAIN_ARRAY pArray, LPCSTR Val, LONG num)
     {
-#ifdef _UNICODE
-        return DTWAIN_ArrayAddFloatStringN(pArray, stringconversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
-#else
-        return DTWAIN_ArrayAddFloatStringN(pArray, Val, num);
-#endif
+        return DTWAIN_ArrayAddFloatStringN(pArray, dtwain_aw_detail::native_input(Val).c_str(), num);
     }
 
 
@@ -3102,30 +2331,15 @@ extern "C"
 
     LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut, nSize);
-#else
-        std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut ? arg.
-                                                            data()
-                                                            : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, nativeOut, nativeCap); });
     }
 
 
     LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut ? arg.
-                                                            data()
-                                                            : nullptr,
-            static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#else
-        return DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut, nSize);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrderExA(LPSTR SearchDirectory, LPSTR UserDirectory)
@@ -3158,171 +2372,95 @@ extern "C"
 
     HANDLE DLLENTRY_DEF DTWAIN_RotateImageStringA(HANDLE hDib, LPCSTR angle)
     {
-#ifdef _UNICODE
-        return DTWAIN_RotateImageString(hDib, stringconversion::Convert_AnsiPtr_To_Native(angle).c_str());
-#else
-        return DTWAIN_RotateImageString(hDib, angle);
-#endif
+        return DTWAIN_RotateImageString(hDib, dtwain_aw_detail::native_input(angle).c_str());
     }
 
     HANDLE DLLENTRY_DEF DTWAIN_RotateImageStringW(HANDLE hDib, LPCWSTR angle)
     {
-#ifdef _UNICODE
-        return DTWAIN_RotateImageString(hDib, angle);
-#else
-        return DTWAIN_RotateImageString(hDib, stringconversion::Convert_WidePtr_To_Native(angle).c_str());
-#endif
+        return DTWAIN_RotateImageString(hDib, dtwain_aw_detail::native_input(angle).c_str());
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetCapLabelW(LONG lCapability, LPWSTR lpszOut, LONG nSize)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetCapLabel(lCapability, lpszOut, nSize);
-#else
-        std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetCapLabel(lCapability, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetCapLabel(lCapability, nativeOut, nativeCap); });
     }
 
 
     LONG DLLENTRY_DEF DTWAIN_GetCapLabelA(LONG lCapability, LPSTR lpszOut, LONG nSize)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetCapLabel(lCapability, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#else
-        return DTWAIN_GetCapLabel(lCapability, lpszOut, nSize);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetCapLabel(lCapability, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetCapHelpW(LONG lCapability, LPWSTR lpszOut, LONG nSize)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetCapHelp(lCapability, lpszOut, nSize);
-#else
-        std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetCapHelp(lCapability, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetCapHelp(lCapability, nativeOut, nativeCap); });
     }
 
 
     LONG DLLENTRY_DEF DTWAIN_GetCapHelpA(LONG lCapability, LPSTR lpszOut, LONG nSize)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetCapHelp(lCapability, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#else
-        return DTWAIN_GetCapHelp(lCapability, lpszOut, nSize);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetCapHelp(lCapability, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfoA(DTWAIN_SOURCE Source, LPSTR lpszOut, LONG indentFactor, LONG nSize)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetAllSourceInfo(Source, lpszOut ? arg.data() : nullptr, indentFactor, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#else
-        return DTWAIN_GetAllSourceInfo(Source, lpszOut, indentFactor, nSize);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetAllSourceInfo(Source, nativeOut, indentFactor, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetAllSourceInfoW(DTWAIN_SOURCE Source, LPWSTR lpszOut, LONG indentFactor, LONG nSize)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetAllSourceInfo(Source, lpszOut, indentFactor, nSize);
-#else
-        std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetAllSourceInfo(Source, lpszOut ? arg.data() : nullptr, indentFactor, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetAllSourceInfo(Source, nativeOut, indentFactor, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetAllSessionInfoA(LPSTR lpszOut, LONG indentFactor, LONG nSize)
     {
-#ifdef _UNICODE
-        std::wstring arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetAllSessionInfo(lpszOut ? arg.data() : nullptr, indentFactor, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#else
-        return DTWAIN_GetAllSessionInfo(lpszOut, indentFactor, nSize);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetAllSessionInfo(nativeOut, indentFactor, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetAllSessionInfoW(LPWSTR lpszOut, LONG indentFactor, LONG nSize)
     {
-#ifdef _UNICODE
-        return DTWAIN_GetAllSessionInfo(lpszOut, indentFactor, nSize);
-#else
-        std::string arg((std::max)(nSize, 0L), 0);
-        LONG retVal = DTWAIN_GetAllSessionInfo(lpszOut ? arg.data() : nullptr, indentFactor, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-#endif
+        return output_with_length(lpszOut, nSize,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetAllSessionInfo(nativeOut, indentFactor, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetCurrentCustomResourceNameA(LPSTR lpszOut, LONG nMaxLen)
     {
-    #ifdef _UNICODE
-        std::wstring arg((std::max)(nMaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetCurrentCustomResourceName(lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-    #else
-        return DTWAIN_GetCurrentCustomResourceName(lpszOut, nMaxLen);
-    #endif
+        return output_with_length(lpszOut, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetCurrentCustomResourceName(nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetCurrentCustomResourceNameW(LPWSTR lpszOut, LONG nMaxLen)
     {
-    #ifdef _UNICODE
-        return DTWAIN_GetCurrentCustomResourceName(lpszOut, nMaxLen);
-    #else
-        std::string arg((std::max)(nMaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetCurrentCustomResourceName(lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-    #endif
+        return output_with_length(lpszOut, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetCurrentCustomResourceName(nativeOut, nativeCap); });
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetComponentPathA(LONG nComponent, LPCSTR szFilePath)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetComponentPath(nComponent, stringconversion::Convert_AnsiPtr_To_Native(szFilePath).c_str());
-#else
-        return DTWAIN_SetComponentPath(nComponent, szFilePath);
-#endif
+        return DTWAIN_SetComponentPath(nComponent, dtwain_aw_detail::native_input(szFilePath).c_str());
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetComponentPathW(LONG nComponent, LPCWSTR szFilePath)
     {
-#ifdef _UNICODE
-        return DTWAIN_SetComponentPath(nComponent, szFilePath);
-#else
-        return DTWAIN_SetComponentPath(nComponent, stringconversion::Convert_WidePtr_To_Native(szFilePath).c_str());
-#endif
+        return DTWAIN_SetComponentPath(nComponent, dtwain_aw_detail::native_input(szFilePath).c_str());
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetComponentPathA(LONG nComponent, LPSTR lpszOut, LONG nMaxLen)
     {
-    #ifdef _UNICODE
-        std::wstring arg((std::max)(nMaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetComponentPath(nComponent, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-    #else
-        return DTWAIN_GetComponentPath(nComponent, lpszOut, nMaxLen);
-    #endif
+        return output_with_length(lpszOut, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetComponentPath(nComponent, nativeOut, nativeCap); });
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetComponentPathW(LONG nComponent, LPWSTR lpszOut, LONG nMaxLen)
     {
-    #ifdef _UNICODE
-        return DTWAIN_GetComponentPath(nComponent, lpszOut, nMaxLen);
-    #else
-        std::string arg((std::max)(nMaxLen, 0L), 0);
-        LONG retVal = DTWAIN_GetComponentPath(nComponent, lpszOut ? arg.data() : nullptr, static_cast<LONG>(arg.size()));
-        return null_terminator_copier(get_view(arg), lpszOut, retVal);
-    #endif
+        return output_with_length(lpszOut, nMaxLen,
+            [&](TCHAR* nativeOut, LONG nativeCap) { return DTWAIN_GetComponentPath(nComponent, nativeOut, nativeCap); });
     }
 }
