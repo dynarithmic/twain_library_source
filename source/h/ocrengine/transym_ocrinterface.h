@@ -21,6 +21,8 @@
 #ifndef TRANSYM_OCRINTERFACE_H
 #define TRANSYM_OCRINTERFACE_H
 #include <unordered_map>
+#include <boost/dll/shared_library.hpp>
+
 #include "ocrinterface.h"
 #include "../ocr/transym/vc++/tocrdll.h"
 #include "../ocr/transym/vc++/TOCRuser.h"
@@ -32,54 +34,38 @@
 
 namespace dynarithmic
 {
-    typedef LONG(__stdcall* TOCRINITIALIZEFUNC)(LONG*);
-    typedef LONG(__stdcall* TOCRSHUTDOWNFUNC)(LONG);
-    typedef LONG(__stdcall* TOCRGETERRORMODEFUNC)(long JobNo, long* ErrorMode);
-    typedef LONG(__stdcall* TOCRSETERRORMODEFUNC)(long JobNo, long ErrorMode);
-    typedef LONG(__stdcall* TOCRDOJOBFUNC)(long JobNo, TOCRJOBINFO* JobInfo);
-    typedef LONG(__stdcall* TOCRWAITFORJOBFUNC)(long JobNo, long* JobStatus);
-    typedef LONG(__stdcall* TOCRWAITFORANYJOBFUNC)(long* WaitAnyStatus, long* JobNo);
-    typedef LONG(__stdcall* TOCRGETJOBDBINFOFUNC)(long* JobSlotInf);
-    typedef LONG(__stdcall* TOCRGETJOBSTATUSFUNC)(long JobNo, long* JobStatus);
-    typedef LONG(__stdcall* TOCRGETJOBSTATUSEXFUNC)(long JobNo, long* JobStatus, float* Progress, long* AutoOrientation);
-    typedef LONG(__stdcall* TOCRGETJOBSTATUSMSGFUNC)(long JobNo, char* Msg);
-    typedef LONG(__stdcall* TOCRGETNUMPAGESFUNC)(long JobNo, char* Filename, long JobType, long* NumPages);
-    typedef LONG(__stdcall* TOCRGETJOBRESULTSFUNC)(long JobNo, long* ResultsInf, TOCRRESULTS* Results);
-    typedef LONG(__stdcall* TOCRGETJOBRESULTSEXFUNC)(long JobNo, long Mode, long* ResultsInf, void* ResultsEx);
-    typedef LONG(__stdcall* TOCRGETLICENCEINFOFUNC)(long* NumberOfJobSlots, long* Volume, long* Time, long* Remaining);
-    typedef LONG(__stdcall* TOCRCONVERTTIFFTODIBFUNC)(long JobNo, char* InputFilename, char* OutputFilename, long PageNo);
-    typedef LONG(__stdcall* TOCRROTATEMONOBITMAPFUNC)(long* hBmp, long Width, long Height, long Orientation);
-    typedef LONG(__stdcall* TOCRCONVERTFORMATFUNC)(long JobNo, void* InputAddr, long InputFormat, void* OutputAddr, long OutputFormat, long PageNo);
-    typedef LONG(__stdcall* TOCRGETLICENCEINFOEXFUNC)(long JobNo, char* Licence, long* Volume, long* Time, long* Remaining, long* Features);
-
     struct TOCRSDK
     {
-        TOCRINITIALIZEFUNC         TOCRInitialise      ;
-        TOCRSHUTDOWNFUNC           TOCRShutdown        ;
-        TOCRGETERRORMODEFUNC       TOCRGetErrorMode    ;
-        TOCRSETERRORMODEFUNC       TOCRSetErrorMode    ;
-        TOCRDOJOBFUNC              TOCRDoJob           ;
-        TOCRWAITFORJOBFUNC         TOCRWaitForJob      ;
-        TOCRWAITFORANYJOBFUNC      TOCRWaitForAnyJob   ;
-        TOCRGETJOBDBINFOFUNC       TOCRGetJobDBInfo    ;
-        TOCRGETJOBSTATUSFUNC       TOCRGetJobStatus    ;
-        TOCRGETJOBSTATUSEXFUNC     TOCRGetJobStatusEx  ;
-        TOCRGETJOBSTATUSMSGFUNC    TOCRGetJobStatusMsg ;
-        TOCRGETNUMPAGESFUNC        TOCRGetNumPages     ;
-        TOCRGETJOBRESULTSFUNC      TOCRGetJobResults   ;
-        TOCRGETJOBRESULTSEXFUNC    TOCRGetJobResultsEx ;
-        TOCRGETLICENCEINFOFUNC     TOCRGetLicenceInfo  ;
-        TOCRCONVERTTIFFTODIBFUNC   TOCRConvertTIFFtoDIB;
-        TOCRROTATEMONOBITMAPFUNC   TOCRRotateMonoBitmap;
-        TOCRCONVERTFORMATFUNC      TOCRConvertFormat   ;
-        TOCRGETLICENCEINFOEXFUNC   TOCRGetLicenceInfoEx;
+        struct Functions
+        {
+            decltype(&TOCRInitialise) Initialise = nullptr;
+            decltype(&TOCRShutdown) Shutdown = nullptr;
+            decltype(&TOCRGetErrorMode) GetErrorMode = nullptr;
+            decltype(&TOCRSetErrorMode) SetErrorMode = nullptr;
+            decltype(&TOCRDoJob) DoJob = nullptr;
+            decltype(&TOCRWaitForJob) WaitForJob = nullptr;
+            decltype(&TOCRWaitForAnyJob) WaitForAnyJob = nullptr;
+            decltype(&TOCRGetJobDBInfo) GetJobDBInfo = nullptr;
+            decltype(&TOCRGetJobStatus) GetJobStatus = nullptr;
+            decltype(&TOCRGetJobStatusEx) GetJobStatusEx = nullptr;
+            decltype(&TOCRGetJobStatusMsg) GetJobStatusMsg = nullptr;
+            decltype(&TOCRGetNumPages) GetNumPages = nullptr;
+            decltype(&TOCRGetJobResults) GetJobResults = nullptr;
+            decltype(&TOCRGetJobResultsEx) GetJobResultsEx = nullptr;
+            decltype(&TOCRGetLicenceInfo) GetLicenseInfo = nullptr;
+            decltype(&TOCRConvertTIFFtoDIB) ConvertTIFFtoDIB = nullptr;
+            decltype(&TOCRRotateMonoBitmap) RotateMonoBitmap = nullptr;
+            decltype(&TOCRConvertFormat) ConvertFormat = nullptr;
+            decltype(&TOCRGetLicenceInfoEx) GetLicenseInfoEx = nullptr;
+        };
 
-        TOCRSDK();
-        ~TOCRSDK();
-        HMODULE InitTOCR();
-        bool IsInitialized() const { return m_hMod!= nullptr; }
-        HMODULE GetModuleHandle() const { return m_hMod; }
-        HMODULE m_hMod;
+        TOCRSDK() = default;
+        ~TOCRSDK(); 
+        boost::dll::shared_library InitTOCR();
+        bool IsInitialized() const { return m_hMod.is_loaded(); }
+        boost::dll::shared_library GetModuleHandle() const { return m_hMod; }
+        boost::dll::shared_library m_hMod = {};
+        Functions m_functions{};
     };
 
     using LongCapMap = BASIC_UNORDERED_MAPTYPE_<LONG,LONG>;
@@ -116,7 +102,6 @@ namespace dynarithmic
         TOCRSDK m_SDK;
         TOCRJOBINFO m_JobInfo;
         UINT m_nJobRetrieveType;
-        HMODULE m_hMod;
         LONG m_JobHandle;
         std::string m_sOCRResults;
         LONG ProcessTOCRJob();

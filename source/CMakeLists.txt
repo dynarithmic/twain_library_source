@@ -597,6 +597,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ocrengine/transym_ocrinterface.h
         ${PROJECT_SOURCE_DIR}/h/pdflib32/pdfencrypt.h
         ${PROJECT_SOURCE_DIR}/h/pdflib32/pdflib32.h
+        ${PROJECT_SOURCE_DIR}/h/sharedlibraryutils.h
         ${PROJECT_SOURCE_DIR}/h/sourceacquireopts.h
         ${PROJECT_SOURCE_DIR}/h/sourceselectopts.h
         ${PROJECT_SOURCE_DIR}/h/twain.h

@@ -2406,7 +2406,8 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
 bool CTL_TwainAppMgr::LoadDSM()
 {
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    m_lpDSMEntry = dtwain_library_loader<DSMENTRYPROC>::get_func_ptr(m_hLibModule.native(), "DSM_Entry");
+    GetSharedLibraryFunction(m_hLibModule, "DSM_Entry", m_lpDSMEntry);
+
     if ( !m_lpDSMEntry )
         DTWAIN_ERROR_CONDITION(IDS_ErrTwainDLLInvalid,false, true)
     pHandle->m_nDSMState = DSM_STATE_LOADED;

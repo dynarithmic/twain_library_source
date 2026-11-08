@@ -28,6 +28,7 @@
 #include <jxl/thread_parallel_runner.h>
 
 #include <string>
+#include <boost/dll/shared_library.hpp>
 
 namespace dynarithmic
 {
@@ -98,8 +99,8 @@ namespace dynarithmic
         }
 
     private:
-        HMODULE m_jxl = nullptr;
-        HMODULE m_threads = nullptr;
+        boost::dll::shared_library m_jxl;
+        boost::dll::shared_library m_threads;
 
         Functions m_functions{};
         bool m_loaded = false;
