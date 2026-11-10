@@ -77,31 +77,57 @@ namespace dtwain_aw_detail
 namespace
 {
     // Windows A means the active ANSI code page (CP_ACP), not UTF-8.
-    template <class OutChar>
-    std::basic_string<OutChar> convert_output(const TCHAR* native)
+    template <class OutChar, class NativeChar>
+    std::basic_string<OutChar> convert_output(const NativeChar* native)
     {
-        if constexpr (std::is_same_v<OutChar, TCHAR>)
-            return native;
-        else if constexpr (std::is_same_v<OutChar, char>)
+        if (!native)
+            return {};
+
+        if constexpr (std::is_same_v<OutChar, NativeChar>)
         {
+            return native;
+        }
+        else if constexpr (std::is_same_v<NativeChar, wchar_t> && std::is_same_v<OutChar, char>)
+        {
+            // Unicode -> ANSI
             const int count = WideCharToMultiByte(CP_ACP, 0, native, -1,
-                                                   nullptr, 0, nullptr, nullptr);
-            if (count <= 0) return {};
+                nullptr, 0, nullptr, nullptr);
+
+            if (count <= 0)
+                return {};
+
             std::string result(static_cast<size_t>(count), '\0');
+
             if (!WideCharToMultiByte(CP_ACP, 0, native, -1,
-                                     result.data(), count, nullptr, nullptr)) return {};
-            result.pop_back(); // strip terminator; caller adds it to required length
+                result.data(), count, nullptr, nullptr))
+                return {};
+
+            result.pop_back(); // Remove null terminator
+            return result;
+        }
+        else if constexpr (std::is_same_v<NativeChar, char> && std::is_same_v<OutChar, wchar_t>)
+        {
+            // ANSI -> Unicode
+            const int count = MultiByteToWideChar(CP_ACP, 0, native, -1,
+                nullptr, 0);
+
+            if (count <= 0)
+                return {};
+
+            std::wstring result(static_cast<size_t>(count), L'\0');
+
+            if (!MultiByteToWideChar(CP_ACP, 0, native, -1,
+                result.data(), count))
+                return {};
+
+            result.pop_back(); // Remove null terminator
             return result;
         }
         else
         {
-            const int count = MultiByteToWideChar(CP_ACP, 0, native, -1, nullptr, 0);
-            if (count <= 0) return {};
-            std::wstring result(static_cast<size_t>(count), L'\0');
-            if (!MultiByteToWideChar(CP_ACP, 0, native, -1,
-                                     result.data(), count)) return {};
-            result.pop_back();
-            return result;
+            static_assert(std::is_same_v<OutChar, char> ||
+                std::is_same_v<OutChar, wchar_t>,
+                "Unsupported output character type");
         }
     }
 
