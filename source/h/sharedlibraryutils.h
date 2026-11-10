@@ -40,17 +40,23 @@ namespace dynarithmic
         function = std::addressof(library.get<FuncType>(name));
         return { function != nullptr, function };
     }
+    namespace fs = std::filesystem;
 
     template <typename ErrorCodeType = std::error_code>
-    int LoadSharedLibrary(boost::dll::shared_library& libloader, const std::wstring& fNameTotal,
-                          boost::dll::load_mode::type loadingtype = boost::dll::load_mode::default_mode)
+    int LoadSharedLibrary(boost::dll::shared_library& libloader, const std::wstring& fNameTotal)
     {
+        boost::dll::load_mode::type loadingtype = boost::dll::load_mode::search_system_folders;
+        fs::path dllPath(fNameTotal);
+        if (dllPath.has_parent_path())
+        {
+            dllPath = fs::absolute(fs::path(fNameTotal));
+            loadingtype =  static_cast<boost::dll::load_mode::type>(LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+        }
+        dllPath.make_preferred();
         ErrorCodeType ec;
-        libloader.load(fNameTotal, ec, loadingtype);
+        libloader.load(dllPath.wstring(), ec, loadingtype);
         return ec.value();
     }
-
-    namespace fs = std::filesystem;
 
     class DynamicLibraryLoader
     {
@@ -127,8 +133,7 @@ namespace dynarithmic
                 return *this;
             }
 
-            bool Load(const std::vector<std::string>& dllNames, const std::wstring& directory = L"",
-                      boost::dll::load_mode::type flags = boost::dll::load_mode::search_system_folders);
+            bool Load(const std::vector<std::string>& dllNames, const std::wstring& directory = L"");
 
             template<typename FunctionPointer>
             bool GetFunction(const std::string& dllName,const std::string& functionName, FunctionPointer& output)

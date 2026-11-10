@@ -24,8 +24,7 @@
 
 namespace dynarithmic
 {
-    bool DynamicLibraryLoader::Load(const std::vector<std::string>& dllNames, const std::wstring& directory, 
-                                    boost::dll::load_mode::type flags)
+    bool DynamicLibraryLoader::Load(const std::vector<std::string>& dllNames, const std::wstring& directory)
     {
         Unload();
 
@@ -43,7 +42,7 @@ namespace dynarithmic
             else
                 path = fs::path(directory) / fs::path(name);
 
-            auto ec = LoadSharedLibrary(library, path.wstring(), flags);
+            auto ec = LoadSharedLibrary(library, path.wstring());
             if (ec)
             {
                 m_lastError = ec;
