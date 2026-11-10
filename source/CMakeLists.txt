@@ -798,6 +798,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ocrengine/transym_ocrinterface.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdfencrypt.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdflib32.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/sharedlibraryutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/stdafx.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windowsinit_impl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windows_versioninfo.cpp

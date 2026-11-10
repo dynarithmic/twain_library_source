@@ -27,7 +27,6 @@
 #include "ctliface.h"
 #include "ctlstaticdata.h"
 #include "ctlstringconversion.h"
-#include "ctlstringdefs.h"
 #include "logwriterutils.h"
 #include "dtwinverex.h"
 #include "sharedlibraryutils.h"
@@ -43,16 +42,100 @@ using namespace dynarithmic;
 
 JxlDynamicLoader::~JxlDynamicLoader()
 {
-    Unload();
+    m_loader.Unload();
 }
+
+DynamicLibraryLoader::FunctionTable JxlDynamicLoader::CreateFunctionTable(Functions& funcs)
+{
+    using Loader = DynamicLibraryLoader;
+    using F = Functions;
+
+    return
+    {
+        // jxl.dll
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderCreate",
+            funcs, &F::EncoderCreate),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderDestroy",
+            funcs, &F::EncoderDestroy),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderSetParallelRunner",
+            funcs, &F::EncoderSetParallelRunner),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderInitBasicInfo",
+            funcs, &F::EncoderInitBasicInfo),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderSetBasicInfo",
+            funcs, &F::EncoderSetBasicInfo),
+
+        Loader::RegisterFunction("jxl.dll", "JxlColorEncodingSetToSRGB",
+            funcs, &F::ColorEncodingSetToSRGB),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderSetColorEncoding",
+            funcs, &F::EncoderSetColorEncoding),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderFrameSettingsCreate",
+            funcs, &F::EncoderFrameSettingsCreate),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderSetFrameLossless",
+            funcs, &F::EncoderSetFrameLossless),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderSetFrameDistance",
+            funcs, &F::EncoderSetFrameDistance),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderFrameSettingsSetOption",
+            funcs, &F::EncoderFrameSettingsSetOption),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderAddImageFrame",
+            funcs, &F::EncoderAddImageFrame),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderCloseInput",
+            funcs, &F::EncoderCloseInput),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderProcessOutput",
+            funcs, &F::EncoderProcessOutput),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderDistanceFromQuality",
+            funcs, &F::EncoderDistanceFromQuality),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderUseBoxes",
+            funcs, &F::EncoderUseBoxes),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderAddBox",
+            funcs, &F::EncoderAddBox),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderCloseBoxes",
+            funcs, &F::EncoderCloseBoxes),
+
+        Loader::RegisterFunction("jxl.dll", "JxlEncoderVersion",
+            funcs, &F::EncoderVersion),
+
+        // jxl_threads.dll
+        Loader::RegisterFunction("jxl_threads.dll",
+            "JxlThreadParallelRunnerCreate",
+            funcs, &F::ThreadParallelRunnerCreate),
+
+        Loader::RegisterFunction("jxl_threads.dll",
+            "JxlThreadParallelRunnerDestroy",
+            funcs, &F::ThreadParallelRunnerDestroy),
+
+        Loader::RegisterFunction("jxl_threads.dll",
+            "JxlThreadParallelRunnerDefaultNumWorkerThreads",
+            funcs, &F::ThreadParallelRunnerDefaultNumWorkerThreads),
+
+        Loader::RegisterFunction("jxl_threads.dll",
+            "JxlThreadParallelRunner",
+            funcs, &F::ThreadParallelRunner)
+    };
+}
+
 
 JxlDynamicLoader& JxlDynamicLoader::operator=(JxlDynamicLoader&& other) noexcept
 {
     if (this != &other)
     {
-        Unload();
-        m_jxl = std::exchange(other.m_jxl, {});
-        m_threads = std::exchange(other.m_threads, {});
+        m_loader.Unload();
+        m_loader = std::exchange(other.m_loader, {});
         m_functions = std::exchange(other.m_functions, Functions{});
         m_loaded = std::exchange(other.m_loaded, false);
         m_lastError = std::exchange(other.m_lastError, ERROR_SUCCESS);
@@ -61,222 +144,36 @@ JxlDynamicLoader& JxlDynamicLoader::operator=(JxlDynamicLoader&& other) noexcept
     return *this;
 }
 
+
 std::pair<bool, int> JxlDynamicLoader::Load(const std::wstring& directory)
 {
-    struct LoadLibraryRAII
+    const std::vector<std::string> dllNames =
     {
-        JxlDynamicLoader* m_pThis{};
-        bool bUnload = true;
-        LoadLibraryRAII(JxlDynamicLoader* thisLoader) : m_pThis(thisLoader) {}
-        ~LoadLibraryRAII()
-        {
-            try
-            {
-                if (bUnload && m_pThis)
-                {
-                    m_pThis->Unload();
-                }
-            }
-            catch (...)
-            {}
-        }
+        "jxl.dll",
+        "jxl_threads.dll"
     };
 
-    struct FunctionResolverRAII
+    if (!m_loader.Load(dllNames, directory))
     {
-        std::string m_functionName;
-        bool bDisplayError = true;
-        FunctionResolverRAII() = default;
-        ~FunctionResolverRAII()
-        {
-            try
-            {
-                if (bDisplayError)
-                {
-                    if (CTL_StaticData::GetLogFilterFlags())
-                    {
-                        CTL_StringType sJXLNative = _T("Could not load JXL exported function ") + 
-                            stringconversion::Convert_Ansi_To_Native(m_functionName);
-                        LogWriterUtils::WriteLogInfoIndented(sJXLNative);
-                    }
-                }
-            }
-            catch (...)
-            {}
-        }
-    };
-
-    if (m_loaded)
-        return { true, 0 };
-
-    // Remove any previous partial state.
-    Unload();
-
-    m_lastError = ERROR_SUCCESS;
-    m_failedFunction.clear();
-
-    namespace fs = std::filesystem;
-
-    boost::dll::shared_library hJxl;
-    boost::dll::shared_library hThreads;
-    std::wstring jxlPath = L"jxl.dll";
-    std::wstring threadsPath = L"jxl_threads.dll";
-    LoadLibraryRAII raii(this);
-    int retCodeThreads = 0;
-    if (directory.empty())
-    {
-        // Use standard Windows DLL search behavior.
-        auto ret = LoadSharedLibrary<std::error_code>(hJxl, L"jxl.dll");
-
-        if (ret != boost::system::errc::success)
-        {
-            m_lastError = ret;
-            return { false, m_lastError };
-        }
-        LoadSharedLibrary<std::error_code>(hThreads, L"jxl_threads.dll");
-    }
-    else
-    {
-        const fs::path base(directory);
-
-        if (!base.is_absolute())
-        {
-            m_lastError = ERROR_INVALID_PARAMETER;
-            return { false, m_lastError };
-        }
-
-        const auto flags =
-        static_cast<boost::dll::load_mode::type>(
-            LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR |
-            LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
-
-        jxlPath = (base / L"jxl.dll").wstring();
-        threadsPath = (base / L"jxl_threads.dll").wstring();
-
-        auto ret = LoadSharedLibrary<std::error_code>(hJxl, jxlPath, flags);
-
-        if (ret != boost::system::errc::success)
-        {
-            m_lastError = ret;
-            return { false, m_lastError };
-        }
-
-        retCodeThreads = LoadSharedLibrary<std::error_code>(hThreads, threadsPath, flags);
-    }
-
-    m_jxl = hJxl;
-
-    if (!hThreads)
-    {
-        m_lastError = retCodeThreads;
+        m_lastError = m_loader.GetLastErrorCode();
+        m_failedFunction = m_loader.GetFailedName();
         return { false, m_lastError };
     }
 
-    m_threads = hThreads;
+    Functions funcs{};
+    const auto table = CreateFunctionTable(funcs);
 
-    if (CTL_StaticData::GetLogFilterFlags())
+    if (!m_loader.ResolveFunctions(table))
     {
-        CTL_StringTypeW sJXLMVersionInfo = basicstringutils::QuoteString<std::wstring>( jxlPath) + L" loaded successfully.  Version Information:\n";
-        CTL_StringType sJXLNative = stringconversion::Convert_Wide_To_Native(sJXLMVersionInfo);
-        try
-        {
-//            sJXLNative += GetVersionInfo(hJxl, 4, _T("\n"));
-        }
-        catch (...)
-        {
-            sJXLNative += _T("No version info available for jxl.dll\n");
-        }
-        sJXLMVersionInfo = basicstringutils::QuoteString<std::wstring>(threadsPath) + L" loaded successfully.  Version Information:\n";
-        sJXLNative += stringconversion::Convert_Wide_To_Native(sJXLMVersionInfo);
-        try
-        {
-  //          sJXLNative += GetVersionInfo(hThreads, 4, _T("\n"));
-        }
-        catch (...)
-        {
-            sJXLNative += _T("No version info available for jxl_threads.dll");
-        }
-        LogWriterUtils::WriteMultiLineInfoIndented(sJXLNative, _T("\n"));
+        m_lastError = m_loader.GetLastErrorCode();
+        m_failedFunction = m_loader.GetFailedName();
+
+        m_loader.Unload();
+        return { false, m_lastError };
     }
 
-    Functions f{};
-
-    FunctionResolverRAII funcResolver;
-
-    // Resolve each required function.
-    // Preserve the error before unloading modules.
-    #define RESOLVE_JXL(module, member, exportedName)  \
-    do {   \
-        if (!GetSharedLibraryFunction(module, exportedName, f.member).first)  \
-        {   \
-            m_lastError = ::GetLastError();  \
-            m_failedFunction = exportedName; \
-            funcResolver.m_functionName = exportedName; \
-            return { false, m_lastError };   \
-        }                                    \
-    } while (false)
-
-    RESOLVE_JXL(m_jxl, EncoderCreate, "JxlEncoderCreate");
-    RESOLVE_JXL(m_jxl, EncoderDestroy, "JxlEncoderDestroy");
-    RESOLVE_JXL(m_jxl, EncoderSetParallelRunner, "JxlEncoderSetParallelRunner");
-    RESOLVE_JXL(m_jxl, EncoderInitBasicInfo, "JxlEncoderInitBasicInfo");
-    RESOLVE_JXL(m_jxl, EncoderSetBasicInfo, "JxlEncoderSetBasicInfo");
-    RESOLVE_JXL(m_jxl, ColorEncodingSetToSRGB, "JxlColorEncodingSetToSRGB");
-    RESOLVE_JXL(m_jxl, EncoderSetColorEncoding, "JxlEncoderSetColorEncoding");
-    RESOLVE_JXL(m_jxl, EncoderFrameSettingsCreate, "JxlEncoderFrameSettingsCreate");
-    RESOLVE_JXL(m_jxl, EncoderSetFrameLossless, "JxlEncoderSetFrameLossless");
-    RESOLVE_JXL(m_jxl, EncoderSetFrameDistance, "JxlEncoderSetFrameDistance");
-    RESOLVE_JXL(m_jxl, EncoderFrameSettingsSetOption, "JxlEncoderFrameSettingsSetOption");
-    RESOLVE_JXL(m_jxl, EncoderAddImageFrame, "JxlEncoderAddImageFrame");
-    RESOLVE_JXL(m_jxl, EncoderCloseInput, "JxlEncoderCloseInput");
-    RESOLVE_JXL(m_jxl, EncoderProcessOutput, "JxlEncoderProcessOutput");
-    RESOLVE_JXL(m_jxl, EncoderDistanceFromQuality, "JxlEncoderDistanceFromQuality");
-    RESOLVE_JXL(m_jxl, EncoderUseBoxes, "JxlEncoderUseBoxes");
-    RESOLVE_JXL(m_jxl, EncoderAddBox, "JxlEncoderAddBox");
-    RESOLVE_JXL(m_jxl, EncoderCloseBoxes, "JxlEncoderCloseBoxes");
-    RESOLVE_JXL(m_jxl, EncoderVersion, "JxlEncoderVersion");
-
-    RESOLVE_JXL(m_threads, ThreadParallelRunnerCreate, "JxlThreadParallelRunnerCreate");
-    RESOLVE_JXL(m_threads, ThreadParallelRunnerDestroy, "JxlThreadParallelRunnerDestroy");
-    RESOLVE_JXL(m_threads, ThreadParallelRunnerDefaultNumWorkerThreads,
-                "JxlThreadParallelRunnerDefaultNumWorkerThreads");
-    RESOLVE_JXL(m_threads, ThreadParallelRunner, "JxlThreadParallelRunner");
-
-#undef RESOLVE_JXL
-
-    // Publish only a fully resolved table.
-    m_functions = f;
+    m_functions = funcs;
     m_loaded = true;
-    raii.bUnload = false;
-    funcResolver.bDisplayError = false;
-    return { true, 0 };
+
+    return { true, DTWAIN_NO_ERROR };
 }
-
-void JxlDynamicLoader::Unload() noexcept
-{
-    // Must not be called while encoder/runner objects
-    // are still alive or encoding is in progress.
-
-    m_loaded = false;
-    m_functions = {};
-
-    if (m_threads)
-    {
-        m_threads.unload();
-        m_threads = {};
-    }
-
-    if (m_jxl)
-    {
-        m_jxl.unload();
-        m_jxl = {};
-    }
-}
-
-void JxlDynamicLoader::Reset() noexcept
-{
-    Unload();
-    m_lastError = ERROR_SUCCESS;
-    m_failedFunction.clear();
-}
-

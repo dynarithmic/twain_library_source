@@ -51,34 +51,58 @@ namespace
     }
 
     LONG GetOCRTextSupport(OCREngine* pEngine, LONG fileType, LONG pixelType, LONG bitDepth);
-}
 
-namespace dynarithmic
-{
-    void LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
+    bool LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
     {
         pHandle->m_OCRProdNameToEngine.clear();
-
-        const OCREnginePtr pInterface = std::make_shared<TransymOCR>(pHandle);
-        if (pInterface->IsInitialized())
-            pHandle->m_OCRInterfaceArray.push_back(pInterface);
-
-        // Add other engines here.
-
-        // Call virtuals to set up the product names.
-        auto it = pHandle->m_OCRInterfaceArray.begin();
-        while (it != pHandle->m_OCRInterfaceArray.end())
+        try
         {
-            (*it)->SetOCRVersionIdentity();
-            pHandle->m_OCRProdNameToEngine.insert({(*it)->GetProductName(), *it});
-            ++it;
+            const OCREnginePtr pInterface = std::make_shared<TransymOCR>(pHandle);
+            if (pInterface->IsInitialized())
+                pHandle->m_OCRInterfaceArray.push_back(pInterface);
+
+            // Add other engines here.
+
+            // Call virtuals to set up the product names.
+            auto it = pHandle->m_OCRInterfaceArray.begin();
+            while (it != pHandle->m_OCRInterfaceArray.end())
+            {
+                (*it)->SetOCRVersionIdentity();
+                pHandle->m_OCRProdNameToEngine.insert({ (*it)->GetProductName(), *it });
+                ++it;
+            }
+        }
+        catch (const DTWAINException& ex)
+        {
+            if (CTL_StaticData::GetLogFilterFlags())
+            {
+                CTL_StringType ocrError = _T("Could not load OCR engine");
+                LogWriterUtils::WriteLogInfoIndented(ocrError);
+            }
+        }
+        catch (...)
+        {
+            if (CTL_StaticData::GetLogFilterFlags())
+            {
+                CTL_StringType ocrError = _T("Could not load OCR engine");
+                LogWriterUtils::WriteLogInfoIndented(ocrError);
+            }
         }
 
         // Set first OCR engine to be the default engine
         if (!pHandle->m_OCRInterfaceArray.empty())
+        {
             pHandle->m_pOCRDefaultEngine = *pHandle->m_OCRInterfaceArray.begin();
+            return true;
+        }
+        return false;
     }
 
+
+}
+
+namespace dynarithmic
+{
     void UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
     {
         pHandle->m_OCRInterfaceArray.clear();
@@ -660,10 +684,11 @@ extern "C"
         LOG_FUNC_ENTRY_PARAMS(())
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     
+        DTWAIN_BOOL bRet = {};
         if (pHandle->m_OCRInterfaceArray.empty())
-            LoadOCRInterfaces(pHandle);
+            bRet = LoadOCRInterfaces(pHandle);
 
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
     }
 

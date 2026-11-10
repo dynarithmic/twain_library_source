@@ -28,13 +28,14 @@
 #include "../ocr/transym/vc++/TOCRuser.h"
 #include "../ocr/transym/vc++/TOCRerrs.h"
 #include "ctliface.h"
+#include "sharedlibraryutils.h"
 #ifndef _WIN32
 #define __stdcall
 #endif
 
 namespace dynarithmic
 {
-    struct TOCRSDK
+    struct TransymDynamicLoader
     {
         struct Functions
         {
@@ -59,13 +60,47 @@ namespace dynarithmic
             decltype(&TOCRGetLicenceInfoEx) GetLicenseInfoEx = nullptr;
         };
 
-        TOCRSDK() = default;
-        ~TOCRSDK(); 
-        boost::dll::shared_library InitTOCR();
-        bool IsInitialized() const { return m_hMod.is_loaded(); }
-        boost::dll::shared_library GetModuleHandle() const { return m_hMod; }
-        boost::dll::shared_library m_hMod = {};
+        TransymDynamicLoader() = default;
+        ~TransymDynamicLoader();
+
+        TransymDynamicLoader(TransymDynamicLoader&& other) = delete;
+        TransymDynamicLoader& operator=(TransymDynamicLoader&& other) noexcept;
+
+        TransymDynamicLoader(const TransymDynamicLoader&) = delete;
+        TransymDynamicLoader& operator=(const TransymDynamicLoader&) = delete;
+
+        std::pair<bool, int> Load(const std::wstring& directory);
+        bool IsLoaded() const noexcept
+        {
+            return m_loaded;
+        }
+
+        const Functions& GetFunctions() const noexcept
+        {
+            return m_functions;
+        }
+
+        DWORD GetLastErrorCode() const noexcept
+        {
+            return m_lastError;
+        }
+
+        const std::string& GetFailedFunction() const noexcept
+        {
+            return m_failedFunction;
+        }
+
+        static DynamicLibraryLoader::FunctionTable CreateFunctionTable(Functions& funcs);
+        DynamicLibraryLoader& GetLibraryLoader() { return m_loader; }
+
+    private:
+        DynamicLibraryLoader m_loader;
+
         Functions m_functions{};
+        bool m_loaded = false;
+
+        DWORD m_lastError = ERROR_SUCCESS;
+        std::string m_failedFunction;
     };
 
     using LongCapMap = BASIC_UNORDERED_MAPTYPE_<LONG,LONG>;
@@ -99,7 +134,7 @@ namespace dynarithmic
 
     private:
         void SetAvailableCaps();
-        TOCRSDK m_SDK;
+        TransymDynamicLoader m_TransymSDK;
         TOCRJOBINFO m_JobInfo;
         UINT m_nJobRetrieveType;
         LONG m_JobHandle;

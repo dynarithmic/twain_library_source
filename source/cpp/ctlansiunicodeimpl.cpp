@@ -2444,12 +2444,12 @@ extern "C"
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetComponentPathA(LONG nComponent, LPCSTR szFilePath)
     {
-        return DTWAIN_SetComponentPath(nComponent, dtwain_aw_detail::native_input(szFilePath).c_str());
+        return DTWAIN_SetComponentPath(nComponent, szFilePath ? dtwain_aw_detail::native_input(szFilePath).c_str() : nullptr);
     }
 
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetComponentPathW(LONG nComponent, LPCWSTR szFilePath)
     {
-        return DTWAIN_SetComponentPath(nComponent, dtwain_aw_detail::native_input(szFilePath).c_str());
+        return DTWAIN_SetComponentPath(nComponent, szFilePath ? dtwain_aw_detail::native_input(szFilePath).c_str() : nullptr);
     }
 
     LONG DLLENTRY_DEF DTWAIN_GetComponentPathA(LONG nComponent, LPSTR lpszOut, LONG nMaxLen)

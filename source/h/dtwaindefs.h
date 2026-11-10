@@ -1744,6 +1744,7 @@ DTWAIN DLL are not displayed */
 /* DTWAIN add on component path constants */
 #define DTWAIN_COMPONENT_JPEGXL        1
 #define DTWAIN_COMPONENT_RESOURCES     2
+#define DTWAIN_COMPONENT_TRANSYMOCR    3
 
 #endif
 
