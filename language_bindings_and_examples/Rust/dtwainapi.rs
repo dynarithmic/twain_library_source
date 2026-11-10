@@ -4146,6 +4146,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_RESOURCE_COPYRIGHT: i32 = 9700;
     pub const DTWAIN_COMPONENT_JPEGXL: i32 = 1;
     pub const DTWAIN_COMPONENT_RESOURCES: i32 = 2;
+    pub const DTWAIN_COMPONENT_TRANSYMOCR: i32 = 3;
 
     pub fn new(library: &'a Library) -> Result<Self, Box<dyn std::error::Error>>
     {
