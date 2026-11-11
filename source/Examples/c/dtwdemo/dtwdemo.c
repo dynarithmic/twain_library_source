@@ -290,7 +290,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     /* Allow DTWAIN messages to be sent directly to our Window proc */
     DTWAIN_StartTwainSession(g_hWnd, NULL);
-    // DTWAIN_SetTwainMode(DTWAIN_MODELESS);
+
     DTWAIN_EnableMsgNotify(TRUE);
 
     /* Also allow DTWAIN messages to be sent to our callback */
@@ -408,6 +408,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                                 return 0;
                             }
                         }
+                        else
+                        /* Check if TEXT type is acquired */
+                        if ( g_FileType == DTWAIN_TEXTMULTI )
+                        {
+                            /* Initialize the OCR engine if it's available */
+                            if (!DTWAIN_InitOCRInterface() )
+                            {
+                                MessageBox(g_hWnd, _T("Text mode requires OCR engine installed"), _T("No OCR engines detected"), MB_ICONSTOP);
+                                EnableAllMenuItems(TRUE);
+                                return 0;
+                            }
+                        }
+
                         AcquireFile(g_allDTWAINFileTypes[i].resourceId < nFirstAcquireFileID, 
                                               g_allDTWAINFileTypes[i].resourceId, 
                                               g_allDTWAINFileTypes[i].dtwainType);
@@ -862,19 +875,10 @@ void AcquireFile(BOOL bUseSource, LONG resourceID, LONG fileType)
     /* Check if TEXT type is acquired */
     if ( fileType == DTWAIN_TEXTMULTI )
     {
-        /* Initialize the OCR engine if it's available */
-        if (!DTWAIN_InitOCRInterface() )
+        if ( !DTWAIN_SelectDefaultOCREngine() )
         {
-            MessageBox(g_hWnd, _T("Text mode requires OCR engine installed"), _T("No OCR engines detected"), MB_ICONSTOP);
+            MessageBox(g_hWnd, _T("OCR engine could not be selected"), _T("OCR engine error"), MB_ICONSTOP);
             return;
-        }
-        else
-        {
-            if ( !DTWAIN_SelectDefaultOCREngine() )
-            {
-                MessageBox(g_hWnd, _T("OCR engine could not be selected"), _T("OCR engine error"), MB_ICONSTOP);
-                return;
-            }
         }
     }
 

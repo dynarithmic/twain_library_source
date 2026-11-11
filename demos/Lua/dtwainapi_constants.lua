@@ -1668,4 +1668,5 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_RESOURCE_COPYRIGHT = 9700
    dtwain_constants.DTWAIN_COMPONENT_JPEGXL = 1
    dtwain_constants.DTWAIN_COMPONENT_RESOURCES = 2
+   dtwain_constants.DTWAIN_COMPONENT_TRANSYMOCR = 3
 return dtwain_constants

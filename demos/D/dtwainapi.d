@@ -1952,6 +1952,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_RESOURCE_COPYRIGHT = 9700;
     public static const int DTWAIN_COMPONENT_JPEGXL = 1;
     public static const int DTWAIN_COMPONENT_RESOURCES = 2;
+    public static const int DTWAIN_COMPONENT_TRANSYMOCR = 3;
 
     /************ Core API ************/
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CCHARPTRTYPE, LONG, LONG, DTWAIN_BOOL, DTWAIN_BOOL, LPLONG) DTWAIN_AcquireAudioFile;

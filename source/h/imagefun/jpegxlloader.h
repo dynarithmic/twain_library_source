@@ -28,7 +28,7 @@
 #include <jxl/thread_parallel_runner.h>
 
 #include <string>
-#include <boost/dll/shared_library.hpp>
+#include "sharedlibraryutils.h"
 
 namespace dynarithmic
 {
@@ -76,8 +76,6 @@ namespace dynarithmic
         JxlDynamicLoader& operator=(const JxlDynamicLoader&) = delete;
 
         std::pair<bool, int> Load(const std::wstring& directory);
-        void Unload() noexcept;
-        void Reset() noexcept;
         bool IsLoaded() const noexcept
         {
             return m_loaded;
@@ -98,9 +96,12 @@ namespace dynarithmic
             return m_failedFunction;
         }
 
+        DynamicLibraryLoader& GetLibraryLoader() { return m_loader; }
+
+        static DynamicLibraryLoader::FunctionTable CreateFunctionTable(Functions& funcs);
+
     private:
-        boost::dll::shared_library m_jxl;
-        boost::dll::shared_library m_threads;
+        DynamicLibraryLoader m_loader;
 
         Functions m_functions{};
         bool m_loaded = false;

@@ -270,18 +270,26 @@ extern "C"
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         bool bRet = IsValidComponent(nComponent);
         DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_INVALID_PARAM, -1, FUNC_MACRO);
+        LPCTSTR szPathToUse = szPath;
+        if (!szPath)
+            szPathToUse = _T("");
         switch (nComponent)
         {
             case DTWAIN_COMPONENT_JPEGXL:
             {
-                auto retValue = SetJXLComponent(pHandle, szPath);
+                auto retValue = SetJXLComponent(pHandle, szPathToUse);
                 DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return retValue != DTWAIN_NO_ERROR; }, 
                                                 retValue,FALSE, FUNC_MACRO);
             }
             break;
             case DTWAIN_COMPONENT_RESOURCES:
             {
-                DTWAIN_SetResourcePath(szPath);
+                DTWAIN_SetResourcePath(szPathToUse);
+            }
+            break;
+            case DTWAIN_COMPONENT_TRANSYMOCR:
+            {
+                CTL_StaticData::GetComponentPath(nComponent) = szPathToUse;
             }
             break;
         }

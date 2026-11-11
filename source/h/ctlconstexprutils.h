@@ -733,6 +733,7 @@ namespace dynarithmic
         {
             case DTWAIN_COMPONENT_JPEGXL:
             case DTWAIN_COMPONENT_RESOURCES:
+            case DTWAIN_COMPONENT_TRANSYMOCR:
                 return true;
         }
         return false;
