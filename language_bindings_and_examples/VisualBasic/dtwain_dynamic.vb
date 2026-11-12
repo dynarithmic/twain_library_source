@@ -2380,6 +2380,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_ClearPageDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_CloseOCRInterfaceDelegate() As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_CloseSourceDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
@@ -2690,6 +2693,12 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumNoiseFiltersExDelegate(Source As System.IntPtr) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_EnumOCREnginesDelegate(ByRef OCRInterfaces As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_EnumOCREnginesExDelegate() As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumOCRInterfacesDelegate(ByRef OCRInterfaces As System.IntPtr) As Integer
@@ -5124,6 +5133,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_ClearPage(Source)
         End Function
         
+        Public Function DTWAIN_CloseOCRInterface() As Integer
+        Return api.DTWAIN_CloseOCRInterface()
+        End Function
+        
         Public Function DTWAIN_CloseSource(Source As System.IntPtr) As Integer
         Return api.DTWAIN_CloseSource(Source)
         End Function
@@ -5538,6 +5551,14 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_EnumNoiseFiltersEx(Source As System.IntPtr) As System.IntPtr
         Return api.DTWAIN_EnumNoiseFiltersEx(Source)
+        End Function
+        
+        Public Function DTWAIN_EnumOCREngines(ByRef OCRInterfaces As System.IntPtr) As Integer
+        Return api.DTWAIN_EnumOCREngines(OCRInterfaces)
+        End Function
+        
+        Public Function DTWAIN_EnumOCREnginesEx() As System.IntPtr
+        Return api.DTWAIN_EnumOCREnginesEx()
         End Function
         
         Public Function DTWAIN_EnumOCRInterfaces(ByRef OCRInterfaces As System.IntPtr) As Integer
@@ -8183,6 +8204,7 @@ Namespace Dynarithmic
             Public DTWAIN_ClearErrorBuffer As DTWAIN_ClearErrorBufferDelegate
             Public DTWAIN_ClearPDFTextElements As DTWAIN_ClearPDFTextElementsDelegate
             Public DTWAIN_ClearPage As DTWAIN_ClearPageDelegate
+            Public DTWAIN_CloseOCRInterface As DTWAIN_CloseOCRInterfaceDelegate
             Public DTWAIN_CloseSource As DTWAIN_CloseSourceDelegate
             Public DTWAIN_CloseSourceUI As DTWAIN_CloseSourceUIDelegate
             Public DTWAIN_ConvertDIBToBitmap As DTWAIN_ConvertDIBToBitmapDelegate
@@ -8287,6 +8309,8 @@ Namespace Dynarithmic
             Public DTWAIN_EnumMaxBuffersEx As DTWAIN_EnumMaxBuffersExDelegate
             Public DTWAIN_EnumNoiseFilters As DTWAIN_EnumNoiseFiltersDelegate
             Public DTWAIN_EnumNoiseFiltersEx As DTWAIN_EnumNoiseFiltersExDelegate
+            Public DTWAIN_EnumOCREngines As DTWAIN_EnumOCREnginesDelegate
+            Public DTWAIN_EnumOCREnginesEx As DTWAIN_EnumOCREnginesExDelegate
             Public DTWAIN_EnumOCRInterfaces As DTWAIN_EnumOCRInterfacesDelegate
             Public DTWAIN_EnumOCRInterfacesEx As DTWAIN_EnumOCRInterfacesExDelegate
             Public DTWAIN_EnumOCRSupportedCaps As DTWAIN_EnumOCRSupportedCapsDelegate

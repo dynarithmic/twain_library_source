@@ -264,6 +264,7 @@ type DtwainclearbuffersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainclearerrorbufferFunc = unsafe extern "C" fn() -> i32;
 type DtwainclearpdftextelementsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainclearpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaincloseocrinterfaceFunc = unsafe extern "C" fn() -> i32;
 type DtwainclosesourceFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainclosesourceuiFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainconvertdibtobitmapFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> *mut c_void;
@@ -372,6 +373,8 @@ type DtwainenummaxbuffersFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_voi
 type DtwainenummaxbuffersexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
 type DtwainenumnoisefiltersFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumnoisefiltersexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumocrenginesFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
+type DtwainenumocrenginesexFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwainenumocrinterfacesFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
 type DtwainenumocrinterfacesexFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwainenumocrsupportedcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
@@ -1451,6 +1454,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_ClearErrorBufferFunc: Symbol<'a, DtwainclearerrorbufferFunc>,
     DTWAIN_ClearPDFTextElementsFunc: Symbol<'a, DtwainclearpdftextelementsFunc>,
     DTWAIN_ClearPageFunc: Symbol<'a, DtwainclearpageFunc>,
+    DTWAIN_CloseOCRInterfaceFunc: Symbol<'a, DtwaincloseocrinterfaceFunc>,
     DTWAIN_CloseSourceFunc: Symbol<'a, DtwainclosesourceFunc>,
     DTWAIN_CloseSourceUIFunc: Symbol<'a, DtwainclosesourceuiFunc>,
     DTWAIN_ConvertDIBToBitmapFunc: Symbol<'a, DtwainconvertdibtobitmapFunc>,
@@ -1559,6 +1563,8 @@ pub struct DTwainAPI<'a>
     DTWAIN_EnumMaxBuffersExFunc: Symbol<'a, DtwainenummaxbuffersexFunc>,
     DTWAIN_EnumNoiseFiltersFunc: Symbol<'a, DtwainenumnoisefiltersFunc>,
     DTWAIN_EnumNoiseFiltersExFunc: Symbol<'a, DtwainenumnoisefiltersexFunc>,
+    DTWAIN_EnumOCREnginesFunc: Symbol<'a, DtwainenumocrenginesFunc>,
+    DTWAIN_EnumOCREnginesExFunc: Symbol<'a, DtwainenumocrenginesexFunc>,
     DTWAIN_EnumOCRInterfacesFunc: Symbol<'a, DtwainenumocrinterfacesFunc>,
     DTWAIN_EnumOCRInterfacesExFunc: Symbol<'a, DtwainenumocrinterfacesexFunc>,
     DTWAIN_EnumOCRSupportedCapsFunc: Symbol<'a, DtwainenumocrsupportedcapsFunc>,
@@ -4329,6 +4335,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_ClearErrorBuffer: Symbol<DtwainclearerrorbufferFunc> = unsafe { library.get(b"DTWAIN_ClearErrorBuffer")? };
         let DTWAIN_ClearPDFTextElements: Symbol<DtwainclearpdftextelementsFunc> = unsafe { library.get(b"DTWAIN_ClearPDFTextElements")? };
         let DTWAIN_ClearPage: Symbol<DtwainclearpageFunc> = unsafe { library.get(b"DTWAIN_ClearPage")? };
+        let DTWAIN_CloseOCRInterface: Symbol<DtwaincloseocrinterfaceFunc> = unsafe { library.get(b"DTWAIN_CloseOCRInterface")? };
         let DTWAIN_CloseSource: Symbol<DtwainclosesourceFunc> = unsafe { library.get(b"DTWAIN_CloseSource")? };
         let DTWAIN_CloseSourceUI: Symbol<DtwainclosesourceuiFunc> = unsafe { library.get(b"DTWAIN_CloseSourceUI")? };
         let DTWAIN_ConvertDIBToBitmap: Symbol<DtwainconvertdibtobitmapFunc> = unsafe { library.get(b"DTWAIN_ConvertDIBToBitmap")? };
@@ -4437,6 +4444,8 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_EnumMaxBuffersEx: Symbol<DtwainenummaxbuffersexFunc> = unsafe { library.get(b"DTWAIN_EnumMaxBuffersEx")? };
         let DTWAIN_EnumNoiseFilters: Symbol<DtwainenumnoisefiltersFunc> = unsafe { library.get(b"DTWAIN_EnumNoiseFilters")? };
         let DTWAIN_EnumNoiseFiltersEx: Symbol<DtwainenumnoisefiltersexFunc> = unsafe { library.get(b"DTWAIN_EnumNoiseFiltersEx")? };
+        let DTWAIN_EnumOCREngines: Symbol<DtwainenumocrenginesFunc> = unsafe { library.get(b"DTWAIN_EnumOCREngines")? };
+        let DTWAIN_EnumOCREnginesEx: Symbol<DtwainenumocrenginesexFunc> = unsafe { library.get(b"DTWAIN_EnumOCREnginesEx")? };
         let DTWAIN_EnumOCRInterfaces: Symbol<DtwainenumocrinterfacesFunc> = unsafe { library.get(b"DTWAIN_EnumOCRInterfaces")? };
         let DTWAIN_EnumOCRInterfacesEx: Symbol<DtwainenumocrinterfacesexFunc> = unsafe { library.get(b"DTWAIN_EnumOCRInterfacesEx")? };
         let DTWAIN_EnumOCRSupportedCaps: Symbol<DtwainenumocrsupportedcapsFunc> = unsafe { library.get(b"DTWAIN_EnumOCRSupportedCaps")? };
@@ -5515,6 +5524,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_ClearErrorBufferFunc: DTWAIN_ClearErrorBuffer,
             DTWAIN_ClearPDFTextElementsFunc: DTWAIN_ClearPDFTextElements,
             DTWAIN_ClearPageFunc: DTWAIN_ClearPage,
+            DTWAIN_CloseOCRInterfaceFunc: DTWAIN_CloseOCRInterface,
             DTWAIN_CloseSourceFunc: DTWAIN_CloseSource,
             DTWAIN_CloseSourceUIFunc: DTWAIN_CloseSourceUI,
             DTWAIN_ConvertDIBToBitmapFunc: DTWAIN_ConvertDIBToBitmap,
@@ -5623,6 +5633,8 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_EnumMaxBuffersExFunc: DTWAIN_EnumMaxBuffersEx,
             DTWAIN_EnumNoiseFiltersFunc: DTWAIN_EnumNoiseFilters,
             DTWAIN_EnumNoiseFiltersExFunc: DTWAIN_EnumNoiseFiltersEx,
+            DTWAIN_EnumOCREnginesFunc: DTWAIN_EnumOCREngines,
+            DTWAIN_EnumOCREnginesExFunc: DTWAIN_EnumOCREnginesEx,
             DTWAIN_EnumOCRInterfacesFunc: DTWAIN_EnumOCRInterfaces,
             DTWAIN_EnumOCRInterfacesExFunc: DTWAIN_EnumOCRInterfacesEx,
             DTWAIN_EnumOCRSupportedCapsFunc: DTWAIN_EnumOCRSupportedCaps,
@@ -7241,6 +7253,10 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ClearPageFunc)(Source);  }
     }
 
+    pub fn DTWAIN_CloseOCRInterface(&self) -> i32 {
+        unsafe { return (self.DTWAIN_CloseOCRInterfaceFunc)();  }
+    }
+
     pub fn DTWAIN_CloseSource(&self, Source: *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_CloseSourceFunc)(Source);  }
     }
@@ -7671,6 +7687,14 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_EnumNoiseFiltersEx(&self, Source: *mut c_void) -> *mut c_void {
         unsafe { return (self.DTWAIN_EnumNoiseFiltersExFunc)(Source);  }
+    }
+
+    pub fn DTWAIN_EnumOCREngines(&self, OCRInterfaces: *mut *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_EnumOCREnginesFunc)(OCRInterfaces);  }
+    }
+
+    pub fn DTWAIN_EnumOCREnginesEx(&self) -> *mut c_void {
+        unsafe { return (self.DTWAIN_EnumOCREnginesExFunc)();  }
     }
 
     pub fn DTWAIN_EnumOCRInterfaces(&self, OCRInterfaces: *mut *mut c_void) -> i32 {

@@ -2134,6 +2134,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function() DTWAIN_ClearErrorBuffer;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_ClearPDFTextElements;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_ClearPage;
+    extern(Windows) DTWAIN_BOOL function() DTWAIN_CloseOCRInterface;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_CloseSource;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_CloseSourceUI;
     extern(Windows) HANDLE function(HANDLE, HANDLE) DTWAIN_ConvertDIBToBitmap;
@@ -2242,6 +2243,8 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE, DTWAIN_BOOL) DTWAIN_EnumMaxBuffersEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumNoiseFilters;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumNoiseFiltersEx;
+    extern(Windows) DTWAIN_BOOL function(LPDTWAIN_ARRAY) DTWAIN_EnumOCREngines;
+    extern(Windows) DTWAIN_ARRAY function() DTWAIN_EnumOCREnginesEx;
     extern(Windows) DTWAIN_BOOL function(LPDTWAIN_ARRAY) DTWAIN_EnumOCRInterfaces;
     extern(Windows) DTWAIN_ARRAY function() DTWAIN_EnumOCRInterfacesEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_OCRENGINE, LPDTWAIN_ARRAY) DTWAIN_EnumOCRSupportedCaps;
@@ -3314,6 +3317,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_ClearErrorBuffer, "DTWAIN_ClearErrorBuffer");
         bindFunction(cast(void**)&DTWAIN_ClearPDFTextElements, "DTWAIN_ClearPDFTextElements");
         bindFunction(cast(void**)&DTWAIN_ClearPage, "DTWAIN_ClearPage");
+        bindFunction(cast(void**)&DTWAIN_CloseOCRInterface, "DTWAIN_CloseOCRInterface");
         bindFunction(cast(void**)&DTWAIN_CloseSource, "DTWAIN_CloseSource");
         bindFunction(cast(void**)&DTWAIN_CloseSourceUI, "DTWAIN_CloseSourceUI");
         bindFunction(cast(void**)&DTWAIN_ConvertDIBToBitmap, "DTWAIN_ConvertDIBToBitmap");
@@ -3422,6 +3426,8 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_EnumMaxBuffersEx, "DTWAIN_EnumMaxBuffersEx");
         bindFunction(cast(void**)&DTWAIN_EnumNoiseFilters, "DTWAIN_EnumNoiseFilters");
         bindFunction(cast(void**)&DTWAIN_EnumNoiseFiltersEx, "DTWAIN_EnumNoiseFiltersEx");
+        bindFunction(cast(void**)&DTWAIN_EnumOCREngines, "DTWAIN_EnumOCREngines");
+        bindFunction(cast(void**)&DTWAIN_EnumOCREnginesEx, "DTWAIN_EnumOCREnginesEx");
         bindFunction(cast(void**)&DTWAIN_EnumOCRInterfaces, "DTWAIN_EnumOCRInterfaces");
         bindFunction(cast(void**)&DTWAIN_EnumOCRInterfacesEx, "DTWAIN_EnumOCRInterfacesEx");
         bindFunction(cast(void**)&DTWAIN_EnumOCRSupportedCaps, "DTWAIN_EnumOCRSupportedCaps");

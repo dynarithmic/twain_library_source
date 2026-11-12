@@ -2157,6 +2157,9 @@ typedef _ClearPDFTextElementsDart = int Function(DTWAIN_SOURCE);
 typedef _ClearPageNative = DTWAIN_BOOL Function(DTWAIN_SOURCE);
 typedef _ClearPageDart = int Function(DTWAIN_SOURCE);
 
+typedef _CloseOCRInterfaceNative = DTWAIN_BOOL Function();
+typedef _CloseOCRInterfaceDart = int Function();
+
 typedef _CloseSourceNative = DTWAIN_BOOL Function(DTWAIN_SOURCE);
 typedef _CloseSourceDart = int Function(DTWAIN_SOURCE);
 
@@ -2468,6 +2471,12 @@ typedef _EnumNoiseFiltersDart = int Function(DTWAIN_SOURCE, LPDTWAIN_ARRAY);
 
 typedef _EnumNoiseFiltersExNative = DTWAIN_ARRAY Function(DTWAIN_SOURCE);
 typedef _EnumNoiseFiltersExDart = DTWAIN_ARRAY Function(DTWAIN_SOURCE);
+
+typedef _EnumOCREnginesNative = DTWAIN_BOOL Function(LPDTWAIN_ARRAY);
+typedef _EnumOCREnginesDart = int Function(LPDTWAIN_ARRAY);
+
+typedef _EnumOCREnginesExNative = DTWAIN_ARRAY Function();
+typedef _EnumOCREnginesExDart = DTWAIN_ARRAY Function();
 
 typedef _EnumOCRInterfacesNative = DTWAIN_BOOL Function(LPDTWAIN_ARRAY);
 typedef _EnumOCRInterfacesDart = int Function(LPDTWAIN_ARRAY);
@@ -4443,6 +4452,7 @@ class DTWAIN {
   late final _ClearErrorBufferDart _clearErrorBuffer;
   late final _ClearPDFTextElementsDart _clearPDFTextElements;
   late final _ClearPageDart _clearPage;
+  late final _CloseOCRInterfaceDart _closeOCRInterface;
   late final _CloseSourceDart _closeSource;
   late final _CloseSourceUIDart _closeSourceUI;
   late final _ConvertDIBToBitmapDart _convertDIBToBitmap;
@@ -4547,6 +4557,8 @@ class DTWAIN {
   late final _EnumMaxBuffersExDart _enumMaxBuffersEx;
   late final _EnumNoiseFiltersDart _enumNoiseFilters;
   late final _EnumNoiseFiltersExDart _enumNoiseFiltersEx;
+  late final _EnumOCREnginesDart _enumOCREngines;
+  late final _EnumOCREnginesExDart _enumOCREnginesEx;
   late final _EnumOCRInterfacesDart _enumOCRInterfaces;
   late final _EnumOCRInterfacesExDart _enumOCRInterfacesEx;
   late final _EnumOCRSupportedCapsDart _enumOCRSupportedCaps;
@@ -5317,6 +5329,7 @@ class DTWAIN {
   _clearErrorBuffer = _dll.lookupFunction<_ClearErrorBufferNative, _ClearErrorBufferDart>('DTWAIN_ClearErrorBuffer');
   _clearPDFTextElements = _dll.lookupFunction<_ClearPDFTextElementsNative, _ClearPDFTextElementsDart>('DTWAIN_ClearPDFTextElements');
   _clearPage = _dll.lookupFunction<_ClearPageNative, _ClearPageDart>('DTWAIN_ClearPage');
+  _closeOCRInterface = _dll.lookupFunction<_CloseOCRInterfaceNative, _CloseOCRInterfaceDart>('DTWAIN_CloseOCRInterface');
   _closeSource = _dll.lookupFunction<_CloseSourceNative, _CloseSourceDart>('DTWAIN_CloseSource');
   _closeSourceUI = _dll.lookupFunction<_CloseSourceUINative, _CloseSourceUIDart>('DTWAIN_CloseSourceUI');
   _convertDIBToBitmap = _dll.lookupFunction<_ConvertDIBToBitmapNative, _ConvertDIBToBitmapDart>('DTWAIN_ConvertDIBToBitmap');
@@ -5421,6 +5434,8 @@ class DTWAIN {
   _enumMaxBuffersEx = _dll.lookupFunction<_EnumMaxBuffersExNative, _EnumMaxBuffersExDart>('DTWAIN_EnumMaxBuffersEx');
   _enumNoiseFilters = _dll.lookupFunction<_EnumNoiseFiltersNative, _EnumNoiseFiltersDart>('DTWAIN_EnumNoiseFilters');
   _enumNoiseFiltersEx = _dll.lookupFunction<_EnumNoiseFiltersExNative, _EnumNoiseFiltersExDart>('DTWAIN_EnumNoiseFiltersEx');
+  _enumOCREngines = _dll.lookupFunction<_EnumOCREnginesNative, _EnumOCREnginesDart>('DTWAIN_EnumOCREngines');
+  _enumOCREnginesEx = _dll.lookupFunction<_EnumOCREnginesExNative, _EnumOCREnginesExDart>('DTWAIN_EnumOCREnginesEx');
   _enumOCRInterfaces = _dll.lookupFunction<_EnumOCRInterfacesNative, _EnumOCRInterfacesDart>('DTWAIN_EnumOCRInterfaces');
   _enumOCRInterfacesEx = _dll.lookupFunction<_EnumOCRInterfacesExNative, _EnumOCRInterfacesExDart>('DTWAIN_EnumOCRInterfacesEx');
   _enumOCRSupportedCaps = _dll.lookupFunction<_EnumOCRSupportedCapsNative, _EnumOCRSupportedCapsDart>('DTWAIN_EnumOCRSupportedCaps');
@@ -6834,6 +6849,11 @@ class DTWAIN {
     return _clearPage(Source);  
   }  
   
+  int closeOCRInterface()  
+  {  
+    return _closeOCRInterface();  
+  }  
+  
   int closeSource(DTWAIN_SOURCE Source)  
   {  
     return _closeSource(Source);  
@@ -7366,6 +7386,16 @@ class DTWAIN {
   DTWAIN_ARRAY enumNoiseFiltersEx(DTWAIN_SOURCE Source)  
   {  
     return _enumNoiseFiltersEx(Source);  
+  }  
+  
+  int enumOCREngines(LPDTWAIN_ARRAY OCRInterfaces)  
+  {  
+    return _enumOCREngines(OCRInterfaces);  
+  }  
+  
+  DTWAIN_ARRAY enumOCREnginesEx()  
+  {  
+    return _enumOCREnginesEx();  
   }  
   
   int enumOCRInterfaces(LPDTWAIN_ARRAY OCRInterfaces)  

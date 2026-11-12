@@ -2263,6 +2263,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_ClearPage(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_CloseOCRInterface();
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_CloseSource(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
@@ -2576,6 +2579,12 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_ARRAY DTWAIN_EnumNoiseFiltersEx(DTWAIN_SOURCE Source);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_EnumOCREngines(ref DTWAIN_ARRAY OCRInterfaces);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern DTWAIN_ARRAY DTWAIN_EnumOCREnginesEx();
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_EnumOCRInterfaces(ref DTWAIN_ARRAY OCRInterfaces);

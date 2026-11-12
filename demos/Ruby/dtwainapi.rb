@@ -314,6 +314,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_ClearErrorBuffer
    attr_reader :DTWAIN_ClearPDFTextElements
    attr_reader :DTWAIN_ClearPage
+   attr_reader :DTWAIN_CloseOCRInterface
    attr_reader :DTWAIN_CloseSource
    attr_reader :DTWAIN_CloseSourceUI
    attr_reader :DTWAIN_ConvertDIBToBitmap
@@ -422,6 +423,8 @@ class DTWAINAPI
    attr_reader :DTWAIN_EnumMaxBuffersEx
    attr_reader :DTWAIN_EnumNoiseFilters
    attr_reader :DTWAIN_EnumNoiseFiltersEx
+   attr_reader :DTWAIN_EnumOCREngines
+   attr_reader :DTWAIN_EnumOCREnginesEx
    attr_reader :DTWAIN_EnumOCRInterfaces
    attr_reader :DTWAIN_EnumOCRInterfacesEx
    attr_reader :DTWAIN_EnumOCRSupportedCaps
@@ -3252,6 +3255,7 @@ class DTWAINAPI
        @DTWAIN_ClearErrorBuffer = Fiddle::Function::new(dtwain_dll['DTWAIN_ClearErrorBuffer'],[],Fiddle::TYPE_INT)
        @DTWAIN_ClearPDFTextElements = Fiddle::Function::new(dtwain_dll['DTWAIN_ClearPDFTextElements'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ClearPage = Fiddle::Function::new(dtwain_dll['DTWAIN_ClearPage'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_CloseOCRInterface = Fiddle::Function::new(dtwain_dll['DTWAIN_CloseOCRInterface'],[],Fiddle::TYPE_INT)
        @DTWAIN_CloseSource = Fiddle::Function::new(dtwain_dll['DTWAIN_CloseSource'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_CloseSourceUI = Fiddle::Function::new(dtwain_dll['DTWAIN_CloseSourceUI'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ConvertDIBToBitmap = Fiddle::Function::new(dtwain_dll['DTWAIN_ConvertDIBToBitmap'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
@@ -3360,6 +3364,8 @@ class DTWAINAPI
        @DTWAIN_EnumMaxBuffersEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumMaxBuffersEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumNoiseFilters = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumNoiseFilters'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumNoiseFiltersEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumNoiseFiltersEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
+       @DTWAIN_EnumOCREngines = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumOCREngines'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_EnumOCREnginesEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumOCREnginesEx'],[],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumOCRInterfaces = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumOCRInterfaces'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumOCRInterfacesEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumOCRInterfacesEx'],[],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumOCRSupportedCaps = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumOCRSupportedCaps'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)

@@ -2090,6 +2090,7 @@
         public delegate int DTWAIN_ClearErrorBufferDelegate();
         public delegate int DTWAIN_ClearPDFTextElementsDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_ClearPageDelegate(DTWAIN_SOURCE Source);
+        public delegate int DTWAIN_CloseOCRInterfaceDelegate();
         public delegate int DTWAIN_CloseSourceDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_CloseSourceUIDelegate(DTWAIN_SOURCE Source);
         public delegate HANDLE DTWAIN_ConvertDIBToBitmapDelegate(HANDLE hDib, HANDLE hPalette);
@@ -2195,6 +2196,8 @@
         public delegate DTWAIN_ARRAY DTWAIN_EnumMaxBuffersExDelegate(DTWAIN_SOURCE Source, int bExpandRange);
         public delegate int DTWAIN_EnumNoiseFiltersDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
         public delegate DTWAIN_ARRAY DTWAIN_EnumNoiseFiltersExDelegate(DTWAIN_SOURCE Source);
+        public delegate int DTWAIN_EnumOCREnginesDelegate(ref DTWAIN_ARRAY OCRInterfaces);
+        public delegate DTWAIN_ARRAY DTWAIN_EnumOCREnginesExDelegate();
         public delegate int DTWAIN_EnumOCRInterfacesDelegate(ref DTWAIN_ARRAY OCRInterfaces);
         public delegate DTWAIN_ARRAY DTWAIN_EnumOCRInterfacesExDelegate();
         public delegate int DTWAIN_EnumOCRSupportedCapsDelegate(DTWAIN_OCRENGINE Engine, ref DTWAIN_ARRAY SupportedCaps);
@@ -3332,6 +3335,9 @@
         [DTWAINNativeFunction("DTWAIN_ClearPage")]
         private readonly DTWAIN_ClearPageDelegate  _DTWAIN_ClearPage;
 
+        [DTWAINNativeFunction("DTWAIN_CloseOCRInterface")]
+        private readonly DTWAIN_CloseOCRInterfaceDelegate  _DTWAIN_CloseOCRInterface;
+
         [DTWAINNativeFunction("DTWAIN_CloseSource")]
         private readonly DTWAIN_CloseSourceDelegate  _DTWAIN_CloseSource;
 
@@ -3646,6 +3652,12 @@
 
         [DTWAINNativeFunction("DTWAIN_EnumNoiseFiltersEx")]
         private readonly DTWAIN_EnumNoiseFiltersExDelegate  _DTWAIN_EnumNoiseFiltersEx;
+
+        [DTWAINNativeFunction("DTWAIN_EnumOCREngines")]
+        private readonly DTWAIN_EnumOCREnginesDelegate  _DTWAIN_EnumOCREngines;
+
+        [DTWAINNativeFunction("DTWAIN_EnumOCREnginesEx")]
+        private readonly DTWAIN_EnumOCREnginesExDelegate  _DTWAIN_EnumOCREnginesEx;
 
         [DTWAINNativeFunction("DTWAIN_EnumOCRInterfaces")]
         private readonly DTWAIN_EnumOCRInterfacesDelegate  _DTWAIN_EnumOCRInterfaces;
@@ -6163,6 +6175,9 @@
         public  int DTWAIN_ClearPage(DTWAIN_SOURCE Source)
         { return _DTWAIN_ClearPage(Source); }
 
+        public  int DTWAIN_CloseOCRInterface()
+        { return _DTWAIN_CloseOCRInterface(); }
+
         public  int DTWAIN_CloseSource(DTWAIN_SOURCE Source)
         { return _DTWAIN_CloseSource(Source); }
 
@@ -6477,6 +6492,12 @@
 
         public  DTWAIN_ARRAY DTWAIN_EnumNoiseFiltersEx(DTWAIN_SOURCE Source)
         { return _DTWAIN_EnumNoiseFiltersEx(Source); }
+
+        public  int DTWAIN_EnumOCREngines(ref DTWAIN_ARRAY OCRInterfaces)
+        { return _DTWAIN_EnumOCREngines(ref OCRInterfaces); }
+
+        public  DTWAIN_ARRAY DTWAIN_EnumOCREnginesEx()
+        { return _DTWAIN_EnumOCREnginesEx(); }
 
         public  int DTWAIN_EnumOCRInterfaces(ref DTWAIN_ARRAY OCRInterfaces)
         { return _DTWAIN_EnumOCRInterfaces(ref OCRInterfaces); }

@@ -2066,6 +2066,7 @@ function DTWAIN_ClearBuffers(Source:DTWAIN_SOURCE; ClearBuffer:LONG) : BOOL; std
 function DTWAIN_ClearErrorBuffer : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_ClearErrorBuffer';
 function DTWAIN_ClearPDFTextElements(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_ClearPDFTextElements';
 function DTWAIN_ClearPage(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_ClearPage';
+function DTWAIN_CloseOCRInterface : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_CloseOCRInterface';
 function DTWAIN_CloseSource(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_CloseSource';
 function DTWAIN_CloseSourceUI(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_CloseSourceUI';
 function DTWAIN_ConvertDIBToBitmap(hDib:NativeInt; hPalette:NativeInt) : NativeInt; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_ConvertDIBToBitmap';
@@ -2174,6 +2175,8 @@ function DTWAIN_EnumMaxBuffers(Source:DTWAIN_SOURCE; pMaxBufs:LPDTWAIN_ARRAY; bE
 function DTWAIN_EnumMaxBuffersEx(Source:DTWAIN_SOURCE; bExpandRange:BOOL) : DTWAIN_ARRAY; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnumMaxBuffersEx';
 function DTWAIN_EnumNoiseFilters(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnumNoiseFilters';
 function DTWAIN_EnumNoiseFiltersEx(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnumNoiseFiltersEx';
+function DTWAIN_EnumOCREngines(OCRInterfaces:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnumOCREngines';
+function DTWAIN_EnumOCREnginesEx : DTWAIN_ARRAY; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnumOCREnginesEx';
 function DTWAIN_EnumOCRInterfaces(OCRInterfaces:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnumOCRInterfaces';
 function DTWAIN_EnumOCRInterfacesEx : DTWAIN_ARRAY; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnumOCRInterfacesEx';
 function DTWAIN_EnumOCRSupportedCaps(Engine:DTWAIN_OCRENGINE; SupportedCaps:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_EnumOCRSupportedCaps';

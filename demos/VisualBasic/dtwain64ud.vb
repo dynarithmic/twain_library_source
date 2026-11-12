@@ -1930,6 +1930,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_ClearErrorBuffer Lib "dtwain64ud.dll" () As Integer
     Public Declare Function DTWAIN_ClearPDFTextElements Lib "dtwain64ud.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ClearPage Lib "dtwain64ud.dll" (Source As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_CloseOCRInterface Lib "dtwain64ud.dll" () As Integer
     Public Declare Function DTWAIN_CloseSource Lib "dtwain64ud.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_CloseSourceUI Lib "dtwain64ud.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ConvertDIBToBitmap Lib "dtwain64ud.dll" (hDib As System.IntPtr, hPalette As System.IntPtr) As System.IntPtr
@@ -2034,6 +2035,8 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_EnumMaxBuffersEx Lib "dtwain64ud.dll" (Source As System.IntPtr, bExpandRange As Integer) As System.IntPtr
     Public Declare Function DTWAIN_EnumNoiseFilters Lib "dtwain64ud.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumNoiseFiltersEx Lib "dtwain64ud.dll" (Source As System.IntPtr) As System.IntPtr
+    Public Declare Function DTWAIN_EnumOCREngines Lib "dtwain64ud.dll" (ByRef OCRInterfaces As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_EnumOCREnginesEx Lib "dtwain64ud.dll" () As System.IntPtr
     Public Declare Function DTWAIN_EnumOCRInterfaces Lib "dtwain64ud.dll" (ByRef OCRInterfaces As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumOCRInterfacesEx Lib "dtwain64ud.dll" () As System.IntPtr
     Public Declare Function DTWAIN_EnumOCRSupportedCaps Lib "dtwain64ud.dll" (Engine As System.IntPtr, ByRef SupportedCaps As System.IntPtr) As Integer
