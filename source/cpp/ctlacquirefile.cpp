@@ -128,6 +128,24 @@ extern "C"
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
 
+        struct ExternalFileTypeData
+        {
+            int nFileType;
+            int returnCode;
+        };
+
+        static constexpr std::array<ExternalFileTypeData, 1> aExternalFileTypes {DTWAIN_JPEGXL, DTWAIN_ERR_JXL_NOTAVAILABLE};
+        for (auto extFileType : aExternalFileTypes)
+        {
+            if (lFileType == extFileType.nFileType)
+            {
+                bool bSupported = DTWAIN_IsFileTypeSupported(extFileType.nFileType);
+                if (!bSupported)
+                    DTWAIN_SetLastError(extFileType.returnCode);
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
+            }
+        }
+
         DTWAIN_ARRAY tempNames = nullptr;
         DTWAINArrayPtr_RAII tempRAII(pHandle, &tempNames);
         DTWAIN_ARRAY arrayToUse = aFileNames;
