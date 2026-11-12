@@ -265,7 +265,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         case IcoVistaFormat:
         case IcoFormatResized:
             ImageInfo.IsVistaIcon = nFormat == IcoVistaFormat;
-            ImageInfo.IsIcoResized = (nFormat == IcoFormatResized);
+            ImageInfo.IsIcoResized = true; // Always resize regular ICON type if width/height too large
             pHandler = std::make_unique<CTL_IcoIOHandler>( this, ImageInfo );
         break;
 

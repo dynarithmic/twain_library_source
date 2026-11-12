@@ -180,7 +180,7 @@ AllFileTypes g_allDTWAINFileTypes[] = {
         {IDM_ACQUIREFILE_DCX                    ,  DTWAIN_DCX },
         {IDM_ACQUIREFILE_ENHANCEDMETAFILE       ,  DTWAIN_EMF },
         {IDM_ACQUIREFILE_GIF                    ,  DTWAIN_GIF },
-        {IDM_ACQUIREFILE_ICO                    ,  DTWAIN_ICO_RESIZED },
+        {IDM_ACQUIREFILE_ICO                    ,  DTWAIN_ICO },
         {IDM_ACQUIREFILE_ICOVISTA               ,  DTWAIN_ICO_VISTA },
         {IDM_ACQUIREFILE_JPEG                   ,  DTWAIN_JPEG },
         {IDM_ACQUIREFILE_JPEG2000               ,  DTWAIN_JPEG2000 },
