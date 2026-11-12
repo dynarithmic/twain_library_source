@@ -1192,3 +1192,7 @@ DTWAIN_SetJpegXLQuality                           @1188
 DTWAIN_GetJpegXLQuality                           @1189
 DTWAIN_SetJpegXLThreadCount                       @1190
 DTWAIN_GetJpegXLThreadCount                       @1191
+DTWAIN_CloseOCRInterface                          @1192
+DTWAIN_EnumOCREngines                             @1193
+DTWAIN_EnumOCREnginesEx                           @1194
+
