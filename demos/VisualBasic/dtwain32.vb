@@ -966,7 +966,8 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_OCR_INVALIDPIXELTYPE As Integer = (-2105)
     Public Const DTWAIN_ERR_OCR_INVALIDBITDEPTH As Integer = (-2106)
     Public Const DTWAIN_ERR_OCR_RECOGNITIONERROR As Integer = (-2107)
-    Public Const DTWAIN_ERR_OCR_LAST As Integer = (-2108)
+    Public Const DTWAIN_ERR_OCR_SHUTDOWNFAILURE As Integer = (-2108)
+    Public Const DTWAIN_ERR_OCR_LAST As Integer = (-2109)
     Public Const DTWAIN_ERR_LAST As Integer = DTWAIN_ERR_OCR_LAST
     Public Const DTWAIN_ERR_SOURCE_COULD_NOT_OPEN As Integer = (-2500)
     Public Const DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE As Integer = (-2501)
@@ -2406,6 +2407,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_IsMsgNotifyEnabled Lib "dtwain32.dll" () As Integer
     Public Declare Function DTWAIN_IsNotifyTripletsEnabled Lib "dtwain32.dll" () As Integer
     Public Declare Function DTWAIN_IsOCREngineActivated Lib "dtwain32.dll" (OCREngine As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_IsOCRInterfaceInitialized Lib "dtwain32.dll" () As Integer
     Public Declare Function DTWAIN_IsOpenSourcesOnSelect Lib "dtwain32.dll" () As Integer
     Public Declare Function DTWAIN_IsOrientationSupported Lib "dtwain32.dll" (Source As System.IntPtr, Orientation As Integer) As Integer
     Public Declare Function DTWAIN_IsOverscanSupported Lib "dtwain32.dll" (Source As System.IntPtr, SupportValue As Integer) As Integer

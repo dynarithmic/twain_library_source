@@ -1137,7 +1137,8 @@ Namespace Dynarithmic
         Public Const DTWAIN_ERR_OCR_INVALIDPIXELTYPE As Integer = (-2105)
         Public Const DTWAIN_ERR_OCR_INVALIDBITDEPTH As Integer = (-2106)
         Public Const DTWAIN_ERR_OCR_RECOGNITIONERROR As Integer = (-2107)
-        Public Const DTWAIN_ERR_OCR_LAST As Integer = (-2108)
+        Public Const DTWAIN_ERR_OCR_SHUTDOWNFAILURE As Integer = (-2108)
+        Public Const DTWAIN_ERR_OCR_LAST As Integer = (-2109)
         Public Const DTWAIN_ERR_LAST As Integer = DTWAIN_ERR_OCR_LAST
         Public Const DTWAIN_ERR_SOURCE_COULD_NOT_OPEN As Integer = (-2500)
         Public Const DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE As Integer = (-2501)
@@ -3809,6 +3810,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_IsOCREngineActivatedDelegate(OCREngine As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_IsOCRInterfaceInitializedDelegate() As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_IsOpenSourcesOnSelectDelegate() As Integer
@@ -7041,6 +7045,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_IsOCREngineActivated(OCREngine)
         End Function
         
+        Public Function DTWAIN_IsOCRInterfaceInitialized() As Integer
+        Return api.DTWAIN_IsOCRInterfaceInitialized()
+        End Function
+        
         Public Function DTWAIN_IsOpenSourcesOnSelect() As Integer
         Return api.DTWAIN_IsOpenSourcesOnSelect()
         End Function
@@ -8681,6 +8689,7 @@ Namespace Dynarithmic
             Public DTWAIN_IsMsgNotifyEnabled As DTWAIN_IsMsgNotifyEnabledDelegate
             Public DTWAIN_IsNotifyTripletsEnabled As DTWAIN_IsNotifyTripletsEnabledDelegate
             Public DTWAIN_IsOCREngineActivated As DTWAIN_IsOCREngineActivatedDelegate
+            Public DTWAIN_IsOCRInterfaceInitialized As DTWAIN_IsOCRInterfaceInitializedDelegate
             Public DTWAIN_IsOpenSourcesOnSelect As DTWAIN_IsOpenSourcesOnSelectDelegate
             Public DTWAIN_IsOrientationSupported As DTWAIN_IsOrientationSupportedDelegate
             Public DTWAIN_IsOverscanSupported As DTWAIN_IsOverscanSupportedDelegate

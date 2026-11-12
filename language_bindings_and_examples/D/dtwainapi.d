@@ -1139,7 +1139,8 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ERR_OCR_INVALIDPIXELTYPE = (-2105);
     public static const int DTWAIN_ERR_OCR_INVALIDBITDEPTH = (-2106);
     public static const int DTWAIN_ERR_OCR_RECOGNITIONERROR = (-2107);
-    public static const int DTWAIN_ERR_OCR_LAST = (-2108);
+    public static const int DTWAIN_ERR_OCR_SHUTDOWNFAILURE = (-2108);
+    public static const int DTWAIN_ERR_OCR_LAST = (-2109);
     public static const int DTWAIN_ERR_LAST = DTWAIN_ERR_OCR_LAST;
     public static const int DTWAIN_ERR_SOURCE_COULD_NOT_OPEN = (-2500);
     public static const int DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE = (-2501);
@@ -2758,6 +2759,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function() DTWAIN_IsMsgNotifyEnabled;
     extern(Windows) DTWAIN_BOOL function() DTWAIN_IsNotifyTripletsEnabled;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_OCRENGINE) DTWAIN_IsOCREngineActivated;
+    extern(Windows) DTWAIN_BOOL function() DTWAIN_IsOCRInterfaceInitialized;
     extern(Windows) DTWAIN_BOOL function() DTWAIN_IsOpenSourcesOnSelect;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_IsOrientationSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_IsOverscanSupported;
@@ -3941,6 +3943,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_IsMsgNotifyEnabled, "DTWAIN_IsMsgNotifyEnabled");
         bindFunction(cast(void**)&DTWAIN_IsNotifyTripletsEnabled, "DTWAIN_IsNotifyTripletsEnabled");
         bindFunction(cast(void**)&DTWAIN_IsOCREngineActivated, "DTWAIN_IsOCREngineActivated");
+        bindFunction(cast(void**)&DTWAIN_IsOCRInterfaceInitialized, "DTWAIN_IsOCRInterfaceInitialized");
         bindFunction(cast(void**)&DTWAIN_IsOpenSourcesOnSelect, "DTWAIN_IsOpenSourcesOnSelect");
         bindFunction(cast(void**)&DTWAIN_IsOrientationSupported, "DTWAIN_IsOrientationSupported");
         bindFunction(cast(void**)&DTWAIN_IsOverscanSupported, "DTWAIN_IsOverscanSupported");

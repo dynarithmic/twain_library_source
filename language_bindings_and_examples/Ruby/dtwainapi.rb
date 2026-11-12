@@ -944,6 +944,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_IsMsgNotifyEnabled
    attr_reader :DTWAIN_IsNotifyTripletsEnabled
    attr_reader :DTWAIN_IsOCREngineActivated
+   attr_reader :DTWAIN_IsOCRInterfaceInitialized
    attr_reader :DTWAIN_IsOpenSourcesOnSelect
    attr_reader :DTWAIN_IsOrientationSupported
    attr_reader :DTWAIN_IsOverscanSupported
@@ -2196,7 +2197,8 @@ class DTWAINAPI
    DTWAIN_ERR_OCR_INVALIDPIXELTYPE = (-2105)
    DTWAIN_ERR_OCR_INVALIDBITDEPTH = (-2106)
    DTWAIN_ERR_OCR_RECOGNITIONERROR = (-2107)
-   DTWAIN_ERR_OCR_LAST = (-2108)
+   DTWAIN_ERR_OCR_SHUTDOWNFAILURE = (-2108)
+   DTWAIN_ERR_OCR_LAST = (-2109)
    DTWAIN_ERR_LAST = DTWAIN_ERR_OCR_LAST
    DTWAIN_ERR_SOURCE_COULD_NOT_OPEN = (-2500)
    DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE = (-2501)
@@ -3885,6 +3887,7 @@ class DTWAINAPI
        @DTWAIN_IsMsgNotifyEnabled = Fiddle::Function::new(dtwain_dll['DTWAIN_IsMsgNotifyEnabled'],[],Fiddle::TYPE_INT)
        @DTWAIN_IsNotifyTripletsEnabled = Fiddle::Function::new(dtwain_dll['DTWAIN_IsNotifyTripletsEnabled'],[],Fiddle::TYPE_INT)
        @DTWAIN_IsOCREngineActivated = Fiddle::Function::new(dtwain_dll['DTWAIN_IsOCREngineActivated'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_IsOCRInterfaceInitialized = Fiddle::Function::new(dtwain_dll['DTWAIN_IsOCRInterfaceInitialized'],[],Fiddle::TYPE_INT)
        @DTWAIN_IsOpenSourcesOnSelect = Fiddle::Function::new(dtwain_dll['DTWAIN_IsOpenSourcesOnSelect'],[],Fiddle::TYPE_INT)
        @DTWAIN_IsOrientationSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsOrientationSupported'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_IsOverscanSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsOverscanSupported'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)

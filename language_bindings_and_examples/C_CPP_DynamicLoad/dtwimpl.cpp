@@ -858,6 +858,7 @@
     D_ISMSGNOTIFYENABLEDFUNC                      DYNDTWAIN_API::DTWAIN_IsMsgNotifyEnabled = nullptr;
     D_ISNOTIFYTRIPLETSENABLEDFUNC                 DYNDTWAIN_API::DTWAIN_IsNotifyTripletsEnabled = nullptr;
     D_ISOCRENGINEACTIVATEDFUNC                    DYNDTWAIN_API::DTWAIN_IsOCREngineActivated = nullptr;
+    D_ISOCRINTERFACEINITIALIZEDFUNC               DYNDTWAIN_API::DTWAIN_IsOCRInterfaceInitialized = nullptr;
     D_ISOPENSOURCESONSELECTFUNC                   DYNDTWAIN_API::DTWAIN_IsOpenSourcesOnSelect = nullptr;
     D_ISORIENTATIONSUPPORTEDFUNC                  DYNDTWAIN_API::DTWAIN_IsOrientationSupported = nullptr;
     D_ISOVERSCANSUPPORTEDFUNC                     DYNDTWAIN_API::DTWAIN_IsOverscanSupported = nullptr;
@@ -2133,6 +2134,7 @@ int DYNDTWAIN_API::InitDTWAINInterface(DYNDTWAIN_API*, HMODULE hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsMsgNotifyEnabled, hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsNotifyTripletsEnabled, hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsOCREngineActivated, hModule)
+          LOADFUNCTIONIMPL(DTWAIN_IsOCRInterfaceInitialized, hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsOpenSourcesOnSelect, hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsOrientationSupported, hModule)
           LOADFUNCTIONIMPL(DTWAIN_IsOverscanSupported, hModule)

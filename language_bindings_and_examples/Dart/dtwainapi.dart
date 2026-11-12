@@ -896,7 +896,8 @@ const int DTWAIN_ERR_OCR_INVALIDFILETYPE = (-2104);
 const int DTWAIN_ERR_OCR_INVALIDPIXELTYPE = (-2105);
 const int DTWAIN_ERR_OCR_INVALIDBITDEPTH = (-2106);
 const int DTWAIN_ERR_OCR_RECOGNITIONERROR = (-2107);
-const int DTWAIN_ERR_OCR_LAST = (-2108);
+const int DTWAIN_ERR_OCR_SHUTDOWNFAILURE = (-2108);
+const int DTWAIN_ERR_OCR_LAST = (-2109);
 const int DTWAIN_ERR_LAST = DTWAIN_ERR_OCR_LAST;
 const int DTWAIN_ERR_SOURCE_COULD_NOT_OPEN = (-2500);
 const int DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE = (-2501);
@@ -3570,6 +3571,9 @@ typedef _IsNotifyTripletsEnabledDart = int Function();
 typedef _IsOCREngineActivatedNative = DTWAIN_BOOL Function(DTWAIN_OCRENGINE);
 typedef _IsOCREngineActivatedDart = int Function(DTWAIN_OCRENGINE);
 
+typedef _IsOCRInterfaceInitializedNative = DTWAIN_BOOL Function();
+typedef _IsOCRInterfaceInitializedDart = int Function();
+
 typedef _IsOpenSourcesOnSelectNative = DTWAIN_BOOL Function();
 typedef _IsOpenSourcesOnSelectDart = int Function();
 
@@ -4923,6 +4927,7 @@ class DTWAIN {
   late final _IsMsgNotifyEnabledDart _isMsgNotifyEnabled;
   late final _IsNotifyTripletsEnabledDart _isNotifyTripletsEnabled;
   late final _IsOCREngineActivatedDart _isOCREngineActivated;
+  late final _IsOCRInterfaceInitializedDart _isOCRInterfaceInitialized;
   late final _IsOpenSourcesOnSelectDart _isOpenSourcesOnSelect;
   late final _IsOrientationSupportedDart _isOrientationSupported;
   late final _IsOverscanSupportedDart _isOverscanSupported;
@@ -5800,6 +5805,7 @@ class DTWAIN {
   _isMsgNotifyEnabled = _dll.lookupFunction<_IsMsgNotifyEnabledNative, _IsMsgNotifyEnabledDart>('DTWAIN_IsMsgNotifyEnabled');
   _isNotifyTripletsEnabled = _dll.lookupFunction<_IsNotifyTripletsEnabledNative, _IsNotifyTripletsEnabledDart>('DTWAIN_IsNotifyTripletsEnabled');
   _isOCREngineActivated = _dll.lookupFunction<_IsOCREngineActivatedNative, _IsOCREngineActivatedDart>('DTWAIN_IsOCREngineActivated');
+  _isOCRInterfaceInitialized = _dll.lookupFunction<_IsOCRInterfaceInitializedNative, _IsOCRInterfaceInitializedDart>('DTWAIN_IsOCRInterfaceInitialized');
   _isOpenSourcesOnSelect = _dll.lookupFunction<_IsOpenSourcesOnSelectNative, _IsOpenSourcesOnSelectDart>('DTWAIN_IsOpenSourcesOnSelect');
   _isOrientationSupported = _dll.lookupFunction<_IsOrientationSupportedNative, _IsOrientationSupportedDart>('DTWAIN_IsOrientationSupported');
   _isOverscanSupported = _dll.lookupFunction<_IsOverscanSupportedNative, _IsOverscanSupportedDart>('DTWAIN_IsOverscanSupported');
@@ -9310,6 +9316,11 @@ class DTWAIN {
   int isOCREngineActivated(DTWAIN_OCRENGINE OCREngine)  
   {  
     return _isOCREngineActivated(OCREngine);  
+  }  
+  
+  int isOCRInterfaceInitialized()  
+  {  
+    return _isOCRInterfaceInitialized();  
   }  
   
   int isOpenSourcesOnSelect()  

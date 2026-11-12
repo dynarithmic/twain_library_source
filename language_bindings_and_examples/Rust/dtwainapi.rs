@@ -894,6 +894,7 @@ type DtwainismemfilexfersupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32
 type DtwainismsgnotifyenabledFunc = unsafe extern "C" fn() -> i32;
 type DtwainisnotifytripletsenabledFunc = unsafe extern "C" fn() -> i32;
 type DtwainisocrengineactivatedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisocrinterfaceinitializedFunc = unsafe extern "C" fn() -> i32;
 type DtwainisopensourcesonselectFunc = unsafe extern "C" fn() -> i32;
 type DtwainisorientationsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainisoverscansupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
@@ -2084,6 +2085,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_IsMsgNotifyEnabledFunc: Symbol<'a, DtwainismsgnotifyenabledFunc>,
     DTWAIN_IsNotifyTripletsEnabledFunc: Symbol<'a, DtwainisnotifytripletsenabledFunc>,
     DTWAIN_IsOCREngineActivatedFunc: Symbol<'a, DtwainisocrengineactivatedFunc>,
+    DTWAIN_IsOCRInterfaceInitializedFunc: Symbol<'a, DtwainisocrinterfaceinitializedFunc>,
     DTWAIN_IsOpenSourcesOnSelectFunc: Symbol<'a, DtwainisopensourcesonselectFunc>,
     DTWAIN_IsOrientationSupportedFunc: Symbol<'a, DtwainisorientationsupportedFunc>,
     DTWAIN_IsOverscanSupportedFunc: Symbol<'a, DtwainisoverscansupportedFunc>,
@@ -3339,7 +3341,8 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_ERR_OCR_INVALIDPIXELTYPE: i32 = -2105;
     pub const DTWAIN_ERR_OCR_INVALIDBITDEPTH: i32 = -2106;
     pub const DTWAIN_ERR_OCR_RECOGNITIONERROR: i32 = -2107;
-    pub const DTWAIN_ERR_OCR_LAST: i32 = -2108;
+    pub const DTWAIN_ERR_OCR_SHUTDOWNFAILURE: i32 = -2108;
+    pub const DTWAIN_ERR_OCR_LAST: i32 = -2109;
     pub const DTWAIN_ERR_LAST: i32 = DTwainAPI::DTWAIN_ERR_OCR_LAST;
     pub const DTWAIN_ERR_SOURCE_COULD_NOT_OPEN: i32 = -2500;
     pub const DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE: i32 = -2501;
@@ -4965,6 +4968,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_IsMsgNotifyEnabled: Symbol<DtwainismsgnotifyenabledFunc> = unsafe { library.get(b"DTWAIN_IsMsgNotifyEnabled")? };
         let DTWAIN_IsNotifyTripletsEnabled: Symbol<DtwainisnotifytripletsenabledFunc> = unsafe { library.get(b"DTWAIN_IsNotifyTripletsEnabled")? };
         let DTWAIN_IsOCREngineActivated: Symbol<DtwainisocrengineactivatedFunc> = unsafe { library.get(b"DTWAIN_IsOCREngineActivated")? };
+        let DTWAIN_IsOCRInterfaceInitialized: Symbol<DtwainisocrinterfaceinitializedFunc> = unsafe { library.get(b"DTWAIN_IsOCRInterfaceInitialized")? };
         let DTWAIN_IsOpenSourcesOnSelect: Symbol<DtwainisopensourcesonselectFunc> = unsafe { library.get(b"DTWAIN_IsOpenSourcesOnSelect")? };
         let DTWAIN_IsOrientationSupported: Symbol<DtwainisorientationsupportedFunc> = unsafe { library.get(b"DTWAIN_IsOrientationSupported")? };
         let DTWAIN_IsOverscanSupported: Symbol<DtwainisoverscansupportedFunc> = unsafe { library.get(b"DTWAIN_IsOverscanSupported")? };
@@ -6154,6 +6158,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_IsMsgNotifyEnabledFunc: DTWAIN_IsMsgNotifyEnabled,
             DTWAIN_IsNotifyTripletsEnabledFunc: DTWAIN_IsNotifyTripletsEnabled,
             DTWAIN_IsOCREngineActivatedFunc: DTWAIN_IsOCREngineActivated,
+            DTWAIN_IsOCRInterfaceInitializedFunc: DTWAIN_IsOCRInterfaceInitialized,
             DTWAIN_IsOpenSourcesOnSelectFunc: DTWAIN_IsOpenSourcesOnSelect,
             DTWAIN_IsOrientationSupportedFunc: DTWAIN_IsOrientationSupported,
             DTWAIN_IsOverscanSupportedFunc: DTWAIN_IsOverscanSupported,
@@ -9771,6 +9776,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_IsOCREngineActivated(&self, OCREngine: *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_IsOCREngineActivatedFunc)(OCREngine);  }
+    }
+
+    pub fn DTWAIN_IsOCRInterfaceInitialized(&self) -> i32 {
+        unsafe { return (self.DTWAIN_IsOCRInterfaceInitializedFunc)();  }
     }
 
     pub fn DTWAIN_IsOpenSourcesOnSelect(&self) -> i32 {

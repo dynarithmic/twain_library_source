@@ -883,6 +883,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsMsgNotifyEnabled();
         DTWAIN_BOOL DTWAIN_IsNotifyTripletsEnabled();
         DTWAIN_BOOL DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE OCREngine);
+        DTWAIN_BOOL DTWAIN_IsOCRInterfaceInitialized();
         DTWAIN_BOOL DTWAIN_IsOpenSourcesOnSelect();
         DTWAIN_BOOL DTWAIN_IsOrientationSupported(DTWAIN_SOURCE Source, LONG Orientation);
         DTWAIN_BOOL DTWAIN_IsOverscanSupported(DTWAIN_SOURCE Source, LONG SupportValue);
@@ -2128,6 +2129,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsMsgNotifyEnabled();
         DTWAIN_BOOL DTWAIN_IsNotifyTripletsEnabled();
         DTWAIN_BOOL DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE OCREngine);
+        DTWAIN_BOOL DTWAIN_IsOCRInterfaceInitialized();
         DTWAIN_BOOL DTWAIN_IsOpenSourcesOnSelect();
         DTWAIN_BOOL DTWAIN_IsOrientationSupported(DTWAIN_SOURCE Source, LONG Orientation);
         DTWAIN_BOOL DTWAIN_IsOverscanSupported(DTWAIN_SOURCE Source, LONG SupportValue);
@@ -3373,6 +3375,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsMsgNotifyEnabled();
         DTWAIN_BOOL DTWAIN_IsNotifyTripletsEnabled();
         DTWAIN_BOOL DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE OCREngine);
+        DTWAIN_BOOL DTWAIN_IsOCRInterfaceInitialized();
         DTWAIN_BOOL DTWAIN_IsOpenSourcesOnSelect();
         DTWAIN_BOOL DTWAIN_IsOrientationSupported(DTWAIN_SOURCE Source, LONG Orientation);
         DTWAIN_BOOL DTWAIN_IsOverscanSupported(DTWAIN_SOURCE Source, LONG SupportValue);
@@ -4618,6 +4621,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsMsgNotifyEnabled();
         DTWAIN_BOOL DTWAIN_IsNotifyTripletsEnabled();
         DTWAIN_BOOL DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE OCREngine);
+        DTWAIN_BOOL DTWAIN_IsOCRInterfaceInitialized();
         DTWAIN_BOOL DTWAIN_IsOpenSourcesOnSelect();
         DTWAIN_BOOL DTWAIN_IsOrientationSupported(DTWAIN_SOURCE Source, LONG Orientation);
         DTWAIN_BOOL DTWAIN_IsOverscanSupported(DTWAIN_SOURCE Source, LONG SupportValue);

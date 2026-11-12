@@ -1022,7 +1022,8 @@ module TwainAPI =
     let public DTWAIN_ERR_OCR_INVALIDPIXELTYPE = (-2105)
     let public DTWAIN_ERR_OCR_INVALIDBITDEPTH = (-2106)
     let public DTWAIN_ERR_OCR_RECOGNITIONERROR = (-2107)
-    let public DTWAIN_ERR_OCR_LAST = (-2108)
+    let public DTWAIN_ERR_OCR_SHUTDOWNFAILURE = (-2108)
+    let public DTWAIN_ERR_OCR_LAST = (-2109)
     let public DTWAIN_ERR_LAST = DTWAIN_ERR_OCR_LAST
     let public DTWAIN_ERR_SOURCE_COULD_NOT_OPEN = (-2500)
     let public DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE = (-2501)
@@ -3754,6 +3755,9 @@ module TwainAPI =
     type DTWAIN_IsOCREngineActivatedDelegate = delegate of DTWAIN_OCRENGINE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_IsOCRInterfaceInitializedDelegate = delegate of unit -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_IsOpenSourcesOnSelectDelegate = delegate of unit -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -5120,6 +5124,7 @@ module TwainAPI =
     let private IsMsgNotifyEnabled = lazy (DynamicDll.Bind "DTWAIN_IsMsgNotifyEnabled" : DTWAIN_IsMsgNotifyEnabledDelegate)
     let private IsNotifyTripletsEnabled = lazy (DynamicDll.Bind "DTWAIN_IsNotifyTripletsEnabled" : DTWAIN_IsNotifyTripletsEnabledDelegate)
     let private IsOCREngineActivated = lazy (DynamicDll.Bind "DTWAIN_IsOCREngineActivated" : DTWAIN_IsOCREngineActivatedDelegate)
+    let private IsOCRInterfaceInitialized = lazy (DynamicDll.Bind "DTWAIN_IsOCRInterfaceInitialized" : DTWAIN_IsOCRInterfaceInitializedDelegate)
     let private IsOpenSourcesOnSelect = lazy (DynamicDll.Bind "DTWAIN_IsOpenSourcesOnSelect" : DTWAIN_IsOpenSourcesOnSelectDelegate)
     let private IsOrientationSupported = lazy (DynamicDll.Bind "DTWAIN_IsOrientationSupported" : DTWAIN_IsOrientationSupportedDelegate)
     let private IsOverscanSupported = lazy (DynamicDll.Bind "DTWAIN_IsOverscanSupported" : DTWAIN_IsOverscanSupportedDelegate)
@@ -7861,6 +7866,10 @@ module TwainAPI =
     let DTWAIN_IsOCREngineActivated (ocrengine: DTWAIN_OCRENGINE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         IsOCREngineActivated.Value.Invoke(ocrengine)
+
+    let DTWAIN_IsOCRInterfaceInitialized() : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        IsOCRInterfaceInitialized.Value.Invoke()
 
     let DTWAIN_IsOpenSourcesOnSelect() : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

@@ -1020,7 +1020,8 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_OCR_INVALIDPIXELTYPE = (-2105);
         public const int DTWAIN_ERR_OCR_INVALIDBITDEPTH = (-2106);
         public const int DTWAIN_ERR_OCR_RECOGNITIONERROR = (-2107);
-        public const int DTWAIN_ERR_OCR_LAST = (-2108);
+        public const int DTWAIN_ERR_OCR_SHUTDOWNFAILURE = (-2108);
+        public const int DTWAIN_ERR_OCR_LAST = (-2109);
         public const int DTWAIN_ERR_LAST = DTWAIN_ERR_OCR_LAST;
         public const int DTWAIN_ERR_SOURCE_COULD_NOT_OPEN = (-2500);
         public const int DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE = (-2501);
@@ -3894,6 +3895,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE OCREngine);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
+        public static extern int DTWAIN_IsOCRInterfaceInitialized();
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_IsOpenSourcesOnSelect();
