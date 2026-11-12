@@ -1195,3 +1195,5 @@ DTWAIN_GetJpegXLThreadCount                       @1191
 DTWAIN_CloseOCRInterface                          @1192
 DTWAIN_EnumOCREngines                             @1193
 DTWAIN_EnumOCREnginesEx                           @1194
+DTWAIN_IsOCRInterfaceInitialized                  @1195
+

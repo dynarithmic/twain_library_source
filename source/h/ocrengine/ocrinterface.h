@@ -320,8 +320,15 @@ namespace dynarithmic
         CTL_TwainDLLHandle* m_pHandle;
     };
 
-    std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandles(DTWAIN_OCRENGINE Engine = nullptr);
-    std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine);
+    struct OCRVerificationStatus
+    {
+        CTL_TwainDLLHandle* m_pHandle = {};
+        OCREngine * m_pOCREngine = {};
+        int m_ErrorCode = 0;
+    };
+
+    OCRVerificationStatus VerifyOCRHandles(DTWAIN_OCRENGINE Engine = nullptr);
+    OCRVerificationStatus VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine);
 
     using OCRINFOFUNC = std::string(OCREngine::*)() const;
     LONG GetOCRInfo(OCREngine* pEngine, OCRINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen);

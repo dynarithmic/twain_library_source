@@ -92,7 +92,10 @@ extern "C"
     DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectDefaultOCREngine()
     {
         LOG_FUNC_ENTRY_PARAMS(())
-        auto [pHandle, pDummy] = VerifyOCRHandles();
+        auto [pHandle, pDummy, errorCode] = VerifyOCRHandles();
+        int errCode = errorCode;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return errCode != DTWAIN_NO_ERROR; }, errCode, FALSE, FUNC_MACRO);
+
         auto pH = pHandle;
 
         const auto SelectedEngine = reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine);
@@ -107,7 +110,9 @@ extern "C"
     DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByName(LPCTSTR lpszName)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
-        auto [pHandle, pEngine] = VerifyOCRHandles();
+        auto [pHandle, pEngine, errorCode] = VerifyOCRHandles();
+        int errCode = errorCode;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return errCode != DTWAIN_NO_ERROR; }, errCode, FALSE, FUNC_MACRO);
 
         const std::string sName = stringconversion::Convert_NativePtr_To_Ansi(lpszName);
 
@@ -134,7 +139,10 @@ extern "C"
     DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
     {
         LOG_FUNC_ENTRY_PARAMS(())
-        auto [pHandle, pEngine] = VerifyOCRHandles();
+        auto [pHandle, pEngine, errorCode] = VerifyOCRHandles();
+        int errCode = errorCode;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return errCode != DTWAIN_NO_ERROR; }, errCode, FALSE, FUNC_MACRO);
+
         SourceSelectionOptions opts(SELECTSOURCE, IDS_SELECT_OCRENGINE_TEXT,
                                     nullptr,
                                     nullptr,
@@ -152,7 +160,10 @@ extern "C"
                                                           LONG nOptions)
     {
         LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, nOptions))
-        auto [pHandle, pEngine] = VerifyOCRHandles();
+        auto [pHandle, pEngine, errorCode] = VerifyOCRHandles();
+        int errCode = errorCode;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return errCode != DTWAIN_NO_ERROR; }, errCode, FALSE, FUNC_MACRO);
+
         SourceSelectionOptions opts(SELECTSOURCE, IDS_SELECT_OCRENGINE_TEXT,
                                     nullptr,
                                     hWndParent,
@@ -173,7 +184,10 @@ extern "C"
                                                             LONG nOptions)
     {
         LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, nOptions))
-        auto [pHandle, pEngine] = VerifyOCRHandles();
+        auto [pHandle, pEngine, errorCode] = VerifyOCRHandles();
+        int errCode = errorCode;
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] { return errCode != DTWAIN_NO_ERROR; }, errCode, FALSE, FUNC_MACRO);
+
         SourceSelectionOptions opts(SELECTSOURCE, IDS_SELECT_OCRENGINE_TEXT,
                                     nullptr,
                                     hWndParent,
