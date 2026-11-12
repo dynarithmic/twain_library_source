@@ -23,15 +23,15 @@ using System.Collections.Generic;
 
 namespace TWAINDemo
 {
-	/// <summary>
-	/// Summary description for Form1.
-	/// </summary>
-	public class DTwainDemo : System.Windows.Forms.Form
-	{
-		private System.Windows.Forms.MenuItem SelectSource;
+    /// <summary>
+    /// Summary description for Form1.
+    /// </summary>
+    public class DTwainDemo : System.Windows.Forms.Form
+    {
+        private System.Windows.Forms.MenuItem SelectSource;
         private System.Windows.Forms.MenuItem SelectSourceByNameBox;
         private IContainer components;
-		private System.Windows.Forms.MainMenu mainMenu;
+        private System.Windows.Forms.MainMenu mainMenu;
         private System.Windows.Forms.MenuItem menuItem;
         private MenuItem SelectDefaultSource;
         private MenuItem SelectSourceCustom;
@@ -42,7 +42,7 @@ namespace TWAINDemo
         private MenuItem menuItem7;
         private MenuItem ExitDemo;
 
-		private DTWAIN_SOURCE SelectedSource = IntPtr.Zero;
+        private DTWAIN_SOURCE SelectedSource = IntPtr.Zero;
         private MenuItem menuItem1;
         private MenuItem AcquireNative;
         private MenuItem AcquireBuffered;
@@ -197,12 +197,12 @@ namespace TWAINDemo
         }
 
         public DTwainDemo()
-		{
+        {
             initialized = false;
             InitializeComponent();
             InitializeFileDriverMap();
             sOrigTitle = this.Text;
-			DTWAIN_HANDLE handle = TwainAPI.DTWAIN_SysInitialize();
+            DTWAIN_HANDLE handle = TwainAPI.DTWAIN_SysInitialize();
             if (handle == IntPtr.Zero)
             {
                 initialized = false;
@@ -228,29 +228,29 @@ namespace TWAINDemo
         }
 
         public Boolean InitializedOk() { return initialized; }
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			TwainAPI.DTWAIN_SysDestroy();
-			if( disposing )
-			{
-				if (components != null) 
-				{
-					components.Dispose();
-				}
-			}
-			base.Dispose( disposing );
-		}
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        protected override void Dispose( bool disposing )
+        {
+            TwainAPI.DTWAIN_SysDestroy();
+            if( disposing )
+            {
+                if (components != null) 
+                {
+                    components.Dispose();
+                }
+            }
+            base.Dispose( disposing );
+        }
 
-		#region Windows Form Designer generated code
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
+        #region Windows Form Designer generated code
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
             this.components = new System.ComponentModel.Container();
             this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
             this.menuItem = new System.Windows.Forms.MenuItem();
@@ -1116,26 +1116,26 @@ namespace TWAINDemo
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 
-		}
-		#endregion
+        }
+        #endregion
 
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
-		[STAThread]
-		static void Main() 
-		{
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main() 
+        {
             DTwainDemo theDemo = new DTwainDemo();
             if (theDemo.InitializedOk())
                 Application.Run(theDemo);
-		}
+        }
 
-		
-		private void SelectSource_Click(object sender, System.EventArgs e)
-		{
+        
+        private void SelectSource_Click(object sender, System.EventArgs e)
+        {
             SelectTheSource(0);
             Focus();
-		}
+        }
 
         private void SelectSourceByName_Click(object sender, System.EventArgs e)
         {
