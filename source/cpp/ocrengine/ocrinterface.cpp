@@ -57,9 +57,11 @@ namespace
         pHandle->m_OCRProdNameToEngine.clear();
         try
         {
-            const OCREnginePtr pInterface = std::make_shared<TransymOCR>(pHandle);
+            OCREnginePtr pInterface = std::make_unique<TransymOCR>(pHandle);
+            auto actualPointer = pInterface.get();
+
             if (pInterface->IsInitialized())
-                pHandle->m_OCRInterfaceArray.push_back(pInterface);
+                pHandle->m_OCRInterfaceArray.push_back(std::move(pInterface));
 
             // Add other engines here.
 
@@ -68,7 +70,7 @@ namespace
             while (it != pHandle->m_OCRInterfaceArray.end())
             {
                 (*it)->SetOCRVersionIdentity();
-                pHandle->m_OCRProdNameToEngine.insert({ (*it)->GetProductName(), *it });
+                pHandle->m_OCRProdNameToEngine.insert({ (*it)->GetProductName(), actualPointer });
                 ++it;
             }
         }
@@ -92,7 +94,7 @@ namespace
         // Set first OCR engine to be the default engine
         if (!pHandle->m_OCRInterfaceArray.empty())
         {
-            pHandle->m_pOCRDefaultEngine = *pHandle->m_OCRInterfaceArray.begin();
+            pHandle->m_pOCRDefaultEngine = (pHandle->m_OCRInterfaceArray.begin())->get();
             return true;
         }
         return false;
@@ -105,12 +107,19 @@ namespace dynarithmic
 {
     void UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
     {
+        pHandle->m_OCRProdNameToEngine.clear();
         pHandle->m_OCRInterfaceArray.clear();
+        pHandle->m_pOCRDefaultEngine = nullptr;
     }
 
     std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandles(DTWAIN_OCRENGINE Engine /*=nullptr*/)
     {
         auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        if (pHandle->m_OCRInterfaceArray.empty())
+        {
+            pHandle->m_lLastError = DTWAIN_ERR_OCR_NOTACTIVE;
+            throw DTWAINException(DTWAIN_ERR_OCR_NOTACTIVE);
+        }
         if (!Engine)
             return { pHandle, nullptr };
 
@@ -119,13 +128,17 @@ namespace dynarithmic
         // check if Engine exists
         if (OCREngineExists(pHandle, pEngine))
             return { pHandle, pEngine };
-        pHandle->m_lLastError = DTWAIN_ERR_OCR_INVALIDENGINE;
-        throw DTWAINException(DTWAIN_ERR_OCR_INVALIDENGINE);
+        return { pHandle, nullptr };
     }
 
     std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine)
     {
         auto [pHandle, pEngine] = VerifyOCRHandles(Engine);
+        if (pHandle->m_OCRInterfaceArray.empty())
+        {
+            pHandle->m_lLastError = DTWAIN_ERR_OCR_NOTACTIVE;
+            throw DTWAINException(DTWAIN_ERR_OCR_NOTACTIVE);
+        }
         if (Engine)
             return { pHandle, pEngine };
         pHandle->m_lLastError = DTWAIN_ERR_OCR_INVALIDENGINE;
@@ -675,10 +688,7 @@ extern "C"
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
-}
 
-extern "C"
-{
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
     {
         LOG_FUNC_ENTRY_PARAMS(())
@@ -687,9 +697,35 @@ extern "C"
         DTWAIN_BOOL bRet = {};
         if (pHandle->m_OCRInterfaceArray.empty())
             bRet = LoadOCRInterfaces(pHandle);
-
+        else
+            bRet = TRUE;
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
         CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseOCRInterface()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+        UnloadOCRInterfaces(pHandle);
+        LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+        CATCH_BLOCK(false)
+    }
+
+    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCREngines(LPDTWAIN_ARRAY OCRArray)
+    {
+        LOG_FUNC_ENTRY_PARAMS((OCRArray))
+        DTWAIN_BOOL bRet = DTWAIN_EnumOCRInterfaces(OCRArray);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+        CATCH_BLOCK(FALSE)
+    }
+
+    DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumOCREnginesEx()
+    {
+        LOG_FUNC_ENTRY_PARAMS(())
+        DTWAIN_ARRAY arr = DTWAIN_EnumOCRInterfacesEx();
+        LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+        CATCH_BLOCK(nullptr)
     }
 
     DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumOCRInterfacesEx()

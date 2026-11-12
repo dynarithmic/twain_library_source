@@ -68,7 +68,7 @@ namespace dynarithmic
     };
 
     class OCREngine;
-    using OCREnginePtr = std::shared_ptr<OCREngine>;
+    using OCREnginePtr = std::unique_ptr<OCREngine>;
 
     struct OCRCharacterInfo
     {

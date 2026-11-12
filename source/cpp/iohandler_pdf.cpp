@@ -434,7 +434,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
             // Get the handle to the text buffer
             // Clean up the text if necessary... To do
             //...
-            OCREngine *pEngine = pHandle->m_pOCRDefaultEngine.get();
+            OCREngine *pEngine = pHandle->m_pOCRDefaultEngine;
 
             // Get the OCR information
             GetOCRCharacterInformation( pEngine, ocrTextInfo, m_pDib->GetHandle(), m_ImageInfoEx );
@@ -516,7 +516,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
     const auto pHandle = m_ImageInfoEx.theSource->GetDTWAINHandle();
     auto szTempPath = GetDTWAINTempFilePath(pHandle);
 
-    OCREngine *pEngine = pHandle->m_pOCRDefaultEngine.get();
+    OCREngine *pEngine = pHandle->m_pOCRDefaultEngine;
     if (!pEngine)
         return DTWAIN_ERR_OCR_INVALIDENGINE;
 

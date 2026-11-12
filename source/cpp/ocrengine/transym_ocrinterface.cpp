@@ -653,6 +653,8 @@ TransymOCR::~TransymOCR()
 {
     if ( m_TransymSDK.IsLoaded() )
     {
+        int status;
+        ShutdownOCR(status);
         m_TransymSDK.GetLibraryLoader().Unload();
     }
 }

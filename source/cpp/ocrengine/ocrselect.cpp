@@ -36,7 +36,7 @@ namespace
     {
         std::vector<TCHAR> DefName;
         TCHAR ProdName[256];
-        const auto DefaultEngine = selectTraits.pHandle->m_pOCRDefaultEngine.get();
+        const auto DefaultEngine = selectTraits.pHandle->m_pOCRDefaultEngine;
         GetOCRInfo(DefaultEngine, &OCREngine::GetProductName, ProdName, 255);
         CTL_StringType sourceName = ProdName;
         DefName = std::vector<TCHAR>(sourceName.begin(), sourceName.end());
@@ -95,10 +95,7 @@ extern "C"
         auto [pHandle, pDummy] = VerifyOCRHandles();
         auto pH = pHandle;
 
-        // Get the OCR engine associated with the name
-        DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return pH->m_OCRInterfaceArray.empty(); },
-            DTWAIN_ERR_OCR_NOTACTIVE, 0, FUNC_MACRO);
-        const auto SelectedEngine = reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get());
+        const auto SelectedEngine = reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine);
         const auto pEngine = reinterpret_cast<OCREngine*>(SelectedEngine);
         if (!pEngine->IsActivated())
             pEngine->StartupOCREngine();
@@ -116,7 +113,7 @@ extern "C"
 
         // Get the OCR engine associated with the name
         const auto it = pHandle->m_OCRProdNameToEngine.find(sName);
-        OCREnginePtr SelectedEngine;
+        OCREngine* SelectedEngine = nullptr;
         DTWAIN_OCRENGINE ocrEngine_ = nullptr;
         if (it != pHandle->m_OCRProdNameToEngine.end())
         {
@@ -127,7 +124,7 @@ extern "C"
 
                 if (!SelectedEngine->IsActivated())
                     SelectedEngine->StartupOCREngine();
-                ocrEngine_ = reinterpret_cast<DTWAIN_OCRENGINE>(SelectedEngine.get());
+                ocrEngine_ = reinterpret_cast<DTWAIN_OCRENGINE>(SelectedEngine);
             }
         }
         LOG_FUNC_EXIT_NONAME_PARAMS(ocrEngine_)
