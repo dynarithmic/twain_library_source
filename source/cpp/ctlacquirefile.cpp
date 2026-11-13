@@ -134,7 +134,10 @@ extern "C"
             int returnCode;
         };
 
-        static constexpr std::array<ExternalFileTypeData, 1> aExternalFileTypes {DTWAIN_JPEGXL, DTWAIN_ERR_JXL_NOTAVAILABLE};
+        static constexpr std::array<ExternalFileTypeData, 3> aExternalFileTypes
+        { {{DTWAIN_JPEGXL, DTWAIN_ERR_JXL_NOTAVAILABLE},
+              {DTWAIN_TEXT, DTWAIN_ERR_OCR_NOTACTIVE},
+              {DTWAIN_TEXTMULTI, DTWAIN_ERR_OCR_NOTACTIVE} } };
         for (auto extFileType : aExternalFileTypes)
         {
             if (lFileType == extFileType.nFileType)
