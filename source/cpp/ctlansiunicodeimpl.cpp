@@ -52,25 +52,25 @@ namespace dtwain_aw_detail
     {
         std::basic_string<TCHAR> storage_;
         const TCHAR* pointer_ = nullptr;
-    public:
-        explicit native_input(const CharT* value)
-        {
-            if constexpr (std::is_same_v<CharT, TCHAR>)
-                pointer_ = value; // zero-copy native fast path
-            else if (value)
+        public:
+            explicit native_input(const CharT* value)
             {
-                if constexpr (std::is_same_v<CharT, char>)
-                    storage_ = stringconversion::Convert_AnsiPtr_To_Native(value);
-                else
-                    storage_ = stringconversion::Convert_WidePtr_To_Native(value);
-                pointer_ = storage_.c_str();
+                if constexpr (std::is_same_v<CharT, TCHAR>)
+                    pointer_ = value; // zero-copy native fast path
+                else if (value)
+                {
+                    if constexpr (std::is_same_v<CharT, char>)
+                        storage_ = stringconversion::Convert_AnsiPtr_To_Native(value);
+                    else
+                        storage_ = stringconversion::Convert_WidePtr_To_Native(value);
+                    pointer_ = storage_.c_str();
+                }
             }
-        }
-        native_input(const native_input&) = delete;
-        native_input& operator=(const native_input&) = delete;
-        native_input(native_input&&) = delete;
-        native_input& operator=(native_input&&) = delete;
-        const TCHAR* c_str() const noexcept { return pointer_; }
+            native_input(const native_input&) = delete;
+            native_input& operator=(const native_input&) = delete;
+            native_input(native_input&&) = delete;
+            native_input& operator=(native_input&&) = delete;
+            const TCHAR* c_str() const noexcept { return pointer_; }
     };
 }
 
