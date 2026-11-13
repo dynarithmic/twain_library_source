@@ -1146,10 +1146,15 @@ End Sub
                 Exit Select  
             End Select  
             Dim fDlg As New FileTypeDlg()
-            fDlg.ShowDialog()
+            Dim response As DialogResult = fDlg.ShowDialog(Me)
+            If response = DialogResult.Cancel Then
+                Return
+            End If
             tFileName = fDlg.GetFileName()
-            Dim szSourceName As New StringBuilder(tFileName)
-
+            If tFileName.Length = 0 Then
+                MessageBox.Show("File name cannot be blank", "File name error")
+                Return
+            End If
 
             ' Use default 
             ' Get all pages 
