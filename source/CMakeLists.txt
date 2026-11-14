@@ -1272,6 +1272,14 @@ set(NLOHMANN_SOURCES
   ${PROJECT_SOURCE_DIR}/nlohmann/json_fwd.hpp
   )
 
+set(TRANSYM_SOURCES
+  ${PROJECT_SOURCE_DIR}/ocr/transym/vc++/LICENSE
+  ${PROJECT_SOURCE_DIR}/ocr/transym/vc++/TOCRdll.h
+  ${PROJECT_SOURCE_DIR}/ocr/transym/vc++/TOCRerrs.h
+  ${PROJECT_SOURCE_DIR}/ocr/transym/vc++/TOCRlangSel.h
+  ${PROJECT_SOURCE_DIR}/ocr/transym/vc++/TOCRuser.h
+  )
+
 set(WILDCARD_SOURCES
   ${PROJECT_SOURCE_DIR}/wildcards/wildcards.hpp
   )
@@ -1410,6 +1418,7 @@ add_library(dtwain SHARED
     ${MINIZ_SOURCES}
     ${SIMPLEINI_SOURCES}
     ${NLOHMANN_SOURCES}
+    ${TRANSYM_SOURCES}
     ${WILDCARD_SOURCES}
 
 )
@@ -1704,6 +1713,7 @@ source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${ZLIB_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${MINIZ_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${SIMPLEINI_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${NLOHMANN_SOURCES})
+source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${TRANSYM_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${WILDCARD_SOURCES})
 
 if(MSVC)
