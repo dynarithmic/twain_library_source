@@ -25,22 +25,74 @@
 #include "ocrinterface.h"
 #include <tesseract\capi.h>
 
+#include "sharedlibraryutils.h"
+
 namespace dynarithmic
 {
-    struct TessFunctions
+    struct TesseractDynamicLoader
     {
-        decltype(&TessVersion) TessVersion = nullptr;
-        decltype(&TessBaseAPICreate) TessBaseAPICreate = nullptr;
-        decltype(&TessBaseAPIDelete) TessBaseAPIDelete = nullptr;
-        decltype(&TessBaseAPIInit3) TessBaseAPIInit3 = nullptr;
-        decltype(&TessBaseAPIEnd) TessBaseAPIEnd = nullptr;
+        struct Functions
+        {
+            decltype(&TessVersion) TessVersion = nullptr;
+            decltype(&TessBaseAPICreate) TessBaseAPICreate = nullptr;
+            decltype(&TessBaseAPIDelete) TessBaseAPIDelete = nullptr;
+            decltype(&TessBaseAPIInit3) TessBaseAPIInit3 = nullptr;
+            decltype(&TessBaseAPIEnd) TessBaseAPIEnd = nullptr;
 
-        decltype(&TessBaseAPISetImage) TessBaseAPISetImage = nullptr;
-        decltype(&TessBaseAPISetSourceResolution) TessBaseAPISetSourceResolution = nullptr;
+            decltype(&TessBaseAPISetImage) TessBaseAPISetImage = nullptr;
+            decltype(&TessBaseAPISetSourceResolution) TessBaseAPISetSourceResolution = nullptr;
 
-        decltype(&TessBaseAPIRecognize) TessBaseAPIRecognize = nullptr;
-        decltype(&TessBaseAPIGetUTF8Text) TessBaseAPIGetUTF8Text = nullptr;
-        decltype(&TessDeleteText) TessDeleteText = nullptr;
+            decltype(&TessBaseAPIRecognize) TessBaseAPIRecognize = nullptr;
+            decltype(&TessBaseAPIGetUTF8Text) TessBaseAPIGetUTF8Text = nullptr;
+            decltype(&TessDeleteText) TessDeleteText = nullptr;
+        };
+
+        TesseractDynamicLoader() = default;
+        ~TesseractDynamicLoader();
+
+        TesseractDynamicLoader(TesseractDynamicLoader&& other) = delete;
+        TesseractDynamicLoader& operator=(TesseractDynamicLoader&& other) noexcept;
+
+        TesseractDynamicLoader(const TesseractDynamicLoader&) = delete;
+        TesseractDynamicLoader& operator=(const TesseractDynamicLoader&) = delete;
+
+        std::pair<bool, int> Load(const std::wstring& directory);
+
+        bool IsLoaded() const noexcept
+        {
+            return m_loaded;
+        }
+
+        const Functions& GetFunctions() const noexcept
+        {
+            return m_functions;
+        }
+
+        DWORD GetLastErrorCode() const noexcept
+        {
+            return m_lastError;
+        }
+
+        const std::string& GetFailedFunction() const noexcept
+        {
+            return m_failedFunction;
+        }
+
+        static DynamicLibraryLoader::FunctionTable CreateFunctionTable(Functions& funcs);
+
+        DynamicLibraryLoader& GetLibraryLoader()
+        {
+            return m_loader;
+        }
+
+    private:
+        DynamicLibraryLoader m_loader;
+
+        Functions m_functions{};
+        bool m_loaded = false;
+
+        DWORD m_lastError = ERROR_SUCCESS;
+        std::string m_failedFunction;
     };
 
     class TesseractOCR : public OCREngine
@@ -66,10 +118,8 @@ namespace dynarithmic
 
         void DestroyOCRSession() noexcept;
         void UnloadTesseract() noexcept;
-
-        HMODULE m_hTessDLL = nullptr;
         bool m_bInitialized = false;
-        TessFunctions m_TessFunctions{};
+        TesseractDynamicLoader m_TesseractSDK;
         TessBaseAPI* m_pTessAPI = nullptr;
     };
 }

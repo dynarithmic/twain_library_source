@@ -292,6 +292,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     // DTWAIN_SetTwainMode(DTWAIN_MODELESS);
     DTWAIN_EnableMsgNotify(TRUE);
 
+
+    DTWAIN_SetComponentPathA(DTWAIN_COMPONENT_TESSERACTOCR, "d:/Repos-Copy/Dynarithmic/twain_library_source-tesseract/source/tesseract_lib/32/");
+
+
     /* Also allow DTWAIN messages to be sent to our callback */
     DTWAIN_SetCallback(TwainCallbackProc,0);
 
@@ -809,7 +813,7 @@ void AcquireFile(BOOL bUseSource, LONG resourceID, LONG fileType)
     else
         FileFlags |= DTWAIN_USENATIVE;
 
-        /* Check if TEXT type is acquired */
+    /* Check if TEXT type is acquired */
     if ( fileType == DTWAIN_TEXTMULTI )
     {
         if (!DTWAIN_InitOCRInterface() )

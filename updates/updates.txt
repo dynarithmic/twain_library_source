@@ -114,6 +114,8 @@ DTWAIN Version changes
 
 - Returning 0 from DTWAIN_TN_FILEPAGESAVING notification when acquiring to image files will now stop the file page being saved.
 
+- Fixed issue when unloading the Transym TOCR DLL on DTWAIN shutdown.
+
 - Upgraded following internal image related libraries:
 
       libpng --> 1.6.59

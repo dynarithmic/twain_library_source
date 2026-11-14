@@ -198,14 +198,14 @@ namespace
         return true;
     }
 
-    std::wstring GetTesseractDLLName()
+    CTL_StringType GetTesseractDLLName()
     {
         // Load the resources
         auto* customProfile = CTL_StaticData::GetINIInterface();
         const char* defName = "Tesseract";
         if (customProfile)
             defName = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_OCRLIBRARY_KEY).data(), defName);
-        auto val = stringconversion::Convert_AnsiPtr_To_Wide(defName);
+        auto val = stringconversion::Convert_AnsiPtr_To_Native(defName);
         if (val.empty())
             val = _T("libtesseract-5.dll");
         return val;
@@ -213,14 +213,103 @@ namespace
 }
 
 
+DynamicLibraryLoader::FunctionTable TesseractDynamicLoader::CreateFunctionTable(Functions& funcs)
+{
+    using Loader = DynamicLibraryLoader;
+    using F = Functions;
+
+    std::string sDLLName = stringconversion::Convert_Native_To_Ansi(GetTesseractDLLName());
+    const char* dllName = sDLLName.c_str();
+
+    return
+    {
+        Loader::RegisterFunction(dllName, "TessVersion",
+            funcs, &F::TessVersion),
+
+        Loader::RegisterFunction(dllName, "TessBaseAPICreate",
+            funcs, &F::TessBaseAPICreate),
+
+        Loader::RegisterFunction(dllName, "TessBaseAPIDelete",
+            funcs, &F::TessBaseAPIDelete),
+
+        Loader::RegisterFunction(dllName, "TessBaseAPIInit3",
+            funcs, &F::TessBaseAPIInit3),
+
+        Loader::RegisterFunction(dllName, "TessBaseAPIEnd",
+            funcs, &F::TessBaseAPIEnd),
+
+        Loader::RegisterFunction(dllName, "TessBaseAPISetImage",
+            funcs, &F::TessBaseAPISetImage),
+
+        Loader::RegisterFunction(dllName,
+            "TessBaseAPISetSourceResolution",
+            funcs, &F::TessBaseAPISetSourceResolution),
+
+        Loader::RegisterFunction(dllName, "TessBaseAPIRecognize",
+            funcs, &F::TessBaseAPIRecognize),
+
+        Loader::RegisterFunction(dllName, "TessBaseAPIGetUTF8Text",
+            funcs, &F::TessBaseAPIGetUTF8Text),
+
+        Loader::RegisterFunction(dllName, "TessDeleteText",
+            funcs, &F::TessDeleteText)
+    };
+}
+
+std::pair<bool, int> TesseractDynamicLoader::Load(const std::wstring& directory)
+{
+    m_loader.Unload();
+
+    m_functions = {};
+    m_loaded = false;
+    m_lastError = ERROR_SUCCESS;
+    m_failedFunction.clear();
+
+    std::vector<std::string> dllNames = { stringconversion::Convert_Native_To_Ansi(GetTesseractDLLName()) };    
+
+    if (!m_loader.Load(dllNames, directory))
+    {
+        m_lastError = m_loader.GetLastErrorCode();
+        m_failedFunction = m_loader.GetFailedName();
+
+        return { false, static_cast<int>(m_lastError) };
+    }
+
+    Functions funcs{};
+    const auto table = CreateFunctionTable(funcs);
+
+    if (!m_loader.ResolveFunctions(table))
+    {
+        m_lastError = m_loader.GetLastErrorCode();
+        m_failedFunction = m_loader.GetFailedName();
+
+        m_loader.Unload();
+
+        return { false, static_cast<int>(m_lastError) };
+    }
+
+    m_functions = funcs;
+    m_loaded = true;
+
+    return { true, ERROR_SUCCESS };
+}
+
+TesseractDynamicLoader::~TesseractDynamicLoader()
+{
+    m_loader.Unload();
+}
+
 TesseractOCR::TesseractOCR(CTL_TwainDLLHandle* pHandle) : OCREngine(pHandle) 
 {
     SetOCREngineType(OCREngineType::Tesseract);
 
-    // Load the Tesseract DLL.
-
+    // Load the Tesseract DLL
+    auto bRet = m_TesseractSDK.Load(
+        stringconversion::Convert_Native_To_Wide(CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_TESSERACTOCR)));
+    m_bInitialized = bRet.first;
+#if 0
     // Get the configured path
-    auto strPath = CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_TESSERACT);
+    auto strPath = CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_TESSERACTOCR);
     std::wstring sDLLPath = stringconversion::Convert_Native_To_Wide(strPath);
     sDLLPath = WindowsAPIImplDef::AddBackslashToDirectory(sDLLPath);
 
@@ -259,8 +348,7 @@ TesseractOCR::TesseractOCR(CTL_TwainDLLHandle* pHandle) : OCREngine(pHandle)
         m_TessFunctions = {};
         return;
     }
-
-    m_bInitialized = true;
+#endif
 }
 
 
@@ -274,8 +362,8 @@ bool TesseractOCR::SetOCRVersionIdentity()
 
     identity.Version.Language = TWLG_ENGLISH_USA;
     identity.Version.Country  = TWCY_USA;
-
-    const char* version = m_TessFunctions.TessVersion();
+    auto& funcs = m_TesseractSDK.GetFunctions();
+    const char* version = funcs.TessVersion();
 
     if (version)
     {
@@ -303,17 +391,7 @@ void TesseractOCR::UnloadTesseract() noexcept
 {
     // Release the OCR session first.
     DestroyOCRSession();
-
-    // Unload the Tesseract library.
-    if (m_hTessDLL)
-    {
-        FreeLibrary(m_hTessDLL);
-        m_hTessDLL = nullptr;
-    }
-
-    // Invalidate the function pointers.
-    m_TessFunctions = {};
-
+    m_TesseractSDK.GetLibraryLoader().Unload();
     m_bInitialized = false;
 }
 
@@ -327,11 +405,11 @@ bool TesseractOCR::ShutdownOCR(int& status)
 
 void TesseractOCR::DestroyOCRSession() noexcept
 {
-    if (m_pTessAPI)
+    if (m_TesseractSDK.IsLoaded())
     {
-        m_TessFunctions.TessBaseAPIEnd(m_pTessAPI);
-        m_TessFunctions.TessBaseAPIDelete(m_pTessAPI);
-
+        auto& funcs = m_TesseractSDK.GetFunctions();
+        funcs.TessBaseAPIEnd(m_pTessAPI);
+        funcs.TessBaseAPIDelete(m_pTessAPI);
         m_pTessAPI = nullptr;
     }
 }
@@ -353,8 +431,9 @@ LONG TesseractOCR::StartupOCREngine()
     if (m_pTessAPI)
         return 0;
 
+    auto funcs = m_TesseractSDK.GetFunctions();
     // Create the Tesseract API instance.
-    TessBaseAPI* pAPI = m_TessFunctions.TessBaseAPICreate();
+    TessBaseAPI* pAPI = funcs.TessBaseAPICreate();
 
     if (!pAPI)
         return -1;
@@ -364,13 +443,13 @@ LONG TesseractOCR::StartupOCREngine()
     // nullptr: Use Tesseract's default tessdata
     //           lookup mechanism.
     // "eng":   English language.
-    const int result = m_TessFunctions.TessBaseAPIInit3(pAPI,"d:/dtwain_bin/tessdata","eng");
+    const int result = funcs.TessBaseAPIInit3(pAPI,"d:/dtwain_bin/tessdata","eng");
 
     if (result != 0)
     {
         // Initialization failed.
-        m_TessFunctions.TessBaseAPIEnd(pAPI);
-        m_TessFunctions.TessBaseAPIDelete(pAPI);
+        funcs.TessBaseAPIEnd(pAPI);
+        funcs.TessBaseAPIDelete(pAPI);
         return -1;
     }
 
@@ -413,8 +492,10 @@ LONG TesseractOCR::StartOCR(HANDLE hDib)
         return OCR_FAILURE;
     }
 
+    auto& funcs = m_TesseractSDK.GetFunctions();
+
     // Supply the converted pixels to Tesseract.
-    m_TessFunctions.TessBaseAPISetImage(
+    funcs.TessBaseAPISetImage(
         m_pTessAPI,
         image.pixels.data(),
         image.width,
@@ -423,7 +504,7 @@ LONG TesseractOCR::StartOCR(HANDLE hDib)
         image.bytesPerLine);
 
     // Perform recognition.
-    const int result = m_TessFunctions.TessBaseAPIRecognize(m_pTessAPI, nullptr);
+    const int result = funcs.TessBaseAPIRecognize(m_pTessAPI, nullptr);
 
     if (result != 0)
     {
@@ -432,7 +513,7 @@ LONG TesseractOCR::StartOCR(HANDLE hDib)
     }
 
     // Retrieve the recognized UTF-8 text.
-    char* pText = m_TessFunctions.TessBaseAPIGetUTF8Text(m_pTessAPI);
+    char* pText = funcs.TessBaseAPIGetUTF8Text(m_pTessAPI);
 
     if (!pText)
     {
@@ -444,7 +525,7 @@ LONG TesseractOCR::StartOCR(HANDLE hDib)
     // releasing the Tesseract-owned allocation.
     SetCachedText(std::string(pText));
 
-    m_TessFunctions.TessDeleteText(pText);
+    funcs.TessDeleteText(pText);
 
     SetLastError(OCR_SUCCESS);
     return OCR_SUCCESS;

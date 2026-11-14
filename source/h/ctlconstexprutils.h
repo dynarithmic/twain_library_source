@@ -741,6 +741,9 @@ namespace dynarithmic
         switch (nComponent)
         {
             case DTWAIN_COMPONENT_JPEGXL:
+            case DTWAIN_COMPONENT_RESOURCES:
+            case DTWAIN_COMPONENT_TRANSYMOCR:
+            case DTWAIN_COMPONENT_TESSERACTOCR:
                 return true;
         }
         return false;

@@ -8,7 +8,7 @@ if(POLICY CMP0167)
     cmake_policy(SET CMP0167 OLD)
 endif()
 
-project (dtwain VERSION 5.10.2 LANGUAGES C CXX)
+project (dtwain VERSION 5.11.1 LANGUAGES C CXX)
 
 option(DTWAIN_BUILD_UNICODE
        "Build DTWAIN as Unicode instead of ANSI"
@@ -598,6 +598,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ocrengine/tesseract_ocrinterface.h
         ${PROJECT_SOURCE_DIR}/h/pdflib32/pdfencrypt.h
         ${PROJECT_SOURCE_DIR}/h/pdflib32/pdflib32.h
+        ${PROJECT_SOURCE_DIR}/h/sharedlibraryutils.h
         ${PROJECT_SOURCE_DIR}/h/sourceacquireopts.h
         ${PROJECT_SOURCE_DIR}/h/sourceselectopts.h
         ${PROJECT_SOURCE_DIR}/h/twain.h
@@ -799,6 +800,7 @@ set(MAIN_SOURCES
   ${PROJECT_SOURCE_DIR}/cpp/ocrengine/tesseract_ocrinterface.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdfencrypt.cpp
   ${PROJECT_SOURCE_DIR}/cpp/pdflib32/pdflib32.cpp
+  ${PROJECT_SOURCE_DIR}/cpp/sharedlibraryutils.cpp
   ${PROJECT_SOURCE_DIR}/cpp/stdafx.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windowsinit_impl.cpp
   ${PROJECT_SOURCE_DIR}/cpp/windows_versioninfo.cpp

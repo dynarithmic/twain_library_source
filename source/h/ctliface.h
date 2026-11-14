@@ -36,14 +36,6 @@
 #include "winconst.h"
 namespace dynarithmic
 {
-    template <typename T>
-    struct dtwain_library_loader : library_loader_impl
-    {
-        static T get_func_ptr(void* handle, const char* name)
-        {
-            return static_cast<T>(get(handle, name));
-        }
-    };
 
     struct SysInitializeOptions
     {

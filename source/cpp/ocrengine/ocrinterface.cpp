@@ -84,20 +84,32 @@ namespace dynarithmic
 
         for (const auto& factory: OCRFactories)
         {
-            auto pInterface = factory.create(pHandle);
+            try
+            {
+                auto pInterface = factory.create(pHandle);
 
-            if (pInterface && pInterface->IsInitialized())
-            {
-                pInterface->SetOCRVersionIdentity();
-                pHandle->m_OCRProdNameToEngine.insert({ pInterface->GetProductName(), pInterface });
-                pHandle->m_OCRInterfaceArray.push_back(std::move(pInterface));
+                if (pInterface && pInterface->IsInitialized())
+                {
+                    pInterface->SetOCRVersionIdentity();
+                    pHandle->m_OCRProdNameToEngine.insert({ pInterface->GetProductName(), pInterface });
+                    pHandle->m_OCRInterfaceArray.push_back(std::move(pInterface));
+                }
+                else
+                if ( anyLogFlags )
+                {
+                    std::string sMsg = "Could not load OCR Engine: ";
+                    sMsg += factory.name;
+                    LogWriterUtils::WriteLogInfoIndentedA(sMsg);
+                }
             }
-            else
-            if ( anyLogFlags )
+            catch (const DTWAINException& ex)
             {
-                std::string sMsg = "Could not load OCR Engine: ";
-                sMsg += factory.name;
-                LogWriterUtils::WriteLogInfoIndentedA(sMsg);
+                if (anyLogFlags)
+                {
+                    std::string sMsg = "Could not load OCR Engine: ";
+                    sMsg += factory.name;
+                    LogWriterUtils::WriteLogInfoIndentedA(sMsg);
+                }
             }
         }
 
