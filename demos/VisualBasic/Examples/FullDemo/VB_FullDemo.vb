@@ -874,6 +874,7 @@ End Sub
             If TwainHandle <> 0 Then
                 DTWAINAPI.DTWAIN_EnableMsgNotify(1)
                 DTWAINAPI.DTWAIN_SetCallback(cb, 0)
+                DTWAINAPI.DTWAIN_InitOCRInterface()
                 textElement = DTWAINAPI.DTWAIN_CreatePDFTextElement
                 DTWAINAPI.DTWAIN_SetPDFTextElementLong(textElement, 100, 100, DTWAINAPI.DTWAIN_PDFTEXTELEMENT_POSITION)
                 DTWAINAPI.DTWAIN_SetPDFTextElementLong(textElement, DTWAINAPI.DTWAIN_PDFTEXT_ALLPAGES, 0, DTWAINAPI.DTWAIN_PDFTEXTELEMENT_DISPLAYFLAGS)

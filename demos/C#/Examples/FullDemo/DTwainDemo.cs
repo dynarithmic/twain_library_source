@@ -150,6 +150,10 @@ namespace TWAINDemo
         private MenuItem FF_JP2;
         private MenuItem FF_JPX;
         private MenuItem FF_DEJAVU;
+        private MenuItem UseGetMessage;
+        private MenuItem menuItem10;
+        private MenuItem idlang_cantonese;
+        private MenuItem idlang_turkish;
         private Dictionary<int, MenuItem> fileDriverMap = new Dictionary<int, MenuItem>();
 
 #if _X64
@@ -201,6 +205,7 @@ namespace TWAINDemo
             initialized = false;
             InitializeComponent();
             InitializeFileDriverMap();
+
             sOrigTitle = this.Text;
             DTWAIN_HANDLE handle = TwainAPI.DTWAIN_SysInitialize();
             if (handle == IntPtr.Zero)
@@ -221,6 +226,7 @@ namespace TWAINDemo
             theCallback += CallbackProc;
             TwainAPI.DTWAIN_EnableMsgNotify(1);
             TwainAPI.DTWAIN_SetCallback(theCallback, 0);
+            TwainAPI.DTWAIN_InitOCRInterface();
             textElement = TwainAPI.DTWAIN_CreatePDFTextElement();
             TwainAPI.DTWAIN_SetPDFTextElementLong(textElement, 100, 100, TwainAPI.DTWAIN_PDFTEXTELEMENT_POSITION);
             TwainAPI.DTWAIN_SetPDFTextElementLong(textElement, TwainAPI.DTWAIN_PDFTEXT_ALLPAGES, 0, TwainAPI.DTWAIN_PDFTEXTELEMENT_DISPLAYFLAGS);
@@ -324,11 +330,22 @@ namespace TWAINDemo
             this.FF_PNG = new System.Windows.Forms.MenuItem();
             this.FF_PDF = new System.Windows.Forms.MenuItem();
             this.FF_PDFA = new System.Windows.Forms.MenuItem();
+            this.FF_PDFA2 = new System.Windows.Forms.MenuItem();
+            this.FF_PDFRASTER = new System.Windows.Forms.MenuItem();
+            this.FF_FPX = new System.Windows.Forms.MenuItem();
+            this.FF_EXIF = new System.Windows.Forms.MenuItem();
+            this.FF_SPIFF = new System.Windows.Forms.MenuItem();
+            this.FF_XBM = new System.Windows.Forms.MenuItem();
+            this.FF_PICT = new System.Windows.Forms.MenuItem();
+            this.FF_JP2 = new System.Windows.Forms.MenuItem();
+            this.FF_JPX = new System.Windows.Forms.MenuItem();
+            this.FF_DEJAVU = new System.Windows.Forms.MenuItem();
             this.menuItem4 = new System.Windows.Forms.MenuItem();
             this.ShowPreview = new System.Windows.Forms.MenuItem();
             this.UseSourceUI = new System.Windows.Forms.MenuItem();
             this.DiscardBlankPages = new System.Windows.Forms.MenuItem();
             this.ShowBarcodeInfo = new System.Windows.Forms.MenuItem();
+            this.UseGetMessage = new System.Windows.Forms.MenuItem();
             this.TwainLogging = new System.Windows.Forms.MenuItem();
             this.LoggingOptions = new System.Windows.Forms.MenuItem();
             this.menuItem6 = new System.Windows.Forms.MenuItem();
@@ -349,16 +366,9 @@ namespace TWAINDemo
             this.idlang_custom = new System.Windows.Forms.MenuItem();
             this.menuItem2 = new System.Windows.Forms.MenuItem();
             this.About = new System.Windows.Forms.MenuItem();
-            this.FF_PDFA2 = new System.Windows.Forms.MenuItem();
-            this.FF_PDFRASTER = new System.Windows.Forms.MenuItem();
-            this.FF_FPX = new System.Windows.Forms.MenuItem();
-            this.FF_EXIF = new System.Windows.Forms.MenuItem();
-            this.FF_SPIFF = new System.Windows.Forms.MenuItem();
-            this.FF_XBM = new System.Windows.Forms.MenuItem();
-            this.FF_PICT = new System.Windows.Forms.MenuItem();
-            this.FF_JP2 = new System.Windows.Forms.MenuItem();
-            this.FF_JPX = new System.Windows.Forms.MenuItem();
-            this.FF_DEJAVU = new System.Windows.Forms.MenuItem();
+            this.menuItem10 = new System.Windows.Forms.MenuItem();
+            this.idlang_cantonese = new System.Windows.Forms.MenuItem();
+            this.idlang_turkish = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
             // mainMenu
@@ -455,7 +465,9 @@ namespace TWAINDemo
             this.ShowPreview,
             this.UseSourceUI,
             this.DiscardBlankPages,
-            this.ShowBarcodeInfo});
+            this.ShowBarcodeInfo,
+            this.menuItem10,
+            this.UseGetMessage});
             this.menuItem1.Text = "&Acquire Test";
             // 
             // AcquireNative
@@ -878,174 +890,6 @@ namespace TWAINDemo
             this.FF_PDFA.Text = "PDF/A";
             this.FF_PDFA.Click += new System.EventHandler(this.FF_PDFA_Click);
             // 
-            // menuItem4
-            // 
-            this.menuItem4.Index = 4;
-            this.menuItem4.Text = "-";
-            // 
-            // ShowPreview
-            // 
-            this.ShowPreview.Checked = true;
-            this.ShowPreview.Index = 5;
-            this.ShowPreview.Text = "Show Preview";
-            this.ShowPreview.Click += new System.EventHandler(this.ShowPreview_Click);
-            // 
-            // UseSourceUI
-            // 
-            this.UseSourceUI.Checked = true;
-            this.UseSourceUI.Index = 6;
-            this.UseSourceUI.Text = "Use Source UI";
-            this.UseSourceUI.Click += new System.EventHandler(this.UseSourceUI_Click);
-            // 
-            // DiscardBlankPages
-            // 
-            this.DiscardBlankPages.Index = 7;
-            this.DiscardBlankPages.Text = "Discard Blank Pages";
-            this.DiscardBlankPages.Click += new System.EventHandler(this.DiscardBlankPages_Click);
-            // 
-            // ShowBarcodeInfo
-            // 
-            this.ShowBarcodeInfo.Index = 8;
-            this.ShowBarcodeInfo.Text = "Show Barcode Information";
-            this.ShowBarcodeInfo.Click += new System.EventHandler(this.ShowBarcodeInfo_Click);
-            // 
-            // TwainLogging
-            // 
-            this.TwainLogging.Index = 2;
-            this.TwainLogging.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.LoggingOptions});
-            this.TwainLogging.Text = "&TWAIN Logging";
-            // 
-            // LoggingOptions
-            // 
-            this.LoggingOptions.Index = 0;
-            this.LoggingOptions.Text = "Logging Options...";
-            this.LoggingOptions.Click += new System.EventHandler(this.LoggingOptions_Click);
-            // 
-            // menuItem6
-            // 
-            this.menuItem6.Index = 3;
-            this.menuItem6.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.idlang_dutch,
-            this.idlang_english,
-            this.idlang_french,
-            this.idlang_german,
-            this.idlang_greek,
-            this.idlang_italian,
-            this.idlang_japanese,
-            this.idlang_korean,
-            this.idlang_portuguese,
-            this.idlang_romanian,
-            this.idlang_russian,
-            this.idlang_simplified_chinese,
-            this.idlang_spanish,
-            this.idlang_traditional_chinese,
-            this.idlang_custom});
-            this.menuItem6.Text = "Language";
-            // 
-            // idlang_dutch
-            // 
-            this.idlang_dutch.Index = 0;
-            this.idlang_dutch.Text = "Dutch";
-            this.idlang_dutch.Click += new System.EventHandler(this.idlang_dutch_Click);
-            // 
-            // idlang_english
-            // 
-            this.idlang_english.Index = 1;
-            this.idlang_english.Text = "English";
-            this.idlang_english.Click += new System.EventHandler(this.idlang_english_Click);
-            // 
-            // idlang_french
-            // 
-            this.idlang_french.Index = 2;
-            this.idlang_french.Text = "French";
-            this.idlang_french.Click += new System.EventHandler(this.idlang_french_Click);
-            // 
-            // idlang_german
-            // 
-            this.idlang_german.Index = 3;
-            this.idlang_german.Text = "German";
-            this.idlang_german.Click += new System.EventHandler(this.idlang_german_Click);
-            // 
-            // idlang_greek
-            // 
-            this.idlang_greek.Index = 4;
-            this.idlang_greek.Text = "Greek";
-            this.idlang_greek.Click += new System.EventHandler(this.idlang_greek_Click);
-            // 
-            // idlang_italian
-            // 
-            this.idlang_italian.Index = 5;
-            this.idlang_italian.Text = "Italian";
-            this.idlang_italian.Click += new System.EventHandler(this.idlang_italian_Click);
-            // 
-            // idlang_japanese
-            // 
-            this.idlang_japanese.Index = 6;
-            this.idlang_japanese.Text = "Japanese";
-            this.idlang_japanese.Click += new System.EventHandler(this.idlang_japanese_Click);
-            // 
-            // idlang_korean
-            // 
-            this.idlang_korean.Index = 7;
-            this.idlang_korean.Text = "Korean";
-            this.idlang_korean.Click += new System.EventHandler(this.idlang_korean_Click);
-            // 
-            // idlang_portuguese
-            // 
-            this.idlang_portuguese.Index = 8;
-            this.idlang_portuguese.Text = "Portuguese";
-            this.idlang_portuguese.Click += new System.EventHandler(this.idlang_portuguese_Click);
-            // 
-            // idlang_romanian
-            // 
-            this.idlang_romanian.Index = 9;
-            this.idlang_romanian.Text = "Romanian";
-            this.idlang_romanian.Click += new System.EventHandler(this.idlang_romanian_Click);
-            // 
-            // idlang_russian
-            // 
-            this.idlang_russian.Index = 10;
-            this.idlang_russian.Text = "Russian";
-            this.idlang_russian.Click += new System.EventHandler(this.idlang_russian_Click);
-            // 
-            // idlang_simplified_chinese
-            // 
-            this.idlang_simplified_chinese.Index = 11;
-            this.idlang_simplified_chinese.Text = "Simplified Chinese";
-            this.idlang_simplified_chinese.Click += new System.EventHandler(this.idlang_simplified_chinese_Click);
-            // 
-            // idlang_spanish
-            // 
-            this.idlang_spanish.Index = 12;
-            this.idlang_spanish.Text = "Spanish";
-            this.idlang_spanish.Click += new System.EventHandler(this.idlang_spanish_Click);
-            // 
-            // idlang_traditional_chinese
-            // 
-            this.idlang_traditional_chinese.Index = 13;
-            this.idlang_traditional_chinese.Text = "Traditional Chinese";
-            this.idlang_traditional_chinese.Click += new System.EventHandler(this.idlang_traditional_chinese_Click);
-            // 
-            // idlang_custom
-            // 
-            this.idlang_custom.Index = 14;
-            this.idlang_custom.Text = "Custom Language...";
-            this.idlang_custom.Click += new System.EventHandler(this.idlang_custom_Click);
-            // 
-            // menuItem2
-            // 
-            this.menuItem2.Index = 4;
-            this.menuItem2.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.About});
-            this.menuItem2.Text = "Help";
-            // 
-            // About
-            // 
-            this.About.Index = 0;
-            this.About.Text = "About...";
-            this.About.Click += new System.EventHandler(this.About_Click);
-            // 
             // FF_PDFA2
             // 
             this.FF_PDFA2.Index = 7;
@@ -1105,6 +949,199 @@ namespace TWAINDemo
             this.FF_DEJAVU.Index = 16;
             this.FF_DEJAVU.Text = "DEJAVU";
             this.FF_DEJAVU.Click += new System.EventHandler(this.FF_DEJAVU_Click);
+            // 
+            // menuItem4
+            // 
+            this.menuItem4.Index = 4;
+            this.menuItem4.Text = "-";
+            // 
+            // ShowPreview
+            // 
+            this.ShowPreview.Checked = true;
+            this.ShowPreview.Index = 5;
+            this.ShowPreview.Text = "Show Preview";
+            this.ShowPreview.Click += new System.EventHandler(this.ShowPreview_Click);
+            // 
+            // UseSourceUI
+            // 
+            this.UseSourceUI.Checked = true;
+            this.UseSourceUI.Index = 6;
+            this.UseSourceUI.Text = "Use Source UI";
+            this.UseSourceUI.Click += new System.EventHandler(this.UseSourceUI_Click);
+            // 
+            // DiscardBlankPages
+            // 
+            this.DiscardBlankPages.Index = 7;
+            this.DiscardBlankPages.Text = "Discard Blank Pages";
+            this.DiscardBlankPages.Click += new System.EventHandler(this.DiscardBlankPages_Click);
+            // 
+            // ShowBarcodeInfo
+            // 
+            this.ShowBarcodeInfo.Index = 8;
+            this.ShowBarcodeInfo.Text = "Show Barcode Information";
+            this.ShowBarcodeInfo.Click += new System.EventHandler(this.ShowBarcodeInfo_Click);
+            // 
+            // UseGetMessage
+            // 
+            this.UseGetMessage.Index = 10;
+            this.UseGetMessage.Text = "Use GetMessage TWAIN Loop";
+            this.UseGetMessage.Click += new System.EventHandler(this.UseGetMessage_Click);
+            // 
+            // TwainLogging
+            // 
+            this.TwainLogging.Index = 2;
+            this.TwainLogging.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.LoggingOptions});
+            this.TwainLogging.Text = "&TWAIN Logging";
+            // 
+            // LoggingOptions
+            // 
+            this.LoggingOptions.Index = 0;
+            this.LoggingOptions.Text = "Logging Options...";
+            this.LoggingOptions.Click += new System.EventHandler(this.LoggingOptions_Click);
+            // 
+            // menuItem6
+            // 
+            this.menuItem6.Index = 3;
+            this.menuItem6.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.idlang_cantonese,
+            this.idlang_dutch,
+            this.idlang_english,
+            this.idlang_french,
+            this.idlang_german,
+            this.idlang_greek,
+            this.idlang_italian,
+            this.idlang_japanese,
+            this.idlang_korean,
+            this.idlang_portuguese,
+            this.idlang_romanian,
+            this.idlang_russian,
+            this.idlang_simplified_chinese,
+            this.idlang_spanish,
+            this.idlang_traditional_chinese,
+            this.idlang_turkish,
+            this.idlang_custom});
+            this.menuItem6.Text = "Language";
+            // 
+            // idlang_dutch
+            // 
+            this.idlang_dutch.Index = 1;
+            this.idlang_dutch.Text = "Dutch";
+            this.idlang_dutch.Click += new System.EventHandler(this.idlang_dutch_Click);
+            // 
+            // idlang_english
+            // 
+            this.idlang_english.Index = 2;
+            this.idlang_english.Text = "English";
+            this.idlang_english.Click += new System.EventHandler(this.idlang_english_Click);
+            // 
+            // idlang_french
+            // 
+            this.idlang_french.Index = 3;
+            this.idlang_french.Text = "French";
+            this.idlang_french.Click += new System.EventHandler(this.idlang_french_Click);
+            // 
+            // idlang_german
+            // 
+            this.idlang_german.Index = 4;
+            this.idlang_german.Text = "German";
+            this.idlang_german.Click += new System.EventHandler(this.idlang_german_Click);
+            // 
+            // idlang_greek
+            // 
+            this.idlang_greek.Index = 5;
+            this.idlang_greek.Text = "Greek";
+            this.idlang_greek.Click += new System.EventHandler(this.idlang_greek_Click);
+            // 
+            // idlang_italian
+            // 
+            this.idlang_italian.Index = 6;
+            this.idlang_italian.Text = "Italian";
+            this.idlang_italian.Click += new System.EventHandler(this.idlang_italian_Click);
+            // 
+            // idlang_japanese
+            // 
+            this.idlang_japanese.Index = 7;
+            this.idlang_japanese.Text = "Japanese";
+            this.idlang_japanese.Click += new System.EventHandler(this.idlang_japanese_Click);
+            // 
+            // idlang_korean
+            // 
+            this.idlang_korean.Index = 8;
+            this.idlang_korean.Text = "Korean";
+            this.idlang_korean.Click += new System.EventHandler(this.idlang_korean_Click);
+            // 
+            // idlang_portuguese
+            // 
+            this.idlang_portuguese.Index = 9;
+            this.idlang_portuguese.Text = "Portuguese";
+            this.idlang_portuguese.Click += new System.EventHandler(this.idlang_portuguese_Click);
+            // 
+            // idlang_romanian
+            // 
+            this.idlang_romanian.Index = 10;
+            this.idlang_romanian.Text = "Romanian";
+            this.idlang_romanian.Click += new System.EventHandler(this.idlang_romanian_Click);
+            // 
+            // idlang_russian
+            // 
+            this.idlang_russian.Index = 11;
+            this.idlang_russian.Text = "Russian";
+            this.idlang_russian.Click += new System.EventHandler(this.idlang_russian_Click);
+            // 
+            // idlang_simplified_chinese
+            // 
+            this.idlang_simplified_chinese.Index = 12;
+            this.idlang_simplified_chinese.Text = "Simplified Chinese";
+            this.idlang_simplified_chinese.Click += new System.EventHandler(this.idlang_simplified_chinese_Click);
+            // 
+            // idlang_spanish
+            // 
+            this.idlang_spanish.Index = 13;
+            this.idlang_spanish.Text = "Spanish";
+            this.idlang_spanish.Click += new System.EventHandler(this.idlang_spanish_Click);
+            // 
+            // idlang_traditional_chinese
+            // 
+            this.idlang_traditional_chinese.Index = 14;
+            this.idlang_traditional_chinese.Text = "Traditional Chinese";
+            this.idlang_traditional_chinese.Click += new System.EventHandler(this.idlang_traditional_chinese_Click);
+            // 
+            // idlang_custom
+            // 
+            this.idlang_custom.Index = 16;
+            this.idlang_custom.Text = "Custom Language...";
+            this.idlang_custom.Click += new System.EventHandler(this.idlang_custom_Click);
+            // 
+            // menuItem2
+            // 
+            this.menuItem2.Index = 4;
+            this.menuItem2.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.About});
+            this.menuItem2.Text = "Help";
+            // 
+            // About
+            // 
+            this.About.Index = 0;
+            this.About.Text = "About...";
+            this.About.Click += new System.EventHandler(this.About_Click);
+            // 
+            // menuItem10
+            // 
+            this.menuItem10.Index = 9;
+            this.menuItem10.Text = "-";
+            // 
+            // idlang_cantonese
+            // 
+            this.idlang_cantonese.Index = 0;
+            this.idlang_cantonese.Text = "Cantonese";
+            this.idlang_cantonese.Click += new System.EventHandler(this.idlang_cantonese_Click);
+            // 
+            // idlang_turkish
+            // 
+            this.idlang_turkish.Index = 15;
+            this.idlang_turkish.Text = "Turkish";
+            this.idlang_turkish.Click += new System.EventHandler(this.idlang_turkish_Click);
             // 
             // DTwainDemo
             // 
@@ -1230,6 +1267,7 @@ namespace TWAINDemo
                     EnableSourceItems(true);
                     EnableBarcodeItems(true);
                     EnableFileDriverItems(true);
+                    SetGetMessageLoopProcessing();
                     return;
                 }
                 else
@@ -1861,7 +1899,7 @@ namespace TWAINDemo
 
         private void TEXTOCR_Click(object sender, EventArgs e)
         {
-            if (TwainAPI.DTWAIN_InitOCRInterface() == 0)
+            if (TwainAPI.DTWAIN_IsFileTypeSupported(TwainAPI.DTWAIN_TEXTMULTI) == 0)
             {
                 MessageBox.Show("Text mode requires OCR engine installed", "No OCR engines detected");
                 return;
@@ -2002,6 +2040,31 @@ namespace TWAINDemo
         private void FF_DEJAVU_Click(object sender, EventArgs e)
         {
             AcquireToFile(1, TwainAPI.DTWAIN_FF_DEJAVU);
+        }
+
+        private void SetGetMessageLoopProcessing()
+        {
+            int valueToUse = 0;
+            if (UseGetMessage.Checked)
+                valueToUse = 0;
+            else
+                valueToUse = 1;
+            TwainAPI.DTWAIN_EnablePeekMessageLoop(SelectedSource, valueToUse);
+        }
+        private void UseGetMessage_Click(object sender, EventArgs e)
+        {
+            UseGetMessage.Checked = !UseGetMessage.Checked;
+            SetGetMessageLoopProcessing();
+        }
+
+        private void idlang_cantonese_Click(object sender, EventArgs e)
+        {
+            load_language("cantonese");
+        }
+
+        private void idlang_turkish_Click(object sender, EventArgs e)
+        {
+            load_language("turkish");
         }
     }
 }
