@@ -293,6 +293,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     DTWAIN_EnableMsgNotify(TRUE);
 
+    /* Enable the OCR interface */
+    DTWAIN_InitOCRInterface();
+
     /* Also allow DTWAIN messages to be sent to our callback */
     DTWAIN_SetCallback(TwainCallbackProc,0);
 
@@ -413,7 +416,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         if ( g_FileType == DTWAIN_TEXTMULTI )
                         {
                             /* Initialize the OCR engine if it's available */
-                            if (!DTWAIN_InitOCRInterface() )
+                            if (!DTWAIN_IsFileTypeSupported(DTWAIN_TEXTMULTI) )
                             {
                                 MessageBox(g_hWnd, _T("Text mode requires OCR engine installed"), _T("No OCR engines detected"), MB_ICONSTOP);
                                 EnableAllMenuItems(TRUE);
