@@ -143,8 +143,8 @@ extern "C"
             case DTWAIN_TEXT:
             case DTWAIN_TEXTMULTI:
             {
-                bool isOCRInstalled = !pHandle->m_OCRInterfaceArray.empty();
-                if (!isOCRInstalled)
+                bRet = !pHandle->m_OCRInterfaceArray.empty();
+                if (!bRet)
                     nError = DTWAIN_ERR_OCR_NOTACTIVE;
             }
             break;

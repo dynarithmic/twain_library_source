@@ -144,8 +144,10 @@ extern "C"
             {
                 bool bSupported = DTWAIN_IsFileTypeSupported(extFileType.nFileType);
                 if (!bSupported)
+                {
                     DTWAIN_SetLastError(extFileType.returnCode);
-                LOG_FUNC_EXIT_NONAME_PARAMS(false)
+                    LOG_FUNC_EXIT_NONAME_PARAMS(false)
+                }
             }
         }
 
