@@ -30,16 +30,25 @@ using namespace dynarithmic;
 
 void CTL_JPegXLIOHandler::InitializeJXLSupport()
 {
-    auto jxlPath = stringconversion::Convert_Native_To_Wide(CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_JPEGXL));
-    auto jxlLoadVal = CTL_StaticData::GetJPEGXLLoader().Load(jxlPath); 
-    if ( !jxlLoadVal.first )
+    try
     {
-        jxlError.windowsError = jxlLoadVal.second;
+        auto jxlPath = stringconversion::Convert_Native_To_Wide(CTL_StaticData::GetComponentPath(DTWAIN_COMPONENT_JPEGXL));
+        auto jxlLoadVal = CTL_StaticData::GetJPEGXLLoader().Load(jxlPath);
+        if (!jxlLoadVal.first)
+        {
+            jxlError.windowsError = jxlLoadVal.second;
+            m_bJxlAvailable = false;
+            LogWin32Error(jxlError.windowsError);
+            return;
+        }
+        m_bJxlAvailable = jxlLoadVal.first;
+    }
+    catch (...)
+    {
+        jxlError.windowsError = ERROR_UNHANDLED_EXCEPTION;
         m_bJxlAvailable = false;
         LogWin32Error(jxlError.windowsError);
-        return;
     }
-    m_bJxlAvailable = jxlLoadVal.first;
 }
 
 int CTL_JPegXLIOHandler::WriteBitmap(LPCTSTR szFile, bool, int, DibMultiPageStruct*) 
