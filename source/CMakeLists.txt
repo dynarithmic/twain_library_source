@@ -1272,13 +1272,14 @@ set(NLOHMANN_SOURCES
   ${PROJECT_SOURCE_DIR}/nlohmann/json_fwd.hpp
   )
 
-set(TRANSYM_SOURCES
-  ${PROJECT_SOURCE_DIR}/ocr/transym/vc++/LICENSE
-  ${PROJECT_SOURCE_DIR}/ocr/transym/vc++/TOCRdll.h
-  ${PROJECT_SOURCE_DIR}/ocr/transym/vc++/TOCRerrs.h
-  ${PROJECT_SOURCE_DIR}/ocr/transym/vc++/TOCRlangSel.h
-  ${PROJECT_SOURCE_DIR}/ocr/transym/vc++/TOCRuser.h
-  )
+file(GLOB TRANSYM_SOURCES CONFIGURE_DEPENDS
+    "${PROJECT_SOURCE_DIR}/ocr/transym/vc++/*.h"
+    "${PROJECT_SOURCE_DIR}/ocr/transym/vc++/LICENSE"
+)
+
+file(GLOB_RECURSE LIBJXL_SOURCES CONFIGURE_DEPENDS
+    "${PROJECT_SOURCE_DIR}/LibJXL/*.*"
+)
 
 set(WILDCARD_SOURCES
   ${PROJECT_SOURCE_DIR}/wildcards/wildcards.hpp
@@ -1410,6 +1411,7 @@ add_library(dtwain SHARED
     ${MAIN_SOURCES}
     ${LIBGIF_SOURCES}
     ${LIBJPEG_SOURCES}
+    ${LIBJXL_SOURCES}
     ${LIBJXR_SOURCES}
     ${LIBOPENJPEG_SOURCES}
     ${LIBTIFF_SOURCES}
@@ -1704,6 +1706,7 @@ source_group(
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${MAIN_INL})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${LIBGIF_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${LIBJPEG_SOURCES})
+source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${LIBJXL_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${LIBJXR_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${LIBOPENJPEG_SOURCES})
 source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${LIBPNG_SOURCES})
