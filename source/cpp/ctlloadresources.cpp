@@ -659,7 +659,7 @@ namespace dynarithmic
         auto str = GetResourceStringFromMap(static_cast<LONG>(std::abs(nResNumber)));
         if (str.empty())
             // Try the internal resources
-            str = LoadResourceFromRC(nResNumber);
+            str = LoadResourceFromRC(std::abs(nResNumber));
         return str;
     }
 

@@ -51,7 +51,7 @@ namespace dynarithmic
     LONG DTWAIN_CloseAllSources();
     HMODULE GetDLLInstance();
 
-    void UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
+    std::pair<bool, int> UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
 
     DTWAIN_HANDLE GetDTWAINHandle_Internal();
     void SysDestroyNoCheck();

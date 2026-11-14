@@ -59,7 +59,7 @@ namespace dynarithmic
     class CTL_TwainDLLHandle
     {
         using OCRInterfaceContainer = std::vector<OCREnginePtr>;
-        using OCRProductNameToEngineMap = BASIC_UNORDERED_MAPTYPE_<std::string, OCREnginePtr>;
+        using OCRProductNameToEngineMap = BASIC_UNORDERED_MAPTYPE_<std::string, OCREngine*>;
         using CTL_TwainDLLHandlePtr = std::shared_ptr<CTL_TwainDLLHandle>;
 
         public:
@@ -165,7 +165,7 @@ namespace dynarithmic
             LONGLONG            m_lCallbackData64;
             OCRInterfaceContainer m_OCRInterfaceArray;
             OCRProductNameToEngineMap m_OCRProdNameToEngine;
-            OCREnginePtr          m_pOCRDefaultEngine;
+            OCREngine*          m_pOCRDefaultEngine;
             CTL_OnSourceOpenProperties  m_OnSourceOpenProperties = {};
 
             // File Save As information
