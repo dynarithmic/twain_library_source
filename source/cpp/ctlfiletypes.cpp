@@ -140,6 +140,14 @@ extern "C"
                     nError = DTWAIN_ERR_JXL_NOTAVAILABLE;
             }
             break;
+            case DTWAIN_TEXT:
+            case DTWAIN_TEXTMULTI:
+            {
+                bRet = !pHandle->m_OCRInterfaceArray.empty();
+                if (!bRet)
+                    nError = DTWAIN_ERR_OCR_NOTACTIVE;
+            }
+            break;
             default:
             {
                 auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();

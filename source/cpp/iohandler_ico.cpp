@@ -23,6 +23,7 @@
 #include "iohandler_ico.h"
 #include "ctldib32ex.h"
 #include "ctlstringconversion.h"
+#include <algorithm>
 
 using namespace dynarithmic;
 
@@ -71,8 +72,8 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
 
         if (m_ImageInfoEx.IsIcoResized && (height > 255 || width > 255))
         {
-            height = 255;
-            width = 255;
+            height = std::clamp(height, 1U, 255U);
+            width = std::clamp(width, 1U, 255U);
             m_pDib->ResampleDib(static_cast<long>(width), static_cast<long>(height));
             hDib = m_pDib->GetHandle();
         }

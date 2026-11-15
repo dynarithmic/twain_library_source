@@ -292,13 +292,13 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
             // Get the current OCR engine's input format
 
             const auto pHandle = ImageInfo.theSource->GetDTWAINHandle();
-            auto* pOCREngine = pHandle->m_pOCRDefaultEngine.get();
+            auto* pOCREngine = pHandle->m_pOCRDefaultEngine;
             if (pOCREngine->GetInputType() == OCRInputType::File)
             {
                 DTWAIN_ARRAY a = nullptr;
                 const auto pHandle = ImageInfo.theSource->GetDTWAINHandle();
                 auto& factory = pHandle->m_ArrayFactory;
-                DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
+                DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                     DTWAIN_CAPGETCURRENT, &a);
                 DTWAINArrayLowLevelPtr_RAII raii(pHandle, &a);
                 if (a)
@@ -307,7 +307,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
                     if (!vValues.empty())
                     {
                         LONG InputFormat = vValues[0];
-                        pHandler = std::make_unique<CTL_TextIOHandler>(this, InputFormat, ImageInfo, pHandle->m_pOCRDefaultEngine.get());
+                        pHandler = std::make_unique<CTL_TextIOHandler>(this, InputFormat, ImageInfo, pHandle->m_pOCRDefaultEngine);
                     }
                     else
                         return DTWAIN_ERR_BADPARAM;
@@ -402,7 +402,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
             // Get the current OCR engine's input format
             DTWAIN_ARRAY a = nullptr;
             const auto pHandle = ImageInfo.theSource->GetDTWAINHandle();
-            auto* pOCREngine = pHandle->m_pOCRDefaultEngine.get();
+            auto* pOCREngine = pHandle->m_pOCRDefaultEngine;
             if (pOCREngine->GetInputType() == OCRInputType::File)
             {
                 DTWAIN_GetOCRCapValues(reinterpret_cast<DTWAIN_OCRENGINE>(pOCREngine), DTWAIN_OCRCV_IMAGEFILEFORMAT,

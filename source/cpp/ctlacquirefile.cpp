@@ -128,12 +128,34 @@ extern "C"
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
 
+        struct ExternalFileTypeData
+        {
+            int nFileType;
+            int returnCode;
+        };
+
+        static constexpr std::array<ExternalFileTypeData, 3> aExternalFileTypes
+        { {{DTWAIN_JPEGXL, DTWAIN_ERR_JXL_NOTAVAILABLE},
+              {DTWAIN_TEXT, DTWAIN_ERR_OCR_NOTACTIVE},
+              {DTWAIN_TEXTMULTI, DTWAIN_ERR_OCR_NOTACTIVE} } };
+        for (auto extFileType : aExternalFileTypes)
+        {
+            if (lFileType == extFileType.nFileType)
+            {
+                bool bSupported = DTWAIN_IsFileTypeSupported(extFileType.nFileType);
+                if (!bSupported)
+                {
+                    DTWAIN_SetLastError(extFileType.returnCode);
+                    LOG_FUNC_EXIT_NONAME_PARAMS(false)
+                }
+            }
+        }
+
         // Adjust lFileType if using OCR 
-        auto pOCR = pHandle->m_pOCRDefaultEngine.get();
-        if ( pOCR )
-            lFileType = OCREngine::GetInternalOCRFileType(lFileType, 
-                                                          pHandle->m_pOCRDefaultEngine.get()->GetOCREngineType());
-        
+        auto pOCR = pHandle->m_pOCRDefaultEngine;
+        if (pOCR)
+            lFileType = OCREngine::GetInternalOCRFileType(lFileType, pHandle->m_pOCRDefaultEngine->GetOCREngineType());
+
         DTWAIN_ARRAY tempNames = nullptr;
         DTWAINArrayPtr_RAII tempRAII(pHandle, &tempNames);
         DTWAIN_ARRAY arrayToUse = aFileNames;
