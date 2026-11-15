@@ -15,14 +15,14 @@ namespace TWAINDemo
     {
         public class PDFOptionsData
         {
-            public string sPDFProducer;
-            public string sPDFCreator;
-            public string sPDFKeywords;
-            public string sPDFTitle;
-            public string sPDFSubject;
-            public string sPDFAuthor;
-            public string sUserPassword;
-            public string sOwnerPassword;
+            public string sPDFProducer = "";
+            public string sPDFCreator = "";
+            public string sPDFKeywords = "";
+            public string sPDFTitle = "";
+            public string sPDFSubject = "";
+            public string sPDFAuthor = "";
+            public string sUserPassword = "";
+            public string sOwnerPassword = "";
             public bool stamp_pdf = false;
         }
 

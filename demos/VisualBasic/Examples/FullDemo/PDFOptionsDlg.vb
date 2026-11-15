@@ -5,14 +5,14 @@ Imports System.Text
 Public Partial Class PDFOptionsDlg
     Inherits Windows.Forms.Form
     Public Class PDFOptionsData
-        Public sPDFProducer As String
-        Public sPDFCreator As String
-        Public sPDFKeywords As String
-        Public sPDFTitle As String
-        Public sPDFSubject As String
-        Public sPDFAuthor As String
-        Public sUserPassword As String
-        Public sOwnerPassword As String
+        Public sPDFProducer As String = ""
+        Public sPDFCreator As String = ""
+        Public sPDFKeywords As String = ""
+        Public sPDFTitle As String = ""
+        Public sPDFSubject As String = ""
+        Public sPDFAuthor As String = ""
+        Public sUserPassword As String = ""
+        Public sOwnerPassword As String = ""
         Public stamp_pdf As Boolean = False
     End Class
 

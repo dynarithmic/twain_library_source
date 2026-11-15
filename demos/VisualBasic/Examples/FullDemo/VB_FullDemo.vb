@@ -1457,17 +1457,16 @@ End Sub
                     useStrong = 1
                 Exit Select
             End Select
-        End If
-        DTWAINAPI.DTWAIN_SetPDFEncryption(SelectedSource, 1, optionsData.sUserPassword, optionsData.sOwnerPassword,
-                                         DTWAINAPI.DTWAIN_PDF_ALLOWALL, useStrong)
-        If encryptionType = PDF_128BitAES_Encryption_Value Then
-            DTWAINAPI.DTWAIN_SetPDFAESEncryption(SelectedSource, DTWAINAPI.DTWAIN_PDF_AES128, 1)
-        ElseIf encryptionType = PDF_256BitAES_Encryption_Value Then
-            DTWAINAPI.DTWAIN_SetPDFAESEncryption(SelectedSource, DTWAINAPI.DTWAIN_PDF_AES256, 1)
-        ElseIf encryptionType = PDF_ASCII85_Value Then
+            DTWAINAPI.DTWAIN_SetPDFEncryption(SelectedSource, 1, optionsData.sUserPassword, optionsData.sOwnerPassword,
+                                             DTWAINAPI.DTWAIN_PDF_ALLOWALL, useStrong)
+            If encryptionType = PDF_128BitAES_Encryption_Value Then
+                DTWAINAPI.DTWAIN_SetPDFAESEncryption(SelectedSource, DTWAINAPI.DTWAIN_PDF_AES128, 1)
+            ElseIf encryptionType = PDF_256BitAES_Encryption_Value Then
+                DTWAINAPI.DTWAIN_SetPDFAESEncryption(SelectedSource, DTWAINAPI.DTWAIN_PDF_AES256, 1)
+            End If
+        Else If encryptionType = PDF_ASCII85_Value Then
             DTWAINAPI.DTWAIN_SetPDFASCIICompression(SelectedSource, 1)
         End If
-
         stamp_pdf = optionsData.stamp_pdf
         AcquireToFile(0, DTWAINAPI.DTWAIN_PDFMULTI)
     End Sub
