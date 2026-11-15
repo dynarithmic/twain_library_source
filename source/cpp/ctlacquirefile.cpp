@@ -152,7 +152,7 @@ extern "C"
         }
 
         // Adjust lFileType if using OCR 
-        auto pOCR = pHandle->m_pOCRDefaultEngine;
+        auto pOCR = pHandle->m_pOCRDefaultEngine.get();
         if (pOCR)
             lFileType = OCREngine::GetInternalOCRFileType(lFileType, pHandle->m_pOCRDefaultEngine->GetOCREngineType());
 
