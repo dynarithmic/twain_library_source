@@ -29,6 +29,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK DisplayOptionsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 
 // Global Variables
@@ -68,6 +69,7 @@ void DisplayBlankThresholdOptions();
 void DisableFileXFerSubItems();
 BOOL IsAcquirePDFEncrypted(int PDFType);
 BOOL IsAcquirePDF(int PDFType);
+void DisplayOptions();
 
 INT_PTR DisplayGetFileNameDlg();
 INT_PTR DisplayPDFOptionsDlg(BOOL bUseEncryption);
@@ -240,6 +242,7 @@ UINT g_AllMenuItems[] = { IDM_SELECT_SOURCE,
                           IDM_SHOW_BARCODEINFO };
 
 TCHAR g_CustomLanguage[256];
+TCHAR g_JPEGXLPath[_MAX_PATH];
 
 DTWAIN_PDFTEXTELEMENT g_PDFTextElement;
 int g_BlankThresholdPct = 98;
@@ -285,6 +288,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         else
             return 0;
     }
+
+    g_JPEGXLPath[0] = 0;
 
     DTWAIN_SetAppInfoA("1.0","Demo Program Menu", "Demo Program Family", "Demo Program Name");
 
@@ -440,6 +445,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case IDM_ABOUT:
                    DialogBox(hInst, (LPCTSTR)IDD_ABOUTBOX, hWnd, (DLGPROC)About);
                    break;
+
+                case IDM_HELP_OPTIONS:
+                    DisplayOptions();
+                    break;
 
                 case IDM_SELECT_SOURCE:
                 case IDM_SELECT_SOURCE_BY_NAME:
@@ -959,6 +968,14 @@ DTWAIN_SOURCE DisplayCustomDlg()
     return g_NamedSource;
 }
 
+void DisplayOptions()
+{
+    if ( DialogBox(g_hInstance, (LPCTSTR)IDD_dlgOptions, g_hWnd, (DLGPROC)DisplayOptionsProc) == IDOK)
+    {
+        DTWAIN_SetComponentPath(DTWAIN_COMPONENT_JPEGXL, g_JPEGXLPath);
+    }
+}
+
 void DisplaySourceProps()
 {
     DialogBox(g_hInstance, (LPCTSTR)IDD_dlgProperties, g_hWnd, (DLGPROC)DisplaySourcePropsProc);
@@ -1439,6 +1456,46 @@ LRESULT CALLBACK DisplayBarCodeInfoProc(HWND hDlg, UINT message, WPARAM wParam, 
                 EndDialog(hDlg, 1);
             }
             break;
+            }
+        }
+        break;
+    }
+    return FALSE;
+}
+
+LRESULT CALLBACK DisplayOptionsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+        case WM_INITDIALOG:
+        {
+            /* Populate the JPEG-XL path edit control */
+            HWND hWndJXLPath = GetDlgItem(hDlg, IDC_edJXLPath);
+            SetWindowText(hWndJXLPath, g_JPEGXLPath);
+            return TRUE;
+        }
+        break;
+        case WM_COMMAND:
+        {
+            int nControl = LOWORD(wParam);
+            int nNotification = HIWORD(wParam);
+
+            switch (nControl)
+            {
+               /* Quit the dialog */
+                case IDOK:
+                {
+                    HWND hWndJXLPath = GetDlgItem(hDlg, IDC_edJXLPath);
+                    GetWindowText(hWndJXLPath, g_JPEGXLPath, _MAX_PATH);
+                    EndDialog(hDlg, LOWORD(wParam));
+                    return TRUE;
+                }
+                break;
+
+                case IDCANCEL:
+                    EndDialog(hDlg, LOWORD(wParam));
+                    return TRUE;
+                    break;
             }
         }
         break;
