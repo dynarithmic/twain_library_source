@@ -1207,6 +1207,7 @@ namespace TWAINDemo
 
         private void SelectTheSource(int nWhich)
         {
+            var customLastSelection = DialogResult.OK;
             if (SelectedSource != IntPtr.Zero)
             {
                 DialogResult nReturn;
@@ -1262,8 +1263,8 @@ namespace TWAINDemo
 
                 case 3:
                     CustomSelectSource customSourceDlg = new CustomSelectSource();
-                    DialogResult dResult = customSourceDlg.ShowDialog(this);
-                    if (dResult == DialogResult.OK)
+                    customLastSelection = customSourceDlg.ShowDialog(this);
+                    if (customLastSelection == DialogResult.OK)
                         SelectedSource = TwainAPI.DTWAIN_SelectSourceByName(customSourceDlg.GetSourceName());
                 break;
             }
@@ -1294,7 +1295,8 @@ namespace TWAINDemo
             else
             {
                 int lastError = TwainAPI.DTWAIN_GetLastError();
-                if (lastError == TwainAPI.DTWAIN_ERR_SOURCESELECTION_CANCELED)
+                if (lastError == TwainAPI.DTWAIN_ERR_SOURCESELECTION_CANCELED ||
+                    customLastSelection == DialogResult.Cancel)
                     MessageBox.Show("Source selection canceled", "TWAIN Info", MessageBoxButtons.OK);
                 else
                 {

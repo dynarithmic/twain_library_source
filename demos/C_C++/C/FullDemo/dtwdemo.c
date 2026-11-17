@@ -51,7 +51,7 @@ void EnableSelectSourceItems(BOOL bEnable);
 void EnableAllMenuItems(BOOL bEnable);
 void EnableBarcodeMenuItem(DTWAIN_SOURCE source);
 DTWAIN_SOURCE DisplayGetNameDlg();
-DTWAIN_SOURCE DisplayCustomDlg();
+DTWAIN_SOURCE DisplayCustomDlg(LONG* result);
 void DisplaySourceProps();
 void SetCaptionToSourceName();
 void AcquireNative();
@@ -633,6 +633,7 @@ BOOL IsMenuItemEnabled(UINT resID)
 void SelectTheSource(int nWhich)
 {
     DTWAIN_SOURCE tempSource=NULL;
+    LONG customSelectionRetCode = 0;
     if ( g_CurrentSource )
     {
         int nReturn = MessageBox(g_hWnd, _T("For this demo, only one Source can be opened.\r\n")
@@ -666,7 +667,7 @@ void SelectTheSource(int nWhich)
         break;
 
         case IDM_SELECT_SOURCE_CUSTOM:
-            tempSource = DisplayCustomDlg();
+            tempSource = DisplayCustomDlg(&customSelectionRetCode);
         break;
     }
     EnableSelectSourceItems(TRUE);
@@ -702,11 +703,18 @@ void SelectTheSource(int nWhich)
         DisableFileXFerSubItems();
 
         LONG lastError = DTWAIN_GetLastError();
-        wchar_t szCancelMsg[256];
+        if ( lastError == DTWAIN_ERR_SOURCESELECTION_CANCELED || customSelectionRetCode == IDCANCEL)
+        {
+            MessageBoxW(g_hWnd, L"Source selection cancelled",L"Information", MB_ICONINFORMATION);
+        }
+        else
+        {
+            wchar_t szCancelMsg[256];
 
-        // We will use the wide version, to ensure we get the proper UTF-8 string
-        DTWAIN_GetErrorStringW(lastError, szCancelMsg, 256);
-        MessageBoxW(g_hWnd, szCancelMsg, L"Information", MB_ICONSTOP);
+            // We will use the wide version, to ensure we get the proper UTF-8 string
+            DTWAIN_GetErrorStringW(lastError, szCancelMsg, 256);
+            MessageBoxW(g_hWnd, szCancelMsg, L"Information", MB_ICONSTOP);
+        }
     }
 }
 
@@ -961,10 +969,10 @@ void DisplayBarCodeInfo()
     DialogBox(g_hInstance, (LPCTSTR)IDD_dlgBarCodes, g_hWnd, (DLGPROC)DisplayBarCodeInfoProc);
 }
 
-DTWAIN_SOURCE DisplayCustomDlg()
+DTWAIN_SOURCE DisplayCustomDlg(LONG* result)
 {
     g_NamedSource = NULL;
-    DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSelectCustom, g_hWnd, (DLGPROC)DisplayCustomSelectProc);
+    *result = DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSelectCustom, g_hWnd, (DLGPROC)DisplayCustomSelectProc);
     return g_NamedSource;
 }
 
@@ -1562,7 +1570,7 @@ LRESULT CALLBACK DisplayCustomSelectProc(HWND hDlg, UINT message, WPARAM wParam,
                     if ( tempSource )
                     {
                         g_NamedSource = tempSource;
-                        EndDialog(hDlg, 1);
+                        EndDialog(hDlg, LOWORD(wParam));
                     }
                     else
                     {

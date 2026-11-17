@@ -67,6 +67,7 @@ Public Class VB_FullDemo
     Friend WithEvents menuTurkish As MenuItem
     Friend WithEvents TEXTOCR As MenuItem
     Friend WithEvents MenuItem12 As MenuItem
+    Friend WithEvents GeneralOptions As MenuItem
     Public Shared stamp_pdf As Boolean = True
     
     Public Sub New()
@@ -977,6 +978,7 @@ End Sub
             End If
         End If
         Enabled = False
+        Dim customLastSelection As DialogResult = DialogResult.OK
         Select Case nWhich
             Case 0
                 SelectedSource = DTWAINAPI.DTWAIN_SelectSource2(IntPtr.Zero, Nothing, 0, 0,
@@ -992,8 +994,8 @@ End Sub
                 SelectedSource = DTWAINAPI.DTWAIN_SelectDefaultSource
             Case 3
                 Dim customSourceDlg As New CustomSelectSource()
-                Dim dResult As DialogResult = customSourceDlg.ShowDialog()
-                If dResult = DialogResult.OK Then
+                customLastSelection = customSourceDlg.ShowDialog()
+                If customLastSelection = DialogResult.OK Then
                     SelectedSource = DTWAINAPI.DTWAIN_SelectSourceByName(customSourceDlg.GetSourceName())
                 End If
         End Select
@@ -1018,12 +1020,12 @@ End Sub
         Else
             Dim lastError As Integer
             lastError = DTWAINAPI.DTWAIN_GetLastError()
-            If lastError = DTWAINAPI.DTWAIN_ERR_SOURCESELECTION_CANCELED Then
+            If lastError = DTWAINAPI.DTWAIN_ERR_SOURCESELECTION_CANCELED Or customLastSelection = DialogResult.Cancel Then
                 MessageBox.Show("Source selection canceled", "TWAIN Info", MessageBoxButtons.OK)
             Else
                 Dim szErr = New StringBuilder(100)
                 DTWAINAPI.DTWAIN_GetErrorString(lastError, szErr, 100)
-                MessageBox.Show("Error Selecting and/or opening Source.\r\n" + szErr.ToString(), "TWAIN Error", MessageBoxButtons.OK)
+                MessageBox.Show("Error Selecting and/or opening Source.  " + szErr.ToString(), "TWAIN Error", MessageBoxButtons.OK)
             End If
             SetCaptionToSourceName()
             EnableSourceItems(False)
