@@ -245,6 +245,7 @@ Public Class VB_FullDemo
         Me.UseSourceUI = New System.Windows.Forms.MenuItem()
         Me.DiscardBlankPages = New System.Windows.Forms.MenuItem()
         Me.ShowBarcodeInfo = New System.Windows.Forms.MenuItem()
+        Me.MenuItem12 = New System.Windows.Forms.MenuItem()
         Me.UseGetMessage = New System.Windows.Forms.MenuItem()
         Me.MenuItem10 = New System.Windows.Forms.MenuItem()
         Me.LoggingOptions = New System.Windows.Forms.MenuItem()
@@ -268,7 +269,7 @@ Public Class VB_FullDemo
         Me.menuCustomLanguage = New System.Windows.Forms.MenuItem()
         Me.MenuItem2 = New System.Windows.Forms.MenuItem()
         Me.DTWAINVersion = New System.Windows.Forms.MenuItem()
-        Me.MenuItem12 = New System.Windows.Forms.MenuItem()
+        Me.GeneralOptions = New System.Windows.Forms.MenuItem()
         Me.SuspendLayout
         '
         'MainMenu1
@@ -709,6 +710,11 @@ Public Class VB_FullDemo
         Me.ShowBarcodeInfo.Index = 8
         Me.ShowBarcodeInfo.Text = "Show Barcode Information"
         '
+        'MenuItem12
+        '
+        Me.MenuItem12.Index = 9
+        Me.MenuItem12.Text = "-"
+        '
         'UseGetMessage
         '
         Me.UseGetMessage.Index = 10
@@ -819,18 +825,18 @@ Public Class VB_FullDemo
         'MenuItem2
         '
         Me.MenuItem2.Index = 4
-        Me.MenuItem2.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.DTWAINVersion})
+        Me.MenuItem2.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.GeneralOptions, Me.DTWAINVersion})
         Me.MenuItem2.Text = "Help"
         '
         'DTWAINVersion
         '
-        Me.DTWAINVersion.Index = 0
+        Me.DTWAINVersion.Index = 1
         Me.DTWAINVersion.Text = "DTWAIN Version..."
         '
-        'MenuItem12
+        'GeneralOptions
         '
-        Me.MenuItem12.Index = 9
-        Me.MenuItem12.Text = "-"
+        Me.GeneralOptions.Index = 0
+        Me.GeneralOptions.Text = "Options..."
         '
         'VB_FullDemo
         '
@@ -1658,5 +1664,18 @@ End Sub
     Private Sub UseGetMessage_Click(sender As Object, e As EventArgs) Handles UseGetMessage.Click
         UseGetMessage.Checked = Not UseGetMessage.Checked
         SetGetMessageLoopProcessing()
+    End Sub
+
+    Private Sub GeneralOptions_Click(sender As Object, e As EventArgs) Handles GeneralOptions.Click
+        Dim origData As GeneralOptionsDlg.GeneralOptionsData = new GeneralOptionsDlg.GeneralOptionsData()
+        Dim curJXLPath As StringBuilder = new StringBuilder(256)
+        DTWAINAPI.DTWAIN_GetComponentPath(DTWAINAPI.DTWAIN_COMPONENT_JPEGXL, curJXLPath, 256)
+        origData.sJXLPath = curJXLPath.ToString()
+        Dim dlg As GeneralOptionsDlg = new GeneralOptionsDlg(origData)
+        dlg.StartPosition = FormStartPosition.CenterParent
+        If dlg.ShowDialog(Me) = DialogResult.OK Then
+            Dim jxlPath As string = dlg.GetGeneraoOptionsData().sJXLPath
+            DTWAINAPI.DTWAIN_SetComponentPath(DTWAINAPI.DTWAIN_COMPONENT_JPEGXL, jxlPath)
+        End If
     End Sub
 End Class
