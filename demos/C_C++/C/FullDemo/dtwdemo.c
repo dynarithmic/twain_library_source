@@ -50,7 +50,7 @@ void EnableSourceItems(BOOL bEnable);
 void EnableSelectSourceItems(BOOL bEnable);
 void EnableAllMenuItems(BOOL bEnable);
 void EnableBarcodeMenuItem(DTWAIN_SOURCE source);
-DTWAIN_SOURCE DisplayGetNameDlg();
+DTWAIN_SOURCE DisplayGetNameDlg(LONG* result);
 DTWAIN_SOURCE DisplayCustomDlg(LONG* result);
 void DisplaySourceProps();
 void SetCaptionToSourceName();
@@ -663,7 +663,7 @@ void SelectTheSource(int nWhich)
         break;
 
         case IDM_SELECT_SOURCE_BY_NAME:
-            tempSource = DisplayGetNameDlg();
+            tempSource = DisplayGetNameDlg(&customSelectionRetCode);
         break;
 
         case IDM_SELECT_SOURCE_CUSTOM:
@@ -941,10 +941,10 @@ void AcquireFile(BOOL bUseSource, LONG resourceID, LONG fileType)
 }
 
 
-DTWAIN_SOURCE DisplayGetNameDlg()
+DTWAIN_SOURCE DisplayGetNameDlg(LONG *result)
 {
     g_NamedSource = NULL;
-    DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterSourceName, g_hWnd, (DLGPROC)EnterSourceNameProc);
+    *result = DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterSourceName, g_hWnd, (DLGPROC)EnterSourceNameProc);
     return g_NamedSource;
 }
 

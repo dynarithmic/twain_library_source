@@ -986,8 +986,8 @@ End Sub
                                                                 DTWAINAPI.DTWAIN_DLG_TOPMOSTWINDOW Or DTWAINAPI.DTWAIN_DLG_SORTNAMES)
             Case 1
                 Dim objSelectSourceByName = New SelectSourceByName()
-                Dim nResult As DialogResult = objSelectSourceByName.ShowDialog()
-                If nResult = DialogResult.OK Then
+                customLastSelection = objSelectSourceByName.ShowDialog()
+                If customLastSelection = DialogResult.OK Then
                     SelectedSource = DTWAINAPI.DTWAIN_SelectSourceByName(objSelectSourceByName.GetText())
                 End If
             Case 2

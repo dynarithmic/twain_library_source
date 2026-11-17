@@ -1246,8 +1246,8 @@ namespace TWAINDemo
 
                 case 1:
                     SelectSourceByNameBox objSelectSourceByName = new SelectSourceByNameBox();
-                    DialogResult nResult = objSelectSourceByName.ShowDialog(this);
-                    if (nResult == DialogResult.OK)
+                    customLastSelection = objSelectSourceByName.ShowDialog(this);
+                    if (customLastSelection == DialogResult.OK)
                     {
                         SelectedSource = TwainAPI.DTWAIN_SelectSourceByName(objSelectSourceByName.GetText());
                     }
