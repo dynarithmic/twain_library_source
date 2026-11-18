@@ -124,7 +124,8 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                 // Get the image information
                 if ( !bNextAttemptIsRetry )
                 {
-                    if (!CTL_TwainAppMgr::GetImageInfo(pSource))
+                    auto CurImageInfo = CTL_TwainAppMgr::GetImageInfo(pSource);
+                    if (!CurImageInfo.first)
                     {
                         if ( !pSource->SkipImageInfoErrors() )
                         {
@@ -138,6 +139,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                     }
                     else
                     {
+                        pSource->SetImageInfo(&CurImageInfo.second);
                     }
                 }
                 // Let TWAIN initiate the transfer

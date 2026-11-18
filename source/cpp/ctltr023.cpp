@@ -18,6 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include <cstdint>
+#include <cstring>
+#include <limits>
 #include "ctltr023.h"
 #include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
@@ -29,6 +32,54 @@
 
 using namespace dynarithmic;
 
+namespace
+{
+    bool AlignTransferredStrip(BYTE* pStrip,size_t rows,size_t sourceStride,
+                               size_t destinationStride,size_t pixelBytes)
+    {
+        if (!pStrip || !rows || !sourceStride || !destinationStride)
+            return false;
+
+        if (pixelBytes > sourceStride || pixelBytes > destinationStride)
+            return false;
+
+        if (rows > SIZE_MAX / sourceStride || rows > SIZE_MAX / destinationStride)
+            return false;
+
+        if (sourceStride == destinationStride)
+            return true;
+
+        if (destinationStride > sourceStride)
+        {
+            // Expand rows backward to avoid overwriting
+            // source rows that have not been processed.
+            for (size_t row = rows; row-- > 0;)
+            {
+                BYTE* src = pStrip + row * sourceStride;
+                BYTE* dst = pStrip + row * destinationStride;
+
+                memmove(dst, src, pixelBytes);
+
+                // Clear destination padding.
+                memset(dst + pixelBytes, 0,destinationStride - pixelBytes);
+            }
+        }
+        else
+        {
+            // Compact rows forward.
+            for (size_t row = 0; row < rows; ++row)
+            {
+                BYTE* src = pStrip + row * sourceStride;
+                BYTE* dst = pStrip + row * destinationStride;
+
+                memmove(dst, src, pixelBytes);
+
+                memset(dst + pixelBytes, 0,destinationStride - pixelBytes);
+            }
+        }
+        return true;
+    }
+}
 CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
                                                  CTL_ITwainSource* pSource,
                                                  HANDLE hDib,
@@ -171,14 +222,10 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
                 else
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_TRANSFERSTRIPREADY, reinterpret_cast<LPARAM>(pSource));
-                if ( m_nCompression == TWCP_NONE )
-                {
-                    m_nCompressPos += m_ImageMemXferBuffer.BytesWritten;
-                    // If not user defined copy DIB data here
-                    if ( !pSource->GetUserStripBuffer() && !pSource->IsTileModeOn())
-                        m_ptrDib += m_ImageMemXferBuffer.BytesWritten;
 
-                    m_ImageMemXferBuffer.Memory.TheMem = m_ptrDib;
+                if (m_nCompression == TWCP_NONE)
+                {
+                    ProcessTransferredStrip();
                 }
                 else /* At this point, compression was assumed.  The memory will be allocated // by the Source if strips are
                 used.  To see if the memory buffer can be deleted, the pointer // to the memory buffer is compared to the
@@ -319,8 +366,11 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                 else
                 // we do strip processing to clean up
                 {
-                    // Let Source set the handle
-                    m_nCompressPos += m_ImageMemXferBuffer.BytesWritten;
+                    if (!pSource->GetUserStripBuffer())
+                        ProcessTransferredStrip();
+                    else
+                        // Let Source set the handle
+                        m_nCompressPos += m_ImageMemXferBuffer.BytesWritten;
                     pSource->SetNumCompressBytes(m_nCompressPos);
 
                     ImageMemoryHandler::GlobalUnlock(m_DibStrip);
@@ -586,4 +636,43 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     return rc;
 }
 
+void CTL_ImageMemXferTriplet::ProcessTransferredStrip()
+{
+    auto* pSource = GetSourcePtr();
+    const auto& xfer = m_ImageMemXferBuffer;
 
+    m_nCompressPos += xfer.BytesWritten;
+
+    if (!pSource->GetUserStripBuffer() &&
+        !pSource->IsTileModeOn())
+    {
+        TW_IMAGEINFO ImageInfo = {};
+        pSource->GetImageInfo(&ImageInfo);
+        const size_t width = static_cast<size_t>(ImageInfo.ImageWidth);
+        const size_t bpp = static_cast<size_t>(ImageInfo.BitsPerPixel);
+        const size_t pixelBytes = (width * bpp + 7) / 8;
+
+        const size_t dibStride = ((width * bpp + 31) / 32) * 4;
+
+        const size_t sourceStride =
+            static_cast<size_t>(xfer.BytesPerRow);
+
+        const size_t rows = static_cast<size_t>(xfer.Rows);
+
+        BYTE* pStrip = static_cast<BYTE*>(xfer.Memory.TheMem);
+
+        if (sourceStride != dibStride)
+        {
+            if (!AlignTransferredStrip(pStrip, rows, sourceStride, dibStride, pixelBytes))
+            {
+                CTL_TwainAppMgr::SendTwainMsgToWindow(GetSessionPtr(),nullptr, DTWAIN_TN_TRANSFERSTRIPFAILED,
+                    reinterpret_cast<LPARAM>(pSource));
+            }
+        }
+
+        // Advance by the size of the aligned DIB rows.
+        const size_t alignedStripBytes = rows * dibStride;
+        m_ptrDib = pStrip + alignedStripBytes;
+    }
+    m_ImageMemXferBuffer.Memory.TheMem = m_ptrDib;
+}

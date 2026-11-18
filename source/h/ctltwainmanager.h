@@ -170,7 +170,7 @@ namespace dynarithmic
             // User Interface functions
             static bool ShowUserInterface(CTL_ITwainSource *pSource, bool bTest = false, bool bShowUIOnly = false);
             static bool DisableUserInterface( const CTL_ITwainSource *pSource );
-            static bool GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip=nullptr);
+            static std::pair<bool, TW_IMAGEINFO> GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip=nullptr);
             static int  TransferImage(const CTL_ITwainSource *pSource, int nImageNum=0);
             static bool SetFeederEnableMode( CTL_ITwainSource *pSource, bool bMode=true);
             static void NotifyFeederStatus();

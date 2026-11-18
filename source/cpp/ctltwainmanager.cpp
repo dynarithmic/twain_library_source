@@ -693,7 +693,7 @@ void CTL_TwainAppMgr::EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSo
     }
 }
 
-bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip/*=nullptr*/)
+std::pair<bool, TW_IMAGEINFO> CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip/*=nullptr*/)
 {
     const auto pTempSource = pSource;
     const auto pSession = pTempSource->GetTwainSession();
@@ -704,11 +704,10 @@ bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTripl
     {
         auto ccode = GetLastConditionCodeError();
         if ( ccode != TWCC_SUCCESS )
-            return false;
-        return true;
+            return { false, {} };
+        return { false, {} };
     }
-    pSource->SetImageInfo(pTrip->GetImageInfoBuffer());
-    return true;
+    return { true, pTrip->GetImageInfoData() };
 }
 
 CTL_ITwainSession* CTL_TwainAppMgr::GetCurrentSession()

@@ -39,6 +39,11 @@ namespace dynarithmic
                 return &m_ImageInfo;
             }
 
+            TW_IMAGEINFO GetImageInfoData() const
+            {
+                return m_ImageInfo;
+            }
+
         private:
             TW_IMAGEINFO          m_ImageInfo {};
     };
