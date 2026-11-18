@@ -773,110 +773,141 @@ HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
 
 bool CTL_TwainDib::FlipBitMap(bool /*bRGB*/) const
 {
-    int                     pixels;
-    long                    items;
-    long                    i;
-
     const HANDLE hDib = m_TwainDibInfo.GetDib();
+    if (!hDib)
+        return false;
 
-    if (hDib)
+    auto* pDib = static_cast<BYTE*>(ImageMemoryHandler::GlobalLock(hDib));
+
+    if (!pDib)
+        return false;
+
+    DTWAINGlobalHandle_RAII dibHandler(hDib);
+
+    const size_t dibSize = static_cast<size_t>(ImageMemoryHandler::GlobalSize(hDib));
+
+    if (dibSize < sizeof(BITMAPINFOHEADER))
+        return false;
+
+    const auto* header = reinterpret_cast<const BITMAPINFOHEADER*>(pDib);
+
+    if (header->biSize != sizeof(BITMAPINFOHEADER))
+        return false;
+
+    if (header->biPlanes != 1 ||
+        header->biWidth <= 0 ||
+        header->biHeight == 0)
+        return false;
+
+    // This implementation handles uncompressed BI_RGB DIBs.
+    if (header->biCompression != BI_RGB)
+        return false;
+
+    const WORD bpp = header->biBitCount;
+
+    switch (bpp)
     {
-        BYTE* pDib = static_cast<BYTE*>(ImageMemoryHandler::GlobalLock(hDib));
+        case 1:
+        case 4:
+        case 8:
+        case 16:
+        case 24:
+        case 32:
+            break;
 
-        DTWAINGlobalHandle_RAII hDibHandler(hDib);
+        default:
+            return false;
+    }
 
-        LPBITMAPINFO pdib = reinterpret_cast<LPBITMAPINFO>(pDib);
-        LONG Width = pdib->bmiHeader.biWidth;
-        LONG Height = pdib->bmiHeader.biHeight;
-        DWORD SizeImage = pdib->bmiHeader.biSizeImage;
-        WORD BitCount = pdib->bmiHeader.biBitCount;
+    const uint64_t width = static_cast<uint64_t>(header->biWidth);
 
-        HANDLE temp = ImageMemoryHandler::GlobalAlloc(GHND, SizeImage);
-        if (temp)
+    // Convert through a wider signed type to safely
+    // handle LONG_MIN.
+    const int64_t signedHeight = header->biHeight;
+    const uint64_t height = static_cast<uint64_t>(signedHeight < 0 ? -signedHeight : signedHeight);
+
+    // DWORD-aligned DIB scan-line stride.
+    const uint64_t rowBits = width * bpp;
+    const uint64_t stride64 = ((rowBits + 31) / 32) * 4;
+
+    const uint64_t imageSize64 = stride64 * height;
+
+    if (stride64 > SIZE_MAX || imageSize64 > SIZE_MAX)
+        return false;
+
+    const size_t stride = static_cast<size_t>(stride64);
+    const size_t imageSize = static_cast<size_t>(imageSize64);
+
+    // Determine the palette size.
+    uint64_t paletteEntries = 0;
+
+    if (bpp <= 8)
+    {
+        const uint64_t maxColors = uint64_t{1} << bpp;
+
+        paletteEntries = header->biClrUsed ? header->biClrUsed : maxColors;
+
+        if (paletteEntries > maxColors)
+            return false;
+    }
+
+    const uint64_t pixelOffset64 = sizeof(BITMAPINFOHEADER) + paletteEntries * sizeof(RGBQUAD);
+
+    if (pixelOffset64 > dibSize)
+        return false;
+
+    const size_t pixelOffset = static_cast<size_t>(pixelOffset64);
+
+    if (imageSize > dibSize - pixelOffset)
+        return false;
+
+    BYTE* pixels = pDib + pixelOffset;
+
+    // Allocate storage for one scan line.
+    std::vector<BYTE> tempRow;
+
+    try
+    {
+        tempRow.resize(stride);
+    }
+    catch (const std::bad_alloc&)
+    {
+        return false;
+    }
+
+    // Reverse scan lines in place.
+    const size_t h = static_cast<size_t>(height);
+
+    for (size_t y = 0; y < h / 2; ++y)
+    {
+        BYTE* first = pixels + y * stride;
+        BYTE* last = pixels + (h - 1 - y) * stride;
+
+        memcpy(tempRow.data(), first, stride);
+        memcpy(first, last, stride);
+        memcpy(last, tempRow.data(), stride);
+    }
+
+    // Preserve the original 24-bit RGB/BGR conversion.
+    if (bpp == 24)
+    {
+        const size_t w = static_cast<size_t>(width);
+
+        for (size_t y = 0; y < h; ++y)
         {
-            auto tempptr = static_cast<unsigned char*>(ImageMemoryHandler::GlobalLock(temp));
+            BYTE* row = pixels + y * stride;
 
-            // make sure we unlock and free
-            DTWAINGlobalHandleUnlockFree_RAII memHandler(temp);
-
-            auto tempptrsave = tempptr;
-
-            // calculate offset to start of the bitmap data
-            DWORD offset = sizeof(BITMAPINFOHEADER);
-            offset += pdib->bmiHeader.biClrUsed * sizeof(RGBQUAD);
-
-            LONG Linelength = (Width * BitCount + 31) / 32 * 4;
-
-            //Goto Last line in bitmap
-            offset += Linelength * (Height-1);
-            pDib = pDib + offset - Linelength;
-
-            //For each line
-            for (LONG indexH = 1; indexH < Height; indexH++)
+            for (size_t x = 0; x < w; ++x)
             {
-                memcpy(tempptr, pDib, Linelength);
-                pDib -= Linelength;
-                tempptr += Linelength;
+                BYTE* pixel = row + x * 3;
+                std::swap(pixel[0], pixel[2]);
             }
-
-            // Copy temp over hBM
-            auto pbuffer = reinterpret_cast<unsigned char*>(pdib);
-             pbuffer += sizeof(BITMAPINFOHEADER);
-            pbuffer += pdib->bmiHeader.biClrUsed * sizeof(RGBQUAD);
-
-            memcpy(pbuffer, tempptrsave, SizeImage);
-
-            //Flip RGB color table
-            if ( BitCount == 4 )
-            {
-                pbuffer = reinterpret_cast<unsigned char*>(pdib);
-                pbuffer += sizeof(BITMAPINFOHEADER);
-                pbuffer += pdib->bmiHeader.biClrUsed * sizeof(RGBQUAD);
-
-                pixels = static_cast<int>(pdib->bmiHeader.biWidth);
-                for (items = 0; items < Height; items++)
-                {
-                    tempptr = pbuffer;
-                    for (i=0; i<pixels; i++)
-                    {
-                        //Switch Red byte and Blue nibble
-                        *tempptr = *tempptr << 4 | *tempptr >> 4;
-                        tempptr++;
-                    }
-                    pbuffer += Linelength;
-                }
-            }
-            else
-            if ( BitCount > 1 && BitCount != 8) //bRGB )
-            {
-                pbuffer = reinterpret_cast<unsigned char*>(pdib);
-                pbuffer += sizeof(BITMAPINFOHEADER);
-                pbuffer += pdib->bmiHeader.biClrUsed * sizeof(RGBQUAD);
-
-                pixels = static_cast<int>(pdib->bmiHeader.biWidth);
-                for (items = 0; items < Height; items++)
-                {
-                    tempptr = pbuffer;
-                    for (i=0; i<pixels; i++)
-                    {
-                        //Switch Red byte and Blue byte
-                        const BYTE SaveRed = *tempptr;
-                        const BYTE SaveBlue = *(tempptr + 2);
-
-                        // Test
-                        *tempptr = SaveBlue;
-                        *(tempptr+2) = SaveRed;
-                        //increment to next triplet
-                        tempptr += 3;
-                    }
-                    pbuffer += Linelength;
-                }
-            }
-            return true;
         }
     }
-    return false;
+
+    return true;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 CTL_TwainDibPtr CTL_TwainDibArray::CreateDib()
