@@ -645,6 +645,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
     public static const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
     public static const int DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310;
+    public static const int DTWAIN_TN_STRIPALIGNMENTFAILURE = 1311;
     public static const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
     public static const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
     public static const int DTWAIN_MODAL = 0;

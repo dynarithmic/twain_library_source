@@ -526,6 +526,7 @@ namespace Dynarithmic
         public const int DTWAIN_TN_QUERYUPDATEDIBORIG = 1308;
         public const int DTWAIN_TN_QUERYUPDATEDIBRESAMPLED = 1309;
         public const int DTWAIN_TN_PENDINGXFERSRETRIEVED = 1310;
+        public const int DTWAIN_TN_STRIPALIGNMENTFAILURE = 1311;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
