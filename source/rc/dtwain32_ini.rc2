@@ -5,6 +5,7 @@ WIA-* = 1000
 [FlatbedOnly]
 WIA-* = 1
 [TwainLoopPeek]
+Testget = 0
 [TwainLoopGetMsg]
 [OCRLibrary]
 Transym = TOCRDLL.DLL
