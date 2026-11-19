@@ -110,7 +110,11 @@ DTWAIN Version changes
 
     The function can be called repeatedly to detect changes in format availability during application execution.
 
-    Applications can also call this function during acquisition notifications, such as `DTWAIN_TN_QUERYDISCARDPAGE`, to check JPEG XL availability before saving an acquired image.
+    Applications can also call this function during acquisition notifications, such as `DTWAIN_TN_QUERYDISCARDPAGE`, to check JPEG XL 
+    availability before saving an acquired image.
+
+- Fixed issue with when DTWAIN_AcquireBuffered() or DTWAIN_AcquiredBufferedEx() is called, and the device returns non-word unaligned DIB data.
+  The symptoms of the issue would be that the returned DIB could have the "staircase" effect when viewed.
 
 - Returning 0 from DTWAIN_TN_FILEPAGESAVING notification when acquiring to image files will now stop the file page being saved.
 

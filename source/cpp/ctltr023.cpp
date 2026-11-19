@@ -19,8 +19,6 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <cstdint>
-#include <cstring>
-#include <limits>
 #include "ctltr023.h"
 #include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
@@ -643,20 +641,15 @@ void CTL_ImageMemXferTriplet::ProcessTransferredStrip()
 
     m_nCompressPos += xfer.BytesWritten;
 
-    if (!pSource->GetUserStripBuffer() &&
-        !pSource->IsTileModeOn())
+    if (!pSource->GetUserStripBuffer() && !pSource->IsTileModeOn())
     {
         TW_IMAGEINFO ImageInfo = {};
         pSource->GetImageInfo(&ImageInfo);
         const size_t width = static_cast<size_t>(ImageInfo.ImageWidth);
         const size_t bpp = static_cast<size_t>(ImageInfo.BitsPerPixel);
         const size_t pixelBytes = (width * bpp + 7) / 8;
-
         const size_t dibStride = ((width * bpp + 31) / 32) * 4;
-
-        const size_t sourceStride =
-            static_cast<size_t>(xfer.BytesPerRow);
-
+        const size_t sourceStride = static_cast<size_t>(xfer.BytesPerRow);
         const size_t rows = static_cast<size_t>(xfer.Rows);
 
         BYTE* pStrip = static_cast<BYTE*>(xfer.Memory.TheMem);
@@ -665,7 +658,7 @@ void CTL_ImageMemXferTriplet::ProcessTransferredStrip()
         {
             if (!AlignTransferredStrip(pStrip, rows, sourceStride, dibStride, pixelBytes))
             {
-                CTL_TwainAppMgr::SendTwainMsgToWindow(GetSessionPtr(),nullptr, DTWAIN_TN_TRANSFERSTRIPFAILED,
+                CTL_TwainAppMgr::SendTwainMsgToWindow(GetSessionPtr(),nullptr, DTWAIN_TN_STRIPALIGNMENTFAILURE,
                     reinterpret_cast<LPARAM>(pSource));
             }
         }

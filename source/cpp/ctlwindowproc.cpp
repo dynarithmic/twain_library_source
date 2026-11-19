@@ -541,6 +541,7 @@ namespace dynarithmic
             case DTWAIN_TN_QUERYUPDATEDIBORIG:
             case DTWAIN_TN_QUERYUPDATEDIBRESAMPLED:
             case DTWAIN_TN_PENDINGXFERSRETRIEVED:
+            case DTWAIN_TN_STRIPALIGNMENTFAILURE:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))
