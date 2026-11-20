@@ -461,11 +461,6 @@ extern "C"
         auto& logFlags = CTL_StaticData::GetLogFilterFlags();
         FlagRAII raii(logFlags);
 
-        // Turn off low-level TWAIN logging if no logging for
-        // IsTwainMsg
-        if (!(logFlags & DTWAIN_LOG_ISTWAINMSG))
-            logFlags = logFlags & ~DTWAIN_LOG_LOWLEVELTWAIN;
-
         auto& msgQueue = CTL_StaticData::GetTwainV2MessageQueue();
         if (!msgQueue.empty())
         {

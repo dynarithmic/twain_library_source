@@ -693,7 +693,7 @@ void CTL_TwainAppMgr::EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSo
     }
 }
 
-bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip/*=nullptr*/)
+std::pair<bool, TW_IMAGEINFO> CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip/*=nullptr*/)
 {
     const auto pTempSource = pSource;
     const auto pSession = pTempSource->GetTwainSession();
@@ -704,11 +704,10 @@ bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTripl
     {
         auto ccode = GetLastConditionCodeError();
         if ( ccode != TWCC_SUCCESS )
-            return false;
-        return true;
+            return { false, {} };
+        return { false, {} };
     }
-    pSource->SetImageInfo(pTrip->GetImageInfoBuffer());
-    return true;
+    return { true, pTrip->GetImageInfoData() };
 }
 
 CTL_ITwainSession* CTL_TwainAppMgr::GetCurrentSession()
@@ -2553,17 +2552,23 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     TW_MEMREF    pData   = pTriplet.GetMemRef();
 
     bool isConditionCode = (nDG == DG_CONTROL && nDAT == DAT_STATUS && nMSG == MSG_GET);
+    bool isProcessEvent = (nDG == DG_CONTROL && nDAT == DAT_EVENT && nMSG == MSG_PROCESSEVENT);
 
     // To avoid infinite loop, only run the exit condition code triplet for 
     // triplets that are not DG_CONTROL / DAT_STATUS / MSG_GET
     ConditionCodeRAII raii(pOrigin, pDest, !isConditionCode);
 
-    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
+    auto logFilterFlags = CTL_StaticData::GetLogFilterFlags();
+    bool logTWEVENT = logFilterFlags & DTWAIN_LOG_DECODE_TWEVENT;
+    if (logFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
     {
-        decoder = GetGeneralErrorInfo(nDG, nDAT, nMSG);
-        sTwainLogString = decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
-        sTwainLogString = GetResourceStringFromMap(IDS_LOGMSG_INPUTTEXT) + ": " + sTwainLogString;
-        LogWriterUtils::WriteMultiLineInfoIndentedA(sTwainLogString, "\n");
+        if ((isProcessEvent && logTWEVENT) || !isProcessEvent)
+        {
+            decoder = GetGeneralErrorInfo(nDG, nDAT, nMSG);
+            sTwainLogString = decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
+            sTwainLogString = GetResourceStringFromMap(IDS_LOGMSG_INPUTTEXT) + ": " + sTwainLogString;
+            LogWriterUtils::WriteMultiLineInfoIndentedA(sTwainLogString, "\n");
+        }
     }
 
     TripletSaveRestore tSaveRestore(&m_pCurrentTriplet);
@@ -2640,13 +2645,16 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     }
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
     {
-        std::string sz;
-        std::ostringstream strm;
-        sTwainLogString =  decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
-        sz = CTL_TWAINDecoderStruct::GetTWAINDSMError(retcode);
-        std::string s1 = GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT);
-        strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4\n", { s1, std::to_string(retcode), sz, sTwainLogString });
-        LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
+        if ((isProcessEvent && logTWEVENT) || !isProcessEvent)
+        {
+            std::string sz;
+            std::ostringstream strm;
+            sTwainLogString = decoder.GetIdentityAndDataInfo(pOrigin, pDest, pData);
+            sz = CTL_TWAINDecoderStruct::GetTWAINDSMError(retcode);
+            std::string s1 = GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT);
+            strm << ReplacePlaceHolders<std::string>("%1=%2 (%3)\n%4\n", { s1, std::to_string(retcode), sz, sTwainLogString });
+            LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
+        }
     }
     if (retcode == TWRC_FAILURE || retcode == TWRC_CHECKSTATUS)
     {

@@ -77,27 +77,26 @@ extern "C"
     {
         LOG_FUNC_ENTRY_PARAMS((Source, XResolution, YResolution, Width, Length, NumSamples, BitsPerSample,BitsPerPixel, Planar, PixelType, Compression))
 
-        auto [pHandle, p] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-        CTL_ImageInfoTriplet II(pHandle->m_pTwainSession, p);
+        auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
         // Call TWAIN to get the information
-        auto bOk = CTL_TwainAppMgr::GetImageInfo(p, &II);
-        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bOk; }, DTWAIN_ERR_IMAGEINFO_INVALID, false, FUNC_MACRO);
+        auto bOk = CTL_TwainAppMgr::GetImageInfo(pSource);
+        DTWAIN_Check_Error_Condition_WithThrow_Ex(pHandle, [&] {return !bOk.first; }, DTWAIN_ERR_IMAGEINFO_INVALID, false, FUNC_MACRO);
 
         // Retrieve the image information.
-        TW_IMAGEINFO *pInfo = II.GetImageInfoBuffer();
+        TW_IMAGEINFO& rInfo = bOk.second;
         if (XResolution)
-            *XResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(pInfo->XResolution));
+            *XResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(rInfo.XResolution));
         if (YResolution)
-            *YResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(pInfo->YResolution));
+            *YResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(rInfo.YResolution));
         if (Width)
-            *Width = pInfo->ImageWidth;
+            *Width = rInfo.ImageWidth;
         if (Length)
-            *Length = pInfo->ImageLength;
+            *Length = rInfo.ImageLength;
         if (NumSamples)
-            *NumSamples = pInfo->SamplesPerPixel;
+            *NumSamples = rInfo.SamplesPerPixel;
         if (BitsPerPixel)
-            *BitsPerPixel = pInfo->BitsPerPixel;
+            *BitsPerPixel = rInfo.BitsPerPixel;
 
         if (BitsPerSample)
         {
@@ -106,8 +105,8 @@ extern "C"
             {
                 auto Array = retValue.second;
                 auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
-                TW_INT16* pStart = &pInfo->BitsPerSample[0];
-                TW_INT16* pEnd = &pInfo->BitsPerSample[8];
+                TW_INT16* pStart = &rInfo.BitsPerSample[0];
+                TW_INT16* pEnd = &rInfo.BitsPerSample[8];
                 std::copy(pStart, pEnd, vValues.begin());
                 MoveArray(pHandle, BitsPerSample, &Array);
             }
@@ -116,13 +115,13 @@ extern "C"
         }
 
         if (Planar)
-            *Planar = pInfo->Planar;
+            *Planar = rInfo.Planar;
 
         if (PixelType)
-            *PixelType = pInfo->PixelType;
+            *PixelType = rInfo.PixelType;
 
         if (Compression)
-            *Compression = pInfo->Compression;
+            *Compression = rInfo.Compression;
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression))
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK_LOG_PARAMS(false)

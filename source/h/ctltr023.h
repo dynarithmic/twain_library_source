@@ -46,6 +46,7 @@ namespace dynarithmic
             void InitXferBuffer();
             TW_IMAGEMEMXFER& GetMemXferBuffer() { return m_ImageMemXferBuffer; }
         private:
+            void ProcessTransferredStrip();
             TW_IMAGEMEMXFER m_ImageMemXferBuffer;
             TW_MEMORY       m_TempMemory;
             HANDLE          m_DibStrip;
