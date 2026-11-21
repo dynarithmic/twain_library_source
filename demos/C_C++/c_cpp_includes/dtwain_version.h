@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #ifndef DTWAIN_VERSION_H
-#define DTWAIN_VERSION_H
+#define DTWAIN_VERSION_H    
 
 #define DTWAIN_MAJOR_VERSION           5
 #define DTWAIN_MINOR_VERSION           10

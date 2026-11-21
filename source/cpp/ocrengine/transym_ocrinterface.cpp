@@ -419,6 +419,8 @@ TransymOCR::TransymOCR(CTL_TwainDLLHandle* DLLHandle) : OCREngine(DLLHandle), m_
         if ( status != TOCR_OK )
         {
             m_TransymSDK.GetLibraryLoader().Unload();
+            DTWAIN_Check_Error_Condition_WithThrow_Ex(DLLHandle, [&] { return true; },
+                                                      DTWAIN_ERR_OCR_INITFAILURE, false, FUNC_MACRO);
         }
         else
         {
