@@ -656,7 +656,7 @@ namespace dynarithmic
     std::string GetResourceString_Internal(int nResNumber)
     {
         // First check the external resources
-        auto str = GetResourceStringFromMap(static_cast<LONG>(std::abs(nResNumber)));
+        auto str = GetResourceStringFromMap(std::abs(nResNumber));
         if (str.empty())
             // Try the internal resources
             str = LoadResourceFromRC(std::abs(nResNumber));
