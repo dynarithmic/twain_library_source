@@ -51,6 +51,7 @@
 #include "errorcheck.h"
 #include "dtwain_config.h"
 #include "ctltwaindllpath.h"
+#include "ctlresourcestring.h"
 
 #ifdef _WIN64
     #pragma message ("Compiling 64-bit DTWAIN")
@@ -584,6 +585,26 @@ namespace
             }
         }
     }
+
+    void LoadConfiguredLibraryPaths(CTL_TwainDLLHandle *pHandle, int iniKey,
+                                    const std::vector<int>& aItemNames, const std::vector<int>& aComponent)
+    {
+        // Get the section name
+        auto* customProfile = CTL_StaticData::GetINIInterface();
+        if (!customProfile)
+            return;
+        std::string imageLibKey = CTL_StaticData::GetINIKey(iniKey).data();
+        std::vector<std::string> vItemNames;
+        for (auto num : aItemNames)
+            vItemNames.push_back(CTL_StaticData::GetINIKey(num).data());
+        int curComponent = 0;
+        for (auto& sItem : vItemNames)
+        {
+            std::string defName = customProfile->GetValue(imageLibKey.c_str(), sItem.c_str(), "");
+            CTL_StaticData::GetComponentPath(aComponent[curComponent]) = stringconversion::Convert_Ansi_To_Native(defName);
+            ++curComponent;
+        }
+    }
 }
 
 #ifdef _WIN32
@@ -713,7 +734,17 @@ namespace dynarithmic
 
                     // Load the last "Select Source" file dialog position
                     LoadSelectSourcePosition();
-                
+
+                    // Load the Image library paths if set in INI file
+                    LoadConfiguredLibraryPaths(pHandle, CTL_StaticDataStruct::INI_IMAGELIBRARY_KEY, 
+                                                { CTL_StaticDataStruct::INI_JXLPATH_ITEM },
+                                                { DTWAIN_COMPONENT_JPEGXL});
+
+                    // Load the OCR library paths if set in INI file
+                    LoadConfiguredLibraryPaths(pHandle, CTL_StaticDataStruct::INI_OCRLIBRARY_KEY, 
+                            { CTL_StaticDataStruct::INI_TRANSYMPATH_ITEM },
+                            { DTWAIN_COMPONENT_TRANSYMOCR});
+
                     WriteVersionToLog(pHandle);
                     // Store the user defined search order for the
                     // TWAIN datasource manager
