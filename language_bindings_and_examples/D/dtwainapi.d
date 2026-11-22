@@ -1141,7 +1141,8 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ERR_OCR_INVALIDBITDEPTH = (-2106);
     public static const int DTWAIN_ERR_OCR_RECOGNITIONERROR = (-2107);
     public static const int DTWAIN_ERR_OCR_SHUTDOWNFAILURE = (-2108);
-    public static const int DTWAIN_ERR_OCR_LAST = (-2109);
+    public static const int DTWAIN_ERR_OCR_INITFAILURE = (-2109);
+    public static const int DTWAIN_ERR_OCR_LAST = (-2110);
     public static const int DTWAIN_ERR_LAST = DTWAIN_ERR_OCR_LAST;
     public static const int DTWAIN_ERR_SOURCE_COULD_NOT_OPEN = (-2500);
     public static const int DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE = (-2501);
