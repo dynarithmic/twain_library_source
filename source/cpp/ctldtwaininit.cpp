@@ -601,7 +601,8 @@ namespace
         for (auto& sItem : vItemNames)
         {
             std::string defName = customProfile->GetValue(imageLibKey.c_str(), sItem.c_str(), "");
-            CTL_StaticData::GetComponentPath(aComponent[curComponent]) = stringconversion::Convert_Ansi_To_Native(defName);
+            CTL_StaticData::GetComponentPath(aComponent[curComponent]) = 
+                basicstringutils::UnquoteString(stringconversion::Convert_Ansi_To_Native(defName));
             ++curComponent;
         }
     }
