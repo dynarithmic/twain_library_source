@@ -426,6 +426,7 @@ extern "C"
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableGetMessageLoopDetection(DTWAIN_BOOL bEnable)
     {
         LOG_FUNC_ENTRY_PARAMS((bEnable))
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         auto& bTest = CTL_StaticData::IsTestForGetMessage();
         bTest = (bEnable ? true : false);
         LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
@@ -435,6 +436,7 @@ extern "C"
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsGetMessageLoopDetectionOn(VOID_PROTOTYPE)
     {
         LOG_FUNC_ENTRY_PARAMS(())
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
         LOG_FUNC_EXIT_NONAME_PARAMS(CTL_StaticData::IsTestForGetMessage()?TRUE:FALSE)
         CATCH_BLOCK(0)
     }

@@ -86,10 +86,12 @@ namespace dynarithmic
         }
 
         static const constexpr char* DoubleQuote() { return "\""; }
+        static const constexpr char* SingleQuote() { return "\'"; }
         static const constexpr char* Space() { return " "; }
         static const constexpr char* EmptyString() { return ""; }
         static const constexpr char* NewLineString() { return "\n"; }
         static const constexpr char* DateTimeString() { return "%Y-%m-%d_%H-%M-%S"; }
+        static const constexpr char* AllSpaceCharacters() { return " \t\n\r\f\v";}
         static size_t Length(const char* s) { return std::char_traits<char>::length(s); }
     };
 
@@ -122,11 +124,24 @@ namespace dynarithmic
         }
 
         static const constexpr wchar_t* DoubleQuote() { return L"\""; }
+        static const constexpr wchar_t* SingleQuote() { return L"\'"; }
         static const constexpr wchar_t* Space() { return L" "; }
         static const constexpr wchar_t* EmptyString() { return L""; }
         static const constexpr wchar_t* NewLineString() { return L"\n"; }
         static const constexpr wchar_t* DateTimeString() { return L"%Y-%m-%d_%H-%M-%S"; }
-
+        static const constexpr wchar_t* AllSpaceCharacters()
+        {
+            return  L" \t\n\r\f\v"
+                    L"\u0085"
+                    L"\u00A0"
+                    L"\u1680"
+                    L"\u2000\u2001\u2002\u2003\u2004\u2005"
+                    L"\u2006\u2007\u2008\u2009\u200A"
+                    L"\u2028\u2029"
+                    L"\u202F"
+                    L"\u205F"
+                    L"\u3000";
+        }
         static size_t Length(const wchar_t* s) { return std::char_traits<wchar_t>::length(s); }
     };
 
@@ -217,6 +232,19 @@ namespace dynarithmic
             CharTraits<typename StringType::value_type>::DoubleQuote())
         {
             return quoteString + str + quoteString;
+        }
+
+        template <typename StringType = DTWAIN_STRING_TYPE_>
+        StringType UnquoteString(StringType str)
+        {
+            using CharT = typename StringType::value_type;
+            auto singleQuote = CharTraits<typename StringType::value_type>::SingleQuote();
+            auto doubleQuote = CharTraits<typename StringType::value_type>::DoubleQuote();
+            StringType sAllQuotes = singleQuote + StringType(doubleQuote);
+            str = trim(str);
+            str = TrimAll(str, sAllQuotes.c_str());
+            str = trim(str);
+            return str;
         }
 
         template <typename StringType = DTWAIN_STRING_TYPE_, typename T>
@@ -378,13 +406,13 @@ namespace dynarithmic
         };
 
         template <typename CharT>
-        auto is_any_of(const CharT* chars)
+        static auto is_any_of(const CharT* chars)
         {
             return is_any_of_pred<CharT>(std::basic_string<CharT>(chars));
         }
 
         template <typename StringType, typename Pred>
-        StringType& ltrim_if(StringType& str, Pred pred)
+        static StringType& ltrim_if(StringType& str, Pred pred)
         {
             auto it2 = std::find_if_not(str.begin(), str.end(), pred);
             str.erase(str.begin(), it2);
@@ -392,7 +420,7 @@ namespace dynarithmic
         }
 
         template <typename StringType, typename Pred>
-        StringType& rtrim_if(StringType& str, Pred pred)
+        static StringType& rtrim_if(StringType& str, Pred pred)
         {
             auto it1 = std::find_if_not(str.rbegin(), str.rend(), pred);
             str.erase(it1.base(), str.end());
@@ -400,96 +428,99 @@ namespace dynarithmic
         }
 
         template <typename StringType, typename Pred>
-        StringType ltrim_copy_if(StringType str, Pred pred)
+        static StringType ltrim_copy_if(StringType str, Pred pred)
         {
             return ltrim_if(str, pred);
         }
 
         template <typename StringType, typename Pred>
-        StringType rtrim_copy(StringType str, Pred pred)
+        static StringType rtrim_copy(StringType str, Pred pred)
         {
             return ltrim_if(str, pred);
         }
 
         template <typename StringType, typename Pred>
-        StringType trim_copy_if(StringType str, Pred pred)
+        static StringType trim_copy_if(StringType str, Pred pred)
         {
             return ltrim_if(rtrim_if(str, pred), pred);
         }
 
         template <typename StringType, typename Pred>
-        StringType& trim_if(StringType& str, Pred pred)
+        static StringType& trim_if(StringType& str, Pred pred)
         {
             return ltrim_if(rtrim_if(str, pred), pred);
         }
 
-        template <typename StringType, typename TrimmerFn>
-        decltype(auto) string_trimmer(StringType&& str, TrimmerFn fn)
+        template <typename StringType>
+        static decltype(auto) ltrim(StringType& str)
         {
             if constexpr (std::is_same_v <StringType, std::wstring>)
             {
-                return fn(str, [](unsigned char ch) { return !iswspace(ch); });
+                return ltrim_if(str, [](unsigned int ch) { return iswspace(ch); });
             }
             else
             {
-                return fn(str, [](unsigned char ch) { return !isspace(ch); });
+                return ltrim_if(str, [](char ch) { return isspace(ch); });
             }
-            return std::forward<StringType>(str);
         }
 
         template <typename StringType>
-        decltype(auto) ltrim(StringType&& str)
+        static decltype(auto) rtrim(StringType& str)
         {
-            return string_trimmer(str, &ltrim_if);
+            if constexpr (std::is_same_v <StringType, std::wstring>)
+            {
+                return rtrim_if(str, [](unsigned int ch) { return iswspace(ch); });
+            }
+            else
+            {
+                return rtrim_if(str, [](char ch) { return isspace(ch); });
+            }
         }
 
         template <typename StringType>
-        decltype(auto) rtrim(StringType&& str)
+        static decltype(auto) trim(StringType& str)
         {
-            return string_trimmer(str, &rtrim_if);
+            return ltrim<StringType>(rtrim(str));
         }
 
         template <typename StringType>
-        decltype(auto) trim(StringType&& str)
-        {
-            return ltrim_copy(rtrim_copy(str));
-        }
-
-        template <typename StringType>
-        StringType ltrim_copy(StringType str)
+        static StringType ltrim_copy(StringType str)
         {
             return ltrim(str);
         }
 
         template <typename StringType>
-        StringType rtrim_copy(StringType str)
+        static StringType rtrim_copy(StringType str)
         {
             return rtrim(str);
         }
 
         template <typename StringType>
-        StringType trim_copy(StringType str)
+        static StringType trim_copy(StringType str)
         {
             return ltrim_copy(rtrim_copy(str));
         }
 
         template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType& TrimRight(StringType& str, 
-                   const typename StringType::value_type* lpszTrimStr = typename CharTraits<typename StringType::value_type>::Space())
+            const typename StringType::value_type* lpszTrimStr = 
+            typename CharTraits<typename StringType::value_type>::AllSpaceCharacters())
         {
             return rtrim_if(str, is_any_of(lpszTrimStr));
         }
 
         template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType& TrimLeft(StringType& str, 
-            const typename StringType::value_type* lpszTrimStr = typename CharTraits<typename StringType::value_type>::Space())
+            const typename StringType::value_type* lpszTrimStr = 
+            typename CharTraits<typename StringType::value_type>::AllSpaceCharacters())
         {
             return ltrim_if(str, is_any_of(lpszTrimStr));
         }
 
         template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType& TrimAll(StringType& str, 
-            const typename StringType::value_type* lpszTrimStr = typename CharTraits<typename StringType::value_type>::Space())
+            const typename StringType::value_type* lpszTrimStr = 
+            typename CharTraits<typename StringType::value_type>::AllSpaceCharacters())
         {
             return trim_if(str, is_any_of(lpszTrimStr));
         }

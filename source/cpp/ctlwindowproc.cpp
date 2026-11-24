@@ -104,8 +104,11 @@ namespace
         if (pHandle)
         {
             if (!pHandle->m_bNotificationsUsed)
+            {
+                if (IsDTWAINNotification(wParam))
+                    return TRUE;
                 bPassMsg = FALSE;
-
+            }
             // Check if there is a session window defined, if so call it's window proc
             // This is also a notification message, so we can safely skip the CallWindowProc
             // return if there is also a callback defined
@@ -729,7 +732,7 @@ namespace dynarithmic
             CTL_TwainDLLHandle::NotifyWindows(uMsg, wParam, lParam);
 
             // Do not let window process this message again
-            if (!bPassMsg)
+            if (!bPassMsg && !IsDTWAINNotification(wParam))
             {
                 return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
             }

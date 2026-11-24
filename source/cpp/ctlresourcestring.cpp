@@ -22,6 +22,7 @@
 #include "dtwainx.h"
 #include "ctlstringutils.h"
 #include "ctlstringutilsx.h"
+#include "ctlresourcestring.h"
 #include "cppfunc.h"
 #include <errorcheck.h>
 #include "ctldtwainhandle.h"
@@ -128,6 +129,36 @@ namespace
         jxlPath = directory.string();
         #endif
         return DTWAIN_NO_ERROR;
+    }
+
+}
+
+namespace dynarithmic
+{
+    std::pair<bool, int> SetComponentPath(CTL_TwainDLLHandle* pHandle, int nComponent, const CTL_StringType& szPathToUse)
+    {
+        switch (nComponent)
+        {
+            case DTWAIN_COMPONENT_JPEGXL:
+            {
+                auto retValue = SetJXLComponent(pHandle, szPathToUse.c_str());
+                return { retValue == DTWAIN_NO_ERROR, retValue };
+            }
+            break;
+            case DTWAIN_COMPONENT_RESOURCES:
+            {
+                DTWAIN_SetResourcePath(szPathToUse.c_str());
+                return { true, DTWAIN_NO_ERROR };
+            }
+            break;
+            case DTWAIN_COMPONENT_TRANSYMOCR:
+            {
+                CTL_StaticData::GetComponentPath(nComponent) = szPathToUse;
+                return { true, DTWAIN_NO_ERROR };
+            }
+            break;
+        }
+        return { true, DTWAIN_NO_ERROR };
     }
 }
 
@@ -273,27 +304,9 @@ extern "C"
         LPCTSTR szPathToUse = szPath;
         if (!szPath)
             szPathToUse = _T("");
-        switch (nComponent)
-        {
-            case DTWAIN_COMPONENT_JPEGXL:
-            {
-                auto retValue = SetJXLComponent(pHandle, szPathToUse);
-                DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return retValue != DTWAIN_NO_ERROR; }, 
-                                                retValue,FALSE, FUNC_MACRO);
-            }
-            break;
-            case DTWAIN_COMPONENT_RESOURCES:
-            {
-                DTWAIN_SetResourcePath(szPathToUse);
-            }
-            break;
-            case DTWAIN_COMPONENT_TRANSYMOCR:
-            {
-                CTL_StaticData::GetComponentPath(nComponent) = szPathToUse;
-            }
-            break;
-        }
-        LOG_FUNC_EXIT_PARAMS(TRUE)
+        auto retValue = SetComponentPath(pHandle, nComponent, szPathToUse);
+        pHandle->m_lLastError = retValue.second;
+        LOG_FUNC_EXIT_PARAMS(retValue.first);
         CATCH_BLOCK(FALSE)
     }
 

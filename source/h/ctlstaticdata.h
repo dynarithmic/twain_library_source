@@ -86,6 +86,9 @@ namespace dynarithmic
                INI_AUTOCLOSEUI_KEY,
                INI_PARSEDELIMS_ITEM,
                INI_USEEXTERNALRC_ITEM,
+               INI_IMAGELIBRARY_KEY,
+               INI_JXLPATH_ITEM,
+               INI_TRANSYMPATH_ITEM,
                LASTINIENTRY };
 
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;

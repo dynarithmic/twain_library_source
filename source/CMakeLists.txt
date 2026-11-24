@@ -446,6 +446,7 @@ set(MAIN_HEADERS
         ${PROJECT_SOURCE_DIR}/h/ctlobtyp.h
         ${PROJECT_SOURCE_DIR}/h/ctlmapdefs.h
         ${PROJECT_SOURCE_DIR}/h/ctlrandnumutils.h
+        ${PROJECT_SOURCE_DIR}/h/ctlresourcestring.h
         ${PROJECT_SOURCE_DIR}/h/ctlsetgetcaps.h
         ${PROJECT_SOURCE_DIR}/h/ctlshowuionly.h
         ${PROJECT_SOURCE_DIR}/h/ctlsourceacquire.h

@@ -207,10 +207,10 @@ extern "C"
         LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus))
         auto [pHandle, pSource] = VerifyHandles(Source);
 
-        // Check for null filename
-        if (!lpszFile)
+        // Check for null or empty filename
+        if (!lpszFile || lpszFile[0] == 0 || stringutils::IsAllSpace(lpszFile))
         {
-            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+            DTWAIN_Check_Error_Condition_Throw_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BAD_FILENAME, false, FUNC_MACRO);
         }
 
         DTWAIN_ARRAY aFileNames = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0).second;

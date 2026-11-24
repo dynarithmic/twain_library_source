@@ -23,7 +23,6 @@
 #include <queue>
 #include <fstream>
 #include <string>
-#include <boost/algorithm/string.hpp>
 #include "ctlloadresources.h"
 #include "ctlwindowsimpl.h"
 #include "cppfunc.h"
@@ -105,12 +104,12 @@ namespace
         for (int i = 0; i < numTrailers; ++i)
         {
             std::getline(ifs, line);
-            boost::trim(line);
+            stringutils::TrimAll(line);
             lineQueue.push(line);
         }
         while (std::getline(ifs, line))
         {
-            boost::trim(line);
+            stringutils::TrimAll(line);
             totalBuf += lineQueue.front();
             lineQueue.pop();
             lineQueue.push(line);
@@ -656,7 +655,7 @@ namespace dynarithmic
     std::string GetResourceString_Internal(int nResNumber)
     {
         // First check the external resources
-        auto str = GetResourceStringFromMap(static_cast<LONG>(std::abs(nResNumber)));
+        auto str = GetResourceStringFromMap(std::abs(nResNumber));
         if (str.empty())
             // Try the internal resources
             str = LoadResourceFromRC(std::abs(nResNumber));

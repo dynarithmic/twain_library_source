@@ -50,6 +50,20 @@ namespace
         return pEngine->IsActivated();
     }
 
+    void ReportOCRLoadError(const CTL_TwainDLLHandle* pHandle, int errorCode)
+    {
+        try
+        {
+            auto ocrError = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_ERROR_NAMES, pHandle->m_lLastError);
+            if (ocrError.first)
+                LogWriterUtils::WriteLogInfoIndented(ocrError.second);
+            else
+                LogWriterUtils::WriteLogInfoIndented(_T("Unknown OCR initialization error"));
+        }
+        catch (...)
+        {}
+    }
+
     LONG GetOCRTextSupport(OCREngine* pEngine, LONG fileType, LONG pixelType, LONG bitDepth);
 
     bool LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
@@ -78,16 +92,14 @@ namespace
         {
             if (CTL_StaticData::GetLogFilterFlags())
             {
-                CTL_StringType ocrError = _T("Could not load OCR engine");
-                LogWriterUtils::WriteLogInfoIndented(ocrError);
+                ReportOCRLoadError(pHandle, pHandle->m_lLastError);
             }
         }
         catch (...)
         {
             if (CTL_StaticData::GetLogFilterFlags())
             {
-                CTL_StringType ocrError = _T("Could not load OCR engine");
-                LogWriterUtils::WriteLogInfoIndented(ocrError);
+                ReportOCRLoadError(pHandle, pHandle->m_lLastError);
             }
         }
 
@@ -108,10 +120,9 @@ namespace dynarithmic
     std::pair<bool, int> UnloadOCRInterfaces(CTL_TwainDLLHandle* pHandle)
     {
         std::vector<std::string> failureNames;
-        std::string currentName;
         for (auto& engine : pHandle->m_OCRInterfaceArray)
         {
-            currentName = engine->GetProductName();
+            std::string currentName = engine->GetProductName();
             try
             {
                 engine.reset();
