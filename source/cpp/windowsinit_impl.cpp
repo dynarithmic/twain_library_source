@@ -143,19 +143,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
             CTL_StaticData::SetDLLInstanceHandle(hinstDll);
         }
         return TRUE;
-
-        case DLL_THREAD_DETACH:
-        case DLL_PROCESS_DETACH:
-
-    #ifndef DTWAIN_RETAIL
-        if (fdwReason == DLL_PROCESS_DETACH)
-        {
-            DTWAINScopedLogController sLogContoller(0);
-            if (GetDTWAINHandle_Internal())
-                DTWAIN_SysDestroy();
-        }
-    #endif
-        return TRUE;
     }
     return TRUE;
 }
