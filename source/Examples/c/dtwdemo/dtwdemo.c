@@ -856,6 +856,12 @@ void AcquireFile(BOOL bUseSource, LONG resourceID, LONG fileType)
 
     if (IsAcquirePDFEncrypted(resourceID))
     {
+        /* Set all encryption / encoding options to "off" */
+        DTWAIN_SetPDFEncryptionA(g_CurrentSource, FALSE, NULL, NULL, 0, 0);
+        DTWAIN_SetPDFAESEncryption(g_CurrentSource, DTWAIN_PDF_AES128, FALSE);
+        DTWAIN_SetPDFAESEncryption(g_CurrentSource, DTWAIN_PDF_AES256, FALSE);
+        DTWAIN_SetPDFASCIICompression(g_CurrentSource, FALSE);
+
         BOOL bUseStrong = FALSE;
         switch (resourceID)
         {
