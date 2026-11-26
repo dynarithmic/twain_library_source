@@ -1700,8 +1700,8 @@ void WaitLoop()
 
 void PromptUserToCorrectJxlInstallation()
 {
-    MessageBox(g_hWnd, _T("JPEG-XL library not found or one or more JPEG-XL dependencies were not found. " 
-        "Please install JPEG-XL components now and select JPEG-XL again..."), _T("JPEG-XL error"), MB_OKCANCEL);
+    MessageBox(g_hWnd, _T("JPEG-XL library not found or one or more JPEG-XL dependencies were not found.\r\n\r\nPlease install JPEG-XL components now (choose Help -> Options...) and select JPEG-XL again..."), 
+             _T("JPEG-XL error"), MB_OKCANCEL);
 }
 
 LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserData)

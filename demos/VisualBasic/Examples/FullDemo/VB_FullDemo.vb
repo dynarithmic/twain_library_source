@@ -1411,7 +1411,10 @@ End Sub
     Private Sub JPEGXL_Click(sender As Object, e As EventArgs) Handles JPEGXL.Click
         Dim isSupported As Integer = DTWAINAPI.DTWAIN_IsFileTypeSupported(DTWAINAPI.DTWAIN_JPEGXL)
         If isSupported = 0 Then
-            MessageBox.Show("JPEG-XL library not found or one or more JPEG-XL dependencies were not found. Please install JPEG-XL components now and select JPEG-XL again...")
+            MessageBox.Show(
+                "JPEG-XL library not found or one or more JPEG-XL dependencies were not found." & vbCrLf & vbCrLf &
+                "Please install JPEG-XL components now (choose Help -> Options...) and select JPEG-XL again...",
+                "JPEG-XL Error")
             Return
         Else
             AcquireToFile(0, DTWAINAPI.DTWAIN_JPEGXL)

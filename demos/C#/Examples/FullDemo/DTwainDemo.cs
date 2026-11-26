@@ -1764,7 +1764,9 @@ namespace TWAINDemo
             int isSupported = TwainAPI.DTWAIN_IsFileTypeSupported(TwainAPI.DTWAIN_JPEGXL);
             if ( isSupported == 0 )
             {
-                MessageBox.Show("JPEG-XL library not found or one or more JPEG-XL dependencies were not found. Please install JPEG-XL components now and select JPEG-XL again...");
+                MessageBox.Show(
+                "JPEG-XL library not found or one or more JPEG-XL dependencies were not found.\r\n\r\nPlease install JPEG-XL components now (choose Help -> Options...) and select JPEG-XL again...",
+                "JPEG-XL Error");
             }
             else
                 AcquireToFile(0, TwainAPI.DTWAIN_JPEGXL);
