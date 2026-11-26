@@ -147,6 +147,146 @@ namespace dynarithmic
 
     namespace basicstringutils
     {
+        template <typename CharT>
+        class is_any_of_pred
+        {
+        public:
+            using string_type = std::basic_string<CharT>;
+
+            explicit is_any_of_pred(string_type chars)
+                : chars_(std::move(chars)) {
+            }
+
+            bool operator()(CharT ch) const
+            {
+                return chars_.find(ch) != string_type::npos;
+            }
+
+        private:
+            string_type chars_;
+        };
+
+        template <typename CharT>
+        auto is_any_of(const CharT* chars)
+        {
+            return is_any_of_pred<CharT>(std::basic_string<CharT>(chars));
+        }
+
+        template <typename StringType, typename Pred>
+        StringType& ltrim_if(StringType& str, Pred pred)
+        {
+            auto it2 = std::find_if_not(str.begin(), str.end(), pred);
+            str.erase(str.begin(), it2);
+            return str;
+        }
+
+        template <typename StringType, typename Pred>
+        StringType& rtrim_if(StringType& str, Pred pred)
+        {
+            auto it1 = std::find_if_not(str.rbegin(), str.rend(), pred);
+            str.erase(it1.base(), str.end());
+            return str;
+        }
+
+        template <typename StringType, typename Pred>
+        StringType ltrim_copy_if(StringType str, Pred pred)
+        {
+            return ltrim_if(str, pred);
+        }
+
+        template <typename StringType, typename Pred>
+        StringType rtrim_copy(StringType str, Pred pred)
+        {
+            return ltrim_if(str, pred);
+        }
+
+        template <typename StringType, typename Pred>
+        StringType trim_copy_if(StringType str, Pred pred)
+        {
+            return ltrim_if(rtrim_if(str, pred), pred);
+        }
+
+        template <typename StringType, typename Pred>
+        StringType& trim_if(StringType& str, Pred pred)
+        {
+            return ltrim_if(rtrim_if(str, pred), pred);
+        }
+
+        template <typename StringType>
+        decltype(auto) ltrim(StringType& str)
+        {
+            if constexpr (std::is_same_v <StringType, std::wstring>)
+            {
+                return ltrim_if(str, [](unsigned int ch) { return iswspace(ch); });
+            }
+            else
+            {
+                return ltrim_if(str, [](char ch) { return isspace(ch); });
+            }
+        }
+
+        template <typename StringType>
+        decltype(auto) rtrim(StringType& str)
+        {
+            if constexpr (std::is_same_v <StringType, std::wstring>)
+            {
+                return rtrim_if(str, [](unsigned int ch) { return iswspace(ch); });
+            }
+            else
+            {
+                return rtrim_if(str, [](char ch) { return isspace(ch); });
+            }
+        }
+
+        template <typename StringType>
+        decltype(auto) trim(StringType& str)
+        {
+            return ltrim<StringType>(rtrim(str));
+        }
+
+        template <typename StringType>
+        StringType ltrim_copy(StringType str)
+        {
+            return ltrim(str);
+        }
+
+        template <typename StringType>
+        StringType rtrim_copy(StringType str)
+        {
+            return rtrim(str);
+        }
+
+        template <typename StringType>
+        StringType trim_copy(StringType str)
+        {
+            return ltrim_copy(rtrim_copy(str));
+        }
+
+        template <typename StringType = DTWAIN_STRING_TYPE_>
+        StringType& TrimRight(StringType& str,
+            const typename StringType::value_type* lpszTrimStr =
+            typename CharTraits<typename StringType::value_type>::AllSpaceCharacters())
+        {
+            return rtrim_if(str, is_any_of(lpszTrimStr));
+        }
+
+        template <typename StringType = DTWAIN_STRING_TYPE_>
+        StringType& TrimLeft(StringType& str,
+            const typename StringType::value_type* lpszTrimStr =
+            typename CharTraits<typename StringType::value_type>::AllSpaceCharacters())
+        {
+            return ltrim_if(str, is_any_of(lpszTrimStr));
+        }
+
+        template <typename StringType = DTWAIN_STRING_TYPE_>
+        StringType& TrimAll(StringType& str,
+            const typename StringType::value_type* lpszTrimStr =
+            typename CharTraits<typename StringType::value_type>::AllSpaceCharacters())
+        {
+            return trim_if(str, is_any_of(lpszTrimStr));
+        }
+
+
         template <typename StringType = DTWAIN_STRING_TYPE_>
         StringType PointerToString(const void* ptr)
         {
@@ -386,144 +526,6 @@ namespace dynarithmic
             return IEquals(str, vw);
         }
 
-        template <typename CharT>
-        class is_any_of_pred
-        {
-            public:
-                using string_type = std::basic_string<CharT>;
-
-                explicit is_any_of_pred(string_type chars)
-                    : chars_(std::move(chars)) {
-                }
-
-                bool operator()(CharT ch) const
-                {
-                    return chars_.find(ch) != string_type::npos;
-                }
-
-            private:
-                string_type chars_;
-        };
-
-        template <typename CharT>
-        static auto is_any_of(const CharT* chars)
-        {
-            return is_any_of_pred<CharT>(std::basic_string<CharT>(chars));
-        }
-
-        template <typename StringType, typename Pred>
-        static StringType& ltrim_if(StringType& str, Pred pred)
-        {
-            auto it2 = std::find_if_not(str.begin(), str.end(), pred);
-            str.erase(str.begin(), it2);
-            return str;
-        }
-
-        template <typename StringType, typename Pred>
-        static StringType& rtrim_if(StringType& str, Pred pred)
-        {
-            auto it1 = std::find_if_not(str.rbegin(), str.rend(), pred);
-            str.erase(it1.base(), str.end());
-            return str;
-        }
-
-        template <typename StringType, typename Pred>
-        static StringType ltrim_copy_if(StringType str, Pred pred)
-        {
-            return ltrim_if(str, pred);
-        }
-
-        template <typename StringType, typename Pred>
-        static StringType rtrim_copy(StringType str, Pred pred)
-        {
-            return ltrim_if(str, pred);
-        }
-
-        template <typename StringType, typename Pred>
-        static StringType trim_copy_if(StringType str, Pred pred)
-        {
-            return ltrim_if(rtrim_if(str, pred), pred);
-        }
-
-        template <typename StringType, typename Pred>
-        static StringType& trim_if(StringType& str, Pred pred)
-        {
-            return ltrim_if(rtrim_if(str, pred), pred);
-        }
-
-        template <typename StringType>
-        static decltype(auto) ltrim(StringType& str)
-        {
-            if constexpr (std::is_same_v <StringType, std::wstring>)
-            {
-                return ltrim_if(str, [](unsigned int ch) { return iswspace(ch); });
-            }
-            else
-            {
-                return ltrim_if(str, [](char ch) { return isspace(ch); });
-            }
-        }
-
-        template <typename StringType>
-        static decltype(auto) rtrim(StringType& str)
-        {
-            if constexpr (std::is_same_v <StringType, std::wstring>)
-            {
-                return rtrim_if(str, [](unsigned int ch) { return iswspace(ch); });
-            }
-            else
-            {
-                return rtrim_if(str, [](char ch) { return isspace(ch); });
-            }
-        }
-
-        template <typename StringType>
-        static decltype(auto) trim(StringType& str)
-        {
-            return ltrim<StringType>(rtrim(str));
-        }
-
-        template <typename StringType>
-        static StringType ltrim_copy(StringType str)
-        {
-            return ltrim(str);
-        }
-
-        template <typename StringType>
-        static StringType rtrim_copy(StringType str)
-        {
-            return rtrim(str);
-        }
-
-        template <typename StringType>
-        static StringType trim_copy(StringType str)
-        {
-            return ltrim_copy(rtrim_copy(str));
-        }
-
-        template <typename StringType = DTWAIN_STRING_TYPE_>
-        StringType& TrimRight(StringType& str, 
-            const typename StringType::value_type* lpszTrimStr = 
-            typename CharTraits<typename StringType::value_type>::AllSpaceCharacters())
-        {
-            return rtrim_if(str, is_any_of(lpszTrimStr));
-        }
-
-        template <typename StringType = DTWAIN_STRING_TYPE_>
-        StringType& TrimLeft(StringType& str, 
-            const typename StringType::value_type* lpszTrimStr = 
-            typename CharTraits<typename StringType::value_type>::AllSpaceCharacters())
-        {
-            return ltrim_if(str, is_any_of(lpszTrimStr));
-        }
-
-        template <typename StringType = DTWAIN_STRING_TYPE_>
-        StringType& TrimAll(StringType& str, 
-            const typename StringType::value_type* lpszTrimStr = 
-            typename CharTraits<typename StringType::value_type>::AllSpaceCharacters())
-        {
-            return trim_if(str, is_any_of(lpszTrimStr));
-        }
 
         template <typename StringType = DTWAIN_STRING_TYPE_>
         int TokenizeEx(const StringType& str,
