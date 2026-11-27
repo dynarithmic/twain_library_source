@@ -705,7 +705,13 @@ void SelectTheSource(int nWhich)
         LONG lastError = DTWAIN_GetLastError();
         if ( lastError == DTWAIN_ERR_SOURCESELECTION_CANCELED || customSelectionRetCode == IDCANCEL)
         {
-            MessageBoxW(g_hWnd, L"Source selection cancelled",L"Information", MB_ICONINFORMATION);
+            lastError = DTWAIN_ERR_SOURCESELECTION_CANCELED;
+            TCHAR sMsg[1024];
+            LONG len = DTWAIN_GetErrorString(lastError, sMsg, 1024);
+            if ( len == 0 )
+                MessageBoxW(g_hWnd, L"Source selection cancelled",L"Information", MB_ICONINFORMATION);
+            else
+                MessageBox(g_hWnd, sMsg,L"Information", MB_ICONINFORMATION);
         }
         else
         {
