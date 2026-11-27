@@ -122,6 +122,15 @@ DTWAIN Version changes
     availability before saving an acquired image.
 
 
+- The DTWDEMO32U.exe and DTWDEMO64U.exe full demo programs allows setting the path to the JPEG-XL library (libjxl components).  
+
+  From the main menu, choose:
+      Help -> Options...
+
+  If testing the acquisition of images to JPEG-XL, ensure that the path to the libjxl components is valid and contains 
+  all the libjxl DLL files.
+
+
 - TWAIN Message Loop Detection Change:
 
   Automatic GetMessage() TWAIN loop detection is now disabled by default. DTWAIN uses PeekMessage() unless otherwise configured.
