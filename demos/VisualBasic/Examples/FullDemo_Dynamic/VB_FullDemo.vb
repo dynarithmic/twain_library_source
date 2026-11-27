@@ -1470,6 +1470,13 @@ End Sub
         DTWAINAPI.DTWAIN_SetPDFSubject(SelectedSource, optionsData.sPDFSubject)
 
         Dim useStrong = 0
+
+        REM Turn off encryption And encoding by default
+        DTWAINAPI.DTWAIN_SetPDFEncryption(SelectedSource, 0, "", "", 0, 0)
+        DTWAINAPI.DTWAIN_SetPDFAESEncryption(SelectedSource, DTWAINAPI.DTWAIN_PDF_AES128, 0)
+        DTWAINAPI.DTWAIN_SetPDFAESEncryption(SelectedSource, DTWAINAPI.DTWAIN_PDF_AES256, 0)
+        DTWAINAPI.DTWAIN_SetPDFASCIICompression(SelectedSource, 0)
+
         If pdfEncrypted Then
             Select Case encryptionType
                 Case PDF_128BitAES_Encryption_Value:
