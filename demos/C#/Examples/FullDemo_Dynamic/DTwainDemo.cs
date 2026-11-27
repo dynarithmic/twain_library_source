@@ -1805,6 +1805,12 @@ namespace TWAINDemo
             TwainAPI.DTWAIN_SetPDFSubject(SelectedSource, optionsData.sPDFSubject);
 
             bool useStrong = false;
+
+            // Turn off encryption and encoding by default
+            TwainAPI.DTWAIN_SetPDFEncryption(SelectedSource, 0, "", "",0,0);
+            TwainAPI.DTWAIN_SetPDFAESEncryption(SelectedSource, TwainAPI.DTWAIN_PDF_AES128, 0);
+            TwainAPI.DTWAIN_SetPDFAESEncryption(SelectedSource, TwainAPI.DTWAIN_PDF_AES256, 0);
+            TwainAPI.DTWAIN_SetPDFASCIICompression(SelectedSource, 0);
             if (pdfEncrypted)
             {
                 switch (encryptionType)
