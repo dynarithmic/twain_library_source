@@ -1725,6 +1725,7 @@ typedef DTWAIN_CHARPTRTYPE = Pointer<Utf16>;
 typedef DTWAIN_HANDLE = Pointer<Void>;
 typedef NULL_HANDLE = Pointer<Void>;
 typedef DTWAIN_IDENTITY = Pointer<Void>;
+typedef TWAIN_IDENTITY = Pointer<Void>;
 typedef DTWAIN_OCRENGINE = Pointer<Void>;
 typedef DTWAIN_OCRTEXTINFOHANDLE = Pointer<Void>;
 typedef DTWAIN_MEMORY_PTR = Pointer<Void>;
